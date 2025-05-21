@@ -1,0 +1,66 @@
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-1px);
+  }
+  50% {
+    transform: translateX(1px);
+  }
+  75% {
+    transform: translateX(-1px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+.shake span {
+  animation: shake 0.5s ease-in-out;
+  display: inline-block;
+  /* vertical-align: middle; */
+  position: relative;
+  /* font-size: 1rem; */
+  /* transform: translateY(0); */
+  /* transform: none !important; */
+}
+.icon-input .MuiInputLabel-root {
+  margin-left: 2em;
+}
+/* .icon-input .MuiInputLabel-shrink {
+  margin-left: "0";
+} */
+
+.icon-input .MuiInputLabel-root.MuiInputLabel-shrink {
+  margin-left: 0;
+}
+
+.icon-input .MuiIconButton-root {
+  padding: 0;
+}
+
+.passHint {
+  margin-top: 1em;
+}
+
+.text-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  /* height: 100vh; */
+}
+
+/* .label-shake {
+  animation: shake 0.5s ease-in-out;
+} */
+
+/* Fix label positioning if adornment causes issues 
+.MuiInputLabel-outlined {
+  transform: translate(14px, 20px) scale(1); /* Default position 
+}
+
+.MuiInputLabel-outlined.Mui-focused,
+.MuiInputLabel-outlined.MuiFormLabel-filled {
+  transform: translate(14px, -6px) scale(0.75); /* Shrunk position 
+}*/
