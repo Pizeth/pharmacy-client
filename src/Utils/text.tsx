@@ -18,7 +18,7 @@ import { clsx } from "clsx";
 
 import { useFormContext } from "react-hook-form";
 import { IconTextInputProps, TogglePasswordEvent } from "../Types/types";
-import { useMatchPassword, usePasswordValidator } from "./validator";
+import { useMatchPassword, usePasswordValidator } from "./Validator";
 import { EventHandlers } from "./EventHandlers";
 import ResettableIconInputField from "../components/CustomInputs/ResettableIconInputField";
 import { InputHelper } from "../CustomComponents/InputHelper";

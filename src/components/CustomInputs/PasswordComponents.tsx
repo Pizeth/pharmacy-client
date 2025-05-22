@@ -1,7 +1,7 @@
-import { useFormContext } from "react-hook-form";
 import { useEffect } from "react";
-import PasswordValidationInput from "../fortest";
+import { useFormContext } from "react-hook-form";
 import { PasswordFieldProps } from "@/types/Types";
+import PasswordValidationInput from "./PasswordValidationInput";
 
 const PasswordFields = (props: PasswordFieldProps) => {
   const { className, iconStart, password, rePassword } = props;

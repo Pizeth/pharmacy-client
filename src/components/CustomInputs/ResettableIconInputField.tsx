@@ -8,7 +8,6 @@ import {
   TextField as MuiTextField,
 } from "@mui/material";
 import { useTranslate } from "ra-core";
-// import EndAdornment from "@/CustomComponents/EndAdorment";
 import { IconTextInputProps } from "@/types/Types";
 import EndAdornment from "../CustomComponents/EndAdorment";
 
@@ -23,7 +22,7 @@ export const ResettableIconInputField = forwardRef<
     clearAlwaysVisible,
     slotProps,
     value,
-    // resettable,
+    resettable,
     disabled,
     readOnly,
     variant = "outlined",
@@ -34,10 +33,10 @@ export const ResettableIconInputField = forwardRef<
     isValidating,
     isSuccess,
     isFocused,
-    // isPassword,
-    // isVisible,
+    isPassword,
+    isVisible,
     helper,
-    // togglePassword,
+    togglePassword,
     ...rest
   } = props;
 
@@ -69,8 +68,25 @@ export const ResettableIconInputField = forwardRef<
     );
   }
 
+  // Build an object with the custom props that EndAdornment relies on.
+  // We include only the properties that EndAdornment will need.
+  const adornmentProps: IconTextInputProps = {
+    ...rest,
+    resettable,
+    isPassword,
+    isVisible,
+    togglePassword,
+    value,
+    // Include any other props EndAdornment may use,
+    // for example, a "select" flag or clearAlwaysVisible, disabled, readOnly values.
+    select: props.select,
+    clearAlwaysVisible,
+    disabled,
+    readOnly,
+  };
+
   const endAdornmentElement = EndAdornment({
-    props,
+    props: adornmentProps,
     classess: classes,
     endAdornment,
     // translate,
@@ -125,12 +141,13 @@ export const ResettableIconInputField = forwardRef<
       variant={variant}
       margin={margin}
       className={className}
-      {...rest}
+      {...rest} // Spread only safe props (custom ones omitted)
       inputRef={ref}
     />
   );
 });
 
+// Provide a display name for debugging and ESLint compliance.
 ResettableIconInputField.displayName = "ResettableIconInputField";
 
 const handleMouseDownClearButton = (e: React.MouseEvent<HTMLButtonElement>) => {

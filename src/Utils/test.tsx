@@ -7,7 +7,7 @@ import {
   ToolbarProps,
 } from "react-admin";
 import { useFormState } from "react-hook-form";
-import ValidationInput from "../CustomFields/LiveValidationInput";
+// import ValidationInput from "@/CustomFields/LiveValidationInput";
 import {
   PermIdentity,
   MailOutline,
@@ -15,9 +15,12 @@ import {
   SwitchAccount,
 } from "@mui/icons-material";
 import { useState } from "react";
-import PasswordValidationInput from "../fortest";
-import IconInput from "../CustomFields/IconInput";
-import { useRequired } from "../Utils/validator";
+// import PasswordValidationInput from "../fortest";
+// import IconInput from "../CustomFields/IconInput";
+import { useRequired } from "./Validator";
+import ValidationInput from "@/components/CustomInputs/IconInput";
+import PasswordValidationInput from "@/components/CustomInputs/PasswordValidationInput";
+import IconInput from "@/components/CustomInputs/IconInput";
 
 const CustomToolbar = (props: ToolbarProps) => {
   const { errors, isValid, isDirty } = useFormState();

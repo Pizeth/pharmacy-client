@@ -8,12 +8,12 @@ import {
 } from "react-admin";
 import { IconTextInputProps } from "@/types/Types";
 import clsx from "clsx";
-import "../Styles/style.css";
+// import "../Styles/style.css";
 // import { InputHelper } from "./CustomComponents/InputHelper";
 import ResettableIconInputField from "@/components/CustomInputs/ResettableIconInputField";
 import { InputHelper } from "../CustomComponents/InputHelper";
 
-const ValidationInput = forwardRef((props: IconTextInputProps, ref) => {
+const IconInput = forwardRef((props: IconTextInputProps, ref) => {
   const {
     className,
     defaultValue,
@@ -171,4 +171,6 @@ const ValidationInput = forwardRef((props: IconTextInputProps, ref) => {
   );
 });
 
-export default ValidationInput;
+IconInput.displayName = "ValidationInput";
+
+export default IconInput;

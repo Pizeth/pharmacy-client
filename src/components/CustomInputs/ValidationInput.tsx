@@ -1,19 +1,20 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { isEmpty, useInput, useTranslate } from "react-admin";
-import { IconTextInputProps } from "../Types/types";
 import clsx from "clsx";
-import { useAsyncValidator, useRequired } from "../Utils/validator";
+import { useAsyncValidator } from "../../Utils/Validator";
 import { FieldTitle, sanitizeInputRestProps } from "react-admin";
-import "../Styles/style.css";
-import { InputHelper } from "../CustomComponents/InputHelper";
+// import "../Styles/style.css";
 import { useAtom, useAtomValue } from "jotai";
 import {
   clearValidationMessageAtom,
   setValidationMessageAtom,
   validationMessagesAtom,
-} from "../Stores/validationStore";
-import ResettableIconInputField from "../components/CustomInputs/ResettableIconInputField";
+} from "../../Stores/validationStore";
+import ResettableIconInputField from "./ResettableIconInputField";
 import { useFormContext } from "react-hook-form";
+import { InputHelper } from "@/components/CustomComponents/InputHelper";
+import { IconTextInputProps } from "@/types/Types";
+
 export const ValidationInput = forwardRef((props: IconTextInputProps, ref) => {
   const {
     className,
@@ -87,7 +88,7 @@ export const ValidationInput = forwardRef((props: IconTextInputProps, ref) => {
     } else {
       clearErrors(source);
     }
-  }, [isValidating, invalid, source, clearErrors, source]);
+  }, [isValidating, invalid, source, clearErrors]);
 
   // Handle shake effect without useState
   // useEffect(() => {
@@ -190,6 +191,9 @@ export const ValidationInput = forwardRef((props: IconTextInputProps, ref) => {
     />
   );
 });
+
+// Add a display name to the component for better debugging and to satisfy ESLint.
+ValidationInput.displayName = "ValidationInput";
 
 export default ValidationInput;
 

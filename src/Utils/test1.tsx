@@ -14,7 +14,7 @@ import { clsx } from "clsx";
 import { IconTextInputProps } from "../Types/types";
 import zxcvbn from "../Utils/lazyZxcvbn";
 import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
-import { matchPassword, validateStrength } from "../Utils/validator";
+import { matchPassword, validateStrength } from "./Validator";
 
 export const PasswordValidationInput = (props: IconTextInputProps) => {
   const {
@@ -185,7 +185,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
                   aria-label={translate(
                     visible
                       ? "ra.input.password.toggle_visible"
-                      : "ra.input.password.toggle_hidden",
+                      : "ra.input.password.toggle_hidden"
                   )}
                   onClick={handleClick}
                   size="large"
