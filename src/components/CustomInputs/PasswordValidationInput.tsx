@@ -9,7 +9,7 @@ import {
 import Utils from "@/Utils/Utils";
 import { Animations } from "@/Utils/Animations";
 import { EventHandlers } from "@/Utils/EventHandlers";
-import { useMatchPassword, usePasswordValidator } from "@/Utils/Validator";
+// import { useMatchPassword, usePasswordValidator } from "@/Utils/Validator";
 import { IconTextInputProps, TogglePasswordEvent } from "@/types/Types";
 import { Box } from "@mui/material";
 import {
@@ -24,6 +24,7 @@ import { useFormContext } from "react-hook-form";
 import { InputHelper } from "../CustomComponents/InputHelper";
 import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
 import ResettableIconInputField from "./ResettableIconInputField";
+import { useMatchPassword, usePasswordValidator } from "@/Utils/Validator";
 
 // import Utils from "./Utils/Utils";
 
