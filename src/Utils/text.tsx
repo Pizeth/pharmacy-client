@@ -17,12 +17,14 @@ import {
 import { clsx } from "clsx";
 
 import { useFormContext } from "react-hook-form";
-import { IconTextInputProps, TogglePasswordEvent } from "../Types/types";
+import { IconTextInputProps, TogglePasswordEvent } from "@/types/Types";
 import { useMatchPassword, usePasswordValidator } from "./Validator";
 import { EventHandlers } from "./EventHandlers";
 import ResettableIconInputField from "../components/CustomInputs/ResettableIconInputField";
-import { InputHelper } from "../CustomComponents/InputHelper";
-import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
+import { InputHelper } from "@/components/CustomComponents/InputHelper";
+import PasswordStrengthMeter from "@/components/CustomComponents/PasswordStrengthMeter";
+// import { InputHelper } from "../CustomComponents/InputHelper";
+// import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
 
 export const PasswordValidationInput = (props: IconTextInputProps) => {
   const {
