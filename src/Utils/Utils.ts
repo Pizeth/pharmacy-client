@@ -36,40 +36,40 @@ export class Utils {
   private static readonly weakMapTag = "[object WeakMap]";
   private static readonly weakSetTag = "[object WeakSet]";
 
-  // cache proxy check once
-  // static proxyTag: string | null = "[object Object]";
-  private static readonly proxyTag: string = (() => {
-    try {
-      const tag = this.toString.call(Proxy.revocable({}, {}).proxy);
-      if (tag !== "[object Object]") return tag;
-    } catch {}
-    return "[object Object]"; // fallback
-  })();
+  // // cache proxy check once
+  // // static proxyTag: string | null = "[object Object]";
+  // private static readonly proxyTag: string = (() => {
+  //   try {
+  //     const tag = this.toString.call(Proxy.revocable({}, {}).proxy);
+  //     if (tag !== "[object Object]") return tag;
+  //   } catch {}
+  //   return "[object Object]"; // fallback
+  // })();
 
-  // Modify the static initialization block
-  static {
-    // Initialize proxy tag once
-    try {
-      // Create and immediately revoke proxy for safety
-      const { proxy, revoke } = Proxy.revocable({}, {});
-      this.proxyTag = this.toString.call(proxy);
-      revoke();
-    } catch (e) {
-      // Fallback for environments where Proxy creation fails
-      this.proxyTag = null;
-      if (typeof Proxy !== "undefined") {
-        // If Proxy exists but instantiation failed, check constructor name fallback
-        try {
-          const proxy = new Proxy({}, {});
-          this.proxyTag = this.toString.call(proxy);
-          delete (proxy as any).constructor; // Try to break potential infinite loops
-        } catch (subError) {
-          // Final fallback to constructor name check
-          this.proxyTag = "[object Proxy]";
-        }
-      }
-    }
-  }
+  // // Modify the static initialization block
+  // static {
+  //   // Initialize proxy tag once
+  //   try {
+  //     // Create and immediately revoke proxy for safety
+  //     const { proxy, revoke } = Proxy.revocable({}, {});
+  //     this.proxyTag = this.toString.call(proxy);
+  //     revoke();
+  //   } catch (e) {
+  //     // Fallback for environments where Proxy creation fails
+  //     this.proxyTag = null;
+  //     if (typeof Proxy !== "undefined") {
+  //       // If Proxy exists but instantiation failed, check constructor name fallback
+  //       try {
+  //         const proxy = new Proxy({}, {});
+  //         this.proxyTag = this.toString.call(proxy);
+  //         delete (proxy as any).constructor; // Try to break potential infinite loops
+  //       } catch (subError) {
+  //         // Final fallback to constructor name check
+  //         this.proxyTag = "[object Proxy]";
+  //       }
+  //     }
+  //   }
+  // }
 
   private static readonly proxyTag: string = (() => {
     let tag: string | null = null;
@@ -128,9 +128,9 @@ export class Utils {
     if (typeof Proxy !== "function") {
       return false;
     }
-    if (this.proxyTag !== null && objectToString.call(obj) === this.proxyTag) {
+    if (this.proxyTag !== null && this.toString.call(obj) === this.proxyTag) {
       try {
-        const hasCtor = hasOwnProperty.call(obj, "constructor");
+        const hasCtor = this.hasOwnProperty.call(obj, "constructor");
         const ctor = hasCtor ? (obj as any).constructor : null;
         if (
           ctor &&
@@ -182,7 +182,7 @@ export class Utils {
     if (
       typeof anyObj.deref === "function" &&
       anyObj.constructor?.name === "WeakRef" &&
-      objectToString.call(obj) === "[object WeakRef]"
+      this.toString.call(obj) === "[object WeakRef]"
     ) {
       return true;
     }
@@ -283,15 +283,15 @@ export class Utils {
     if (
       typeof val !== "object" ||
       val === null ||
-      objectToString.call(val) !== "[object Object]"
+      this.toString.call(val) !== "[object Object]"
     ) {
       return false;
     }
 
     // Check if the object has a prototype chain that leads to null
     // This is a more reliable way to check for plain objects
-    const proto = getProto(val);
-    return proto === null || proto === objectProto;
+    const proto = this.getPrototypeOf(val);
+    return proto === null || proto === this.getProto;
   };
 
   /**
@@ -316,13 +316,13 @@ export class Utils {
    */
   static isEmptyPlainObject = (obj: object): boolean => {
     // Check for enumerable keys first (fastest)
-    const keys = objectKeys(obj);
+    const keys = this.getKeys(obj);
 
     // Quick path: no enumerable keys
     if (keys.length === 0) {
       // Get all own properties (enumerable AND non-enumerable string keys, and all symbols)
-      const allProps = getOwnPropertyNames(obj);
-      const allSymbols = getOwnPropertySymbols(obj);
+      const allProps = this.getOwnPropertyNames(obj);
+      const allSymbols = this.getOwnPropertySymbols(obj);
 
       // Truly empty: no properties at all
       if (allProps.length === 0 && allSymbols.length === 0) {
@@ -421,7 +421,7 @@ export class Utils {
     if (value instanceof ArrayBuffer || ArrayBuffer.isView(value)) return true;
 
     //fallback to Object.prototype.toString for cross-realm safety
-    const tag = objectToString.call(value);
+    const tag = this.toString.call(value);
     return (
       tag === "[object ArrayBuffer]" ||
       (tag.startsWith("[object ") &&
@@ -606,7 +606,7 @@ export class Utils {
     // Note: `value instanceof String` is not cross-realm safe, but String() handles both.
     if (
       typeof value === "string" ||
-      objectToString.call(value) === "[object String]"
+      this.toString.call(value) === "[object String]"
     ) {
       return String(value).length === 0;
     }
@@ -723,7 +723,7 @@ export class Utils {
 
     // 13. Check special collection types first (Maps, Sets, ArrayBuffers, typed arrays, etc)
     // Use Object.prototype.toString for reliable cross-realm type checking
-    const tag = objectToString.call(obj);
+    const tag = this.toString.call(obj);
     switch (tag) {
       // These cases are handled by instanceof checks above but kept for cross-realm safety
       case "[object Map]":
@@ -794,8 +794,8 @@ export class Utils {
     if (this.isArrayLike(obj)) {
       // For other array-like objects, only consider them empty if they're not custom class instances
       // Otherwise (custom class instance with length), treat as non-empty by default
-      const proto = getProto(obj);
-      return proto === objectProto || proto === null
+      const proto = this.getPrototypeOf(obj);
+      return proto === this.getProto || proto === null
         ? (obj as ArrayLike).length === 0
         : false;
     }
