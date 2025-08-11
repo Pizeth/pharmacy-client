@@ -23,7 +23,7 @@ import { useMatchPassword, usePasswordValidator } from "./validator";
 import ResettableIconInputField from "../components/CustomInputs/ResettableIconInputField";
 import { InputHelper } from "@/components/CustomComponents/InputHelper";
 import PasswordStrengthMeter from "@/components/CustomComponents/PasswordStrengthMeter";
-import { EventHandlers } from "./EventHandlers";
+import { EventHandlers } from "./eventHandlers";
 // import { InputHelper } from "../CustomComponents/InputHelper";
 // import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
 

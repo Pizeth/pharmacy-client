@@ -7,8 +7,8 @@ import {
   useState,
 } from "react";
 import Utils from "@/utils/utils";
-import { Animations } from "@/utils/Animations";
-import { EventHandlers } from "@/utils/EventHandlers";
+import { Animations } from "@/utils/animations";
+import { EventHandlers } from "@/utils/eventHandlers";
 // import { useMatchPassword, usePasswordValidator } from "@/Utils/Validator";
 import { IconTextInputProps, TogglePasswordEvent } from "@/types/Types";
 import { Box } from "@mui/material";

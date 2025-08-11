@@ -74,7 +74,7 @@ import {
 } from "@/types/Types";
 
 import lodashMemoize from "lodash/memoize";
-import MsgUtils from "./MsgUtils";
+import MsgUtils from "./msgUtils";
 import { useCallback, useRef, useState } from "react";
 import { merge } from "lodash";
 
