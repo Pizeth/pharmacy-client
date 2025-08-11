@@ -558,14 +558,14 @@ const mockDocuments: Document[] = [
 ];
 
 const categories: Option[] = [
-  { value: "Finance", label: "Finance" },
-  { value: "Marketing", label: "Marketing" },
-  { value: "HR", label: "Human Resources" },
+  { value: "ជូនជ្រាប", label: "ជូនជ្រាប" },
+  { value: "មុខការ", label: "មុខការ" },
+  { value: "លិខិតអញ្ជើញ", label: "លិខិតអញ្ជើញ" },
   { value: "IT", label: "Information Technology" },
-  { value: "Product", label: "Product Management" },
+  { value: "ផ្សេងៗ", label: "ផ្សេងៗ" },
 ];
 const subcategories: { [key: string]: Option[] } = {
-  Finance: [
+  ជូនជ្រាប: [
     { value: "Reports", label: "Reports" },
     { value: "Minutes", label: "Minutes" },
   ],
@@ -581,24 +581,27 @@ const subcategories: { [key: string]: Option[] } = {
   Product: [{ value: "Roadmaps", label: "Roadmaps" }],
 };
 const statuses: Option[] = [
-  { value: "Pending", label: "Pending" },
-  { value: "Processing", label: "Processing" },
-  { value: "Completed", label: "Completed" },
+  { value: "កំពុងពិនិត្យ", label: "កំពុងពិនិត្យ" },
+  { value: "កំពុងដំណើរការ", label: "កំពុងដំណើរការ" },
+  { value: "រួចរាល់", label: "រួចរាល់" },
 ];
 const destinations: Option[] = [
-  { value: "Alice", label: "Alice" },
-  { value: "Bob", label: "Bob" },
-  { value: "Charlie", label: "Charlie" },
-  { value: "David", label: "David" },
-  { value: "Eve", label: "Eve" },
-  { value: "Frank", label: "Frank" },
-  { value: "Grace", label: "Grace" },
-  { value: "Heidi", label: "Heidi" },
+  { value: "ឯកឧត្តមឧបនាយករដ្ឋមន្រ្តី", label: "ឯកឧត្តមឧបនាយករដ្ឋមន្រ្តី" },
+  {
+    value: "ឯកឧត្តមរដ្ឋលេខាធិការប្រចាំការ",
+    label: "ឯកឧត្តមរដ្ឋលេខាធិការប្រចាំការ",
+  },
+  { value: "អ.កមស", label: "អ.កមស" },
+  { value: "អ.មស", label: "អ.មស" },
+  { value: "អ.គម", label: "អ.គម" },
+  { value: "អគ្គាធិការដ្ឋាន", label: "អគ្គាធិការដ្ឋាន" },
+  { value: "ន.សវក", label: "ន.សវក" },
+  { value: "ន.រដ្ឋបាល", label: "ខុទ្ទកាល័យ" },
 ];
 const priorities: Option[] = [
-  { value: "High", label: "High" },
-  { value: "Medium", label: "Medium" },
-  { value: "Low", label: "Low" },
+  { value: "ប្រញ៉ាប់ណាស់", label: "ប្រញ៉ាប់ណាស់" },
+  { value: "ប្រញ៉ាប់", label: "ប្រញ៉ាប់" },
+  { value: "ធម្មតា", label: "ធម្មតា" },
 ];
 const priorityColorMap: { [key: string]: string } = {
   High: "bg-red-100 text-red-800",
@@ -783,13 +786,13 @@ export default function AdvancedSearchPage() {
                     htmlFor="destination"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Destination
+                    គោលដៅ
                   </label>
                   <CustomSelect
                     options={destinations}
                     value={destination}
                     onChange={setDestination}
-                    placeholder="All"
+                    placeholder="ជ្រើសរើស"
                   />
                 </div>
                 <div>
