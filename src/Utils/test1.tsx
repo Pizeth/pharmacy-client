@@ -14,7 +14,7 @@ import { clsx } from "clsx";
 // import { IconTextInputProps } from "../Types/types";
 import zxcvbn from "../Utils/lazyZxcvbn";
 // import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
-import { matchPassword, validateStrength } from "./Validator";
+import { matchPassword, validateStrength } from "./validator";
 import { IconTextInputProps } from "@/types/Types";
 import PasswordStrengthMeter from "@/components/CustomComponents/PasswordStrengthMeter";
 

@@ -6,9 +6,9 @@ import {
   useRef,
   useState,
 } from "react";
-import Utils from "@/Utils/Utils";
-import { Animations } from "@/Utils/Animations";
-import { EventHandlers } from "@/Utils/EventHandlers";
+import Utils from "@/utils/utils";
+import { Animations } from "@/utils/Animations";
+import { EventHandlers } from "@/utils/EventHandlers";
 // import { useMatchPassword, usePasswordValidator } from "@/Utils/Validator";
 import { IconTextInputProps, TogglePasswordEvent } from "@/types/Types";
 import { Box } from "@mui/material";
@@ -24,8 +24,7 @@ import { useFormContext } from "react-hook-form";
 import { InputHelper } from "../CustomComponents/InputHelper";
 import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
 import ResettableIconInputField from "./ResettableIconInputField";
-import { useMatchPassword, usePasswordValidator } from "@/Utils/Validator";
-// import { useMatchPassword, usePasswordValidator } from "@/Utils/Validator";
+import { useMatchPassword, usePasswordValidator } from "@/utils/validator";
 
 // import Utils from "./Utils/Utils";
 

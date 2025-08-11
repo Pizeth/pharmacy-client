@@ -17,7 +17,7 @@ import {
 import { useState } from "react";
 // import PasswordValidationInput from "../fortest";
 // import IconInput from "../CustomFields/IconInput";
-import { useRequired } from "./Validator";
+import { useRequired } from "./validator";
 import ValidationInput from "@/components/CustomInputs/IconInput";
 import PasswordValidationInput from "@/components/CustomInputs/PasswordValidationInput";
 import IconInput from "@/components/CustomInputs/IconInput";

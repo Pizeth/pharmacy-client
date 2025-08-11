@@ -20,7 +20,7 @@ import {
   MailOutline,
 } from "@mui/icons-material";
 import { useState } from "react";
-import { useRequired } from "@/Utils/Validator";
+import { useRequired } from "@/utils/validator";
 import ValidationInput from "@/components/CustomInputs/ValidationInput";
 import PasswordFields from "../CustomInputs/PasswordComponents";
 import IconInput from "../CustomInputs/IconInput";

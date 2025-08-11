@@ -18,11 +18,12 @@ import { clsx } from "clsx";
 
 import { useFormContext } from "react-hook-form";
 import { IconTextInputProps, TogglePasswordEvent } from "@/types/Types";
-import { useMatchPassword, usePasswordValidator } from "./Validator";
-import { EventHandlers } from "./EventHandlers";
+import { useMatchPassword, usePasswordValidator } from "./validator";
+// import { EventHandlers } from "./EventHandlers";
 import ResettableIconInputField from "../components/CustomInputs/ResettableIconInputField";
 import { InputHelper } from "@/components/CustomComponents/InputHelper";
 import PasswordStrengthMeter from "@/components/CustomComponents/PasswordStrengthMeter";
+import { EventHandlers } from "./EventHandlers";
 // import { InputHelper } from "../CustomComponents/InputHelper";
 // import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
 

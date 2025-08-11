@@ -7,7 +7,7 @@ import {
   Identifier,
   RaRecord,
 } from "react-admin";
-import FormSerializer from "@/Utils/formData";
+import FormSerializer from "@/utils/formData";
 
 const API_URL = process.env.API_URL; // Define your API URL here
 

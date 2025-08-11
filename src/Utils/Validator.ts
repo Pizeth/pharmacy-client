@@ -54,7 +54,7 @@
 
 import axios, { CancelTokenSource } from "axios";
 import statusCode from "http-status-codes";
-import StringUtils from "./Utils";
+import StringUtils from "./utils";
 import zxcvbn from "./lazyZxcvbn";
 import {
   InputProps,

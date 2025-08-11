@@ -14,7 +14,7 @@ import ResettableIconInputField from "./ResettableIconInputField";
 import { useFormContext } from "react-hook-form";
 import { InputHelper } from "@/components/CustomComponents/InputHelper";
 import { IconTextInputProps } from "@/types/Types";
-import { useAsyncValidator } from "@/Utils/Validator";
+import { useAsyncValidator } from "@/utils/validator";
 
 export const ValidationInput = forwardRef((props: IconTextInputProps, ref) => {
   const {
