@@ -12,7 +12,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { ResettableTextField, sanitizeInputRestProps } from "react-admin";
 import { clsx } from "clsx";
 // import { IconTextInputProps } from "../Types/types";
-import zxcvbn from "../Utils/lazyZxcvbn";
+import zxcvbn from "../utils/lazyZxcvbn";
 // import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
 import { matchPassword, validateStrength } from "./validator";
 import { IconTextInputProps } from "@/types/Types";
