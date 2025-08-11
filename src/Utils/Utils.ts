@@ -909,7 +909,9 @@ export class Utils {
    * @static
    */
   private static deepEqual(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     a: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     b: any,
     seen: WeakMap<object, object>
   ): boolean {
