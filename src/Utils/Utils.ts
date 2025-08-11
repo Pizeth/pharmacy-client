@@ -1,7 +1,7 @@
 import {
   ArrayLike,
   IsEmptyOptions,
-  UnwrapProxy,
+  // UnwrapProxy,
   unwrapProxySymbol,
   WithIsEmpty,
 } from "@/types/Types";
@@ -47,65 +47,65 @@ export class Utils {
   })();
 
   // Modify the static initialization block
-  static {
-    // Initialize proxy tag once
-    try {
-      // Create and immediately revoke proxy for safety
-      const { proxy, revoke } = Proxy.revocable({}, {});
-      this.proxyTag = this.toString.call(proxy);
-      revoke();
-    } catch (e) {
-      // Fallback for environments where Proxy creation fails
-      this.proxyTag = null;
-      if (typeof Proxy !== "undefined") {
-        // If Proxy exists but instantiation failed, check constructor name fallback
-        try {
-          const proxy = new Proxy({}, {});
-          this.proxyTag = this.toString.call(proxy);
-          delete (proxy as any).constructor; // Try to break potential infinite loops
-        } catch (subError) {
-          // Final fallback to constructor name check
-          this.proxyTag = "[object Proxy]";
-        }
-      }
-    }
-  }
+  // static {
+  //   // Initialize proxy tag once
+  //   try {
+  //     // Create and immediately revoke proxy for safety
+  //     const { proxy, revoke } = Proxy.revocable({}, {});
+  //     this.proxyTag = this.toString.call(proxy);
+  //     revoke();
+  //   } catch (e) {
+  //     // Fallback for environments where Proxy creation fails
+  //     this.proxyTag = null;
+  //     if (typeof Proxy !== "undefined") {
+  //       // If Proxy exists but instantiation failed, check constructor name fallback
+  //       try {
+  //         const proxy = new Proxy({}, {});
+  //         this.proxyTag = this.toString.call(proxy);
+  //         delete (proxy as any).constructor; // Try to break potential infinite loops
+  //       } catch (subError) {
+  //         // Final fallback to constructor name check
+  //         this.proxyTag = "[object Proxy]";
+  //       }
+  //     }
+  //   }
+  // }
 
-  private static readonly proxyTag: string = (() => {
-    let tag: string | null = null;
+  // private static readonly proxyTag: string = (() => {
+  //   let tag: string | null = null;
 
-    // First attempt: Use a revocable proxy to ensure no lingering side effects.
-    try {
-      const { proxy, revoke } = Proxy.revocable({}, {});
-      tag = this.toString.call(proxy);
-      revoke();
-    } catch (e) {
-      // Revocable proxy creation might fail in some environments.
-      tag = null;
-    }
+  //   // First attempt: Use a revocable proxy to ensure no lingering side effects.
+  //   try {
+  //     const { proxy, revoke } = Proxy.revocable({}, {});
+  //     tag = this.toString.call(proxy);
+  //     revoke();
+  //   } catch (e) {
+  //     // Revocable proxy creation might fail in some environments.
+  //     tag = null;
+  //   }
 
-    // Check if the result is meaningful (not the generic "[object Object]").
-    if (tag && tag !== "[object Object]") {
-      return tag;
-    }
+  //   // Check if the result is meaningful (not the generic "[object Object]").
+  //   if (tag && tag !== "[object Object]") {
+  //     return tag;
+  //   }
 
-    // Second attempt: If Proxy exists, try a standard proxy.
-    if (typeof Proxy !== "undefined") {
-      try {
-        const proxy = new Proxy({}, {});
-        tag = this.toString.call(proxy);
-        // Remove the constructor property as a safeguard against potential infinite loops.
-        delete (proxy as any).constructor;
-        return tag;
-      } catch (subError) {
-        // If even a standard proxy fails, provide a less generic fallback.
-        return "[object Proxy]";
-      }
-    }
+  //   // Second attempt: If Proxy exists, try a standard proxy.
+  //   if (typeof Proxy !== "undefined") {
+  //     try {
+  //       const proxy = new Proxy({}, {});
+  //       tag = this.toString.call(proxy);
+  //       // Remove the constructor property as a safeguard against potential infinite loops.
+  //       delete (proxy as any).constructor;
+  //       return tag;
+  //     } catch (subError) {
+  //       // If even a standard proxy fails, provide a less generic fallback.
+  //       return "[object Proxy]";
+  //     }
+  //   }
 
-    // Final fallback: Return the default tag if Proxy isn't available or both attempts failed.
-    return "[object Object]";
-  })();
+  //   // Final fallback: Return the default tag if Proxy isn't available or both attempts failed.
+  //   return "[object Object]";
+  // })();
 
   // Define this at the class level or module scope
   /**
@@ -120,46 +120,46 @@ export class Utils {
   private static readonly unwrapProxySymbol = unwrapProxySymbol;
 
   // Optional: Basic unwrap helper (override for custom Proxies)
-  private static defaultUnwrapProxy: UnwrapProxy = (proxy) => {
-    return (proxy as any)[this.unwrapProxySymbol]?.() ?? proxy;
-  };
+  // private static defaultUnwrapProxy: UnwrapProxy = (proxy) => {
+  //   return (proxy as any)[this.unwrapProxySymbol]?.() ?? proxy;
+  // };
 
-  private static isProxyObject(obj: object): boolean {
-    if (typeof Proxy !== "function") {
-      return false;
-    }
-    if (this.proxyTag !== null && objectToString.call(obj) === this.proxyTag) {
-      try {
-        const hasCtor = hasOwnProperty.call(obj, "constructor");
-        const ctor = hasCtor ? (obj as any).constructor : null;
-        if (
-          ctor &&
-          (/Proxy/.test(ctor.name) ||
-            ctor.name === "Proxy" ||
-            (typeof ctor.toString === "function" &&
-              ctor.toString().includes("[native code]") &&
-              ctor.toString().includes("Proxy")))
-        ) {
-          try {
-            Object.keys(obj);
-          } catch (e) {
-            logger.warn("Utils.isEmpty: Proxy property access error:", e);
-            return true;
-          }
-          return true;
-        }
-      } catch (e) {
-        logger.warn("Utils.isEmpty: Proxy check error:", e);
-        return true;
-      }
-    }
-    try {
-      if (obj instanceof Proxy) {
-        return true;
-      }
-    } catch (e) {}
-    return false;
-  }
+  // private static isProxyObject(obj: object): boolean {
+  //   if (typeof Proxy !== "function") {
+  //     return false;
+  //   }
+  //   if (this.proxyTag !== null && objectToString.call(obj) === this.proxyTag) {
+  //     try {
+  //       const hasCtor = hasOwnProperty.call(obj, "constructor");
+  //       const ctor = hasCtor ? (obj as any).constructor : null;
+  //       if (
+  //         ctor &&
+  //         (/Proxy/.test(ctor.name) ||
+  //           ctor.name === "Proxy" ||
+  //           (typeof ctor.toString === "function" &&
+  //             ctor.toString().includes("[native code]") &&
+  //             ctor.toString().includes("Proxy")))
+  //       ) {
+  //         try {
+  //           Object.keys(obj);
+  //         } catch (e) {
+  //           logger.warn("Utils.isEmpty: Proxy property access error:", e);
+  //           return true;
+  //         }
+  //         return true;
+  //       }
+  //     } catch (e) {
+  //       logger.warn("Utils.isEmpty: Proxy check error:", e);
+  //       return true;
+  //     }
+  //   }
+  //   try {
+  //     if (obj instanceof Proxy) {
+  //       return true;
+  //     }
+  //   } catch (e) {}
+  //   return false;
+  // }
 
   static isWeakRef(obj: unknown): obj is WeakRef<object> {
     // Narrow from unknown → object
@@ -178,14 +178,14 @@ export class Utils {
     }
 
     // Cross-realm / fallback check: look for a .deref() method and “WeakRef” constructor name
-    const anyObj = obj as any;
-    if (
-      typeof anyObj.deref === "function" &&
-      anyObj.constructor?.name === "WeakRef" &&
-      objectToString.call(obj) === "[object WeakRef]"
-    ) {
-      return true;
-    }
+    // const anyObj = obj as any;
+    // if (
+    //   typeof anyObj.deref === "function" &&
+    //   anyObj.constructor?.name === "WeakRef" &&
+    //   Utils.toString.call(obj) === "[object WeakRef]"
+    // ) {
+    //   return true;
+    // }
 
     return false;
   }
@@ -283,15 +283,15 @@ export class Utils {
     if (
       typeof val !== "object" ||
       val === null ||
-      objectToString.call(val) !== "[object Object]"
+      Utils.toString.call(val) !== "[object Object]"
     ) {
       return false;
     }
 
     // Check if the object has a prototype chain that leads to null
     // This is a more reliable way to check for plain objects
-    const proto = getProto(val);
-    return proto === null || proto === objectProto;
+    const proto = Utils.getPrototypeOf(val);
+    return proto === null || proto === Utils.getProto;
   };
 
   /**
@@ -316,13 +316,13 @@ export class Utils {
    */
   static isEmptyPlainObject = (obj: object): boolean => {
     // Check for enumerable keys first (fastest)
-    const keys = objectKeys(obj);
+    const keys = Utils.getKeys(obj);
 
     // Quick path: no enumerable keys
     if (keys.length === 0) {
       // Get all own properties (enumerable AND non-enumerable string keys, and all symbols)
-      const allProps = getOwnPropertyNames(obj);
-      const allSymbols = getOwnPropertySymbols(obj);
+      const allProps = Utils.getOwnPropertyNames(obj);
+      const allSymbols = Utils.getOwnPropertySymbols(obj);
 
       // Truly empty: no properties at all
       if (allProps.length === 0 && allSymbols.length === 0) {
@@ -394,7 +394,9 @@ export class Utils {
    * isCollection({}); // false
    * ```
    */
-  static isCollection = (value: unknown): value is Map<any, any> | Set<any> => {
+  static isCollection = (
+    value: unknown
+  ): value is Map<unknown, unknown> | Set<unknown> => {
     return value instanceof Map || value instanceof Set;
   };
 
@@ -421,7 +423,7 @@ export class Utils {
     if (value instanceof ArrayBuffer || ArrayBuffer.isView(value)) return true;
 
     //fallback to Object.prototype.toString for cross-realm safety
-    const tag = objectToString.call(value);
+    const tag = Utils.toString.call(value);
     return (
       tag === "[object ArrayBuffer]" ||
       (tag.startsWith("[object ") &&
@@ -606,7 +608,7 @@ export class Utils {
     // Note: `value instanceof String` is not cross-realm safe, but String() handles both.
     if (
       typeof value === "string" ||
-      objectToString.call(value) === "[object String]"
+      Utils.toString.call(value) === "[object String]"
     ) {
       return String(value).length === 0;
     }
@@ -634,7 +636,7 @@ export class Utils {
       ...options,
       _seen,
       _internalCall: true,
-      unwrapProxy: this.defaultUnwrapProxy,
+      // unwrapProxy: this.defaultUnwrapProxy,
     }; // _internalCall prevents re-checking .isEmpty()
 
     // Custom Emptiness Overrides
@@ -675,15 +677,15 @@ export class Utils {
 
     // Proxy and WeakRef Checks
     // 9. Handle Proxy objects
-    if (this.isProxyObject(obj)) {
-      // Best-effort detection
-      try {
-        const target = internalOptions.unwrapProxy(obj);
-        return this.isEmpty(target, internalOptions, _seen);
-      } catch (e) {
-        return false; // Fallback to non-empty
-      }
-    }
+    // if (this.isProxyObject(obj)) {
+    //   // Best-effort detection
+    //   try {
+    //     const target = internalOptions.unwrapProxy(obj);
+    //     return this.isEmpty(target, internalOptions, _seen);
+    //   } catch (e) {
+    //     return false; // Fallback to non-empty
+    //   }
+    // }
 
     // 10. Check WeakRef objects (cross-environment safe) - Requires recursion protection
     if (this.isWeakRef(obj)) {
@@ -703,7 +705,7 @@ export class Utils {
     // 11. Fast path for collections and buffers using instanceof (not cross-realm safe)
     // The toString check later provides cross-realm safety as a fallback.
     if (this.isCollection(obj)) {
-      return (obj as Map<any, any> | Set<any>).size === 0;
+      return (obj as Map<unknown, unknown> | Set<unknown>).size === 0;
     }
 
     if (this.isBufferType(obj)) {
@@ -723,12 +725,12 @@ export class Utils {
 
     // 13. Check special collection types first (Maps, Sets, ArrayBuffers, typed arrays, etc)
     // Use Object.prototype.toString for reliable cross-realm type checking
-    const tag = objectToString.call(obj);
+    const tag = Utils.toString.call(obj);
     switch (tag) {
       // These cases are handled by instanceof checks above but kept for cross-realm safety
       case "[object Map]":
       case "[object Set]":
-        return (obj as Map<any, any> | Set<any>).size === 0;
+        return (obj as Map<unknown, unknown> | Set<unknown>).size === 0;
       // Check for ArrayBuffer and TypedArray types
       // ArrayBuffer is a special case, as it doesn't have a length property
       case "[object ArrayBuffer]":
@@ -794,8 +796,8 @@ export class Utils {
     if (this.isArrayLike(obj)) {
       // For other array-like objects, only consider them empty if they're not custom class instances
       // Otherwise (custom class instance with length), treat as non-empty by default
-      const proto = getProto(obj);
-      return proto === objectProto || proto === null
+      const proto = Utils.getPrototypeOf(obj);
+      return proto === Utils.getProto || proto === null
         ? (obj as ArrayLike).length === 0
         : false;
     }
@@ -842,8 +844,8 @@ export class Utils {
   // }
 
   static isEqual(
-    value: any,
-    other: any,
+    value: unknown,
+    other: unknown,
     options: {
       isPassword?: boolean;
       customIsEmpty?: (value: object) => boolean;
@@ -874,7 +876,7 @@ export class Utils {
    * const isEqual = await Utils.asyncIsEqual(obj1, obj2); // Returns true
    * ```
    */
-  static async asyncIsEqual(value: any, other: any): Promise<boolean> {
+  static async asyncIsEqual(value: unknown, other: unknown): Promise<boolean> {
     return this.asyncDeepEqual(value, other, new WeakMap<object, object>());
   }
 
@@ -1032,7 +1034,7 @@ export class Utils {
         // Convert b to an array to allow tracking of used elements
         const bArray = Array.from(b);
 
-        const isSerializable = (val: any) => {
+        const isSerializable = (val: unknown) => {
           try {
             JSON.stringify(val);
             return true;
@@ -1116,8 +1118,8 @@ export class Utils {
    * @static
    */
   private static async asyncDeepEqual(
-    a: any,
-    b: any,
+    a: unknown,
+    b: unknown,
     seen: WeakMap<object, object>
   ): Promise<boolean> {
     if (a instanceof Promise && b instanceof Promise) {
