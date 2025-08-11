@@ -235,9 +235,9 @@ const Sidebar = ({
     >
       <div className="h-16 flex items-center justify-between bg-indigo-900 flex-shrink-0 px-4">
         <Image
-          src={`https://placehold.co/120x40/6366F1/FFFFFF?text=LOGO&font=lato`}
+          src={"/logo.png"}
           alt="Logo"
-          width={120}
+          width={40}
           height={40}
           className={`transition-opacity duration-300 ${
             isCollapsed ? "opacity-0 hidden" : "opacity-100"
