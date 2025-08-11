@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@bicstone/ra-language-japanese": "^5.6.3",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^7.1.0",
     "@zxcvbn-ts/core": "^3.0.4",
     "@zxcvbn-ts/language-common": "^3.0.4",
     "@zxcvbn-ts/language-en": "^3.0.2",
@@ -30,7 +33,7 @@
     "@tailwindcss/postcss": "^4",
     "@types/lodash": "^4.17.17",
     "@types/node": "^22",
-    "@types/react": "^19",
+    "@types/react": "^19.1.5",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",

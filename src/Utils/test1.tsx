@@ -11,10 +11,12 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { ResettableTextField, sanitizeInputRestProps } from "react-admin";
 import { clsx } from "clsx";
-import { IconTextInputProps } from "../Types/types";
+// import { IconTextInputProps } from "../Types/types";
 import zxcvbn from "../Utils/lazyZxcvbn";
-import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
+// import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
 import { matchPassword, validateStrength } from "./Validator";
+import { IconTextInputProps } from "@/types/Types";
+import PasswordStrengthMeter from "@/components/CustomComponents/PasswordStrengthMeter";
 
 export const PasswordValidationInput = (props: IconTextInputProps) => {
   const {
@@ -119,7 +121,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
         setTyping(false);
         const debounce = await zxcvbn.loadDebounce();
         debounce(validateAsync, 500)();
-      }, interval);
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [
@@ -211,7 +213,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
         <PasswordStrengthMeter
           passwordStrength={passwordStrength}
           passwordFeedback={passwordFeedback}
-          value={field.value}
+          // value={field.value}
         />
       )}
     </Box>
