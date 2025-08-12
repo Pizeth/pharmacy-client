@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, ReactNode } from "react";
+import React, { useState, useMemo, ReactNode, useEffect } from "react";
 import Image from "next/image";
 
 // --- Type Definitions ---
@@ -20,7 +20,7 @@ interface Document {
   destination: string;
   createdAt: string;
   updatedAt: string;
-  priority: "High" | "Medium" | "Low";
+  priority: "Very Urgent" | "Urgent" | "Normal";
 }
 
 interface Option {
@@ -70,7 +70,7 @@ const EditIcon = ({ className = "w-4 h-4" }) => (
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
+      strokeWidth={2}
       d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"
     />
   </svg>
@@ -86,7 +86,7 @@ const DeleteIcon = ({ className = "w-4 h-4" }) => (
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
+      strokeWidth={2}
       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
     />
   </svg>
@@ -102,7 +102,7 @@ const HomeIcon = ({ className = "w-6 h-6" }) => (
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
+      strokeWidth={2}
       d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
     />
   </svg>
@@ -118,7 +118,7 @@ const DocumentDuplicateIcon = ({ className = "w-6 h-6" }) => (
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
+      strokeWidth={2}
       d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
     />
   </svg>
@@ -134,25 +134,21 @@ const FolderIcon = ({ className = "w-6 h-6" }) => (
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
+      strokeWidth={2}
       d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
     />
   </svg>
 );
-const GlobeAltIcon = ({ className = "w-6 h-6" }) => (
+const I18nIcon = ({ className = "w-6 h-6" }) => (
   <svg
     className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
     stroke="currentColor"
+    fill="currentColor"
+    strokeWidth="0"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
   >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m0 18a9 9 0 009-9m-9 9a9 9 0 00-9-9"
-    />
+    <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path>
   </svg>
 );
 const BellIcon = ({ className = "w-6 h-6" }) => (
@@ -166,7 +162,7 @@ const BellIcon = ({ className = "w-6 h-6" }) => (
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
+      strokeWidth={2}
       d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
     />
   </svg>
@@ -182,7 +178,7 @@ const MenuIcon = ({ className = "w-6 h-6" }) => (
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
+      strokeWidth={2}
       d="M4 6h16M4 12h16M4 18h16"
     />
   </svg>
@@ -216,39 +212,38 @@ const SortIcon = ({
 // --- Helper Components ---
 
 const Sidebar = ({
+  isOpen,
   isCollapsed,
-  onToggleSidebar,
 }: {
+  isOpen: boolean;
   isCollapsed: boolean;
-  onToggleSidebar: () => void;
 }) => {
   const navItems = [
     { name: "Dashboard", icon: HomeIcon, active: false },
     { name: "Incoming Documents", icon: DocumentDuplicateIcon, active: true },
     { name: "Categories", icon: FolderIcon, active: false },
   ];
+  const sidebarClasses = `
+        bg-indigo-800 text-white flex flex-col flex-shrink-0 transition-transform duration-300 ease-in-out
+        fixed lg:relative inset-y-0 left-0 z-40
+        ${isCollapsed ? "w-20" : "w-64"}
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        lg:translate-x-0
+    `;
   return (
-    <aside
-      className={`bg-indigo-800 text-white flex-col flex-shrink-0 transition-all duration-300 ease-in-out lg:flex ${
-        isCollapsed ? "w-20" : "w-64"
-      }`}
-    >
-      <div className="h-16 flex items-center justify-between bg-indigo-900 flex-shrink-0 px-4">
-        <Image
-          src={"/logo.png"}
-          alt="Logo"
-          width={40}
-          height={40}
-          className={`transition-opacity duration-300 ${
-            isCollapsed ? "opacity-0 hidden" : "opacity-100"
-          }`}
-        />
-        <button
-          onClick={onToggleSidebar}
-          className="p-2 rounded-full text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-800 focus:ring-white"
+    <aside className={sidebarClasses}>
+      <div className="h-16 flex items-center justify-center bg-indigo-900 flex-shrink-0 px-4">
+        <div
+          className={`w-10 h-10 rounded-full overflow-hidden bg-indigo-700 flex items-center justify-center`}
         >
-          <MenuIcon className="w-6 h-6" />
-        </button>
+          <Image
+            src={`/logo.png`}
+            alt="Logo"
+            width={150}
+            height={150}
+            className="w-full h-full object-cover"
+          />
+        </div>
       </div>
       <nav className="flex-1 px-4 py-6">
         <ul>
@@ -282,35 +277,62 @@ const Sidebar = ({
   );
 };
 
-const TopHeader = () => (
-  <header className="bg-white shadow-sm w-full flex-shrink-0">
-    <div className="flex items-center justify-end h-16 px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center space-x-4">
-        <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none">
-          <SearchIcon className="w-6 h-6" />
-        </button>
-        <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none">
-          <GlobeAltIcon />
-        </button>
-        <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none">
-          <BellIcon />
+const TopHeader = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => {
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  return (
+    <header className="bg-white shadow-sm w-full flex-shrink-0 z-30">
+      <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+        <button
+          onClick={onToggleSidebar}
+          className="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none"
+        >
+          <MenuIcon className="w-6 h-6" />
         </button>
         <div className="flex items-center space-x-2">
-          <Image
-            className="h-8 w-8 rounded-full object-cover"
-            src="https://placehold.co/40x40/EFEFEF/4A4A4A?text=A"
-            alt="User avatar"
-            width={40}
-            height={40}
-          />
-          <span className="text-sm font-medium text-gray-700 hidden sm:block">
-            Admin User
-          </span>
+          <div
+            className={`flex items-center transition-all duration-300 ease-in-out ${
+              isSearchExpanded ? "w-48" : "w-0"
+            }`}
+          >
+            <input
+              type="text"
+              className={`w-full bg-gray-100 rounded-full px-4 py-1.5 transition-opacity duration-300 ${
+                isSearchExpanded ? "opacity-100" : "opacity-0"
+              }`}
+              placeholder="Global Search..."
+            />
+          </div>
+          <button
+            onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+            className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none"
+          >
+            <SearchIcon className="w-6 h-6" />
+          </button>
+          <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none">
+            <I18nIcon />
+          </button>
+          <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none">
+            <BellIcon />
+          </button>
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 rounded-full overflow-hidden">
+              <Image
+                className="w-full h-full object-cover"
+                src="/logo.png"
+                alt="User avatar"
+                width={40}
+                height={40}
+              />
+            </div>
+            <span className="text-sm font-medium text-gray-700 hidden sm:block">
+              Admin User
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-  </header>
-);
+    </header>
+  );
+};
 
 interface CustomSelectProps {
   options: Option[];
@@ -332,7 +354,7 @@ const CustomSelect = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
-      className={`appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:bg-white focus:border-indigo-500 ${
+      className={`font-khmer appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:bg-white focus:border-indigo-500 ${
         disabled ? "bg-gray-100 cursor-not-allowed" : ""
       }`}
     >
@@ -426,7 +448,7 @@ const SortableHeader = ({
       onClick={() => requestSort(sortKey)}
     >
       <div className="flex items-center gap-2">
-        <span>{children}</span>
+        <span className="font-khmer">{children}</span>
         <SortIcon className="text-indigo-300" direction={direction} />
       </div>
     </th>
@@ -434,180 +456,306 @@ const SortableHeader = ({
 };
 
 // --- Mock Data ---
+const categories: Option[] = [
+  { value: "Authorization", label: "មុខការ" },
+  { value: "Notification", label: "ជូនជ្រាប" },
+  { value: "Invitation", label: "លិខិតអញ្ជើញ" },
+  { value: "Others", label: "ផ្សេងៗ" },
+];
+const subcategories: { [key: string]: Option[] } = {
+  Authorization: [
+    { value: "Proposals", label: "សំណើ" },
+    { value: "Promotion", label: "ការតែងតាំង" },
+    { value: "Policies", label: "គោលនយោបាយ" },
+    { value: "Audits", label: "សវនកម្ម" },
+  ],
+  Notification: [
+    { value: "Reports", label: "របាយការណ៍" },
+    { value: "Minutes", label: "កំណត់ហេតុ" },
+  ],
+  Invitation: [
+    { value: "Invitation", label: "លិខិតអញ្ជើញក្រុមការងារចុះមូលដ្ឋាន" },
+    { value: "Inter Ministry", label: "លិខិតអញ្ជើញអន្តរក្រសួង" },
+  ],
+  Others: [{ value: "Greeting", label: "លិខិតជូនពរ" }],
+};
+const statuses: Option[] = [
+  { value: "Pending", label: "កំពុងរង់ចាំ" },
+  { value: "Processing", label: "កំពុងដំណើរការ" },
+  { value: "Completed", label: "រួចរាល់" },
+];
+const destinations: Option[] = [
+  {
+    value: "Minister",
+    label: "ឯកឧត្តមឧបនាយករដ្ឋមន្រ្តី រដ្ឋមន្រ្តីក្រសួងមុខងារសាធារណៈ",
+  },
+  {
+    value: "Permannent Secretary of State",
+    label: "ឯកឧត្តមរដ្ឋលេខាធិការប្រចាំការ",
+  },
+  { value: "Minister's Cabinet", label: "ខុទ្ទកាល័យ" },
+  { value: "អ.កមស", label: "អ.កមស" },
+  { value: "អ.មស", label: "អ.មស" },
+  { value: "អ.គម", label: "អ.គម" },
+  { value: "G.Inspection", label: "អគ្គាធិការដ្ឋាន" },
+  { value: "D.Audit", label: "ន.សវក" },
+  { value: "D.Administration", label: "ន.រដ្ឋបាល" },
+  { value: "អង្គភាពលទ្ធកម្ម", label: "អង្គភាពលទ្ធកម្ម" },
+];
+const priorities: Option[] = [
+  { value: "Very Urgent", label: "ប្រញ៉ាប់ណាស់" },
+  { value: "Urgent", label: "ប្រញ៉ាប់" },
+  { value: "Normal", label: "ធម្មតា" },
+];
+
+const priorityColorMap: { [key: string]: string } = {
+  "Very Urgent": "bg-red-100 text-red-800",
+  Urgent: "bg-yellow-100 text-yellow-800",
+  Normal: "bg-gray-100 text-gray-800",
+};
+
 const mockDocuments: Document[] = [
   {
     id: 1,
     orderNumber: 1001,
-    title: "Q1 Financial Report",
-    category: "Finance",
-    subcategory: "Reports",
+    title: "សំណើសុំតែងតាំងមន្ត្រី",
+    category: "Authorization",
+    subcategory: "Promotion",
     status: "Completed",
-    destination: "Alice",
+    destination: "Minister",
     createdAt: "2023-01-15",
     updatedAt: "2023-01-20",
-    priority: "High",
+    priority: "Very Urgent",
   },
   {
     id: 2,
     orderNumber: 1002,
-    title: "Marketing Campaign Proposal",
-    category: "Marketing",
-    subcategory: "Proposals",
+    title: "របាយការណ៍ប្រចាំខែ",
+    category: "Notification",
+    subcategory: "Reports",
     status: "Pending",
-    destination: "Bob",
+    destination: "Permannent Secretary of State",
     createdAt: "2023-02-01",
     updatedAt: "2023-02-01",
-    priority: "Medium",
+    priority: "Normal",
   },
   {
     id: 3,
     orderNumber: 1003,
-    title: "HR Policy Update",
-    category: "HR",
-    subcategory: "Policies",
+    title: "លិខិតអញ្ជើញប្រជុំអន្តរក្រសួង",
+    category: "Invitation",
+    subcategory: "Inter Ministry",
     status: "Processing",
-    destination: "Charlie",
+    destination: "Minister's Cabinet",
     createdAt: "2023-02-10",
     updatedAt: "2023-02-12",
-    priority: "High",
+    priority: "Urgent",
   },
   {
     id: 4,
     orderNumber: 1004,
-    title: "IT Security Audit",
-    category: "IT",
+    title: "សវនកម្មផ្ទៃក្នុង",
+    category: "Authorization",
     subcategory: "Audits",
     status: "Completed",
-    destination: "David",
+    destination: "G.Inspection",
     createdAt: "2023-03-05",
     updatedAt: "2023-03-10",
-    priority: "Low",
+    priority: "Normal",
   },
   {
     id: 5,
     orderNumber: 1005,
-    title: "Product Roadmap Q3",
-    category: "Product",
-    subcategory: "Roadmaps",
+    title: "លិខិតជូនពរក្នុងឱកាសចូលឆ្នាំថ្មី",
+    category: "Others",
+    subcategory: "Greeting",
     status: "Pending",
-    destination: "Eve",
+    destination: "Minister",
     createdAt: "2023-03-20",
     updatedAt: "2023-03-20",
-    priority: "Medium",
+    priority: "Normal",
   },
   {
     id: 6,
     orderNumber: 1006,
-    title: "Annual General Meeting Minutes",
-    category: "Finance",
+    title: "កំណត់ហេតុកិច្ចប្រជុំ",
+    category: "Notification",
     subcategory: "Minutes",
     status: "Processing",
-    destination: "Frank",
+    destination: "អ.កមស",
     createdAt: "2023-04-01",
     updatedAt: "2023-04-02",
-    priority: "High",
+    priority: "Urgent",
   },
   {
     id: 7,
     orderNumber: 1007,
-    title: "New Hire Onboarding Docs",
-    category: "HR",
-    subcategory: "Onboarding",
+    title: "គោលនយោបាយថ្មីស្តីពីការគ្រប់គ្រងបុគ្គលិក",
+    category: "Authorization",
+    subcategory: "Policies",
     status: "Completed",
-    destination: "Grace",
+    destination: "អ.មស",
     createdAt: "2023-04-15",
     updatedAt: "2023-04-18",
-    priority: "Low",
+    priority: "Normal",
   },
   {
     id: 8,
     orderNumber: 1008,
-    title: "Website Redesign Mockups",
-    category: "Marketing",
-    subcategory: "Designs",
+    title: "លិខិតអញ្ជើញក្រុមការងារចុះមូលដ្ឋាន",
+    category: "Invitation",
+    subcategory: "Invitation",
     status: "Pending",
-    destination: "Heidi",
+    destination: "D.Administration",
     createdAt: "2023-05-01",
     updatedAt: "2023-05-01",
-    priority: "Medium",
+    priority: "Urgent",
   },
   {
     id: 9,
     orderNumber: 1009,
-    title: "Server Maintenance Plan",
-    category: "IT",
-    subcategory: "Audits",
+    title: "សំណើសុំปรับปรุงប្រព័ន្ធ",
+    category: "Authorization",
+    subcategory: "Proposals",
     status: "Pending",
-    destination: "David",
+    destination: "អ.គម",
     createdAt: "2023-05-10",
     updatedAt: "2023-05-10",
-    priority: "High",
+    priority: "Very Urgent",
   },
   {
     id: 10,
     orderNumber: 1010,
-    title: "Q2 Sales Report",
-    category: "Finance",
+    title: "របាយការណ៍ត្រីមាសទី២",
+    category: "Notification",
     subcategory: "Reports",
     status: "Completed",
-    destination: "Alice",
+    destination: "Permannent Secretary of State",
     createdAt: "2023-06-01",
     updatedAt: "2023-06-05",
-    priority: "Low",
+    priority: "Normal",
   },
-];
-
-const categories: Option[] = [
-  { value: "ជូនជ្រាប", label: "ជូនជ្រាប" },
-  { value: "មុខការ", label: "មុខការ" },
-  { value: "លិខិតអញ្ជើញ", label: "លិខិតអញ្ជើញ" },
-  { value: "IT", label: "Information Technology" },
-  { value: "ផ្សេងៗ", label: "ផ្សេងៗ" },
-];
-const subcategories: { [key: string]: Option[] } = {
-  ជូនជ្រាប: [
-    { value: "Reports", label: "Reports" },
-    { value: "Minutes", label: "Minutes" },
-  ],
-  Marketing: [
-    { value: "Proposals", label: "Proposals" },
-    { value: "Designs", label: "Designs" },
-  ],
-  HR: [
-    { value: "Policies", label: "Policies" },
-    { value: "Onboarding", label: "Onboarding" },
-  ],
-  IT: [{ value: "Audits", label: "Audits" }],
-  Product: [{ value: "Roadmaps", label: "Roadmaps" }],
-};
-const statuses: Option[] = [
-  { value: "កំពុងពិនិត្យ", label: "កំពុងពិនិត្យ" },
-  { value: "កំពុងដំណើរការ", label: "កំពុងដំណើរការ" },
-  { value: "រួចរាល់", label: "រួចរាល់" },
-];
-const destinations: Option[] = [
-  { value: "ឯកឧត្តមឧបនាយករដ្ឋមន្រ្តី", label: "ឯកឧត្តមឧបនាយករដ្ឋមន្រ្តី" },
   {
-    value: "ឯកឧត្តមរដ្ឋលេខាធិការប្រចាំការ",
-    label: "ឯកឧត្តមរដ្ឋលេខាធិការប្រចាំការ",
+    id: 11,
+    orderNumber: 1011,
+    title: "សំណើសុំจัดซื้ออุปกรณ์",
+    category: "Authorization",
+    subcategory: "Proposals",
+    status: "Pending",
+    destination: "អង្គភាពលទ្ធកម្ម",
+    createdAt: "2023-06-10",
+    updatedAt: "2023-06-11",
+    priority: "Urgent",
   },
-  { value: "អ.កមស", label: "អ.កមស" },
-  { value: "អ.មស", label: "អ.មស" },
-  { value: "អ.គម", label: "អ.គម" },
-  { value: "អគ្គាធិការដ្ឋាន", label: "អគ្គាធិការដ្ឋាន" },
-  { value: "ន.សវក", label: "ន.សវក" },
-  { value: "ន.រដ្ឋបាល", label: "ខុទ្ទកាល័យ" },
+  {
+    id: 12,
+    orderNumber: 1012,
+    title: "លិខិតអញ្ជើញចូលរួមពិធីសម្ពោធ",
+    category: "Invitation",
+    subcategory: "Inter Ministry",
+    status: "Processing",
+    destination: "Minister's Cabinet",
+    createdAt: "2023-06-15",
+    updatedAt: "2023-06-20",
+    priority: "Urgent",
+  },
+  {
+    id: 13,
+    orderNumber: 1013,
+    title: "ការតែងតាំងប្រធាននាយកដ្ឋាន",
+    category: "Authorization",
+    subcategory: "Promotion",
+    status: "Pending",
+    destination: "Minister",
+    createdAt: "2023-07-01",
+    updatedAt: "2023-07-01",
+    priority: "Very Urgent",
+  },
+  {
+    id: 14,
+    orderNumber: 1014,
+    title: "លិខិតជូនពរថ្ងៃខួបកំណើត",
+    category: "Others",
+    subcategory: "Greeting",
+    status: "Completed",
+    destination: "Permannent Secretary of State",
+    createdAt: "2023-07-05",
+    updatedAt: "2023-07-10",
+    priority: "Normal",
+  },
+  {
+    id: 15,
+    orderNumber: 1015,
+    title: "សំណើសុំงบประมาณปี 2024",
+    category: "Authorization",
+    subcategory: "Proposals",
+    status: "Pending",
+    destination: "Minister",
+    createdAt: "2023-07-12",
+    updatedAt: "2023-07-12",
+    priority: "Very Urgent",
+  },
+  {
+    id: 16,
+    orderNumber: 1016,
+    title: "របាយការណ៍បេសកកម្ម",
+    category: "Notification",
+    subcategory: "Reports",
+    status: "Processing",
+    destination: "អ.កមស",
+    createdAt: "2023-07-20",
+    updatedAt: "2023-07-22",
+    priority: "Urgent",
+  },
+  {
+    id: 17,
+    orderNumber: 1017,
+    title: "គោលនយោបាយស្តីពីការប្រើប្រាស់អ៊ីនធឺណិត",
+    category: "Authorization",
+    subcategory: "Policies",
+    status: "Completed",
+    destination: "អ.មស",
+    createdAt: "2023-08-01",
+    updatedAt: "2023-08-05",
+    priority: "Normal",
+  },
+  {
+    id: 18,
+    orderNumber: 1018,
+    title: "សវនកម្មប្រចាំឆ្នាំ",
+    category: "Authorization",
+    subcategory: "Audits",
+    status: "Pending",
+    destination: "G.Inspection",
+    createdAt: "2023-08-10",
+    updatedAt: "2023-08-10",
+    priority: "Very Urgent",
+  },
+  {
+    id: 19,
+    orderNumber: 1019,
+    title: "កំណត់ហេតុកិច្ចប្រជុំក្រុមប្រឹក្សា",
+    category: "Notification",
+    subcategory: "Minutes",
+    status: "Processing",
+    destination: "Minister's Cabinet",
+    createdAt: "2023-08-15",
+    updatedAt: "2023-08-18",
+    priority: "Urgent",
+  },
+  {
+    id: 20,
+    orderNumber: 1020,
+    title: "លិខិតអញ្ជើញចូលរួមសិក្ខាសាលា",
+    category: "Invitation",
+    subcategory: "Invitation",
+    status: "Completed",
+    destination: "D.Administration",
+    createdAt: "2023-09-01",
+    updatedAt: "2023-09-05",
+    priority: "Normal",
+  },
 ];
-const priorities: Option[] = [
-  { value: "ប្រញ៉ាប់ណាស់", label: "ប្រញ៉ាប់ណាស់" },
-  { value: "ប្រញ៉ាប់", label: "ប្រញ៉ាប់" },
-  { value: "ធម្មតា", label: "ធម្មតា" },
-];
-const priorityColorMap: { [key: string]: string } = {
-  High: "bg-red-100 text-red-800",
-  Medium: "bg-yellow-100 text-yellow-800",
-  Low: "bg-gray-100 text-gray-800",
-};
 
 // --- Main Search Component ---
 export default function AdvancedSearchPage() {
@@ -630,7 +778,16 @@ export default function AdvancedSearchPage() {
   });
 
   // State for sidebar
-  const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isDesktopCollapsed, setDesktopCollapsed] = useState(false);
+
+  const handleToggleSidebar = () => {
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(!isSidebarOpen);
+    } else {
+      setDesktopCollapsed(!isDesktopCollapsed);
+    }
+  };
 
   const handleCategoryChange = (value: string) => {
     setCategory(value);
@@ -673,10 +830,18 @@ export default function AdvancedSearchPage() {
     // Sorting
     if (sortConfig.key !== null) {
       sortableItems.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
+        const valA = a[sortConfig.key];
+        const valB = b[sortConfig.key];
+
+        if (typeof valA === "string" && typeof valB === "string") {
+          return sortConfig.direction === "ascending"
+            ? valA.localeCompare(valB)
+            : valB.localeCompare(valA);
+        }
+        if (valA < valB) {
           return sortConfig.direction === "ascending" ? -1 : 1;
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
+        if (valA > valB) {
           return sortConfig.direction === "ascending" ? 1 : -1;
         }
         return 0;
@@ -708,83 +873,106 @@ export default function AdvancedSearchPage() {
     currentPage * itemsPerPage
   );
 
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = `
+            @import url('https://fonts.googleapis.com/css2?family=Siemreap&display=swap');
+            .font-khmer {
+                font-family: 'Siemreap', sans-serif;
+            }
+        `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
-    <div className="flex min-h-screen bg-gray-100 font-sans">
+    <div className="flex h-screen bg-gray-100 font-sans overflow-hidden">
       <Sidebar
-        isCollapsed={isSidebarCollapsed}
-        onToggleSidebar={() => setSidebarCollapsed(!isSidebarCollapsed)}
+        isOpen={
+          isSidebarOpen ||
+          (typeof window !== "undefined" && window.innerWidth >= 1024)
+        }
+        isCollapsed={isDesktopCollapsed}
       />
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
       <div className="flex-1 flex flex-col min-w-0">
-        <TopHeader />
+        <TopHeader onToggleSidebar={handleToggleSidebar} />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           <div className="bg-white rounded-lg shadow-md p-6 w-full">
             <header className="flex justify-between items-center pb-4 border-b border-gray-200 mb-6">
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">
-                  Incoming Documents
+                <h1 className="text-2xl font-bold text-gray-800 font-khmer">
+                  ឯកសារចូល
                 </h1>
-                <p className="text-sm text-gray-500 mt-1">
-                  Home / Documents / Search
+                <p className="text-sm text-gray-500 mt-1 font-khmer">
+                  ទំព័រដើម / ឯកសារ / ស្វែងរក
                 </p>
               </div>
             </header>
 
             <div className="mb-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                <div className="sm:col-span-2 lg:col-span-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                <div className="sm:col-span-2 lg:col-span-3 xl:col-span-1">
                   <label
                     htmlFor="keywords"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
                   >
-                    Keywords
+                    ពាក្យគន្លឹះ
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <SearchIcon className="text-gray-400" />
-                    </div>
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                      <SearchIcon className="h-5 w-5 text-gray-400" />
+                    </span>
                     <input
                       type="text"
                       id="keywords"
                       value={keywords}
                       onChange={(e) => setKeywords(e.target.value)}
-                      placeholder="Type to filter..."
-                      className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                      placeholder="ស្វែងរក..."
+                      className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 font-khmer text-gray-900 placeholder-gray-500"
                     />
                   </div>
                 </div>
                 <div>
                   <label
                     htmlFor="category"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
                   >
-                    Category
+                    ប្រភេទ
                   </label>
                   <CustomSelect
                     options={categories}
                     value={category}
                     onChange={handleCategoryChange}
-                    placeholder="All"
+                    placeholder="ទាំងអស់"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="subcategory"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
                   >
-                    Subcategory
+                    ប្រភេទរង
                   </label>
                   <CustomSelect
                     options={subcategories[category] || []}
                     value={subcategory}
                     onChange={setSubcategory}
-                    placeholder="Select Category First"
+                    placeholder="ជ្រើសរើសប្រភេទ"
                     disabled={!category}
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="destination"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
                   >
                     គោលដៅ
                   </label>
@@ -792,35 +980,35 @@ export default function AdvancedSearchPage() {
                     options={destinations}
                     value={destination}
                     onChange={setDestination}
-                    placeholder="ជ្រើសរើស"
+                    placeholder="ទាំងអស់"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="priority"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
                   >
-                    Priority
+                    អាទិភាព
                   </label>
                   <CustomSelect
                     options={priorities}
                     value={priority}
                     onChange={setPriority}
-                    placeholder="All"
+                    placeholder="ទាំងអស់"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="status"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
                   >
-                    Status
+                    ស្ថានភាព
                   </label>
                   <CustomSelect
                     options={statuses}
                     value={status}
                     onChange={setStatus}
-                    placeholder="All"
+                    placeholder="ទាំងអស់"
                   />
                 </div>
               </div>
@@ -843,48 +1031,48 @@ export default function AdvancedSearchPage() {
                         sortConfig={sortConfig}
                         requestSort={requestSort}
                       >
-                        Document Title
+                        ចំណងជើងឯកសារ
                       </SortableHeader>
                       <SortableHeader
                         sortKey="priority"
                         sortConfig={sortConfig}
                         requestSort={requestSort}
                       >
-                        Priority
+                        អាទិភាព
                       </SortableHeader>
                       <SortableHeader
                         sortKey="createdAt"
                         sortConfig={sortConfig}
                         requestSort={requestSort}
                       >
-                        Created
+                        បង្កើតនៅ
                       </SortableHeader>
                       <SortableHeader
                         sortKey="updatedAt"
                         sortConfig={sortConfig}
                         requestSort={requestSort}
                       >
-                        Updated
+                        កែប្រែនៅ
                       </SortableHeader>
                       <SortableHeader
                         sortKey="destination"
                         sortConfig={sortConfig}
                         requestSort={requestSort}
                       >
-                        Destination
+                        គោលដៅ
                       </SortableHeader>
                       <SortableHeader
                         sortKey="status"
                         sortConfig={sortConfig}
                         requestSort={requestSort}
                       >
-                        Status
+                        ស្ថានភាព
                       </SortableHeader>
                       <th
                         scope="col"
-                        className="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider"
+                        className="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider font-khmer"
                       >
-                        Actions
+                        សកម្មភាព
                       </th>
                     </tr>
                   </thead>
@@ -898,18 +1086,21 @@ export default function AdvancedSearchPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <a
                               href={`/docs/${doc.id}`}
-                              className="text-indigo-600 hover:text-indigo-900 hover:underline"
+                              className="text-indigo-600 hover:text-indigo-900 hover:underline font-khmer"
                             >
                               {doc.title}
                             </a>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <span
-                              className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              className={`font-khmer px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                 priorityColorMap[doc.priority]
                               }`}
                             >
-                              {doc.priority}
+                              {
+                                priorities.find((p) => p.value === doc.priority)
+                                  ?.label
+                              }
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -918,12 +1109,16 @@ export default function AdvancedSearchPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {doc.updatedAt}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {doc.destination}
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-khmer">
+                            {
+                              destinations.find(
+                                (d) => d.value === doc.destination
+                              )?.label
+                            }
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <span
-                              className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              className={`font-khmer px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                 doc.status === "Completed"
                                   ? "bg-green-100 text-green-800"
                                   : doc.status === "Processing"
@@ -931,7 +1126,10 @@ export default function AdvancedSearchPage() {
                                   : "bg-yellow-100 text-yellow-800"
                               }`}
                             >
-                              {doc.status}
+                              {
+                                statuses.find((s) => s.value === doc.status)
+                                  ?.label
+                              }
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
@@ -950,9 +1148,9 @@ export default function AdvancedSearchPage() {
                       <tr>
                         <td
                           colSpan={8}
-                          className="text-center py-10 text-gray-500"
+                          className="text-center py-10 text-gray-500 font-khmer"
                         >
-                          No documents match your search criteria.
+                          មិនមានឯកសារដែលត្រូវនឹងលក្ខខណ្ឌស្វែងរករបស់អ្នកទេ។
                         </td>
                       </tr>
                     )}
