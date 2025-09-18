@@ -67,6 +67,7 @@ import { UserCreate } from "./Users/userCreate";
 import { UserShow } from "./Users/userDetail";
 import { UserEdit } from "./Users/userEdit";
 import { UserList } from "./Users/users";
+import { LoginPage } from "./LoginPage";
 
 const store = localStorageStore(undefined, "ECommerce");
 
@@ -96,6 +97,7 @@ export const AdminApp = () => {
       i18nProvider={i18nProvider}
       layout={Layout}
       dataProvider={dataProvider}
+      loginPage={LoginPage}
       // authProvider={authProvider}
       disableTelemetry
       // theme={theme}
