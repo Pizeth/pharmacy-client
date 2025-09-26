@@ -1,6 +1,6 @@
 // app/auth/login/page.tsx
 "use client";
-import * as React from "react";
+// import * as React from "react";
 
 // SVG Icon Components for a clean, self-contained design
 const GoogleIcon = () => (
@@ -297,75 +297,98 @@ export function LoginPage1() {
   );
 }
 
-// app/auth/login/page.tsx
-'use client';
+// app/auth/login/page.tsx - React Admin + MUI Login Page
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
-// import { Separator } from '@/components/ui/separator';
-// import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle, CheckCircle2, Eye, EyeOff, Mail, Lock, CheckIcon } from 'lucide-react';
-import { Card, CardHeader, CardContent, Alert, Input } from "@mui/material";
-import { Button } from "react-admin";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Divider,
+  Alert,
+  IconButton,
+  InputAdornment,
+  Tab,
+  Tabs,
+  Stack,
+  Chip,
+  CircularProgress,
+  Link as MuiLink,
+} from "@mui/material";
+import {
+  Visibility,
+  VisibilityOff,
+  Email,
+  Lock,
+  Google,
+  Facebook,
+} from "@mui/icons-material";
+import { styled, useTheme } from "@mui/material/styles";
+import { User } from "@/interfaces/user.interface";
 
-// Provider configuration with icons and colors
+// Custom Discord icon component since MUI doesn't have one
+const DiscordIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z" />
+  </svg>
+);
+
+// Styled components for provider buttons
+const StyledProviderButton = styled(Button)<{ provider: string }>(
+  ({ theme, provider }) => {
+    const configs = {
+      google: {
+        backgroundColor: "#fff",
+        borderColor: theme.palette.grey[300],
+        color: theme.palette.text.primary,
+        "&:hover": {
+          backgroundColor: theme.palette.grey[50],
+        },
+      },
+      facebook: {
+        backgroundColor: "#1877F2",
+        borderColor: "#1877F2",
+        color: "#fff",
+        "&:hover": {
+          backgroundColor: "#166FE5",
+        },
+      },
+      discord: {
+        backgroundColor: "#5865F2",
+        borderColor: "#5865F2",
+        color: "#fff",
+        "&:hover": {
+          backgroundColor: "#4752C4",
+        },
+      },
+    };
+
+    return configs[provider as keyof typeof configs] || {};
+  }
+);
+
+// Provider configuration
 const PROVIDERS = {
   google: {
-    name: 'Google',
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24">
-        <path
-          fill="currentColor"
-          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-        />
-        <path
-          fill="currentColor"
-          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-        />
-        <path
-          fill="currentColor"
-          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-        />
-        <path
-          fill="currentColor"
-          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-        />
-      </svg>
-    ),
-    bgColor: 'bg-white hover:bg-gray-50',
-    textColor: 'text-gray-900',
-    borderColor: 'border-gray-300',
+    name: "Google",
+    icon: <Google />,
   },
   facebook: {
-    name: 'Facebook',
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-      </svg>
-    ),
-    bgColor: 'bg-[#1877F2] hover:bg-[#166FE5]',
-    textColor: 'text-white',
-    borderColor: 'border-[#1877F2]',
+    name: "Facebook",
+    icon: <Facebook />,
   },
   discord: {
-    name: 'Discord',
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/>
-      </svg>
-    ),
-    bgColor: 'bg-[#5865F2] hover:bg-[#4752C4]',
-    textColor: 'text-white',
-    borderColor: 'border-[#5865F2]',
+    name: "Discord",
+    icon: <DiscordIcon />,
   },
 };
 
 interface LoginPageProps {
-  onSuccess?: (user: any) => void;
+  onSuccess?: (user: User) => void;
   redirectTo?: string;
 }
 
@@ -374,41 +397,59 @@ interface LoginFormData {
   password: string;
 }
 
-export default function LoginPageClaude({ onSuccess, redirectTo }: LoginPageProps) {
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel({ children, value, index }: TabPanelProps) {
+  return (
+    <div hidden={value !== index} style={{ width: "100%" }}>
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+export default function LoginPageClaude({
+  onSuccess,
+  redirectTo,
+}: LoginPageProps) {
+  const theme = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [loginType, setLoginType] = useState<'form' | 'oauth'>('form');
-  
+
   // Form state
   const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [formErrors, setFormErrors] = useState<Partial<LoginFormData>>({});
 
   // Handle OAuth callback results
   useEffect(() => {
-    const error = searchParams?.get('error');
-    const authSuccess = searchParams?.get('auth');
-    const logout = searchParams?.get('logout');
+    const error = searchParams?.get("error");
+    const authSuccess = searchParams?.get("auth");
+    const logout = searchParams?.get("logout");
 
     if (error) {
       setError(decodeURIComponent(error));
-    } else if (authSuccess === 'success') {
-      setSuccess('Authentication successful! Redirecting...');
+    } else if (authSuccess === "success") {
+      setSuccess("Authentication successful! Redirecting...");
       setTimeout(() => {
         if (onSuccess) {
           onSuccess({ authenticated: true });
         } else {
-          router.push(redirectTo || '/admin');
+          router.push(redirectTo || "/admin");
         }
       }, 1500);
-    } else if (logout === 'success') {
-      setSuccess('Logged out successfully');
+    } else if (logout === "success") {
+      setSuccess("Logged out successfully");
       setTimeout(() => setSuccess(null), 3000);
     }
   }, [searchParams, onSuccess, redirectTo, router]);
@@ -417,15 +458,15 @@ export default function LoginPageClaude({ onSuccess, redirectTo }: LoginPageProp
     const errors: Partial<LoginFormData> = {};
 
     if (!formData.email.trim()) {
-      errors.email = 'Email is required';
+      errors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address';
+      errors.email = "Please enter a valid email address";
     }
 
     if (!formData.password) {
-      errors.password = 'Password is required';
+      errors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
+      errors.password = "Password must be at least 6 characters";
     }
 
     setFormErrors(errors);
@@ -434,23 +475,24 @@ export default function LoginPageClaude({ onSuccess, redirectTo }: LoginPageProp
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     try {
-      setLoading('form');
+      setLoading("form");
       setError(null);
 
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
-      
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
+
       const response = await fetch(`${backendUrl}/auth/login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include', // Important for session cookies
+        credentials: "include",
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
@@ -460,13 +502,13 @@ export default function LoginPageClaude({ onSuccess, redirectTo }: LoginPageProp
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess('Login successful! Redirecting...');
-        
-        // Store user info if provided
+        setSuccess("Login successful! Redirecting...");
+
+        // Store user info
         if (data.user) {
-          localStorage.setItem('oidc_user', JSON.stringify(data.user));
+          localStorage.setItem("oidc_user", JSON.stringify(data.user));
           if (data.tokens) {
-            localStorage.setItem('oidc_tokens', JSON.stringify(data.tokens));
+            localStorage.setItem("oidc_tokens", JSON.stringify(data.tokens));
           }
         }
 
@@ -474,15 +516,17 @@ export default function LoginPageClaude({ onSuccess, redirectTo }: LoginPageProp
           if (onSuccess) {
             onSuccess(data.user);
           } else {
-            router.push(redirectTo || '/admin');
+            router.push(redirectTo || "/admin");
           }
         }, 1500);
       } else {
-        setError(data.message || 'Login failed. Please check your credentials.');
+        setError(
+          data.message || "Login failed. Please check your credentials."
+        );
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setError('Login failed. Please try again.');
+      console.error("Login error:", err);
+      setError("Login failed. Please try again.");
     } finally {
       setLoading(null);
     }
@@ -493,14 +537,14 @@ export default function LoginPageClaude({ onSuccess, redirectTo }: LoginPageProp
       setLoading(provider);
       setError(null);
 
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
       const loginUrl = `${backendUrl}/auth/${provider}/login`;
-      
+
       window.location.href = loginUrl;
-      
     } catch (err) {
-      console.error('Login error:', err);
-      setError('Failed to initiate login. Please try again.');
+      console.error("Login error:", err);
+      setError("Failed to initiate login. Please try again.");
       setLoading(null);
     }
   };
@@ -508,257 +552,226 @@ export default function LoginPageClaude({ onSuccess, redirectTo }: LoginPageProp
   const isLoading = (type: string) => loading === type;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="w-full max-w-md">
-        <Card className="shadow-xl border-0">
-          <CardHeader className="space-y-1 text-center pb-6" title="Welcome back" subheader="Sign in to your account to continue">
-            {/* <CardTitle className="text-2xl font-bold tracking-tight">
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: `linear-gradient(135deg, ${theme.palette.primary.light}20, ${theme.palette.secondary.light}20)`,
+        p: 2,
+      }}
+    >
+      <Card
+        sx={{
+          maxWidth: 400,
+          width: "100%",
+          boxShadow: theme.shadows[8],
+        }}
+      >
+        <CardContent sx={{ p: 4 }}>
+          {/* Header */}
+          <Box sx={{ textAlign: "center", mb: 3 }}>
+            <Typography
+              variant="h4"
+              component="h1"
+              fontWeight="bold"
+              gutterBottom
+            >
               Welcome back
-            </CardTitle>
-            <CardDescription className="text-base">
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
               Sign in to your account to continue
-            </CardDescription> */}
-          </CardHeader>
-          
-          <CardContent className="space-y-6">
-            {/* Success Message */}
-            {success && (
-              <Alert className="border-green-200 bg-green-50" icon={<CheckIcon fontSize="inherit" />} severity="success" variant="outlined">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />{success}
-                {/* <AlertDescription className="text-green-800">
-                  {success}
-                </AlertDescription> */}
-              </Alert>
-            )}
+            </Typography>
+          </Box>
 
-            {/* Error Message */}
-            {error && (
-              <Alert variant="outlined" icon={<AlertCircle className="h-4 w-4" fontSize="inherit" />} severity="error">
-               {error}
-                {/* <AlertDescription>
-                  {error}
-                </AlertDescription> */}
-              </Alert>
-            )}
+          {/* Success Message */}
+          {success && (
+            <Alert severity="success" sx={{ mb: 3 }}>
+              {success}
+            </Alert>
+          )}
 
-            {/* Login Type Selector */}
-            <div className="flex rounded-lg border border-gray-200 p-1 bg-gray-50">
-              <button
-                type="button"
-                onClick={() => setLoginType('form')}
-                className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                  loginType === 'form'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Email & Password
-              </button>
-              <button
-                type="button"
-                onClick={() => setLoginType('oauth')}
-                className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                  loginType === 'oauth'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Social Login
-              </button>
-            </div>
+          {/* Error Message */}
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
 
-            {/* Form Login */}
-            {loginType === 'form' && (
-              <form onSubmit={handleFormSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium">
-                    Email address
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      placeholder="Enter your email"
-                      className="pl-10"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      disabled={loading !== null}
-                    />
-                  </div>
-                  {formErrors.email && (
-                    <p className="text-sm text-red-600">{formErrors.email}</p>
-                  )}
-                </div>
+          {/* Login Tabs */}
+          <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+            <Tabs
+              value={tabValue}
+              onChange={(_, newValue) => setTabValue(newValue)}
+              variant="fullWidth"
+            >
+              <Tab label="Email & Password" />
+              <Tab label="Social Login" />
+            </Tabs>
+          </Box>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-sm font-medium">
-                      Password
-                    </Label>
-                    <button
-                      type="button"
-                      className="text-sm text-blue-600 hover:text-blue-500 font-medium"
-                      onClick={() => {
-                        // Handle forgot password
-                        router.push('/auth/forgot-password');
-                      }}
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      id="password"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="current-password"
-                      placeholder="Enter your password"
-                      className="pl-10 pr-10"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      disabled={loading !== null}
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
-                  {formErrors.password && (
-                    <p className="text-sm text-red-600">{formErrors.password}</p>
-                  )}
-                </div>
+          {/* Form Login Tab */}
+          <TabPanel value={tabValue} index={0}>
+            <Box
+              component="form"
+              onSubmit={handleFormSubmit}
+              sx={{ width: "100%" }}
+            >
+              <Stack spacing={3}>
+                <TextField
+                  fullWidth
+                  label="Email address"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  error={!!formErrors.email}
+                  helperText={formErrors.email}
+                  disabled={loading !== null}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Email color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  error={!!formErrors.password}
+                  helperText={formErrors.password}
+                  disabled={loading !== null}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock color="action" />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <MuiLink
+                    component="button"
+                    type="button"
+                    variant="body2"
+                    onClick={() => router.push("/auth/forgot-password")}
+                  >
+                    Forgot password?
+                  </MuiLink>
+                </Box>
 
                 <Button
                   type="submit"
-                  className="w-full h-11"
+                  fullWidth
+                  variant="contained"
+                  size="large"
                   disabled={loading !== null}
+                  sx={{ height: 48 }}
                 >
-                  {isLoading('form') ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {isLoading("form") ? (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <CircularProgress size={20} color="inherit" />
                       Signing in...
-                    </>
+                    </Box>
                   ) : (
-                    'Sign in'
+                    "Sign in"
                   )}
                 </Button>
-              </form>
-            )}
+              </Stack>
+            </Box>
+          </TabPanel>
 
-            {/* OAuth Login */}
-            {loginType === 'oauth' && (
-              <div className="space-y-3">
-                {Object.entries(PROVIDERS).map(([key, provider]) => (
-                  <Button
-                    key={key}
-                    variant="outline"
-                    size="lg"
-                    className={`w-full h-12 ${provider.bgColor} ${provider.textColor} ${provider.borderColor} transition-all duration-200 font-medium`}
-                    onClick={() => handleProviderLogin(key)}
-                    disabled={loading !== null}
-                  >
-                    {isLoading(key) ? (
-                      <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                    ) : (
-                      <span className="mr-3">{provider.icon}</span>
-                    )}
-                    {isLoading(key) 
-                      ? `Connecting to ${provider.name}...`
-                      : `Continue with ${provider.name}`
-                    }
-                  </Button>
-                ))}
-              </div>
-            )}
-
-            {/* Separator */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator className="w-full" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">
-                  New to our platform?
-                </span>
-              </div>
-            </div>
-
-            {/* Sign up link */}
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => router.push('/auth/register')}
-                className="text-sm text-blue-600 hover:text-blue-500 font-medium"
-              >
-                Create an account
-              </button>
-            </div>
-
-            {/* Additional Info */}
-            <div className="text-center text-xs text-gray-600 mt-6">
-              <p>By continuing, you agree to our Terms of Service and Privacy Policy.</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Footer */}
-        <div className="text-center mt-6 text-sm text-gray-500">
-          <p>Need help? Contact our support team</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-              </Alert>
-            )}
-
-            {/* Provider Buttons */}
-            <div className="space-y-3">
+          {/* Social Login Tab */}
+          <TabPanel value={tabValue} index={1}>
+            <Stack spacing={2}>
               {Object.entries(PROVIDERS).map(([key, provider]) => (
-                <Button
+                <StyledProviderButton
                   key={key}
-                  variant="outline"
-                  size="lg"
-                  className={`w-full h-12 ${provider.bgColor} ${provider.textColor} ${provider.borderColor} transition-all duration-200 font-medium`}
+                  provider={key}
+                  fullWidth
+                  variant="outlined"
+                  size="large"
                   onClick={() => handleProviderLogin(key)}
                   disabled={loading !== null}
+                  sx={{ height: 48 }}
                 >
                   {isLoading(key) ? (
-                    <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <CircularProgress size={20} color="inherit" />
+                      Connecting to {provider.name}...
+                    </Box>
                   ) : (
-                    <span className="mr-3">{provider.icon}</span>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      {provider.icon}
+                      Continue with {provider.name}
+                    </Box>
                   )}
-                  {isLoading(key) 
-                    ? `Connecting to ${provider.name}...`
-                    : `Continue with ${provider.name}`
-                  }
-                </Button>
+                </StyledProviderButton>
               ))}
-            </div>
+            </Stack>
+          </TabPanel>
 
-            {/* Additional Info */}
-            <div className="text-center text-sm text-gray-600 mt-8">
-              <p>By continuing, you agree to our Terms of Service and Privacy Policy.</p>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Divider */}
+          <Divider sx={{ my: 3 }}>
+            <Chip label="New to our platform?" size="small" />
+          </Divider>
 
-        {/* Footer */}
-        <div className="text-center mt-6 text-sm text-gray-500">
-          <p>Need help? Contact our support team</p>
-        </div>
-      </div>
-    </div>
+          {/* Sign up link */}
+          <Box sx={{ textAlign: "center" }}>
+            <MuiLink
+              component="button"
+              type="button"
+              variant="body2"
+              onClick={() => router.push("/auth/register")}
+            >
+              Create an account
+            </MuiLink>
+          </Box>
+
+          {/* Footer */}
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block", textAlign: "center", mt: 3 }}
+          >
+            By continuing, you agree to our Terms of Service and Privacy Policy.
+          </Typography>
+        </CardContent>
+      </Card>
+
+      {/* Support Footer */}
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 16,
+          textAlign: "center",
+          width: "100%",
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          Need help? Contact our support team
+        </Typography>
+      </Box>
+    </Box>
   );
 }
