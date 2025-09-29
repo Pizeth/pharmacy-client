@@ -59,7 +59,7 @@ import {
 // import PostIcon from "@mui/icons-material/Book";
 import UserIcon from "@mui/icons-material/Group";
 import { Layout } from "./CustomComponents/Layout";
-import { dataProvider } from "./Providers/dataProvider";
+import { dataProvider } from "../lib/dataProvider";
 import { Dashboard } from "./Dashboard";
 import { i18nProvider } from "@/i18n/i18nProvider";
 import { darkTheme, lightTheme } from "@/theme/razeth";

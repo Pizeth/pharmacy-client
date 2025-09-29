@@ -1,6 +1,33 @@
 // lib/authProvider.ts
 import { AuthTokens, User } from "@/interfaces/user.interface";
+// lib/authProvider.ts
 import { AuthProvider } from "react-admin";
+
+// interface User {
+//   id: string;
+//   name: string;
+//   email: string;
+//   avatar?: string;
+//   provider?: string;
+//   roles?: string[];
+// }
+
+// interface AuthTokens {
+//   accessToken?: string;
+//   refreshToken?: string;
+//   idToken?: string;
+//   expiresAt?: number;
+// }
+
+interface LoginParams {
+  // For form login
+  email?: string;
+  password?: string;
+  // For OIDC callback
+  token?: string;
+  // Other params
+  [key: string]: unknown;
+}
 
 class OidcAuthProvider implements AuthProvider {
   private readonly backendUrl: string;
@@ -27,30 +54,28 @@ class OidcAuthProvider implements AuthProvider {
 
     // Check if token is expired
     if (tokens.expiresAt && Date.now() > tokens.expiresAt) {
-      // Try to refresh token
       try {
         await this.refreshTokens();
       } catch (error) {
-        console.log("Token refresh failed:", error);
-        // Refresh failed, user needs to login again
+        console.error("Token refresh failed:", error);
         this.clearAuth();
         throw new Error("Token expired");
       }
     }
   }
 
-  // Login - this is called when user is redirected back from OIDC provider
-  async login({ token, ...params }: Request) {
-    // If we have a token from URL params (callback), validate it with backend
-    if (token) {
+  // Login - handles both form login and OIDC callback
+  async login(params: LoginParams) {
+    // Handle OIDC callback with token
+    if (params.token) {
       try {
         const response = await fetch(`${this.backendUrl}/auth/validate`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${params.token}`,
           },
-          body: JSON.stringify({ token }),
+          body: JSON.stringify({ token: params.token }),
         });
 
         if (response.ok) {
@@ -63,14 +88,41 @@ class OidcAuthProvider implements AuthProvider {
       }
     }
 
+    // Handle form login
+    if (params.email && params.password) {
+      try {
+        const response = await fetch(`${this.backendUrl}/auth/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            email: params.email,
+            password: params.password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          this.storeAuth(data.user, data.tokens || {});
+          return data.user;
+        } else {
+          throw new Error(data.message || "Login failed");
+        }
+      } catch (error) {
+        throw error instanceof Error ? error : new Error("Login failed");
+      }
+    }
+
     // Check if user is already authenticated (e.g., page refresh)
     const storedUser = this.getStoredUser();
     if (storedUser) {
       return storedUser;
     }
 
-    // If no stored user and no token, user needs to login
-    // This will redirect to login page
+    // If no stored user and no valid login params, user needs to login
     return Promise.reject({
       redirectTo: "/auth/login",
       message: "Please log in to continue",
@@ -81,13 +133,12 @@ class OidcAuthProvider implements AuthProvider {
   async logout(): Promise<void | false | string> {
     const user = this.getStoredUser();
 
-    // Clear local storage
+    // Clear local storage first
     this.clearAuth();
 
     // If user was authenticated via OIDC, redirect to provider logout
-    if (user?.provider) {
+    if (user?.provider && user.provider !== "local") {
       try {
-        // Call backend logout endpoint to handle OIDC provider logout
         const response = await fetch(
           `${this.backendUrl}/auth/${user.provider}/logout`,
           {
@@ -97,16 +148,24 @@ class OidcAuthProvider implements AuthProvider {
         );
 
         if (response.redirected) {
-          // Backend is redirecting to OIDC provider logout
           window.location.href = response.url;
           return false; // Prevent React Admin redirect
         }
+      } catch (error) {
+        console.error("OIDC logout error:", error);
+      }
+    } else {
+      // For local auth, call logout endpoint
+      try {
+        await fetch(`${this.backendUrl}/auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
       } catch (error) {
         console.error("Logout error:", error);
       }
     }
 
-    // Default redirect to login page
     return "/auth/login";
   }
 
@@ -125,7 +184,7 @@ class OidcAuthProvider implements AuthProvider {
     return Promise.resolve();
   }
 
-  // Get permissions (optional - implement based on your needs)
+  // Get permissions
   async getPermissions(): Promise<string[]> {
     const user = this.getStoredUser();
     return user?.roles || [];
@@ -230,18 +289,17 @@ class OidcAuthProvider implements AuthProvider {
     }
 
     if (authSuccess === "success") {
-      // The backend should have set session cookies
-      // We need to validate the session with the backend
       return this.validateSession();
     }
 
     return Promise.resolve(null);
   }
 
+  // Validate session after OAuth callback
   private async validateSession(): Promise<User | null> {
     try {
       const response = await fetch(`${this.backendUrl}/auth/me`, {
-        credentials: "include", // Important: include cookies
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -258,12 +316,39 @@ class OidcAuthProvider implements AuthProvider {
 
     return null;
   }
+
+  // Check if user is authenticated for initial load
+  async checkInitialAuth(): Promise<User | null> {
+    // First check local storage
+    const storedUser = this.getStoredUser();
+    if (storedUser) {
+      try {
+        await this.checkAuth();
+        return storedUser;
+      } catch {
+        // Token expired or invalid, try to validate session
+        try {
+          return await this.validateSession();
+        } catch {
+          this.clearAuth();
+          return null;
+        }
+      }
+    }
+
+    // If no stored user, try to validate session (in case of fresh OAuth callback)
+    try {
+      return await this.validateSession();
+    } catch {
+      return null;
+    }
+  }
 }
 
 // Create and export the auth provider instance
 export const authProvider = new OidcAuthProvider();
 
-// Custom hook for handling OAuth callbacks in your app
+// Custom hook for handling OAuth callbacks
 export function useOAuthCallback() {
   const handleCallback = async (searchParams: URLSearchParams) => {
     try {

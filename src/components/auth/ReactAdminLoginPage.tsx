@@ -26,7 +26,7 @@ import {
   Facebook,
 } from "@mui/icons-material";
 import { styled, useTheme } from "@mui/material/styles";
-import { useLogin, useNotify } from "react-admin"; // Removed useSafeSetState
+import { useLogin, useNotify } from "react-admin";
 import { useSearchParams } from "react-router-dom";
 
 // Custom Discord icon component
@@ -308,12 +308,14 @@ const ReactAdminLoginPage = () => {
                   error={!!formErrors.email}
                   helperText={formErrors.email}
                   disabled={loading !== null}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Email color="action" />
-                      </InputAdornment>
-                    ),
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Email color="action" />
+                        </InputAdornment>
+                      ),
+                    },
                   }}
                 />
 
@@ -328,22 +330,24 @@ const ReactAdminLoginPage = () => {
                   error={!!formErrors.password}
                   helperText={formErrors.password}
                   disabled={loading !== null}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Lock color="action" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Lock color="action" />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
                   }}
                 />
 
