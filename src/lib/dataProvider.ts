@@ -12,7 +12,8 @@ import { StatusCodes } from "http-status-codes";
 import FormSerializer from "@/utils/formData";
 
 // const API_URL = process.env.API_URL; // Define your API URL here
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
 
 interface GetListParams {
   pagination?: { page: number; perPage: number };

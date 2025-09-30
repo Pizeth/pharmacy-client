@@ -1,4 +1,3 @@
-// in src/components/AdminApp.tsx
 "use client"; // remove this line if you choose Pages Router
 
 // import * as React from "react";
@@ -67,7 +66,9 @@ import { UserCreate } from "./Users/userCreate";
 import { UserShow } from "./Users/userDetail";
 import { UserEdit } from "./Users/userEdit";
 import { UserList } from "./Users/users";
-import { LoginPage } from "./LoginPage";
+import ReactAdminLoginPage from "./auth/ReactAdminLoginPage";
+import { authProvider } from "@/lib/authProvider";
+import { LoginPage } from "./auth/login-page";
 
 const store = localStorageStore(undefined, "ECommerce");
 
@@ -98,7 +99,7 @@ export const AdminApp = () => {
       layout={Layout}
       dataProvider={dataProvider}
       loginPage={LoginPage}
-      // authProvider={authProvider}
+      authProvider={authProvider}
       disableTelemetry
       // theme={theme}
       lightTheme={lightTheme}

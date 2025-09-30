@@ -1,5 +1,5 @@
+import "./src/configs/envConfig";
 import type { NextConfig } from "next";
-/** @type {import('next').NextConfig} */
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
       // Proxy API calls to your NestJS backend during development
       {
         source: "/api/v1/:path*",
-        destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_BACKEND_URL!}/api/v1/:path*`,
       },
     ];
   },

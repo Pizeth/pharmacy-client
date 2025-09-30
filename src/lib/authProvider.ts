@@ -1,35 +1,12 @@
 // lib/authProvider.ts
-import { AuthTokens, User } from "@/interfaces/user.interface";
-// lib/authProvider.ts
+import AppError from "@/exceptions/app.exception";
+import { AuthTokens, LoginParams } from "@/interfaces/auth.interface";
+import { User } from "@/interfaces/user.interface";
+import { StatusCodes } from "http-status-codes";
 import { AuthProvider } from "react-admin";
 
-// interface User {
-//   id: string;
-//   name: string;
-//   email: string;
-//   avatar?: string;
-//   provider?: string;
-//   roles?: string[];
-// }
-
-// interface AuthTokens {
-//   accessToken?: string;
-//   refreshToken?: string;
-//   idToken?: string;
-//   expiresAt?: number;
-// }
-
-interface LoginParams {
-  // For form login
-  email?: string;
-  password?: string;
-  // For OIDC callback
-  token?: string;
-  // Other params
-  [key: string]: unknown;
-}
-
 class OidcAuthProvider implements AuthProvider {
+  private readonly context = OidcAuthProvider.name;
   private readonly backendUrl: string;
   private readonly storageKeys = {
     user: "oidc_user",
@@ -39,8 +16,8 @@ class OidcAuthProvider implements AuthProvider {
   constructor(backendUrl?: string) {
     this.backendUrl =
       backendUrl ||
-      process.env.NEXT_PUBLIC_BACKEND_URL ||
-      "http://localhost:3000";
+      process.env.NEXT_PUBLIC_API_URL ||
+      "http://localhost:3000/api/v1";
   }
 
   // Check if user is authenticated
@@ -49,7 +26,12 @@ class OidcAuthProvider implements AuthProvider {
     const tokens = this.getStoredTokens();
 
     if (!user || !tokens) {
-      throw new Error("Not authenticated");
+      throw new AppError(
+        "Not authenticated",
+        StatusCodes.UNAUTHORIZED,
+        this.context,
+        { cause: "No user or tokens found in storage" }
+      );
     }
 
     // Check if token is expired
@@ -59,7 +41,12 @@ class OidcAuthProvider implements AuthProvider {
       } catch (error) {
         console.error("Token refresh failed:", error);
         this.clearAuth();
-        throw new Error("Token expired");
+        throw new AppError(
+          "Token expired",
+          StatusCodes.UNAUTHORIZED,
+          this.context,
+          { cause: "Token refresh failed" }
+        );
       }
     }
   }
@@ -170,8 +157,8 @@ class OidcAuthProvider implements AuthProvider {
   }
 
   // Check error from API calls
-  checkError(error: any): Promise<void> {
-    const status = error.status;
+  checkError(error: unknown): Promise<void> {
+    const status = error instanceof AppError ? error.statusCode : undefined;
 
     if (status === 401 || status === 403) {
       this.clearAuth();
