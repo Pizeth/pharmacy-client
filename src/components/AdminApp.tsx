@@ -68,7 +68,7 @@ import { UserEdit } from "./Users/userEdit";
 import { UserList } from "./Users/users";
 import ReactAdminLoginPage from "./auth/ReactAdminLoginPage";
 import { authProvider } from "@/lib/authProvider";
-import { LoginPage } from "./auth/login-page";
+import LoginPage from "./auth/login-page";
 
 const store = localStorageStore(undefined, "ECommerce");
 

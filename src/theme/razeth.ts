@@ -2,6 +2,7 @@ import { deepmerge } from "@mui/utils";
 import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
 import { red, blue } from "@mui/material/colors";
 import { createTheme, Theme } from "@mui/material/styles";
+import { size } from "lodash";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -161,6 +162,9 @@ const customBaseTheme = createTheme({
             // weight: "bold",
             // fontWeight: "bold",
           },
+          "&.MuiTypography-body1": {
+            fontSize: "0.875rem",
+          },
         },
       },
     },
@@ -194,7 +198,11 @@ const customBaseTheme = createTheme({
     },
     MuiButtonBase: {
       styleOverrides: {
-        root: (props: { theme: Theme }) => ({}),
+        root: (props: { theme: Theme }) => ({
+          "&.MuiButton-root": {
+            color: props.theme.palette.text.primary,
+          },
+        }),
       },
     },
     // MuiIconButton: {
