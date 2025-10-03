@@ -1,0 +1,198 @@
+import React, { useEffect, useRef } from "react";
+import { useCheckAuth } from "ra-core";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Divider,
+  Grid,
+  Link,
+  Theme,
+} from "@mui/material";
+import { styled, useTheme, useThemeProps } from "@mui/material/styles";
+import PasswordLogin from "./passwordLogin";
+import SocialLogin from "./socialLogin";
+import SideImage from "./sideImage";
+import AvatarHeader from "./avatar";
+import { LoginProps } from "@/interfaces/auth.interface";
+import { useNavigate } from "react-router-dom";
+import PersonIcon from "@mui/icons-material/Person";
+
+const Login = (inProps: LoginProps) => {
+  const props = useThemeProps({
+    props: inProps,
+    name: PREFIX,
+  });
+  const {
+    children = defaultLoginForm,
+    // backgroundImage,
+    // avatarIcon = defaultAvatar,
+    ...rest
+  } = props;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const checkAuth = useCheckAuth();
+  const theme = useTheme();
+  const navigate = useNavigate();
+  useEffect(() => {
+    checkAuth({}, false)
+      .then(() => {
+        // already authenticated, redirect to the home page
+        navigate("/");
+      })
+      .catch(() => {
+        // not authenticated, stay on the login page
+      });
+  }, [checkAuth, navigate]);
+
+  return (
+    <Root
+      {...rest}
+      ref={containerRef}
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        p: 2,
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? theme.palette.grey[900]
+            : theme.palette.grey[100],
+      }}
+    >
+      <Box sx={{ width: "100%", maxWidth: { xs: "100%", md: "750px" } }}>
+        <Card sx={{ overflow: "hidden", borderRadius: 2, boxShadow: 3 }}>
+          <Grid container spacing={0}>
+            {/* Image section - hidden on mobile */}
+            <SideImage />
+
+            {/* Form section */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                  {defaultAvatar}
+                  {children}
+                  <Box
+                    sx={{
+                      position: "relative",
+                      display: "flex",
+                      alignItems: "center",
+                      my: 2,
+                    }}
+                  >
+                    <Divider sx={{ flex: 1 }} />
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        px: 2,
+                        backgroundColor: theme.palette.background.paper,
+                        color: "text.secondary",
+                      }}
+                    >
+                      Or continue with
+                    </Typography>
+                    <Divider sx={{ flex: 1 }} />
+                  </Box>
+
+                  {SocialLogin}
+
+                  <Box
+                    sx={{
+                      textAlign: "center",
+                      mt: 1,
+                      color: "text.secondary",
+                    }}
+                  >
+                    Don&apos;t have an account?{" "}
+                    <Link
+                      href="#"
+                      sx={{
+                        color: "primary.main",
+                        textDecoration: "underline",
+                        textUnderlineOffset: "2px",
+                        "&:hover": {
+                          textDecoration: "underline",
+                        },
+                      }}
+                    >
+                      Sign up
+                    </Link>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Grid>
+          </Grid>
+        </Card>
+
+        <Box
+          sx={{
+            mt: 2,
+            textAlign: "center",
+            color: "text.secondary",
+            fontSize: "0.75rem",
+            a: {
+              color: "primary.main",
+              textDecoration: "underline",
+              textUnderlineOffset: "2px",
+              "&:hover": {
+                textDecoration: "underline",
+              },
+            },
+          }}
+        >
+          By clicking continue, you agree to our{" "}
+          <Link href="#">Terms of Service</Link> and{" "}
+          <Link href="#">Privacy Policy</Link>.
+        </Box>
+      </Box>
+    </Root>
+  );
+};
+
+const PREFIX = "RazethLogin";
+
+export const LoginClasses = {
+  content: `${PREFIX}-content`,
+  button: `${PREFIX}-button`,
+  icon: `${PREFIX}-icon`,
+  card: `${PREFIX}-card`,
+  avatar: `${PREFIX}-avatar`,
+};
+
+export const LoginStyles = (theme: Theme) => ({
+  [`& .${LoginClasses.avatar}`]: {
+    margin: theme.spacing(0, 0, 1.5, 0),
+    display: "flex",
+    justifyContent: "center",
+  },
+  // [`& .MuiBox-root`]: {
+  //   gap: theme.spacing(0),
+  // },
+  // [`& .${LoginClasses.content}`]: {
+  //   minWidth: 300,
+  //   padding: `${theme.spacing(0)}`,
+  // },
+  // [`& .${LoginClasses.button}`]: {
+  //   // marginTop: theme.spacing(2),
+  //   mt: 1,
+  //   py: 1.5,
+  //   fontWeight: 600,
+  // },
+  // [`& .${LoginClasses.icon}`]: {
+  //   margin: theme.spacing(0.3),
+  // },
+});
+
+const Root = styled("div", {
+  name: PREFIX,
+  overridesResolver: (_props, styles) => styles.root,
+})(({ theme }) => LoginStyles(theme));
+
+const defaultLoginForm = <PasswordLogin />;
+
+const defaultAvatar = (
+  <AvatarHeader avatarIcon={<PersonIcon />} className={LoginClasses.avatar} />
+);
+
+export default Login;

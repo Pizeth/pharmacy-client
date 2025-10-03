@@ -9,6 +9,11 @@ const messages: { [key: string]: any } = {
   en: {
     ...englishMessages,
     razeth: {
+      auth: {
+        credentail: "Username or Email",
+        password: "Password",
+        sign_in: "Sign In",
+      },
       validation: {
         required: "%{field} is required!",
         notmatch: "The password do not match!",

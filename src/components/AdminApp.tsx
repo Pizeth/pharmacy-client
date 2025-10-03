@@ -68,7 +68,7 @@ import { UserEdit } from "./Users/userEdit";
 import { UserList } from "./Users/users";
 import ReactAdminLoginPage from "./auth/ReactAdminLoginPage";
 import { authProvider } from "@/lib/authProvider";
-import LoginPage from "./auth/login-page";
+import Login from "./auth/login";
 
 const store = localStorageStore(undefined, "ECommerce");
 
@@ -98,7 +98,7 @@ export const AdminApp = () => {
       i18nProvider={i18nProvider}
       layout={Layout}
       dataProvider={dataProvider}
-      loginPage={LoginPage}
+      loginPage={Login}
       authProvider={authProvider}
       disableTelemetry
       // theme={theme}
