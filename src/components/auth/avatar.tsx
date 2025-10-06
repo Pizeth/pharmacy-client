@@ -9,7 +9,7 @@ const AvatarHeader = (inProps: AvatarProps) => {
     name: PREFIX,
   });
   const { avatarIcon = defaultAvatarIcon, className, ...rest } = props;
-  console.log("className", className);
+
   return (
     <Box {...rest}>
       <div className={className}>
@@ -37,7 +37,10 @@ const defaultAvatarIcon = <PersonIcon />;
 const PREFIX = "RazethAvatar";
 
 export const AvatarClasses = {
-  avatar: `${PREFIX}-avatar`,
+  content: `${PREFIX}-content`,
+  "& svg": {
+    fill: "#fff",
+  },
 };
 
 // export const AvatarStyles = () => ({

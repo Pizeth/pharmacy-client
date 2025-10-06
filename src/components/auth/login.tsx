@@ -1,15 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useCheckAuth } from "ra-core";
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Divider,
-  Grid,
-  Link,
-  Theme,
-} from "@mui/material";
+import { Box, Card, CardContent, Grid, Link, Theme } from "@mui/material";
 import { styled, useTheme, useThemeProps } from "@mui/material/styles";
 import PasswordLogin from "./passwordLogin";
 import SocialLogin from "./socialLogin";
@@ -18,6 +9,8 @@ import AvatarHeader from "./avatar";
 import { LoginProps } from "@/interfaces/auth.interface";
 import { useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
+import { RazethDivider as Divider } from "./divider";
+import SignupLink from "./ui/signUp";
 
 const Login = (inProps: LoginProps) => {
   const props = useThemeProps({
@@ -61,19 +54,31 @@ const Login = (inProps: LoginProps) => {
             : theme.palette.grey[100],
       }}
     >
-      <Box sx={{ width: "100%", maxWidth: { xs: "100%", md: "750px" } }}>
-        <Card sx={{ overflow: "hidden", borderRadius: 2, boxShadow: 3 }}>
+      <Box
+        className={LoginClasses.content}
+        // sx={{ width: "100%", maxWidth: { xs: "100%", md: "750px" } }}
+      >
+        <Card
+          className={LoginClasses.card}
+          // sx={{ overflow: "hidden", borderRadius: 2, boxShadow: 3 }}
+        >
           <Grid container spacing={0}>
             {/* Image section - hidden on mobile */}
-            <SideImage />
+            <SideImage src="static/images/placeholder-mcs-orange.svg" />
 
             {/* Form section */}
             <Grid size={{ xs: 12, md: 6 }}>
-              <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              <CardContent
+                className="card-content"
+                // sx={{ p: { xs: 3, md: 4 } }}
+              >
+                <Box
+                  className="card-box"
+                  // sx={{ display: "flex", flexDirection: "column", gap: 0 }}
+                >
                   {defaultAvatar}
                   {children}
-                  <Box
+                  {/* <Box
                     sx={{
                       position: "relative",
                       display: "flex",
@@ -93,11 +98,11 @@ const Login = (inProps: LoginProps) => {
                       Or continue with
                     </Typography>
                     <Divider sx={{ flex: 1 }} />
-                  </Box>
-
+                  </Box> */}
+                  <Divider title="Or continue with" />
                   {SocialLogin}
 
-                  <Box
+                  {/* <Box
                     sx={{
                       textAlign: "center",
                       mt: 1,
@@ -118,7 +123,8 @@ const Login = (inProps: LoginProps) => {
                     >
                       Sign up
                     </Link>
-                  </Box>
+                  </Box> */}
+                  <SignupLink />
                 </Box>
               </CardContent>
             </Grid>
@@ -161,10 +167,38 @@ export const LoginClasses = {
 };
 
 export const LoginStyles = (theme: Theme) => ({
+  // [theme.breakpoints.up("md")]: {
+  //   maxWidth: "750px",
+  // },
   [`& .${LoginClasses.avatar}`]: {
     margin: theme.spacing(0, 0, 1.5, 0),
     display: "flex",
     justifyContent: "center",
+    ["& .MuiAvatar-root"]: { backgroundColor: "#e72d32" },
+    "& svg": {
+      fill: "#fff",
+    },
+  },
+  [`& .${LoginClasses.content}`]: {
+    width: "100%",
+    maxWidth: "100%",
+    [theme.breakpoints.up("md")]: {
+      maxWidth: "750px",
+    },
+    // maxWidth: { xs: "100%", md: "750px" },
+    [`& .${LoginClasses.card}`]: {
+      overflow: "hidden",
+      borderRadius: theme.spacing(2),
+      boxShadow: theme.shadows[3],
+      ["& .card-content"]: {
+        padding: theme.spacing(3, 4),
+        ["& .card-box"]: {
+          display: "flex",
+          flexDirection: "column",
+          gap: 0,
+        },
+      },
+    },
   },
   // [`& .MuiBox-root`]: {
   //   gap: theme.spacing(0),

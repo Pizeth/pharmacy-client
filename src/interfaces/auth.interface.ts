@@ -47,3 +47,29 @@ export interface SideImageProps extends HtmlHTMLAttributes<HTMLDivElement> {
   src?: string;
   sx?: SxProps<Theme>;
 }
+
+export interface DividerProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  className?: string;
+  title: string;
+  sx?: SxProps<Theme>;
+}
+
+export interface SignUpProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  className?: string;
+  message?: string;
+  title?: string;
+  icon?: ReactNode;
+  sx?: SxProps<Theme>;
+}
+
+export interface FooterProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  className?: string;
+  description?: string;
+  termsOfService?: string;
+  termsOfServiceUrl?: string;
+  privacyPolicy?: string;
+  privacyPolicyUrl?: string;
+  copyright?: string;
+  ampersand?: string;
+  sx?: SxProps<Theme>;
+}

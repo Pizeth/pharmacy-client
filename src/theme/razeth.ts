@@ -205,6 +205,19 @@ const customBaseTheme = createTheme({
         }),
       },
     },
+    MuiLink: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          color: props.theme.palette.primary.main,
+          textDecoration: "underline",
+          textUnderlineOffset: "2px",
+          "&:hover": {
+            textDecoration: "underline",
+            color: "#9d1820ff",
+          },
+        }),
+      },
+    },
     // MuiIconButton: {
     //   styleOverrides: {
     //     root: (props: { theme: Theme }) => ({

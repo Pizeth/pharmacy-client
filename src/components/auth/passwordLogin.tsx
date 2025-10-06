@@ -71,7 +71,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
     >
       <CardContent className={LoginFormClasses.content}>
         {children || (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          <Box className="box-body">
             <IconInput
               source="credential"
               className="icon-input"
@@ -82,13 +82,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
               validate={required()}
               resettable
             />
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 0,
-              }}
-            >
+            <Box className="box-input">
               <PasswordValidationInput
                 source="password"
                 iconStart={<Password />}
@@ -99,31 +93,14 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                 resettable
                 fullWidth
               />
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              <Box className="box-input-footer">
+                <Typography variant="body2">
                   <FormControlLabel
                     control={<Checkbox defaultChecked />}
                     label="Remember me"
                   />
                 </Typography>
-                <Link
-                  href="#"
-                  variant="body2"
-                  sx={{
-                    color: "primary.main",
-                    textDecoration: "underline",
-                    textUnderlineOffset: "2px",
-                    "&:hover": {
-                      textDecoration: "underline",
-                    },
-                  }}
-                >
+                <Link href="#" variant="body2">
                   Forgot your password?
                 </Link>
               </Box>
@@ -137,13 +114,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
               disabled={loading}
               // fullWidth
               className={LoginFormClasses.button}
-              //   sx={{
-              //     mt: 1,
-              //     py: 1.5,
-              //     fontWeight: 600,
-              //   }}
             >
-              {/* <MCS /> */}
               {loading ? (
                 <CircularProgress
                   //   size={24}
@@ -191,15 +162,41 @@ export const LoginFormStyles = (theme: Theme) => ({
   [`& .${LoginFormClasses.content}`]: {
     minWidth: 300,
     padding: `${theme.spacing(0)}`,
+    ["& .box-body"]: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 0,
+      ["& .box-input"]: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 0,
+        ["& .box-input-footer"]: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          fontWeight: 500,
+          ["& a"]: {
+            color: "primary.main",
+            textDecoration: "underline",
+            textUnderlineOffset: "2px",
+            "&:hover": {
+              textDecoration: "underline",
+            },
+          },
+        },
+      },
+    },
   },
   [`& .${LoginFormClasses.content}:last-child`]: {
     paddingBottom: `${theme.spacing(0)}`,
   },
   [`& .${LoginFormClasses.button}`]: {
     marginTop: theme.spacing(2),
-    mt: 1,
-    py: 1.5,
-    fontWeight: 600,
+    // paddingTop: theme.spacing(1.5),
+    // paddingBottom: theme.spacing(1.5),
+    // mt: 1,
+    // py: 1.5,
+    fontWeight: 700,
   },
   [`& .${LoginFormClasses.icon}`]: {
     margin: theme.spacing(0.3),
