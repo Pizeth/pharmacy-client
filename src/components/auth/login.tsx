@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useCheckAuth } from "ra-core";
-import { Box, Card, CardContent, Grid, Link, Theme } from "@mui/material";
-import { styled, useTheme, useThemeProps } from "@mui/material/styles";
+import { Box, Card, CardContent, Grid, Theme } from "@mui/material";
+import { styled, useThemeProps } from "@mui/material/styles";
 import PasswordLogin from "./passwordLogin";
 import SocialLogin from "./socialLogin";
 import SideImage from "./sideImage";
@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import { RazethDivider as Divider } from "./divider";
 import SignupLink from "./ui/signUp";
+import Footer from "./ui/footer";
 
 const Login = (inProps: LoginProps) => {
   const props = useThemeProps({
@@ -18,14 +19,21 @@ const Login = (inProps: LoginProps) => {
     name: PREFIX,
   });
   const {
+    avatarIcon = defaultAvatar,
     children = defaultLoginForm,
+    divider = defaultDivider,
+    signUp = defaultSignUp,
+    footer = defaultFooter,
+    variant = "full",
+    className,
+    sx,
     // backgroundImage,
     // avatarIcon = defaultAvatar,
     ...rest
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const checkAuth = useCheckAuth();
-  const theme = useTheme();
+  // const theme = useTheme();
   const navigate = useNavigate();
   useEffect(() => {
     checkAuth({}, false)
@@ -40,19 +48,22 @@ const Login = (inProps: LoginProps) => {
 
   return (
     <Root
-      {...rest}
       ref={containerRef}
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        p: 2,
-        backgroundColor:
-          theme.palette.mode === "dark"
-            ? theme.palette.grey[900]
-            : theme.palette.grey[100],
-      }}
+      variant={variant}
+      className={className}
+      sx={sx}
+      {...rest}
+      // sx={{
+      //   minHeight: "100vh",
+      //   display: "flex",
+      //   alignItems: "center",
+      //   justifyContent: "center",
+      //   p: 2,
+      //   backgroundColor:
+      //     theme.palette.mode === "dark"
+      //       ? theme.palette.grey[900]
+      //       : theme.palette.grey[100],
+      // }}
     >
       <Box
         className={LoginClasses.content}
@@ -76,7 +87,7 @@ const Login = (inProps: LoginProps) => {
                   className="card-box"
                   // sx={{ display: "flex", flexDirection: "column", gap: 0 }}
                 >
-                  {defaultAvatar}
+                  {avatarIcon}
                   {children}
                   {/* <Box
                     sx={{
@@ -99,7 +110,7 @@ const Login = (inProps: LoginProps) => {
                     </Typography>
                     <Divider sx={{ flex: 1 }} />
                   </Box> */}
-                  <Divider title="Or continue with" />
+                  {divider}
                   {SocialLogin}
 
                   {/* <Box
@@ -124,14 +135,14 @@ const Login = (inProps: LoginProps) => {
                       Sign up
                     </Link>
                   </Box> */}
-                  <SignupLink />
+                  {signUp}
                 </Box>
               </CardContent>
             </Grid>
           </Grid>
         </Card>
 
-        <Box
+        {/* <Box
           sx={{
             mt: 2,
             textAlign: "center",
@@ -150,7 +161,8 @@ const Login = (inProps: LoginProps) => {
           By clicking continue, you agree to our{" "}
           <Link href="#">Terms of Service</Link> and{" "}
           <Link href="#">Privacy Policy</Link>.
-        </Box>
+        </Box> */}
+        {footer}
       </Box>
     </Root>
   );
@@ -159,6 +171,7 @@ const Login = (inProps: LoginProps) => {
 const PREFIX = "RazethLogin";
 
 export const LoginClasses = {
+  root: `${PREFIX}-root`,
   content: `${PREFIX}-content`,
   button: `${PREFIX}-button`,
   icon: `${PREFIX}-icon`,
@@ -170,15 +183,17 @@ export const LoginStyles = (theme: Theme) => ({
   // [theme.breakpoints.up("md")]: {
   //   maxWidth: "750px",
   // },
-  [`& .${LoginClasses.avatar}`]: {
-    margin: theme.spacing(0, 0, 1.5, 0),
-    display: "flex",
-    justifyContent: "center",
-    ["& .MuiAvatar-root"]: { backgroundColor: "#e72d32" },
-    "& svg": {
-      fill: "#fff",
-    },
-  },
+  // [` .${LoginClasses.root}`]: {
+  //   minHeight: "100vh",
+  //   display: "flex",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   padding: theme.spacing(2),
+  //   backgroundColor:
+  //     theme.palette.mode === "dark"
+  //       ? theme.palette.grey[900]
+  //       : theme.palette.grey[100],
+  // },
   [`& .${LoginClasses.content}`]: {
     width: "100%",
     maxWidth: "100%",
@@ -200,6 +215,15 @@ export const LoginStyles = (theme: Theme) => ({
       },
     },
   },
+  [`& .${LoginClasses.avatar}`]: {
+    margin: theme.spacing(0, 0, 1.5, 0),
+    display: "flex",
+    justifyContent: "center",
+    ["& .MuiAvatar-root"]: { backgroundColor: "#e72d32" },
+    "& svg": {
+      fill: "#fff",
+    },
+  },
   // [`& .MuiBox-root`]: {
   //   gap: theme.spacing(0),
   // },
@@ -218,15 +242,24 @@ export const LoginStyles = (theme: Theme) => ({
   // },
 });
 
+// const Root = styled("div", {
+//   name: PREFIX,
+//   slot: "Root",
+//   overridesResolver: (_props, styles) => styles.root,
+// })<LoginProps>(({ theme }) => LoginStyles(theme));
+
 const Root = styled("div", {
   name: PREFIX,
+  slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})(({ theme }) => LoginStyles(theme));
+})<LoginProps>(() => ({}));
 
 const defaultLoginForm = <PasswordLogin />;
-
 const defaultAvatar = (
   <AvatarHeader avatarIcon={<PersonIcon />} className={LoginClasses.avatar} />
 );
+const defaultDivider = <Divider />;
+const defaultSignUp = <SignupLink />;
+const defaultFooter = <Footer />;
 
 export default Login;

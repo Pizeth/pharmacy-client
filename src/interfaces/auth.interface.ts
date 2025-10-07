@@ -23,8 +23,12 @@ export interface LoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
   avatarIcon?: ReactNode;
   backgroundImage?: string;
   children?: ReactNode;
+  divider?: ReactNode;
+  signUp?: ReactNode;
+  footer?: ReactNode;
   className?: string;
   sx?: SxProps<Theme>;
+  variant?: "compact" | "full";
 }
 
 export interface LoginFormProps {
@@ -32,6 +36,8 @@ export interface LoginFormProps {
   className?: string;
   sx?: SxProps<Theme>;
   children?: React.ReactNode;
+  forgotPassword?: string;
+  forgotPasswordUrl?: string;
 }
 
 export interface AvatarProps extends HtmlHTMLAttributes<HTMLDivElement> {
@@ -50,7 +56,7 @@ export interface SideImageProps extends HtmlHTMLAttributes<HTMLDivElement> {
 
 export interface DividerProps extends HtmlHTMLAttributes<HTMLDivElement> {
   className?: string;
-  title: string;
+  title?: string;
   sx?: SxProps<Theme>;
 }
 
@@ -58,6 +64,7 @@ export interface SignUpProps extends HtmlHTMLAttributes<HTMLDivElement> {
   className?: string;
   message?: string;
   title?: string;
+  link?: string;
   icon?: ReactNode;
   sx?: SxProps<Theme>;
 }

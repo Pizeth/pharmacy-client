@@ -7,6 +7,7 @@ const SignupLink = (inProps: SignUpProps) => {
   const {
     message = "Don't have an account?",
     title = "Sign Up",
+    link = "#",
     icon = defaultIcon,
     sx,
     className,
@@ -25,15 +26,15 @@ const SignupLink = (inProps: SignUpProps) => {
         {/* Don&apos;t have an account?{" "} */}
         {message + " "}
         <Link
-          href="#"
-          sx={{
-            color: "primary.main",
-            textDecoration: "underline",
-            textUnderlineOffset: "2px",
-            "&:hover": {
-              textDecoration: "underline",
-            },
-          }}
+          href={link}
+          // sx={{
+          //   color: "primary.main",
+          //   textDecoration: "underline",
+          //   textUnderlineOffset: "2px",
+          //   "&:hover": {
+          //     textDecoration: "underline",
+          //   },
+          // }}
         >
           {title + " "} {icon}
         </Link>

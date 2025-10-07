@@ -17,15 +17,22 @@ import IconInput from "../CustomInputs/IconInput";
 import { PermIdentity, Password, Login } from "@mui/icons-material";
 import { useRequired } from "@/utils/validator";
 import PasswordValidationInput from "../CustomInputs/PasswordValidationInput";
-import { LoginFormProps } from "react-admin";
-import { LoginParams } from "@/interfaces/auth.interface";
+import { LoginFormProps, LoginParams } from "@/interfaces/auth.interface";
 
 const PasswordLogin = (inProps: LoginFormProps) => {
   const props = useThemeProps({
     props: inProps,
     name: PREFIX,
   });
-  const { redirectTo, className, sx, children } = props;
+  const {
+    redirectTo,
+    className,
+    sx,
+    forgotPassword,
+    forgotPasswordUrl = "#",
+    children,
+    ...rest
+  } = props;
   const [loading, setLoading] = useState(false);
   const login = useLogin();
   const translate = useTranslate();
@@ -68,6 +75,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
       noValidate
       className={className}
       sx={sx}
+      {...rest}
     >
       <CardContent className={LoginFormClasses.content}>
         {children || (
@@ -97,11 +105,11 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                 <Typography variant="body2">
                   <FormControlLabel
                     control={<Checkbox defaultChecked />}
-                    label="Remember me"
+                    label={translate("razeth.auth.remember_me")}
                   />
                 </Typography>
-                <Link href="#" variant="body2">
-                  Forgot your password?
+                <Link href={forgotPasswordUrl} variant="body2">
+                  {forgotPassword || translate("razeth.auth.forgot_password")}
                 </Link>
               </Box>
             </Box>

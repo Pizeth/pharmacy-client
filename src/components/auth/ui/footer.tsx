@@ -1,4 +1,11 @@
-import { Box, Link, styled, Theme, useThemeProps } from "@mui/material";
+import {
+  Box,
+  Link,
+  styled,
+  Theme,
+  Typography,
+  useThemeProps,
+} from "@mui/material";
 import { FooterProps } from "@/interfaces/auth.interface";
 
 const Footer = (inProps: FooterProps) => {
@@ -34,9 +41,9 @@ const Footer = (inProps: FooterProps) => {
         // }}
         className={FooterClasses.content}
       >
-        By clicking continue, you agree to our{" "}
-        <Link href="#">Terms of Service</Link> and{" "}
-        <Link href="#">Privacy Policy</Link>.
+        {description} <Link href={termsOfServiceUrl}>{termsOfService}</Link>{" "}
+        {ampersand} <Link href={privacyPolicyUrl}>{privacyPolicy}</Link>.
+        <Typography variant="body2">{copyright}</Typography>
       </Box>
     </StyledFooter>
   );
@@ -49,11 +56,15 @@ export const FooterClasses = {
 };
 
 export const FooterStyles = (theme: Theme) => ({
-  [`&.${FooterClasses.content}`]: {
+  [`& .${FooterClasses.content}`]: {
     marginTop: theme.spacing(2),
     textAlign: "center",
     color: theme.palette.text.secondary,
     fontSize: "0.75rem",
+    ["& .MuiTypography-root"]: {
+      marginTop: theme.spacing(1),
+      fontSize: "0.75rem",
+    },
     // a: {
     //   color: "primary.main",
     //   textDecoration: "underline",
@@ -68,6 +79,6 @@ export const FooterStyles = (theme: Theme) => ({
 const StyledFooter = styled("div", {
   name: PREFIX,
   overridesResolver: (_props, styles) => styles.root,
-})(FooterStyles);
+})(({ theme }) => FooterStyles(theme));
 
 export default Footer;

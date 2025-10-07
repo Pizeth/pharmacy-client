@@ -7,10 +7,12 @@ import {
   Typography,
   useThemeProps,
 } from "@mui/material";
+import { useTranslate } from "ra-core";
 
 export const RazethDivider = (inProps: DividerProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
   const { className, title, sx, ...rest } = props;
+  const translate = useTranslate();
   return (
     <StyledDivider className={className} sx={sx} {...rest}>
       <Box
@@ -31,7 +33,7 @@ export const RazethDivider = (inProps: DividerProps) => {
           //     color: "text.secondary",
           //   }}
         >
-          {title}
+          {title || translate("razeth.auth.social_login")}
         </Typography>
         <Divider />
       </Box>

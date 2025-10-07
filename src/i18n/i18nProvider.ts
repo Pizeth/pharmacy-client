@@ -10,9 +10,17 @@ const messages: { [key: string]: any } = {
     ...englishMessages,
     razeth: {
       auth: {
+        welcome: "Welcome Back",
         credentail: "Username or Email",
         password: "Password",
         sign_in: "Sign In",
+        sign_out: "Sign Out",
+        sign_up: "Sign up",
+        remember_me: "Remember me",
+        forgot_password: "Forgot your password?",
+        sign_in_error: "Authentication failed, please try again!",
+        social_login: "Or continue with",
+        no_account: "Don't have an account?",
       },
       validation: {
         required: "%{field} is required!",
@@ -29,6 +37,13 @@ const messages: { [key: string]: any } = {
         password:
           "Password must be at least 10 characters, include uppercase, lowercase, number, and special character!",
         weak: "Password is too weak!",
+      },
+      footer: {
+        description: "By clicking continue, you agree to our",
+        termsOfService: "Terms of Service",
+        privacyPolicy: "Privacy Policy",
+        ampersand: "and",
+        copyright: "Copyright © 2025 Razeth Inc. All rights reserved.",
       },
     },
     // "razeth.validation.required": "%{field} is required!",

@@ -1,8 +1,9 @@
 import { deepmerge } from "@mui/utils";
 import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
 import { red, blue } from "@mui/material/colors";
-import { createTheme, Theme } from "@mui/material/styles";
-import { size } from "lodash";
+import { ComponentsOverrides, createTheme, Theme } from "@mui/material/styles";
+import { LoginClasses } from "@/components/auth/login";
+import { LoginProps } from "@/interfaces/auth.interface";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -10,6 +11,27 @@ declare module "@mui/material/styles" {
   }
   interface PaletteOptions {
     passwordStrength?: string[] | ((theme: Theme) => string[]);
+  }
+
+  interface ComponentNameToClassKey {
+    RazethLogin: "root" | "content" | "button" | "icon" | "card" | "avatar";
+  }
+
+  interface ComponentsPropsList {
+    RazethLogin: Partial<LoginProps>;
+  }
+
+  interface Components {
+    RazethLogin?: {
+      defaultProps?: ComponentsPropsList["RazethLogin"];
+      styleOverrides?: ComponentsOverrides<
+        Omit<Theme, "components">
+      >["RazethLogin"];
+      variants?: Array<{
+        props: Partial<LoginProps>;
+        style: (props: { theme: Theme }) => unknown;
+      }>;
+    };
   }
 }
 
@@ -118,6 +140,96 @@ const customBaseTheme = createTheme({
     // ],
   },
   components: {
+    RazethLogin: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: props.theme.spacing(2),
+          backgroundColor:
+            props.theme.palette.mode === "dark"
+              ? props.theme.palette.grey[900]
+              : props.theme.palette.grey[100],
+        }),
+
+        content: (props: { theme: Theme }) => ({
+          width: "100%",
+          maxWidth: "100%",
+          [props.theme.breakpoints.up("md")]: {
+            maxWidth: "750px",
+          },
+        }),
+
+        card: (props: { theme: Theme }) => ({
+          overflow: "hidden",
+          borderRadius: props.theme.spacing(2),
+          boxShadow: props.theme.shadows[3],
+          "& .card-content": {
+            padding: props.theme.spacing(3, 4),
+            "& .card-box": {
+              display: "flex",
+              flexDirection: "column",
+              gap: 0,
+            },
+          },
+        }),
+
+        avatar: (props: { theme: Theme }) => ({
+          margin: props.theme.spacing(0, 0, 1.5, 0),
+          display: "flex",
+          justifyContent: "center",
+          "& .MuiAvatar-root": { backgroundColor: "#e72d32" },
+          "& svg": { fill: "#fff" },
+        }),
+      },
+      // 👇 Variants
+      variants: [
+        {
+          props: { variant: "compact" },
+          style: ({ theme }) => ({
+            [`& .${LoginClasses.content}`]: {
+              [theme.breakpoints.up("md")]: {
+                maxWidth: "500px",
+              },
+            },
+            [`& .${LoginClasses.card}`]: {
+              borderRadius: theme.spacing(1),
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? theme.shadows[2]
+                  : theme.shadows[1],
+              backgroundColor:
+                theme.palette.mode === "dark"
+                  ? theme.palette.grey[800]
+                  : theme.palette.background.paper,
+            },
+          }),
+        },
+        {
+          props: { variant: "full" },
+          style: ({ theme }) => ({
+            [`& .${LoginClasses.content}`]: {
+              [theme.breakpoints.up("md")]: {
+                maxWidth: "750px",
+              },
+            },
+            [`& .${LoginClasses.card}`]: {
+              borderRadius: theme.spacing(3),
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? theme.shadows[8]
+                  : theme.shadows[6],
+              backgroundColor:
+                theme.palette.mode === "dark"
+                  ? theme.palette.grey[900]
+                  : theme.palette.background.paper,
+            },
+          }),
+        },
+      ],
+    },
     MuiAppBar: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
