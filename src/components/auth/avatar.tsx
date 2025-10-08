@@ -12,9 +12,9 @@ const AvatarHeader = (inProps: AvatarProps) => {
 
   return (
     <Box {...rest}>
-      <div className={className}>
-        <Avatar>{avatarIcon}</Avatar>
-      </div>
+      {/* <div className={className}> */}
+      <Avatar>{avatarIcon}</Avatar>
+      {/* </div> */}
       <Typography align="center" variant="h6" fontWeight="bold" gutterBottom>
         Welcome back
       </Typography>

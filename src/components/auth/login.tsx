@@ -12,8 +12,9 @@ import PersonIcon from "@mui/icons-material/Person";
 import { RazethDivider as Divider } from "./divider";
 import SignupLink from "./ui/signUp";
 import Footer from "./ui/footer";
+import { StyleComponent } from "@/types/classKey";
 
-const Login = (inProps: LoginProps) => {
+const LoginOld = (inProps: LoginProps) => {
   const props = useThemeProps({
     props: inProps,
     name: PREFIX,
@@ -248,18 +249,163 @@ export const LoginStyles = (theme: Theme) => ({
 //   overridesResolver: (_props, styles) => styles.root,
 // })<LoginProps>(({ theme }) => LoginStyles(theme));
 
+// Root styled component
 const Root = styled("div", {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
 })<LoginProps>(() => ({}));
 
+// Slot components
+const Content = styled("div", {
+  name: PREFIX,
+  slot: "Content",
+  overridesResolver: (_props, styles) => styles.content,
+})(() => ({}));
+
+const LoginCard = styled("div", {
+  name: PREFIX,
+  slot: "Card",
+  overridesResolver: (_props, styles) => styles.card,
+})(() => ({}));
+
+const LoginAvatar = styled("div", {
+  name: PREFIX,
+  slot: "Avatar",
+  overridesResolver: (_props, styles) => styles.avatar,
+})(() => ({}));
+
+// Main component + slot API
+// export const Login: React.FC<React.PropsWithChildren<LoginProps>> & {
+//   Content: typeof LoginContent;
+//   Card: typeof LoginCard;
+//   Avatar: typeof LoginAvatar;
+// } = (props) => {
+//   const { children, ...rest } = props;
+//   return <Root {...rest}>{children}</Root>;
+// };
+
+export const Login = (
+  inProps: LoginProps & {
+    Content?: StyleComponent;
+    Card?: StyleComponent;
+    CardContent?: StyleComponent;
+    Form?: StyleComponent;
+    Avatar?: StyleComponent;
+  }
+) => {
+  const props = useThemeProps({
+    props: inProps,
+    name: PREFIX,
+  });
+  const {
+    sideImage = defaultSideImage,
+    avatarIcon = defaultAvatar,
+    children = defaultLoginForm,
+    divider = defaultDivider,
+    signUp = defaultSignUp,
+    footer = defaultFooter,
+    variant = "full",
+    className,
+    sx,
+    // backgroundImage,
+    // avatarIcon = defaultAvatar,
+    ...rest
+  } = props;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const checkAuth = useCheckAuth();
+  // const theme = useTheme();
+  const navigate = useNavigate();
+  useEffect(() => {
+    checkAuth({}, false)
+      .then(() => {
+        // already authenticated, redirect to the home page
+        navigate("/");
+      })
+      .catch(() => {
+        // not authenticated, stay on the login page
+      });
+  }, [checkAuth, navigate]);
+  return (
+    <Root
+      ref={containerRef}
+      variant={variant}
+      className={className}
+      sx={sx}
+      {...rest}
+    >
+      <Login.Content>
+        <Login.Card>
+          <Grid container>
+            {/* Image section - hidden on mobile */}
+            {sideImage}
+
+            {/* Form section */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <CardContent className="card-content">
+                <Box className="card-box">
+                  {avatarIcon}
+                  {/* <Box>
+                    <LoginAvatar>
+                      <Avatar>{avatarIcon}</Avatar>
+                    </LoginAvatar>
+                    <Typography
+                      align="center"
+                      variant="h6"
+                      fontWeight="bold"
+                      gutterBottom
+                    >
+                      Welcome back
+                    </Typography>
+                  </Box> */}
+                  {children}
+                  {divider}
+                  {SocialLogin}
+                  {signUp}
+                </Box>
+              </CardContent>
+            </Grid>
+          </Grid>
+        </Login.Card>
+        {footer}
+      </Login.Content>
+    </Root>
+  );
+};
+
+Login.Content = Content;
+Login.Card = LoginCard;
+Login.Avatar = LoginAvatar;
+
 const defaultLoginForm = <PasswordLogin />;
-const defaultAvatar = (
-  <AvatarHeader avatarIcon={<PersonIcon />} className={LoginClasses.avatar} />
+const defaultSideImage = (
+  <SideImage src="static/images/placeholder-mcs-orange.svg" />
 );
+const defaultAvatar = <AvatarHeader avatarIcon={<PersonIcon />} />;
 const defaultDivider = <Divider />;
 const defaultSignUp = <SignupLink />;
 const defaultFooter = <Footer />;
 
+// ✅ Named exports (optional, for tree-shaking)
+export {
+  // Header as LoginHeader,
+  Content as LoginContent,
+  LoginCard,
+  LoginAvatar,
+};
+
 export default Login;
+
+// export default function LoginPage() {
+//   return (
+//     <Login Content={LoginContent} Card={LoginCard} Avatar={LoginAvatar}>
+//       <Login.Content>
+//         <Login.Card>
+//           {/* <Login.Header>Welcome back</Login.Header> */}
+//           <Login.Avatar>{/* Avatar here */}</Login.Avatar>
+//           {/* Form goes here */}
+//         </Login.Card>
+//       </Login.Content>
+//     </Login>
+//   );
+// }

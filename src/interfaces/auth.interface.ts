@@ -20,8 +20,12 @@ export interface AuthTokens {
 }
 
 export interface LoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  // Content: MUIStyledCommonProps<Theme>;
+  // Card: MUIStyledCommonProps<Theme>;
+  // Avatar: MUIStyledCommonProps<Theme>;
   avatarIcon?: ReactNode;
   backgroundImage?: string;
+  sideImage?: ReactNode;
   children?: ReactNode;
   divider?: ReactNode;
   signUp?: ReactNode;

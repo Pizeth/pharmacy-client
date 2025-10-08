@@ -4,6 +4,7 @@ import { red, blue } from "@mui/material/colors";
 import { ComponentsOverrides, createTheme, Theme } from "@mui/material/styles";
 import { LoginClasses } from "@/components/auth/login";
 import { LoginProps } from "@/interfaces/auth.interface";
+import { ClassKey } from "@/types/classKey";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -14,7 +15,7 @@ declare module "@mui/material/styles" {
   }
 
   interface ComponentNameToClassKey {
-    RazethLogin: "root" | "content" | "button" | "icon" | "card" | "avatar";
+    RazethLogin: ClassKey;
   }
 
   interface ComponentsPropsList {
@@ -160,6 +161,7 @@ const customBaseTheme = createTheme({
           [props.theme.breakpoints.up("md")]: {
             maxWidth: "750px",
           },
+          // "& .MuiGrid-container": { gap: 0 },
         }),
 
         card: (props: { theme: Theme }) => ({
