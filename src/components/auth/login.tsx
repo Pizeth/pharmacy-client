@@ -1,6 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { useCheckAuth } from "ra-core";
-import { Box, Card, CardContent, Grid, Theme } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Theme,
+  Avatar,
+  Typography,
+} from "@mui/material";
 import { styled, useThemeProps } from "@mui/material/styles";
 import PasswordLogin from "./passwordLogin";
 import SocialLogin from "./socialLogin";
@@ -269,7 +277,7 @@ const LoginCard = styled("div", {
   overridesResolver: (_props, styles) => styles.card,
 })(() => ({}));
 
-const LoginAvatar = styled("div", {
+const LoginAvatar = styled(Box, {
   name: PREFIX,
   slot: "Avatar",
   overridesResolver: (_props, styles) => styles.avatar,
@@ -290,8 +298,8 @@ export const Login = (
     Content?: StyleComponent;
     Card?: StyleComponent;
     CardContent?: StyleComponent;
-    Form?: StyleComponent;
-    Avatar?: StyleComponent;
+    // Form?: StyleComponent;
+    // Avatar?: StyleComponent;
   }
 ) => {
   const props = useThemeProps({
@@ -300,6 +308,7 @@ export const Login = (
   });
   const {
     sideImage = defaultSideImage,
+    title = "Welcome back",
     avatarIcon = defaultAvatar,
     children = defaultLoginForm,
     divider = defaultDivider,
@@ -344,7 +353,19 @@ export const Login = (
             <Grid size={{ xs: 12, md: 6 }}>
               <CardContent className="card-content">
                 <Box className="card-box">
-                  {avatarIcon}
+                  <LoginAvatar>
+                    {/* <LoginAvatar> */}
+                    <Avatar>{avatarIcon}</Avatar>
+                    {/* </LoginAvatar> */}
+                    <Typography
+                      align="center"
+                      variant="h6"
+                      fontWeight="bold"
+                      gutterBottom
+                    >
+                      {title}
+                    </Typography>
+                  </LoginAvatar>
                   {/* <Box>
                     <LoginAvatar>
                       <Avatar>{avatarIcon}</Avatar>
@@ -381,7 +402,7 @@ const defaultLoginForm = <PasswordLogin />;
 const defaultSideImage = (
   <SideImage src="static/images/placeholder-mcs-orange.svg" />
 );
-const defaultAvatar = <AvatarHeader avatarIcon={<PersonIcon />} />;
+const defaultAvatar = <PersonIcon />;
 const defaultDivider = <Divider />;
 const defaultSignUp = <SignupLink />;
 const defaultFooter = <Footer />;

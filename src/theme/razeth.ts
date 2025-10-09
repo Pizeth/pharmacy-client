@@ -182,7 +182,10 @@ const customBaseTheme = createTheme({
           margin: props.theme.spacing(0, 0, 1.5, 0),
           display: "flex",
           justifyContent: "center",
-          "& .MuiAvatar-root": { backgroundColor: "#e72d32" },
+          "& .MuiAvatar-root": {
+            backgroundColor: "#e72d32",
+            position: "relative",
+          },
           "& svg": { fill: "#fff" },
         }),
       },
