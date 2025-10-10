@@ -119,6 +119,12 @@ export interface IconTextInputProps extends PasswordInputProps {
   passwordValue?: string; // Props for RepasswordInput to receive the password field value
 }
 
+// export interface InputHelperTextProps {
+//   helperText?: React.ReactNode;
+//   error?: ValidationErrorMessage;
+//   alwaysShowHelper?: boolean;
+// }
+
 export type TogglePasswordEvent =
   | React.MouseEvent<HTMLElement>
   | React.TouchEvent<HTMLElement>

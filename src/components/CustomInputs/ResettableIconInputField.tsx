@@ -95,8 +95,6 @@ export const ResettableIconInputField = forwardRef<
     handleMouseDownClearButton,
   });
 
-  console.log("helper", helper);
-
   return (
     <StyledTextField
       value={value}
@@ -127,7 +125,13 @@ export const ResettableIconInputField = forwardRef<
           shrink: isFocused || value !== "",
         },
         formHelperText: {
-          className: clsx({ helper: !helper }),
+          // className: clsx({
+          //   helper: !helper,
+          //   alwaysShowHelper: !alwaysShowHelper,
+          // }),
+          className: clsx(
+            helper ? { showHelper: helper } : { hideHelper: !helper }
+          ),
           sx: {
             fontWeight:
               isSuccess && !error && !isValidating ? "bold" : undefined,

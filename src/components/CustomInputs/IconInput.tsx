@@ -17,8 +17,8 @@ const IconInput = forwardRef((props: IconTextInputProps, ref) => {
   const {
     className,
     defaultValue,
-    helperText,
     helper,
+    helperText,
     label,
     format,
     onBlur,
@@ -109,10 +109,10 @@ const IconInput = forwardRef((props: IconTextInputProps, ref) => {
   };
 
   const errMsg = error?.message;
-  const renderHelperText = !!(helperText || errMsg || invalid);
+  const renderHelperText = !!(helper || helperText || errMsg || invalid);
   const setHelper = !!(helper || helperText || errMsg || isValidating);
+  console.log("renderHelperText", renderHelperText);
 
-  console.log("setHelper", setHelper);
   return (
     <ResettableIconInputField
       id={id}
