@@ -95,6 +95,8 @@ export const ResettableIconInputField = forwardRef<
     handleMouseDownClearButton,
   });
 
+  console.log("helper", helper);
+
   return (
     <StyledTextField
       value={value}

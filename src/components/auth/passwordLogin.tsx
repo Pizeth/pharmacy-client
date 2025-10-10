@@ -18,6 +18,7 @@ import { PermIdentity, Password, Login } from "@mui/icons-material";
 import { useRequired } from "@/utils/validator";
 import PasswordValidationInput from "../CustomInputs/PasswordValidationInput";
 import { LoginFormProps, LoginParams } from "@/interfaces/auth.interface";
+// import { TextInput } from "react-admin";
 
 const PasswordLogin = (inProps: LoginFormProps) => {
   const props = useThemeProps({
@@ -85,11 +86,21 @@ const PasswordLogin = (inProps: LoginFormProps) => {
               className="icon-input"
               iconStart={<PermIdentity />}
               fullWidth
+              helper={true}
               label={translate("razeth.auth.credentail")}
               autoComplete="username"
               validate={required()}
               resettable
             />
+            {/* <TextInput
+              source="credential"
+              className="icon-input"
+              label={translate("razeth.auth.credentail")}
+              autoComplete="username"
+              validate={required()}
+              resettable
+              fullWidth
+            /> */}
             <Box className="box-input">
               <PasswordValidationInput
                 source="password"

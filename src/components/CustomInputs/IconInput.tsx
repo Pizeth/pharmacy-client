@@ -18,6 +18,7 @@ const IconInput = forwardRef((props: IconTextInputProps, ref) => {
     className,
     defaultValue,
     helperText,
+    helper,
     label,
     format,
     onBlur,
@@ -109,8 +110,9 @@ const IconInput = forwardRef((props: IconTextInputProps, ref) => {
 
   const errMsg = error?.message;
   const renderHelperText = !!(helperText || errMsg || invalid);
-  const helper = !!(helperText || errMsg || isValidating);
+  const setHelper = !!(helper || helperText || errMsg || isValidating);
 
+  console.log("setHelper", setHelper);
   return (
     <ResettableIconInputField
       id={id}
@@ -141,7 +143,7 @@ const IconInput = forwardRef((props: IconTextInputProps, ref) => {
       //     className: clsx({ shake: shake }),
       //   },
       // }}
-      helper={helper}
+      helper={setHelper}
       label={
         label !== "" && label !== false ? (
           <FieldTitle label={label} source={source} isRequired={isRequired} />

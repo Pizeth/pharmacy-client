@@ -43,7 +43,7 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-@keyframes shake {
+/* @keyframes shake {
   0% {
     transform: translateX(0);
   }
@@ -64,19 +64,19 @@
 .shake span {
   animation: shake 0.5s ease-in-out;
   display: inline-block;
-  /* vertical-align: middle; */
+  vertical-align: middle;
   position: relative;
-  /* font-size: 1rem; */
-  /* transform: translateY(0); */
-  /* transform: none !important; */
+  font-size: 1rem; 
+  transform: translateY(0);
+  transform: none !important;
 }
 
 .icon-input .MuiInputLabel-root {
   margin-left: 2em;
 }
-/* .icon-input .MuiInputLabel-shrink {
+.icon-input .MuiInputLabel-shrink {
   margin-left: "0";
-} */
+}
 
 .icon-input .MuiInputLabel-root.MuiInputLabel-shrink {
   margin-left: 0;
@@ -95,9 +95,9 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  /* height: 100vh; */
+  height: 100vh;
 }
-
+*/
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

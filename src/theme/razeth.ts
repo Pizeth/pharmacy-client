@@ -5,6 +5,7 @@ import { ComponentsOverrides, createTheme, Theme } from "@mui/material/styles";
 import { LoginClasses } from "@/components/auth/login";
 import { LoginProps } from "@/interfaces/auth.interface";
 import { ClassKey } from "@/types/classKey";
+import { keyframes } from "@emotion/react";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -43,6 +44,92 @@ declare module "@mui/material/styles" {
 //     };
 //   }
 // }
+
+const shake = keyframes`
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-1px);
+  }
+  50% {
+    transform: translateX(1px);
+  }
+  75% {
+    transform: translateX(-1px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+    `;
+
+const globalStyles = (theme: Theme) => ({
+  // Custom styles for a text field with an icon
+  ".icon-input .MuiInputLabel-root": {
+    marginLeft: "2em",
+  },
+  // Style for the shrunken label
+  ".icon-input .MuiInputLabel-root.MuiInputLabel-shrink": {
+    marginLeft: 0,
+  },
+  // Style for the icon button within the input
+  ".icon-input .MuiIconButton-root": {
+    padding: 0,
+  },
+  // Style for the password hint text
+  ".passHint": {
+    marginTop: "1em",
+  },
+  // Centering utility class
+  ".text-center": {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
+  /* Target ALL Boxes inside Stacks */
+  ".MuiStack-root .MuiBox-root": {
+    margin: `${theme.spacing(0)}`,
+    padding: `${theme.spacing(0)}`,
+    lineHeight: 0,
+  },
+  /* Specific to Password Strength Meter Box */
+  ".MuiStack-root > .MuiBox-root:has(.MuiLinearProgress-root)": {
+    marginTop: `${theme.spacing(0)}`,
+    padding: `${theme.spacing(0)}`,
+    // background-color: ${theme.palette.grey[100]};
+  },
+  /* For browsers without :has() support (fallback) */
+  ".MuiStack-root > .MuiBox-root[data-pw-strength]": {
+    marginTop: `${theme.spacing(0)}`,
+    padding: `${theme.spacing(0)}`,
+    // background-color: ${theme.palette.grey[100]};
+  },
+  // .MuiBox-root {
+  //   // Default styles for all Box components
+  //   margin: ${theme.spacing(0)};
+  //   padding: ${theme.spacing(0)};
+
+  //   // Specific styles for react-admin components
+  //   &.RaFileInput-dropZone {
+  //     border: 2px dashed ${theme.palette.divider};
+  //     padding: ${theme.spacing(4)};
+  //     text-align: center;
+  //   }
+
+  //   &.css-164r41r { // Password strength meter container
+  //     margin-top: ${theme.spacing(0)};
+  //     padding: ${theme.spacing(0)};
+  //   }
+  // }
+
+  // .MuiStack-root > .MuiBox-root p.Mui-error {
+  //   margin-bottom: -0.5em;
+  // }
+  // .MuiFormControl-root p.Mui-error {
+  //   margin-bottom: -0.5em;
+  // }
+});
 
 const defaultThemeInvariants = {
   typography: {
@@ -179,10 +266,14 @@ const customBaseTheme = createTheme({
         }),
 
         avatar: (props: { theme: Theme }) => ({
-          margin: props.theme.spacing(0, 0, 1.5, 0),
-          display: "flex",
-          justifyContent: "center",
+          margin: props.theme.spacing(0, 0, 0, 0),
+          // display: "flex",
+          // justifyContent: "center",
+          display: "flex", // Use flexbox for alignment
+          flexDirection: "column", // Arrange items vertically
+          alignItems: "center", // Center items horizontally
           "& .MuiAvatar-root": {
+            marginBottom: props.theme.spacing(1),
             backgroundColor: "#e72d32",
             position: "relative",
           },
@@ -241,6 +332,21 @@ const customBaseTheme = createTheme({
           // backgroundColor: props.theme.palette.primary.main, // Customize the AppBar background color
           backgroundColor: "#c40316", // Customize the AppBar background color
           color: props.theme.palette.text.primary, // Customize font color
+        }),
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          "&.shake span": {
+            animation: `${shake} 0.5s ease-in-out`,
+            display: "inline-block",
+            /* vertical-align: middle; */
+            position: "relative",
+            /* font-size: 1rem; */
+            /* transform: translateY(0); */
+            /* transform: none !important; */
+          },
         }),
       },
     },
@@ -343,53 +449,7 @@ const customBaseTheme = createTheme({
     //   },
     // },
     MuiCssBaseline: {
-      styleOverrides: (theme) => `
-        // .MuiBox-root {
-        //   // Default styles for all Box components
-        //   margin: ${theme.spacing(0)};
-        //   padding: ${theme.spacing(0)};
-        
-        //   // Specific styles for react-admin components
-        //   &.RaFileInput-dropZone {
-        //     border: 2px dashed ${theme.palette.divider};
-        //     padding: ${theme.spacing(4)};
-        //     text-align: center;
-        //   }
-
-        //   &.css-164r41r { // Password strength meter container
-        //     margin-top: ${theme.spacing(0)};
-        //     padding: ${theme.spacing(0)};
-        //   }
-        // }
-
-        /* Target ALL Boxes inside Stacks */
-        .MuiStack-root .MuiBox-root {
-          margin: ${theme.spacing(0)};
-          padding: ${theme.spacing(0)};
-          line-height: 0;
-        }
-
-        /* Specific to Password Strength Meter Box */
-        .MuiStack-root > .MuiBox-root:has(.MuiLinearProgress-root) {
-          margin-top: ${theme.spacing(0)};
-          padding: ${theme.spacing(0)};
-          // background-color: ${theme.palette.grey[100]};
-        }
-
-        /* For browsers without :has() support (fallback) */
-        .MuiStack-root > .MuiBox-root[data-pw-strength] {
-          margin-top: ${theme.spacing(0)};
-          padding: ${theme.spacing(0)};
-          // background-color: ${theme.palette.grey[100]};
-        }
-
-        // .MuiStack-root > .MuiBox-root p.Mui-error {
-        //   margin-bottom: -0.5em;
-        // }
-        // .MuiFormControl-root p.Mui-error {
-        //   margin-bottom: -0.5em;
-        // }
-      `,
+      styleOverrides: (theme) => globalStyles(theme),
     },
     MuiCard: {
       styleOverrides: {
