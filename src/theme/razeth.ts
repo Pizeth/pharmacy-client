@@ -3,8 +3,15 @@ import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
 import { red, blue } from "@mui/material/colors";
 import { ComponentsOverrides, createTheme, Theme } from "@mui/material/styles";
 import { LoginClasses } from "@/components/auth/login";
-import { LoginProps } from "@/interfaces/auth.interface";
-import { ClassKey } from "@/types/classKey";
+import {
+  AvatarProps,
+  DividerProps,
+  FooterProps,
+  LoginProps,
+  SideImageProps,
+  SignUpProps,
+} from "@/interfaces/auth.interface";
+import { ClassKey} from "@/types/classKey";
 import { keyframes } from "@emotion/react";
 
 declare module "@mui/material/styles" {
@@ -15,26 +22,113 @@ declare module "@mui/material/styles" {
     passwordStrength?: string[] | ((theme: Theme) => string[]);
   }
 
-  interface ComponentNameToClassKey {
-    RazethLogin: ClassKey;
+  // interface ComponentNameToClassKey {
+  //   RazethLogin: ClassKey;
+  //   RazethSideImage: ClassKey;
+  //   RazethAvatar: ClassKey;
+  //   RazethDivider: ClassKey;
+  //   RazethSignUpLink: ClassKey;
+  //   RazethFooter: ClassKey;
+  // }
+
+  // STEP 2: The rest of the interfaces now build from the mapping.
+
+  // ComponentNameToClassKey can derive its keys from our map.
+  // Note: If each component has different keys (e.g., 'root', 'card'),
+  // this interface should be defined manually for full accuracy.
+  type ComponentNameToClassKey = Record<keyof ComponentsPropsList, ClassKey>;
+
+  // interface RazethComponentPropsMap {
+  //   RazethLogin: LoginProps;
+  //   RazethSideImage: SideImageProps;
+  //   RazethAvatar: AvatarProps;
+  //   RazethDivider: DividerProps;
+  //   RazethSignUpLink: SignUpProps;
+  //   RazethFooter: FooterProps;
+  // }
+
+  // STEP 3: The Components interface is now a concise mapped type.
+  // It iterates over every key in our RazethComponentPropsMap and generates
+  // the theme structure for it, eliminating all repetition.
+  // interface Components {
+  //   [Key in keyof ComponentsPropsList]?: {
+  //     defaultProps?: Partial<ComponentsPropsList[Key]>;
+  //     styleOverrides?: ComponentsOverrides<Omit<Theme, 'components'>>[Key];
+  //     variants?: Array<{
+  //       props: Partial<ComponentsPropsList[Key]>;
+  //       style: (props: { theme: Theme }) => unknown;
+  //     }>;
+  //   };
+  // }
+  interface Components extends CustomComponents {
+    [K in keyof ComponentsPropsList]?: CustomComponentConfig<K>;
+    // Your custom components are now automatically included
+    // You can still add standard MUI component overrides here if needed
   }
 
-  interface ComponentsPropsList {
-    RazethLogin: Partial<LoginProps>;
-  }
 
-  interface Components {
-    RazethLogin?: {
-      defaultProps?: ComponentsPropsList["RazethLogin"];
-      styleOverrides?: ComponentsOverrides<
-        Omit<Theme, "components">
-      >["RazethLogin"];
-      variants?: Array<{
-        props: Partial<LoginProps>;
-        style: (props: { theme: Theme }) => unknown;
-      }>;
-    };
-  }
+  // interface Components {
+  //   RazethLogin?: {
+  //     defaultProps?: ComponentsPropsList["RazethLogin"];
+  //     styleOverrides?: ComponentsOverrides<
+  //       Omit<Theme, "components">
+  //     >["RazethLogin"];
+  //     variants?: Array<{
+  //       props: Partial<LoginProps>;
+  //       style: (props: { theme: Theme }) => unknown;
+  //     }>;
+  //   };
+  //   RazethSideImage?: {
+  //     defaultProps?: ComponentsPropsList["RazethSideImage"];
+  //     styleOverrides?: ComponentsOverrides<
+  //       Omit<Theme, "components">
+  //     >["RazethSideImage"];
+  //     variants?: Array<{
+  //       props: Partial<SideImageProps>;
+  //       style: (props: { theme: Theme }) => unknown;
+  //     }>;
+  //   };
+  //   RazethAvatar?: {
+  //     defaultProps?: ComponentsPropsList["RazethAvatar"];
+  //     styleOverrides?: ComponentsOverrides<
+  //       Omit<Theme, "components">
+  //     >["RazethAvatar"];
+  //     variants?: Array<{
+  //       props: Partial<AvatarProps>;
+  //       style: (props: { theme: Theme }) => unknown;
+  //     }>;
+  //   };
+  //   RazethDivider?: {
+  //     defaultProps?: ComponentsPropsList["RazethDivider"];
+  //     styleOverrides?: ComponentsOverrides<
+  //       Omit<Theme, "components">
+  //     >["RazethDivider"];
+  //     variants?: Array<{
+  //       props: Partial<DividerProps>;
+  //       style: (props: { theme: Theme }) => unknown;
+  //     }>;
+  //   };
+  //   RazethSignUpLink?: {
+  //     defaultProps?: ComponentsPropsList["RazethSignUpLink"];
+  //     styleOverrides?: ComponentsOverrides<
+  //       Omit<Theme, "components">
+  //     >["RazethSignUpLink"];
+  //     variants?: Array<{
+  //       props: Partial<SignUpProps>;
+  //       style: (props: { theme: Theme }) => unknown;
+  //     }>;
+  //   };
+  //   RazethFooter?: {
+  //     defaultProps?: ComponentsPropsList["RazethFooter"];
+  //     styleOverrides?: ComponentsOverrides<
+  //       Omit<Theme, "components">
+  //     >["RazethFooter"];
+  //     variants?: Array<{
+  //       props: Partial<FooterProps>;
+  //       style: (props: { theme: Theme }) => unknown;
+  //     }>;
+  //   };
+  // }
 }
 
 // declare module "@mui/material/LinearProgress" {
@@ -248,6 +342,11 @@ const customBaseTheme = createTheme({
           [props.theme.breakpoints.up("md")]: {
             maxWidth: "750px",
           },
+          "& .MuiFormControl-root": {
+            // marginTop: "0.5em",
+            // marginBottom: "0",
+          },
+
           // "& .MuiGrid-container": { gap: 0 },
         }),
 
@@ -255,30 +354,31 @@ const customBaseTheme = createTheme({
           overflow: "hidden",
           borderRadius: props.theme.spacing(2),
           boxShadow: props.theme.shadows[3],
-          "& .card-content": {
-            padding: props.theme.spacing(3, 4),
-            "& .card-box": {
-              display: "flex",
-              flexDirection: "column",
-              gap: 0,
-            },
+          // "& .card-content": {
+          "& .MuiCardContent-root": {
+            padding: props.theme.spacing(3),
+            // "& .card-box": {
+            //   display: "flex",
+            //   flexDirection: "column",
+            //   gap: 0,
+            // },
           },
         }),
 
-        avatar: (props: { theme: Theme }) => ({
-          margin: props.theme.spacing(0, 0, 0, 0),
-          // display: "flex",
-          // justifyContent: "center",
-          display: "flex", // Use flexbox for alignment
-          flexDirection: "column", // Arrange items vertically
-          alignItems: "center", // Center items horizontally
-          "& .MuiAvatar-root": {
-            marginBottom: props.theme.spacing(1),
-            backgroundColor: "#e72d32",
-            position: "relative",
-          },
-          "& svg": { fill: "#fff" },
-        }),
+        // avatar: (props: { theme: Theme }) => ({
+        //   margin: props.theme.spacing(0, 0, 0, 0),
+        //   // display: "flex",
+        //   // justifyContent: "center",
+        //   display: "flex", // Use flexbox for alignment
+        //   flexDirection: "column", // Arrange items vertically
+        //   alignItems: "center", // Center items horizontally
+        //   "& .MuiAvatar-root": {
+        //     marginBottom: props.theme.spacing(1),
+        //     backgroundColor: "#e72d32",
+        //     position: "relative",
+        //   },
+        //   "& svg": { fill: "#fff" },
+        // }),
       },
       // 👇 Variants
       variants: [
@@ -326,6 +426,101 @@ const customBaseTheme = createTheme({
         },
       ],
     },
+    RazethSideImage: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          position: "relative",
+          // height: "100%",
+          backgroundColor:
+            props.theme.palette.mode === "dark"
+              ? "rgba(0, 0, 0, 0.2)"
+              : props.theme.palette.grey[200],
+          "& img": {
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            ...(props.theme.palette.mode === "dark" &&
+              {
+                // filter: "brightness(0.25) grayscale(1)",
+                // filter:
+                //   "grayscale(1) sepia(1) saturate(5) hue-rotate(315deg) brightness(1)",
+              }),
+          },
+        }),
+      },
+    },
+    RazethAvatar: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          margin: props.theme.spacing(0, 0, 0, 0),
+          // display: "flex",
+          // justifyContent: "center",
+          display: "flex", // Use flexbox for alignment
+          flexDirection: "column", // Arrange items vertically
+          alignItems: "center", // Center items horizontally
+          "& .MuiAvatar-root": {
+            marginBottom: props.theme.spacing(1),
+            backgroundColor: "#e72d32",
+            position: "relative",
+          },
+          "& svg": { fill: "#fff" },
+        }),
+      },
+    },
+    RazethDivider: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          marginTop: props.theme.spacing(2),
+          marginBottom: props.theme.spacing(2),
+          ["& .MuiDivider-root"]: { flex: 1 },
+          ["& .MuiTypography-root"]: {
+            paddingLeft: props.theme.spacing(2),
+            paddingRight: props.theme.spacing(2),
+            backgroundColor: props.theme.palette.background.paper,
+            color: props.theme.palette.text.secondary,
+          },
+        }),
+      },
+    },
+    RazethSignUpLink: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          textAlign: "center",
+          marginTop: props.theme.spacing(1),
+          color: props.theme.palette.text.secondary,
+          a: {
+            //   color: theme.palette.primary.main,
+            //   textDecoration: "underline",
+            //   textUnderlineOffset: "2px",
+            textTransform: "uppercase",
+            svg: {
+              paddingBottom: "2px",
+            },
+          },
+        }),
+      },
+    },
+    RazethFooter: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          textAlign: "center",
+          marginTop: props.theme.spacing(2),
+          color: props.theme.palette.text.secondary,
+          fontSize: "0.75rem",
+          ["& .MuiTypography-root"]: {
+            marginTop: props.theme.spacing(1),
+            fontSize: "0.75rem",
+          },
+        }),
+      },
+    },
+
+    /***** MUI's COMPONENTs *****/
     MuiAppBar: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
@@ -366,7 +561,7 @@ const customBaseTheme = createTheme({
     MuiFormHelperText: {
       styleOverrides: {
         root: {
-          marginTop: "0.75em",
+          marginTop: "0.5em",
           marginBottom: "-0.5em",
           // "&.Mui-error": { color: (theme: Theme) => theme.palette.error.main },
           // Apply styles when the helper text is in an error state
@@ -375,13 +570,14 @@ const customBaseTheme = createTheme({
             marginTop: "0",
             marginBottom: "0",
           },
-          // "&.showHelper": {
-          //   // lineHeight: "0",
-          //   marginTop: "0",
-          //   // marginBottom: "0",
-          // },
+          "&.showHelper": {
+            // lineHeight: "0",
+            marginTop: "0.5em",
+            // marginBottom: "0",
+          },
           "&.Mui-error": {
             marginBottom: "-0.5em", // Negative margin adjustment
+            marginTop: "0.5em",
           },
         },
       },

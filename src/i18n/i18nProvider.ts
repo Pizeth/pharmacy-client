@@ -9,8 +9,11 @@ const messages: { [key: string]: any } = {
   en: {
     ...englishMessages,
     razeth: {
-      auth: {
+      title: {
         welcome: "Welcome Back",
+      },
+      auth: {
+        // welcome: "Welcome Back",
         credentail: "Username or Email",
         password: "Password",
         sign_in: "Sign In",

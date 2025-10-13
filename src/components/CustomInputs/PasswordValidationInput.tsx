@@ -33,6 +33,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
     className,
     defaultValue,
     label,
+    helper,
     helperText,
     format,
     onBlur,
@@ -405,6 +406,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
   // Combine sync and async errors
   const errMsg = error?.message;
   const renderHelperText = !!(
+    helper ||
     helperText ||
     errMsg ||
     result.feedbackMsg ||

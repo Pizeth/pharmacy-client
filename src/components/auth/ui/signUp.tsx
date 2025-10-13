@@ -1,4 +1,4 @@
-import { Box, Link, styled, Theme, useThemeProps } from "@mui/material";
+import { Link, styled, useThemeProps } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { SignUpProps } from "@/interfaces/auth.interface";
 
@@ -15,68 +15,38 @@ const SignupLink = (inProps: SignUpProps) => {
   } = props;
   return (
     <StyledSignUpLink className={className} sx={sx} {...rest}>
-      <Box
-        // sx={{
-        //   textAlign: "center",
-        //   mt: 1,
-        //   color: "text.secondary",
-        // }}
-        className={SideImageClasses.content}
-      >
-        {/* Don&apos;t have an account?{" "} */}
-        {message + " "}
-        <Link
-          href={link}
-          // sx={{
-          //   color: "primary.main",
-          //   textDecoration: "underline",
-          //   textUnderlineOffset: "2px",
-          //   "&:hover": {
-          //     textDecoration: "underline",
-          //   },
-          // }}
-        >
-          {title + " "} {icon}
-        </Link>
-      </Box>
+      {message + " "}
+      <Link href={link}>
+        {title + " "} {icon}
+      </Link>
     </StyledSignUpLink>
   );
 };
 
-const PREFIX = "RazethSideImage";
-
-export const SideImageClasses = {
-  content: `${PREFIX}-content`,
-  button: `${PREFIX}-button`,
-  icon: `${PREFIX}-icon`,
-};
+const PREFIX = "RazethSignUpLink";
 
 const defaultIcon = <PersonAddIcon />;
 
-export const SingupLinktyles = (theme: Theme) => ({
-  [`& .${SideImageClasses.content}`]: {
-    textAlign: "center",
-    marginTop: theme.spacing(1),
-    color: theme.palette.text.secondary,
-    a: {
-      //   color: theme.palette.primary.main,
-      //   textDecoration: "underline",
-      //   textUnderlineOffset: "2px",
-      textTransform: "uppercase",
-      svg: {
-        paddingBottom: "2px",
-      },
-    },
-  },
-
-  // [`& .${SideImageClasses.content}:last-child`]: {
-  //   paddingBottom: `${theme.spacing(0)}`,
-  // },
-});
+// export const SingupLinktyles = (theme: Theme) => ({
+//   [`& .${RazethSignUpLinkClasses.content}`]: {
+//     textAlign: "center",
+//     marginTop: theme.spacing(1),
+//     color: theme.palette.text.secondary,
+//     a: {
+//       //   color: theme.palette.primary.main,
+//       //   textDecoration: "underline",
+//       //   textUnderlineOffset: "2px",
+//       textTransform: "uppercase",
+//       svg: {
+//         paddingBottom: "2px",
+//       },
+//     },
+//   },
+// });
 
 const StyledSignUpLink = styled("div", {
   name: PREFIX,
   overridesResolver: (_props, styles) => styles.root,
-})(({ theme }) => SingupLinktyles(theme));
+})<SignUpProps>(() => ({}));
 
 export default SignupLink;

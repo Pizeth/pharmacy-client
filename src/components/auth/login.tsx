@@ -1,15 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import { useCheckAuth } from "ra-core";
-import {
-  Box,
-  Card,
-  CardContent,
-  Grid,
-  Theme,
-  Avatar,
-  Typography,
-} from "@mui/material";
+import { Box, Card, CardContent, Grid, Theme } from "@mui/material";
 import { styled, useThemeProps } from "@mui/material/styles";
 import PasswordLogin from "./passwordLogin";
 import SocialLogin from "./socialLogin";
@@ -83,7 +75,7 @@ const LoginOld = (inProps: LoginProps) => {
           className={LoginClasses.card}
           // sx={{ overflow: "hidden", borderRadius: 2, boxShadow: 3 }}
         >
-          <Grid container spacing={0}>
+          <Grid container>
             {/* Image section - hidden on mobile */}
             <SideImage src="static/images/placeholder-mcs-orange.svg" />
 
@@ -266,23 +258,23 @@ const Root = styled("div", {
 })<LoginProps>(() => ({}));
 
 // Slot components
-const Content = styled("div", {
+const Content = styled(Box, {
   name: PREFIX,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
 })(() => ({}));
 
-const LoginCard = styled("div", {
+const LoginCard = styled(Card, {
   name: PREFIX,
   slot: "Card",
   overridesResolver: (_props, styles) => styles.card,
 })(() => ({}));
 
-const LoginAvatar = styled(Box, {
-  name: PREFIX,
-  slot: "Avatar",
-  overridesResolver: (_props, styles) => styles.avatar,
-})(() => ({}));
+// const LoginAvatar = styled(Box, {
+//   name: PREFIX,
+//   slot: "Avatar",
+//   overridesResolver: (_props, styles) => styles.avatar,
+// })(() => ({}));
 
 // Main component + slot API
 // export const Login: React.FC<React.PropsWithChildren<LoginProps>> & {
@@ -298,9 +290,6 @@ export const Login = (
   inProps: LoginProps & {
     Content?: StyleComponent;
     Card?: StyleComponent;
-    CardContent?: StyleComponent;
-    // Form?: StyleComponent;
-    // Avatar?: StyleComponent;
   }
 ) => {
   const props = useThemeProps({
@@ -309,7 +298,6 @@ export const Login = (
   });
   const {
     sideImage = defaultSideImage,
-    title = "Welcome back",
     avatarIcon = defaultAvatar,
     children = defaultLoginForm,
     divider = defaultDivider,
@@ -319,7 +307,6 @@ export const Login = (
     className,
     sx,
     // backgroundImage,
-    // avatarIcon = defaultAvatar,
     ...rest
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -346,40 +333,15 @@ export const Login = (
     >
       <Login.Content>
         <Login.Card>
-          <Grid container>
+          <Grid container spacing={0}>
             {/* Image section - hidden on mobile */}
             {sideImage}
 
             {/* Form section */}
             <Grid size={{ xs: 12, md: 6 }}>
-              <CardContent className="card-content">
-                <Box className="card-box">
-                  <LoginAvatar>
-                    {/* <LoginAvatar> */}
-                    <Avatar>{avatarIcon}</Avatar>
-                    {/* </LoginAvatar> */}
-                    <Typography
-                      align="center"
-                      variant="h6"
-                      fontWeight="bold"
-                      gutterBottom
-                    >
-                      {title}
-                    </Typography>
-                  </LoginAvatar>
-                  {/* <Box>
-                    <LoginAvatar>
-                      <Avatar>{avatarIcon}</Avatar>
-                    </LoginAvatar>
-                    <Typography
-                      align="center"
-                      variant="h6"
-                      fontWeight="bold"
-                      gutterBottom
-                    >
-                      Welcome back
-                    </Typography>
-                  </Box> */}
+              <CardContent>
+                <Box>
+                  {avatarIcon}
                   {children}
                   {divider}
                   {SocialLogin}
@@ -397,13 +359,14 @@ export const Login = (
 
 Login.Content = Content;
 Login.Card = LoginCard;
-Login.Avatar = LoginAvatar;
+// Login.Avatar = LoginAvatar;
 
 const defaultLoginForm = <PasswordLogin />;
 const defaultSideImage = (
-  <SideImage src="static/images/placeholder-mcs-orange.svg" />
+  <SideImage src={process.env.NEXT_PUBLIC_PLACEHOLDER} />
 );
-const defaultAvatar = <PersonIcon />;
+// const defaultAvatar = <PersonIcon />;
+const defaultAvatar = <AvatarHeader avatarIcon={<PersonIcon />} />;
 const defaultDivider = <Divider />;
 const defaultSignUp = <SignupLink />;
 const defaultFooter = <Footer />;
@@ -413,20 +376,34 @@ export {
   // Header as LoginHeader,
   Content as LoginContent,
   LoginCard,
-  LoginAvatar,
 };
 
 export default Login;
 
 // export default function LoginPage() {
 //   return (
-//     <Login Content={LoginContent} Card={LoginCard} Avatar={LoginAvatar}>
+//     <Login Content={Content} Card={LoginCard}>
 //       <Login.Content>
 //         <Login.Card>
-//           {/* <Login.Header>Welcome back</Login.Header> */}
-//           <Login.Avatar>{/* Avatar here */}</Login.Avatar>
-//           {/* Form goes here */}
+//           <Grid container spacing={0}>
+//             {/* Image section - hidden on mobile */}
+//             {defaultSideImage}
+
+//             {/* Form section */}
+//             <Grid size={{ xs: 12, md: 6 }}>
+//               <CardContent>
+//                 <Box>
+//                   {defaultAvatar}
+//                   {defaultLoginForm}
+//                   {defaultDivider}
+//                   {SocialLogin}
+//                   {defaultSignUp}
+//                 </Box>
+//               </CardContent>
+//             </Grid>
+//           </Grid>
 //         </Login.Card>
+//         {defaultFooter}
 //       </Login.Content>
 //     </Login>
 //   );

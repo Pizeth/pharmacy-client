@@ -1,22 +1,28 @@
-import { Avatar, Box, Typography, useThemeProps } from "@mui/material";
+import { Avatar, Box, styled, Typography, useThemeProps } from "@mui/material";
 
 import PersonIcon from "@mui/icons-material/Person";
 import { AvatarProps } from "@/interfaces/auth.interface";
+import { useTranslate } from "ra-core";
 
 const AvatarHeader = (inProps: AvatarProps) => {
   const props = useThemeProps({
     props: inProps,
-    name: PREFIX,
+    name: inProps.prefix || PREFIX,
   });
-  const { avatarIcon = defaultAvatarIcon, className, ...rest } = props;
+  const {
+    avatarIcon = defaultAvatarIcon,
+    className,
+    sx,
+    title,
+    ...rest
+  } = props;
+  const translate = useTranslate();
 
   return (
-    <Box {...rest}>
-      {/* <div className={className}> */}
+    <BoxAvatar className={className} sx={sx} {...rest}>
       <Avatar>{avatarIcon}</Avatar>
-      {/* </div> */}
       <Typography align="center" variant="h6" fontWeight="bold" gutterBottom>
-        Welcome back
+        {translate("razeth.title.welcome") || title}
       </Typography>
       {/* <Typography
         variant="body2"
@@ -29,19 +35,25 @@ const AvatarHeader = (inProps: AvatarProps) => {
       >
         Login to your MCS account
       </Typography> */}
-    </Box>
+    </BoxAvatar>
   );
 };
 
 const defaultAvatarIcon = <PersonIcon />;
 const PREFIX = "RazethAvatar";
 
-export const AvatarClasses = {
-  content: `${PREFIX}-content`,
-  "& svg": {
-    fill: "#fff",
-  },
-};
+// export const AvatarClasses = {
+//   content: `${PREFIX}-content`,
+//   "& svg": {
+//     fill: "#fff",
+//   },
+// };
+
+const BoxAvatar = styled(Box, {
+  name: PREFIX,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})<AvatarProps>(() => ({}));
 
 // export const AvatarStyles = () => ({
 //   //   textAlign: "center",
