@@ -1,18 +1,12 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import { deepmerge } from "@mui/utils";
 import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
 import { red, blue } from "@mui/material/colors";
-import { ComponentsOverrides, createTheme, Theme } from "@mui/material/styles";
-import { LoginClasses } from "@/components/auth/login";
-import {
-  AvatarProps,
-  DividerProps,
-  FooterProps,
-  LoginProps,
-  SideImageProps,
-  SignUpProps,
-} from "@/interfaces/auth.interface";
-import { ClassKey} from "@/types/classKey";
+import { createTheme, Theme } from "@mui/material/styles";
+// import { LoginClasses } from "@/components/auth/login";
+import { ClassKey, CustomComponents } from "@/types/classKey";
 import { keyframes } from "@emotion/react";
+import { RazethComponentsPropsList } from "@/interfaces/theme.interface";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -22,50 +16,19 @@ declare module "@mui/material/styles" {
     passwordStrength?: string[] | ((theme: Theme) => string[]);
   }
 
-  // interface ComponentNameToClassKey {
-  //   RazethLogin: ClassKey;
-  //   RazethSideImage: ClassKey;
-  //   RazethAvatar: ClassKey;
-  //   RazethDivider: ClassKey;
-  //   RazethSignUpLink: ClassKey;
-  //   RazethFooter: ClassKey;
-  // }
-
-  // STEP 2: The rest of the interfaces now build from the mapping.
-
   // ComponentNameToClassKey can derive its keys from our map.
   // Note: If each component has different keys (e.g., 'root', 'card'),
   // this interface should be defined manually for full accuracy.
-  type ComponentNameToClassKey = Record<keyof ComponentsPropsList, ClassKey>;
+  interface ComponentNameToClassKey
+    extends Record<keyof RazethComponentsPropsList, ClassKey> {}
 
-  // interface RazethComponentPropsMap {
-  //   RazethLogin: LoginProps;
-  //   RazethSideImage: SideImageProps;
-  //   RazethAvatar: AvatarProps;
-  //   RazethDivider: DividerProps;
-  //   RazethSignUpLink: SignUpProps;
-  //   RazethFooter: FooterProps;
-  // }
+  // ComponentsPropsList directly extends our map.
+  interface ComponentsPropsList extends RazethComponentsPropsList {}
 
-  // STEP 3: The Components interface is now a concise mapped type.
-  // It iterates over every key in our RazethComponentPropsMap and generates
-  // the theme structure for it, eliminating all repetition.
-  // interface Components {
-  //   [Key in keyof ComponentsPropsList]?: {
-  //     defaultProps?: Partial<ComponentsPropsList[Key]>;
-  //     styleOverrides?: ComponentsOverrides<Omit<Theme, 'components'>>[Key];
-  //     variants?: Array<{
-  //       props: Partial<ComponentsPropsList[Key]>;
-  //       style: (props: { theme: Theme }) => unknown;
-  //     }>;
-  //   };
-  // }
   interface Components extends CustomComponents {
-    [K in keyof ComponentsPropsList]?: CustomComponentConfig<K>;
     // Your custom components are now automatically included
     // You can still add standard MUI component overrides here if needed
   }
-
 
   // interface Components {
   //   RazethLogin?: {
@@ -364,33 +327,20 @@ const customBaseTheme = createTheme({
             // },
           },
         }),
-
-        // avatar: (props: { theme: Theme }) => ({
-        //   margin: props.theme.spacing(0, 0, 0, 0),
-        //   // display: "flex",
-        //   // justifyContent: "center",
-        //   display: "flex", // Use flexbox for alignment
-        //   flexDirection: "column", // Arrange items vertically
-        //   alignItems: "center", // Center items horizontally
-        //   "& .MuiAvatar-root": {
-        //     marginBottom: props.theme.spacing(1),
-        //     backgroundColor: "#e72d32",
-        //     position: "relative",
-        //   },
-        //   "& svg": { fill: "#fff" },
-        // }),
       },
       // 👇 Variants
       variants: [
         {
           props: { variant: "compact" },
-          style: ({ theme }) => ({
-            [`& .${LoginClasses.content}`]: {
+          style: ({ theme }: { theme: Theme }) => ({
+            // Target slots using their MUI-generated global class names
+            // The format is '& .Mui[ComponentName]-[slotName]'
+            "& .MuiRazethLogin-content": {
               [theme.breakpoints.up("md")]: {
                 maxWidth: "500px",
               },
             },
-            [`& .${LoginClasses.card}`]: {
+            "& .MuiRazethLogin-card": {
               borderRadius: theme.spacing(1),
               boxShadow:
                 theme.palette.mode === "dark"
@@ -405,13 +355,13 @@ const customBaseTheme = createTheme({
         },
         {
           props: { variant: "full" },
-          style: ({ theme }) => ({
-            [`& .${LoginClasses.content}`]: {
+          style: ({ theme }: { theme: Theme }) => ({
+            "& .MuiRazethLogin-content": {
               [theme.breakpoints.up("md")]: {
                 maxWidth: "750px",
               },
             },
-            [`& .${LoginClasses.card}`]: {
+            "& .MuiRazethLogin-card": {
               borderRadius: theme.spacing(3),
               boxShadow:
                 theme.palette.mode === "dark"
@@ -469,6 +419,57 @@ const customBaseTheme = createTheme({
         }),
       },
     },
+    RazethLoginForm: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          ["& .MuiCardContent-root"]: {
+            minWidth: 300,
+            padding: `${props.theme.spacing(0)}`,
+          },
+        }),
+        content: (props: { theme: Theme }) => ({
+          display: "flex",
+          flexDirection: "column",
+          gap: props.theme.spacing(0),
+          // Apply custom styles to the last child element inside this container
+          "& > :last-child": {
+            // For example, you could add extra margin to the button
+            // if it's the last item. Let's override its default top margin.
+            marginTop: props.theme.spacing(1),
+          },
+        }),
+        password: (props: { theme: Theme }) => ({
+          display: "flex",
+          flexDirection: "column",
+          gap: props.theme.spacing(0),
+        }),
+        footer: (props: { theme: Theme }) => ({
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          fontWeight: 500,
+          marginTop: "-0.5rem",
+          gap: props.theme.spacing(0),
+          // ["& a"]: {
+          //   color: props.theme.palette.primary.main,
+          //   textDecoration: "underline",
+          //   textUnderlineOffset: "2px",
+          //   "&:hover": {
+          //     textDecoration: "underline",
+          //   },
+          // },
+        }),
+        button: (props: { theme: Theme }) => ({
+          marginTop: props.theme.spacing(1),
+          // paddingTop: theme.spacing(1.5),
+          // paddingBottom: theme.spacing(1.5),
+          // mt: 1,
+          // py: 1.5,
+          fontWeight: 700,
+          ["& .MuiSvgIcon-root"]: { margin: props.theme.spacing(0.3) },
+        }),
+      },
+    },
     RazethDivider: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
@@ -491,7 +492,8 @@ const customBaseTheme = createTheme({
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
           textAlign: "center",
-          marginTop: props.theme.spacing(1),
+          fontSize: "0.875rem",
+          marginTop: props.theme.spacing(2),
           color: props.theme.palette.text.secondary,
           a: {
             //   color: theme.palette.primary.main,
@@ -499,7 +501,7 @@ const customBaseTheme = createTheme({
             //   textUnderlineOffset: "2px",
             textTransform: "uppercase",
             svg: {
-              paddingBottom: "2px",
+              paddingBottom: "3px",
             },
           },
         }),

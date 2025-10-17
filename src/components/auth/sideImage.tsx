@@ -23,7 +23,7 @@ const SideImage = (inProps: SideImageProps) => {
       <StyledSideImage size={{ xs: 12, md: 6 }} {...rest}>
         <Image
           src={src}
-          // placeholder="empty"
+          placeholder="empty"
           alt="Background"
           fill
           priority={true}
@@ -35,6 +35,14 @@ const SideImage = (inProps: SideImageProps) => {
 };
 
 const PREFIX = "RazethSideImage";
+
+const StyledSideImage = styled(Grid, {
+  name: PREFIX,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})<SideImageProps>(() => ({}));
+
+export default SideImage;
 
 // export const SideImageStyles = (theme: Theme) => ({
 //   [`& .${SideImageClasses.content}`]: {
@@ -60,11 +68,3 @@ const PREFIX = "RazethSideImage";
 //     },
 //   },
 // });
-
-const StyledSideImage = styled(Grid, {
-  name: PREFIX,
-  slot: "Root",
-  overridesResolver: (_props, styles) => styles.root,
-})<SideImageProps>(() => ({}));
-
-export default SideImage;

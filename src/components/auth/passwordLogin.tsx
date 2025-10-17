@@ -10,7 +10,6 @@ import {
   FormControlLabel,
   Checkbox,
   CardContent,
-  Theme,
 } from "@mui/material";
 import { styled, useThemeProps } from "@mui/material/styles";
 import IconInput from "../CustomInputs/IconInput";
@@ -18,9 +17,37 @@ import { PermIdentity, Password, Login } from "@mui/icons-material";
 import { useRequired } from "@/utils/validator";
 import PasswordValidationInput from "../CustomInputs/PasswordValidationInput";
 import { LoginFormProps, LoginParams } from "@/interfaces/auth.interface";
-import { TextInput } from "react-admin";
-import { forgotPasswordIcon } from "../icons/svg";
-// import { TextInput } from "react-admin";
+
+const PREFIX = "RazethLoginForm";
+const StyledLoginForm = styled(Form, {
+  name: PREFIX,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})<LoginFormProps>(() => ({}));
+
+const Content = styled(Box, {
+  name: PREFIX,
+  slot: "Content",
+  overridesResolver: (_props, styles) => styles.content,
+})<LoginFormProps>(() => ({}));
+
+const PasswordArea = styled(Box, {
+  name: PREFIX,
+  slot: "password",
+  overridesResolver: (_props, styles) => styles.password,
+})<LoginFormProps>(() => ({}));
+
+const Footer = styled(Box, {
+  name: PREFIX,
+  slot: "footer",
+  overridesResolver: (_props, styles) => styles.footer,
+})<LoginFormProps>(() => ({}));
+
+const FormButton = styled(Button, {
+  name: PREFIX,
+  slot: "button",
+  overridesResolver: (_props, styles) => styles.button,
+})<LoginFormProps>(() => ({}));
 
 const PasswordLogin = (inProps: LoginFormProps) => {
   const props = useThemeProps({
@@ -80,9 +107,9 @@ const PasswordLogin = (inProps: LoginFormProps) => {
       sx={sx}
       {...rest}
     >
-      <CardContent className={LoginFormClasses.content}>
+      <CardContent>
         {children || (
-          <Box className="box-body">
+          <PasswordLogin.content>
             <IconInput
               source="credential"
               className="icon-input"
@@ -94,16 +121,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
               validate={required()}
               resettable
             />
-            {/* <TextInput
-              source="credential"
-              className="icon-input"
-              label={translate("razeth.auth.credentail")}
-              autoComplete="username"
-              validate={required()}
-              resettable
-              fullWidth
-            /> */}
-            <Box className="password">
+            <PasswordLogin.password>
               <PasswordValidationInput
                 source="password"
                 iconStart={<Password />}
@@ -115,8 +133,8 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                 resettable
                 fullWidth
               />
-            </Box>
-            <Box className="footer">
+            </PasswordLogin.password>
+            <PasswordLogin.footer>
               <Typography variant="body2">
                 <FormControlLabel
                   control={<Checkbox defaultChecked />}
@@ -127,22 +145,22 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                 {forgotPassword || translate("razeth.auth.forgot_password")}
                 {/* {forgotPasswordIcon} */}
               </Link>
-            </Box>
+            </PasswordLogin.footer>
 
-            <Button
+            <PasswordLogin.button
               type="submit"
               variant="contained"
               color="primary"
               size="large"
               disabled={loading}
               // fullWidth
-              className={LoginFormClasses.button}
+              // className={LoginFormClasses.button}
             >
               {loading ? (
                 <CircularProgress
                   //   size={24}
                   color="inherit"
-                  className={LoginFormClasses.icon}
+                  // className={LoginFormClasses.icon}
                   size={19}
                   thickness={3}
                 />
@@ -164,85 +182,83 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                 />
               </svg> */}
               <Login />
-            </Button>
-          </Box>
+            </PasswordLogin.button>
+          </PasswordLogin.content>
         )}
       </CardContent>
     </StyledLoginForm>
   );
 };
 
-const PREFIX = "RazethLoginForm";
+PasswordLogin.content = Content;
+PasswordLogin.password = PasswordArea;
+PasswordLogin.footer = Footer;
+PasswordLogin.button = FormButton;
 
-export const LoginFormClasses = {
-  content: `${PREFIX}-content`,
-  button: `${PREFIX}-button`,
-  icon: `${PREFIX}-icon`,
-};
+// export const LoginFormClasses = {
+//   content: `${PREFIX}-content`,
+//   button: `${PREFIX}-button`,
+//   icon: `${PREFIX}-icon`,
+// };
 
-export const LoginFormStyles = (theme: Theme) => ({
-  [`& .${LoginFormClasses.content}`]: {
-    minWidth: 300,
-    padding: `${theme.spacing(0)}`,
-    ["& .box-body"]: {
-      display: "flex",
-      flexDirection: "column",
-      gap: 0,
-      ["& .password"]: {
-        display: "flex",
-        flexDirection: "column",
-        gap: 0,
-        // ["& .box-input-footer"]: {
-        //   display: "flex",
-        //   justifyContent: "space-between",
-        //   alignItems: "center",
-        //   fontWeight: 500,
-        //   ["& a"]: {
-        //     color: "primary.main",
-        //     textDecoration: "underline",
-        //     textUnderlineOffset: "2px",
-        //     "&:hover": {
-        //       textDecoration: "underline",
-        //     },
-        //   },
-        // },
-      },
-      ["& .footer"]: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        fontWeight: 500,
-        marginTop: "-0.5rem",
-        ["& a"]: {
-          color: "primary.main",
-          textDecoration: "underline",
-          textUnderlineOffset: "2px",
-          "&:hover": {
-            textDecoration: "underline",
-          },
-        },
-      },
-    },
-  },
-  [`& .${LoginFormClasses.content}:last-child`]: {
-    paddingBottom: `${theme.spacing(0)}`,
-  },
-  [`& .${LoginFormClasses.button}`]: {
-    marginTop: theme.spacing(1),
-    // paddingTop: theme.spacing(1.5),
-    // paddingBottom: theme.spacing(1.5),
-    // mt: 1,
-    // py: 1.5,
-    fontWeight: 700,
-  },
-  [`& .${LoginFormClasses.icon}`]: {
-    margin: theme.spacing(0.3),
-  },
-});
-
-const StyledLoginForm = styled(Form, {
-  name: PREFIX,
-  overridesResolver: (_props, styles) => styles.root,
-})(({ theme }) => LoginFormStyles(theme));
+// export const LoginFormStyles = (theme: Theme) => ({
+//   [`& .${LoginFormClasses.content}`]: {
+//     minWidth: 300,
+//     padding: `${theme.spacing(0)}`,
+//     ["& .box-body"]: {
+//       display: "flex",
+//       flexDirection: "column",
+//       gap: 0,
+//       ["& .password"]: {
+//         display: "flex",
+//         flexDirection: "column",
+//         gap: 0,
+//         // ["& .box-input-footer"]: {
+//         //   display: "flex",
+//         //   justifyContent: "space-between",
+//         //   alignItems: "center",
+//         //   fontWeight: 500,
+//         //   ["& a"]: {
+//         //     color: "primary.main",
+//         //     textDecoration: "underline",
+//         //     textUnderlineOffset: "2px",
+//         //     "&:hover": {
+//         //       textDecoration: "underline",
+//         //     },
+//         //   },
+//         // },
+//       },
+//       ["& .footer"]: {
+//         display: "flex",
+//         justifyContent: "space-between",
+//         alignItems: "center",
+//         fontWeight: 500,
+//         marginTop: "-0.5rem",
+//         ["& a"]: {
+//           color: "primary.main",
+//           textDecoration: "underline",
+//           textUnderlineOffset: "2px",
+//           "&:hover": {
+//             textDecoration: "underline",
+//           },
+//         },
+//       },
+//     },
+//   },
+//   [`& .${LoginFormClasses.content}:last-child`]: {
+//     paddingBottom: `${theme.spacing(0)}`,
+//   },
+//   [`& .${LoginFormClasses.button}`]: {
+//     marginTop: theme.spacing(1),
+//     // paddingTop: theme.spacing(1.5),
+//     // paddingBottom: theme.spacing(1.5),
+//     // mt: 1,
+//     // py: 1.5,
+//     fontWeight: 700,
+//   },
+//   [`& .${LoginFormClasses.icon}`]: {
+//     margin: theme.spacing(0.3),
+//   },
+// });
 
 export default PasswordLogin;

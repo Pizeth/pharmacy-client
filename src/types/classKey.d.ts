@@ -5,10 +5,12 @@ import { ComponentsOverrides, Theme } from "@mui/material";
 export type ClassKey =
   | "root"
   | "content"
+  | "password"
   | "button"
   | "icon"
   | "card"
-  | "avatar";
+  | "avatar"
+  | "footer";
 
 export type StyleComponent = StyledComponent<
   MUIStyledCommonProps<Theme>,
@@ -39,6 +41,11 @@ export type CustomComponentConfig<Name extends keyof ComponentsPropsList> = {
   }>;
 };
 
+// Mapped type to generate all component configs automatically
+export type CustomComponents = {
+  [K in keyof ComponentsPropsList]?: CustomComponentConfig<K>;
+};
+
 // Generic helper type for custom component config
 // export type CustomComponentConfig<Name extends keyof ComponentsPropsList> = {
 //   defaultProps?: ComponentsPropsList[Name];
@@ -47,9 +54,4 @@ export type CustomComponentConfig<Name extends keyof ComponentsPropsList> = {
 //     props: ComponentsPropsList[Name];
 //     style: (props: { theme: Theme }) => unknown;
 //   }>;
-// };
-
-// Mapped type to generate all component configs automatically
-// export type CustomComponents = {
-//   [K in keyof ComponentsPropsList]?: CustomComponentConfig<K>;
 // };

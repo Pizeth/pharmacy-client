@@ -1,3 +1,4 @@
+import { StyleComponent } from "@/types/classKey";
 import { Theme } from "@emotion/react";
 import { SxProps } from "@mui/material";
 import { HtmlHTMLAttributes, ReactNode } from "react";
@@ -36,6 +37,10 @@ export interface LoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
 }
 
 export interface LoginFormProps {
+  content?: StyleComponent;
+  password?: StyleComponent;
+  footer?: StyleComponent;
+  formButton?: StyleComponent;
   redirectTo?: string;
   className?: string;
   sx?: SxProps<Theme>;

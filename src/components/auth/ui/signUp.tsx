@@ -27,6 +27,13 @@ const PREFIX = "RazethSignUpLink";
 
 const defaultIcon = <PersonAddIcon />;
 
+const StyledSignUpLink = styled("div", {
+  name: PREFIX,
+  overridesResolver: (_props, styles) => styles.root,
+})<SignUpProps>(() => ({}));
+
+export default SignupLink;
+
 // export const SingupLinktyles = (theme: Theme) => ({
 //   [`& .${RazethSignUpLinkClasses.content}`]: {
 //     textAlign: "center",
@@ -43,10 +50,3 @@ const defaultIcon = <PersonAddIcon />;
 //     },
 //   },
 // });
-
-const StyledSignUpLink = styled("div", {
-  name: PREFIX,
-  overridesResolver: (_props, styles) => styles.root,
-})<SignUpProps>(() => ({}));
-
-export default SignupLink;

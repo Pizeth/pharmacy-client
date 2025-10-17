@@ -19,6 +19,14 @@ export const RazethDivider = (inProps: DividerProps) => {
 
 const PREFIX = "RazethDivider";
 
+const StyledDivider = styled(Box, {
+  name: PREFIX,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})<DividerProps>(() => ({}));
+
+export default RazethDivider;
+
 // export const DividerStyles = (theme: Theme) => ({
 //   [`& .${DividerClasses.content}`]: {
 //     position: "relative",
@@ -35,11 +43,3 @@ const PREFIX = "RazethDivider";
 //     },
 //   },
 // });
-
-const StyledDivider = styled(Box, {
-  name: PREFIX,
-  slot: "Root",
-  overridesResolver: (_props, styles) => styles.root,
-})<DividerProps>(() => ({}));
-
-export default RazethDivider;

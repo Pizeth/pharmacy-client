@@ -42,13 +42,6 @@ const AvatarHeader = (inProps: AvatarProps) => {
 const defaultAvatarIcon = <PersonIcon />;
 const PREFIX = "RazethAvatar";
 
-// export const AvatarClasses = {
-//   content: `${PREFIX}-content`,
-//   "& svg": {
-//     fill: "#fff",
-//   },
-// };
-
 const BoxAvatar = styled(Box, {
   name: PREFIX,
   slot: "Root",

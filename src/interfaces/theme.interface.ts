@@ -1,4 +1,3 @@
-import { ComponentsOverrides, Theme } from "@mui/material";
 import {
   AvatarProps,
   DividerProps,
@@ -6,14 +5,16 @@ import {
   SideImageProps,
   SignUpProps,
   FooterProps,
+  LoginFormProps,
 } from "./auth.interface";
 
 // This interface maps each component's name to its specific props interface.
 // To add a new component, you only need to add a new line here.
-export interface ComponentsPropsList {
+export interface RazethComponentsPropsList {
   RazethLogin: Partial<LoginProps>;
   RazethSideImage: Partial<SideImageProps>;
   RazethAvatar: Partial<AvatarProps>;
+  RazethLoginForm: Partial<LoginFormProps>;
   RazethDivider: Partial<DividerProps>;
   RazethSignUpLink: Partial<SignUpProps>;
   RazethFooter: Partial<FooterProps>;
