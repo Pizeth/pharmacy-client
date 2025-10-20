@@ -1,34 +1,40 @@
-import { Link, styled, useThemeProps } from "@mui/material";
+import { Box, Link, styled, Typography, useThemeProps } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { SignUpProps } from "@/interfaces/auth.interface";
+import { useTranslate } from "ra-core";
 
 const SignupLink = (inProps: SignUpProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
   const {
-    message = "Don't have an account?",
-    title = "Sign Up",
+    message,
+    title,
     link = "#",
     icon = defaultIcon,
     sx,
     className,
     ...rest
   } = props;
+
+  const translate = useTranslate();
   return (
     <StyledSignUpLink className={className} sx={sx} {...rest}>
-      {message + " "}
-      <Link href={link}>
-        {title + " "} {icon}
+      {/* We wrap the message in a Typography component for consistency */}
+      <Typography variant="body2" component="span">
+        {message || translate("razeth.auth.no_account")}
+      </Typography>
+      <Link variant="body2" href={link}>
+        {title || translate("razeth.auth.sign_up")} {icon}
       </Link>
     </StyledSignUpLink>
   );
 };
 
 const PREFIX = "RazethSignUpLink";
-
 const defaultIcon = <PersonAddIcon />;
 
-const StyledSignUpLink = styled("div", {
+const StyledSignUpLink = styled(Box, {
   name: PREFIX,
+  slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
 })<SignUpProps>(() => ({}));
 

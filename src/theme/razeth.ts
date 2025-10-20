@@ -491,8 +491,12 @@ const customBaseTheme = createTheme({
     RazethSignUpLink: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: props.theme.spacing(0.5), // The space is now handled by the gap property
           textAlign: "center",
-          fontSize: "0.875rem",
+          // fontSize: "0.875rem",
           marginTop: props.theme.spacing(2),
           color: props.theme.palette.text.secondary,
           a: {
@@ -500,8 +504,12 @@ const customBaseTheme = createTheme({
             //   textDecoration: "underline",
             //   textUnderlineOffset: "2px",
             textTransform: "uppercase",
+            display: "inline-flex",
+            alignItems: "center",
             svg: {
-              paddingBottom: "3px",
+              marginLeft: props.theme.spacing(0.5),
+              fontSize: "1rem",
+              // paddingBottom: "3px",
             },
           },
         }),
@@ -511,12 +519,46 @@ const customBaseTheme = createTheme({
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
           textAlign: "center",
-          marginTop: props.theme.spacing(2),
+          marginTop: props.theme.spacing(1),
           color: props.theme.palette.text.secondary,
-          fontSize: "0.75rem",
+          // fontSize: "0.75rem",
+          // ["& .MuiBox-root"]: {
+          //   display: "flex",
+          //   alignItems: "center",
+          //   justifyContent: "center",
+          //   gap: props.theme.spacing(0.5), // The space is now handled by the gap property
+          //   marginBottom: props.theme.spacing(0.5),
+          // },
           ["& .MuiTypography-root"]: {
-            marginTop: props.theme.spacing(1),
+            marginTop: props.theme.spacing(0.5),
+            // paddingTop: props.theme.spacing(0.5),
             fontSize: "0.75rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: props.theme.spacing(0.5), // The space is now handled by the gap property
+            // marginBottom: props.theme.spacing(0.5),
+            a: {
+              margin: props.theme.spacing(0),
+              display: "inline-flex",
+              alignItems: "center",
+            },
+            // "& > :last-child": {
+            //   // For example, you could add extra margin to the button
+            //   // if it's the last item. Let's override its default top margin.
+            //   marginRight: props.theme.spacing(-0.5),
+            // },
+            "& > :last-child::after": {
+              color: props.theme.palette.text.secondary,
+              textDecoration: "none",
+              marginLeft: props.theme.spacing(-0.5),
+              content: '"."',
+            },
+            "& > :last-child:hover::after": {
+              textDecoration: "none",
+              // content: '" - Hover Text!"' /* Text to be displayed on hover */,
+              // opacity: 1 /* Make the text visible on hover */,
+            },
           },
         }),
       },
@@ -639,10 +681,11 @@ const customBaseTheme = createTheme({
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
           color: props.theme.palette.primary.main,
-          textDecoration: "underline",
-          textUnderlineOffset: "2px",
+          textDecoration: "none",
+          // textUnderlineOffset: "2px",
           "&:hover": {
             textDecoration: "underline",
+            textUnderlineOffset: props.theme.spacing(0.5),
             color: "#9d1820ff",
           },
         }),

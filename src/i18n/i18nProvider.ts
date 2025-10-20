@@ -11,6 +11,11 @@ const messages: { [key: string]: any } = {
     razeth: {
       title: {
         welcome: "Welcome Back",
+        description: "By clicking continue, you agree to our",
+        terms_of_service: "Terms of Service",
+        privacy_policy: "Privacy Policy",
+        ampersand: "and",
+        copyright: "Copyright © 2025 Razeth Inc. All rights reserved.",
       },
       auth: {
         // welcome: "Welcome Back",
