@@ -75,6 +75,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
     login(values, redirectTo)
       .then(() => {
         setLoading(false);
+        notify("ra.auth.sign_in_success", { type: "success" });
       })
       .catch((error) => {
         setLoading(false);

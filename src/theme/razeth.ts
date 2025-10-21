@@ -488,6 +488,45 @@ const customBaseTheme = createTheme({
         }),
       },
     },
+    RazethSocialLogin: {
+      styleOverrides: {
+        button: (props: { theme: Theme }) => ({
+          button: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: props.theme.spacing(1),
+            width: "100%",
+            padding: props.theme.spacing(1),
+            textTransform: "none",
+            border: `1px solid ${props.theme.palette.divider}`,
+            // "& .MuiTypography-root": {
+            //   fontWeight: "500",
+            //   display: "none", // Hide by default
+            //   [props.theme.breakpoints.up("sm")]: {
+            //     display: "block", // This applies for 'sm' and larger breakpoints
+            //   },
+            // },
+            "&:hover": {
+              border: `1px solid ${props.theme.palette.divider}`,
+              backgroundColor: props.theme.palette.action.hover,
+            },
+            "& svg": {
+              width: 16,
+              height: 16,
+            },
+          },
+          label: {
+            fontWeight: "500",
+            display: "none", // Hide by default
+            [props.theme.breakpoints.up("sm")]: {
+              display: "block", // This applies for 'sm' and larger breakpoints
+            },
+          },
+        }),
+      },
+    },
+
     RazethSignUpLink: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({

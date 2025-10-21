@@ -6,6 +6,8 @@ import {
   SignUpProps,
   FooterProps,
   LoginFormProps,
+  SocialLoginProps,
+  SocialButtonProps,
 } from "./auth.interface";
 
 // This interface maps each component's name to its specific props interface.
@@ -16,6 +18,8 @@ export interface RazethComponentsPropsList {
   RazethAvatar: Partial<AvatarProps>;
   RazethLoginForm: Partial<LoginFormProps>;
   RazethDivider: Partial<DividerProps>;
+  RazethSocialLogin: Partial<SocialLoginProps>;
+  RazethSocialButton: Partial<SocialButtonProps>;
   RazethSignUpLink: Partial<SignUpProps>;
   RazethFooter: Partial<FooterProps>;
 }

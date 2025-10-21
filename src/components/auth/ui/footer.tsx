@@ -29,7 +29,6 @@ const Footer = (inProps: FooterProps) => {
         <Link href={privacyPolicyUrl}>
           {privacyPolicy || translate("razeth.title.privacy_policy")}
         </Link>
-        {/* . */}
       </Typography>
       <Typography variant="body2" component="span">
         {copyright || translate("razeth.title.copyright")}

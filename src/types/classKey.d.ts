@@ -6,6 +6,7 @@ export type ClassKey =
   | "root"
   | "content"
   | "password"
+  | "label"
   | "button"
   | "icon"
   | "card"

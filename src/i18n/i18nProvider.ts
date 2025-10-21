@@ -27,6 +27,7 @@ const messages: { [key: string]: any } = {
         remember_me: "Remember me",
         forgot_password: "Forgot your password?",
         sign_in_error: "Authentication failed, please try again!",
+        oidc_error: "Failed to initiate login. Please try again!",
         social_login: "Or continue with",
         no_account: "Don't have an account?",
       },

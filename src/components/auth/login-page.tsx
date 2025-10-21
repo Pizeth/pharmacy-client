@@ -325,15 +325,15 @@ import { LogIn, LogInIcon } from "lucide-react";
 import { LoginFormProps, LoginProps } from "react-admin";
 import { LoginParams } from "@/interfaces/auth.interface";
 import {
-  apple,
-  discord,
-  github,
-  gitlab,
-  google,
-  linkedin,
-  meta,
-  microsoft,
-  x,
+  Apple,
+  Discord,
+  Github,
+  Gitlab,
+  Google,
+  Linkedin,
+  Meta,
+  Microsoft,
+  X,
 } from "../icons/socialIcons";
 
 const PREFIX = "RazethLoginForm";
@@ -646,31 +646,49 @@ const LoginPageOld = (inProps: LoginFormProps) => {
 
                   <Grid container spacing={2}>
                     {/* Linkedin */}
-                    <Grid size={{ xs: 6, sm: 4 }}>{linkedin}</Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <Linkedin />
+                    </Grid>
 
                     {/* Microsoft */}
-                    <Grid size={{ xs: 6, sm: 4 }}>{microsoft}</Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <Microsoft />
+                    </Grid>
 
                     {/* GitLab */}
-                    <Grid size={{ xs: 6, sm: 4 }}>{gitlab}</Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <Gitlab />
+                    </Grid>
 
                     {/* GitHub */}
-                    <Grid size={{ xs: 6, sm: 4 }}>{github}</Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <Github />
+                    </Grid>
 
                     {/* Google */}
-                    <Grid size={{ xs: 6, sm: 4 }}>{google}</Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <Google />
+                    </Grid>
 
                     {/* X (Twitter) */}
-                    <Grid size={{ xs: 6, sm: 4 }}>{x}</Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <X />
+                    </Grid>
 
                     {/* Discord */}
-                    <Grid size={{ xs: 6, sm: 4 }}>{discord}</Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <Discord />
+                    </Grid>
 
                     {/* Apple */}
-                    <Grid size={{ xs: 6, sm: 4 }}>{apple}</Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <Apple />
+                    </Grid>
 
                     {/* Meta */}
-                    <Grid size={{ xs: 6, sm: 4 }}>{meta}</Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <Meta />
+                    </Grid>
                   </Grid>
 
                   <Box
