@@ -290,6 +290,7 @@ export const Login = (
     avatarIcon = defaultAvatar,
     children = defaultLoginForm,
     divider = defaultDivider,
+    social = defaultSocial,
     signUp = defaultSignUp,
     footer = defaultFooter,
     variant = "full",
@@ -312,6 +313,7 @@ export const Login = (
         // not authenticated, stay on the login page
       });
   }, [checkAuth, navigate]);
+
   return (
     <Root
       ref={containerRef}
@@ -333,7 +335,7 @@ export const Login = (
                   {avatarIcon}
                   {children}
                   {divider}
-                  {SocialLogin}
+                  {social}
                   {signUp}
                 </Box>
               </CardContent>
@@ -357,6 +359,7 @@ const defaultSideImage = (
 // const defaultAvatar = <PersonIcon />;
 const defaultAvatar = <AvatarHeader avatarIcon={<PersonIcon />} />;
 const defaultDivider = <Divider />;
+const defaultSocial = <SocialLogin />;
 const defaultSignUp = <SignupLink />;
 const defaultFooter = <Footer />;
 

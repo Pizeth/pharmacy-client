@@ -29,6 +29,7 @@ export interface LoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
   sideImage?: ReactNode;
   children?: ReactNode;
   divider?: ReactNode;
+  social?: ReactNode;
   signUp?: ReactNode;
   footer?: ReactNode;
   className?: string;
@@ -66,6 +67,11 @@ export interface SideImageProps extends HtmlHTMLAttributes<HTMLDivElement> {
 export interface DividerProps extends HtmlHTMLAttributes<HTMLDivElement> {
   className?: string;
   title?: string;
+  sx?: SxProps<Theme>;
+}
+
+export interface SocialLoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  className?: string;
   sx?: SxProps<Theme>;
 }
 

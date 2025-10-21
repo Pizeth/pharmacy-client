@@ -11,9 +11,10 @@ import {
   Checkbox,
   CardContent,
 } from "@mui/material";
+// import PersonIcon from "@mui/icons-material/Person";
 import { styled, useThemeProps } from "@mui/material/styles";
 import IconInput from "../CustomInputs/IconInput";
-import { PermIdentity, Password, Login } from "@mui/icons-material";
+import { PermIdentity, Person, Password, Login } from "@mui/icons-material";
 import { useRequired } from "@/utils/validator";
 import PasswordValidationInput from "../CustomInputs/PasswordValidationInput";
 import { LoginFormProps, LoginParams } from "@/interfaces/auth.interface";
@@ -113,9 +114,9 @@ const PasswordLogin = (inProps: LoginFormProps) => {
             <IconInput
               source="credential"
               className="icon-input"
-              iconStart={<PermIdentity />}
+              iconStart={<Person />}
               fullWidth
-              // helper={true}
+              helper={true}
               label={translate("razeth.auth.credentail")}
               autoComplete="username"
               validate={required()}
@@ -126,7 +127,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                 source="password"
                 iconStart={<Password />}
                 className="icon-input"
-                // helper={true}
+                helper={true}
                 label={translate("razeth.auth.password")}
                 autoComplete="current-password"
                 validate={required()}
