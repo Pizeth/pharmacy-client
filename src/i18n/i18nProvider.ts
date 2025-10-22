@@ -30,6 +30,7 @@ const messages: { [key: string]: any } = {
         oidc_error: "Failed to initiate login. Please try again!",
         social_login: "Or continue with",
         no_account: "Don't have an account?",
+        not_authenticated: "You are not authenticated.",
       },
       validation: {
         required: "%{field} is required!",

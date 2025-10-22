@@ -66,6 +66,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
 
   // Compute validators with normalization
   const validators = useMemo(() => {
+    // console.log("Setting up validators", passwordValue);
     const normalizedValidate = Array.isArray(validate) ? validate : [validate];
     const baseValidators = [...normalizedValidate];
     baseValidators.push(strengthMeter ? passwordValidator() : matchPassword());
@@ -312,7 +313,6 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
   // Apply shake effect when validation state changes
   useEffect(() => {
     if (Utils.isEqual(field.value, passwordValue)) {
-      console.log("equal");
       return;
     }
     Animations.shake(isValidating, invalid, shakeRef, clearErrors, source);
@@ -382,15 +382,22 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
     };
   }, [handleMouseUp, handleTouchEnd]);
 
+  // --- LOGIC CORRECTION ---
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e?.target?.value ?? e;
-    initialValueRef.current = newValue;
+    // DO NOT set initialValueRef.current here
+    // initialValueRef.current = newValue;
     field.onChange(newValue); // Ensure form data is in sync
   };
 
-  const handleFocus = () => setFocused(true);
+  const handleFocus = () => {
+    setFocused(true); // SET the initial value *on focus*
+    initialValueRef.current = field.value;
+  };
   const handleBlur = () => {
     setFocused(false);
+    // This check now correctly compares the value on blur
+    // to the value as it was on focus.
     if (
       field.value !== initialValueRef.current ||
       (isRequired && isEmpty(field.value)) /*&& isEmpty(passwordValue)*/
@@ -403,6 +410,10 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
     // Animations.shake(isValidating, invalid, shakeRef, clearErrors, source);
   };
 
+  // --- END LOGIC CORRECTION ---
+
+  // const showValidating = isValidating && !focused;
+
   // Combine sync and async errors
   const errMsg = error?.message;
   const renderHelperText = !!(
@@ -411,6 +422,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
     errMsg ||
     result.feedbackMsg ||
     isValidating ||
+    // showValidating ||
     invalid
   );
   // const helper = !!(helperText || errMsg || isValidating);
@@ -447,12 +459,17 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
               error={
                 // Show validation message only when NOT in validating state
                 isValidating ? undefined : errMsg
+                // showValidating ? undefined : errMsg
               }
               helperText={
                 // Show "Validating..." text during async validation
                 isValidating
                   ? translate("razeth.validation.validating")
                   : helperText
+                // BUT NOT when the user is currently typing in the field
+                // showValidating
+                //   ? translate("razeth.validation.validating")
+                //   : helperText
               }
             />
           )

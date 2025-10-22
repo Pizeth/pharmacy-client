@@ -27,7 +27,7 @@ class OidcAuthProvider implements AuthProvider {
 
     if (!user || !tokens) {
       throw new AppError(
-        "Not authenticated",
+        "razeth.auth.not_authenticated",
         StatusCodes.UNAUTHORIZED,
         this.context,
         { cause: "No user or tokens found in storage" }

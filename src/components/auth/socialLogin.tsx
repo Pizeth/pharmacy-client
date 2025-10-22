@@ -34,8 +34,8 @@ const SocialLoginRoot = styled(Grid, {
 
 const SocialLoginContent = styled(Grid, {
   name: PREFIX,
-  slot: "Button",
-  overridesResolver: (_props, styles) => styles.button,
+  slot: "Content",
+  overridesResolver: (_props, styles) => styles.content,
 })(() => ({}));
 
 // Provider configuration
@@ -88,13 +88,13 @@ const SocialLogin = (inProps: SocialLoginProps) => {
   const [searchParams] = useSearchParams();
 
   // State management with standard useState
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   const handleProviderLogin = useCallback(
     async (provider: string) => {
       try {
         // setLoading(provider);
-        setLoading(true);
+        // setLoading(true);
 
         const backendUrl =
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
@@ -119,34 +119,21 @@ const SocialLogin = (inProps: SocialLoginProps) => {
   return (
     <SocialLoginRoot container spacing={2}>
       {Object.entries(PROVIDERS).map(([key, provider]) => (
-        // <Grid key={key} size={{ xs: 6, sm: 4 }}>
-        //   <SocialButton
-        //     variant="outlined"
-        //     onClick={() => handleProviderLogin(key)}
-        //   >
-        //     {provider.icon}
-        //     <Typography variant="body2">{provider.name}</Typography>
-        //   </SocialButton>
-        // </Grid>
-        <SocialLogin.buttons
-          key={key}
-          // onClick={() => handleProviderLogin(key)}
-          size={{ xs: 6, sm: 4 }}
-        >
+        <SocialLogin.children key={key} size={{ xs: 6, sm: 4 }}>
           <SocialButton
             variant="outlined"
             icon={provider.icon}
-            // onClick={() => handleProviderLogin(key)}
+            onClick={() => handleProviderLogin(key)}
           >
             {provider.name}
           </SocialButton>
-        </SocialLogin.buttons>
+        </SocialLogin.children>
       ))}
     </SocialLoginRoot>
   );
 };
 
-SocialLogin.buttons = SocialLoginContent;
+SocialLogin.children = SocialLoginContent;
 
 export default SocialLogin;
 

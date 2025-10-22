@@ -12,6 +12,8 @@ import clsx from "clsx";
 // import { InputHelper } from "./CustomComponents/InputHelper";
 import ResettableIconInputField from "@/components/CustomInputs/ResettableIconInputField";
 import { InputHelper } from "../CustomComponents/InputHelper";
+import { Animations } from "@/utils/animations";
+import { useFormContext } from "react-hook-form";
 
 const IconInput = forwardRef((props: IconTextInputProps, ref) => {
   const {
@@ -35,7 +37,7 @@ const IconInput = forwardRef((props: IconTextInputProps, ref) => {
   const inputRef = useRef<HTMLDivElement>(null);
   const shakeRef = useRef<HTMLLabelElement | null>(null); // Ref for shake effect
   const [focused, setFocused] = useState(false);
-  // const { clearErrors } = useFormContext();
+  const { clearErrors } = useFormContext();
 
   const {
     field,
@@ -73,23 +75,33 @@ const IconInput = forwardRef((props: IconTextInputProps, ref) => {
   //   // }
   // };
 
+  useEffect(() => {
+    // Query the label element inside the container
+    if (inputRef.current) {
+      shakeRef.current = inputRef.current.querySelector(
+        ".MuiInputLabel-root"
+      ) as HTMLLabelElement | null;
+    }
+  }, []);
+
   // Handle shake effect without useState
   useEffect(() => {
-    if (!isValidating && invalid && inputRef.current) {
-      shakeRef.current = inputRef.current.querySelector(".MuiInputLabel-root");
-      if (shakeRef.current) {
-        shakeRef.current.classList.add("shake");
-        setTimeout(() => {
-          if (shakeRef.current) {
-            shakeRef.current.classList.remove("shake");
-          }
-        }, 500); // Matches animation duration
-      }
-    }
+    // if (!isValidating && invalid && inputRef.current) {
+    //   shakeRef.current = inputRef.current.querySelector(".MuiInputLabel-root");
+    //   if (shakeRef.current) {
+    //     shakeRef.current.classList.add("shake");
+    //     setTimeout(() => {
+    //       if (shakeRef.current) {
+    //         shakeRef.current.classList.remove("shake");
+    //       }
+    //     }, 500); // Matches animation duration
+    //   }
+    // }
+    Animations.shake(isValidating, invalid, shakeRef, clearErrors, source);
     // } else {
     //   clearErrors(source);
     // }
-  }, [isValidating, invalid, source]);
+  }, [isValidating, invalid, source, clearErrors]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e?.target?.value ?? e;

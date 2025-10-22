@@ -134,6 +134,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                 validate={required()}
                 resettable
                 fullWidth
+                // strengthMeter
               />
             </PasswordLogin.password>
             <PasswordLogin.footer>

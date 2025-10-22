@@ -490,7 +490,7 @@ const customBaseTheme = createTheme({
     },
     RazethSocialLogin: {
       styleOverrides: {
-        button: (props: { theme: Theme }) => ({
+        content: (props: { theme: Theme }) => ({
           button: {
             display: "flex",
             alignItems: "center",
@@ -512,21 +512,24 @@ const customBaseTheme = createTheme({
               backgroundColor: props.theme.palette.action.hover,
             },
             "& svg": {
-              width: 16,
-              height: 16,
-            },
-          },
-          label: {
-            fontWeight: "500",
-            display: "none", // Hide by default
-            [props.theme.breakpoints.up("sm")]: {
-              display: "block", // This applies for 'sm' and larger breakpoints
+              width: props.theme.spacing(2),
+              height: props.theme.spacing(2),
             },
           },
         }),
       },
     },
-
+    RazethSocialButton: {
+      styleOverrides: {
+        label: (props: { theme: Theme }) => ({
+          fontWeight: "500",
+          display: "none", // Hide by default
+          [props.theme.breakpoints.up("sm")]: {
+            display: "block", // This applies for 'sm' and larger breakpoints
+          },
+        }),
+      },
+    },
     RazethSignUpLink: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({

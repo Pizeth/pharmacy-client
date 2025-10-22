@@ -336,11 +336,13 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
             }),
           };
 
+          // --- SYNCHRONOUS CHECK 1: Empty Value ---
           if (isEmpty(value)) {
             setResult({
               score: 0,
               feedbackMsg: "",
             });
+            // Return a synchronous error (string or error object)
             return MsgUtils.getMessage(message, args, value, allValues);
             // return Object.assign(
             //   MsgUtils.getMessage(message, args, value, allValues),
@@ -348,6 +350,34 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
             //   { status: statusCode.ACCEPTED },
             // );
           }
+
+          // --- SYNCHRONOUS CHECK 2: Regex Test (If fails, STOP HERE) ---
+          if (!regex.test(value)) {
+            // Clear previous validation since we're returning sync error
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            if (cancelTokenRef.current) {
+              cancelTokenRef.current.cancel(
+                "New validation started - Sync Fail"
+              );
+            }
+
+            // Provide immediate feedback for regex failure
+            setResult({
+              score: 0,
+              feedbackMsg: String(
+                translateLabel({
+                  label: "razeth.feedback.password",
+                  source,
+                }) ?? ""
+              ),
+            });
+            // Return a synchronous error (string or error object)
+            return MsgUtils.setMsg("razeth.validation.password", args);
+          }
+
+          // --- ASYNCHRONOUS CHECK 3: Passed sync checks, now do debounced check ---
+          // If we get here, the password is syntactically valid and we
+          // can proceed with the debounced async strength check.
 
           // Clear previous validation
           if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -361,19 +391,19 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
           return new Promise<AsyncValidationErrorMessage | undefined>(
             (resolve) => {
               // Step 1: Check regex immediately
-              if (!regex.test(value)) {
-                setResult({
-                  score: 0,
-                  feedbackMsg: String(
-                    translateLabel({
-                      label: "razeth.feedback.password",
-                      source,
-                    }) ?? ""
-                  ),
-                });
-                resolve(MsgUtils.setMsg("razeth.validation.password", args));
-                return;
-              }
+              // if (!regex.test(value)) {
+              //   setResult({
+              //     score: 0,
+              //     feedbackMsg: String(
+              //       translateLabel({
+              //         label: "razeth.feedback.password",
+              //         source,
+              //       }) ?? ""
+              //     ),
+              //   });
+              //   resolve(MsgUtils.setMsg("razeth.validation.password", args));
+              //   return;
+              // }
 
               // Step 2: If regex passes, proceed with debounced zxcvbn check
               timeoutRef.current = setTimeout(async () => {
@@ -402,6 +432,7 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
                   } else {
                     resolve(undefined);
                   }
+                  // Set state only after the promise has successfully resolved its value
                   setResult({
                     score,
                     feedbackMsg: invalid
@@ -417,6 +448,8 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
                       statusCode.INTERNAL_SERVER_ERROR
                     )
                   );
+                  // Ensure state reflects error on failure
+                  setResult({ score: 0, feedbackMsg: "Validation failed" });
                 }
               }, interval ?? DEFAULT_DEBOUNCE);
             }

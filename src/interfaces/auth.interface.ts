@@ -1,6 +1,6 @@
 import { StyleComponent } from "@/types/classKey";
 import { Theme } from "@emotion/react";
-import { ButtonOwnProps, SxProps } from "@mui/material";
+import { ButtonProps, SxProps } from "@mui/material";
 import { HtmlHTMLAttributes, ReactNode } from "react";
 
 export interface LoginParams {
@@ -72,12 +72,12 @@ export interface DividerProps extends HtmlHTMLAttributes<HTMLDivElement> {
 
 export interface SocialLoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
   className?: string;
-  buttons?: ReactNode;
+  children?: ReactNode;
   sx?: SxProps<Theme>;
 }
 
 export interface SocialButtonProps
-  extends /*ExtendButtonBase<ButtonTypeMap> &*/ ButtonOwnProps {
+  extends ButtonProps /*ExtendButtonBase<ButtonTypeMap> & ButtonOwnProps */ {
   className?: string;
   icon?: ReactNode;
   children?: ReactNode;
