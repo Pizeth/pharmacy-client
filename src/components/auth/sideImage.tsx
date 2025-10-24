@@ -1,5 +1,6 @@
 import { SideImageProps } from "@/interfaces/auth.interface";
 import {
+  Box,
   Grid,
   styled,
   useMediaQuery,
@@ -7,32 +8,6 @@ import {
   useThemeProps,
 } from "@mui/material";
 import Image from "next/image";
-
-/* Image section - hidden on mobile */
-const SideImage = (inProps: SideImageProps) => {
-  const props = useThemeProps({ props: inProps, name: PREFIX });
-  const {
-    src = `${process.env.NEXT_PUBLIC_PLACEHOLDER}` ||
-      "/static/images/placeholder-mcs-orange.svg",
-    ...rest
-  } = props;
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  return (
-    !isMobile && (
-      <StyledSideImage size={{ xs: 12, md: 6 }} {...rest}>
-        <Image
-          src={src}
-          placeholder="empty"
-          alt="Background"
-          fill
-          priority={true}
-          //   className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
-      </StyledSideImage>
-    )
-  );
-};
 
 const PREFIX = "RazethSideImage";
 
@@ -42,7 +17,88 @@ const StyledSideImage = styled(Grid, {
   overridesResolver: (_props, styles) => styles.root,
 })<SideImageProps>(() => ({}));
 
+const Circle = styled("div", {
+  name: PREFIX,
+  slot: "Content",
+  overridesResolver: (_props, styles) => styles.content,
+})(() => ({}));
+
+const LogoWrapper = styled(Box, {
+  name: PREFIX,
+  slot: "Image",
+  overridesResolver: (_props, styles) => styles.image,
+})(() => ({}));
+
+/* Image section - hidden on mobile */
+// const SideImage = (inProps: SideImageProps) => {
+//   const props = useThemeProps({ props: inProps, name: PREFIX });
+//   const {
+//     src = `${process.env.NEXT_PUBLIC_PLACEHOLDER}` ||
+//       "/static/images/placeholder-mcs-orange.svg",
+//     ...rest
+//   } = props;
+//   const theme = useTheme();
+//   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+//   return (
+//     !isMobile && (
+//       <StyledSideImage size={{ xs: 12, md: 6 }} {...rest}>
+//         <Image
+//           src={src}
+//           placeholder="empty"
+//           alt="Background"
+//           fill
+//           priority={true}
+//           //   className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+//         />
+//       </StyledSideImage>
+//     )
+//   );
+// };
+
+const SideImage = (inProps: SideImageProps) => {
+  const props = useThemeProps({ props: inProps, name: PREFIX });
+  const { src = "/static/images/piseth_chesda_logo.svg", ...rest } = props;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  if (isMobile) return null;
+
+  return (
+    <StyledSideImage size={{ xs: 12, md: 6 }} {...rest}>
+      {/* Blue circle centered */}
+      <SideImage.circle />
+      {/* Fixed-size logo in the middle */}
+      <SideImage.logo src={src} />
+    </StyledSideImage>
+  );
+};
+
+SideImage.circle = Circle;
+SideImage.logo = ({ src }: { src: string }) => (
+  <LogoWrapper>
+    <Image
+      src={src}
+      alt="Logo"
+      fill
+      style={{ objectFit: "contain" }}
+      priority
+    />
+  </LogoWrapper>
+);
+
 export default SideImage;
+
+// const DefaultLogo = ({ src }: { src: string }) => (
+//   <LogoWrapper>
+//     <Image
+//       src={src}
+//       alt="Logo"
+//       fill
+//       style={{ objectFit: "contain" }}
+//       priority
+//     />
+//   </LogoWrapper>
+// );
 
 // export const SideImageStyles = (theme: Theme) => ({
 //   [`& .${SideImageClasses.content}`]: {

@@ -352,7 +352,11 @@ Login.Content = Content;
 Login.Card = LoginCard;
 // Login.Avatar = LoginAvatar;
 
-const defaultLoginForm = <PasswordLogin />;
+const defaultLoginForm = (
+  <PasswordLogin
+    forgotPasswordUrl={process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL}
+  />
+);
 const defaultSideImage = (
   <SideImage src={process.env.NEXT_PUBLIC_PLACEHOLDER} />
 );
@@ -360,7 +364,7 @@ const defaultSideImage = (
 const defaultAvatar = <AvatarHeader avatarIcon={<PersonIcon />} />;
 const defaultDivider = <Divider />;
 const defaultSocial = <SocialLogin />;
-const defaultSignUp = <SignupLink />;
+const defaultSignUp = <SignupLink link="/auth/register" />;
 const defaultFooter = <Footer />;
 
 // ✅ Named exports (optional, for tree-shaking)

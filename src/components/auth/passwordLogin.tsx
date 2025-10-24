@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Form, useLogin, useNotify, useTranslate } from "ra-core";
 import { SubmitHandler, FieldValues } from "react-hook-form";
 import {
@@ -100,6 +100,11 @@ const PasswordLogin = (inProps: LoginFormProps) => {
       });
   };
 
+  const handleForgotPassword = useCallback(() => {
+    // Navigate to forgot password page
+    window.location.href = forgotPasswordUrl;
+  }, [forgotPasswordUrl]);
+
   return (
     <StyledLoginForm
       onSubmit={handleSubmit}
@@ -117,7 +122,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
               className="icon-input"
               iconStart={<Person />}
               fullWidth
-              helper={true}
+              // helper={true}
               label={translate("razeth.auth.credentail")}
               autoComplete="username"
               validate={required()}
@@ -128,7 +133,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                 source="password"
                 iconStart={<Password />}
                 className="icon-input"
-                helper={true}
+                // helper={true}
                 label={translate("razeth.auth.password")}
                 autoComplete="current-password"
                 validate={required()}
@@ -144,7 +149,13 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                   label={translate("razeth.auth.remember_me")}
                 />
               </Typography>
-              <Link href={forgotPasswordUrl} variant="body2">
+              <Link
+                // href={forgotPasswordUrl}
+                component="button"
+                type="button"
+                variant="body2"
+                onClick={handleForgotPassword}
+              >
                 {forgotPassword || translate("razeth.auth.forgot_password")}
                 {/* {forgotPasswordIcon} */}
               </Link>

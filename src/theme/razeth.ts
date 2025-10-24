@@ -16,6 +16,19 @@ declare module "@mui/material/styles" {
     passwordStrength?: string[] | ((theme: Theme) => string[]);
   }
 
+  interface ThemeVars {
+    sideImage?: {
+      circleSize?: string;
+      circleColor?: string;
+    };
+  }
+  interface Theme {
+    vars: ThemeVars;
+  }
+  interface ThemeOptions {
+    vars?: ThemeVars;
+  }
+
   // ComponentNameToClassKey can derive its keys from our map.
   // Note: If each component has different keys (e.g., 'root', 'card'),
   // this interface should be defined manually for full accuracy.
@@ -380,11 +393,17 @@ const customBaseTheme = createTheme({
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
           position: "relative",
+          /*** New CSS ***/
+          overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f97316", // orange background
           // height: "100%",
-          backgroundColor:
-            props.theme.palette.mode === "dark"
-              ? "rgba(0, 0, 0, 0.2)"
-              : props.theme.palette.grey[200],
+          // backgroundColor:
+          //   props.theme.palette.mode === "dark"
+          //     ? "rgba(0, 0, 0, 0.2)"
+          //     : props.theme.palette.grey[200],
           "& img": {
             position: "absolute",
             inset: 0,
@@ -398,6 +417,39 @@ const customBaseTheme = createTheme({
                 //   "grayscale(1) sepia(1) saturate(5) hue-rotate(315deg) brightness(1)",
               }),
           },
+        }),
+        content: (props: { theme: Theme }) => ({
+          position: "absolute",
+          // maxWidth: "300px",
+          // maxHeight: "300px",
+          // width: "25%",
+          // height: "auto",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+
+          width: props.theme.vars?.sideImage?.circleSize || "40%", // one-third of parent width
+          aspectRatio: "1 / 1", // keep height equal to width
+          // paddingTop: "33%", // makes height equal to width
+          borderRadius: "50%",
+          backgroundColor:
+            props.theme.vars?.sideImage?.circleColor || "#1e40af", // blue circle
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)", // center it
+        }),
+        image: (props: { theme: Theme }) => ({
+          position: "relative",
+          zIndex: 2,
+          width: "120px", // fixed size, won’t scale with container
+          height: "120px",
+          objectFit: "cover",
+          ...(props.theme.palette.mode === "dark" &&
+            {
+              // filter: "brightness(0.25) grayscale(1)",
+              // filter:
+              //   "grayscale(1) sepia(1) saturate(5) hue-rotate(315deg) brightness(1)",
+            }),
         }),
       },
     },
@@ -541,7 +593,7 @@ const customBaseTheme = createTheme({
           // fontSize: "0.875rem",
           marginTop: props.theme.spacing(2),
           color: props.theme.palette.text.secondary,
-          a: {
+          button: {
             //   color: theme.palette.primary.main,
             //   textDecoration: "underline",
             //   textUnderlineOffset: "2px",

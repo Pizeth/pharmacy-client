@@ -59,8 +59,12 @@ export interface AvatarProps extends HtmlHTMLAttributes<HTMLDivElement> {
 }
 
 export interface SideImageProps extends HtmlHTMLAttributes<HTMLDivElement> {
-  className?: string;
+  circle?: ReactNode;
+  logo?: ReactNode;
   src?: string;
+  circleSize?: string; // e.g. "33%", "200px"
+  circleColor?: string; // e.g. "#1e40af", "red", "var(--mui-palette-primary-main)"
+  className?: string;
   sx?: SxProps<Theme>;
 }
 

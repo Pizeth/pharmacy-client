@@ -1,4 +1,4 @@
-import { Grid, styled, useThemeProps } from "@mui/material";
+import { CircularProgress, Grid, styled, useThemeProps } from "@mui/material";
 import {
   Apple,
   Discord,
@@ -89,11 +89,12 @@ const SocialLogin = (inProps: SocialLoginProps) => {
 
   // State management with standard useState
   // const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
 
   const handleProviderLogin = useCallback(
     async (provider: string) => {
       try {
-        // setLoading(provider);
+        setLoading(provider);
         // setLoading(true);
 
         const backendUrl =
@@ -116,6 +117,8 @@ const SocialLogin = (inProps: SocialLoginProps) => {
     [notify]
   );
 
+  const isLoading = useCallback((type: string) => loading === type, [loading]);
+
   return (
     <SocialLoginRoot container spacing={2}>
       {Object.entries(PROVIDERS).map(([key, provider]) => (
@@ -124,8 +127,13 @@ const SocialLogin = (inProps: SocialLoginProps) => {
             variant="outlined"
             icon={provider.icon}
             onClick={() => handleProviderLogin(key)}
+            disabled={loading != null}
           >
-            {provider.name}
+            {isLoading(key) ? (
+              <CircularProgress color="inherit" size={"1rem"} thickness={3} />
+            ) : (
+              provider.name
+            )}
           </SocialButton>
         </SocialLogin.children>
       ))}

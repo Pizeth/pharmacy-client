@@ -11,6 +11,7 @@ export type ClassKey =
   | "icon"
   | "card"
   | "avatar"
+  | "image"
   | "footer";
 
 export type StyleComponent = StyledComponent<

@@ -2,6 +2,7 @@ import { Box, Link, styled, Typography, useThemeProps } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { SignUpProps } from "@/interfaces/auth.interface";
 import { useTranslate } from "ra-core";
+import { useCallback } from "react";
 
 const SignupLink = (inProps: SignUpProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
@@ -15,6 +16,11 @@ const SignupLink = (inProps: SignUpProps) => {
     ...rest
   } = props;
 
+  const handleCreateAccount = useCallback(() => {
+    // Navigate to registration page
+    window.location.href = link;
+  }, [link]);
+
   const translate = useTranslate();
   return (
     <StyledSignUpLink className={className} sx={sx} {...rest}>
@@ -22,7 +28,13 @@ const SignupLink = (inProps: SignUpProps) => {
       <Typography variant="body2" component="span">
         {message || translate("razeth.auth.no_account")}
       </Typography>
-      <Link variant="body2" href={link}>
+      <Link
+        component="button"
+        type="button"
+        variant="body2"
+        onClick={handleCreateAccount}
+        // href={link}
+      >
         {title || translate("razeth.auth.sign_up")} {icon}
       </Link>
     </StyledSignUpLink>

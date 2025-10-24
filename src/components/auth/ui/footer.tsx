@@ -7,7 +7,7 @@ const Footer = (inProps: FooterProps) => {
   const {
     description,
     termsOfService,
-    termsOfServiceUrl,
+    termsOfServiceUrl = "#",
     privacyPolicy,
     privacyPolicyUrl = "#",
     ampersand,
