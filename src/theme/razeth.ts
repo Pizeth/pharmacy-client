@@ -6,7 +6,10 @@ import { createTheme, Theme } from "@mui/material/styles";
 // import { LoginClasses } from "@/components/auth/login";
 import { ClassKey, CustomComponents } from "@/types/classKey";
 import { keyframes } from "@emotion/react";
-import { RazethComponentsPropsList } from "@/interfaces/theme.interface";
+import {
+  RazethComponentsPropsList,
+  SideImage,
+} from "@/interfaces/theme.interface";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -17,16 +20,17 @@ declare module "@mui/material/styles" {
   }
 
   interface ThemeVars {
-    sideImage?: {
-      circleSize?: string;
-      circleColor?: string;
-    };
+    sideImage?: SideImage;
   }
   interface Theme {
-    vars: ThemeVars;
+    custom: {
+      sideImage: SideImage;
+    };
   }
   interface ThemeOptions {
-    vars?: ThemeVars;
+    custom?: {
+      sideImage?: SideImage;
+    };
   }
 
   // ComponentNameToClassKey can derive its keys from our map.
@@ -134,6 +138,11 @@ const shake = keyframes`
     `;
 
 const globalStyles = (theme: Theme) => ({
+  ":root": {
+    "--app-sideImage-circleSize": "30%",
+    "--app-sideImage-circleColor": "#1e40af",
+    "--app-sideImage-logoOffset": "3%",
+  },
   // Custom styles for a text field with an icon
   ".icon-input .MuiInputLabel-root": {
     marginLeft: "2em",
@@ -263,6 +272,15 @@ const defaultThemeInvariants = {
 };
 
 const customBaseTheme = createTheme({
+  cssVariables: { cssVarPrefix: "app" },
+  // cssVarPrefix: "app", // all vars will start with --app-
+  custom: {
+    sideImage: {
+      circleSize: "30%",
+      circleColor: "#1e40af",
+      logoOffset: "3%",
+    },
+  },
   palette: {
     primary: { main: "#e1232e", contrastText: "#fff" },
     secondary: { main: "#007bff" },
@@ -315,8 +333,15 @@ const customBaseTheme = createTheme({
         content: (props: { theme: Theme }) => ({
           width: "100%",
           maxWidth: "100%",
+          // [props.theme.breakpoints.up("lg")]: {
+          //   // maxWidth: "750px",
+          //   maxWidth: "50%",
+          // },
           [props.theme.breakpoints.up("md")]: {
-            maxWidth: "750px",
+            maxWidth: "min(80%, 750px)",
+          },
+          [props.theme.breakpoints.up("lg")]: {
+            maxWidth: "max(750px, 50%)",
           },
           "& .MuiFormControl-root": {
             // marginTop: "0.5em",
@@ -371,7 +396,8 @@ const customBaseTheme = createTheme({
           style: ({ theme }: { theme: Theme }) => ({
             "& .MuiRazethLogin-content": {
               [theme.breakpoints.up("md")]: {
-                maxWidth: "750px",
+                // maxWidth: "750px",
+                maxWidth: "75%",
               },
             },
             "& .MuiRazethLogin-card": {
@@ -428,12 +454,13 @@ const customBaseTheme = createTheme({
           alignItems: "center",
           justifyContent: "center",
 
-          width: props.theme.vars?.sideImage?.circleSize || "40%", // one-third of parent width
+          width: props.theme.custom.sideImage.circleSize || "35%", // one-third of parent width
+          // width: "var(--app-sideImage-circleSize)", // one-third of parent width
           aspectRatio: "1 / 1", // keep height equal to width
-          // paddingTop: "33%", // makes height equal to width
+          // paddingTop: "var(--app-sideImage-circleSize)", // makes height equal to width
           borderRadius: "50%",
           backgroundColor:
-            props.theme.vars?.sideImage?.circleColor || "#1e40af", // blue circle
+            props.theme.custom.sideImage.circleColor || "#1e40af", // blue circle
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)", // center it
@@ -441,8 +468,14 @@ const customBaseTheme = createTheme({
         image: (props: { theme: Theme }) => ({
           position: "relative",
           zIndex: 2,
-          width: "120px", // fixed size, won’t scale with container
-          height: "120px",
+          // width: "120px", // fixed size, won’t scale with container
+          // height: "120px",
+          aspectRatio: "1 / 1",
+          width:
+            `calc(
+              ${props.theme.custom.sideImage.circleSize} -
+                ${props.theme.custom.sideImage.logoOffset}
+            )` || "32%",
           objectFit: "cover",
           ...(props.theme.palette.mode === "dark" &&
             {

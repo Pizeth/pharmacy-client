@@ -1,36 +1,7 @@
 import { SocialButtonProps } from "@/interfaces/auth.interface";
 import { Button, styled, Typography, useThemeProps } from "@mui/material";
 
-// Custom styled button for social login
-// const SocialButton = styled(Button)(({ theme }) => ({
-//   display: "flex",
-//   alignItems: "center",
-//   justifyContent: "center",
-//   gap: theme.spacing(1),
-//   width: "100%",
-//   padding: theme.spacing(1),
-//   textTransform: "none",
-//   border: `1px solid ${theme.palette.divider}`,
-//   "&:hover": {
-//     border: `1px solid ${theme.palette.divider}`,
-//     backgroundColor: theme.palette.action.hover,
-//   },
-//   "& svg": {
-//     width: 16,
-//     height: 16,
-//   },
-// }));
-
-// export default SocialButton;
-
 const PREFIX = "RazethSocialButton";
-
-// Custom styled button for social login
-// const SocialButtonRoot = styled(Grid, {
-//   name: PREFIX,
-//   slot: "Root",
-//   overridesResolver: (_props, styles) => styles.root,
-// })<SocialButtonProps>(() => ({}));
 
 // The main button component
 const SocialButtonRoot = styled(Button, {
@@ -72,3 +43,25 @@ export const SocialButton = (inProps: SocialButtonProps) => {
 };
 
 export default SocialButton;
+
+// Custom styled button for social login
+// const SocialButton = styled(Button)(({ theme }) => ({
+//   display: "flex",
+//   alignItems: "center",
+//   justifyContent: "center",
+//   gap: theme.spacing(1),
+//   width: "100%",
+//   padding: theme.spacing(1),
+//   textTransform: "none",
+//   border: `1px solid ${theme.palette.divider}`,
+//   "&:hover": {
+//     border: `1px solid ${theme.palette.divider}`,
+//     backgroundColor: theme.palette.action.hover,
+//   },
+//   "& svg": {
+//     width: 16,
+//     height: 16,
+//   },
+// }));
+
+// export default SocialButton;

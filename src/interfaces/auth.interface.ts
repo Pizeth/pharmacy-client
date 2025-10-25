@@ -64,6 +64,7 @@ export interface SideImageProps extends HtmlHTMLAttributes<HTMLDivElement> {
   src?: string;
   circleSize?: string; // e.g. "33%", "200px"
   circleColor?: string; // e.g. "#1e40af", "red", "var(--mui-palette-primary-main)"
+  logoOffset?: string; // e.g. "2%", "8px"
   className?: string;
   sx?: SxProps<Theme>;
 }

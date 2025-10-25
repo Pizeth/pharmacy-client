@@ -23,3 +23,9 @@ export interface RazethComponentsPropsList {
   RazethSignUpLink: Partial<SignUpProps>;
   RazethFooter: Partial<FooterProps>;
 }
+
+export interface SideImage {
+  circleSize: string;
+  circleColor: string;
+  logoOffset: string;
+}

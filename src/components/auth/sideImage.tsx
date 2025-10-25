@@ -29,7 +29,6 @@ const LogoWrapper = styled(Box, {
   overridesResolver: (_props, styles) => styles.image,
 })(() => ({}));
 
-/* Image section - hidden on mobile */
 // const SideImage = (inProps: SideImageProps) => {
 //   const props = useThemeProps({ props: inProps, name: PREFIX });
 //   const {
@@ -55,6 +54,7 @@ const LogoWrapper = styled(Box, {
 //   );
 // };
 
+/* Image section - hidden on mobile */
 const SideImage = (inProps: SideImageProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
   const { src = "/static/images/piseth_chesda_logo.svg", ...rest } = props;

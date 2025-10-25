@@ -19,13 +19,6 @@ import { useSearchParams } from "react-router-dom";
 
 const PREFIX = "RazethSocialLogin";
 
-// Custom styled button for social login
-// const SocialButton = styled(Button, {
-//   name: PREFIX,
-//   slot: "Button",
-//   overridesResolver: (_props, styles) => styles.button,
-// })<SocialLoginProps>(() => ({}));
-
 const SocialLoginRoot = styled(Grid, {
   name: PREFIX,
   slot: "Root",

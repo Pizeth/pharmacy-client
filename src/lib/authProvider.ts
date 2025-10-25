@@ -267,9 +267,13 @@ class OidcAuthProvider implements AuthProvider {
   }
 
   // Method to handle successful OAuth callback
-  handleOAuthCallback(searchParams: URLSearchParams): Promise<User | null> {
-    const authSuccess = searchParams.get("auth");
-    const error = searchParams.get("error");
+  handleOAuthCallback(
+    searchParams: Record<string, string>
+  ): Promise<User | null> {
+    // If you need URLSearchParams, reconstruct it:
+    const urlParams = new URLSearchParams(searchParams);
+    const authSuccess = urlParams.get("auth");
+    const error = urlParams.get("error");
 
     if (error) {
       return Promise.reject(new Error(decodeURIComponent(error)));
@@ -337,7 +341,7 @@ export const authProvider = new OidcAuthProvider();
 
 // Custom hook for handling OAuth callbacks
 export function useOAuthCallback() {
-  const handleCallback = async (searchParams: URLSearchParams) => {
+  const handleCallback = async (searchParams: Record<string, string>) => {
     try {
       const user = await authProvider.handleOAuthCallback(searchParams);
       return { success: true, user };
