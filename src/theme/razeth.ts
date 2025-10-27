@@ -137,6 +137,34 @@ const shake = keyframes`
   }
     `;
 
+const filt = keyframes`
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  to {
+    filter: hue-rotate(360deg);
+  }
+}`;
+
+const wee = keyframes`
+  0% {
+    background-position:
+      var(--p),
+      800% 400%,
+      1000% -400%,
+      -1200% -600%,
+      400% 41.5692194px;
+  }
+  to {
+    background-position:
+      var(--p),
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%;
+  }
+}`;
+
 const globalStyles = (theme: Theme) => ({
   ":root": {
     "--app-sideImage-circleSize": "30%",
@@ -328,6 +356,20 @@ const customBaseTheme = createTheme({
             props.theme.palette.mode === "dark"
               ? props.theme.palette.grey[900]
               : props.theme.palette.grey[100],
+          backgroundImage: `
+         repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+        repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
+      `,
+          backgroundSize: "24px 24px, 24px 24px, 8px 8px",
+          background: `
+       radial-gradient(ellipse 140% 50% at 15% 60%, rgba(124, 58, 237, 0.11), transparent 48%),
+       radial-gradient(ellipse 90% 80% at 85% 25%, rgba(245, 101, 101, 0.09), transparent 58%),
+       radial-gradient(ellipse 120% 65% at 40% 90%, rgba(34, 197, 94, 0.13), transparent 52%),
+       radial-gradient(ellipse 100% 45% at 70% 5%, rgba(251, 191, 36, 0.07), transparent 42%),
+       radial-gradient(ellipse 80% 75% at 90% 80%, rgba(168, 85, 247, 0.10), transparent 55%),
+       #000000
+     `,
         }),
 
         content: (props: { theme: Theme }) => ({
@@ -347,7 +389,6 @@ const customBaseTheme = createTheme({
             // marginTop: "0.5em",
             // marginBottom: "0",
           },
-
           // "& .MuiGrid-container": { gap: 0 },
         }),
 
@@ -355,6 +396,22 @@ const customBaseTheme = createTheme({
           overflow: "hidden",
           borderRadius: props.theme.spacing(2),
           boxShadow: props.theme.shadows[3],
+          // backgroundImage: `
+          //  repeating-linear-gradient(45deg, rgba(255, 140, 0, 0.12) 0, rgba(255, 140, 0, 0.12) 1px, transparent 1px, transparent 22px),
+          //       repeating-linear-gradient(-45deg, rgba(255, 69, 0, 0.08) 0, rgba(255, 69, 0, 0.08) 1px, transparent 1px, transparent 22px)
+          //       `,
+          // backgroundSize: "44px 44px",
+          backgroundImage: `
+            repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 40px),
+            repeating-linear-gradient(45deg, rgba(0,255,128,0.09) 0, rgba(0,255,128,0.09) 1px, transparent 1px, transparent 20px),
+           repeating-linear-gradient(-45deg, rgba(255,0,128,0.10) 0, rgba(255,0,128,0.10) 1px, transparent 1px, transparent 30px),
+            repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 80px),
+            radial-gradient(circle at 60% 40%, rgba(0,255,128,0.05) 0, transparent 60%)
+          `,
+          backgroundSize:
+            "80px 80px, 40px 40px, 60px 60px, 80px 80px, 100% 100%",
+          backgroundPosition: "0 0, 0 0, 0 0, 40px 40px, center",
+
           // "& .card-content": {
           "& .MuiCardContent-root": {
             padding: props.theme.spacing(3),
@@ -424,12 +481,62 @@ const customBaseTheme = createTheme({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#f97316", // orange background
+          // backgroundColor: "#f97316", // orange background
+          "&::before": {
+            content: "''",
+            position: "absolute",
+            inset: 0,
+            "--c": "7px",
+            // backgroundColor: "#000",
+            backgroundImage: `
+              radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+              radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+              radial-gradient(circle at 50% 50%, #f00, #f000 60%),
+              radial-gradient(circle at 50% 50%, #ff0, #ff00 60%),
+              radial-gradient(circle at 50% 50%, #0f0, #0f00 60%),
+              radial-gradient(ellipse at 50% 50%, #00f, #00f0 60%)
+            `,
+            backgroundSize: `
+              12px 20.7846097px,
+              12px 20.7846097px,
+              200% 200%,
+              200% 200%,
+              200% 200%,
+              200% 20.7846097px
+            `,
+            "--p": "0px 0px, 6px 10.39230485px",
+            backgroundPosition: `
+              var(--p),
+              0% 0%,
+              0% 0%,
+              0% 0px
+            `,
+            animation: `${wee} 40s linear infinite, ${filt} 6s linear infinite`,
+            zIndex: 0,
+          },
+
+          // backgroundImage: `
+          //  repeating-linear-gradient(45deg, rgba(255, 140, 0, 0.12) 0, rgba(255, 140, 0, 0.12) 1px, transparent 1px, transparent 22px),
+          //       repeating-linear-gradient(-45deg, rgba(255, 69, 0, 0.08) 0, rgba(255, 69, 0, 0.08) 1px, transparent 1px, transparent 22px)
+          //       `,
+          // backgroundSize: "44px 44px",
+
+          // backgroundImage: `
+          //   radial-gradient(circle at 50% 50%,
+          //     rgba(220, 38, 38, 0.2) 0%,
+          //     rgba(220, 38, 38, 0.12) 25%,
+          //     rgba(220, 38, 38, 0.06) 35%,
+          //     transparent 50%
+          //   )
+          // `,
+          // backgroundSize: "100% 100%",
+
           // height: "100%",
           // backgroundColor:
           //   props.theme.palette.mode === "dark"
           //     ? "rgba(0, 0, 0, 0.2)"
           //     : props.theme.palette.grey[200],
+          // inset: "-1em",
           "& img": {
             position: "absolute",
             inset: 0,
@@ -453,17 +560,58 @@ const customBaseTheme = createTheme({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-
+          borderRadius: "50%",
           width: props.theme.custom.sideImage.circleSize || "35%", // one-third of parent width
           // width: "var(--app-sideImage-circleSize)", // one-third of parent width
           aspectRatio: "1 / 1", // keep height equal to width
           // paddingTop: "var(--app-sideImage-circleSize)", // makes height equal to width
-          borderRadius: "50%",
+          // borderRadius: "50%",
+
+          backgroundImage: `
+         repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+        repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
+      `,
+          backgroundSize: "24px 24px, 24px 24px, 8px 8px",
           backgroundColor:
-            props.theme.custom.sideImage.circleColor || "#1e40af", // blue circle
+            props.theme.custom.sideImage.circleColor || "#02020280", // blue circle
+          backgroundBlendMode: "multiply",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)", // center it
+          // "&::before": {
+          //   content: "''",
+          //   position: "absolute",
+          //   borderRadius: "50%",
+          //   inset: 0,
+          //   "--c": "7px",
+          //   // backgroundColor: "#000",
+          //   backgroundImage: `
+          //     radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+          //     radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+          //     radial-gradient(circle at 50% 50%, #f00, #f000 60%),
+          //     radial-gradient(circle at 50% 50%, #ff0, #ff00 60%),
+          //     radial-gradient(circle at 50% 50%, #0f0, #0f00 60%),
+          //     radial-gradient(ellipse at 50% 50%, #00f, #00f0 60%)
+          //   `,
+          //   backgroundSize: `
+          //     12px 20.7846097px,
+          //     12px 20.7846097px,
+          //     200% 200%,
+          //     200% 200%,
+          //     200% 200%,
+          //     200% 20.7846097px
+          //   `,
+          //   "--p": "0px 0px, 6px 10.39230485px",
+          //   backgroundPosition: `
+          //     var(--p),
+          //     0% 0%,
+          //     0% 0%,
+          //     0% 0px
+          //   `,
+          //   animation: `${wee} 40s linear infinite, ${filt} 6s linear infinite`,
+          //   zIndex: 0,
+          // },
         }),
         image: (props: { theme: Theme }) => ({
           position: "relative",

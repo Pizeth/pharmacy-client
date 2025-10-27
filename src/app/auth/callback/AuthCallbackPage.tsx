@@ -12,19 +12,31 @@ const theme = createTheme();
 export default function AuthCallbackPage({
   searchParams,
 }: {
-  searchParams: Record<string, string>;
+  // searchParams: Record<string, string>;
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const router = useRouter();
 
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const result = await authProvider.handleOAuthCallback(searchParams);
+        // Normalize to URLSearchParams if your authProvider expects it
+        const urlParams = new URLSearchParams();
+        Object.entries(searchParams).forEach(([key, value]) => {
+          if (Array.isArray(value)) {
+            value.forEach((v) => urlParams.append(key, v));
+          } else if (value != null) {
+            urlParams.append(key, value);
+          }
+        });
+        const result = await authProvider.handleOAuthCallback(urlParams);
 
+        // router.push("/admin");
         if (result) {
           router.push("/admin");
         } else {
-          router.push("/admin"); // Let React Admin handle auth redirect
+          // router.push("/admin"); // Let React Admin handle auth redirect
+          router.push("/auth/login"); // No result, redirect to login
         }
       } catch (error) {
         console.error("Callback handling failed:", error);
