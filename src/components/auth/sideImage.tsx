@@ -17,10 +17,16 @@ const StyledSideImage = styled(Grid, {
   overridesResolver: (_props, styles) => styles.root,
 })<SideImageProps>(() => ({}));
 
-const Circle = styled("div", {
+const Content = styled("div", {
   name: PREFIX,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
+})(() => ({}));
+
+const Circle = styled("div", {
+  name: PREFIX,
+  slot: "Card",
+  overridesResolver: (_props, styles) => styles.card,
 })(() => ({}));
 
 const LogoWrapper = styled(Box, {
@@ -65,14 +71,18 @@ const SideImage = (inProps: SideImageProps) => {
 
   return (
     <StyledSideImage size={{ xs: 12, md: 6 }} {...rest}>
-      {/* Blue circle centered */}
-      <SideImage.circle />
+      <SideImage.content>
+        {" "}
+        {/* Blue circle centered */}
+        <SideImage.circle />
+      </SideImage.content>
       {/* Fixed-size logo in the middle */}
       <SideImage.logo src={src} />
     </StyledSideImage>
   );
 };
 
+SideImage.content = Content;
 SideImage.circle = Circle;
 SideImage.logo = ({ src }: { src: string }) => (
   <LogoWrapper>

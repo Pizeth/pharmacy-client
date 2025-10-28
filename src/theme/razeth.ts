@@ -143,8 +143,7 @@ const filt = keyframes`
   }
   to {
     filter: hue-rotate(360deg);
-  }
-}`;
+  }`;
 
 const wee = keyframes`
   0% {
@@ -163,7 +162,97 @@ const wee = keyframes`
       0% 0%,
       0% 0%;
   }
-}`;
+`;
+
+const hii = keyframes`
+  0% {
+    backdrop-filter: var(--f) hue-rotate(0deg);
+  }
+  to {
+    backdrop-filter: var(--f) hue-rotate(360deg);
+  }
+`;
+
+const hi = keyframes`
+0% {
+    background-position:
+      0px 220px,
+      3px 220px,
+      151.5px 337.5px,
+      25px 24px,
+      28px 24px,
+      176.5px 150px,
+      50px 16px,
+      53px 16px,
+      201.5px 91px,
+      75px 224px,
+      78px 224px,
+      226.5px 350.5px,
+      100px 19px,
+      103px 19px,
+      251.5px 121px,
+      125px 120px,
+      128px 120px,
+      276.5px 187px,
+      150px 31px,
+      153px 31px,
+      301.5px 120.5px,
+      175px 235px,
+      178px 235px,
+      326.5px 384.5px,
+      200px 121px,
+      203px 121px,
+      351.5px 228.5px,
+      225px 224px,
+      228px 224px,
+      376.5px 364.5px,
+      250px 26px,
+      253px 26px,
+      401.5px 105px,
+      275px 75px,
+      278px 75px,
+      426.5px 180px;
+  }
+
+  to {
+    background-position:
+      0px 6800px,
+      3px 6800px,
+      151.5px 6917.5px,
+      25px 13632px,
+      28px 13632px,
+      176.5px 13758px,
+      50px 5416px,
+      53px 5416px,
+      201.5px 5491px,
+      75px 17175px,
+      78px 17175px,
+      226.5px 17301.5px,
+      100px 5119px,
+      103px 5119px,
+      251.5px 5221px,
+      125px 8428px,
+      128px 8428px,
+      276.5px 8495px,
+      150px 9876px,
+      153px 9876px,
+      301.5px 9965.5px,
+      175px 13391px,
+      178px 13391px,
+      326.5px 13540.5px,
+      200px 14741px,
+      203px 14741px,
+      351.5px 14848.5px,
+      225px 18770px,
+      228px 18770px,
+      376.5px 18910.5px,
+      250px 5082px,
+      253px 5082px,
+      401.5px 5161px,
+      275px 6375px,
+      278px 6375px,
+      426.5px 6480px;
+  }`;
 
 const globalStyles = (theme: Theme) => ({
   ":root": {
@@ -305,7 +394,15 @@ const customBaseTheme = createTheme({
   custom: {
     sideImage: {
       circleSize: "30%",
-      circleColor: "#1e40af",
+      // circleColor: "#1e40af",
+      circleColor: `radial-gradient(circle at 50% 50%,
+          rgba(220, 38, 38, 0.3) 0%,
+          rgba(220, 38, 38, 0.15) 25%,
+          rgba(220, 38, 38, 0.1) 50%,
+          rgba(220, 38, 38, 0.05) 75%,
+          rgba(220, 38, 38, 0.025) 100%,
+          transparent 50%
+        )`,
       logoOffset: "3%",
     },
   },
@@ -357,19 +454,46 @@ const customBaseTheme = createTheme({
               ? props.theme.palette.grey[900]
               : props.theme.palette.grey[100],
           backgroundImage: `
-         repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
-        repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
-        repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
-      `,
+            repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+            repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+            repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
+          `,
           backgroundSize: "24px 24px, 24px 24px, 8px 8px",
           background: `
-       radial-gradient(ellipse 140% 50% at 15% 60%, rgba(124, 58, 237, 0.11), transparent 48%),
-       radial-gradient(ellipse 90% 80% at 85% 25%, rgba(245, 101, 101, 0.09), transparent 58%),
-       radial-gradient(ellipse 120% 65% at 40% 90%, rgba(34, 197, 94, 0.13), transparent 52%),
-       radial-gradient(ellipse 100% 45% at 70% 5%, rgba(251, 191, 36, 0.07), transparent 42%),
-       radial-gradient(ellipse 80% 75% at 90% 80%, rgba(168, 85, 247, 0.10), transparent 55%),
-       #000000
-     `,
+            radial-gradient(ellipse 140% 50% at 15% 60%, rgba(124, 58, 237, 0.11), transparent 48%),
+            radial-gradient(ellipse 90% 80% at 85% 25%, rgba(245, 101, 101, 0.09), transparent 58%),
+            radial-gradient(ellipse 120% 65% at 40% 90%, rgba(34, 197, 94, 0.13), transparent 52%),
+            radial-gradient(ellipse 100% 45% at 70% 5%, rgba(251, 191, 36, 0.07), transparent 42%),
+            radial-gradient(ellipse 80% 75% at 90% 80%, rgba(168, 85, 247, 0.10), transparent 55%),
+            #000000
+          `,
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `
+              repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 40px),
+              repeating-linear-gradient(45deg, rgba(0,255,128,0.09) 0, rgba(0,255,128,0.09) 1px, transparent 1px, transparent 20px),
+              repeating-linear-gradient(-45deg, rgba(255,0,128,0.10) 0, rgba(255,0,128,0.10) 1px, transparent 1px, transparent 30px),
+              repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 80px),
+              radial-gradient(circle at 60% 40%, rgba(0,255,128,0.05) 0, transparent 60%)
+            `,
+            backgroundSize:
+              "80px 80px, 40px 40px, 60px 60px, 80px 80px, 100% 100%",
+            backgroundPosition: "0 0, 0 0, 0 0, 40px 40px, center",
+          },
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none", // don't block interaction
+            backgroundImage: `
+              repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(75, 85, 99, 0.06) 2px, rgba(75, 85, 99, 0.06) 3px, transparent 3px, transparent 8px),
+              repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(107, 114, 128, 0.05) 2px, rgba(107, 114, 128, 0.05) 3px, transparent 3px, transparent 8px),
+              repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(55, 65, 81, 0.04) 2px, rgba(55, 65, 81, 0.04) 3px, transparent 3px, transparent 8px),
+              repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(31, 41, 55, 0.03) 2px, rgba(31, 41, 55, 0.03) 3px, transparent 3px, transparent 8px)
+            `,
+          },
         }),
 
         content: (props: { theme: Theme }) => ({
@@ -390,31 +514,38 @@ const customBaseTheme = createTheme({
             // marginBottom: "0",
           },
           // "& .MuiGrid-container": { gap: 0 },
+          // zIndex: 1,
         }),
 
         card: (props: { theme: Theme }) => ({
+          // position: "relative",
+          // zIndex: 2,
           overflow: "hidden",
           borderRadius: props.theme.spacing(2),
           boxShadow: props.theme.shadows[3],
-          // backgroundImage: `
-          //  repeating-linear-gradient(45deg, rgba(255, 140, 0, 0.12) 0, rgba(255, 140, 0, 0.12) 1px, transparent 1px, transparent 22px),
-          //       repeating-linear-gradient(-45deg, rgba(255, 69, 0, 0.08) 0, rgba(255, 69, 0, 0.08) 1px, transparent 1px, transparent 22px)
-          //       `,
-          // backgroundSize: "44px 44px",
+          /*** Paper Texture ***/
           backgroundImage: `
-            repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 40px),
-            repeating-linear-gradient(45deg, rgba(0,255,128,0.09) 0, rgba(0,255,128,0.09) 1px, transparent 1px, transparent 20px),
-           repeating-linear-gradient(-45deg, rgba(255,0,128,0.10) 0, rgba(255,0,128,0.10) 1px, transparent 1px, transparent 30px),
-            repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 80px),
-            radial-gradient(circle at 60% 40%, rgba(0,255,128,0.05) 0, transparent 60%)
+            radial-gradient(circle at 1px 1px, rgba(0,0,0,0.08) 1px, transparent 0),
+            repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px),
+            repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px)
           `,
-          backgroundSize:
-            "80px 80px, 40px 40px, 60px 60px, 80px 80px, 100% 100%",
-          backgroundPosition: "0 0, 0 0, 0 0, 40px 40px, center",
+          backgroundSize: "8px 8px, 32px 32px, 32px 32px",
 
           // "& .card-content": {
           "& .MuiCardContent-root": {
-            padding: props.theme.spacing(3),
+            backgroundImage: `
+              repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(75, 85, 99, 0.06) 2px, rgba(75, 85, 99, 0.06) 3px, transparent 3px, transparent 8px),
+              repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(107, 114, 128, 0.05) 2px, rgba(107, 114, 128, 0.05) 3px, transparent 3px, transparent 8px),
+              repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(55, 65, 81, 0.04) 2px, rgba(55, 65, 81, 0.04) 3px, transparent 3px, transparent 8px),
+              repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(31, 41, 55, 0.03) 2px, rgba(31, 41, 55, 0.03) 3px, transparent 3px, transparent 8px)
+            `,
+            //       backgroundImage: `
+            //   repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(16, 185, 129, 0.18) 2px, rgba(16, 185, 129, 0.18) 3px, transparent 3px, transparent 8px),
+            //   repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(245, 101, 101, 0.10) 2px, rgba(245, 101, 101, 0.10) 3px, transparent 3px, transparent 8px),
+            //   repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(234, 179, 8, 0.08) 2px, rgba(234, 179, 8, 0.08) 3px, transparent 3px, transparent 8px),
+            //   repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(249, 115, 22, 0.06) 2px, rgba(249, 115, 22, 0.06) 3px, transparent 3px, transparent 8px)
+            // `,
+            // padding: props.theme.spacing(3),
             // "& .card-box": {
             //   display: "flex",
             //   flexDirection: "column",
@@ -515,43 +646,30 @@ const customBaseTheme = createTheme({
             zIndex: 0,
           },
 
-          // backgroundImage: `
-          //  repeating-linear-gradient(45deg, rgba(255, 140, 0, 0.12) 0, rgba(255, 140, 0, 0.12) 1px, transparent 1px, transparent 22px),
-          //       repeating-linear-gradient(-45deg, rgba(255, 69, 0, 0.08) 0, rgba(255, 69, 0, 0.08) 1px, transparent 1px, transparent 22px)
-          //       `,
-          // backgroundSize: "44px 44px",
-
-          // backgroundImage: `
-          //   radial-gradient(circle at 50% 50%,
-          //     rgba(220, 38, 38, 0.2) 0%,
-          //     rgba(220, 38, 38, 0.12) 25%,
-          //     rgba(220, 38, 38, 0.06) 35%,
-          //     transparent 50%
-          //   )
-          // `,
-          // backgroundSize: "100% 100%",
-
           // height: "100%",
           // backgroundColor:
           //   props.theme.palette.mode === "dark"
           //     ? "rgba(0, 0, 0, 0.2)"
           //     : props.theme.palette.grey[200],
           // inset: "-1em",
-          "& img": {
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            ...(props.theme.palette.mode === "dark" &&
-              {
-                // filter: "brightness(0.25) grayscale(1)",
-                // filter:
-                //   "grayscale(1) sepia(1) saturate(5) hue-rotate(315deg) brightness(1)",
-              }),
-          },
         }),
         content: (props: { theme: Theme }) => ({
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          // width:
+          //   `calc(${props.theme.custom.sideImage.circleSize} * 2)` || "70%",
+          // height:
+          //   `calc(${props.theme.custom.sideImage.circleSize} * 2)` || "70%",
+          // background: "#000000",
+          backgroundImage: `
+            repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(16, 185, 129, 0.18) 2px, rgba(16, 185, 129, 0.18) 3px, transparent 3px, transparent 8px),
+            repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(245, 101, 101, 0.10) 2px, rgba(245, 101, 101, 0.10) 3px, transparent 3px, transparent 8px),
+            repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(234, 179, 8, 0.08) 2px, rgba(234, 179, 8, 0.08) 3px, transparent 3px, transparent 8px),
+            repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(249, 115, 22, 0.06) 2px, rgba(249, 115, 22, 0.06) 3px, transparent 3px, transparent 8px)
+          `,
+        }),
+        card: (props: { theme: Theme }) => ({
           position: "absolute",
           // maxWidth: "300px",
           // maxHeight: "300px",
@@ -565,20 +683,103 @@ const customBaseTheme = createTheme({
           // width: "var(--app-sideImage-circleSize)", // one-third of parent width
           aspectRatio: "1 / 1", // keep height equal to width
           // paddingTop: "var(--app-sideImage-circleSize)", // makes height equal to width
-          // borderRadius: "50%",
 
-          backgroundImage: `
-         repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
-        repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
-        repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
-      `,
-          backgroundSize: "24px 24px, 24px 24px, 8px 8px",
-          backgroundColor:
-            props.theme.custom.sideImage.circleColor || "#02020280", // blue circle
-          backgroundBlendMode: "multiply",
+          // backgroundImage: `radial-gradient(circle 500px at 50% 100px, rgba(249,115,22,0.4), transparent)`,
+
+          // backgroundImage:
+          //   props.theme.custom.sideImage.circleColor || "#02020280", // blue circle
+          // backgroundSize: "100% 100%",
+          // backgroundBlendMode: "multiply",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)", // center it
+
+          "&::before": {
+            content: "''",
+            position: "absolute",
+            inset: 0,
+            borderRadius: "50%",
+            backgroundImage:
+              props.theme.custom.sideImage.circleColor || "#02020280", // blue circle
+            backgroundSize: "100% 100%",
+          },
+
+          /*** Animation ***/
+          "--c": "#09f",
+          backgroundColor: "#000",
+          backgroundImage: `radial-gradient(4px 100px at 0px 235px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 235px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 117.5px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 252px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 252px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 126px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 150px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 150px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 75px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 253px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 253px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 126.5px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 204px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 204px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 102px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 134px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 134px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 67px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 179px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 179px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 89.5px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 299px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 299px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 149.5px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 215px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 215px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 107.5px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 281px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 281px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 140.5px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 158px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 158px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 79px, var(--c) 100%, #0000 150%),
+    radial-gradient(4px 100px at 0px 210px, var(--c), #0000),
+    radial-gradient(4px 100px at 300px 210px, var(--c), #0000),
+    radial-gradient(1.5px 1.5px at 150px 105px, var(--c) 100%, #0000 150%)`,
+          backgroundSize: `300px 235px,
+    300px 235px,
+    300px 235px,
+    300px 252px,
+    300px 252px,
+    300px 252px,
+    300px 150px,
+    300px 150px,
+    300px 150px,
+    300px 253px,
+    300px 253px,
+    300px 253px,
+    300px 204px,
+    300px 204px,
+    300px 204px,
+    300px 134px,
+    300px 134px,
+    300px 134px,
+    300px 179px,
+    300px 179px,
+    300px 179px,
+    300px 299px,
+    300px 299px,
+    300px 299px,
+    300px 215px,
+    300px 215px,
+    300px 215px,
+    300px 281px,
+    300px 281px,
+    300px 281px,
+    300px 158px,
+    300px 158px,
+    300px 158px,
+    300px 210px,
+    300px 210px,
+    300px 210px`,
+          animation: `${hi} 150s linear infinite`,
           // "&::before": {
           //   content: "''",
           //   position: "absolute",
@@ -612,6 +813,22 @@ const customBaseTheme = createTheme({
           //   animation: `${wee} 40s linear infinite, ${filt} 6s linear infinite`,
           //   zIndex: 0,
           // },
+          "&::after": {
+            content: "''",
+            borderRadius: "50%",
+            position: "absolute",
+            inset: 0,
+            zIndex: 1,
+            backgroundImage: `radial-gradient(
+    circle at 50% 50%,
+    #0000 0,
+    #0000 2px,
+    hsl(0 0 4%) 2px
+  )`,
+            backgroundSize: "8px 8px",
+            "--f": "blur(1em) brightness(6)",
+            animation: `${hii} 10s linear infinite`,
+          },
         }),
         image: (props: { theme: Theme }) => ({
           position: "relative",
@@ -631,6 +848,19 @@ const customBaseTheme = createTheme({
               // filter:
               //   "grayscale(1) sepia(1) saturate(5) hue-rotate(315deg) brightness(1)",
             }),
+          // "& img": {
+          //   position: "absolute",
+          //   inset: 0,
+          //   width: "100%",
+          //   height: "100%",
+          //   objectFit: "cover",
+          //   ...(props.theme.palette.mode === "dark" &&
+          //     {
+          //       // filter: "brightness(0.25) grayscale(1)",
+          //       // filter:
+          //       //   "grayscale(1) sepia(1) saturate(5) hue-rotate(315deg) brightness(1)",
+          //     }),
+          // },
         }),
       },
     },

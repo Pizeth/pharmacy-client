@@ -14,10 +14,15 @@
 // app/auth/callback/page.tsx
 import AuthCallbackPage from "./AuthCallbackPage";
 
-export default function Page({
+export default async function Page({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  // searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  return <AuthCallbackPage searchParams={searchParams ?? {}} />;
+  // Await the promise that Next.js passes in
+  const resolved = await searchParams;
+
+  return <AuthCallbackPage searchParams={resolved} />;
+  // return <AuthCallbackPage searchParams={searchParams ?? {}} />;
 }
