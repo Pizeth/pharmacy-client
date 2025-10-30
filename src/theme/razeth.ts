@@ -7,6 +7,7 @@ import { createTheme, Theme } from "@mui/material/styles";
 import { ClassKey, CustomComponents } from "@/types/classKey";
 import { keyframes } from "@emotion/react";
 import {
+  line,
   RazethComponentsPropsList,
   SideImage,
 } from "@/interfaces/theme.interface";
@@ -25,11 +26,13 @@ declare module "@mui/material/styles" {
   interface Theme {
     custom: {
       sideImage: SideImage;
+      lines: line[];
     };
   }
   interface ThemeOptions {
     custom?: {
       sideImage?: SideImage;
+      lines?: line[];
     };
   }
 
@@ -254,7 +257,35 @@ const hi = keyframes`
       426.5px 6480px;
   }`;
 
+const drop = keyframes`
+  0% {
+    top: -50%;
+  }
+  100% {
+    top: 110%;
+  }`;
+
 const globalStyles = (theme: Theme) => ({
+  // "*": {
+  //   margin: 0,
+  //   padding: 0,
+  //   boxSizing: "border-box !important",
+  // },
+  // "html, body": {
+  //   height: "100%",
+  // },
+  // body: {
+  //   display: "table",
+  //   width: "100%",
+  //   height: "100%",
+  //   backgroundColor: "#111",
+  //   color: "#f2f2f2",
+  //   lineHeight: 1.6,
+  //   position: "relative",
+  //   fontFamily: "sans-serif",
+  //   overflow: "hidden",
+  // },
+
   ":root": {
     "--app-sideImage-circleSize": "30%",
     "--app-sideImage-circleColor": "#1e40af",
@@ -325,6 +356,52 @@ const globalStyles = (theme: Theme) => ({
   // .MuiFormControl-root p.Mui-error {
   //   margin-bottom: -0.5em;
   // }
+
+  ".lines": {
+    position: "absolute",
+    zIndex: 2,
+    borderRadius: "50%",
+    overflow: "hidden",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "100%",
+    margin: "auto",
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  ".line": {
+    position: "relative",
+    width: "1px",
+    height: "100%",
+    overflow: "hidden",
+  },
+  ".line::after": {
+    content: '""',
+    display: "block",
+    position: "absolute",
+    height: "15vh",
+    width: "100%",
+    top: "-50%",
+    left: 0,
+    background:
+      "linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 75%, #ffffff 100%)",
+    animation: `${drop} 7s 0s infinite`,
+    animationFillMode: "forwards",
+    animationTimingFunction: "cubic-bezier(0.4, 0.26, 0, 0.97)",
+  },
+
+  // Dynamically generated nth-child overrides
+  ...Object.fromEntries(
+    theme.custom.lines.map((line, i) => [
+      `.line:nth-of-type(${i + 1})::after`,
+      {
+        background: `linear-gradient(to bottom, rgba(255,255,255,0) 0%, ${line.color} 75%, ${line.color} 100%)`,
+        animationDelay: line.delay,
+      },
+    ])
+  ),
 });
 
 const defaultThemeInvariants = {
@@ -405,6 +482,18 @@ const customBaseTheme = createTheme({
         )`,
       logoOffset: "3%",
     },
+    lines: [
+      { color: "#FF4500", delay: "0.5s" },
+      { color: "#32CD32", delay: "1s" },
+      { color: "#1E90FF", delay: "1.5s" },
+      { color: "#FFD700", delay: "2s" },
+      { color: "#8A2BE2", delay: "2.5s" },
+      { color: "#20B2AA", delay: "3s" },
+      { color: "#DC143C", delay: "3.5s" },
+      { color: "#00FA9A", delay: "4s" },
+      { color: "#FF1493", delay: "4.5s" },
+      { color: "#00BFFF", delay: "5s" },
+    ],
   },
   palette: {
     primary: { main: "#e1232e", contrastText: "#fff" },
@@ -703,7 +792,7 @@ const customBaseTheme = createTheme({
               props.theme.custom.sideImage.circleColor || "#02020280", // blue circle
             backgroundSize: "100% 100%",
           },
-
+          boxShadow: "0 0 20px 10px rgba(30, 64, 175, 0.5)",
           /*** Animation ***/
           "--c": "#09f",
           backgroundColor: "#000",
@@ -780,39 +869,6 @@ const customBaseTheme = createTheme({
     300px 210px,
     300px 210px`,
           animation: `${hi} 150s linear infinite`,
-          // "&::before": {
-          //   content: "''",
-          //   position: "absolute",
-          //   borderRadius: "50%",
-          //   inset: 0,
-          //   "--c": "7px",
-          //   // backgroundColor: "#000",
-          //   backgroundImage: `
-          //     radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
-          //     radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
-          //     radial-gradient(circle at 50% 50%, #f00, #f000 60%),
-          //     radial-gradient(circle at 50% 50%, #ff0, #ff00 60%),
-          //     radial-gradient(circle at 50% 50%, #0f0, #0f00 60%),
-          //     radial-gradient(ellipse at 50% 50%, #00f, #00f0 60%)
-          //   `,
-          //   backgroundSize: `
-          //     12px 20.7846097px,
-          //     12px 20.7846097px,
-          //     200% 200%,
-          //     200% 200%,
-          //     200% 200%,
-          //     200% 20.7846097px
-          //   `,
-          //   "--p": "0px 0px, 6px 10.39230485px",
-          //   backgroundPosition: `
-          //     var(--p),
-          //     0% 0%,
-          //     0% 0%,
-          //     0% 0px
-          //   `,
-          //   animation: `${wee} 40s linear infinite, ${filt} 6s linear infinite`,
-          //   zIndex: 0,
-          // },
           "&::after": {
             content: "''",
             borderRadius: "50%",

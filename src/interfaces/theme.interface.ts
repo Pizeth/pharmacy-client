@@ -29,3 +29,8 @@ export interface SideImage {
   circleColor: string;
   logoOffset: string;
 }
+
+export interface line {
+  color: string;
+  delay: string;
+}
