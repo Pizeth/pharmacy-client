@@ -75,18 +75,16 @@ const SideImage = (inProps: SideImageProps) => {
         {/* Blue circle centered */}
 
         <SideImage.circle>
-          <div className="lines">
-            {Array.from({ length: 10 }).map((_, i) => (
+          {/* <div className="lines">
+           
+            {Array.from({ length: theme.custom.lines.length }).map((_, i) => (
               <div key={i} className="line" />
             ))}
-            {/* {Array.from({ length: theme.custom.lines.length }).map((_, i) => (
-                  <div key={i} className="line" />
-                ))} */}
-          </div>
+          </div> */}
         </SideImage.circle>
       </SideImage.content>
       {/* Fixed-size logo in the middle */}
-      <SideImage.logo src={src} />
+      {/* <SideImage.logo src={src} /> */}
     </StyledSideImage>
   );
 };

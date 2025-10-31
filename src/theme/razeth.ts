@@ -11,6 +11,7 @@ import {
   RazethComponentsPropsList,
   SideImage,
 } from "@/interfaces/theme.interface";
+import { makePulseKeyframes, makeRadialStops } from "@/utils/colorStop";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -265,6 +266,37 @@ const drop = keyframes`
     top: 110%;
   }`;
 
+// const pulseSoftness = keyframes`
+//   0%, 100% {
+//     background: radial-gradient(circle at 50% 50%, var(--app-gradient-soft-min));
+//   }
+//   25% {
+//     background: radial-gradient(circle at 50% 50%, var(--app-gradient-soft-quart));
+//   }
+//   50% {
+//     background: radial-gradient(circle at 50% 50%, var(--app-gradient-soft-mid));
+//   }
+//   75% {
+//     background: radial-gradient(circle at 50% 50%, var(--app-gradient-soft-max));
+//   }
+// `;
+
+const pulseSoftness = makePulseKeyframes(
+  theme.custom.sideImage.circlePulseSequence
+);
+
+// 0%, 100% { background: circle at 50% 50%, var(--app-gradient-soft-min)}
+// 50% { background: circle at 50% 50%, var(--app-gradient-soft-max)}`;
+
+// const pulseSoftness = keyframes`
+//   0%, 100% {
+//     background: radial-gradient(circle, var(--app-circle-color) var(--app-circle-soft-min), transparent var(--app-circle-soft-fade));
+//   }
+//   50% {
+//     background: radial-gradient(circle, var(--app-circle-color) var(--app-circle-soft-max), transparent var(--app-circle-soft-fade));
+//   }
+// `;
+
 const globalStyles = (theme: Theme) => ({
   // "*": {
   //   margin: 0,
@@ -287,9 +319,48 @@ const globalStyles = (theme: Theme) => ({
   // },
 
   ":root": {
-    "--app-sideImage-circleSize": "30%",
-    "--app-sideImage-circleColor": "#1e40af",
-    "--app-sideImage-logoOffset": "3%",
+    "--app-sideImage-circleSize": theme.custom.sideImage.circleSize,
+    // "--app-sideImage-circleColor": "#1e40af",
+    "--app-sideImage-circleColor": theme.custom.sideImage.circleColor,
+    "--app-sideImage-logoOffset": theme.custom.sideImage.logoOffset,
+    "--app-circle-stop-count": theme.custom.sideImage.circleStopCount,
+    "--app-circle-color": theme.custom.sideImage.circleColor,
+    "--app-gradient-soft-min": makeRadialStops(
+      theme.custom.sideImage.circleColor,
+      theme.custom.sideImage.circleStopCount,
+      theme.custom.sideImage.circlePulseMin
+    ),
+    "--app-gradient-soft-quart": makeRadialStops(
+      theme.custom.sideImage.circleColor,
+      theme.custom.sideImage.circleStopCount,
+      theme.custom.sideImage.circlePulseMin +
+        (theme.custom.sideImage.circlePulseMax -
+          theme.custom.sideImage.circlePulseMin) /
+          4 // 25%
+    ),
+    "--app-gradient-soft-mid": makeRadialStops(
+      theme.custom.sideImage.circleColor,
+      theme.custom.sideImage.circleStopCount,
+      theme.custom.sideImage.circlePulseMin +
+        (theme.custom.sideImage.circlePulseMax -
+          theme.custom.sideImage.circlePulseMin) /
+          2 // 30%
+    ),
+    "--app-gradient-soft-max": makeRadialStops(
+      theme.custom.sideImage.circleColor,
+      theme.custom.sideImage.circleStopCount,
+      theme.custom.sideImage.circlePulseMax
+    ),
+    // "--app-circle-soft-fade": theme.custom.sideImage.circleSoftFade,
+    "--app-circle-pulse-sequence": makePulseKeyframes(
+      theme.custom.sideImage.circlePulseSequence
+    ),
+    "--app-circlePulseDuration": theme.custom.sideImage.circlePulseDuration,
+    // "--app-radial-gradient": makeRadialStops(
+    //   theme.custom.sideImage.circleColor,
+    //   theme.custom.sideImage.circleStopCount,
+    //   theme.custom.sideImage.circlePulseMin
+    // ),
   },
   // Custom styles for a text field with an icon
   ".icon-input .MuiInputLabel-root": {
@@ -472,15 +543,25 @@ const customBaseTheme = createTheme({
     sideImage: {
       circleSize: "30%",
       // circleColor: "#1e40af",
-      circleColor: `radial-gradient(circle at 50% 50%,
-          rgba(220, 38, 38, 0.3) 0%,
-          rgba(220, 38, 38, 0.15) 25%,
-          rgba(220, 38, 38, 0.1) 50%,
-          rgba(220, 38, 38, 0.05) 75%,
-          rgba(220, 38, 38, 0.025) 100%,
-          transparent 50%
-        )`,
+      // circleColor: `radial-gradient(circle at 50% 50%,
+      //     rgba(220, 38, 38, 0.3) 0%,
+      //     rgba(220, 38, 38, 0.15) 25%,
+      //     rgba(220, 38, 38, 0.1) 50%,
+      //     rgba(220, 38, 38, 0.05) 75%,
+      //     rgba(220, 38, 38, 0.025) 100%,
+      //     transparent 50%
+      //   )`,
+      circleColor: "rgb(220, 38, 38)",
+
       logoOffset: "3%",
+      circleStopCount: 5, // number of fading rings
+      // circleSoftStop: "70%", // solid until 70%
+      // circleSoftFade: "100%", // fully faded at 100%
+      circlePulseMin: 0.25, // contracts to 65%
+      circlePulseMax: 0.55, // expands to 75%
+      circlePulseSequence: [0.25, 0.3, 0.45, 0.55, 0.45, 0.35, 0.25],
+      circlePulseDuration: "7s", // one full cycle every 6s
+      maxOpacity: 0.3, // maximum opacity of the radial gradient
     },
     lines: [
       { color: "#FF4500", delay: "0.5s" },
@@ -760,21 +841,13 @@ const customBaseTheme = createTheme({
         }),
         card: (props: { theme: Theme }) => ({
           position: "absolute",
-          // maxWidth: "300px",
-          // maxHeight: "300px",
-          // width: "25%",
-          // height: "auto",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           borderRadius: "50%",
           width: props.theme.custom.sideImage.circleSize || "35%", // one-third of parent width
-          // width: "var(--app-sideImage-circleSize)", // one-third of parent width
           aspectRatio: "1 / 1", // keep height equal to width
           // paddingTop: "var(--app-sideImage-circleSize)", // makes height equal to width
-
-          // backgroundImage: `radial-gradient(circle 500px at 50% 100px, rgba(249,115,22,0.4), transparent)`,
-
           // backgroundImage:
           //   props.theme.custom.sideImage.circleColor || "#02020280", // blue circle
           // backgroundSize: "100% 100%",
@@ -782,109 +855,131 @@ const customBaseTheme = createTheme({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)", // center it
-
+          // boxShadow: "0 0 20px 10px rgba(30, 64, 175, 0.5)",
+          // boxShadow: `0 0 20px 10px ${props.theme.palette.primary.main}50`,
           "&::before": {
             content: "''",
             position: "absolute",
             inset: 0,
             borderRadius: "50%",
-            backgroundImage:
-              props.theme.custom.sideImage.circleColor || "#02020280", // blue circle
+            // backgroundImage:
+            //   props.theme.custom.sideImage.circleColor || "#02020280", // blue circle
+
+            // zIndex: 0, // keep it behind children
+            // pointerEvents: "none", // don’t block clicks
+            // background: `radial-gradient(
+            //   circle,
+            //       ${props.theme.custom.sideImage.circleColor} ${
+            //   props.theme.custom.sideImage.circleSoftStop
+            // },
+            //   transparent ${props.theme.custom.sideImage.circleSoftFade}
+            //   // ${props.theme.custom.sideImage.circleColor || "#1e40af"} 70%,
+            //   // transparent 100%
+            // )`,
+            backgroundImage: `radial-gradient(
+              circle at 50% 50%,
+              ${makeRadialStops(
+                props.theme.custom.sideImage.circleColor,
+                props.theme.custom.sideImage.circleStopCount,
+                props.theme.custom.sideImage.maxOpacity
+              )}
+            )`,
+            animation: `${pulseSoftness} ${props.theme.custom.sideImage.circlePulseDuration} ease-in-out infinite`,
             backgroundSize: "100% 100%",
           },
-          boxShadow: "0 0 20px 10px rgba(30, 64, 175, 0.5)",
+
           /*** Animation ***/
           "--c": "#09f",
           backgroundColor: "#000",
           backgroundImage: `radial-gradient(4px 100px at 0px 235px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 235px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 117.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 252px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 252px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 126px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 150px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 150px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 75px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 253px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 253px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 126.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 204px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 204px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 102px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 134px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 134px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 67px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 179px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 179px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 89.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 299px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 299px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 149.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 215px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 215px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 107.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 281px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 281px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 140.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 158px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 158px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 79px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 210px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 210px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 105px, var(--c) 100%, #0000 150%)`,
+            radial-gradient(4px 100px at 300px 235px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 117.5px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 252px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 252px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 126px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 150px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 150px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 75px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 253px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 253px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 126.5px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 204px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 204px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 102px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 134px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 134px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 67px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 179px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 179px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 89.5px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 299px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 299px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 149.5px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 215px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 215px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 107.5px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 281px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 281px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 140.5px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 158px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 158px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 79px, var(--c) 100%, #0000 150%),
+            radial-gradient(4px 100px at 0px 210px, var(--c), #0000),
+            radial-gradient(4px 100px at 300px 210px, var(--c), #0000),
+            radial-gradient(1.5px 1.5px at 150px 105px, var(--c) 100%, #0000 150%)`,
           backgroundSize: `300px 235px,
-    300px 235px,
-    300px 235px,
-    300px 252px,
-    300px 252px,
-    300px 252px,
-    300px 150px,
-    300px 150px,
-    300px 150px,
-    300px 253px,
-    300px 253px,
-    300px 253px,
-    300px 204px,
-    300px 204px,
-    300px 204px,
-    300px 134px,
-    300px 134px,
-    300px 134px,
-    300px 179px,
-    300px 179px,
-    300px 179px,
-    300px 299px,
-    300px 299px,
-    300px 299px,
-    300px 215px,
-    300px 215px,
-    300px 215px,
-    300px 281px,
-    300px 281px,
-    300px 281px,
-    300px 158px,
-    300px 158px,
-    300px 158px,
-    300px 210px,
-    300px 210px,
-    300px 210px`,
-          animation: `${hi} 150s linear infinite`,
-          "&::after": {
-            content: "''",
-            borderRadius: "50%",
-            position: "absolute",
-            inset: 0,
-            zIndex: 1,
-            backgroundImage: `radial-gradient(
-    circle at 50% 50%,
-    #0000 0,
-    #0000 2px,
-    hsl(0 0 4%) 2px
-  )`,
-            backgroundSize: "8px 8px",
-            "--f": "blur(1em) brightness(6)",
-            animation: `${hii} 10s linear infinite`,
-          },
+            300px 235px,
+            300px 235px,
+            300px 252px,
+            300px 252px,
+            300px 252px,
+            300px 150px,
+            300px 150px,
+            300px 150px,
+            300px 253px,
+            300px 253px,
+            300px 253px,
+            300px 204px,
+            300px 204px,
+            300px 204px,
+            300px 134px,
+            300px 134px,
+            300px 134px,
+            300px 179px,
+            300px 179px,
+            300px 179px,
+            300px 299px,
+            300px 299px,
+            300px 299px,
+            300px 215px,
+            300px 215px,
+            300px 215px,
+            300px 281px,
+            300px 281px,
+            300px 281px,
+            300px 158px,
+            300px 158px,
+            300px 158px,
+            300px 210px,
+            300px 210px,
+            300px 210px`,
+          // animation: `${hi} 150s linear infinite`,
+          // "&::after": {
+          //   content: "''",
+          //   borderRadius: "50%",
+          //   position: "absolute",
+          //   inset: 0,
+          //   zIndex: 1,
+          //   backgroundImage: `radial-gradient(
+          //     circle at 50% 50%,
+          //     #0000 0,
+          //     #0000 2px,
+          //     hsl(0 0 4%) 2px
+          //   )`,
+          //   backgroundSize: "8px 8px",
+          //   "--f": "blur(1em) brightness(6)",
+          //   animation: `${hii} 10s linear infinite`,
+          // },
         }),
         image: (props: { theme: Theme }) => ({
           position: "relative",
