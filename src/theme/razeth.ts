@@ -1054,6 +1054,15 @@ const customBaseTheme = createTheme({
             padding: props.theme.spacing(1),
             textTransform: "none",
             border: `1px solid ${props.theme.palette.divider}`,
+            // transition: "transform 0.3s ease-in-out", // smooth scaling
+            // Use theme.transitions.create for consistency
+            transition: props.theme.transitions.create(
+              ["transform", "background-color"],
+              {
+                duration: props.theme.transitions.duration.standard,
+                easing: props.theme.transitions.easing.easeInOut,
+              }
+            ),
             // "& .MuiTypography-root": {
             //   fontWeight: "500",
             //   display: "none", // Hide by default
@@ -1064,6 +1073,8 @@ const customBaseTheme = createTheme({
             "&:hover": {
               border: `1px solid ${props.theme.palette.divider}`,
               backgroundColor: props.theme.palette.action.hover,
+              transform: "scale(1.05)", // enlarge smoothly
+              boxShadow: props.theme.shadows[3],
             },
             "& svg": {
               width: props.theme.spacing(2),
