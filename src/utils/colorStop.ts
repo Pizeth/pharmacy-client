@@ -34,7 +34,6 @@ export function makeRadialStops(
   count = 5,
   maxOpacity = 0.3
 ): string {
-  console.log("makeRadialStops called with:", { color, count, maxOpacity });
   const stops: string[] = [];
   for (let i = 0; i <= count; i++) {
     const pct = (i / count) * 100;
@@ -42,8 +41,42 @@ export function makeRadialStops(
     stops.push(`${alpha(color, opacity)} ${pct}%`);
   }
   stops.push("transparent 100%");
-  //   console.log("makeRadialStops:", stops);
   return stops.join(", ");
+}
+
+/**
+ * Generate a symmetric pulse sequence.
+ * @param ringCount - total number of steps (must be odd for symmetry)
+ * @param min - lowest opacity
+ * @param max - highest opacity
+ */
+export function makePulseSequence(
+  ringCount: number,
+  min: number,
+  max: number
+): number[] {
+  // if (ringCount < 3) throw new Error("ringCount must be >= 3");
+  // if (ringCount % 2 === 0)
+  //   throw new Error("ringCount should be odd for symmetry");
+  // number of frames = (rings * 2) - (rings % 2)
+  const frameCount = ringCount * 2 - (ringCount % 2); // ensures symmetry
+
+  // const half = (ringCount - 1) / 2;
+  const half = (frameCount - 1) / 2;
+  const seq: number[] = [];
+
+  for (let i = 0; i <= half; i++) {
+    const t = i / half; // 0 → 1
+    const value = +(min + (max - min) * t).toFixed(2);
+    seq.push(value);
+  }
+
+  // mirror the sequence (excluding the peak to avoid duplication)
+  for (let i = half - 1; i >= 0; i--) {
+    seq.push(seq[i]);
+  }
+
+  return seq;
 }
 
 export function makePulseVars(
@@ -55,6 +88,7 @@ export function makePulseVars(
   sequence.forEach((opacity, i) => {
     vars[`--app-gradient-soft-${i}`] = makeRadialStops(color, count, opacity);
   });
+
   return vars;
 }
 

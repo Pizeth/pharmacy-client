@@ -11,7 +11,13 @@ import {
   RazethComponentsPropsList,
   SideImage,
 } from "@/interfaces/theme.interface";
-import { makePulseKeyframes, makeRadialStops } from "@/utils/colorStop";
+import {
+  makePulseKeyframes,
+  makePulseSequence,
+  makePulseVars,
+  makeRadialStops,
+} from "@/utils/colorStop";
+import { getSideImageConfig } from "@/configs/themeConfig";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -281,22 +287,6 @@ const drop = keyframes`
 //   }
 // `;
 
-const pulseSoftness = makePulseKeyframes(
-  theme.custom.sideImage.circlePulseSequence
-);
-
-// 0%, 100% { background: circle at 50% 50%, var(--app-gradient-soft-min)}
-// 50% { background: circle at 50% 50%, var(--app-gradient-soft-max)}`;
-
-// const pulseSoftness = keyframes`
-//   0%, 100% {
-//     background: radial-gradient(circle, var(--app-circle-color) var(--app-circle-soft-min), transparent var(--app-circle-soft-fade));
-//   }
-//   50% {
-//     background: radial-gradient(circle, var(--app-circle-color) var(--app-circle-soft-max), transparent var(--app-circle-soft-fade));
-//   }
-// `;
-
 const globalStyles = (theme: Theme) => ({
   // "*": {
   //   margin: 0,
@@ -319,48 +309,16 @@ const globalStyles = (theme: Theme) => ({
   // },
 
   ":root": {
+    ...makePulseVars(
+      theme.custom.sideImage.circleColor,
+      theme.custom.sideImage.circleStopCount,
+      theme.custom.sideImage.circlePulseSequence
+    ),
     "--app-sideImage-circleSize": theme.custom.sideImage.circleSize,
     // "--app-sideImage-circleColor": "#1e40af",
     "--app-sideImage-circleColor": theme.custom.sideImage.circleColor,
     "--app-sideImage-logoOffset": theme.custom.sideImage.logoOffset,
     "--app-circle-stop-count": theme.custom.sideImage.circleStopCount,
-    "--app-circle-color": theme.custom.sideImage.circleColor,
-    "--app-gradient-soft-min": makeRadialStops(
-      theme.custom.sideImage.circleColor,
-      theme.custom.sideImage.circleStopCount,
-      theme.custom.sideImage.circlePulseMin
-    ),
-    "--app-gradient-soft-quart": makeRadialStops(
-      theme.custom.sideImage.circleColor,
-      theme.custom.sideImage.circleStopCount,
-      theme.custom.sideImage.circlePulseMin +
-        (theme.custom.sideImage.circlePulseMax -
-          theme.custom.sideImage.circlePulseMin) /
-          4 // 25%
-    ),
-    "--app-gradient-soft-mid": makeRadialStops(
-      theme.custom.sideImage.circleColor,
-      theme.custom.sideImage.circleStopCount,
-      theme.custom.sideImage.circlePulseMin +
-        (theme.custom.sideImage.circlePulseMax -
-          theme.custom.sideImage.circlePulseMin) /
-          2 // 30%
-    ),
-    "--app-gradient-soft-max": makeRadialStops(
-      theme.custom.sideImage.circleColor,
-      theme.custom.sideImage.circleStopCount,
-      theme.custom.sideImage.circlePulseMax
-    ),
-    // "--app-circle-soft-fade": theme.custom.sideImage.circleSoftFade,
-    "--app-circle-pulse-sequence": makePulseKeyframes(
-      theme.custom.sideImage.circlePulseSequence
-    ),
-    "--app-circlePulseDuration": theme.custom.sideImage.circlePulseDuration,
-    // "--app-radial-gradient": makeRadialStops(
-    //   theme.custom.sideImage.circleColor,
-    //   theme.custom.sideImage.circleStopCount,
-    //   theme.custom.sideImage.circlePulseMin
-    // ),
   },
   // Custom styles for a text field with an icon
   ".icon-input .MuiInputLabel-root": {
@@ -540,29 +498,7 @@ const customBaseTheme = createTheme({
   cssVariables: { cssVarPrefix: "app" },
   // cssVarPrefix: "app", // all vars will start with --app-
   custom: {
-    sideImage: {
-      circleSize: "30%",
-      // circleColor: "#1e40af",
-      // circleColor: `radial-gradient(circle at 50% 50%,
-      //     rgba(220, 38, 38, 0.3) 0%,
-      //     rgba(220, 38, 38, 0.15) 25%,
-      //     rgba(220, 38, 38, 0.1) 50%,
-      //     rgba(220, 38, 38, 0.05) 75%,
-      //     rgba(220, 38, 38, 0.025) 100%,
-      //     transparent 50%
-      //   )`,
-      circleColor: "rgb(220, 38, 38)",
-
-      logoOffset: "3%",
-      circleStopCount: 5, // number of fading rings
-      // circleSoftStop: "70%", // solid until 70%
-      // circleSoftFade: "100%", // fully faded at 100%
-      circlePulseMin: 0.25, // contracts to 65%
-      circlePulseMax: 0.55, // expands to 75%
-      circlePulseSequence: [0.25, 0.3, 0.45, 0.55, 0.45, 0.35, 0.25],
-      circlePulseDuration: "7s", // one full cycle every 6s
-      maxOpacity: 0.3, // maximum opacity of the radial gradient
-    },
+    sideImage: getSideImageConfig(),
     lines: [
       { color: "#FF4500", delay: "0.5s" },
       { color: "#32CD32", delay: "1s" },
@@ -856,7 +792,7 @@ const customBaseTheme = createTheme({
           left: "50%",
           transform: "translate(-50%, -50%)", // center it
           // boxShadow: "0 0 20px 10px rgba(30, 64, 175, 0.5)",
-          // boxShadow: `0 0 20px 10px ${props.theme.palette.primary.main}50`,
+          boxShadow: `0 0 20px 10px ${props.theme.palette.primary.main}50`,
           "&::before": {
             content: "''",
             position: "absolute",
@@ -876,16 +812,20 @@ const customBaseTheme = createTheme({
             //   // ${props.theme.custom.sideImage.circleColor || "#1e40af"} 70%,
             //   // transparent 100%
             // )`,
-            backgroundImage: `radial-gradient(
-              circle at 50% 50%,
-              ${makeRadialStops(
-                props.theme.custom.sideImage.circleColor,
-                props.theme.custom.sideImage.circleStopCount,
-                props.theme.custom.sideImage.maxOpacity
-              )}
-            )`,
-            animation: `${pulseSoftness} ${props.theme.custom.sideImage.circlePulseDuration} ease-in-out infinite`,
-            backgroundSize: "100% 100%",
+            // backgroundImage: `radial-gradient(
+            //   circle at 50% 50%,
+            //   ${makeRadialStops(
+            //     props.theme.custom.sideImage.circleColor,
+            //     props.theme.custom.sideImage.circleStopCount,
+            //     props.theme.custom.sideImage.maxOpacity
+            //   )}
+            // )`,
+            animation: `${makePulseKeyframes(
+              props.theme.custom.sideImage.circlePulseSequence
+            )} ${
+              props.theme.custom.sideImage.circlePulseDuration
+            } ease-in-out infinite`,
+            // backgroundSize: "100% 100%",
           },
 
           /*** Animation ***/
@@ -963,23 +903,23 @@ const customBaseTheme = createTheme({
             300px 210px,
             300px 210px,
             300px 210px`,
-          // animation: `${hi} 150s linear infinite`,
-          // "&::after": {
-          //   content: "''",
-          //   borderRadius: "50%",
-          //   position: "absolute",
-          //   inset: 0,
-          //   zIndex: 1,
-          //   backgroundImage: `radial-gradient(
-          //     circle at 50% 50%,
-          //     #0000 0,
-          //     #0000 2px,
-          //     hsl(0 0 4%) 2px
-          //   )`,
-          //   backgroundSize: "8px 8px",
-          //   "--f": "blur(1em) brightness(6)",
-          //   animation: `${hii} 10s linear infinite`,
-          // },
+          animation: `${hi} 150s linear infinite`,
+          "&::after": {
+            content: "''",
+            borderRadius: "50%",
+            position: "absolute",
+            inset: 0,
+            zIndex: 1,
+            backgroundImage: `radial-gradient(
+              circle at 50% 50%,
+              #0000 0,
+              #0000 2px,
+              hsl(0 0 4%) 2px
+            )`,
+            backgroundSize: "8px 8px",
+            "--f": "blur(1em) brightness(6)",
+            animation: `${hii} 10s linear infinite`,
+          },
         }),
         image: (props: { theme: Theme }) => ({
           position: "relative",
