@@ -17,6 +17,16 @@ export function getSideImageConfig() {
   const circlePulseDuration =
     process.env.NEXT_PUBLIC_CIRCLE_PULSE_SPEED || "5s";
   const maxOpacity = parseFloat(process.env.NEXT_PUBLIC_MAX_OPACITY || "0.3");
+  const logoCaption =
+    process.env.NEXT_PUBLIC_LOGO_CAPTION || "ក្រសួងមុខងារសាធារណៈ";
+  const captionOutlineColor =
+    process.env.NEXT_PUBLIC_CAPTION_OUTLINE_COLOR || "#000"; // black outline
+  const captionGlowColor =
+    process.env.NEXT_PUBLIC_CAPTION_GLOW_COLOR || "rgba(255,255,255,0.75)"; // white glow
+  const captionFontSize =
+    process.env.NEXT_PUBLIC_CAPTION_FONT_SIZE || "0.75rem";
+  const captionShadowStrength =
+    process.env.NEXT_PUBLIC_CAPTION_SHADOW_STRENGTH || 7.5;
 
   //   const circleStopCount = 35;
   //   const circlePulseMin = 0.25;
@@ -47,5 +57,10 @@ export function getSideImageConfig() {
     ),
     circlePulseDuration,
     maxOpacity,
+    logoCaption,
+    captionOutlineColor,
+    captionGlowColor,
+    captionFontSize,
+    captionShadowStrength,
   };
 }

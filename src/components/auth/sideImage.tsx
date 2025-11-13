@@ -35,6 +35,62 @@ const LogoWrapper = styled(Box, {
   overridesResolver: (_props, styles) => styles.image,
 })(() => ({}));
 
+const Caption = styled(Box, {
+  name: PREFIX,
+  slot: "Caption",
+  overridesResolver: (_props, styles) => styles.caption,
+})(() => ({}));
+
+/* Image section - hidden on mobile */
+const SideImage = (inProps: SideImageProps) => {
+  const props = useThemeProps({ props: inProps, name: PREFIX });
+  const { src = "/static/images/piseth_chesda_logo.svg", ...rest } = props;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  if (isMobile) return null;
+
+  return (
+    <StyledSideImage size={{ xs: 12, md: 6 }} {...rest}>
+      <SideImage.content>
+        {/* Blue circle centered */}
+
+        <SideImage.circle>
+          {/* <div className="lines">
+            {Array.from({ length: theme.custom.lines.length }).map((_, i) => (
+              <div key={i} className="line" />
+            ))}
+          </div> */}
+        </SideImage.circle>
+      </SideImage.content>
+      {/* Fixed-size logo in the middle */}
+      <SideImage.logo src={src} />
+      {/* Caption below logo */}
+      <SideImage.caption caption={theme.custom.sideImage.logoCaption} />
+    </StyledSideImage>
+  );
+};
+
+SideImage.content = Content;
+SideImage.circle = Circle;
+SideImage.logo = ({ src }: { src: string }) => (
+  <LogoWrapper>
+    <Image
+      src={src}
+      alt="Logo"
+      fill
+      style={{ objectFit: "contain" }}
+      priority
+    />
+  </LogoWrapper>
+);
+
+SideImage.caption = ({ caption }: { caption: string }) => {
+  return <Caption>{caption}</Caption>;
+};
+
+export default SideImage;
+
 // const SideImage = (inProps: SideImageProps) => {
 //   const props = useThemeProps({ props: inProps, name: PREFIX });
 //   const {
@@ -59,50 +115,6 @@ const LogoWrapper = styled(Box, {
 //     )
 //   );
 // };
-
-/* Image section - hidden on mobile */
-const SideImage = (inProps: SideImageProps) => {
-  const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { src = "/static/images/piseth_chesda_logo.svg", ...rest } = props;
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
-  if (isMobile) return null;
-
-  return (
-    <StyledSideImage size={{ xs: 12, md: 6 }} {...rest}>
-      <SideImage.content>
-        {/* Blue circle centered */}
-
-        <SideImage.circle>
-          <div className="lines">
-            {Array.from({ length: theme.custom.lines.length }).map((_, i) => (
-              <div key={i} className="line" />
-            ))}
-          </div>
-        </SideImage.circle>
-      </SideImage.content>
-      {/* Fixed-size logo in the middle */}
-      <SideImage.logo src={src} />
-    </StyledSideImage>
-  );
-};
-
-SideImage.content = Content;
-SideImage.circle = Circle;
-SideImage.logo = ({ src }: { src: string }) => (
-  <LogoWrapper>
-    <Image
-      src={src}
-      alt="Logo"
-      fill
-      style={{ objectFit: "contain" }}
-      priority
-    />
-  </LogoWrapper>
-);
-
-export default SideImage;
 
 // const DefaultLogo = ({ src }: { src: string }) => (
 //   <LogoWrapper>

@@ -17,6 +17,7 @@ import {
   makePulseVars,
   makeRadialStops,
 } from "@/utils/colorStop";
+import "@fontsource/moul";
 import { getSideImageConfig } from "@/configs/themeConfig";
 
 declare module "@mui/material/styles" {
@@ -952,6 +953,26 @@ const customBaseTheme = createTheme({
           //       //   "grayscale(1) sepia(1) saturate(5) hue-rotate(315deg) brightness(1)",
           //     }),
           // },
+        }),
+        caption: (props: { theme: Theme }) => ({
+          position: "absolute",
+          top: `calc(50% + ((${props.theme.custom.sideImage.circleSize} - ${props.theme.custom.sideImage.logoOffset})/2))`, // adjust based on logo size
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 2,
+          // fontWeight: 500,
+          // color: props.theme.palette.text.primary,
+          color: "#edad54",
+          textAlign: "center",
+          fontFamily: "sans-serif, Moul",
+          fontSize: props.theme.custom.sideImage.captionFontSize,
+          textShadow: `
+            -0.5px -0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
+            0.5px -0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
+            -0.5px  0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
+            0.5px  0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
+            0    0   7px ${props.theme.custom.sideImage.captionGlowColor}
+          `,
         }),
       },
     },
