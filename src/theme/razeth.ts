@@ -17,7 +17,7 @@ import {
   makePulseVars,
   makeRadialStops,
 } from "@/utils/colorStop";
-import "@fontsource/moul";
+// import "@fontsource/moul";
 import { getSideImageConfig } from "@/configs/themeConfig";
 
 declare module "@mui/material/styles" {
@@ -928,11 +928,13 @@ const customBaseTheme = createTheme({
           // width: "120px", // fixed size, won’t scale with container
           // height: "120px",
           aspectRatio: "1 / 1",
-          width:
-            `calc(
-              ${props.theme.custom.sideImage.circleSize} -
-                ${props.theme.custom.sideImage.logoOffset}
-            )` || "32%",
+          // width:
+          //   `calc(
+          //     ${props.theme.custom.sideImage.circleSize} -
+          //       ${props.theme.custom.sideImage.logoOffset}
+          //   )` || "32%",
+          width: props.theme.custom.sideImage.logoSize,
+          overflow: "visible",
           objectFit: "cover",
           ...(props.theme.palette.mode === "dark" &&
             {
@@ -956,16 +958,22 @@ const customBaseTheme = createTheme({
         }),
         caption: (props: { theme: Theme }) => ({
           position: "absolute",
-          top: `calc(50% + ((${props.theme.custom.sideImage.circleSize} - ${props.theme.custom.sideImage.logoOffset})/2))`, // adjust based on logo size
+          // top: `calc(50% + ((${props.theme.custom.sideImage.circleSize} - ${props.theme.custom.sideImage.logoOffset})/2))`, // adjust based on logo size
+          // top: `calc(50% + (${props.theme.custom.sideImage.logoSize} / 2) + ${props.theme.custom.sideImage.captionOffset})`,
+          top: `calc(100% + ${props.theme.custom.sideImage.captionOffset.xs})`,
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 2,
+          // 👇 key changes
+          whiteSpace: "nowrap", // prevent wrapping
+          overflow: "visible", // allow text to extend beyond logo box
+          maxWidth: "none", // remove inherited width limit
           // fontWeight: 500,
           // color: props.theme.palette.text.primary,
           color: "#edad54",
           textAlign: "center",
-          fontFamily: "sans-serif, Moul",
-          fontSize: props.theme.custom.sideImage.captionFontSize,
+          // fontFamily: "sans-serif, Moul",
+          fontSize: props.theme.custom.sideImage.captionFontSize.xs,
           textShadow: `
             -0.5px -0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
             0.5px -0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
@@ -973,6 +981,14 @@ const customBaseTheme = createTheme({
             0.5px  0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
             0    0   7px ${props.theme.custom.sideImage.captionGlowColor}
           `,
+          [props.theme.breakpoints.up("sm")]: {
+            top: `calc(100% + ${props.theme.custom.sideImage.captionOffset.sm})`,
+            fontSize: props.theme.custom.sideImage.captionFontSize.sm,
+          },
+          [props.theme.breakpoints.up("md")]: {
+            top: `calc(100% + ${props.theme.custom.sideImage.captionOffset.md})`,
+            fontSize: props.theme.custom.sideImage.captionFontSize.md,
+          },
         }),
       },
     },

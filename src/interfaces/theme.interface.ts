@@ -28,6 +28,7 @@ export interface SideImage {
   circleSize: string;
   circleColor: string;
   logoOffset: string;
+  logoSize: string;
   circleStopCount: number; // number of fading rings
   // circleSoftStop: string; // % where solid color ends
   // circleSoftFade: string; // % where it fully fades
@@ -36,9 +37,24 @@ export interface SideImage {
   circlePulseSequence: number[]; // sequence of softness values for animation
   circlePulseDuration: string; // animation speed
   maxOpacity: number; // maximum opacity of the radial gradient
+  logoCaption: string;
+  captionOutlineColor: string;
+  captionGlowColor: string;
+  // captionFontSize: number | string;
+  // 👇 responsive font sizes
+  captionFontSize: responsive;
+  captionShadowStrength: number | string;
+  // captionOffset: string;
+  captionOffset: responsive;
 }
 
 export interface line {
   color: string;
   delay: string;
+}
+
+interface responsive {
+  xs: string;
+  sm: string;
+  md: string;
 }

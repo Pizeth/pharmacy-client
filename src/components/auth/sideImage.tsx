@@ -3,11 +3,18 @@ import {
   Box,
   Grid,
   styled,
+  Theme,
   useMediaQuery,
   useTheme,
   useThemeProps,
 } from "@mui/material";
 import Image from "next/image";
+import { Moul } from "next/font/google";
+
+const moul = Moul({
+  subsets: ["khmer", "latin"],
+  weight: "400",
+});
 
 const PREFIX = "RazethSideImage";
 
@@ -64,16 +71,15 @@ const SideImage = (inProps: SideImageProps) => {
         </SideImage.circle>
       </SideImage.content>
       {/* Fixed-size logo in the middle */}
-      <SideImage.logo src={src} />
+      <SideImage.logo src={src} theme={theme} />
       {/* Caption below logo */}
-      <SideImage.caption caption={theme.custom.sideImage.logoCaption} />
     </StyledSideImage>
   );
 };
 
 SideImage.content = Content;
 SideImage.circle = Circle;
-SideImage.logo = ({ src }: { src: string }) => (
+SideImage.logo = ({ src, theme }: { src: string; theme: Theme }) => (
   <LogoWrapper>
     <Image
       src={src}
@@ -82,11 +88,25 @@ SideImage.logo = ({ src }: { src: string }) => (
       style={{ objectFit: "contain" }}
       priority
     />
+    <SideImage.caption
+      caption={theme.custom.sideImage.logoCaption}
+      className={moul.className}
+    />
   </LogoWrapper>
 );
 
-SideImage.caption = ({ caption }: { caption: string }) => {
-  return <Caption>{caption}</Caption>;
+// SideImage.caption = ({ caption }: { caption: string }) => {
+//   return <Caption>{caption}</Caption>;
+// };
+
+SideImage.caption = ({
+  caption,
+  className,
+}: {
+  caption: string;
+  className?: string;
+}) => {
+  return <Caption className={className}>{caption}</Caption>;
 };
 
 export default SideImage;
