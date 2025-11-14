@@ -1,7 +1,22 @@
 import { makePulseSequence } from "@/utils/colorStop";
 
-function getEnvNumber(key: string, fallback: number): number {
-  const raw = process.env[key] ?? import.meta.env?.[key]; // works in CRA or Vite
+// function getEnvNumber(key: string, fallback: number): number {
+//   const raw = process.env[key] ?? import.meta.env?.[key]; // works in CRA or Vite
+//   const parsed = raw !== undefined ? Number(raw) : NaN;
+//   return isNaN(parsed) ? fallback : parsed;
+// }
+
+/**
+ * Parses an environment variable as a number.
+ * * @param key The environment variable key.
+ * (e.g., "DATABASE_PORT" on server, "NEXT_PUBLIC_ITEMS_PER_PAGE" on client/server)
+ * @param fallback A default value if parsing fails.
+ * @returns The parsed number or the fallback.
+ */
+export function getEnvNumber(key: string, fallback: number): number {
+  // In Next.js, all env vars are on process.env
+  const raw = process.env[key];
+
   const parsed = raw !== undefined ? Number(raw) : NaN;
   return isNaN(parsed) ? fallback : parsed;
 }
@@ -43,7 +58,7 @@ export function getSideImageConfig() {
   const logoOffset = process.env.NEXT_PUBLIC_LOGO_OFFSET || "3%";
   const circleStopCount = getEnvNumber("NEXT_PUBLIC_CIRCLE_STOP_COUNT", 35);
   const circlePulseMin = getEnvNumber("NEXT_PUBLIC_CIRCLE_PULSE_MIN", 0.25);
-  const circlePulseMax = getEnvNumber("NEXT_PUBLIC_CIRCLE_PULSE_MAX", 0.75);
+  const circlePulseMax = getEnvNumber("NEXT_PUBLIC_CIRCLE_PULSE_MAX", 0.95);
   console.log("circlePulseMax:", circlePulseMax);
   const circlePulseDuration =
     process.env.NEXT_PUBLIC_CIRCLE_PULSE_SPEED || "5s";
