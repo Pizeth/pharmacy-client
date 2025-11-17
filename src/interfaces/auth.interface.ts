@@ -52,6 +52,7 @@ export interface LoginFormProps {
 
 export interface AvatarProps extends HtmlHTMLAttributes<HTMLDivElement> {
   avatarIcon?: ReactNode;
+  src?: string;
   //   backgroundImage?: string;
   //   children?: ReactNode;
   className?: string;

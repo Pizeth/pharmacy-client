@@ -46,6 +46,10 @@ export interface SideImage {
   captionShadowStrength: number | string;
   // captionOffset: string;
   captionOffset: responsive;
+  animationBackground: {
+    backgroundImage: string;
+    backgroundSize: string;
+  };
 }
 
 export interface line {

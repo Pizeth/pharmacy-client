@@ -1,4 +1,5 @@
 // utils/colorStops.ts
+import { GradientOptions, GradientPoint } from "@/types/theme";
 import { alpha, keyframes } from "@mui/material/styles";
 
 // export function makeSoftStops(color: string) {
@@ -104,4 +105,42 @@ export function makePulseKeyframes(sequence: number[]) {
     `;
   });
   return keyframes`${frames}`;
+}
+
+export function buildGradients(
+  points: GradientPoint[],
+  opts: GradientOptions = {}
+): {
+  backgroundImage: string;
+  backgroundSize: string;
+} {
+  const {
+    dotSize = 1.5,
+    streakWidth = 4,
+    streakHeight = 100,
+    color = "var(--c)",
+  } = opts;
+
+  // const gradients = points.map((p) =>
+  //   p.small
+  //     ? `radial-gradient(1.5px 1.5px at ${p.x}px ${p.y}px, var(--c) 100%, #0000 150%)`
+  //     : `radial-gradient(4px 100px at ${p.x}px ${p.y}px, var(--c), #0000)`
+  // );
+
+  const gradients = points.map((p) =>
+    p.small
+      ? `radial-gradient(${dotSize}px ${dotSize}px at ${p.x}px ${p.y}px, ${color} 100%, #0000 150%)`
+      : `radial-gradient(${streakWidth}px ${streakHeight}px at ${p.x}px ${p.y}px, ${color}, #0000)`
+  );
+
+  // const sizes = points.map((p) =>
+  //   p.small ? `300px ${p.y}px` : `300px ${p.y}px`
+  // );
+
+  const sizes = points.map((p) => `300px ${p.y}px`);
+
+  return {
+    backgroundImage: gradients.join(", "),
+    backgroundSize: sizes.join(", "),
+  };
 }

@@ -1,65 +1,160 @@
-import { makePulseSequence } from "@/utils/colorStop";
-
-// function getEnvNumber(key: string, fallback: number): number {
-//   const raw = process.env[key] ?? import.meta.env?.[key]; // works in CRA or Vite
-//   const parsed = raw !== undefined ? Number(raw) : NaN;
-//   return isNaN(parsed) ? fallback : parsed;
-// }
+import { GradientPoint, GradientRow } from "@/types/theme";
+import { buildGradients, makePulseSequence } from "@/utils/colorStop";
 
 /**
- * Parses an environment variable as a number.
- * * @param key The environment variable key.
- * (e.g., "DATABASE_PORT" on server, "NEXT_PUBLIC_ITEMS_PER_PAGE" on client/server)
- * @param fallback A default value if parsing fails.
- * @returns The parsed number or the fallback.
+ * Returns the parsed number or the fallback if parsing fails.
+ *
+ * @param {string|undefined} value The environment variable value.
+ * @param {number} fallback A default value if parsing fails.
+ * @returns {number} The parsed number or the fallback.
  */
-export function getEnvNumber(key: string, fallback: number): number {
-  // In Next.js, all env vars are on process.env
-  const raw = process.env[key];
-
-  const parsed = raw !== undefined ? Number(raw) : NaN;
+export function getEnvNumber(
+  value: string | undefined,
+  fallback: number
+): number {
+  /**
+   * The parsed number or NaN if parsing fails.
+   */
+  const parsed = value !== undefined ? Number(value) : NaN;
+  /**
+   * Returns the parsed number or the fallback if parsing fails.
+   */
   return isNaN(parsed) ? fallback : parsed;
 }
 
-// function getEnvObject<T>(key: string, fallback: T): T {
-//   const raw = process.env[key];
-//   if (!raw) return fallback;
-//   try {
-//     return JSON.parse(raw) as T;
-//   } catch {
-//     return fallback;
-//   }
-// }
-
-function getEnvObject<T>(key: string, fallback: T): T {
-  console.log(`Fetching env var for key: ${key}`);
-  // const raw = process.env[key as keyof NodeJS.ProcessEnv]; // ensure exact key lookup
-  const raw = process.env[key] ?? import.meta.env?.[key]; // ensure exact key lookup
-  console.log(`Raw value for ${key}:`, raw);
-  if (!raw) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(`${key} missing; using fallback`);
-    }
+/**
+ * A small inline helper for parsing JSON, or returning a fallback.
+ *
+ * @param {string|undefined} value The environment variable value.
+ * @param {T} fallback A default value if parsing fails.
+ * @returns {T} The parsed JSON or the fallback.
+ */
+function parseEnvJson<T>(value: string | undefined, fallback: T): T {
+  /**
+   * If the value is undefined, return the fallback.
+   */
+  if (value === undefined) {
     return fallback;
   }
+
   try {
-    return JSON.parse(raw) as T;
-  } catch (e) {
-    console.warn(`Invalid JSON in ${key}: "${raw}" — using fallback`, e);
+    /**
+     * Attempt to parse the JSON string.
+     * If parsing fails, return the fallback.
+     */
+    return JSON.parse(value) as T;
+  } catch {
+    /**
+     * If not in production mode, log a warning message.
+     * Return the fallback.
+     */
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("Failed to parse env var JSON, using fallback.");
+    }
     return fallback;
   }
 }
 
 export function getSideImageConfig() {
-  const a = getEnvObject("NEXT_PUBLIC_PULSE_MIN", 1);
+  const rows: GradientRow[] = [
+    { y: 235, dotY: 117.5 },
+    { y: 252, dotY: 126 },
+    { y: 150, dotY: 75 },
+    { y: 253, dotY: 126.5 },
+    { y: 204, dotY: 102 },
+    { y: 134, dotY: 67 },
+    { y: 179, dotY: 89.5 },
+    { y: 299, dotY: 149.5 },
+    { y: 215, dotY: 107.5 },
+    { y: 281, dotY: 140.5 },
+    { y: 158, dotY: 79 },
+    { y: 210, dotY: 105 },
+  ];
+
+  const points: GradientPoint[] = rows.flatMap((row) => [
+    { x: 0, y: row.y },
+    { x: 300, y: row.y },
+    { x: 150, y: row.dotY, small: true },
+  ]);
+
+  // const points: GradientPoint[] = [
+  //   // y = 235
+  //   { x: 0, y: 235 },
+  //   { x: 300, y: 235 },
+  //   { x: 150, y: 117.5, small: true },
+
+  //   // y = 252
+  //   { x: 0, y: 252 },
+  //   { x: 300, y: 252 },
+  //   { x: 150, y: 126, small: true },
+
+  //   // y = 150
+  //   { x: 0, y: 150 },
+  //   { x: 300, y: 150 },
+  //   { x: 150, y: 75, small: true },
+
+  //   // y = 253
+  //   { x: 0, y: 253 },
+  //   { x: 300, y: 253 },
+  //   { x: 150, y: 126.5, small: true },
+
+  //   // y = 204
+  //   { x: 0, y: 204 },
+  //   { x: 300, y: 204 },
+  //   { x: 150, y: 102, small: true },
+
+  //   // y = 134
+  //   { x: 0, y: 134 },
+  //   { x: 300, y: 134 },
+  //   { x: 150, y: 67, small: true },
+
+  //   // y = 179
+  //   { x: 0, y: 179 },
+  //   { x: 300, y: 179 },
+  //   { x: 150, y: 89.5, small: true },
+
+  //   // y = 299
+  //   { x: 0, y: 299 },
+  //   { x: 300, y: 299 },
+  //   { x: 150, y: 149.5, small: true },
+
+  //   // y = 215
+  //   { x: 0, y: 215 },
+  //   { x: 300, y: 215 },
+  //   { x: 150, y: 107.5, small: true },
+
+  //   // y = 281
+  //   { x: 0, y: 281 },
+  //   { x: 300, y: 281 },
+  //   { x: 150, y: 140.5, small: true },
+
+  //   // y = 158
+  //   { x: 0, y: 158 },
+  //   { x: 300, y: 158 },
+  //   { x: 150, y: 79, small: true },
+
+  //   // y = 210
+  //   { x: 0, y: 210 },
+  //   { x: 300, y: 210 },
+  //   { x: 150, y: 105, small: true },
+  // ];
+
   const circleSize = process.env.NEXT_PUBLIC_CIRCLE_SIZE || "30%";
   const circleColor =
     process.env.NEXT_PUBLIC_CIRCLE_COLOR || "rgba(220, 38, 38, 1)";
   const logoOffset = process.env.NEXT_PUBLIC_LOGO_OFFSET || "3%";
-  const circleStopCount = getEnvNumber("NEXT_PUBLIC_CIRCLE_STOP_COUNT", 35);
-  const circlePulseMin = getEnvNumber("NEXT_PUBLIC_CIRCLE_PULSE_MIN", 0.25);
-  const circlePulseMax = getEnvNumber("NEXT_PUBLIC_CIRCLE_PULSE_MAX", 0.95);
-  console.log("circlePulseMax:", circlePulseMax);
+  const circleStopCount = getEnvNumber(
+    process.env.NEXT_PUBLIC_CIRCLE_STOP_COUNT,
+    35
+  );
+  const circlePulseMin = getEnvNumber(
+    process.env.NEXT_PUBLIC_CIRCLE_PULSE_MIN,
+    0.25
+  );
+  const circlePulseMax = getEnvNumber(
+    process.env.NEXT_PUBLIC_CIRCLE_PULSE_MAX,
+    0.95
+  );
   const circlePulseDuration =
     process.env.NEXT_PUBLIC_CIRCLE_PULSE_SPEED || "5s";
   const maxOpacity = parseFloat(process.env.NEXT_PUBLIC_MAX_OPACITY || "0.3");
@@ -71,26 +166,21 @@ export function getSideImageConfig() {
     process.env.NEXT_PUBLIC_CAPTION_GLOW_COLOR || "rgba(255,255,255,0.75)"; // white glow
   // const captionFontSize =
   //   process.env.NEXT_PUBLIC_CAPTION_FONT_SIZE || "0.75rem";
-  const captionFontSize = getEnvObject("NEXT_PUBLIC_CAPTION_FONT_SIZE", {
-    xs: "0.75rem",
-    sm: "1.1rem",
-    md: "1.3rem",
-  });
-  console.log("captionFontSize:", captionFontSize);
+  const captionFontSize = parseEnvJson(
+    process.env.NEXT_PUBLIC_CAPTION_FONT_SIZE,
+    {
+      xs: "0.55rem",
+      sm: "0.65rem",
+      md: "0.75rem",
+    }
+  );
   const captionShadowStrength =
     process.env.NEXT_PUBLIC_CAPTION_SHADOW_STRENGTH || 7.5;
-  const captionOffset = getEnvObject("NEXT_PUBLIC_CAPTION_OFFSET", {
+  const captionOffset = parseEnvJson(process.env.NEXT_PUBLIC_CAPTION_OFFSET, {
     xs: "8px",
     sm: "12px",
     md: "16px",
   });
-  console.log("captionOffset:", captionOffset);
-
-  //   const circleStopCount = 35;
-  //   const circlePulseMin = 0.25;
-  //   const circlePulseMax = 0.75;
-  //   const circlePulseDuration = "5s";
-  //   const maxOpacity = "0.3";
 
   return {
     circleSize,
@@ -122,5 +212,11 @@ export function getSideImageConfig() {
     captionFontSize,
     captionShadowStrength,
     captionOffset,
+    animationBackground: buildGradients(points, {
+      dotSize: 1.5,
+      streakWidth: 4,
+      streakHeight: 100,
+      color: "#09f", // or from env: process.env.NEXT_PUBLIC_GRADIENT_COLOR
+    }),
   };
 }

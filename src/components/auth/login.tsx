@@ -361,7 +361,14 @@ const defaultSideImage = (
   <SideImage src={process.env.NEXT_PUBLIC_PLACEHOLDER} />
 );
 // const defaultAvatar = <PersonIcon />;
-const defaultAvatar = <AvatarHeader avatarIcon={<PersonIcon />} />;
+const defaultAvatar = (
+  <AvatarHeader
+    src={
+      "https://api.dicebear.com/9.x/adventurer-neutral/svg?radius=50&seed=Razeth"
+    }
+    avatarIcon={<PersonIcon />}
+  />
+);
 const defaultDivider = <Divider />;
 const defaultSocial = <SocialLogin />;
 const defaultSignUp = <SignupLink link="/auth/register" />;
