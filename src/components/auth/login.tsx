@@ -364,7 +364,8 @@ const defaultSideImage = (
 const defaultAvatar = (
   <AvatarHeader
     src={
-      "https://api.dicebear.com/9.x/adventurer-neutral/svg?radius=50&seed=Razeth"
+      // "https://api.dicebear.com/9.x/adventurer-neutral/svg?radius=50&seed=Razeth"
+      "https://pub-ce3376330760464f8be1e4a3b46318c0.r2.dev/sea-planet-water-Earth-map-Arctic-193611-wallhere.com.jpg"
     }
     avatarIcon={<PersonIcon />}
   />

@@ -21,7 +21,7 @@ const AvatarHeader = (inProps: AvatarProps) => {
 
   return (
     <BoxAvatar className={className} sx={sx} {...rest}>
-      <Avatar src={src}>{avatarIcon}</Avatar>
+      <Avatar></Avatar>
       <Typography align="center" variant="h6" fontWeight="bold" gutterBottom>
         {translate("razeth.title.welcome") || title}
       </Typography>

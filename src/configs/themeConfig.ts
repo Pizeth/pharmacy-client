@@ -1,5 +1,5 @@
 import { GradientPoint, GradientRow } from "@/types/theme";
-import { buildGradients, makePulseSequence } from "@/utils/colorStop";
+import { buildGradients, makePulseSequence } from "@/utils/colorUtils";
 
 /**
  * Returns the parsed number or the fallback if parsing fails.
@@ -55,6 +55,38 @@ function parseEnvJson<T>(value: string | undefined, fallback: T): T {
   }
 }
 
+/**
+ * Returns a configuration object for the side image component.
+ *
+ * The configuration object is constructed from environment variables, and
+ * provides sensible defaults if the environment variables are not set.
+ *
+ * The configuration object contains the following properties:
+ *
+ * - `circleSize`: The size of the circle as a percentage of the
+ *   container height.
+ * - `circleColor`: The color of the circle as a CSS color string.
+ * - `logoOffset`: The offset of the logo from the center of the
+ *   circle as a percentage of the container height.
+ * - `logoSize`: The size of the logo as a CSS calc expression.
+ * - `circleStopCount`: The number of gradient stops in the circle.
+ * - `circlePulseMin`: The minimum pulse value of the circle.
+ * - `circlePulseMax`: The maximum pulse value of the circle.
+ * - `circlePulseSequence`: An array of pulse values for the circle.
+ * - `circlePulseDuration`: The duration of the pulse animation in seconds.
+ * - `maxOpacity`: The maximum opacity of the circle.
+ * - `logoCaption`: The caption text of the logo.
+ * - `captionOutlineColor`: The color of the caption outline as a CSS color
+ *   string.
+ * - `captionGlowColor`: The color of the caption glow as a CSS color
+ *   string.
+ * - `captionFontSize`: The size of the caption as a CSS calc expression.
+ * - `captionShadowStrength`: The strength of the caption shadow.
+ * - `captionOffset`: The offset of the caption from the center of the
+ *   circle as a CSS calc expression.
+ * - `animationBackground`: An object containing the gradient and streak
+ *   styles for the animation background.
+ */
 export function getSideImageConfig() {
   const rows: GradientRow[] = [
     { y: 235, dotY: 117.5 },
@@ -77,67 +109,12 @@ export function getSideImageConfig() {
     { x: 150, y: row.dotY, small: true },
   ]);
 
-  // const points: GradientPoint[] = [
-  //   // y = 235
-  //   { x: 0, y: 235 },
-  //   { x: 300, y: 235 },
-  //   { x: 150, y: 117.5, small: true },
-
-  //   // y = 252
-  //   { x: 0, y: 252 },
-  //   { x: 300, y: 252 },
-  //   { x: 150, y: 126, small: true },
-
-  //   // y = 150
-  //   { x: 0, y: 150 },
-  //   { x: 300, y: 150 },
-  //   { x: 150, y: 75, small: true },
-
-  //   // y = 253
-  //   { x: 0, y: 253 },
-  //   { x: 300, y: 253 },
-  //   { x: 150, y: 126.5, small: true },
-
-  //   // y = 204
-  //   { x: 0, y: 204 },
-  //   { x: 300, y: 204 },
-  //   { x: 150, y: 102, small: true },
-
-  //   // y = 134
-  //   { x: 0, y: 134 },
-  //   { x: 300, y: 134 },
-  //   { x: 150, y: 67, small: true },
-
-  //   // y = 179
-  //   { x: 0, y: 179 },
-  //   { x: 300, y: 179 },
-  //   { x: 150, y: 89.5, small: true },
-
-  //   // y = 299
-  //   { x: 0, y: 299 },
-  //   { x: 300, y: 299 },
-  //   { x: 150, y: 149.5, small: true },
-
-  //   // y = 215
-  //   { x: 0, y: 215 },
-  //   { x: 300, y: 215 },
-  //   { x: 150, y: 107.5, small: true },
-
-  //   // y = 281
-  //   { x: 0, y: 281 },
-  //   { x: 300, y: 281 },
-  //   { x: 150, y: 140.5, small: true },
-
-  //   // y = 158
-  //   { x: 0, y: 158 },
-  //   { x: 300, y: 158 },
-  //   { x: 150, y: 79, small: true },
-
-  //   // y = 210
-  //   { x: 0, y: 210 },
-  //   { x: 300, y: 210 },
-  //   { x: 150, y: 105, small: true },
-  // ];
+  const options = parseEnvJson(process.env.NEXT_PUBLIC_SIDE_IMAGE_CONFIG, {
+    dotSize: 1.5,
+    streakWidth: 4,
+    streakHeight: 100,
+    color: "#09f",
+  });
 
   const circleSize = process.env.NEXT_PUBLIC_CIRCLE_SIZE || "30%";
   const circleColor =
@@ -164,8 +141,6 @@ export function getSideImageConfig() {
     process.env.NEXT_PUBLIC_CAPTION_OUTLINE_COLOR || "#000"; // black outline
   const captionGlowColor =
     process.env.NEXT_PUBLIC_CAPTION_GLOW_COLOR || "rgba(255,255,255,0.75)"; // white glow
-  // const captionFontSize =
-  //   process.env.NEXT_PUBLIC_CAPTION_FONT_SIZE || "0.75rem";
   const captionFontSize = parseEnvJson(
     process.env.NEXT_PUBLIC_CAPTION_FONT_SIZE,
     {
@@ -185,15 +160,6 @@ export function getSideImageConfig() {
   return {
     circleSize,
     circleColor,
-    // circleColor: "#1e40af",
-    // circleColor: `radial-gradient(circle at 50% 50%,
-    //     rgba(220, 38, 38, 0.3) 0%,
-    //     rgba(220, 38, 38, 0.15) 25%,
-    //     rgba(220, 38, 38, 0.1) 50%,
-    //     rgba(220, 38, 38, 0.05) 75%,
-    //     rgba(220, 38, 38, 0.025) 100%,
-    //     transparent 50%
-    //   )`,
     logoOffset,
     logoSize: `calc(${circleSize} - ${logoOffset})`, // 👈 new token
     circleStopCount,
@@ -212,11 +178,6 @@ export function getSideImageConfig() {
     captionFontSize,
     captionShadowStrength,
     captionOffset,
-    animationBackground: buildGradients(points, {
-      dotSize: 1.5,
-      streakWidth: 4,
-      streakHeight: 100,
-      color: "#09f", // or from env: process.env.NEXT_PUBLIC_GRADIENT_COLOR
-    }),
+    animationBackground: buildGradients(points, options),
   };
 }
