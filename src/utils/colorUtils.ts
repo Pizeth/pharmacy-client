@@ -144,3 +144,14 @@ export function buildGradients(
     backgroundSize: sizes.join(", "),
   };
 }
+
+export function buildResponsiveShadow(sizeVar = "--avatar-size") {
+  return `
+    0 0 calc(var(${sizeVar}) * 0.08) rgba(255,255,255,0.2),
+    calc(var(${sizeVar}) * -0.02) 0 calc(var(${sizeVar}) * 0.03) #c3f4ff inset,
+    calc(var(${sizeVar}) * 0.06) calc(var(${sizeVar}) * 0.008) calc(var(${sizeVar}) * 0.1) #000 inset,
+    calc(var(${sizeVar}) * -0.1) calc(var(${sizeVar}) * -0.008) calc(var(${sizeVar}) * 0.14) #c3f4ff99 inset,
+    calc(var(${sizeVar}) * 1) 0 calc(var(${sizeVar}) * 0.18) #00000066 inset,
+    calc(var(${sizeVar}) * 0.6) 0 calc(var(${sizeVar}) * 0.15) #000000aa inset
+  `;
+}

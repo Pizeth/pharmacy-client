@@ -22,9 +22,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https", // Or 'http' if applicable
-        hostname: "placehold.co",
+        hostname: "uiverse.io",
         port: "", // Leave empty if no specific port
         pathname: "/**", // Allow all paths under this hostname
+        search: "",
       },
     ],
   },

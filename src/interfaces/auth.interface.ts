@@ -35,6 +35,9 @@ export interface LoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
   className?: string;
   sx?: SxProps<Theme>;
   variant?: "compact" | "full";
+  src?: string;
+  alt?: string;
+  heading?: string;
 }
 
 export interface LoginFormProps {

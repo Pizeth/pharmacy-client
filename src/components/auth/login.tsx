@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import { useCheckAuth } from "ra-core";
-import { Box, Card, CardContent, Grid } from "@mui/material";
+import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
 import { styled, useThemeProps } from "@mui/material/styles";
 import PasswordLogin from "./passwordLogin";
 import SocialLogin from "./socialLogin";
@@ -13,7 +13,10 @@ import PersonIcon from "@mui/icons-material/Person";
 import { RazethDivider as Divider } from "./divider";
 import SignupLink from "./ui/signUp";
 import Footer from "./ui/footer";
+import Image from "next/image";
 import { StyleComponent } from "@/types/classKey";
+import SocialButton from "./ui/socialButton";
+import { Web, Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
 
 // const LoginOld = (inProps: LoginProps) => {
 //   const props = useThemeProps({
@@ -255,6 +258,30 @@ const Root = styled("div", {
   overridesResolver: (_props, styles) => styles.root,
 })<LoginProps>(() => ({}));
 
+const Overlay = styled(Box, {
+  name: PREFIX,
+  slot: "Overlay",
+  overridesResolver: (_props, styles) => styles.overlay,
+})(() => ({}));
+
+const Astronaut = styled(Image, {
+  name: PREFIX,
+  slot: "Image",
+  overridesResolver: (_props, styles) => styles.image,
+})(() => ({}));
+
+const Heading = styled(Typography, {
+  name: PREFIX,
+  slot: "Heading",
+  overridesResolver: (_props, styles) => styles.heading,
+})(() => ({}));
+
+const Icons = styled(Box, {
+  name: PREFIX,
+  slot: "Icon",
+  overridesResolver: (_props, styles) => styles.icon,
+})(() => ({}));
+
 // Slot components
 const Content = styled(Box, {
   name: PREFIX,
@@ -267,6 +294,30 @@ const LoginCard = styled(Card, {
   slot: "Card",
   overridesResolver: (_props, styles) => styles.card,
 })(() => ({}));
+
+// Provider configuration
+const PROVIDERS = {
+  web: {
+    name: "Web",
+    icon: <Web />,
+  },
+  meta: {
+    name: "Meta",
+    icon: <Meta />,
+  },
+  instagram: {
+    name: "Instagram",
+    icon: <Instagram />,
+  },
+  telegram: {
+    name: "Telegram",
+    icon: <Telegram />,
+  },
+  youtube: {
+    name: "Youtube",
+    icon: <YouTube />,
+  },
+};
 
 // const LoginAvatar = styled(Box, {
 //   name: PREFIX,
@@ -294,6 +345,9 @@ export const Login = (
     signUp = defaultSignUp,
     footer = defaultFooter,
     variant = "full",
+    src = "/static/images/astronaut.png",
+    alt = "Picture of the astronaut",
+    heading = "Find me on Social Media",
     className,
     sx,
     // backgroundImage,
@@ -322,32 +376,47 @@ export const Login = (
       sx={sx}
       {...rest}
     >
-      <Login.Content>
-        <Login.Card>
-          <Grid container spacing={0}>
-            {/* Image section - hidden on mobile */}
-            {sideImage}
+      <Login.Overlay>
+        <Login.Image src={src} alt={alt} width={100} height={100} />
+        <Login.Content>
+          <Login.Card>
+            <Grid container spacing={0}>
+              {/* Image section - hidden on mobile */}
+              {sideImage}
 
-            {/* Form section */}
-            <Grid size={{ xs: 12, md: 6 }}>
-              <CardContent>
-                <Box>
-                  {avatarIcon}
-                  {children}
-                  {divider}
-                  {social}
-                  {signUp}
-                </Box>
-              </CardContent>
+              {/* Form section */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CardContent>
+                  <Box>
+                    {avatarIcon}
+                    {children}
+                    {divider}
+                    {social}
+                    {signUp}
+                  </Box>
+                </CardContent>
+              </Grid>
             </Grid>
-          </Grid>
-        </Login.Card>
-        {footer}
-      </Login.Content>
+          </Login.Card>
+          {footer}
+        </Login.Content>
+        <Login.Heading>{heading}</Login.Heading>
+        <Login.Icon>
+          {Object.entries(PROVIDERS).map(([key, provider]) => (
+            <SocialButton key={key} variant="outlined" icon={provider.icon}>
+              {/* {provider.name} */}
+            </SocialButton>
+          ))}
+        </Login.Icon>
+      </Login.Overlay>
     </Root>
   );
 };
 
+Login.Overlay = Overlay;
+Login.Image = Astronaut;
+Login.Heading = Heading;
+Login.Icon = Icons;
 Login.Content = Content;
 Login.Card = LoginCard;
 // Login.Avatar = LoginAvatar;

@@ -5,15 +5,29 @@ import { red, blue } from "@mui/material/colors";
 import { createTheme, Theme } from "@mui/material/styles";
 // import { LoginClasses } from "@/components/auth/login";
 import { ClassKey, CustomComponents } from "@/types/classKey";
-import { keyframes } from "@emotion/react";
 import {
   line,
   RazethComponentsPropsList,
   SideImage,
 } from "@/interfaces/theme.interface";
-import { makePulseKeyframes, makePulseVars } from "@/utils/colorUtils";
+import {
+  buildResponsiveShadow,
+  makePulseKeyframes,
+  makePulseVars,
+} from "@/utils/colorUtils";
 // import "@fontsource/moul";
 import { getSideImageConfig } from "@/configs/themeConfig";
+import { drop, max } from "lodash";
+import {
+  wee,
+  filt,
+  hi,
+  hii,
+  earthRotate,
+  shake,
+  move,
+  glowingStars,
+} from "./keyframes";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -124,175 +138,6 @@ declare module "@mui/material/styles" {
 //     };
 //   }
 // }
-
-const shake = keyframes`
-  0% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-1px);
-  }
-  50% {
-    transform: translateX(1px);
-  }
-  75% {
-    transform: translateX(-1px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-    `;
-
-const filt = keyframes`
-  0% {
-    filter: hue-rotate(0deg);
-  }
-  to {
-    filter: hue-rotate(360deg);
-  }`;
-
-const wee = keyframes`
-  0% {
-    background-position:
-      var(--p),
-      800% 400%,
-      1000% -400%,
-      -1200% -600%,
-      400% 41.5692194px;
-  }
-  to {
-    background-position:
-      var(--p),
-      0% 0%,
-      0% 0%,
-      0% 0%,
-      0% 0%;
-  }
-`;
-
-const hii = keyframes`
-  0% {
-    backdrop-filter: var(--f) hue-rotate(0deg);
-  }
-  to {
-    backdrop-filter: var(--f) hue-rotate(360deg);
-  }
-`;
-
-const hi = keyframes`
-0% {
-    background-position:
-      0px 220px,
-      3px 220px,
-      151.5px 337.5px,
-      25px 24px,
-      28px 24px,
-      176.5px 150px,
-      50px 16px,
-      53px 16px,
-      201.5px 91px,
-      75px 224px,
-      78px 224px,
-      226.5px 350.5px,
-      100px 19px,
-      103px 19px,
-      251.5px 121px,
-      125px 120px,
-      128px 120px,
-      276.5px 187px,
-      150px 31px,
-      153px 31px,
-      301.5px 120.5px,
-      175px 235px,
-      178px 235px,
-      326.5px 384.5px,
-      200px 121px,
-      203px 121px,
-      351.5px 228.5px,
-      225px 224px,
-      228px 224px,
-      376.5px 364.5px,
-      250px 26px,
-      253px 26px,
-      401.5px 105px,
-      275px 75px,
-      278px 75px,
-      426.5px 180px;
-  }
-
-  to {
-    background-position:
-      0px 6800px,
-      3px 6800px,
-      151.5px 6917.5px,
-      25px 13632px,
-      28px 13632px,
-      176.5px 13758px,
-      50px 5416px,
-      53px 5416px,
-      201.5px 5491px,
-      75px 17175px,
-      78px 17175px,
-      226.5px 17301.5px,
-      100px 5119px,
-      103px 5119px,
-      251.5px 5221px,
-      125px 8428px,
-      128px 8428px,
-      276.5px 8495px,
-      150px 9876px,
-      153px 9876px,
-      301.5px 9965.5px,
-      175px 13391px,
-      178px 13391px,
-      326.5px 13540.5px,
-      200px 14741px,
-      203px 14741px,
-      351.5px 14848.5px,
-      225px 18770px,
-      228px 18770px,
-      376.5px 18910.5px,
-      250px 5082px,
-      253px 5082px,
-      401.5px 5161px,
-      275px 6375px,
-      278px 6375px,
-      426.5px 6480px;
-  }`;
-
-const drop = keyframes`
-  0% {
-    top: -50%;
-  }
-  100% {
-    top: 110%;
-  }`;
-
-/* Faster blur animation */
-const blurAnimation = keyframes`
-  to {
-    filter: blur(0.5vmin);
-    transform: scale(1.00125);
-  }
-`;
-
-/* Faster gradient animation */
-const gradientShift = keyframes`
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-`;
-
-const steam = keyframes`
-  0% { background-position: 0 0; }
-  50% { background-position: 250% 0; }
-  100% { background-position: 0 0; }
-`;
-
-const earthRotate = keyframes`
-  0% { background-position: 0 0; }
-  100% { background-position: 400px 0; }
-`;
 
 // const pulseSoftness = keyframes`
 //   0%, 100% {
@@ -623,6 +468,148 @@ const customBaseTheme = createTheme({
             `,
           },
         }),
+        overlay: (props: { theme: Theme }) => ({
+          position: "relative",
+          width: "100%",
+          maxWidth: "100%",
+          // height: "100%",
+          height: "100dvh",
+          maxHeight: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          // backgroundColor: "#171717",
+          color: "white",
+          fontFamily: "Montserrat",
+          fontWeight: "bold",
+          // padding: "1em 2em 1em 1em",
+          // borderRadius: "20px",
+          // overflow: "hidden",
+          zIndex: 1,
+          rowGap: "1em",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            inset: "-3px",
+            borderRadius: "10px",
+            background: "radial-gradient(#858585, transparent, transparent)",
+            transform: "translate(-5px, 250px)",
+            transition: "0.4s ease-in-out",
+            zIndex: -1,
+          },
+          "&:hover::before": {
+            width: "150%",
+            height: "100%",
+            marginLeft: "-4.25em",
+          },
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            inset: "2px",
+            borderRadius: "20px",
+            // background: "rgba(23,23,23,0.7)",
+            transition: "all 0.4s ease-in-out",
+            zIndex: -1,
+          },
+        }),
+        image: {
+          // position: "absolute",
+          // width: "12em",
+          // marginRight: "1em",
+          animation: `${move} 10s ease-in-out infinite`,
+          // zIndex: 5,
+          "&:hover": {
+            cursor: "grab",
+          },
+          "&:active": {
+            cursor: "grabbing",
+          },
+        },
+        heading: {
+          zIndex: 2,
+          transition: "0.4s ease-in-out",
+          "&:hover": {
+            letterSpacing: "0.025em",
+          },
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "2px",
+            height: "2px",
+            borderRadius: "50%",
+            opacity: 1,
+            boxShadow:
+              "220px 118px #fff, 280px 176px #fff, 40px 50px #fff, 60px 180px #fff, 120px 130px #fff, 180px 176px #fff, 220px 290px #fff, 520px 250px #fff, 400px 220px #fff, 50px 350px #fff, 10px 230px #fff",
+            zIndex: -1,
+            transition: "1s ease",
+            animation: `${glowingStars} 1s linear alternate infinite`,
+            animationDelay: "0s",
+          },
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            top: "-8.5%",
+            left: "-8.5%",
+            width: "7.5em",
+            height: "7.5em",
+            borderRadius: "50%",
+            background: "#f9f9fb",
+            boxShadow:
+              "0px 0px 100px rgba(193,119,241,0.8), 0px 0px 100px rgba(135,42,211,0.8), inset #9b40fc 0px 0px 40px -12px",
+            transition: "0.4s ease-in-out",
+            zIndex: -1,
+          },
+          "&:hover::after": {
+            boxShadow:
+              "0px 0px 200px rgba(193,119,241,1), 0px 0px 200px rgba(135,42,211,1), inset #9b40fc 0px 0px 40px -12px",
+          },
+        },
+        icon: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "row",
+          columnGap: "1em",
+          zIndex: 1,
+          button: {
+            border: "none",
+          },
+          // "& svg": {
+          //   width: "20px",
+          //   height: "20px",
+          // },
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            width: "2px",
+            height: "2px",
+            borderRadius: "50%",
+            opacity: 1,
+            boxShadow:
+              "140px 20px #fff, 425px 20px #fff, 70px 120px #fff, 20px 130px #fff, 110px 80px #fff, 280px 80px #fff, 250px 350px #fff, 280px 230px #fff, 220px 190px #fff, 450px 100px #fff, 380px 80px #fff, 520px 50px #fff",
+            zIndex: -1,
+            transition: "1.5s ease",
+            animation: `${glowingStars} 1s linear alternate infinite`,
+            animationDelay: "0.4s",
+          },
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            width: "2px",
+            height: "2px",
+            borderRadius: "50%",
+            opacity: 1,
+            boxShadow:
+              "490px 330px #fff, 420px 300px #fff, 320px 280px #fff, 380px 350px #fff, 546px 170px #fff, 420px 180px #fff, 370px 150px #fff, 200px 250px #fff, 80px 20px #fff, 190px 50px #fff, 270px 20px #fff, 120px 230px #fff, 350px -1px #fff, 150px 369px #fff",
+            zIndex: -1,
+            transition: "2s ease",
+            animation: `${glowingStars} 1s linear alternate infinite`,
+            animationDelay: "0.8s",
+          },
+        },
 
         content: (props: { theme: Theme }) => ({
           width: "100%",
@@ -707,16 +694,16 @@ const customBaseTheme = createTheme({
           //   )
           // `,
 
-          //   // #fb0094,
-          //   // #0000ff,
-          //   // #00ff00,
-          //   // #ffff00,
-          //   // #ff0000,
-          //   // #fb0094,
-          //   // #0000ff,
-          //   // #00ff00,
-          //   // #ffff00,
-          //   // #ff0000
+          //   //   // #fb0094,
+          //   //   // #0000ff,
+          //   //   // #00ff00,
+          //   //   // #ffff00,
+          //   //   // #ff0000,
+          //   //   // #fb0094,
+          //   //   // #0000ff,
+          //   //   // #00ff00,
+          //   //   // #ffff00,
+          //   //   // #ff0000
 
           //   backgroundSize: "250%",
           //   width: "calc(100% + 2px)",
@@ -725,7 +712,7 @@ const customBaseTheme = createTheme({
           //   animation: `${steam} 60s linear infinite`,
           // },
           // "&::after": {
-          //   filter: "blur(100vmin)",
+          //   filter: "blur(1vmin)",
           // },
 
           "& .MuiGrid-container": {
@@ -1013,13 +1000,19 @@ const customBaseTheme = createTheme({
           flexDirection: "column", // Arrange items vertically
           alignItems: "center", // Center items horizontally
           "& .MuiAvatar-root": {
+            "--avatar-size": "min(12vmin, 70px)", // responsive size
+            width: "var(--avatar-size)",
+            height: "var(--avatar-size)",
+
             marginBottom: props.theme.spacing(1),
-            // backgroundColor: "#e72d32",
             backgroundImage: `url('https://pub-ce3376330760464f8be1e4a3b46318c0.r2.dev/sea-planet-water-Earth-map-Arctic-193611-wallhere.com.jpg')`,
-            // background: `url("https://pub-ce3376330760464f8be1e4a3b46318c0.r2.dev/download.jpg")`,
+            // backgroundColor: "#e72d32",
+            // background: "linear-gradient(135deg, #1e1e24 10%, #050505 60%)",
+            color: props.theme.palette.primary.main,
             position: "relative",
 
             /*** Globe Animation ***/
+            zIndex: 5,
             transition: "left 0.3s linear",
             backgroundSize: "cover",
             backgroundPosition: "left",
@@ -1034,12 +1027,28 @@ const customBaseTheme = createTheme({
             //   250px 0px 44px #00000066 inset,
             //   150px 0px 38px #000000aa inset
             // `,
-            boxShadow: `0px 0 3px rgba(255,255,255,0.2),
-  -1px 0px 1px #c3f4ff inset,
-  2px 0px 4px #000 inset,
-  -4px 0px 5px #c3f4ff99 inset,
-  40px 0px 7px #00000066 inset,
-  24px 0px 6px #000000aa inset;`,
+            // boxShadow: `0px 0 3px rgba(255,255,255,0.2),
+            //   -1px 0px 1px #c3f4ff inset,
+            //   2px 0px 4px #000 inset,
+            //   -4px 0px 5px #c3f4ff99 inset,
+            //   40px 0px 7px #00000066 inset,
+            //   24px 0px 6px #000000aa inset;`,
+            boxShadow: buildResponsiveShadow(),
+            //   "&::before": {
+            //     content: '""',
+            //     position: "absolute",
+            //     inset: 0,
+            //     borderRadius: "50%",
+            //     background: `
+            //   radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
+            //   radial-gradient(circle at 100% 0, #00a6ff, transparent),
+            //   radial-gradient(circle at 0 100%, #ff0056, transparent),
+            //   radial-gradient(circle at 100% 100%, #6500ff, transparent)
+            // `,
+            //     // zIndex: -1,
+            //     filter: "blur(100vmin)",
+            //     animation: `${blurPulse} 3s ease-in-out alternate infinite`,
+            //   },
           },
           "& svg": { fill: "#fff" },
         }),

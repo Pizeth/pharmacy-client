@@ -86,6 +86,51 @@ export const Google = () => (
   </svg>
 );
 
+/* Instagram */
+// export const Instagram = () => (
+//   <svg width="16" height="16" viewBox="0 0 24 24">
+//     <path
+//       d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5z"
+//       fill="url(#instaGradient)"
+//     />
+//     <circle cx="12" cy="12" r="3.5" fill="white" />
+//     <circle cx="17.5" cy="6.5" r="1.5" fill="white" />
+//     <defs>
+//       <linearGradient id="instaGradient" x1="2" y1="2" x2="22" y2="22">
+//         <stop stopColor="#feda75" />
+//         <stop offset="0.3" stopColor="#fa7e1e" />
+//         <stop offset="0.6" stopColor="#d62976" />
+//         <stop offset="0.8" stopColor="#962fbf" />
+//         <stop offset="1" stopColor="#4f5bd5" />
+//       </linearGradient>
+//     </defs>
+//   </svg>
+// );
+
+export const Instagram = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <rect
+      x="2"
+      y="2"
+      width="12"
+      height="12"
+      rx="3"
+      fill="url(#instaGradient)"
+    />
+    <circle cx="8" cy="8" r="2.5" fill="white" />
+    <circle cx="11.5" cy="4.5" r="1" fill="white" />
+    <defs>
+      <linearGradient id="instaGradient" x1="2" y1="2" x2="14" y2="14">
+        <stop stopColor="#feda75" />
+        <stop offset="0.3" stopColor="#fa7e1e" />
+        <stop offset="0.6" stopColor="#d62976" />
+        <stop offset="0.8" stopColor="#962fbf" />
+        <stop offset="1" stopColor="#4f5bd5" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
 /* Linkedin */
 export const Linkedin = () => (
   <svg
@@ -149,6 +194,59 @@ export const Microsoft = () => (
   </svg>
 );
 
+/* Telegram */
+// export const Telegram = () => (
+//   <svg width="16" height="16" viewBox="0 0 24 24">
+//     <path
+//       d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12
+//          12-5.37 12-12S18.63 0 12 0z"
+//       fill="#0088cc"
+//     />
+//     <path
+//       d="M17.5 7.5l-2.2 10.4c-.2.9-.7 1.1-1.4.7l-3.9-2.9-1.9 1.8c-.2.2-.4.3-.7.3l.3-4.2 7.7-6.9c.3-.3.6-.1.5.2z"
+//       fill="white"
+//     />
+//   </svg>
+// );
+
+export const Telegram = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <circle cx="8" cy="8" r="8" fill="#0088cc" />
+    <path
+      d="M11.7 5.2L10.3 11.2c-.1.6-.5.7-1 .5L6.7 9.7l-1.3 1.2c-.1.1-.3.2-.5.2l.2-2.9 5.7-5.1c.2-.2.4 0 .3.1z"
+      fill="white"
+    />
+  </svg>
+);
+
+/* Web (Globe) */
+// export const Web = () => (
+//   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+//     <path
+//       d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
+//          10-4.48 10-10S17.52 2 12 2z"
+//       stroke="#0081FB"
+//       strokeWidth="2"
+//     />
+//     <path
+//       d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"
+//       stroke="#0081FB"
+//       strokeWidth="1.5"
+//     />
+//   </svg>
+// );
+
+export const Web = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <circle cx="8" cy="8" r="7" stroke="#0081FB" strokeWidth="1.5" />
+    <path
+      d="M1 8h14M8 1a14 14 0 010 14M8 1a14 14 0 000 14"
+      stroke="#0081FB"
+      strokeWidth="1"
+    />
+  </svg>
+);
+
 /* X (Twitter) */
 export const X = () => (
   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -158,5 +256,26 @@ export const X = () => (
       d="M0.5 0.5H5.75L9.48421 5.71053L14 0.5H16L10.3895 6.97368L16.5 15.5H11.25L7.51579 10.2895L3 15.5H1L6.61053 9.02632L0.5 0.5ZM12.0204 14L3.42043 2H4.97957L13.5796 14H12.0204Z"
       fill="currentColor"
     />
+  </svg>
+);
+
+/* YouTube */
+// export const YouTube = () => (
+//   <svg width="16" height="16" viewBox="0 0 24 24">
+//     <path
+//       d="M23.5 6.2a2.9 2.9 0 00-2-2C19.5 4 12 4 12 4s-7.5 0-9.5.2a2.9 2.9 0 00-2 2C0 8.3 0 12 0 12s0 3.7.5 5.8a2.9 2.9 0 002 2C4.5 20 12 20 12 20s7.5 0 9.5-.2a2.9 2.9 0 002-2c.5-2.1.5-5.8.5-5.8s0-3.7-.5-5.8z"
+//       fill="#FF0000"
+//     />
+//     <polygon points="9.5,15.5 15.5,12 9.5,8.5" fill="white" />
+//   </svg>
+// );
+
+export const YouTube = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16">
+    <path
+      d="M15.7 4.1c-.1-.6-.6-1-1.2-1.1C13.1 3 8 3 8 3s-5.1 0-6.5.1c-.6.1-1.1.5-1.2 1.1C0 5.3 0 8 0 8s0 2.7.3 3.9c.1.6.6 1 1.2 1.1C2.9 13 8 13 8 13s5.1 0 6.5-.1c.6-.1 1.1-.5 1.2-1.1.3-1.2.3-3.9.3-3.9s0-2.7-.3-3.9z"
+      fill="#FF0000"
+    />
+    <polygon points="6,11 11,8 6,5" fill="white" />
   </svg>
 );
