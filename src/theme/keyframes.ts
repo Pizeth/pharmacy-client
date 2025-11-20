@@ -176,21 +176,27 @@ export const earthRotate = keyframes`
 
 export const move = keyframes`
   0% { transform: translateX(0em) translateY(0em); }
-  25% { transform: translateY(-1em) translateX(-1em) rotate(-10deg); }
-  50% { transform: translateY(1em) translateX(-1em); }
-  75% { transform: translateY(-1.25em) translateX(1em) rotate(10deg); }
+  25% { transform: translateY(-0.75em) translateX(-0.75em) rotate(-10deg); }
+  50% { transform: translateY(0.75em) translateX(-0.75em); }
+  75% { transform: translateY(-1em) translateX(0.75em) rotate(10deg); }
   100% { transform: translateX(0em) translateY(0em); }
 `;
 
-export const glowingStars = keyframes`
-  0% { opacity: 0; }
-  50% { opacity: 1; }
-  100% { opacity: 0; }
-`;
+// export const glowingStars = keyframes`
+//   0% { opacity: 0; }
+//   50% { opacity: 1; }
+//   100% { opacity: 0; }
+// `;
 
 export const shootingStar = keyframes`
   0% { transform: translateX(0) translateY(0); opacity: 1; }
   50% { transform: translateX(-55em) translateY(0); opacity: 1; }
   70% { transform: translateX(-70em) translateY(0); opacity: 0; }
   100% { transform: translateX(0) translateY(0); opacity: 0; }
+`;
+
+export const glowingStars = keyframes`
+  0% { opacity: 0.25; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
 `;

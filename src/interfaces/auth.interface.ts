@@ -113,3 +113,7 @@ export interface FooterProps extends HtmlHTMLAttributes<HTMLDivElement> {
   ampersand?: string;
   sx?: SxProps<Theme>;
 }
+
+export interface IconProps extends HtmlHTMLAttributes<SVGElement> {
+  className?: string;
+}

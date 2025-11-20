@@ -155,3 +155,28 @@ export function buildResponsiveShadow(sizeVar = "--avatar-size") {
     calc(var(${sizeVar}) * 0.6) 0 calc(var(${sizeVar}) * 0.15) #000000aa inset
   `;
 }
+
+// export function createStarfield(count: number, color = "#fff"): string {
+//   return Array.from({ length: count })
+//     .map(() => {
+//       const x = Math.floor(Math.random() * window.innerWidth);
+//       const y = Math.floor(Math.random() * window.innerHeight);
+//       return `${x}px ${y}px ${color}`;
+//     })
+//     .join(", ");
+// }
+
+// utils/starfield.ts
+export function createStarfield(
+  count: number,
+  colors: string[] = ["#fff", "#9b40fc", "#00f", "#ff3300ff"]
+): string {
+  return Array.from({ length: count })
+    .map(() => {
+      const x = (Math.random() * 100).toFixed(2); // viewport width %
+      const y = (Math.random() * 100).toFixed(2); // viewport height %
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      return `${x}vw ${y}vh ${color}`;
+    })
+    .join(", ");
+}

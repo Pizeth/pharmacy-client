@@ -16,7 +16,8 @@ import Footer from "./ui/footer";
 import Image from "next/image";
 import { StyleComponent } from "@/types/classKey";
 import SocialButton from "./ui/socialButton";
-import { Web, Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
+import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
+import MCS from "../icons/mcs";
 
 // const LoginOld = (inProps: LoginProps) => {
 //   const props = useThemeProps({
@@ -264,7 +265,7 @@ const Overlay = styled(Box, {
   overridesResolver: (_props, styles) => styles.overlay,
 })(() => ({}));
 
-const Astronaut = styled(Image, {
+const Astronaut = styled(Box, {
   name: PREFIX,
   slot: "Image",
   overridesResolver: (_props, styles) => styles.image,
@@ -299,7 +300,7 @@ const LoginCard = styled(Card, {
 const PROVIDERS = {
   web: {
     name: "Web",
-    icon: <Web />,
+    icon: <MCS className="web" />,
   },
   meta: {
     name: "Meta",
@@ -307,15 +308,15 @@ const PROVIDERS = {
   },
   instagram: {
     name: "Instagram",
-    icon: <Instagram />,
+    icon: <Instagram className="instagram" />,
   },
   telegram: {
     name: "Telegram",
-    icon: <Telegram />,
+    icon: <Telegram className="telegram" />,
   },
   youtube: {
     name: "Youtube",
-    icon: <YouTube />,
+    icon: <YouTube className="youtube" />,
   },
 };
 
@@ -377,7 +378,7 @@ export const Login = (
       {...rest}
     >
       <Login.Overlay>
-        <Login.Image src={src} alt={alt} width={100} height={100} />
+        <Login.Image src={src} alt={alt} />
         <Login.Content>
           <Login.Card>
             <Grid container spacing={0}>
@@ -400,7 +401,7 @@ export const Login = (
           </Login.Card>
           {footer}
         </Login.Content>
-        <Login.Heading>{heading}</Login.Heading>
+        {/* <Login.Heading>{heading}</Login.Heading> */}
         <Login.Icon>
           {Object.entries(PROVIDERS).map(([key, provider]) => (
             <SocialButton key={key} variant="outlined" icon={provider.icon}>
@@ -414,7 +415,11 @@ export const Login = (
 };
 
 Login.Overlay = Overlay;
-Login.Image = Astronaut;
+Login.Image = ({ src, alt }: { src: string; alt: string }) => (
+  <Astronaut>
+    <Image src={src} alt={alt} fill style={{ objectFit: "contain" }} priority />
+  </Astronaut>
+);
 Login.Heading = Heading;
 Login.Icon = Icons;
 Login.Content = Content;
