@@ -348,7 +348,7 @@ export const Login = (
     variant = "full",
     src = "/static/images/astronaut.png",
     alt = "Picture of the astronaut",
-    heading = "Find me on Social Media",
+    // heading = "Find me on Social Media",
     className,
     sx,
     // backgroundImage,
@@ -377,10 +377,10 @@ export const Login = (
       sx={sx}
       {...rest}
     >
-      <Login.Overlay>
-        <Login.Image src={src} alt={alt} />
-        <Login.Content>
-          <Login.Card>
+      <Login.overlay>
+        <Login.image src={src} alt={alt} />
+        <Login.content>
+          <Login.card>
             <Grid container spacing={0}>
               {/* Image section - hidden on mobile */}
               {sideImage}
@@ -398,32 +398,32 @@ export const Login = (
                 </CardContent>
               </Grid>
             </Grid>
-          </Login.Card>
+          </Login.card>
           {footer}
-        </Login.Content>
+        </Login.content>
         {/* <Login.Heading>{heading}</Login.Heading> */}
-        <Login.Icon>
+        <Login.icon>
           {Object.entries(PROVIDERS).map(([key, provider]) => (
             <SocialButton key={key} variant="outlined" icon={provider.icon}>
               {/* {provider.name} */}
             </SocialButton>
           ))}
-        </Login.Icon>
-      </Login.Overlay>
+        </Login.icon>
+      </Login.overlay>
     </Root>
   );
 };
 
-Login.Overlay = Overlay;
-Login.Image = ({ src, alt }: { src: string; alt: string }) => (
+Login.overlay = Overlay;
+Login.image = ({ src, alt }: { src: string; alt: string }) => (
   <Astronaut>
     <Image src={src} alt={alt} fill style={{ objectFit: "contain" }} priority />
   </Astronaut>
 );
-Login.Heading = Heading;
-Login.Icon = Icons;
-Login.Content = Content;
-Login.Card = LoginCard;
+// Login.heading = Heading;
+Login.icon = Icons;
+Login.content = Content;
+Login.card = LoginCard;
 // Login.Avatar = LoginAvatar;
 
 const defaultLoginForm = (
