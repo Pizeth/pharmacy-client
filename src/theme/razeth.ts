@@ -13,12 +13,12 @@ import {
 import {
   buildResponsiveShadow,
   createStarfield,
+  generateShootingStars,
   makePulseKeyframes,
   makePulseVars,
 } from "@/utils/colorUtils";
 // import "@fontsource/moul";
 import { getSideImageConfig } from "@/configs/themeConfig";
-import { drop, max, min } from "lodash";
 import {
   wee,
   filt,
@@ -27,7 +27,9 @@ import {
   earthRotate,
   shake,
   move,
+  drop,
   glowingStars,
+  shootingStar,
 } from "./keyframes";
 
 declare module "@mui/material/styles" {
@@ -514,7 +516,7 @@ const customBaseTheme = createTheme({
             // background: "radial-gradient(#858585, transparent, transparent)",
             // transform: "translate(-5px, 250px)",
             // transition: "0.4s ease-in-out",
-            // zIndex: -1,
+            zIndex: -1,
             /* */
             width: "3px",
             height: "3px",
@@ -540,7 +542,7 @@ const customBaseTheme = createTheme({
             // borderRadius: "20px",
             // background: "rgba(23,23,23,0.7)",
             // transition: "all 0.4s ease-in-out",
-            // zIndex: -1,
+            zIndex: -1,
             /* */
             width: "3px",
             height: "3px",
@@ -553,6 +555,33 @@ const customBaseTheme = createTheme({
             animation: `${glowingStars} 1s linear alternate infinite`,
             animationDelay: "0.8s",
           },
+        }),
+        effect: (props: { theme: Theme }) => ({
+          position: "absolute",
+          inset: 0,
+          overflow: "hidden",
+          zIndex: 0,
+          "& .shooting-star": {
+            position: "absolute",
+            top: "-5vh", // random vertical
+            // left: "100vw", // start off-screen right
+            rotate: "-45deg",
+            width: "5em",
+            height: "1px",
+            background: "linear-gradient(90deg, #fff, transparent)",
+            animation: `${shootingStar} 7s ease-in-out infinite`,
+            transition: "7s ease",
+            // animationDelay: `${Math.random() * 10}s`,
+          },
+          // dynamically inject nth-of-type rules
+          ...generateShootingStars(6).reduce((acc, star, i) => {
+            acc[`& .shooting-star:nth-of-type(${i + 1})`] = {
+              left: star.left,
+              // left: "100vw", // always start off-screen right
+              animationDelay: star.delay,
+            };
+            return acc;
+          }, {} as Record<string, unknown>),
         }),
         image: {
           position: "absolute",
@@ -581,7 +610,7 @@ const customBaseTheme = createTheme({
             inset: 0,
             // boxShadow:
             //   "220px 118px #fff, 280px 176px #fff, 40px 50px #fff, 60px 180px #fff, 120px 130px #fff, 180px 176px #fff, 220px 290px #fff, 520px 250px #fff, 400px 220px #fff, 50px 350px #fff, 10px 230px #fff",
-            boxShadow: createStarfield(25), // random stars
+            // boxShadow: createStarfield(25), // random stars
             // zIndex: -1,
             transition: "1s ease",
             animation: `${glowingStars} 1s linear alternate infinite`,
@@ -717,8 +746,24 @@ const customBaseTheme = createTheme({
           "& .web": {
             backgroundColor: "#ffffffff",
           },
+          "& .meta::before": {
+            content: '""',
+            position: "absolute",
+            zIndex: -1,
+            // top: "10%",
+            // left: "90%",
+            top: "10vh" /* 10% of viewport height */,
+            left: "100vw" /* start just outside right edge */,
+            rotate: "-45deg",
+            width: "5em",
+            height: "1px",
+            background: "linear-gradient(90deg, #fff, transparent)",
+            animation: `${shootingStar} 4s ease-in-out infinite`,
+            transition: "1s ease",
+            animationDelay: "1s",
+          },
           "& .meta": {
-            backgroundColor: "#0081FB",
+            // backgroundColor: "#0081FB",
           },
           "& .instagram": {
             background: "linear-gradient(45deg,#fd5,#ff543e,#c837ab,#3771c8)",
@@ -850,13 +895,19 @@ const customBaseTheme = createTheme({
           "& .MuiGrid-container": {
             position: "relative",
             zIndex: 1,
-            background: "linear-gradient(0deg, #000, #272727)",
+            // background: "linear-gradient(0deg, #000, #272727)",
             // backgroundImage: `
             //   repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
             //   repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
             //   repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
             // `,
             // backgroundSize: "24px 24px, 24px 24px, 8px 8px",
+
+            backgroundImage: `
+            repeating-linear-gradient(45deg, rgba(255, 140, 0, 0.12) 0, rgba(255, 140, 0, 0.12) 1px, transparent 1px, transparent 22px),
+            repeating-linear-gradient(-45deg, rgba(255, 69, 0, 0.08) 0, rgba(255, 69, 0, 0.08) 1px, transparent 1px, transparent 22px)
+            `,
+            backgroundSize: "44px 44px",
           },
           // "& .card-content": {
           "& .MuiCardContent-root": {

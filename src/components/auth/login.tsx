@@ -265,6 +265,12 @@ const Overlay = styled(Box, {
   overridesResolver: (_props, styles) => styles.overlay,
 })(() => ({}));
 
+const Effect = styled(Box, {
+  name: PREFIX,
+  slot: "Effect",
+  overridesResolver: (_props, styles) => styles.effect,
+})(() => ({}));
+
 const Astronaut = styled(Box, {
   name: PREFIX,
   slot: "Image",
@@ -300,23 +306,28 @@ const LoginCard = styled(Card, {
 const PROVIDERS = {
   web: {
     name: "Web",
-    icon: <MCS className="web" />,
+    icon: <MCS />,
+    className: "web",
   },
   meta: {
     name: "Meta",
     icon: <Meta />,
+    className: "meta",
   },
   instagram: {
     name: "Instagram",
-    icon: <Instagram className="instagram" />,
+    icon: <Instagram />,
+    className: "instagram",
   },
   telegram: {
     name: "Telegram",
-    icon: <Telegram className="telegram" />,
+    icon: <Telegram />,
+    className: "telegram",
   },
   youtube: {
     name: "Youtube",
-    icon: <YouTube className="youtube" />,
+    icon: <YouTube />,
+    className: "youtube",
   },
 };
 
@@ -378,6 +389,7 @@ export const Login = (
       {...rest}
     >
       <Login.overlay>
+        <Login.effect count={25} className="shooting-star" />
         <Login.image src={src} alt={alt} />
         <Login.content>
           <Login.card>
@@ -404,7 +416,12 @@ export const Login = (
         {/* <Login.Heading>{heading}</Login.Heading> */}
         <Login.icon>
           {Object.entries(PROVIDERS).map(([key, provider]) => (
-            <SocialButton key={key} variant="outlined" icon={provider.icon}>
+            <SocialButton
+              key={key}
+              variant="outlined"
+              icon={provider.icon}
+              className={provider.className}
+            >
               {/* {provider.name} */}
             </SocialButton>
           ))}
@@ -419,6 +436,13 @@ Login.image = ({ src, alt }: { src: string; alt: string }) => (
   <Astronaut>
     <Image src={src} alt={alt} fill style={{ objectFit: "contain" }} priority />
   </Astronaut>
+);
+Login.effect = ({ count, className }: { count: number; className: string }) => (
+  <Effect>
+    {Array.from({ length: count }).map((_, i) => (
+      <span key={i} className={className} />
+    ))}
+  </Effect>
 );
 // Login.heading = Heading;
 Login.icon = Icons;

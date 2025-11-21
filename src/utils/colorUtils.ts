@@ -1,4 +1,5 @@
 // utils/colorStops.ts
+import { StarfieldOptions } from "@/interfaces/css.interface";
 import { GradientOptions, GradientPoint } from "@/types/theme";
 import { alpha, keyframes } from "@mui/material/styles";
 
@@ -167,10 +168,25 @@ export function buildResponsiveShadow(sizeVar = "--avatar-size") {
 // }
 
 // utils/starfield.ts
+// export function createStarfield(
+//   count: number,
+//   colors: string[] = ["#fff", "#9b40fc", "#00f", "#ff3300ff"]
+// ): string {
+//   return Array.from({ length: count })
+//     .map(() => {
+//       const x = (Math.random() * 100).toFixed(2); // viewport width %
+//       const y = (Math.random() * 100).toFixed(2); // viewport height %
+//       const color = colors[Math.floor(Math.random() * colors.length)];
+//       return `${x}vw ${y}vh ${color}`;
+//     })
+//     .join(", ");
+// }
+
 export function createStarfield(
-  count: number,
-  colors: string[] = ["#fff", "#9b40fc", "#00f", "#ff3300ff"]
+  count = 50,
+  colors = ["#fff", "#9b40fc", "#4fc3f7", "#f06292", "#ff3300ff", "#40b809ff"]
 ): string {
+  // static stars
   return Array.from({ length: count })
     .map(() => {
       const x = (Math.random() * 100).toFixed(2); // viewport width %
@@ -179,4 +195,38 @@ export function createStarfield(
       return `${x}vw ${y}vh ${color}`;
     })
     .join(", ");
+
+  // JSX shooting star spans
+  // const ShootingStars = (
+  //   <>
+  //     {Array.from({ length: shootingStars }).map((_, i) => (
+  //       <span
+  //         key={i}
+  //         className="shooting-star"
+  //         style={{
+  //           position: "absolute",
+  //           top: `${20 + i * 15}%`,
+  //           left: `${80 - i * 10}%`,
+  //           width: "5em",
+  //           height: "1px",
+  //           background: "linear-gradient(90deg, #fff, transparent)",
+  //           animation: "shootingStar 4s ease-in-out infinite",
+  //           animationDelay: `${i * 2}s`,
+  //         }}
+  //       />
+  //     ))}
+  //   </>
+  // );
+
+  // return { boxShadow: stars };
+}
+
+// utils/shootingStars.ts
+export function generateShootingStars(count: number) {
+  return Array.from({ length: count }).map((_, i) => {
+    // const top = `${Math.random() * 100}vh`;
+    const left = `${Math.random() * 100}vw`; // start off-screen right
+    const delay = `${Math.random() * 10}s`;
+    return { left, delay };
+  });
 }

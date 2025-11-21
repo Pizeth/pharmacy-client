@@ -24,6 +24,7 @@ export interface LoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
   // Content: MUIStyledCommonProps<Theme>;
   // Card: MUIStyledCommonProps<Theme>;
   // Avatar: MUIStyledCommonProps<Theme>;
+  effect?: ReactNode;
   avatarIcon?: ReactNode;
   backgroundImage?: string;
   image?: ReactNode;

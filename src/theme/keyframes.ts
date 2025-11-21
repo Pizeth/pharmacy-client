@@ -190,13 +190,19 @@ export const move = keyframes`
 
 export const shootingStar = keyframes`
   0% { transform: translateX(0) translateY(0); opacity: 1; }
-  50% { transform: translateX(-55em) translateY(0); opacity: 1; }
-  70% { transform: translateX(-70em) translateY(0); opacity: 0; }
+  50% { transform: translateX(-55vw) translateY(0); opacity: 1; }
+  70% { transform: translateX(-70vw) translateY(0); opacity: 0; }
   100% { transform: translateX(0) translateY(0); opacity: 0; }
 `;
 
 export const glowingStars = keyframes`
-  0% { opacity: 0.25; }
+  0% { opacity: 0; }
+  12.5% { opacity: 0.25; }
+  25% { opacity: 0.5; }
+  37.5% { opacity: 0.75; }
   50% { opacity: 1; }
-  100% { opacity: 0.3; }
+  62.5% { opacity: 0.75; }
+  75% { opacity: 0.5; }
+  87.5% { opacity: 0.25; }
+  100% { opacity: 0; }
 `;
