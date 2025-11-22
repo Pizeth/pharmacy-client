@@ -5,8 +5,8 @@ import clsx from "clsx";
 import {
   CircularProgress,
   InputAdornment,
-  InputClasses,
   TextField as MuiTextField,
+  OutlinedInputProps,
 } from "@mui/material";
 import { useTranslate } from "ra-core";
 import { IconTextInputProps } from "@/types/Types";
@@ -100,14 +100,24 @@ export const ResettableIconInputField = forwardRef<
     <StyledTextField
       value={value}
       ref={ref}
+      variant={variant}
       slotProps={{
         input: {
           readOnly: readOnly,
           classes:
             props.select && variant === "outlined"
               ? {
-                  inputAdornedEnd: classes.inputAdornedEnd,
-                  inputAdornedStart: classes.inputAdornedStart,
+                  // adornedEnd: classes.inputAdornedEnd,
+                  // adornedStart: classes.inputAdornedStart,
+                  // Fix for MUI Migration:
+                  // The keys 'inputAdornedEnd' and 'inputAdornedStart' are removed from InputClasses.
+                  // We must apply these classes to the 'input' slot manually.
+                  input: clsx({
+                    // Always apply end style for Selects (to fix arrow padding)
+                    [classes.inputAdornedEnd]: true,
+                    // Only apply start style if a start icon is present
+                    [classes.inputAdornedStart]: !!iconStart,
+                  }),
                 }
               : {},
           startAdornment: iconStart ? (
@@ -120,7 +130,11 @@ export const ResettableIconInputField = forwardRef<
           ) : (
             endAdornmentElement
           ),
-          ...InputPropsWithoutEndAdornment,
+          // ...InputPropsWithoutEndAdornment,
+          // Fix for Type Mismatch:
+          // Explicitly cast the spread props to TextFieldProps["InputProps"] to resolve
+          // the RefObject<unknown> vs Ref<HTMLDivElement> conflict.
+          ...(InputPropsWithoutEndAdornment as OutlinedInputProps),
         },
         inputLabel: {
           shrink: isFocused || value !== "",
@@ -145,11 +159,9 @@ export const ResettableIconInputField = forwardRef<
         },
       }}
       disabled={disabled || readOnly}
-      variant={variant}
       margin={margin}
       className={className}
       {...rest} // Spread only safe props (custom ones omitted)
-      inputRef={ref}
     />
   );
 });
