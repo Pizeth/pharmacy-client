@@ -5,6 +5,7 @@ import clsx from "clsx";
 import {
   CircularProgress,
   InputAdornment,
+  InputClasses,
   TextField as MuiTextField,
 } from "@mui/material";
 import { useTranslate } from "ra-core";
@@ -105,8 +106,8 @@ export const ResettableIconInputField = forwardRef<
           classes:
             props.select && variant === "outlined"
               ? {
-                  adornedEnd: classes.inputAdornedEnd,
-                  adornedStart: classes.inputAdornedStart,
+                  inputAdornedEnd: classes.inputAdornedEnd,
+                  inputAdornedStart: classes.inputAdornedStart,
                 }
               : {},
           startAdornment: iconStart ? (
