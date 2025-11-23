@@ -161,7 +161,7 @@ export const ResettableIconInputField = forwardRef<
       margin={margin}
       className={className}
       {...rest} // Spread only safe props (custom ones omitted)
-      inputRef={ref}
+      // inputRef={ref}
     />
   );
 });

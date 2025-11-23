@@ -12,13 +12,26 @@ import {
   SideImage,
 } from "@/interfaces/theme.interface";
 import {
+  buildResponsiveShadow,
+  createStarfield,
+  generateShootingStars,
   makePulseKeyframes,
-  makePulseSequence,
   makePulseVars,
-  makeRadialStops,
 } from "@/utils/colorUtils";
 // import "@fontsource/moul";
 import { getSideImageConfig } from "@/configs/themeConfig";
+import {
+  wee,
+  filt,
+  hi,
+  hii,
+  earthRotate,
+  shake,
+  move,
+  drop,
+  glowingStars,
+  shootingStar,
+} from "./keyframes";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -130,149 +143,6 @@ declare module "@mui/material/styles" {
 //   }
 // }
 
-const shake = keyframes`
-  0% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-1px);
-  }
-  50% {
-    transform: translateX(1px);
-  }
-  75% {
-    transform: translateX(-1px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-    `;
-
-const filt = keyframes`
-  0% {
-    filter: hue-rotate(0deg);
-  }
-  to {
-    filter: hue-rotate(360deg);
-  }`;
-
-const wee = keyframes`
-  0% {
-    background-position:
-      var(--p),
-      800% 400%,
-      1000% -400%,
-      -1200% -600%,
-      400% 41.5692194px;
-  }
-  to {
-    background-position:
-      var(--p),
-      0% 0%,
-      0% 0%,
-      0% 0%,
-      0% 0%;
-  }
-`;
-
-const hii = keyframes`
-  0% {
-    backdrop-filter: var(--f) hue-rotate(0deg);
-  }
-  to {
-    backdrop-filter: var(--f) hue-rotate(360deg);
-  }
-`;
-
-const hi = keyframes`
-0% {
-    background-position:
-      0px 220px,
-      3px 220px,
-      151.5px 337.5px,
-      25px 24px,
-      28px 24px,
-      176.5px 150px,
-      50px 16px,
-      53px 16px,
-      201.5px 91px,
-      75px 224px,
-      78px 224px,
-      226.5px 350.5px,
-      100px 19px,
-      103px 19px,
-      251.5px 121px,
-      125px 120px,
-      128px 120px,
-      276.5px 187px,
-      150px 31px,
-      153px 31px,
-      301.5px 120.5px,
-      175px 235px,
-      178px 235px,
-      326.5px 384.5px,
-      200px 121px,
-      203px 121px,
-      351.5px 228.5px,
-      225px 224px,
-      228px 224px,
-      376.5px 364.5px,
-      250px 26px,
-      253px 26px,
-      401.5px 105px,
-      275px 75px,
-      278px 75px,
-      426.5px 180px;
-  }
-
-  to {
-    background-position:
-      0px 6800px,
-      3px 6800px,
-      151.5px 6917.5px,
-      25px 13632px,
-      28px 13632px,
-      176.5px 13758px,
-      50px 5416px,
-      53px 5416px,
-      201.5px 5491px,
-      75px 17175px,
-      78px 17175px,
-      226.5px 17301.5px,
-      100px 5119px,
-      103px 5119px,
-      251.5px 5221px,
-      125px 8428px,
-      128px 8428px,
-      276.5px 8495px,
-      150px 9876px,
-      153px 9876px,
-      301.5px 9965.5px,
-      175px 13391px,
-      178px 13391px,
-      326.5px 13540.5px,
-      200px 14741px,
-      203px 14741px,
-      351.5px 14848.5px,
-      225px 18770px,
-      228px 18770px,
-      376.5px 18910.5px,
-      250px 5082px,
-      253px 5082px,
-      401.5px 5161px,
-      275px 6375px,
-      278px 6375px,
-      426.5px 6480px;
-  }`;
-
-const drop = keyframes`
-  0% {
-    top: -50%;
-  }
-  100% {
-    top: 110%;
-  }`;
-
 // const pulseSoftness = keyframes`
 //   0%, 100% {
 //     background: radial-gradient(circle at 50% 50%, var(--app-gradient-soft-min));
@@ -294,9 +164,11 @@ const globalStyles = (theme: Theme) => ({
   //   padding: 0,
   //   boxSizing: "border-box !important",
   // },
-  // "html, body": {
-  //   height: "100%",
-  // },
+  "html, body, #__next": {
+    height: "100%",
+    margin: 0,
+    padding: 0,
+  },
   // body: {
   //   display: "table",
   //   width: "100%",
@@ -551,7 +423,10 @@ const customBaseTheme = createTheme({
     RazethLogin: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
+          width: "100vw",
+          height: "100vh",
           minHeight: "100vh",
+          overflow: "hidden",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -560,12 +435,12 @@ const customBaseTheme = createTheme({
             props.theme.palette.mode === "dark"
               ? props.theme.palette.grey[900]
               : props.theme.palette.grey[100],
-          backgroundImage: `
-            repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
-            repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
-            repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
-          `,
-          backgroundSize: "24px 24px, 24px 24px, 8px 8px",
+          // backgroundImage: `
+          //   repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+          //   repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+          //   repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
+          // `,
+          // backgroundSize: "24px 24px, 24px 24px, 8px 8px",
           background: `
             radial-gradient(ellipse 140% 50% at 15% 60%, rgba(124, 58, 237, 0.11), transparent 48%),
             radial-gradient(ellipse 90% 80% at 85% 25%, rgba(245, 101, 101, 0.09), transparent 58%),
@@ -602,6 +477,274 @@ const customBaseTheme = createTheme({
             `,
           },
         }),
+        overlay: (props: { theme: Theme }) => ({
+          position: "relative",
+          width: "100dvw",
+          // maxWidth: "100%",
+          // height: "100%",
+          height: "100dvh",
+          // maxHeight: "100%",
+          // position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          // width: "100%",
+          // height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          // backgroundColor: "#171717",
+          color: "white",
+          fontFamily: "Montserrat",
+          fontWeight: "bold",
+          padding: "1em 2em 1em 1em",
+          // borderRadius: "20px",
+          overflow: "hidden",
+          zIndex: 1,
+          // rowGap: "1em",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            /* */
+            // width: "100%",
+            // height: "100%",
+            /* */
+            // inset: "-3px",
+            inset: 0,
+            // borderRadius: "10px",
+            // background: "radial-gradient(#858585, transparent, transparent)",
+            // transform: "translate(-5px, 250px)",
+            // transition: "0.4s ease-in-out",
+            zIndex: -1,
+            /* */
+            width: "3px",
+            height: "3px",
+            borderRadius: "50%",
+            opacity: 1,
+            // boxShadow:
+            //   "140px 20px #fff, 425px 20px #fff, 70px 120px #fff, 20px 130px #fff, 110px 80px #fff, 280px 80px #fff, 250px 350px #fff, 280px 230px #fff, 220px 190px #fff, 450px 100px #fff, 380px 80px #fff, 520px 50px #fff",
+            boxShadow: createStarfield(25), // random stars
+            transition: "1.5s ease",
+            animation: `${glowingStars} 1s linear alternate infinite`,
+            animationDelay: "0.4s",
+          },
+          // "&:hover::before": {
+          //   width: "150%",
+          //   height: "100%",
+          //   marginLeft: "-4.25em",
+          // },
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            // inset: "2px",
+            inset: 0,
+            // borderRadius: "20px",
+            // background: "rgba(23,23,23,0.7)",
+            // transition: "all 0.4s ease-in-out",
+            zIndex: -1,
+            /* */
+            width: "3px",
+            height: "3px",
+            borderRadius: "50%",
+            opacity: 1,
+            // boxShadow:
+            //   "490px 330px #fff, 420px 300px #fff, 320px 280px #fff, 380px 350px #fff, 546px 170px #fff, 420px 180px #fff, 370px 150px #fff, 200px 250px #fff, 80px 20px #fff, 190px 50px #fff, 270px 20px #fff, 120px 230px #fff, 350px -1px #fff, 150px 369px #fff",
+            boxShadow: createStarfield(25), // random stars
+            transition: "2s ease",
+            animation: `${glowingStars} 1s linear alternate infinite`,
+            animationDelay: "0.8s",
+          },
+        }),
+        effect: (props: { theme: Theme }) => ({
+          position: "absolute",
+          inset: 0,
+          overflow: "hidden",
+          zIndex: 0,
+          "& .shooting-star": {
+            position: "absolute",
+            top: "-5vh", // random vertical
+            // left: "100vw", // start off-screen right
+            rotate: "-45deg",
+            width: "5em",
+            height: "1px",
+            background: "linear-gradient(90deg, #fff, transparent)",
+            animation: `${shootingStar} 7s ease-in-out infinite`,
+            transition: "7s ease",
+            // animationDelay: `${Math.random() * 10}s`,
+          },
+          // dynamically inject nth-of-type rules
+          ...generateShootingStars(6).reduce((acc, star, i) => {
+            acc[`& .shooting-star:nth-of-type(${i + 1})`] = {
+              left: star.left,
+              // left: "100vw", // always start off-screen right
+              animationDelay: star.delay,
+            };
+            return acc;
+          }, {} as Record<string, unknown>),
+        }),
+        image: {
+          position: "absolute",
+          width: "5em",
+          height: "5em",
+          // marginRight: "1em",
+          top: "2.5rem",
+          left: "2.5rem",
+          // zIndex: 5,
+          img: { animation: `${move} 10s ease-in-out infinite` },
+          "&:hover": {
+            cursor: "grab",
+          },
+          "&:active": {
+            cursor: "grabbing",
+          },
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "3px",
+            height: "3px",
+            borderRadius: "50%",
+            opacity: 1,
+            inset: 0,
+            // boxShadow:
+            //   "220px 118px #fff, 280px 176px #fff, 40px 50px #fff, 60px 180px #fff, 120px 130px #fff, 180px 176px #fff, 220px 290px #fff, 520px 250px #fff, 400px 220px #fff, 50px 350px #fff, 10px 230px #fff",
+            // boxShadow: createStarfield(25), // random stars
+            // zIndex: -1,
+            transition: "1s ease",
+            animation: `${glowingStars} 1s linear alternate infinite`,
+            // animation: `${twinkle} 1.5s linear alternate infinite`,
+            animationDelay: "0s",
+          },
+          "&::after": {
+            content: '""',
+            position: "fixed",
+            top: "-5rem",
+            left: "-5rem",
+            // top: 0,
+            // left: 0,
+            width: "10em",
+            height: "10em",
+            borderRadius: "50%",
+            background: "#f9f9fb",
+            boxShadow:
+              "0px 0px 100px rgba(193,119,241,0.8), 0px 0px 100px rgba(135,42,211,0.8), inset #9b40fc 0px 0px 40px -12px",
+            transition: "0.4s ease-in-out",
+            zIndex: -1,
+          },
+          "&:hover::before": {
+            filter: "blur(3px)",
+          },
+          "&:hover::after": {
+            boxShadow:
+              "0px 0px 200px rgba(193,119,241,1), 0px 0px 200px rgba(135,42,211,1), inset #9b40fc 0px 0px 40px -12px",
+          },
+        },
+        icon: {
+          // postion: "fixed",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "row",
+          // columnGap: "0.5rem",
+          zIndex: 1,
+          button: {
+            border: "none",
+            padding: "0.75rem",
+            margin: 0,
+            minWidth: "1rem",
+            borderRadius: "50%",
+            // "&:hover": {
+            //   transform: "scale(1.25)",
+            // },
+          },
+          "& svg": {
+            width: "1rem",
+            height: "1rem",
+            transition: "0.3s ease-in-out",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+            "&:hover": {
+              transform: "scale(1.5)",
+            },
+            borderRadius: "50%",
+          },
+          // "&::before": {
+          //   content: '""',
+          //   position: "absolute",
+          //   width: "3px",
+          //   height: "3px",
+          //   borderRadius: "50%",
+          //   opacity: 1,
+          //   // boxShadow:
+          //   //   "140px 20px #fff, 425px 20px #fff, 70px 120px #fff, 20px 130px #fff, 110px 80px #fff, 280px 80px #fff, 250px 350px #fff, 280px 230px #fff, 220px 190px #fff, 450px 100px #fff, 380px 80px #fff, 520px 50px #fff",
+          //   boxShadow: createStarfield(75), // random stars
+          //   zIndex: -1,
+          //   transition: "1.5s ease",
+          //   animation: `${glowingStars} 1s linear alternate infinite`,
+          //   animationDelay: "0.4s",
+          // },
+          // "&::after": {
+          //   content: '""',
+          //   position: "absolute",
+          //   width: "3px",
+          //   height: "3px",
+          //   borderRadius: "50%",
+          //   opacity: 1,
+          //   // boxShadow:
+          //   //   "490px 330px #fff, 420px 300px #fff, 320px 280px #fff, 380px 350px #fff, 546px 170px #fff, 420px 180px #fff, 370px 150px #fff, 200px 250px #fff, 80px 20px #fff, 190px 50px #fff, 270px 20px #fff, 120px 230px #fff, 350px -1px #fff, 150px 369px #fff",
+          //   boxShadow: createStarfield(75), // random stars
+          //   zIndex: -1,
+          //   transition: "2s ease",
+          //   animation: `${glowingStars} 1s linear alternate infinite`,
+          //   animationDelay: "0.8s",
+          // },
+          // Specific provider color classes
+          "& .web": {
+            backgroundColor: "#ffffffff",
+          },
+          "& .meta::before": {
+            content: '""',
+            position: "absolute",
+            zIndex: -1,
+            // top: "10%",
+            // left: "90%",
+            top: "10vh" /* 10% of viewport height */,
+            left: "100vw" /* start just outside right edge */,
+            rotate: "-45deg",
+            width: "5em",
+            height: "1px",
+            background: "linear-gradient(90deg, #fff, transparent)",
+            animation: `${shootingStar} 4s ease-in-out infinite`,
+            transition: "1s ease",
+            animationDelay: "1s",
+          },
+          "& .meta": {
+            // backgroundColor: "#0081FB",
+          },
+          "& .instagram": {
+            background: "linear-gradient(45deg,#fd5,#ff543e,#c837ab,#3771c8)",
+          },
+          "& .telegram": {
+            backgroundColor: "#229ed9",
+          },
+          "& .youtube": {
+            backgroundColor: "#FF0000",
+          },
+          // // Provider-specific hover strokes
+          // "& .web svg path": { stroke: "#2859c5" },
+          // "& .meta svg path": { stroke: "#0081FB" },
+          // "& .instagram svg path": { stroke: "#808080" },
+          // "& .instagram:hover svg path": { stroke: "#cc39a4" },
+          // "& .telegram svg path": { stroke: "#229ed9" },
+          // "& .youtube svg path": { stroke: "#FF0000" },
+          // // Scale effects
+          // "& .instagram:hover svg": { transform: "scale(1.4)" },
+          // "& .telegram:hover svg, & .youtube:hover svg": {
+          //   transform: "scale(1.25)",
+          // },
+        },
 
         content: (props: { theme: Theme }) => ({
           width: "100%",
@@ -625,9 +768,9 @@ const customBaseTheme = createTheme({
         }),
 
         card: (props: { theme: Theme }) => ({
-          // position: "relative",
+          position: "relative",
           // zIndex: 2,
-          overflow: "hidden",
+          overflow: "visible",
           borderRadius: props.theme.spacing(2),
           boxShadow: props.theme.shadows[3],
           /*** Paper Texture ***/
@@ -638,14 +781,99 @@ const customBaseTheme = createTheme({
           `,
           backgroundSize: "8px 8px, 32px 32px, 32px 32px",
 
+          /*** Gradient Glow Effect ***/
+          // display: "flex",
+          // alignItems: "center",
+          // justifyContent: "center",
+          // userSelect: "none",
+          // animation: `${gradientShift} 10s ease-in-out infinite` /* Faster animation */,
+
+          // "&::before, &::after": {
+          //   content: '""',
+          //   position: "absolute",
+          //   top: "calc(var(--size) / -2)",
+          //   left: "calc(var(--size) / -2)",
+          //   width: "calc(100% + var(--size))",
+          //   height: "calc(100% + var(--size))",
+          //   background: `
+          //   radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
+          //   radial-gradient(circle at 100% 0, #00a6ff, transparent),
+          //   radial-gradient(circle at 0 100%, #ff0056, transparent),
+          //   radial-gradient(circle at 100% 100%, #6500ff, transparent)
+          // `,
+          // },
+          // "&::after": {
+          //   "--size": "2px",
+          //   // zIndex: "-1",
+          // },
+          // "&::before": {
+          //   "--size": "5px",
+          //   // zIndex: "-2",
+          //   filter: "blur(0.25vmin)",
+          //   animation: `${blurAnimation} 3s ease-in-out alternate infinite`,
+          // },
+
+          // "&::before, &::after": {
+          //   content: '""',
+          //   position: "absolute",
+          //   left: "-1px",
+          //   top: "-1px",
+          //   // borderRadius: "5%",
+          //   background: `
+          //   linear-gradient(
+          //     45deg,
+          //     hsl(27deg 93% 60%),
+          //   #00a6ff,
+          //   #ff0056,
+          //   #6500ff
+          //   )
+          // `,
+
+          //   //   // #fb0094,
+          //   //   // #0000ff,
+          //   //   // #00ff00,
+          //   //   // #ffff00,
+          //   //   // #ff0000,
+          //   //   // #fb0094,
+          //   //   // #0000ff,
+          //   //   // #00ff00,
+          //   //   // #ffff00,
+          //   //   // #ff0000
+
+          //   backgroundSize: "250%",
+          //   width: "calc(100% + 2px)",
+          //   height: "calc(100% + 2px)",
+          //   // zIndex: -99,
+          //   animation: `${steam} 60s linear infinite`,
+          // },
+          // "&::after": {
+          //   filter: "blur(1vmin)",
+          // },
+          "& .MuiGrid-container": {
+            position: "relative",
+            zIndex: 1,
+            // background: "linear-gradient(0deg, #000, #272727)",
+            // backgroundImage: `
+            //   repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+            //   repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+            //   repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
+            // `,
+            // backgroundSize: "24px 24px, 24px 24px, 8px 8px",
+
+            backgroundImage: `
+            repeating-linear-gradient(45deg, rgba(255, 140, 0, 0.12) 0, rgba(255, 140, 0, 0.12) 1px, transparent 1px, transparent 22px),
+            repeating-linear-gradient(-45deg, rgba(255, 69, 0, 0.08) 0, rgba(255, 69, 0, 0.08) 1px, transparent 1px, transparent 22px)
+            `,
+            backgroundSize: "44px 44px",
+          },
           // "& .card-content": {
           "& .MuiCardContent-root": {
-            backgroundImage: `
-              repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(75, 85, 99, 0.06) 2px, rgba(75, 85, 99, 0.06) 3px, transparent 3px, transparent 8px),
-              repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(107, 114, 128, 0.05) 2px, rgba(107, 114, 128, 0.05) 3px, transparent 3px, transparent 8px),
-              repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(55, 65, 81, 0.04) 2px, rgba(55, 65, 81, 0.04) 3px, transparent 3px, transparent 8px),
-              repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(31, 41, 55, 0.03) 2px, rgba(31, 41, 55, 0.03) 3px, transparent 3px, transparent 8px)
-            `,
+            // backgroundImage: `
+            //   repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(75, 85, 99, 0.06) 2px, rgba(75, 85, 99, 0.06) 3px, transparent 3px, transparent 8px),
+            //   repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(107, 114, 128, 0.05) 2px, rgba(107, 114, 128, 0.05) 3px, transparent 3px, transparent 8px),
+            //   repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(55, 65, 81, 0.04) 2px, rgba(55, 65, 81, 0.04) 3px, transparent 3px, transparent 8px),
+            //   repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(31, 41, 55, 0.03) 2px, rgba(31, 41, 55, 0.03) 3px, transparent 3px, transparent 8px)
+            // `,
             //       backgroundImage: `
             //   repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(16, 185, 129, 0.18) 2px, rgba(16, 185, 129, 0.18) 3px, transparent 3px, transparent 8px),
             //   repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(245, 101, 101, 0.10) 2px, rgba(245, 101, 101, 0.10) 3px, transparent 3px, transparent 8px),
@@ -715,7 +943,7 @@ const customBaseTheme = createTheme({
         root: (props: { theme: Theme }) => ({
           position: "relative",
           /*** New CSS ***/
-          overflow: "hidden",
+          overflow: "hidden", // prevents scrollbars
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -830,80 +1058,13 @@ const customBaseTheme = createTheme({
           },
 
           /*** Animation ***/
-          "--c": "#09f",
+          // "--c": "#09f",
           backgroundColor: "#000",
-          backgroundImage: `radial-gradient(4px 100px at 0px 235px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 235px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 117.5px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 252px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 252px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 126px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 150px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 150px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 75px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 253px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 253px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 126.5px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 204px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 204px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 102px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 134px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 134px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 67px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 179px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 179px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 89.5px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 299px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 299px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 149.5px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 215px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 215px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 107.5px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 281px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 281px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 140.5px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 158px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 158px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 79px, var(--c) 100%, #0000 150%),
-            radial-gradient(4px 100px at 0px 210px, var(--c), #0000),
-            radial-gradient(4px 100px at 300px 210px, var(--c), #0000),
-            radial-gradient(1.5px 1.5px at 150px 105px, var(--c) 100%, #0000 150%)`,
-          backgroundSize: `300px 235px,
-            300px 235px,
-            300px 235px,
-            300px 252px,
-            300px 252px,
-            300px 252px,
-            300px 150px,
-            300px 150px,
-            300px 150px,
-            300px 253px,
-            300px 253px,
-            300px 253px,
-            300px 204px,
-            300px 204px,
-            300px 204px,
-            300px 134px,
-            300px 134px,
-            300px 134px,
-            300px 179px,
-            300px 179px,
-            300px 179px,
-            300px 299px,
-            300px 299px,
-            300px 299px,
-            300px 215px,
-            300px 215px,
-            300px 215px,
-            300px 281px,
-            300px 281px,
-            300px 281px,
-            300px 158px,
-            300px 158px,
-            300px 158px,
-            300px 210px,
-            300px 210px,
-            300px 210px`,
+          backgroundImage:
+            props.theme.custom.sideImage.animationBackground.backgroundImage,
+          backgroundSize:
+            props.theme.custom.sideImage.animationBackground.backgroundSize,
+
           animation: `${hi} 150s linear infinite`,
           "&::after": {
             content: "''",
@@ -925,16 +1086,12 @@ const customBaseTheme = createTheme({
         image: (props: { theme: Theme }) => ({
           position: "relative",
           zIndex: 2,
-          // width: "120px", // fixed size, won’t scale with container
-          // height: "120px",
+
           aspectRatio: "1 / 1",
-          // width:
-          //   `calc(
-          //     ${props.theme.custom.sideImage.circleSize} -
-          //       ${props.theme.custom.sideImage.logoOffset}
-          //   )` || "32%",
+
           width: props.theme.custom.sideImage.logoSize,
           overflow: "visible",
+          inset: 0,
           objectFit: "cover",
           ...(props.theme.palette.mode === "dark" &&
             {
@@ -942,24 +1099,9 @@ const customBaseTheme = createTheme({
               // filter:
               //   "grayscale(1) sepia(1) saturate(5) hue-rotate(315deg) brightness(1)",
             }),
-          // "& img": {
-          //   position: "absolute",
-          //   inset: 0,
-          //   width: "100%",
-          //   height: "100%",
-          //   objectFit: "cover",
-          //   ...(props.theme.palette.mode === "dark" &&
-          //     {
-          //       // filter: "brightness(0.25) grayscale(1)",
-          //       // filter:
-          //       //   "grayscale(1) sepia(1) saturate(5) hue-rotate(315deg) brightness(1)",
-          //     }),
-          // },
         }),
         caption: (props: { theme: Theme }) => ({
           position: "absolute",
-          // top: `calc(50% + ((${props.theme.custom.sideImage.circleSize} - ${props.theme.custom.sideImage.logoOffset})/2))`, // adjust based on logo size
-          // top: `calc(50% + (${props.theme.custom.sideImage.logoSize} / 2) + ${props.theme.custom.sideImage.captionOffset})`,
           top: `calc(100% + ${props.theme.custom.sideImage.captionOffset.xs})`,
           left: "50%",
           transform: "translateX(-50%)",
@@ -968,11 +1110,8 @@ const customBaseTheme = createTheme({
           whiteSpace: "nowrap", // prevent wrapping
           overflow: "visible", // allow text to extend beyond logo box
           maxWidth: "none", // remove inherited width limit
-          // fontWeight: 500,
-          // color: props.theme.palette.text.primary,
           color: "#edad54",
           textAlign: "center",
-          // fontFamily: "sans-serif, Moul",
           fontSize: props.theme.custom.sideImage.captionFontSize.xs,
           textShadow: `
             -0.5px -0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
@@ -981,6 +1120,9 @@ const customBaseTheme = createTheme({
             0.5px  0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
             0    0   7px ${props.theme.custom.sideImage.captionGlowColor}
           `,
+          // "-webkit-text-stroke": `0.125px ${props.theme.custom.sideImage.captionOutlineColor}`,
+          WebkitTextStroke: `0.125px ${props.theme.custom.sideImage.captionOutlineColor}`,
+
           [props.theme.breakpoints.up("sm")]: {
             top: `calc(100% + ${props.theme.custom.sideImage.captionOffset.sm})`,
             fontSize: props.theme.custom.sideImage.captionFontSize.sm,
@@ -1002,9 +1144,55 @@ const customBaseTheme = createTheme({
           flexDirection: "column", // Arrange items vertically
           alignItems: "center", // Center items horizontally
           "& .MuiAvatar-root": {
+            "--avatar-size": "min(12vmin, 70px)", // responsive size
+            width: "var(--avatar-size)",
+            height: "var(--avatar-size)",
+
             marginBottom: props.theme.spacing(1),
-            backgroundColor: "#e72d32",
+            backgroundImage: `url('https://pub-ce3376330760464f8be1e4a3b46318c0.r2.dev/sea-planet-water-Earth-map-Arctic-193611-wallhere.com.jpg')`,
+            // backgroundColor: "#e72d32",
+            // background: "linear-gradient(135deg, #1e1e24 10%, #050505 60%)",
+            color: props.theme.palette.primary.main,
             position: "relative",
+
+            /*** Globe Animation ***/
+            zIndex: 5,
+            transition: "left 0.3s linear",
+            backgroundSize: "cover",
+            backgroundPosition: "left",
+            bottom: 0,
+            borderRadius: "50%",
+            animation: `${earthRotate} 90s linear infinite`,
+            // boxShadow: `
+            //   0px 0 20px rgba(255, 255, 255, 0.2),
+            //   -5px 0px 8px #c3f4ff inset,
+            //   15px 2px 25px #000 inset,
+            //   -24px -2px 34px #c3f4ff99 inset,
+            //   250px 0px 44px #00000066 inset,
+            //   150px 0px 38px #000000aa inset
+            // `,
+            // boxShadow: `0px 0 3px rgba(255,255,255,0.2),
+            //   -1px 0px 1px #c3f4ff inset,
+            //   2px 0px 4px #000 inset,
+            //   -4px 0px 5px #c3f4ff99 inset,
+            //   40px 0px 7px #00000066 inset,
+            //   24px 0px 6px #000000aa inset;`,
+            boxShadow: buildResponsiveShadow(),
+            //   "&::before": {
+            //     content: '""',
+            //     position: "absolute",
+            //     inset: 0,
+            //     borderRadius: "50%",
+            //     background: `
+            //   radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
+            //   radial-gradient(circle at 100% 0, #00a6ff, transparent),
+            //   radial-gradient(circle at 0 100%, #ff0056, transparent),
+            //   radial-gradient(circle at 100% 100%, #6500ff, transparent)
+            // `,
+            //     // zIndex: -1,
+            //     filter: "blur(100vmin)",
+            //     animation: `${blurPulse} 3s ease-in-out alternate infinite`,
+            //   },
           },
           "& svg": { fill: "#fff" },
         }),
@@ -1022,6 +1210,20 @@ const customBaseTheme = createTheme({
           display: "flex",
           flexDirection: "column",
           gap: props.theme.spacing(0),
+          // justifyContent: "center" /* Centers items horizontally */,
+          // alignItems: "center" /* Centers items vertically */,
+          input: {
+            // color: "#444", // default
+            // transition: "color 0.3s ease",
+            transition: props.theme.transitions.create("color", {
+              easing: props.theme.transitions.easing.easeInOut,
+              duration: props.theme.transitions.duration.short,
+            }),
+            "&:focus": {
+              // color: "#e1232e", // focused
+              color: props.theme.palette.primary.main, // focused
+            },
+          },
           // Apply custom styles to the last child element inside this container
           "& > :last-child": {
             // For example, you could add extra margin to the button
@@ -1032,6 +1234,7 @@ const customBaseTheme = createTheme({
         password: (props: { theme: Theme }) => ({
           display: "flex",
           flexDirection: "column",
+          width: "100%",
           gap: props.theme.spacing(0),
         }),
         footer: (props: { theme: Theme }) => ({
@@ -1040,6 +1243,7 @@ const customBaseTheme = createTheme({
           alignItems: "center",
           fontWeight: 500,
           marginTop: "-0.5rem",
+          width: "100%",
           gap: props.theme.spacing(0),
           // ["& a"]: {
           //   color: props.theme.palette.primary.main,
@@ -1057,6 +1261,13 @@ const customBaseTheme = createTheme({
           // mt: 1,
           // py: 1.5,
           fontWeight: 700,
+          // maxWidth: "100%",
+          // [props.theme.breakpoints.up("sm")]: {
+          //   maxWidth: "70%",
+          // },
+          // [props.theme.breakpoints.up("md")]: {
+          //   maxWidth: "50%",
+          // },
           ["& .MuiSvgIcon-root"]: { margin: props.theme.spacing(0.3) },
         }),
       },
@@ -1165,6 +1376,7 @@ const customBaseTheme = createTheme({
           textAlign: "center",
           marginTop: props.theme.spacing(1),
           color: props.theme.palette.text.secondary,
+          position: "relative",
           // fontSize: "0.75rem",
           // ["& .MuiBox-root"]: {
           //   display: "flex",
