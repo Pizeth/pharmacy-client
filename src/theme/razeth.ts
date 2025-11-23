@@ -16,7 +16,7 @@ import {
   makePulseSequence,
   makePulseVars,
   makeRadialStops,
-} from "@/utils/colorStop";
+} from "@/utils/colorUtils";
 // import "@fontsource/moul";
 import { getSideImageConfig } from "@/configs/themeConfig";
 

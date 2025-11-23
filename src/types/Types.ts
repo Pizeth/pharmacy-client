@@ -3,10 +3,11 @@
 import { ChangeEvent, ReactNode } from "react";
 import {
   LinearProgressProps,
-  PasswordInputProps,
+  // PasswordInputProps,
   Translate,
   ValidationErrorMessage,
 } from "react-admin";
+import { PasswordInputProps } from "./input";
 
 // export const DEFAULT_DEBOUNCE = import.meta.env.VITE_DELAY_CALL || 2500; // Time in milliseconds
 export const DEFAULT_DEBOUNCE = Number(process.env.DELAY_CALL) || 2500; // Time in milliseconds
