@@ -17,6 +17,7 @@ import {
   generateShootingStars,
   makePulseKeyframes,
   makePulseVars,
+  useResponsiveShootingStars,
 } from "@/utils/colorUtils";
 // import "@fontsource/moul";
 import { getSideImageConfig } from "@/configs/themeConfig";
@@ -31,7 +32,9 @@ import {
   drop,
   glowingStars,
   shootingStar,
+  moonRotate,
 } from "./keyframes";
+import { backdropClasses } from "@mui/material";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -564,22 +567,60 @@ const customBaseTheme = createTheme({
           zIndex: 0,
           "& .shooting-star": {
             position: "absolute",
-            top: "-5vh", // random vertical
+            // top: "-5vh", // random vertical
+            top: "50%",
+            left: "50%",
             // left: "100vw", // start off-screen right
-            rotate: "-45deg",
-            width: "5em",
-            height: "1px",
-            background: "linear-gradient(90deg, #fff, transparent)",
-            animation: `${shootingStar} 7s ease-in-out infinite`,
-            transition: "7s ease",
+            // rotate: "-45deg",
+            // width: "5em",
+            width: "3px",
+            height: "3px",
+            borderRadius: "50%",
+            boxShadow:
+              "0 0 0 4px rgba(255, 255, 255, 0.1), 0 0 0 8px rgba(255, 255, 255, 0.1), 0 0 20px rgba(255, 255, 255, 1)",
+            // background: "linear-gradient(90deg, #fff, transparent)",
+            background: "#fff",
+            animation: `${shootingStar} 7s linear infinite`,
+            animationFillMode: "backwards",
+            willChange: "transform, opacity",
+            offsetRotate: "auto" /* 👈 aligns with path direction */,
+            // transition: "1s ease",
             // animationDelay: `${Math.random() * 10}s`,
+            "::before": {
+              content: '""',
+              position: "absolute",
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: "10em",
+              height: "1px",
+              background: "linear-gradient(90deg, #fff, transparent)",
+            },
           },
           // dynamically inject nth-of-type rules
-          ...generateShootingStars(6).reduce((acc, star, i) => {
-            acc[`& .shooting-star:nth-of-type(${i + 1})`] = {
-              left: star.left,
+          ...useResponsiveShootingStars(
+            props.theme.custom.sideImage.shootingStarCount,
+            // props.theme.custom.sideImage.minAngle,
+            // props.theme.custom.sideImage.maxAngle,
+            props.theme.custom.sideImage.shootingStarInterval,
+            props.theme.custom.sideImage.curveFactor,
+            props.theme.custom.sideImage.trajectoryMix
+          ).reduce((acc, star, i) => {
+            // const path = `path("M ${star.right} ${star.top} Q ${
+            //   Math.random() * 100
+            // }vw ${Math.random() * 100}vh, -100vw ${Math.random() * 100}vh")`;
+            acc[
+              `& .${props.theme.custom.sideImage.shootingClass}:nth-of-type(${
+                i + 1
+              })`
+            ] = {
+              // top: star.top,
+              // right: star.right,
+              // left: "initial",
               // left: "100vw", // always start off-screen right
               animationDelay: star.delay,
+              animationDuration: star.duration,
+              // "--rot": star.rot, // per-star rotation variable
+              offsetPath: star.path, // 👈 px-based, regenerated on resize
             };
             return acc;
           }, {} as Record<string, unknown>),
@@ -629,10 +670,20 @@ const customBaseTheme = createTheme({
             height: "10em",
             borderRadius: "50%",
             // background: "#f9f9fb",
-            backgroundImage: `url('/static/images/full-moon.png')`,
+            backgroundImage: `url('/static/images/full-moon.svg')`,
+            // backgroundImage: `url('https://assets.science.nasa.gov/dynamicimage/assets/science/psd/lunar-science/2023/08/colormap_1500.jpg?w=1636&h=500&fit=clip&crop=faces%2Cfocalpoint')`,
+            backgroundRepeat: "no-repeat" /* Prevents image tiling */,
+            // backgroundPosition: "center" /* Centers the image */,
+            backgroundSize: "cover",
+            backgroundPosition: "left",
+            bottom: 0,
+            backgroundColor: "#f9f9fb",
+            backgroundBlendMode: "multiply",
             boxShadow:
               "0px 0px 100px rgba(193,119,241,0.8), 0px 0px 100px rgba(135,42,211,0.8), inset #9b40fc 0px 0px 40px -12px",
-            transition: "0.4s ease-in-out",
+            transition: "0.5s ease-in-out",
+            // transition: "left 0.3s linear",
+            // animation: `${moonRotate} 60s linear infinite`,
             zIndex: -1,
           },
           "&:hover::before": {
@@ -1158,7 +1209,7 @@ const customBaseTheme = createTheme({
 
             /*** Globe Animation ***/
             zIndex: 5,
-            transition: "left 0.3s linear",
+            transition: "left 0.5s linear",
             backgroundSize: "cover",
             backgroundPosition: "left",
             bottom: 0,

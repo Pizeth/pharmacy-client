@@ -221,12 +221,136 @@ export function createStarfield(
   // return { boxShadow: stars };
 }
 
-// utils/shootingStars.ts
-export function generateShootingStars(count: number) {
+function pickStyle(mix: { straight: number; shallow: number; deep: number }) {
+  const r = Math.random();
+  if (r < mix.straight) return "straight";
+  if (r < mix.straight + mix.shallow) return "shallow";
+  return "deep";
+}
+
+export function generateShootingStars(
+  count: number,
+  // minAngle: number = -20, // shallow
+  // maxAngle: number = -70, // steep
+  interval: number = 5, // seconds between streaks
+  curveFactor: number,
+  // trajectoryStyle: "straight" | "shallow" | "deep"
+  mix: { straight: number; shallow: number; deep: number }
+) {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
   return Array.from({ length: count }).map((_, i) => {
-    // const top = `${Math.random() * 100}vh`;
-    const left = `${Math.random() * 100}vw`; // start off-screen right
-    const delay = `${Math.random() * 10}s`;
-    return { left, delay };
+    // const top = `${Math.random() * 100}vh`; // random vertical position
+    // const right = `${Math.random() * 100}vw`; // start off-screen right
+    // const top = `${Math.random() * 100}%`;
+    // const right = `${Math.random() * 100}%`;
+    // const left = `${Math.random() * 100}vw`; // start off-screen right
+
+    const starDirection = Math.random() < 0.5 ? "left" : "right";
+
+    // const startX = Math.random() * width;
+    // // const startX = 0;
+    // const startY = Math.random() * height;
+    // const endX = -100; // off-screen left
+    // // const endX = width + 100; // off-screen left
+    // const endY = Math.random() * height;
+
+    const startX = starDirection === "left" ? width : 0;
+    const startY = Math.random() * height;
+    const endX = starDirection === "left" ? -100 : width + 100;
+    const endY = Math.random() * height;
+
+    const delay = `${Math.random() * interval}s`; // staggered by interval
+    const duration = `${2 + Math.random() * 5}s`; // 2s to 7s duration
+    // random angle between minAngle and maxAngle
+    // const rot = `${
+    //   minAngle - Math.random() * Math.abs(maxAngle - minAngle)
+    // }deg`;
+
+    const style = pickStyle(mix);
+
+    if (style === "straight") {
+      // straight line path
+      return {
+        // top,
+        // right,
+        delay,
+        duration,
+        // rot,
+        // path: `path("M ${right} ${top} L -100vw ${Math.random() * 100}vh")`,
+        path: `path("M ${startX} ${startY} L ${endX} ${endY}")`,
+      };
+    }
+
+    // const controlX = `${Math.random() * curveFactor}vw`;
+    const controlX = Math.random() * (curveFactor / 100) * width;
+    // pick control point based on style
+    const controlY =
+      style === "shallow"
+        ? Math.random() * (curveFactor / 200) * height
+        : Math.random() * (curveFactor / 50) * height;
+    // ? `${Math.random() * (curveFactor / 2)}vh`
+    // : `${Math.random() * (curveFactor * 2)}vh`;
+
+    // const color = colors[Math.floor(Math.random() * colors.length)];
+    // const glow = `
+    //   0 0 0 ${4 * glowIntensity}px ${color}20,
+    //   0 0 0 ${8 * glowIntensity}px ${color}20,
+    //   0 0 ${20 * glowIntensity}px ${color}
+    // `;
+
+    return {
+      // top,
+      // right,
+      delay,
+      duration,
+      // rot,
+      // path: `path("M ${right} ${top} Q ${controlX} ${controlY}, -100vw ${
+      //   Math.random() * 100
+      // }vh")`,
+      path: `path("M ${startX} ${startY} Q ${controlX} ${controlY}, ${endX} ${endY}")`,
+    };
   });
+}
+
+import { useEffect, useState } from "react";
+
+export function useResponsiveShootingStars(
+  count: number,
+  interval: number,
+  curveFactor: number,
+  mix: { straight: number; shallow: number; deep: number }
+  // colors: string[],
+  // glowIntensity: number
+) {
+  const [stars, setStars] = useState(() =>
+    generateShootingStars(
+      count,
+      interval,
+      curveFactor,
+      mix
+      // colors,
+      // glowIntensity
+    )
+  );
+
+  useEffect(() => {
+    function handleResize() {
+      setStars(
+        generateShootingStars(
+          count,
+          interval,
+          curveFactor,
+          mix
+          // colors,
+          // glowIntensity
+        )
+      );
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [count, interval, curveFactor, mix]);
+
+  return stars;
 }

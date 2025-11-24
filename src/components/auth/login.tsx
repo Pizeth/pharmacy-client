@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import { useCheckAuth } from "ra-core";
 import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
-import { styled, useThemeProps } from "@mui/material/styles";
+import { styled, useTheme, useThemeProps } from "@mui/material/styles";
 import PasswordLogin from "./passwordLogin";
 import SocialLogin from "./socialLogin";
 import SideImage from "./sideImage";
@@ -367,7 +367,7 @@ export const Login = (
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const checkAuth = useCheckAuth();
-  // const theme = useTheme();
+  const theme = useTheme();
   const navigate = useNavigate();
   useEffect(() => {
     checkAuth({}, false)
@@ -389,7 +389,10 @@ export const Login = (
       {...rest}
     >
       <Login.overlay>
-        <Login.effect count={25} className="shooting-star" />
+        <Login.effect
+          count={theme.custom.sideImage.shootingStarCount}
+          className={theme.custom.sideImage.shootingClass}
+        />
         <Login.image src={src} alt={alt} />
         <Login.content>
           <Login.card>

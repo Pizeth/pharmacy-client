@@ -1,3 +1,4 @@
+import { shootingStar } from "@/theme/keyframes";
 import { GradientPoint, GradientRow } from "@/types/theme";
 import { buildGradients, makePulseSequence } from "@/utils/colorUtils";
 
@@ -156,6 +157,32 @@ export function getSideImageConfig() {
     sm: "12px",
     md: "16px",
   });
+  const shootingStarCount = getEnvNumber(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_COUNT,
+    15
+  );
+  const shootingStarInterval = getEnvNumber(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_INTERVAL,
+    5
+  );
+  const shootingClass =
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_CLASS || "shooting-star";
+  const minAngle = getEnvNumber(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_MIN_ANGLE,
+    -20
+  );
+  const maxAngle = getEnvNumber(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_MAX_ANGLE,
+    -70
+  );
+  const curveFactor = getEnvNumber(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_CURVE_FACTOR,
+    0.5
+  );
+  const trajectoryMix = parseEnvJson(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_TRAJECTORY_MIX,
+    { straight: 0.3, shallow: 0.4, deep: 0.3 }
+  );
 
   return {
     circleSize,
@@ -179,5 +206,12 @@ export function getSideImageConfig() {
     captionShadowStrength,
     captionOffset,
     animationBackground: buildGradients(points, options),
+    shootingStarCount,
+    shootingStarInterval,
+    shootingClass,
+    minAngle,
+    maxAngle,
+    curveFactor,
+    trajectoryMix,
   };
 }

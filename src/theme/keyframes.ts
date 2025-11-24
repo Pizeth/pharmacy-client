@@ -171,7 +171,12 @@ export const steam = keyframes`
 
 export const earthRotate = keyframes`
   0% { background-position: 0 0; }
-  100% { background-position: 400px 0; }
+  100% { background-position: 300px 0; }
+`;
+
+export const moonRotate = keyframes`
+  0% { background-position: 0 0; }
+  100% { background-position: 700px 0; }
 `;
 
 export const move = keyframes`
@@ -188,11 +193,25 @@ export const move = keyframes`
 //   100% { opacity: 0; }
 // `;
 
+// export const shootingStar = keyframes`
+//   0% { transform: rotate(315deg) translateX(0) translateY(0); opacity: 1; }
+//   50% { transform: rotate(315deg) translateX(-55vw) translateY(0); opacity: 1; }
+//   70% { transform: rotate(315deg) translateX(-70vw) translateY(0); opacity: 0; }
+//   100% { transform: translateX(0) translateY(0); opacity: 0; }
+// `;
+
+// export const shootingStar = keyframes`
+//     0% { transform: rotate(var(--rot)) translateX(0) translateY(0); opacity: 0; }
+//     10% {transform: rotate(var(--rot)) translateX(0) translateY(0); opacity: 1; }
+//     70% { transform: rotate(var(--rot)) translateX(-100vw) translateY(0); opacity: 0; }
+//     100% { transform: rotate(var(--rot)) translateX(0) translateY(0); opacity: 0; }
+// `;
+
 export const shootingStar = keyframes`
-  0% { transform: translateX(0) translateY(0); opacity: 1; }
-  50% { transform: translateX(-55vw) translateY(0); opacity: 1; }
-  70% { transform: translateX(-70vw) translateY(0); opacity: 0; }
-  100% { transform: translateX(0) translateY(0); opacity: 0; }
+  0%   { opacity: 0; offset-distance: 0%; }
+  10%  { opacity: 1; offset-distance: 20%; }
+  70%  { opacity: 0; offset-distance: 100%; }
+  100% { opacity: 0; offset-distance: 100%; }
 `;
 
 export const glowingStars = keyframes`

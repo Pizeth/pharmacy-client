@@ -50,6 +50,17 @@ export interface SideImage {
     backgroundImage: string;
     backgroundSize: string;
   };
+  shootingStarCount: number;
+  shootingStarInterval: number;
+  shootingClass: string;
+  minAngle: number;
+  maxAngle: number;
+  curveFactor: number;
+  trajectoryMix: {
+    straight: number;
+    shallow: number;
+    deep: number;
+  };
 }
 
 export interface line {
