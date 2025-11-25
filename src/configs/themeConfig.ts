@@ -167,6 +167,19 @@ export function getSideImageConfig() {
   );
   const shootingClass =
     process.env.NEXT_PUBLIC_SHOOTING_STAR_CLASS || "shooting-star";
+  const starColors = parseEnvJson(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_COLORS,
+    ["#fff", "#9b40fc", "#4fc3f7", "#f06292", "#ff3300ff", "#40b809ff"]
+  );
+  console.log("Shooting star colors:", starColors);
+  const glowIntensity = getEnvNumber(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_GLOW_INTENSITY,
+    1
+  );
+  const baseSpeed = getEnvNumber(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_BASE_SPEED,
+    20
+  );
   const minAngle = getEnvNumber(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_MIN_ANGLE,
     -20
@@ -209,6 +222,9 @@ export function getSideImageConfig() {
     shootingStarCount,
     shootingStarInterval,
     shootingClass,
+    starColors,
+    glowIntensity,
+    baseSpeed,
     minAngle,
     maxAngle,
     curveFactor,

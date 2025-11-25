@@ -33,6 +33,8 @@ import {
   glowingStars,
   shootingStar,
   moonRotate,
+  shining,
+  tail,
 } from "./keyframes";
 import { backdropClasses } from "@mui/material";
 
@@ -528,7 +530,11 @@ const customBaseTheme = createTheme({
             opacity: 1,
             // boxShadow:
             //   "140px 20px #fff, 425px 20px #fff, 70px 120px #fff, 20px 130px #fff, 110px 80px #fff, 280px 80px #fff, 250px 350px #fff, 280px 230px #fff, 220px 190px #fff, 450px 100px #fff, 380px 80px #fff, 520px 50px #fff",
-            boxShadow: createStarfield(25), // random stars
+            boxShadow: createStarfield(
+              25,
+              props.theme.custom.sideImage.starColors,
+              props.theme.custom.sideImage.glowIntensity
+            ), // random stars
             transition: "1.5s ease",
             animation: `${glowingStars} 1s linear alternate infinite`,
             animationDelay: "0.4s",
@@ -548,13 +554,17 @@ const customBaseTheme = createTheme({
             // transition: "all 0.4s ease-in-out",
             zIndex: -1,
             /* */
-            width: "3px",
-            height: "3px",
+            width: "2px",
+            height: "2px",
             borderRadius: "50%",
             opacity: 1,
             // boxShadow:
             //   "490px 330px #fff, 420px 300px #fff, 320px 280px #fff, 380px 350px #fff, 546px 170px #fff, 420px 180px #fff, 370px 150px #fff, 200px 250px #fff, 80px 20px #fff, 190px 50px #fff, 270px 20px #fff, 120px 230px #fff, 350px -1px #fff, 150px 369px #fff",
-            boxShadow: createStarfield(25), // random stars
+            boxShadow: createStarfield(
+              25,
+              props.theme.custom.sideImage.starColors,
+              props.theme.custom.sideImage.glowIntensity
+            ), // random stars
             transition: "2s ease",
             animation: `${glowingStars} 1s linear alternate infinite`,
             animationDelay: "0.8s",
@@ -568,20 +578,25 @@ const customBaseTheme = createTheme({
           "& .shooting-star": {
             position: "absolute",
             // top: "-5vh", // random vertical
-            top: "50%",
-            left: "50%",
+            // top: "-50%",
+            // left: "15%",
             // left: "100vw", // start off-screen right
-            // rotate: "-45deg",
+            // rotate: "315deg",
             // width: "5em",
-            width: "3px",
-            height: "3px",
-            borderRadius: "50%",
-            boxShadow:
-              "0 0 0 4px rgba(255, 255, 255, 0.1), 0 0 0 8px rgba(255, 255, 255, 0.1), 0 0 20px rgba(255, 255, 255, 1)",
+            // width: "0.3vw",
+            height: "0.3vh",
+            // borderRadius: "50%",
+            borderRadius: "100%",
+            // boxShadow:
+            //   "0 0 0 4px rgba(255, 255, 255, 0.1), 0 0 0 8px rgba(255, 255, 255, 0.1), 0 0 20px rgba(255, 255, 255, 1)",
             // background: "linear-gradient(90deg, #fff, transparent)",
-            background: "#fff",
-            animation: `${shootingStar} 7s linear infinite`,
+            // background: "#fff",
+            // background: "linear-gradient(-45deg, #FFF, rgba(0, 0, 255, 0))",
+            filter: "drop-shadow(0 0 7px var(--head-color))",
+            animation: `${shootingStar} 7s linear infinite, ${tail} 7s linear infinite`,
+            // animation: `${tail} 7s ease-in-out infinite`,
             animationFillMode: "backwards",
+            // animationDirection: "reverse",
             willChange: "transform, opacity",
             offsetRotate: "auto" /* 👈 aligns with path direction */,
             // transition: "1s ease",
@@ -589,11 +604,34 @@ const customBaseTheme = createTheme({
             "::before": {
               content: '""',
               position: "absolute",
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: "10em",
-              height: "1px",
-              background: "linear-gradient(90deg, #fff, transparent)",
+              // top: "-50%",
+              right: 0,
+              // transform: "rotate(180deg) translateX(100%) translateY(-100%)",
+              // width: "10em",
+              height: "0.25vh",
+              // offsetRotate: "auto",
+              // background:
+              //   "linear-gradient(90deg, var(--head-color), transparent)",
+              background:
+                "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
+              borderRadius: "100%",
+              transform: "translateX(50%) rotateZ(45deg)",
+              animation: `${shining} 7s ease-in-out infinite`,
+              animationFillMode: "backwards",
+            },
+            "::after": {
+              content: '""',
+              position: "absolute",
+              // top: `calc(50%-1px)`,
+              right: 0,
+              height: "0.25vh",
+              background:
+                "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
+              borderRadius: "100%",
+              // transform: "translateX(50%) rotateZ(45deg)",
+              transform: "translateX(50%) rotateZ(-45deg)",
+              animation: `${shining} 7s ease-in-out infinite`,
+              animationFillMode: "backwards",
             },
           },
           // dynamically inject nth-of-type rules
@@ -603,7 +641,10 @@ const customBaseTheme = createTheme({
             // props.theme.custom.sideImage.maxAngle,
             props.theme.custom.sideImage.shootingStarInterval,
             props.theme.custom.sideImage.curveFactor,
-            props.theme.custom.sideImage.trajectoryMix
+            props.theme.custom.sideImage.trajectoryMix,
+            props.theme.custom.sideImage.starColors,
+            props.theme.custom.sideImage.glowIntensity,
+            props.theme.custom.sideImage.baseSpeed
           ).reduce((acc, star, i) => {
             // const path = `path("M ${star.right} ${star.top} Q ${
             //   Math.random() * 100
@@ -619,13 +660,65 @@ const customBaseTheme = createTheme({
               // left: "100vw", // always start off-screen right
               animationDelay: star.delay,
               animationDuration: star.duration,
+              animationFillMode: "forwards",
               // "--rot": star.rot, // per-star rotation variable
               offsetPath: star.path, // 👈 px-based, regenerated on resize
+              // background: star.color,
+              background: `linear-gradient(-45deg, ${star.color}, rgba(0, 0, 255, 0))`,
+              "--head-color": star.color,
+              "--trail-path": star.path,
+              boxShadow: star.glow,
             };
             return acc;
           }, {} as Record<string, unknown>),
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "1px",
+            height: "1px",
+            borderRadius: "50%",
+            opacity: 1,
+            inset: 0,
+            // boxShadow:
+            //   "220px 118px #fff, 280px 176px #fff, 40px 50px #fff, 60px 180px #fff, 120px 130px #fff, 180px 176px #fff, 220px 290px #fff, 520px 250px #fff, 400px 220px #fff, 50px 350px #fff, 10px 230px #fff",
+            boxShadow: createStarfield(
+              15,
+              props.theme.custom.sideImage.starColors,
+              props.theme.custom.sideImage.glowIntensity
+            ), // random stars
+            zIndex: -1,
+            transition: "1s ease",
+            animation: `${glowingStars} 1s linear alternate infinite`,
+            // animation: `${twinkle} 1.5s linear alternate infinite`,
+            animationDelay: "0s",
+          },
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "1px",
+            height: "1px",
+            borderRadius: "50%",
+            opacity: 1,
+            inset: 0,
+            // boxShadow:
+            //   "220px 118px #fff, 280px 176px #fff, 40px 50px #fff, 60px 180px #fff, 120px 130px #fff, 180px 176px #fff, 220px 290px #fff, 520px 250px #fff, 400px 220px #fff, 50px 350px #fff, 10px 230px #fff",
+            boxShadow: createStarfield(
+              15,
+              props.theme.custom.sideImage.starColors,
+              props.theme.custom.sideImage.glowIntensity
+            ), // random stars
+            zIndex: -1,
+            transition: "2.5s ease",
+            animation: `${glowingStars} 1s linear alternate infinite`,
+            // animation: `${twinkle} 1.5s linear alternate infinite`,
+            animationDelay: "1.2s",
+          },
         }),
-        image: {
+        image: (props: { theme: Theme }) => ({
           position: "absolute",
           width: "5em",
           height: "5em",
@@ -640,25 +733,29 @@ const customBaseTheme = createTheme({
           "&:active": {
             cursor: "grabbing",
           },
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "3px",
-            height: "3px",
-            borderRadius: "50%",
-            opacity: 1,
-            inset: 0,
-            // boxShadow:
-            //   "220px 118px #fff, 280px 176px #fff, 40px 50px #fff, 60px 180px #fff, 120px 130px #fff, 180px 176px #fff, 220px 290px #fff, 520px 250px #fff, 400px 220px #fff, 50px 350px #fff, 10px 230px #fff",
-            // boxShadow: createStarfield(25), // random stars
-            // zIndex: -1,
-            transition: "1s ease",
-            animation: `${glowingStars} 1s linear alternate infinite`,
-            // animation: `${twinkle} 1.5s linear alternate infinite`,
-            animationDelay: "0s",
-          },
+          // "&::before": {
+          //   content: '""',
+          //   position: "absolute",
+          //   top: 0,
+          //   left: 0,
+          //   width: "1px",
+          //   height: "1px",
+          //   borderRadius: "50%",
+          //   opacity: 1,
+          //   inset: 0,
+          //   // boxShadow:
+          //   //   "220px 118px #fff, 280px 176px #fff, 40px 50px #fff, 60px 180px #fff, 120px 130px #fff, 180px 176px #fff, 220px 290px #fff, 520px 250px #fff, 400px 220px #fff, 50px 350px #fff, 10px 230px #fff",
+          //   boxShadow: createStarfield(
+          //     25,
+          //     props.theme.custom.sideImage.starColors,
+          //     props.theme.custom.sideImage.glowIntensity
+          //   ), // random stars
+          //   // zIndex: -1,
+          //   transition: "1s ease",
+          //   animation: `${glowingStars} 1s linear alternate infinite`,
+          //   // animation: `${twinkle} 1.5s linear alternate infinite`,
+          //   animationDelay: "0s",
+          // },
           "&::after": {
             content: '""',
             position: "fixed",
@@ -693,7 +790,7 @@ const customBaseTheme = createTheme({
             boxShadow:
               "0px 0px 200px rgba(193,119,241,1), 0px 0px 200px rgba(135,42,211,1), inset #9b40fc 0px 0px 40px -12px",
           },
-        },
+        }),
         icon: {
           // postion: "fixed",
           display: "flex",

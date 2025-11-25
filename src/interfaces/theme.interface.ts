@@ -53,6 +53,9 @@ export interface SideImage {
   shootingStarCount: number;
   shootingStarInterval: number;
   shootingClass: string;
+  starColors: string[];
+  glowIntensity: number;
+  baseSpeed: number;
   minAngle: number;
   maxAngle: number;
   curveFactor: number;

@@ -207,6 +207,22 @@ export const move = keyframes`
 //     100% { transform: rotate(var(--rot)) translateX(0) translateY(0); opacity: 0; }
 // `;
 
+export const tail = keyframes`   
+  0% {width: 0; }
+  30% { width: 15vw; }
+  100% {width: 0; }
+`;
+
+// @keyframes falling {
+//     0% {
+//         transform: translateX(0);
+//     }
+
+//     100% {
+//         transform: translateX(300px);
+//     }
+// }
+
 export const shootingStar = keyframes`
   0%   { opacity: 0; offset-distance: 0%; }
   10%  { opacity: 1; offset-distance: 20%; }
@@ -225,3 +241,8 @@ export const glowingStars = keyframes`
   87.5% { opacity: 0.25; }
   100% { opacity: 0; }
 `;
+
+export const shining = keyframes`    
+  0% { width: 0; }
+  50% { width: 3vw; }
+  100% { width: 0; }`;
