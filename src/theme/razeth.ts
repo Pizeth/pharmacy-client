@@ -32,9 +32,11 @@ import {
   drop,
   glowingStars,
   shootingStar,
-  moonRotate,
+  cloudMove,
   shining,
   tail,
+  moveBackgroundLeft,
+  moveBackgroundRight,
 } from "./keyframes";
 import { backdropClasses } from "@mui/material";
 
@@ -404,7 +406,7 @@ const customBaseTheme = createTheme({
     // info: { main: "#f89696", dark: "#cc56e4" },
     // success: { main: "#2ece71", dark: "#079e0f" },
     mode: "dark",
-    background: { default: "#121212", paper: "#1d1d1d" },
+    background: { default: "#121212", paper: "#1d1d1dbf" },
     text: { primary: "#ffffff", secondary: "#aaaaaa" },
     // passwordStrength: ["#f44336", "#ff9900", "#ffeb3b", "#4caf50", "#2e7d32"],
     passwordStrength: ["#aaaaaa", "#e76f51", "#f58700", "#0668d1", "#4caf50"],
@@ -435,7 +437,7 @@ const customBaseTheme = createTheme({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: props.theme.spacing(2),
+          // padding: props.theme.spacing(2),
           backgroundColor:
             props.theme.palette.mode === "dark"
               ? props.theme.palette.grey[900]
@@ -570,6 +572,71 @@ const customBaseTheme = createTheme({
             animationDelay: "0.8s",
           },
         }),
+        ambient: {
+          position: "absolute",
+          inset: 0,
+          overflow: "hidden",
+          // top: 0,
+          // bottom: 0,
+          // right: 0,
+          // background:
+          //   "url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png) repeat",
+          background: `transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/clouds_repeat.png") repeat`,
+          backgroundSize: "contain",
+          animation: `${cloudMove} 150s linear infinite`,
+          "::before": {
+            content: '""',
+            position: "absolute",
+            inset: 0,
+            // background: `transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/clouds_repeat.png") repeat`,
+            background:
+              "url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png) repeat",
+            backgroundSize: "contain",
+            animation: `${moveBackgroundLeft} 500s linear infinite`,
+          },
+          // "::after": {
+          //   content: '""',
+          //   position: "absolute",
+          //   inset: 0,
+          //   background:
+          //     "url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png) repeat",
+          //   backgroundSize: "contain",
+          //   animation: `${moveBackgroundRight} 100s linear infinite`,
+          // },
+          // "&.MuiBox-root .stars": {
+          //   background: `url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png) repeat`,
+          //   position: "absolute",
+          //   top: 0,
+          //   bottom: 0,
+          //   left: 0,
+          //   right: 0,
+          //   display: "block",
+          //   // zIndex: 0,
+          // },
+          // "&.MuiBox-root .twinkling": {
+          //   width: "10000px",
+          //   height: "100%",
+          //   background: `transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/twinkling.png") repeat`,
+          //   position: "absolute",
+          //   right: 0,
+          //   top: 0,
+          //   bottom: 0,
+          //   zIndex: 2,
+          //   animation: `${moveBackgroundRight} 300s linear infinite`,
+          // },
+          // "&.MuiBox-root .clouds": {
+          //   width: "10000px",
+          //   height: "100%",
+          //   background: `transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/clouds_repeat.png") repeat`,
+          //   backgroundSize: "contain",
+          //   position: "absolute",
+          //   right: 0,
+          //   top: 0,
+          //   bottom: 0,
+          //   // zIndex: 3,
+          //   animation: `${moveBackground} 150s linear infinite`,
+          // },
+        },
         effect: (props: { theme: Theme }) => ({
           position: "absolute",
           inset: 0,
@@ -586,14 +653,14 @@ const customBaseTheme = createTheme({
             // width: "0.3vw",
             height: "0.3vh",
             // borderRadius: "50%",
-            borderRadius: "100%",
+            // borderRadius: "100%",
             // boxShadow:
             //   "0 0 0 4px rgba(255, 255, 255, 0.1), 0 0 0 8px rgba(255, 255, 255, 0.1), 0 0 20px rgba(255, 255, 255, 1)",
             // background: "linear-gradient(90deg, #fff, transparent)",
             // background: "#fff",
             // background: "linear-gradient(-45deg, #FFF, rgba(0, 0, 255, 0))",
             filter: "drop-shadow(0 0 7px var(--head-color))",
-            animation: `${shootingStar} 7s linear infinite, ${tail} 7s linear infinite`,
+            animation: `${shootingStar} var(--glow-duration) linear infinite, ${tail} var(--glow-duration) linear infinite`,
             // animation: `${tail} 7s ease-in-out infinite`,
             animationFillMode: "backwards",
             // animationDirection: "reverse",
@@ -605,10 +672,11 @@ const customBaseTheme = createTheme({
               content: '""',
               position: "absolute",
               // top: "-50%",
+              top: `calc(50% - 0.15vh)`,
               right: 0,
               // transform: "rotate(180deg) translateX(100%) translateY(-100%)",
               // width: "10em",
-              height: "0.25vh",
+              height: "0.3vh",
               // offsetRotate: "auto",
               // background:
               //   "linear-gradient(90deg, var(--head-color), transparent)",
@@ -616,21 +684,21 @@ const customBaseTheme = createTheme({
                 "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
               borderRadius: "100%",
               transform: "translateX(50%) rotateZ(45deg)",
-              animation: `${shining} 7s ease-in-out infinite`,
+              animation: `${shining} 5s ease-in-out infinite`,
               animationFillMode: "backwards",
             },
             "::after": {
               content: '""',
               position: "absolute",
-              // top: `calc(50%-1px)`,
+              top: `calc(50% - 0.15vh)`,
               right: 0,
-              height: "0.25vh",
+              height: "0.3vh",
               background:
                 "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
               borderRadius: "100%",
               // transform: "translateX(50%) rotateZ(45deg)",
               transform: "translateX(50%) rotateZ(-45deg)",
-              animation: `${shining} 7s ease-in-out infinite`,
+              animation: `${shining} 5s ease-in-out infinite`,
               animationFillMode: "backwards",
             },
           },
@@ -646,6 +714,7 @@ const customBaseTheme = createTheme({
             props.theme.custom.sideImage.glowIntensity,
             props.theme.custom.sideImage.baseSpeed
           ).reduce((acc, star, i) => {
+            // console.log(`Generating star style for star(${i}):`, star.duration);
             // const path = `path("M ${star.right} ${star.top} Q ${
             //   Math.random() * 100
             // }vw ${Math.random() * 100}vh, -100vw ${Math.random() * 100}vh")`;
@@ -667,6 +736,7 @@ const customBaseTheme = createTheme({
               background: `linear-gradient(-45deg, ${star.color}, rgba(0, 0, 255, 0))`,
               "--head-color": star.color,
               "--trail-path": star.path,
+              "--glow-duration": star.duration,
               boxShadow: star.glow,
             };
             return acc;
@@ -929,6 +999,7 @@ const customBaseTheme = createTheme({
             repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px)
           `,
           backgroundSize: "8px 8px, 32px 32px, 32px 32px",
+          backgroundColor: props.theme.palette.background.paper,
 
           /*** Gradient Glow Effect ***/
           // display: "flex",

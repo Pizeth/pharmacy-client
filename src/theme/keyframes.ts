@@ -174,9 +174,24 @@ export const earthRotate = keyframes`
   100% { background-position: 300px 0; }
 `;
 
-export const moonRotate = keyframes`
+export const cloudMove = keyframes`
   0% { background-position: 0 0; }
-  100% { background-position: 700px 0; }
+  100% { background-position: 100% 0; }
+`;
+
+// export const moveBackground = keyframes`
+//   from { transform: translate3d(0px, 0px, 0px); }
+//   to   { transform: translate3d(1000px, 0px, 0px); }
+// `;
+
+export const moveBackgroundLeft = keyframes`
+  0% { background-position: 0 0; }
+  100% { background-position: -100% 0; }
+`;
+
+export const moveBackgroundRight = keyframes`
+  0% { background-position: 0 0; }
+  100% { background-position: 100% 0; }
 `;
 
 export const move = keyframes`
@@ -226,13 +241,13 @@ export const tail = keyframes`
 export const shootingStar = keyframes`
   0%   { opacity: 0; offset-distance: 0%; }
   10%  { opacity: 1; offset-distance: 20%; }
-  70%  { opacity: 0; offset-distance: 100%; }
+  75%  { opacity: 0; offset-distance: 100%; }
   100% { opacity: 0; offset-distance: 100%; }
 `;
 
 export const glowingStars = keyframes`
   0% { opacity: 0; }
-  12.5% { opacity: 0.25; }
+  12.5% { opacity: }
   25% { opacity: 0.5; }
   37.5% { opacity: 0.75; }
   50% { opacity: 1; }
@@ -244,5 +259,6 @@ export const glowingStars = keyframes`
 
 export const shining = keyframes`    
   0% { width: 0; }
-  50% { width: 3vw; }
-  100% { width: 0; }`;
+  50% { width: 1.5vw; }
+  100% { width: 0; }
+`;

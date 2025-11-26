@@ -171,7 +171,7 @@ export function getSideImageConfig() {
     process.env.NEXT_PUBLIC_SHOOTING_STAR_COLORS,
     ["#fff", "#9b40fc", "#4fc3f7", "#f06292", "#ff3300ff", "#40b809ff"]
   );
-  console.log("Shooting star colors:", starColors);
+  // console.log("Shooting star colors:", starColors);
   const glowIntensity = getEnvNumber(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_GLOW_INTENSITY,
     1

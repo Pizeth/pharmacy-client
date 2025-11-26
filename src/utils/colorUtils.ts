@@ -196,8 +196,17 @@ export function createStarfield(
       const glow = `
         ${x}vw ${y}vh 0 ${1 * glowIntensity}px ${color}BF,
         ${x}vw ${y}vh 0 ${2 * glowIntensity}px ${color}10,
-        ${x}vw ${y}vh ${3 * glowIntensity}px ${color}BF
+        ${x}vw ${y}vh ${1 * glowIntensity}px ${color}BF
       `;
+
+      // const glow = `
+      //   ${x}vw ${y}vh 0 ${glowIntensity}px ${color}10,
+      //   ${x}vw calc(${y}vh - 8px) 6px -2px ${color}10,
+      //   ${x}vw calc(${y}vh + 8px) 6px -2px ${color}10,
+      //   calc(${x}vw - 8px) ${y}vh 6px -2px ${color}10,
+      //   calc(${x}vw + 8px) ${y}vh 6px -2px ${color}10,
+      //   ${x}vw ${y}vh 0 1px ${color}99
+      // `;
       // console.log("Star glow:", glow);
       return glow;
     })
@@ -290,10 +299,19 @@ export function generateShootingStars(
     // // const endX = width + 100; // off-screen left
     // const endY = Math.random() * height;
 
-    const startX = starDirection === "left" ? width : 0;
+    const startX =
+      starDirection === "left"
+        ? width / 2 + (Math.random() * width) / 2
+        : width / 2 - (Math.random() * width) / 2;
     const startY = Math.random() * height;
     const endX = starDirection === "left" ? -100 : width + 100;
     const endY = Math.random() * height;
+
+    console.log(
+      `Star ${i} Directtion: ${starDirection} - From (${startX.toFixed(
+        2
+      )}, ${startY.toFixed(2)}) to (${endX.toFixed(2)}, ${endY.toFixed(2)})`
+    );
 
     // const delay = `${i * interval}s`; // staggered by interval
     // const duration = `${3 + Math.random() * 10}s`; // 3s to 10s duration
@@ -336,16 +354,23 @@ export function generateShootingStars(
     // const baseSpeed = 20; // % per second (normalized)
     const duration = `${(len / (len * baseSpeed)).toFixed(2)}s`;
     // const duration = `${(len / 50).toFixed(2)}s`;
-    const delay = `${(interval / i + Math.random() * i * interval).toFixed(
-      2
-    )}s`; // staggered by interval
+    const delay = `${(i === 0
+      ? Math.floor(Math.random() * interval)
+      : Math.random() + interval + i + (i / interval) * interval
+    ).toFixed(2)}s`; // staggered by interval
+
+    console.log(
+      `Star ${i} - Style: ${style}, Length: ${len.toFixed(
+        2
+      )}, Duration: ${duration}, Delay: ${delay}`
+    );
 
     // console.log("colors:", colors);
     const color = colors[Math.floor(Math.random() * colors.length)];
     const glow = `
-      0 0 0 ${1 * glowIntensity}px ${color}10,
+      0 0 0 ${1 * glowIntensity}px ${color}00,
       0 0 0 ${2 * glowIntensity}px ${color}10,
-      0 0 ${3 * glowIntensity}px ${color}10
+      0 0 ${1 * glowIntensity}px ${color}10
     `;
 
     return {

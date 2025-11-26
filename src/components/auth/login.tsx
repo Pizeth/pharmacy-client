@@ -265,6 +265,12 @@ const Overlay = styled(Box, {
   overridesResolver: (_props, styles) => styles.overlay,
 })(() => ({}));
 
+const Ambient = styled(Box, {
+  name: PREFIX,
+  slot: "Ambient",
+  overridesResolver: (_props, styles) => styles.ambient,
+})(() => ({}));
+
 const Effect = styled(Box, {
   name: PREFIX,
   slot: "Effect",
@@ -389,6 +395,7 @@ export const Login = (
       {...rest}
     >
       <Login.overlay>
+        <Login.ambient />
         <Login.effect
           count={theme.custom.sideImage.shootingStarCount}
           className={theme.custom.sideImage.shootingClass}
@@ -435,6 +442,13 @@ export const Login = (
 };
 
 Login.overlay = Overlay;
+Login.ambient = () => (
+  <Ambient>
+    <Box className="stars" />
+    <Box className="twinkling" />
+    <Box className="clouds" />
+  </Ambient>
+);
 Login.image = ({ src, alt }: { src: string; alt: string }) => (
   <Astronaut>
     <Image src={src} alt={alt} fill style={{ objectFit: "contain" }} priority />

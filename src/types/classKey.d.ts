@@ -5,6 +5,7 @@ import { ComponentsOverrides, Theme } from "@mui/material";
 export type ClassKey =
   | "root"
   | "overlay"
+  | "ambient"
   | "effect"
   | "heading"
   | "content"
