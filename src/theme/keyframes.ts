@@ -247,7 +247,7 @@ export const shootingStar = keyframes`
 
 export const glowingStars = keyframes`
   0% { opacity: 0; }
-  12.5% { opacity: }
+  12.5% { opacity: 0.25;}
   25% { opacity: 0.5; }
   37.5% { opacity: 0.75; }
   50% { opacity: 1; }
@@ -262,3 +262,39 @@ export const shining = keyframes`
   50% { width: 1.5vw; }
   100% { width: 0; }
 `;
+
+export const twinkling = keyframes`    
+  0% { opacity: width: 0; }
+  12.5%{ opacity: 0.4; width: 0.25vw; }
+  25% { opacity: 0.6; width: 0.5vw; }
+  37.5%{ opacity: 0.8; width: 0.75vw; }
+  50% { opacity: 1; width: 1vw; }
+  62.5%{ opacity: 0.8; width: 0.75vw; }
+  75% { opacity: 0.6; width: 0.5vw; }
+  87.5%{ opacity: 0.4; width: 0.25vw; }
+  100% { opacity: 0.2; width: 0; }
+`;
+
+export const twinkle = keyframes`
+  0% { opacity: 0; --ray: 0vw; --core: 0.1vw; --halo: 0.125vw; }
+  12.5% { opacity: 0.25; --ray: 0.3vw; --core: 0.125vw; --halo: 0.25vw; }
+  25% { opacity: 0.5; --ray: 0.75vw; --core: 0.15vw; --halo: 0.5vw; }
+  37.5% { opacity: 0.75; --ray: 1vw; --core: 0.175vw; --halo: 0.75vw; }
+  50% { opacity: 1; --ray: 1.25vw; --core: 0.20vw; --halo: 1vw; }
+  62.5% { opacity: 0.75; --ray: 1vw; --core: 0.175vw; --halo: 0.75vw;}
+  75% { opacity: 0.5; --ray: 0.75vw; --core: 0.15vw; --halo: 0.5vw; }
+  87.5% { opacity: 0.25; --ray: 0.3vw; --core: 0.125vw; --halo: 0.25vw; }
+  100% { opacity: 0; --ray: 0vw; --core: 0.1vw; --halo: 0.5vw; }
+`;
+
+// export const twinkle = keyframes`
+//   0% { opacity: 0.2; --ray: 0.2vw; --core: 0.10vw; --halo: 0.1vw; }
+//   12.5%{ opacity: 0.4; --ray: 0.3vw; --core: 0.11vw; --halo: 0.2vw; }
+//   25% { opacity: 0.6; --ray: 0.4vw; --core: 0.12vw; --halo: 0.3vw; }
+//   37.5%{ opacity: 0.8; --ray: 0.5vw; --core: 0.13vw; --halo: 0.4vw; }
+//   50% { opacity: 1; --ray: 0.6vw; --core: 0.14vw; --halo: 0.5vw; }
+//   62.5%{ opacity: 0.8; --ray: 0.5vw; --core: 0.13vw; --halo: 0.4vw; }
+//   75% { opacity: 0.6; --ray: 0.4vw; --core: 0.12vw; --halo: 0.3vw; }
+//   87.5%{ opacity: 0.4; --ray: 0.3vw; --core: 0.11vw; --halo: 0.2vw; }
+//   100% { opacity: 0.2; --ray: 0.2vw; --core: 0.10vw; --halo: 0.1vw; }
+// `;

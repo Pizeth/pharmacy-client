@@ -99,7 +99,117 @@
         -ms-animation: move-background 150s linear infinite;
         -o-animation: move-background 150s linear infinite;
         -webkit-animation: move-background 150s linear infinite;
-        animation: move-background 5s linear infinite;
+        animation: move-background 150s linear infinite;
+      }
+
+      .overlay {
+        --ray: 1vw;
+        --core: 12vw;
+        --halo: 5vw;
+        --blurRay: 3vw;
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-radius: 50%;
+        opacity: 1;
+        inset: 0;
+        box-shadow: 54.3vw 6.48vh 0 var(--core) #ee82eee6,
+          54.3vw calc(6.48vh - var(--ray)) var(--blurRay) 0 #ee82eee6,
+          54.3vw calc(6.48h + var(--ray)) var(--blurRay) 0 #ee82eee6,
+          calc(54.3vw - var(--ray)) 6.48vh var(--blurRay) 0 #ee82eee6,
+          calc(54.3vw + var(--ray)) 6.48vh var(--blurRay) 0 #ee82eee6,
+          54.3vw 6.48vh var(--halo) 0 #ee82ee80,
+          62.24vw 13.68vh 0 var(--core) #79c314e6,
+          62.24vw calc(13.68vh - var(--ray)) var(--blurRay) 0 #79c314e6,
+          62.24vw calc(13.68h + var(--ray)) var(--blurRay) 0 #79c314e6,
+          calc(62.24vw - var(--ray)) 13.68vh var(--blurRay) 0 #79c314e6,
+          calc(62.24vw + var(--ray)) 13.68vh var(--blurRay) 0 #79c314e6,
+          62.24vw 13.68vh var(--halo) 0 #79c31480,
+          13.73vw 29.45vh 0 var(--core) #fef44de6,
+          13.73vw calc(29.45vh - var(--ray)) var(--blurRay) 0 #fef44de6,
+          13.73vw calc(29.45h + var(--ray)) var(--blurRay) 0 #fef44de6,
+          calc(13.73vw - var(--ray)) 29.45vh var(--blurRay) 0 #fef44de6,
+          calc(13.73vw + var(--ray)) 29.45vh var(--blurRay) 0 #fef44de6,
+          13.73vw 29.45vh var(--halo) 0 #fef44d80,
+          18.98vw 9.55vh 0 var(--core) #8e58c1e6,
+          18.98vw calc(9.55vh - var(--ray)) var(--blurRay) 0 #8e58c1e6,
+          18.98vw calc(9.55h + var(--ray)) var(--blurRay) 0 #8e58c1e6,
+          calc(18.98vw - var(--ray)) 9.55vh var(--blurRay) 0 #8e58c1e6,
+          calc(18.98vw + var(--ray)) 9.55vh var(--blurRay) 0 #8e58c1e6,
+          18.98vw 9.55vh var(--halo) 0 #8e58c180,
+          30.41vw 14.53vh 0 var(--core) #4fc3f7e6,
+          30.41vw calc(14.53vh - var(--ray)) var(--blurRay) 0 #4fc3f7e6,
+          30.41vw calc(14.53h + var(--ray)) var(--blurRay) 0 #4fc3f7e6,
+          calc(30.41vw - var(--ray)) 14.53vh var(--blurRay) 0 #4fc3f7e6,
+          calc(30.41vw + var(--ray)) 14.53vh var(--blurRay) 0 #4fc3f7e6,
+          30.41vw 14.53vh var(--halo) 0 #4fc3f780,
+          99.9vw 45.12vh 0 var(--core) #ba7ddbe6,
+          99.9vw calc(45.12vh - var(--ray)) var(--blurRay) 0 #ba7ddbe6,
+          99.9vw calc(45.12h + var(--ray)) var(--blurRay) 0 #ba7ddbe6,
+          calc(99.9vw - var(--ray)) 45.12vh var(--blurRay) 0 #ba7ddbe6,
+          calc(99.9vw + var(--ray)) 45.12vh var(--blurRay) 0 #ba7ddbe6,
+          99.9vw 45.12vh var(--halo) 0 #ba7ddb80,
+          38.46vw 72.16vh 0 var(--core) #6365cfe6,
+          38.46vw calc(72.16vh - var(--ray)) var(--blurRay) 0 #6365cfe6,
+          38.46vw calc(72.16h + var(--ray)) var(--blurRay) 0 #6365cfe6,
+          calc(38.46vw - var(--ray)) 72.16vh var(--blurRay) 0 #6365cfe6,
+          calc(38.46vw + var(--ray)) 72.16vh var(--blurRay) 0 #6365cfe6,
+          38.46vw 72.16vh var(--halo) 0 #6365cf80,
+          19.33vw 57.8vh 0 var(--core) #faeb36e6,
+          19.33vw calc(57.8vh - var(--ray)) var(--blurRay) 0 #faeb36e6,
+          19.33vw calc(57.8h + var(--ray)) var(--blurRay) 0 #faeb36e6,
+          calc(19.33vw - var(--ray)) 57.8vh var(--blurRay) 0 #faeb36e6,
+          calc(19.33vw + var(--ray)) 57.8vh var(--blurRay) 0 #faeb36e6,
+          19.33vw 57.8vh var(--halo) 0 #faeb3680,
+          58.98vw 17.98vh 0 var(--core) #4b0082e6,
+          58.98vw calc(17.98vh - var(--ray)) var(--blurRay) 0 #4b0082e6,
+          58.98vw calc(17.98h + var(--ray)) var(--blurRay) 0 #4b0082e6,
+          calc(58.98vw - var(--ray)) 17.98vh var(--blurRay) 0 #4b0082e6,
+          calc(58.98vw + var(--ray)) 17.98vh var(--blurRay) 0 #4b0082e6,
+          58.98vw 17.98vh var(--halo) 0 #4b008280,
+          50.17vw 10.6vh 0 var(--core) #ffffffe6,
+          50.17vw calc(10.6vh - var(--ray)) var(--blurRay) 0 #ffffffe6,
+          50.17vw calc(10.6h + var(--ray)) var(--blurRay) 0 #ffffffe6,
+          calc(50.17vw - var(--ray)) 10.6vh var(--blurRay) 0 #ffffffe6,
+          calc(50.17vw + var(--ray)) 10.6vh var(--blurRay) 0 #ffffffe6,
+          50.17vw 10.6vh var(--halo) 0 #ffffff80,
+          98.53vw 30.24vh 0 var(--core) #ffff00e6,
+          98.53vw calc(30.24vh - var(--ray)) var(--blurRay) 0 #ffff00e6,
+          98.53vw calc(30.24h + var(--ray)) var(--blurRay) 0 #ffff00e6,
+          calc(98.53vw - var(--ray)) 30.24vh var(--blurRay) 0 #ffff00e6,
+          calc(98.53vw + var(--ray)) 30.24vh var(--blurRay) 0 #ffff00e6,
+          98.53vw 30.24vh var(--halo) 0 #ffff0080,
+          84.6vw 21.93vh 0 var(--core) #faeb36e6,
+          84.6vw calc(21.93vh - var(--ray)) var(--blurRay) 0 #faeb36e6,
+          84.6vw calc(21.93h + var(--ray)) var(--blurRay) 0 #faeb36e6,
+          calc(84.6vw - var(--ray)) 21.93vh var(--blurRay) 0 #faeb36e6,
+          calc(84.6vw + var(--ray)) 21.93vh var(--blurRay) 0 #faeb36e6,
+          84.6vw 21.93vh var(--halo) 0 #faeb3680,
+          13.33vw 90.35vh 0 var(--core) #8e58c1e6,
+          13.33vw calc(90.35vh - var(--ray)) var(--blurRay) 0 #8e58c1e6,
+          13.33vw calc(90.35h + var(--ray)) var(--blurRay) 0 #8e58c1e6,
+          calc(13.33vw - var(--ray)) 90.35vh var(--blurRay) 0 #8e58c1e6,
+          calc(13.33vw + var(--ray)) 90.35vh var(--blurRay) 0 #8e58c1e6,
+          13.33vw 90.35vh var(--halo) 0 #8e58c180,
+          46.58vw 95.98vh 0 var(--core) #79c314e6,
+          46.58vw calc(95.98vh - var(--ray)) var(--blurRay) 0 #79c314e6,
+          46.58vw calc(95.98h + var(--ray)) var(--blurRay) 0 #79c314e6,
+          calc(46.58vw - var(--ray)) 95.98vh var(--blurRay) 0 #79c314e6,
+          calc(46.58vw + var(--ray)) 95.98vh var(--blurRay) 0 #79c314e6,
+          46.58vw 95.98vh var(--halo) 0 #79c31480,
+          91.3vw 13.19vh 0 var(--core) #a6cf63e6,
+          91.3vw calc(13.19vh - var(--ray)) var(--blurRay) 0 #a6cf63e6,
+          91.3vw calc(13.19h + var(--ray)) var(--blurRay) 0 #a6cf63e6,
+          calc(91.3vw - var(--ray)) 13.19vh var(--blurRay) 0 #a6cf63e6,
+          calc(91.3vw + var(--ray)) 13.19vh var(--blurRay) 0 #a6cf63e6,
+          91.3vw 13.19vh var(--halo) 0 #a6cf6380;
+        z-index: 99;
+        -webkit-animation: twinkle 5s linear alternate infinite;
+        animation: twinkle 5s linear alternate infinite;
+        -webkit-animation-delay: 0s;
+        animation-delay: 0s;
+        pointer-events: none;
       }
 
       img {
@@ -108,6 +218,24 @@
         position: absolute;
         z-index: 3;
         right: 20px;
+      }
+
+      @keyframes twinkle {
+        0% {
+          --ray: 0vw;
+          --core: 0.12vw;
+          --halo: 0.5vw;
+        }
+        50% {
+          --ray: 1.5vw;
+          --core: 0.2vw;
+          --halo: 1.2vw;
+        }
+        100% {
+          --ray: 0vw;
+          --core: 0.12vw;
+          --halo: 0.5vw;
+        }
       }
     </style>
   </head>
@@ -120,6 +248,7 @@
       <div class="stars"></div>
       <div class="twinkling"></div>
       <div class="clouds"></div>
+      <div class="overlay"></div>
     </div>
   </body>
 </html>

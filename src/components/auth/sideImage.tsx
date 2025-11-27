@@ -71,7 +71,7 @@ const SideImage = (inProps: SideImageProps) => {
         </SideImage.circle>
       </SideImage.content>
       {/* Fixed-size logo in the middle */}
-      <SideImage.logo src={src} theme={theme} />
+      {/* <SideImage.logo src={src} theme={theme} /> */}
       {/* Caption below logo */}
     </StyledSideImage>
   );

@@ -15,6 +15,7 @@ import {
   buildResponsiveShadow,
   createStarfield,
   generateShootingStars,
+  generateTwinkleStars,
   makePulseKeyframes,
   makePulseVars,
   useResponsiveShootingStars,
@@ -37,6 +38,8 @@ import {
   tail,
   moveBackgroundLeft,
   moveBackgroundRight,
+  twinkle,
+  twinkling,
 } from "./keyframes";
 import { backdropClasses } from "@mui/material";
 
@@ -485,6 +488,10 @@ const customBaseTheme = createTheme({
           },
         }),
         overlay: (props: { theme: Theme }) => ({
+          "--ray": "2vw",
+          "--core": "1vw",
+          "--halo": "25vw",
+          "--blurRay": "2vw",
           position: "relative",
           width: "100dvw",
           // maxWidth: "100%",
@@ -532,13 +539,13 @@ const customBaseTheme = createTheme({
             opacity: 1,
             // boxShadow:
             //   "140px 20px #fff, 425px 20px #fff, 70px 120px #fff, 20px 130px #fff, 110px 80px #fff, 280px 80px #fff, 250px 350px #fff, 280px 230px #fff, 220px 190px #fff, 450px 100px #fff, 380px 80px #fff, 520px 50px #fff",
-            boxShadow: createStarfield(
-              25,
-              props.theme.custom.sideImage.starColors,
-              props.theme.custom.sideImage.glowIntensity
-            ), // random stars
+            // boxShadow: createStarfield(
+            //   25,
+            //   props.theme.custom.sideImage.starColors,
+            //   props.theme.custom.sideImage.glowIntensity
+            // ), // random stars
             transition: "1.5s ease",
-            animation: `${glowingStars} 1s linear alternate infinite`,
+            // animation: `${twinkle} 1s linear alternate infinite`,
             animationDelay: "0.4s",
           },
           // "&:hover::before": {
@@ -562,13 +569,13 @@ const customBaseTheme = createTheme({
             opacity: 1,
             // boxShadow:
             //   "490px 330px #fff, 420px 300px #fff, 320px 280px #fff, 380px 350px #fff, 546px 170px #fff, 420px 180px #fff, 370px 150px #fff, 200px 250px #fff, 80px 20px #fff, 190px 50px #fff, 270px 20px #fff, 120px 230px #fff, 350px -1px #fff, 150px 369px #fff",
-            boxShadow: createStarfield(
-              25,
-              props.theme.custom.sideImage.starColors,
-              props.theme.custom.sideImage.glowIntensity
-            ), // random stars
+            // boxShadow: createStarfield(
+            //   25,
+            //   props.theme.custom.sideImage.starColors,
+            //   props.theme.custom.sideImage.glowIntensity
+            // ), // random stars
             transition: "2s ease",
-            animation: `${glowingStars} 1s linear alternate infinite`,
+            // animation: `${twinkle} 1s linear alternate infinite`,
             animationDelay: "0.8s",
           },
         }),
@@ -696,12 +703,56 @@ const customBaseTheme = createTheme({
               background:
                 "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
               borderRadius: "100%",
-              // transform: "translateX(50%) rotateZ(45deg)",
               transform: "translateX(50%) rotateZ(-45deg)",
               animation: `${shining} 5s ease-in-out infinite`,
               animationFillMode: "backwards",
             },
           },
+          ...generateTwinkleStars(
+            50,
+            props.theme.custom.sideImage.starColors
+          ).reduce((acc, star, i) => {
+            acc[
+              `& .${props.theme.custom.sideImage.twinkleClass}:nth-of-type(${
+                i + 1
+              })`
+            ] = {
+              position: "absolute",
+              left: star.left,
+              top: star.top,
+              width: "4vh",
+              height: "4vh",
+              // borderRadius: "50%",
+              boxShadow: star.glow,
+              animation: `${twinkle} 1s linear alternate infinite`,
+              pointerEvents: "none",
+              "::before": {
+                content: '""',
+                position: "absolute",
+                top: `calc(50% - 0.15vh)`,
+                right: 0,
+                height: "0.3vh",
+                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
+                borderRadius: "100%",
+                transform: "translateX(50%) rotateZ(45deg)",
+                animation: `${twinkling} ${star.delay} ease-in-out infinite`,
+                // animationDelay: star.delay,
+              },
+              "::after": {
+                content: '""',
+                position: "absolute",
+                top: `calc(50% - 0.15vh)`,
+                right: 0,
+                height: "0.3vh",
+                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
+                borderRadius: "100%",
+                transform: "translateX(50%) rotateZ(-45deg)",
+                animation: `${twinkling} ${star.delay} ease-in-out infinite`,
+                // animationDelay: star.delay,
+              },
+            };
+            return acc;
+          }, {} as Record<string, unknown>),
           // dynamically inject nth-of-type rules
           ...useResponsiveShootingStars(
             props.theme.custom.sideImage.shootingStarCount,
@@ -714,10 +765,6 @@ const customBaseTheme = createTheme({
             props.theme.custom.sideImage.glowIntensity,
             props.theme.custom.sideImage.baseSpeed
           ).reduce((acc, star, i) => {
-            // console.log(`Generating star style for star(${i}):`, star.duration);
-            // const path = `path("M ${star.right} ${star.top} Q ${
-            //   Math.random() * 100
-            // }vw ${Math.random() * 100}vh, -100vw ${Math.random() * 100}vh")`;
             acc[
               `& .${props.theme.custom.sideImage.shootingClass}:nth-of-type(${
                 i + 1
@@ -753,39 +800,40 @@ const customBaseTheme = createTheme({
             inset: 0,
             // boxShadow:
             //   "220px 118px #fff, 280px 176px #fff, 40px 50px #fff, 60px 180px #fff, 120px 130px #fff, 180px 176px #fff, 220px 290px #fff, 520px 250px #fff, 400px 220px #fff, 50px 350px #fff, 10px 230px #fff",
-            boxShadow: createStarfield(
-              15,
-              props.theme.custom.sideImage.starColors,
-              props.theme.custom.sideImage.glowIntensity
-            ), // random stars
+            // boxShadow: createStarfield(
+            //   15,
+            //   props.theme.custom.sideImage.starColors,
+            //   props.theme.custom.sideImage.glowIntensity
+            // ), // random stars
             zIndex: -1,
-            transition: "1s ease",
-            animation: `${glowingStars} 1s linear alternate infinite`,
+            transition: "3s ease",
+            animation: `${twinkle} 5s linear alternate infinite`,
             // animation: `${twinkle} 1.5s linear alternate infinite`,
-            animationDelay: "0s",
+            animationDelay: "3s",
+            pointerEvents: "none",
           },
           "&::after": {
             content: '""',
             position: "absolute",
             top: 0,
             left: 0,
-            width: "1px",
-            height: "1px",
+            width: "2px",
+            height: "2px",
             borderRadius: "50%",
             opacity: 1,
             inset: 0,
             // boxShadow:
             //   "220px 118px #fff, 280px 176px #fff, 40px 50px #fff, 60px 180px #fff, 120px 130px #fff, 180px 176px #fff, 220px 290px #fff, 520px 250px #fff, 400px 220px #fff, 50px 350px #fff, 10px 230px #fff",
-            boxShadow: createStarfield(
-              15,
-              props.theme.custom.sideImage.starColors,
-              props.theme.custom.sideImage.glowIntensity
-            ), // random stars
+            // boxShadow: createStarfield(
+            //   15,
+            //   props.theme.custom.sideImage.starColors,
+            //   props.theme.custom.sideImage.glowIntensity
+            // ), // random stars
             zIndex: -1,
-            transition: "2.5s ease",
-            animation: `${glowingStars} 1s linear alternate infinite`,
+            transition: "5.5s ease",
+            animation: `${twinkle} 7s linear alternate infinite`,
             // animation: `${twinkle} 1.5s linear alternate infinite`,
-            animationDelay: "1.2s",
+            animationDelay: "5s",
           },
         }),
         image: (props: { theme: Theme }) => ({

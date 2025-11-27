@@ -193,20 +193,44 @@ export function createStarfield(
       const x = (Math.random() * 100).toFixed(2); // viewport width %
       const y = (Math.random() * 100).toFixed(2); // viewport height %
       const color = colors[Math.floor(Math.random() * colors.length)];
+      // const glow = `
+      //   ${x}vw ${y}vh 0 ${1 * glowIntensity}px ${color}BF,
+      //   ${x}vw ${y}vh 0 ${2 * glowIntensity}px ${color}10,
+      //   ${x}vw ${y}vh ${1 * glowIntensity}px ${color}BF
+      // `;
+
+      //       ${x}vw ${y}vh 0 ${glowIntensity}px ${color}10,
+      // ${x}vw calc(${y}vh - 8px) 6px -2px ${color}10,
+      // ${x}vw calc(${y}vh + 8px) 6px -2px ${color}10,
+      // calc(${x}vw - 8px) ${y}vh 6px -2px ${color}10,
+      // calc(${x}vw + 8px) ${y}vh 6px -2px ${color}10,
+      // ${x}vw ${y}vh 0 1px ${color}99
+      // const glow = `
+      //   ${x}vw ${y}vh 0 ${glowIntensity}px ${color}E6,
+      //   ${x}vw calc(${y}vh - var(--ray)) var(--blurRay) 0 ${color}E6,
+      //   ${x}vw calc(${y}vh + var(--ray)) var(--blurRay) 0 ${color}E6,
+      //   calc(${x}vw - var(--ray)) ${y}vh var(--blurRay) 0 ${color}E6,
+      //   calc(${x}vw + var(--ray)) ${y}vh var(--blurRay) 0 ${color}E6,
+      //   ${x}vw ${y}vh var(--halo) 0 ${color}80
+      // `;
+
       const glow = `
-        ${x}vw ${y}vh 0 ${1 * glowIntensity}px ${color}BF,
-        ${x}vw ${y}vh 0 ${2 * glowIntensity}px ${color}10,
-        ${x}vw ${y}vh ${1 * glowIntensity}px ${color}BF
+        /* center glow */
+        ${x}vw ${y}vh 0 ${glowIntensity}px ${color}E6,
+        /* cardinal rays */
+        ${x}vw calc(${y}vh - var(--ray)) var(--blurRay) 0 ${color}E6,
+        ${x}vw calc(${y}vh + var(--ray)) var(--blurRay) 0 ${color}E6,
+        calc(${x}vw - var(--ray)) ${y}vh var(--blurRay) 0 ${color}E6,
+        calc(${x}vw + var(--ray)) ${y}vh var(--blurRay) 0 ${color}E6,
+        /* diagonal rays (approx 45°) */
+        calc(${x}vw + var(--ray) * -0.707) calc(${y}vh + var(--ray) * -0.707) var(--blurRay) 0 ${color}E6,
+        calc(${x}vw + var(--ray) * 0.707)  calc(${y}vh + var(--ray) * -0.707) var(--blurRay) 0 ${color}E6,
+        calc(${x}vw + var(--ray) * -0.707) calc(${y}vh + var(--ray) * 0.707)  var(--blurRay) 0 ${color}E6,
+        calc(${x}vw + var(--ray) * 0.707)  calc(${y}vh + var(--ray) * 0.707)  var(--blurRay) 0 ${color}E6,
+        /* halo */
+        0 0 var(--halo) 0 ${color}80
       `;
 
-      // const glow = `
-      //   ${x}vw ${y}vh 0 ${glowIntensity}px ${color}10,
-      //   ${x}vw calc(${y}vh - 8px) 6px -2px ${color}10,
-      //   ${x}vw calc(${y}vh + 8px) 6px -2px ${color}10,
-      //   calc(${x}vw - 8px) ${y}vh 6px -2px ${color}10,
-      //   calc(${x}vw + 8px) ${y}vh 6px -2px ${color}10,
-      //   ${x}vw ${y}vh 0 1px ${color}99
-      // `;
       // console.log("Star glow:", glow);
       return glow;
     })
@@ -235,6 +259,47 @@ export function createStarfield(
   // );
 
   // return { boxShadow: stars };
+}
+
+export function generateTwinkleStars(
+  count = 12,
+  colors: string[],
+  glowIntensity: number = 1
+) {
+  return Array.from({ length: count }).map((_, i) => {
+    const x = (Math.random() * 100).toFixed(2); // viewport width %
+    const y = (Math.random() * 100).toFixed(2); // viewport height %
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const delay = `${(Math.random() * i + 3).toFixed(2)}s`;
+    const glow = `
+      calc(${x} / 2)vh 0 0 var(--core) ${color}BF,
+      /* cardinal rays */
+      0 calc(var(--ray) * -1) var(--blurRay) 0 ${color}80,
+      0 var(--ray) var(--blurRay) 0 ${color}80,
+      calc(var(--ray) * -1) 0 var(--blurRay) 0 ${color}80,
+      var(--ray) 0 var(--blurRay) 0 ${color}80,
+      /* diagonal rays (approx 45°) */
+      calc(var(--ray) * -0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
+      calc(var(--ray) * 0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
+      calc(var(--ray) * -0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
+      calc(var(--ray) * 0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
+      /* halo */
+      0 0 var(--halo) 0 ${color}BF
+    `;
+
+    // const glow = `
+    //   0 0 0 ${3 * glowIntensity}px ${color}FF,
+    //   0 0 0 ${5 * glowIntensity}px ${color}80,
+    //   0 0 ${5 * glowIntensity}px ${color}FF
+    // `;
+    return {
+      top: `${y}vh`,
+      left: `${x}vw`,
+      delay,
+      color,
+      glow,
+    };
+  });
 }
 
 function pickStyle(mix: { straight: number; shallow: number; deep: number }) {
@@ -307,11 +372,11 @@ export function generateShootingStars(
     const endX = starDirection === "left" ? -100 : width + 100;
     const endY = Math.random() * height;
 
-    console.log(
-      `Star ${i} Directtion: ${starDirection} - From (${startX.toFixed(
-        2
-      )}, ${startY.toFixed(2)}) to (${endX.toFixed(2)}, ${endY.toFixed(2)})`
-    );
+    // console.log(
+    //   `Star ${i} Directtion: ${starDirection} - From (${startX.toFixed(
+    //     2
+    //   )}, ${startY.toFixed(2)}) to (${endX.toFixed(2)}, ${endY.toFixed(2)})`
+    // );
 
     // const delay = `${i * interval}s`; // staggered by interval
     // const duration = `${3 + Math.random() * 10}s`; // 3s to 10s duration
@@ -359,11 +424,11 @@ export function generateShootingStars(
       : Math.random() + interval + i + (i / interval) * interval
     ).toFixed(2)}s`; // staggered by interval
 
-    console.log(
-      `Star ${i} - Style: ${style}, Length: ${len.toFixed(
-        2
-      )}, Duration: ${duration}, Delay: ${delay}`
-    );
+    // console.log(
+    //   `Star ${i} - Style: ${style}, Length: ${len.toFixed(
+    //     2
+    //   )}, Duration: ${duration}, Delay: ${delay}`
+    // );
 
     // console.log("colors:", colors);
     const color = colors[Math.floor(Math.random() * colors.length)];

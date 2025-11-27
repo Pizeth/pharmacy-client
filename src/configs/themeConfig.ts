@@ -167,6 +167,8 @@ export function getSideImageConfig() {
   );
   const shootingClass =
     process.env.NEXT_PUBLIC_SHOOTING_STAR_CLASS || "shooting-star";
+  const twinkleClass =
+    process.env.NEXT_PUBLIC_TWINKLE_STAR_CLASS || "twinkle-star";
   const starColors = parseEnvJson(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_COLORS,
     ["#fff", "#9b40fc", "#4fc3f7", "#f06292", "#ff3300ff", "#40b809ff"]
@@ -222,6 +224,7 @@ export function getSideImageConfig() {
     shootingStarCount,
     shootingStarInterval,
     shootingClass,
+    twinkleClass,
     starColors,
     glowIntensity,
     baseSpeed,

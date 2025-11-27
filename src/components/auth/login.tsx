@@ -310,11 +310,11 @@ const LoginCard = styled(Card, {
 
 // Provider configuration
 const PROVIDERS = {
-  web: {
-    name: "Web",
-    icon: <MCS />,
-    className: "web",
-  },
+  // web: {
+  //   name: "Web",
+  //   icon: <MCS />,
+  //   className: "web",
+  // },
   meta: {
     name: "Meta",
     icon: <Meta />,
@@ -398,7 +398,8 @@ export const Login = (
         <Login.ambient />
         <Login.effect
           count={theme.custom.sideImage.shootingStarCount}
-          className={theme.custom.sideImage.shootingClass}
+          shootingStarClass={theme.custom.sideImage.shootingClass}
+          twinkleClass={theme.custom.sideImage.twinkleClass}
         />
         <Login.image src={src} alt={alt} />
         <Login.content>
@@ -454,10 +455,21 @@ Login.image = ({ src, alt }: { src: string; alt: string }) => (
     <Image src={src} alt={alt} fill style={{ objectFit: "contain" }} priority />
   </Astronaut>
 );
-Login.effect = ({ count, className }: { count: number; className: string }) => (
+Login.effect = ({
+  count,
+  shootingStarClass,
+  twinkleClass,
+}: {
+  count: number;
+  shootingStarClass: string;
+  twinkleClass: string;
+}) => (
   <Effect>
     {Array.from({ length: count }).map((_, i) => (
-      <span key={i} className={className} />
+      <span key={i} className={shootingStarClass} />
+    ))}
+    {Array.from({ length: count }).map((_, i) => (
+      <Box key={i} className={twinkleClass} />
     ))}
   </Effect>
 );
