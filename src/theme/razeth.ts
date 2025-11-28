@@ -5,7 +5,6 @@ import { red, blue } from "@mui/material/colors";
 import { createTheme, Theme } from "@mui/material/styles";
 // import { LoginClasses } from "@/components/auth/login";
 import { ClassKey, CustomComponents } from "@/types/classKey";
-import { keyframes } from "@emotion/react";
 import {
   line,
   RazethComponentsPropsList,
@@ -37,7 +36,6 @@ import {
   shining,
   tail,
   moveBackgroundLeft,
-  moveBackgroundRight,
   twinkle,
   twinkling,
 } from "./keyframes";
@@ -709,7 +707,7 @@ const customBaseTheme = createTheme({
             },
           },
           ...generateTwinkleStars(
-            50,
+            props.theme.custom.sideImage.shootingStarCount,
             props.theme.custom.sideImage.starColors
           ).reduce((acc, star, i) => {
             acc[

@@ -275,18 +275,18 @@ export function generateTwinkleStars(
     const centerPoint = Number(size) / 2;
     const glow = `
       ${centerPoint}vh 0 0 var(--core) ${color}BF,
-      /* cardinal rays */
+      /* cardinal rays 
       ${centerPoint}vh calc(var(--ray) * -1) var(--blurRay) 0 ${color}80,
       ${centerPoint}vh var(--ray) var(--blurRay) 0 ${color}80,
       calc(${centerPoint}vh + var(--ray) * -1) 0 var(--blurRay) 0 ${color}80,
-      calc(${centerPoint}vh + var(--ray)) 0 var(--blurRay) 0 ${color}80,
-      /* diagonal rays (approx 45°) */
+      calc(${centerPoint}vh + var(--ray)) 0 var(--blurRay) 0 ${color}80, */
+      /* diagonal rays (approx 45°) 
       calc(${centerPoint}vh + var(--ray) * -0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
       calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
       calc(${centerPoint}vh + var(--ray) * -0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
-      calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
-      /* halo */
-      ${centerPoint}vh 0 var(--halo) 0 ${color}BF
+      calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80, */
+      /* halo 
+      ${centerPoint}vh 0 var(--halo) 0 ${color}BF */
     `;
 
     // const glow = `
@@ -301,6 +301,7 @@ export function generateTwinkleStars(
       delay,
       color,
       glow,
+      centerPoint: `${centerPoint}vh`,
     };
   });
 }
