@@ -54,6 +54,7 @@ export interface SideImage {
   shootingStarInterval: number;
   shootingClass: string;
   twinkleClass: string;
+  starSize: number;
   starColors: string[];
   glowIntensity: number;
   baseSpeed: number;

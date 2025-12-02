@@ -486,10 +486,6 @@ const customBaseTheme = createTheme({
           },
         }),
         overlay: (props: { theme: Theme }) => ({
-          "--ray": "2vw",
-          "--core": "0.3vw",
-          "--halo": "25vw",
-          "--blurRay": "2vw",
           position: "relative",
           width: "100dvw",
           // maxWidth: "100%",
@@ -656,7 +652,7 @@ const customBaseTheme = createTheme({
             // rotate: "315deg",
             // width: "5em",
             // width: "0.3vw",
-            height: "0.3vh",
+            // height: `${props.theme.custom.sideImage.starSize}vh`,
             // borderRadius: "50%",
             // borderRadius: "100%",
             // boxShadow:
@@ -673,84 +669,39 @@ const customBaseTheme = createTheme({
             offsetRotate: "auto" /* 👈 aligns with path direction */,
             // transition: "1s ease",
             // animationDelay: `${Math.random() * 10}s`,
-            "::before": {
-              content: '""',
-              position: "absolute",
-              // top: "-50%",
-              top: `calc(50% - 0.15vh)`,
-              right: 0,
-              // transform: "rotate(180deg) translateX(100%) translateY(-100%)",
-              // width: "10em",
-              height: "0.3vh",
-              // offsetRotate: "auto",
-              // background:
-              //   "linear-gradient(90deg, var(--head-color), transparent)",
-              background:
-                "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
-              borderRadius: "100%",
-              transform: "translateX(50%) rotateZ(45deg)",
-              animation: `${shining} 5s ease-in-out infinite`,
-              animationFillMode: "backwards",
-            },
-            "::after": {
-              content: '""',
-              position: "absolute",
-              top: `calc(50% - 0.15vh)`,
-              right: 0,
-              height: "0.3vh",
-              background:
-                "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
-              borderRadius: "100%",
-              transform: "translateX(50%) rotateZ(-45deg)",
-              animation: `${shining} 5s ease-in-out infinite`,
-              animationFillMode: "backwards",
-            },
+            // "::before": {
+            //   content: '""',
+            //   position: "absolute",
+            //   // top: "-50%",
+            //   top: `calc(50% - 0.15vh)`,
+            //   right: 0,
+            //   // transform: "rotate(180deg) translateX(100%) translateY(-100%)",
+            //   // width: "10em",
+            //   height: "0.3vh",
+            //   // offsetRotate: "auto",
+            //   // background:
+            //   //   "linear-gradient(90deg, var(--head-color), transparent)",
+            //   background:
+            //     "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
+            //   borderRadius: "100%",
+            //   transform: "translateX(50%) rotateZ(45deg)",
+            //   animation: `${shining} 5s ease-in-out infinite`,
+            //   animationFillMode: "backwards",
+            // },
+            // "::after": {
+            //   content: '""',
+            //   position: "absolute",
+            //   top: `calc(50% - 0.15vh)`,
+            //   right: 0,
+            //   height: "0.3vh",
+            //   background:
+            //     "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
+            //   borderRadius: "100%",
+            //   transform: "translateX(50%) rotateZ(-45deg)",
+            //   animation: `${shining} 5s ease-in-out infinite`,
+            //   animationFillMode: "backwards",
+            // },
           },
-          ...generateTwinkleStars(
-            props.theme.custom.sideImage.shootingStarCount,
-            props.theme.custom.sideImage.starColors
-          ).reduce((acc, star, i) => {
-            acc[
-              `& .${props.theme.custom.sideImage.twinkleClass}:nth-of-type(${
-                i + 1
-              })`
-            ] = {
-              position: "absolute",
-              left: star.left,
-              top: star.top,
-              width: star.size,
-              height: star.size,
-              borderRadius: "50%",
-              boxShadow: star.glow,
-              animation: `${twinkle} 1s linear alternate infinite`,
-              pointerEvents: "none",
-              "::before": {
-                content: '""',
-                position: "absolute",
-                top: `calc(50% - 0.15vh)`,
-                right: 0,
-                height: "0.3vh",
-                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
-                borderRadius: "100%",
-                transform: "translateX(50%) rotateZ(45deg)",
-                animation: `${twinkling} ${star.delay} ease-in-out infinite`,
-                // animationDelay: star.delay,
-              },
-              "::after": {
-                content: '""',
-                position: "absolute",
-                top: `calc(50% - 0.15vh)`,
-                right: 0,
-                height: "0.3vh",
-                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
-                borderRadius: "100%",
-                transform: "translateX(50%) rotateZ(-45deg)",
-                animation: `${twinkling} ${star.delay} ease-in-out infinite`,
-                // animationDelay: star.delay,
-              },
-            };
-            return acc;
-          }, {} as Record<string, unknown>),
           // dynamically inject nth-of-type rules
           ...useResponsiveShootingStars(
             props.theme.custom.sideImage.shootingStarCount,
@@ -768,6 +719,8 @@ const customBaseTheme = createTheme({
                 i + 1
               })`
             ] = {
+              // Test Conent
+              height: star.size,
               // top: star.top,
               // right: star.right,
               // left: "initial",
@@ -783,6 +736,100 @@ const customBaseTheme = createTheme({
               "--trail-path": star.path,
               "--glow-duration": star.duration,
               boxShadow: star.glow,
+              "::before": {
+                content: '""',
+                position: "absolute",
+                // top: "-50%",
+                top: `calc(50% - ${star.centerPoint})`,
+                right: `calc(0% + ${star.centerPoint})`,
+                // transform: "rotate(180deg) translateX(100%) translateY(-100%)",
+                // width: "10em",
+                height: star.size,
+                // offsetRotate: "auto",
+                // background:
+                //   "linear-gradient(90deg, var(--head-color), transparent)",
+                background:
+                  "linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))",
+                borderRadius: "100%",
+                transform: "translateX(50%) rotateZ(45deg)",
+                // animation: `${shining} 5s ease-in-out infinite`,
+                animation: `${twinkling(
+                  star.baseSize
+                )} ${5} ease-in-out infinite`,
+                animationFillMode: "backwards",
+              },
+              "::after": {
+                content: '""',
+                position: "absolute",
+                top: `calc(50% - ${star.centerPoint})`,
+                right: `calc(0% + ${star.centerPoint})`,
+                height: star.size,
+                background:
+                  "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
+                borderRadius: "100%",
+                transform: "translateX(50%) rotateZ(-45deg)",
+                // animation: `${shining} 5s ease-in-out infinite`,
+                animation: `${twinkling(
+                  star.baseSize
+                )} ${5} ease-in-out infinite`,
+                animationFillMode: "backwards",
+              },
+            };
+            return acc;
+          }, {} as Record<string, unknown>),
+          ...generateTwinkleStars(
+            props.theme.custom.sideImage.shootingStarCount,
+            props.theme.custom.sideImage.starColors,
+            props.theme.custom.sideImage.starSize
+          ).reduce((acc, star, i) => {
+            acc[
+              `& .${props.theme.custom.sideImage.twinkleClass}:nth-of-type(${
+                i + 1
+              })`
+            ] = {
+              "--ray": "0.25vh",
+              "--core": star.size,
+              "--halo": "0.3vh",
+              "--blurRay": `calc(${star.size}  * 3.5)`,
+              position: "absolute",
+              // left: `calc(${star.left} + ${star.centerPoint})`,
+              // top: `calc(${star.top} + ${star.centerPoint})`,
+              left: star.left,
+              top: star.top,
+              width: star.size,
+              height: star.size,
+              borderRadius: "50%",
+              boxShadow: star.glow,
+              animation: `${twinkle} ${star.delay} linear alternate infinite`,
+              pointerEvents: "none",
+              "::before": {
+                content: '""',
+                position: "absolute",
+                top: `calc(50% - ${star.centerPoint})`,
+                right: `calc(0% + ${star.centerPoint})`,
+                height: star.size,
+                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
+                borderRadius: "100%",
+                transform: "translateX(50%) rotateZ(45deg)",
+                animation: `${twinkling(star.baseSize)} ${
+                  star.delay
+                } ease-in-out infinite`,
+                // animationDelay: star.delay,
+              },
+              "::after": {
+                content: '""',
+                position: "absolute",
+                top: `calc(50% - ${star.centerPoint})`,
+                right: `calc(0% + ${star.centerPoint})`,
+                height: star.size,
+                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
+                borderRadius: "100%",
+                transform: "translateX(50%) rotateZ(-45deg)",
+                animation: `${twinkling(star.baseSize)} ${
+                  star.delay
+                } ease-in-out infinite`,
+                // animationDelay: star.delay,
+              },
             };
             return acc;
           }, {} as Record<string, unknown>),

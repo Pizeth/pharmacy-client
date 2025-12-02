@@ -264,29 +264,46 @@ export function createStarfield(
 export function generateTwinkleStars(
   count = 12,
   colors: string[],
-  glowIntensity: number = 1
+  baseSize: number = 1
 ) {
   return Array.from({ length: count }).map((_, i) => {
     const x = (Math.random() * 100).toFixed(2); // viewport width %
     const y = (Math.random() * 100).toFixed(2); // viewport height %
-    const size = (5).toFixed(2);
+    const size = (Math.random() * baseSize).toFixed(2);
+    // const size = 0.3;
     const color = colors[Math.floor(Math.random() * colors.length)];
-    const delay = `${(Math.random() * i + 3).toFixed(2)}s`;
+    const delay = `${(Math.random() * i + 1.5).toFixed(2)}s`;
     const centerPoint = Number(size) / 2;
+    // const glow = `
+    //   ${centerPoint}vh 0 0 var(--core) ${color}BF,
+    //   /* cardinal rays */
+    //   ${centerPoint}vh calc(var(--ray) * -1) var(--blurRay) 0 ${color}80,
+    //   ${centerPoint}vh var(--ray) var(--blurRay) 0 ${color}80,
+    //   calc(${centerPoint}vh + var(--ray) * -1) 0 var(--blurRay) 0 ${color}80,
+    //   calc(${centerPoint}vh + var(--ray)) 0 var(--blurRay) 0 ${color}80,
+    //   /* diagonal rays (approx 45°) */
+    //   calc(${centerPoint}vh + var(--ray) * -0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
+    //   calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
+    //   calc(${centerPoint}vh + var(--ray) * -0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
+    //   calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
+    //   /* halo */
+    //   ${centerPoint}vh 0 var(--halo) 0 ${color}BF
+    // `;
+
     const glow = `
-      ${centerPoint}vh 0 0 var(--core) ${color}BF,
-      /* cardinal rays 
-      ${centerPoint}vh calc(var(--ray) * -1) var(--blurRay) 0 ${color}80,
-      ${centerPoint}vh var(--ray) var(--blurRay) 0 ${color}80,
-      calc(${centerPoint}vh + var(--ray) * -1) 0 var(--blurRay) 0 ${color}80,
-      calc(${centerPoint}vh + var(--ray)) 0 var(--blurRay) 0 ${color}80, */
-      /* diagonal rays (approx 45°) 
-      calc(${centerPoint}vh + var(--ray) * -0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
-      calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
-      calc(${centerPoint}vh + var(--ray) * -0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
-      calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80, */
-      /* halo 
-      ${centerPoint}vh 0 var(--halo) 0 ${color}BF */
+      0 0 0 var(--core) ${color}25,
+      /* cardinal rays */
+      0 calc(var(--ray) * -1) var(--blurRay) 0 ${color},
+      0 var(--ray) var(--blurRay) 0 ${color},
+      calc(var(--ray) * -1) 0 var(--blurRay) 0 ${color},
+      var(--ray) 0 var(--blurRay) 0 ${color},
+      /* diagonal rays (approx 45°) */
+      calc(var(--ray) * -0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color},
+      calc(var(--ray) * 0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color},
+      calc(var(--ray) * -0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color},
+      calc(var(--ray) * 0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color},
+      /* halo */
+      0 0 var(--halo) 0 ${color}
     `;
 
     // const glow = `
@@ -298,10 +315,11 @@ export function generateTwinkleStars(
       top: `${y}vh`,
       left: `${x}vw`,
       size: `${size}vh`,
+      centerPoint: `${centerPoint}vh`,
+      baseSize: Number(size) * 0.85,
       delay,
       color,
       glow,
-      centerPoint: `${centerPoint}vh`,
     };
   });
 }
@@ -347,7 +365,8 @@ export function generateShootingStars(
   mix: { straight: number; shallow: number; deep: number },
   colors: string[],
   glowIntensity: number = 1,
-  baseSpeed: number = 20 // % per second (normalized)
+  baseSpeed: number = 20, // % per second (normalized)
+  baseSize: number = 1
 ) {
   const width = window.innerWidth;
   const height = window.innerHeight;
@@ -358,7 +377,6 @@ export function generateShootingStars(
     // const top = `${Math.random() * 100}%`;
     // const right = `${Math.random() * 100}%`;
     // const left = `${Math.random() * 100}vw`; // start off-screen right
-
     const starDirection = Math.random() < 0.5 ? "left" : "right";
 
     // const startX = Math.random() * width;
@@ -434,7 +452,8 @@ export function generateShootingStars(
     //   )}, Duration: ${duration}, Delay: ${delay}`
     // );
 
-    // console.log("colors:", colors);
+    const size = (Math.random() * baseSize).toFixed(2);
+    const centerPoint = Number(size) / 2;
     const color = colors[Math.floor(Math.random() * colors.length)];
     const glow = `
       0 0 0 ${1 * glowIntensity}px ${color}00,
@@ -445,6 +464,9 @@ export function generateShootingStars(
     return {
       // top,
       // right,
+      size: `${size}vh`,
+      centerPoint: `${centerPoint}vh`,
+      baseSize: Number(size) * 0.85,
       delay,
       duration,
       // rot,

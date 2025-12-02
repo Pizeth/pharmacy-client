@@ -263,28 +263,52 @@ export const shining = keyframes`
   100% { width: 0; }
 `;
 
-export const twinkling = keyframes`    
-  0% { opacity: width: 0; }
-  12.5%{ opacity: 0.4; width: 0.25vw; }
-  25% { opacity: 0.6; width: 0.5vw; }
-  37.5%{ opacity: 0.8; width: 0.75vw; }
-  50% { opacity: 1; width: 1vw; }
-  62.5%{ opacity: 0.8; width: 0.75vw; }
-  75% { opacity: 0.6; width: 0.5vw; }
-  87.5%{ opacity: 0.4; width: 0.25vw; }
+// export const twinkling = keyframes`
+//   0% { opacity: width: 0; }
+//   12.5%{ opacity: 0.4; width: 0.25vw; }
+//   25% { opacity: 0.6; width: 0.5vw; }
+//   37.5%{ opacity: 0.8; width: 0.75vw; }
+//   50% { opacity: 1; width: 1vw; }
+//   62.5%{ opacity: 0.8; width: 0.75vw; }
+//   75% { opacity: 0.6; width: 0.5vw; }
+//   87.5%{ opacity: 0.4; width: 0.25vw; }
+//   100% { opacity: 0.2; width: 0; }
+// `;
+
+export const twinkling = (baseSize: number) => keyframes`    
+  0% { opacity: 0.2; width: 0; }
+  12.5%{ opacity: 0.4; width: ${baseSize * 2}vw; }
+  25% { opacity: 0.6; width: ${baseSize * 3}vw; }
+  37.5%{ opacity: 0.8; width: ${baseSize * 4}vw; }
+  50% { opacity: 1; width: ${baseSize * 5}vw; }
+  62.5%{ opacity: 0.8; width: ${baseSize * 4}vw; }
+  75% { opacity: 0.6; width: ${baseSize * 3}vw; }
+  87.5%{ opacity: 0.4; width: ${baseSize * 2}vw; }
   100% { opacity: 0.2; width: 0; }
 `;
 
+// export const twinkle = keyframes`
+//   0% { opacity: 0; --ray: 0vw; --core: 0.1vw; --halo: 0.125vw; }
+//   12.5% { opacity: 0.25; --ray: 0.3vw; --core: 0.125vw; --halo: 0.25vw; }
+//   25% { opacity: 0.5; --ray: 0.75vw; --core: 0.15vw; --halo: 0.5vw; }
+//   37.5% { opacity: 0.75; --ray: 1vw; --core: 0.175vw; --halo: 0.75vw; }
+//   50% { opacity: 1; --ray: 1.25vw; --core: 0.20vw; --halo: 1vw; }
+//   62.5% { opacity: 0.75; --ray: 1vw; --core: 0.175vw; --halo: 0.75vw;}
+//   75% { opacity: 0.5; --ray: 0.75vw; --core: 0.15vw; --halo: 0.5vw; }
+//   87.5% { opacity: 0.25; --ray: 0.3vw; --core: 0.125vw; --halo: 0.25vw; }
+//   100% { opacity: 0; --ray: 0vw; --core: 0.1vw; --halo: 0.5vw; }
+// `;
+
 export const twinkle = keyframes`
-  0% { opacity: 0; --ray: 0vw; --core: 0.1vw; --halo: 0.125vw; }
-  12.5% { opacity: 0.25; --ray: 0.3vw; --core: 0.125vw; --halo: 0.25vw; }
-  25% { opacity: 0.5; --ray: 0.75vw; --core: 0.15vw; --halo: 0.5vw; }
-  37.5% { opacity: 0.75; --ray: 1vw; --core: 0.175vw; --halo: 0.75vw; }
-  50% { opacity: 1; --ray: 1.25vw; --core: 0.20vw; --halo: 1vw; }
-  62.5% { opacity: 0.75; --ray: 1vw; --core: 0.175vw; --halo: 0.75vw;}
-  75% { opacity: 0.5; --ray: 0.75vw; --core: 0.15vw; --halo: 0.5vw; }
-  87.5% { opacity: 0.25; --ray: 0.3vw; --core: 0.125vw; --halo: 0.25vw; }
-  100% { opacity: 0; --ray: 0vw; --core: 0.1vw; --halo: 0.5vw; }
+  0% { opacity: 0; --ray: 0vh; --core: 0.1vh; --halo: 0.125vh; }
+  12.5% { opacity: 0.25; --ray: 0.3vh; --core: 0.125vh; --halo: 0.25vh; }
+  25% { opacity: 0.5; --ray: 0.75vh; --core: 0.15vh; --halo: 0.5vh; }
+  37.5% { opacity: 0.75; --ray: 1vh; --core: 0.175vh; --halo: 0.75vh; }
+  50% { opacity: 1; --ray: 1.25vh; --core: 0.20vh; --halo: 1vh; }
+  62.5% { opacity: 0.75; --ray: 1vh; --core: 0.175vh; --halo: 0.75vh;}
+  75% { opacity: 0.5; --ray: 0.75vh; --core: 0.15vh; --halo: 0.5vh; }
+  87.5% { opacity: 0.25; --ray: 0.3vh; --core: 0.125vh; --halo: 0.25vh; }
+  100% { opacity: 0; --ray: 0vh; --core: 0.1vh; --halo: 0.5vh; }
 `;
 
 // export const twinkle = keyframes`
