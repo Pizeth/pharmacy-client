@@ -712,7 +712,8 @@ const customBaseTheme = createTheme({
             props.theme.custom.sideImage.trajectoryMix,
             props.theme.custom.sideImage.starColors,
             props.theme.custom.sideImage.glowIntensity,
-            props.theme.custom.sideImage.baseSpeed
+            props.theme.custom.sideImage.baseSpeed,
+            props.theme.custom.sideImage.starSize
           ).reduce((acc, star, i) => {
             acc[
               `& .${props.theme.custom.sideImage.shootingClass}:nth-of-type(${
@@ -720,7 +721,12 @@ const customBaseTheme = createTheme({
               })`
             ] = {
               // Test Conent
-              height: star.size,
+              // height: star.size,
+              height: `calc(${star.size} * 1.25)`,
+              width: `calc(${star.size} * 1.25)`,
+              borderRadius: "100%",
+              // animation: `${shootingStar} ${star.duration} linear infinite, ${tail} ${star.duration} linear infinite, ${twinkle} ${star.delay} linear alternate infinite`,
+              // borderRadius: "50%",
               // top: star.top,
               // right: star.right,
               // left: "initial",
@@ -735,7 +741,7 @@ const customBaseTheme = createTheme({
               "--head-color": star.color,
               "--trail-path": star.path,
               "--glow-duration": star.duration,
-              boxShadow: star.glow,
+              // boxShadow: star.glow,
               "::before": {
                 content: '""',
                 position: "absolute",
@@ -748,15 +754,20 @@ const customBaseTheme = createTheme({
                 // offsetRotate: "auto",
                 // background:
                 //   "linear-gradient(90deg, var(--head-color), transparent)",
-                background:
-                  "linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))",
+                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
                 borderRadius: "100%",
                 transform: "translateX(50%) rotateZ(45deg)",
                 // animation: `${shining} 5s ease-in-out infinite`,
-                animation: `${twinkling(
-                  star.baseSize
-                )} ${5} ease-in-out infinite`,
+                animation: `${twinkling(star.baseSize)} ${
+                  star.twinkleDuration
+                } ease-in-out infinite, ${twinkle} ${
+                  star.twinkleDuration
+                } linear alternate infinite`,
                 animationFillMode: "backwards",
+                boxShadow: star.glow,
+                border: `0px solid ${star.color}`,
+                // borderWidth: `0px 3vh 1px 3vh`,
+                borderColor: star.color,
               },
               "::after": {
                 content: '""',
@@ -764,15 +775,20 @@ const customBaseTheme = createTheme({
                 top: `calc(50% - ${star.centerPoint})`,
                 right: `calc(0% + ${star.centerPoint})`,
                 height: star.size,
-                background:
-                  "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
+                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
                 borderRadius: "100%",
                 transform: "translateX(50%) rotateZ(-45deg)",
                 // animation: `${shining} 5s ease-in-out infinite`,
-                animation: `${twinkling(
-                  star.baseSize
-                )} ${5} ease-in-out infinite`,
+                animation: `${twinkling(star.baseSize)} ${
+                  star.twinkleDuration
+                } ease-in-out infinite, ${twinkle} ${
+                  star.twinkleDuration
+                } linear alternate infinite`,
                 animationFillMode: "backwards",
+                boxShadow: star.glow,
+                border: `0px solid ${star.color}`,
+                // borderWidth: `0px 3vh 1px 3vh`,
+                borderColor: star.color,
               },
             };
             return acc;
@@ -787,10 +803,10 @@ const customBaseTheme = createTheme({
                 i + 1
               })`
             ] = {
-              "--ray": "0.25vh",
-              "--core": star.size,
-              "--halo": "0.3vh",
-              "--blurRay": `calc(${star.size}  * 3.5)`,
+              // "--ray": "0.25vh",
+              // "--core": star.size,
+              // "--halo": "0.3vh",
+              // "--blurRay": `calc(${star.size}  * 3.5)`,
               position: "absolute",
               // left: `calc(${star.left} + ${star.centerPoint})`,
               // top: `calc(${star.top} + ${star.centerPoint})`,
