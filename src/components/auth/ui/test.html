@@ -1,254 +1,267 @@
 <html>
   <head>
     <!-- <link rel="stylesheet" href="test.css" /> -->
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.js"
+      integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+      crossorigin="anonymous"
+    ></script>
     <style>
+      html,
       body,
-      html {
+      .ag-format-container,
+      .ag-block {
         height: 100%;
-        margin: 0;
-        padding: 0;
+      }
+      body {
         overflow: hidden;
       }
-      @keyframes move-background {
-        from {
-          -webkit-transform: translate3d(0px, 0px, 0px);
-        }
-        to {
-          -webkit-transform: translate3d(1000px, 0px, 0px);
-        }
-      }
-      @-webkit-keyframes move-background {
-        from {
-          -webkit-transform: translate3d(0px, 0px, 0px);
-        }
-        to {
-          -webkit-transform: translate3d(1000px, 0px, 0px);
-        }
-      }
-      @-moz-keyframes move-background {
-        from {
-          -webkit-transform: translate3d(0px, 0px, 0px);
-        }
-        to {
-          -webkit-transform: translate3d(1000px, 0px, 0px);
-        }
-      }
-      @-webkit-keyframes move-background {
-        from {
-          -webkit-transform: translate3d(0px, 0px, 0px);
-        }
-        to {
-          -webkit-transform: translate3d(1000px, 0px, 0px);
-        }
-      }
-      .background-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
+
+      .ag-format-container {
+        width: 1142px;
+        margin: 0 auto;
       }
 
-      .stars {
-        background: black
-          url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png)
-          repeat;
+      .ag-meteor-block {
+        height: 100%;
+        width: 100%;
+        background-image: url(https://raw.githubusercontent.com/SochavaAG/example-mycode/master/pens/meteors-right/images/bg.jpg);
+        background-position: 100% 0;
         background-size: cover;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        display: block;
-        z-index: 0;
-      }
 
-      .twinkling {
-        width: 10000px;
-        height: 100%;
-        background: transparent
-          url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/twinkling.png")
-          repeat;
-        /* background-size: 1000px 1000px; */
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        z-index: 2;
-        -moz-animation: move-background 70s linear infinite;
-        -ms-animation: move-background 70s linear infinite;
-        -o-animation: move-background 70s linear infinite;
-        -webkit-animation: move-background 70s linear infinite;
-        animation: move-background 70s linear infinite;
-      }
-
-      .clouds {
-        width: 1000%;
-        height: 100%;
-        background: transparent
-          url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/clouds_repeat.png")
-          repeat;
-        background-size: contain;
-        background-position: 0 0;
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        z-index: 3;
-        -moz-animation: move-background 150s linear infinite;
-        -ms-animation: move-background 150s linear infinite;
-        -o-animation: move-background 150s linear infinite;
-        -webkit-animation: move-background 150s linear infinite;
-        animation: move-background 150s linear infinite;
-      }
-
-      .overlay {
-        --ray: 1vw;
-        --core: 12vw;
-        --halo: 5vw;
-        --blurRay: 3vw;
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        border-radius: 50%;
-        opacity: 1;
-        inset: 0;
-        box-shadow: 54.3vw 6.48vh 0 var(--core) #ee82eee6,
-          54.3vw calc(6.48vh - var(--ray)) var(--blurRay) 0 #ee82eee6,
-          54.3vw calc(6.48h + var(--ray)) var(--blurRay) 0 #ee82eee6,
-          calc(54.3vw - var(--ray)) 6.48vh var(--blurRay) 0 #ee82eee6,
-          calc(54.3vw + var(--ray)) 6.48vh var(--blurRay) 0 #ee82eee6,
-          54.3vw 6.48vh var(--halo) 0 #ee82ee80,
-          62.24vw 13.68vh 0 var(--core) #79c314e6,
-          62.24vw calc(13.68vh - var(--ray)) var(--blurRay) 0 #79c314e6,
-          62.24vw calc(13.68h + var(--ray)) var(--blurRay) 0 #79c314e6,
-          calc(62.24vw - var(--ray)) 13.68vh var(--blurRay) 0 #79c314e6,
-          calc(62.24vw + var(--ray)) 13.68vh var(--blurRay) 0 #79c314e6,
-          62.24vw 13.68vh var(--halo) 0 #79c31480,
-          13.73vw 29.45vh 0 var(--core) #fef44de6,
-          13.73vw calc(29.45vh - var(--ray)) var(--blurRay) 0 #fef44de6,
-          13.73vw calc(29.45h + var(--ray)) var(--blurRay) 0 #fef44de6,
-          calc(13.73vw - var(--ray)) 29.45vh var(--blurRay) 0 #fef44de6,
-          calc(13.73vw + var(--ray)) 29.45vh var(--blurRay) 0 #fef44de6,
-          13.73vw 29.45vh var(--halo) 0 #fef44d80,
-          18.98vw 9.55vh 0 var(--core) #8e58c1e6,
-          18.98vw calc(9.55vh - var(--ray)) var(--blurRay) 0 #8e58c1e6,
-          18.98vw calc(9.55h + var(--ray)) var(--blurRay) 0 #8e58c1e6,
-          calc(18.98vw - var(--ray)) 9.55vh var(--blurRay) 0 #8e58c1e6,
-          calc(18.98vw + var(--ray)) 9.55vh var(--blurRay) 0 #8e58c1e6,
-          18.98vw 9.55vh var(--halo) 0 #8e58c180,
-          30.41vw 14.53vh 0 var(--core) #4fc3f7e6,
-          30.41vw calc(14.53vh - var(--ray)) var(--blurRay) 0 #4fc3f7e6,
-          30.41vw calc(14.53h + var(--ray)) var(--blurRay) 0 #4fc3f7e6,
-          calc(30.41vw - var(--ray)) 14.53vh var(--blurRay) 0 #4fc3f7e6,
-          calc(30.41vw + var(--ray)) 14.53vh var(--blurRay) 0 #4fc3f7e6,
-          30.41vw 14.53vh var(--halo) 0 #4fc3f780,
-          99.9vw 45.12vh 0 var(--core) #ba7ddbe6,
-          99.9vw calc(45.12vh - var(--ray)) var(--blurRay) 0 #ba7ddbe6,
-          99.9vw calc(45.12h + var(--ray)) var(--blurRay) 0 #ba7ddbe6,
-          calc(99.9vw - var(--ray)) 45.12vh var(--blurRay) 0 #ba7ddbe6,
-          calc(99.9vw + var(--ray)) 45.12vh var(--blurRay) 0 #ba7ddbe6,
-          99.9vw 45.12vh var(--halo) 0 #ba7ddb80,
-          38.46vw 72.16vh 0 var(--core) #6365cfe6,
-          38.46vw calc(72.16vh - var(--ray)) var(--blurRay) 0 #6365cfe6,
-          38.46vw calc(72.16h + var(--ray)) var(--blurRay) 0 #6365cfe6,
-          calc(38.46vw - var(--ray)) 72.16vh var(--blurRay) 0 #6365cfe6,
-          calc(38.46vw + var(--ray)) 72.16vh var(--blurRay) 0 #6365cfe6,
-          38.46vw 72.16vh var(--halo) 0 #6365cf80,
-          19.33vw 57.8vh 0 var(--core) #faeb36e6,
-          19.33vw calc(57.8vh - var(--ray)) var(--blurRay) 0 #faeb36e6,
-          19.33vw calc(57.8h + var(--ray)) var(--blurRay) 0 #faeb36e6,
-          calc(19.33vw - var(--ray)) 57.8vh var(--blurRay) 0 #faeb36e6,
-          calc(19.33vw + var(--ray)) 57.8vh var(--blurRay) 0 #faeb36e6,
-          19.33vw 57.8vh var(--halo) 0 #faeb3680,
-          58.98vw 17.98vh 0 var(--core) #4b0082e6,
-          58.98vw calc(17.98vh - var(--ray)) var(--blurRay) 0 #4b0082e6,
-          58.98vw calc(17.98h + var(--ray)) var(--blurRay) 0 #4b0082e6,
-          calc(58.98vw - var(--ray)) 17.98vh var(--blurRay) 0 #4b0082e6,
-          calc(58.98vw + var(--ray)) 17.98vh var(--blurRay) 0 #4b0082e6,
-          58.98vw 17.98vh var(--halo) 0 #4b008280,
-          50.17vw 10.6vh 0 var(--core) #ffffffe6,
-          50.17vw calc(10.6vh - var(--ray)) var(--blurRay) 0 #ffffffe6,
-          50.17vw calc(10.6h + var(--ray)) var(--blurRay) 0 #ffffffe6,
-          calc(50.17vw - var(--ray)) 10.6vh var(--blurRay) 0 #ffffffe6,
-          calc(50.17vw + var(--ray)) 10.6vh var(--blurRay) 0 #ffffffe6,
-          50.17vw 10.6vh var(--halo) 0 #ffffff80,
-          98.53vw 30.24vh 0 var(--core) #ffff00e6,
-          98.53vw calc(30.24vh - var(--ray)) var(--blurRay) 0 #ffff00e6,
-          98.53vw calc(30.24h + var(--ray)) var(--blurRay) 0 #ffff00e6,
-          calc(98.53vw - var(--ray)) 30.24vh var(--blurRay) 0 #ffff00e6,
-          calc(98.53vw + var(--ray)) 30.24vh var(--blurRay) 0 #ffff00e6,
-          98.53vw 30.24vh var(--halo) 0 #ffff0080,
-          84.6vw 21.93vh 0 var(--core) #faeb36e6,
-          84.6vw calc(21.93vh - var(--ray)) var(--blurRay) 0 #faeb36e6,
-          84.6vw calc(21.93h + var(--ray)) var(--blurRay) 0 #faeb36e6,
-          calc(84.6vw - var(--ray)) 21.93vh var(--blurRay) 0 #faeb36e6,
-          calc(84.6vw + var(--ray)) 21.93vh var(--blurRay) 0 #faeb36e6,
-          84.6vw 21.93vh var(--halo) 0 #faeb3680,
-          13.33vw 90.35vh 0 var(--core) #8e58c1e6,
-          13.33vw calc(90.35vh - var(--ray)) var(--blurRay) 0 #8e58c1e6,
-          13.33vw calc(90.35h + var(--ray)) var(--blurRay) 0 #8e58c1e6,
-          calc(13.33vw - var(--ray)) 90.35vh var(--blurRay) 0 #8e58c1e6,
-          calc(13.33vw + var(--ray)) 90.35vh var(--blurRay) 0 #8e58c1e6,
-          13.33vw 90.35vh var(--halo) 0 #8e58c180,
-          46.58vw 95.98vh 0 var(--core) #79c314e6,
-          46.58vw calc(95.98vh - var(--ray)) var(--blurRay) 0 #79c314e6,
-          46.58vw calc(95.98h + var(--ray)) var(--blurRay) 0 #79c314e6,
-          calc(46.58vw - var(--ray)) 95.98vh var(--blurRay) 0 #79c314e6,
-          calc(46.58vw + var(--ray)) 95.98vh var(--blurRay) 0 #79c314e6,
-          46.58vw 95.98vh var(--halo) 0 #79c31480,
-          91.3vw 13.19vh 0 var(--core) #a6cf63e6,
-          91.3vw calc(13.19vh - var(--ray)) var(--blurRay) 0 #a6cf63e6,
-          91.3vw calc(13.19h + var(--ray)) var(--blurRay) 0 #a6cf63e6,
-          calc(91.3vw - var(--ray)) 13.19vh var(--blurRay) 0 #a6cf63e6,
-          calc(91.3vw + var(--ray)) 13.19vh var(--blurRay) 0 #a6cf63e6,
-          91.3vw 13.19vh var(--halo) 0 #a6cf6380;
-        z-index: 99;
-        -webkit-animation: twinkle 5s linear alternate infinite;
-        animation: twinkle 5s linear alternate infinite;
-        -webkit-animation-delay: 0s;
-        animation-delay: 0s;
         pointer-events: none;
-      }
 
-      img {
-        height: 30vh;
-        width: 30vh;
+        overflow: hidden;
+
+        top: 0;
+        left: 0;
+      }
+      .ag-meteor-block,
+      .meteor__item {
         position: absolute;
-        z-index: 3;
-        right: 20px;
+      }
+      .meteor__item-img {
+        width: 600px;
+        height: 600px;
+        background-image: url(https://raw.githubusercontent.com/SochavaAG/example-mycode/master/pens/meteors-right/images/meteors-sprite.png);
+        background-size: auto 100%;
+
+        -webkit-animation: an-frame-animation 3s steps(48) infinite;
+        -moz-animation: an-frame-animation 3s steps(48) infinite;
+        -o-animation: an-frame-animation 3s steps(48) infinite;
+        animation: an-frame-animation 3s steps(48) infinite;
+
+        -webkit-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        transform: rotate(45deg);
       }
 
-      @keyframes twinkle {
+      @-webkit-keyframes an-frame-animation {
         0% {
-          --ray: 0vw;
-          --core: 0.12vw;
-          --halo: 0.5vw;
-        }
-        50% {
-          --ray: 1.5vw;
-          --core: 0.2vw;
-          --halo: 1.2vw;
+          background-position: 0 0;
         }
         100% {
-          --ray: 0vw;
-          --core: 0.12vw;
-          --halo: 0.5vw;
+          background-position: -28800px 0;
+        }
+      }
+
+      @-moz-keyframes an-frame-animation {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: -28800px 0;
+        }
+      }
+
+      @-o-keyframes an-frame-animation {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: -28800px 0;
+        }
+      }
+
+      @keyframes an-frame-animation {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: -28800px 0;
+        }
+      }
+
+      @media only screen and (max-width: 767px) {
+        .ag-format-container {
+          width: 96%;
+        }
+      }
+
+      @media only screen and (max-width: 639px) {
+      }
+
+      @media only screen and (max-width: 479px) {
+      }
+
+      @media (min-width: 768px) and (max-width: 979px) {
+        .ag-format-container {
+          width: 750px;
+        }
+      }
+
+      @media (min-width: 980px) and (max-width: 1161px) {
+        .ag-format-container {
+          width: 960px;
         }
       }
     </style>
   </head>
   <body>
-    <div class="background-container">
-      <img
-        src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/moon2.png"
-        alt=""
-      />
-      <div class="stars"></div>
-      <div class="twinkling"></div>
-      <div class="clouds"></div>
-      <div class="overlay"></div>
+    <div id="js-meteor-block" class="ag-meteor-block">
+      <div class="ag-format-container"></div>
     </div>
   </body>
+  <script>
+    (function ($) {
+      $(function () {
+        function index_defineProperties(target, props) {
+          for (var i = 0; i < props.length; i++) {
+            var descriptor = props[i];
+            (descriptor.enumerable = descriptor.enumerable || !1),
+              (descriptor.configurable = !0),
+              "value" in descriptor && (descriptor.writable = !0),
+              Object.defineProperty(target, descriptor.key, descriptor);
+          }
+        }
+
+        var index_Meteor = (function () {
+          function Meteor(options) {
+            var _this = this;
+            !(function (instance, Constructor) {
+              if (!(instance instanceof Constructor))
+                throw new TypeError("Cannot call a class as a function");
+            })(this, Meteor),
+              (this.options = options),
+              (this.container = $("#".concat(this.options.container))),
+              (this.containerWidth = this.container.width()),
+              (this.containerHeight = this.container.height()),
+              setInterval(function () {
+                _this.init();
+              }, 500);
+          }
+
+          var Constructor, protoProps, staticProps;
+          return (
+            (Constructor = Meteor),
+            (protoProps = [
+              {
+                key: "init",
+                value: function () {
+                  var _this2 = this,
+                    id = ""
+                      .concat(this.options.container, "_")
+                      .concat(this.getRandomInt(0, 10000));
+                  if (0 === $("#".concat(id)).length) {
+                    var index = this.getRandomInt(
+                        0,
+                        this.options.meteors.length - 1
+                      ),
+                      meteor = this.options.meteors[index];
+                    if (meteor.count <= meteor.maxCount) {
+                      meteor.count++,
+                        this.container.append(
+                          '\n<div id="'.concat(
+                            id,
+                            '" class="meteor__item">\n<div class="meteor__item-img"></div>\n</div>\n'
+                          )
+                        );
+
+                      var topOrLeft = this.getRandomInt(0, 1),
+                        top = this.getRandomInt(0, this.containerHeight),
+                        left = this.getRandomInt(0, this.containerWidth),
+                        zIndex = 10 * meteor.zIndex,
+                        size = meteor.size,
+                        transition = meteor.speed;
+
+                      $("#".concat(id)).css({
+                        left: topOrLeft ? "100%" : "".concat(left, "px"),
+                        top: topOrLeft ? "".concat(top + 1000, "px") : 0,
+                        transition: "transform ".concat(transition, "s linear"),
+                        transform: "translate("
+                          .concat(size, "px, -")
+                          .concat(size, "px"),
+                        "z-index": zIndex,
+                      });
+
+                      $("#".concat(id))
+                        .find(".meteor__item-img")
+                        .css({
+                          width: "".concat(size, "px"),
+                          height: "".concat(size, "px"),
+                        });
+
+                      setTimeout(function () {
+                        $("#".concat(id)).css({
+                          transform: "translate(-"
+                            .concat(
+                              _this2.containerHeight - (topOrLeft ? top : 0),
+                              "px, "
+                            )
+                            .concat(
+                              _this2.containerHeight - (topOrLeft ? top : 0),
+                              "px"
+                            ),
+                        });
+                      }, 100);
+
+                      setTimeout(function () {
+                        $("#".concat(id)).remove(), meteor.count--;
+                      }, 1000 * transition);
+                    }
+                  }
+                },
+              },
+              {
+                key: "getRandomInt",
+                value: function (min, max) {
+                  return Math.floor(min + Math.random() * (max + 1 - min));
+                },
+              },
+              {
+                key: "isScrolledIntoView",
+                value: function (elem) {
+                  var docViewTop = $(window).scrollTop(),
+                    docViewBottom = docViewTop + $(window).height(),
+                    elemTop = elem.offset().top;
+                  return (
+                    elemTop + elem.height() >= docViewTop &&
+                    elemTop <= docViewBottom
+                  );
+                },
+              },
+            ]) && index_defineProperties(Constructor.prototype, protoProps),
+            staticProps && index_defineProperties(Constructor, staticProps),
+            Meteor
+          );
+        })();
+
+        new index_Meteor({
+          container: "js-meteor-block",
+          meteors: [
+            { size: 600, speed: 5, maxCount: 2, count: 0, zIndex: 10 },
+            {
+              size: 300,
+              speed: 10,
+              maxCount: 3,
+              count: 0,
+              zIndex: 4,
+            },
+            { size: 150, speed: 15, maxCount: 5, count: 0, zIndex: 0 },
+          ],
+        });
+      });
+    })(jQuery);
+  </script>
 </html>

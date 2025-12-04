@@ -245,16 +245,28 @@ export const shootingStar = keyframes`
   100% { opacity: 0; offset-distance: 100%; }
 `;
 
+// export const glowingStars = keyframes`
+//   0% { opacity: 0; }
+//   12.5% { opacity: 0.25;}
+//   25% { opacity: 0.5; }
+//   37.5% { opacity: 0.75; }
+//   50% { opacity: 1; }
+//   62.5% { opacity: 0.75; }
+//   75% { opacity: 0.5; }
+//   87.5% { opacity: 0.25; }
+//   100% { opacity: 0; }
+// `;
+
 export const glowingStars = keyframes`
-  0% { opacity: 0; }
-  12.5% { opacity: 0.25;}
-  25% { opacity: 0.5; }
-  37.5% { opacity: 0.75; }
-  50% { opacity: 1; }
-  62.5% { opacity: 0.75; }
-  75% { opacity: 0.5; }
-  87.5% { opacity: 0.25; }
-  100% { opacity: 0; }
+  0% { opacity: 0.2; --ray: 0vh; --core: 0.1vh; --halo: 0.125vh; right: 0; }
+  12.5% { opacity: 0.4; --ray: 0.3vh; --core: 0.125vh; --halo: 0.25vh; }
+  25% { opacity: 0.6; --ray: 0.75vh; --core: 0.15vh; --halo: 0.5vh; right: 0; }
+  37.5% { opacity: 0.8; --ray: 1vh; --core: 0.175vh; --halo: 0.75vh; }
+  50% { opacity: 1; --ray: 1.25vh; --core: 0.20vh; --halo: 1vh; right: 0; }
+  62.5% { opacity: 0.8; --ray: 1vh; --core: 0.175vh; --halo: 0.75vh; }
+  75% { opacity: 0.6; --ray: 0.75vh; --core: 0.15vh; --halo: 0.5vh; right: 0; }
+  87.5% { opacity: 0.4; --ray: 0.3vh; --core: 0.125vh; --halo: 0.25vh; }
+  100% { opacity: 0.2; --ray: 0vh; --core: 0.1vh; --halo: 0.5vh; right: 0; }
 `;
 
 export const shining = keyframes`    
@@ -312,13 +324,13 @@ export const twinkle = keyframes`
 `;
 
 // export const twinkle = keyframes`
-//   0% { opacity: 0.2; --ray: 0.2vw; --core: 0.10vw; --halo: 0.1vw; }
-//   12.5%{ opacity: 0.4; --ray: 0.3vw; --core: 0.11vw; --halo: 0.2vw; }
-//   25% { opacity: 0.6; --ray: 0.4vw; --core: 0.12vw; --halo: 0.3vw; }
-//   37.5%{ opacity: 0.8; --ray: 0.5vw; --core: 0.13vw; --halo: 0.4vw; }
-//   50% { opacity: 1; --ray: 0.6vw; --core: 0.14vw; --halo: 0.5vw; }
-//   62.5%{ opacity: 0.8; --ray: 0.5vw; --core: 0.13vw; --halo: 0.4vw; }
-//   75% { opacity: 0.6; --ray: 0.4vw; --core: 0.12vw; --halo: 0.3vw; }
-//   87.5%{ opacity: 0.4; --ray: 0.3vw; --core: 0.11vw; --halo: 0.2vw; }
-//   100% { opacity: 0.2; --ray: 0.2vw; --core: 0.10vw; --halo: 0.1vw; }
+//   0% { opacity: 0.2; --ray: 0.vw; --core: 0.1vw; --halo: 0.125vw; }
+//   12.5%{ opacity: 0.4; --ray: 0.3vw; --core: 0.125vw; --halo: 0.25vw; }
+//   25% { opacity: 0.6; --ray: 0.75vw; --core: 0.15vw; --halo: 0.5vw; }
+//   37.5%{ opacity: 0.8; --ray: 1vw; --core: 0.175vw; --halo: 0.75vw; }
+//   50% { opacity: 1; --ray: 1.25vw; --core: 0.2vw; --halo: 1vw; }
+//   62.5%{ opacity: 0.8; --ray: 1vw; --core: 0.175vw; --halo: 0.75vw; }
+//   75% { opacity: 0.6; --ray: 0.75vw; --core: 0.15vw; --halo: 0.5vw; }
+//   87.5%{ opacity: 0.4; --ray: 0.3vw; --core: 0.125vw; --halo: 0.25vw; }
+//   100% { opacity: 0.2; --ray: 0.vw; --core: 0.1vw; --halo: 0.125vw; }
 // `;

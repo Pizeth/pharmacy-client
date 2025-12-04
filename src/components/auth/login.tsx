@@ -18,6 +18,7 @@ import { StyleComponent } from "@/types/classKey";
 import SocialButton from "./ui/socialButton";
 import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
 import MCS from "../icons/mcs";
+import { v7 } from "uuid";
 
 // const LoginOld = (inProps: LoginProps) => {
 //   const props = useThemeProps({
@@ -466,7 +467,9 @@ Login.effect = ({
 }) => (
   <Effect>
     {Array.from({ length: count }).map((_, i) => (
-      <span key={i} className={shootingStarClass} />
+      <span key={v7()} className={shootingStarClass}>
+        <span key={i} />
+      </span>
     ))}
     {Array.from({ length: count }).map((_, i) => (
       <Box key={i} className={twinkleClass} />

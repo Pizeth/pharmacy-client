@@ -667,6 +667,8 @@ const customBaseTheme = createTheme({
             // animationDirection: "reverse",
             willChange: "transform, opacity",
             offsetRotate: "auto" /* 👈 aligns with path direction */,
+            offsetAnchor: "right center",
+            offsetDistance: "0%",
             // transition: "1s ease",
             // animationDelay: `${Math.random() * 10}s`,
             // "::before": {
@@ -722,9 +724,10 @@ const customBaseTheme = createTheme({
             ] = {
               // Test Conent
               // height: star.size,
-              height: `calc(${star.size} * 1.25)`,
-              width: `calc(${star.size} * 1.25)`,
-              borderRadius: "100%",
+              height: star.size,
+              // width: star.size,
+              // width: `calc(${star.size} * 1.25)`,
+              borderRadius: "500% 50% 50% 500%",
               // animation: `${shootingStar} ${star.duration} linear infinite, ${tail} ${star.duration} linear infinite, ${twinkle} ${star.delay} linear alternate infinite`,
               // borderRadius: "50%",
               // top: star.top,
@@ -741,7 +744,26 @@ const customBaseTheme = createTheme({
               "--head-color": star.color,
               "--trail-path": star.path,
               "--glow-duration": star.duration,
-              // boxShadow: star.glow,
+              span: {
+                position: "absolute",
+                zIndex: 2,
+                boxShadow: star.glow,
+                // inset: 0,
+                // right: `calc(${star.centerPoint} * -1)`,
+                right: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                height: star.size,
+                width: star.size,
+                // offsetPath: star.path,
+                // offsetRotate: "auto",
+                borderRadius: "50%",
+                background: "#FFF",
+                // border: `0px solid ${star.color}`,
+                // borderWidth: `1vh`,
+                // borderColor: `${star.color}`,
+                animation: `${twinkle} ${star.twinkleDuration} linear alternate infinite`,
+              },
               "::before": {
                 content: '""',
                 position: "absolute",
@@ -760,14 +782,12 @@ const customBaseTheme = createTheme({
                 // animation: `${shining} 5s ease-in-out infinite`,
                 animation: `${twinkling(star.baseSize)} ${
                   star.twinkleDuration
-                } ease-in-out infinite, ${twinkle} ${
-                  star.twinkleDuration
-                } linear alternate infinite`,
+                } ease-in-out infinite`,
                 animationFillMode: "backwards",
-                boxShadow: star.glow,
-                border: `0px solid ${star.color}`,
-                // borderWidth: `0px 3vh 1px 3vh`,
-                borderColor: star.color,
+                // boxShadow: star.glow,
+                // border: `0px solid ${star.color}`,
+                // borderWidth: `0 1vh 1vh 1vh`,
+                // borderColor: "#FFFFFF10",
               },
               "::after": {
                 content: '""',
@@ -781,14 +801,12 @@ const customBaseTheme = createTheme({
                 // animation: `${shining} 5s ease-in-out infinite`,
                 animation: `${twinkling(star.baseSize)} ${
                   star.twinkleDuration
-                } ease-in-out infinite, ${twinkle} ${
-                  star.twinkleDuration
-                } linear alternate infinite`,
+                } ease-in-out infinite`,
                 animationFillMode: "backwards",
-                boxShadow: star.glow,
-                border: `0px solid ${star.color}`,
-                // borderWidth: `0px 3vh 1px 3vh`,
-                borderColor: star.color,
+                // boxShadow: star.glow,
+                // border: `0px solid ${star.color}`,
+                // borderWidth: `0 1vh 1vh 1vh`,
+                // borderColor: "#FFFFFF10",
               },
             };
             return acc;
@@ -818,6 +836,8 @@ const customBaseTheme = createTheme({
               boxShadow: star.glow,
               animation: `${twinkle} ${star.delay} linear alternate infinite`,
               pointerEvents: "none",
+              background: "#FFF",
+              zIndex: 3,
               "::before": {
                 content: '""',
                 position: "absolute",
