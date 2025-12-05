@@ -202,6 +202,15 @@ export const move = keyframes`
   100% { transform: translateX(0em) translateY(0em); }
 `;
 
+export const infiniteRotate = keyframes`
+  from {
+      transform: rotate(0deg);
+  }
+  to {
+      transform: rotate(360deg);
+  }
+`;
+
 // export const glowingStars = keyframes`
 //   0% { opacity: 0; }
 //   50% { opacity: 1; }

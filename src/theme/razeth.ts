@@ -38,6 +38,7 @@ import {
   moveBackgroundLeft,
   twinkle,
   twinkling,
+  infiniteRotate,
 } from "./keyframes";
 import { backdropClasses } from "@mui/material";
 
@@ -727,7 +728,7 @@ const customBaseTheme = createTheme({
               height: star.size,
               // width: star.size,
               // width: `calc(${star.size} * 1.25)`,
-              borderRadius: "500% 50% 50% 500%",
+              borderRadius: "500% 100% 100% 500%",
               // animation: `${shootingStar} ${star.duration} linear infinite, ${tail} ${star.duration} linear infinite, ${twinkle} ${star.delay} linear alternate infinite`,
               // borderRadius: "50%",
               // top: star.top,
@@ -746,23 +747,37 @@ const customBaseTheme = createTheme({
               "--glow-duration": star.duration,
               span: {
                 position: "absolute",
-                zIndex: 2,
+                zIndex: 3,
                 boxShadow: star.glow,
                 // inset: 0,
-                // right: `calc(${star.centerPoint} * -1)`,
+                // right: `calc(${star.size} * 2)`,
+                // left: 0,
                 right: 0,
-                top: "50%",
-                transform: "translateY(-50%)",
+                // right: `calc(50% - ${star.centerPoint})`,
+                top: `calc(50% - ${star.centerPoint})`,
+                transform: `translateY(-50%) translateX(calc(50% - ${star.centerPoint}))`,
                 height: star.size,
                 width: star.size,
                 // offsetPath: star.path,
                 // offsetRotate: "auto",
                 borderRadius: "50%",
-                background: "#FFF",
+                // background: "#FFF",
                 // border: `0px solid ${star.color}`,
                 // borderWidth: `1vh`,
                 // borderColor: `${star.color}`,
-                animation: `${twinkle} ${star.twinkleDuration} linear alternate infinite`,
+                //  display: flex;
+                justifyContent: "center",
+                alignItems: "center",
+
+                /* Apply your background directly to the main container */
+                background:
+                  "url('/static/images/moon_in_comic_style.svg') no-repeat center center",
+                // backgroundColor: "#FFFFFF10",
+                // backgroundBlendMode: "multiply",
+                backgroundSize: "cover",
+
+                /* Apply the animation directly to this element */
+                animation: `${twinkle} ${star.twinkleDuration} linear alternate infinite, ${infiniteRotate} ${star.twinkleDuration} linear infinite`,
               },
               "::before": {
                 content: '""',

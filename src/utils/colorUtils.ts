@@ -456,7 +456,7 @@ export function generateShootingStars(
 
     const size = Math.max(Math.random() * baseSize, 0.125).toFixed(2);
     const centerPoint = Number(size) / 2;
-    // const head = Number(size) * 1.25;
+    const head = Number(size) * 1.25;
     const blurRay = Number(size) * 3.5;
     const color = colors[Math.floor(Math.random() * colors.length)];
     // const glow = `
@@ -465,7 +465,7 @@ export function generateShootingStars(
     //   0 0 ${1 * glowIntensity}px ${color}10
     // `;
     const glow = `
-      0 0 0 calc(var(--core) * 1.25) ${color},
+      0 0 0 calc(var(--core) * 1.25) ${color}80,
       /* cardinal rays */
       0 calc(var(--ray) * -1) ${blurRay}vh 0 ${color}40,
       0 var(--ray) ${blurRay}vh 0 ${color}40,
@@ -485,8 +485,8 @@ export function generateShootingStars(
       // right,
       size: `${size}vh`,
       centerPoint: `${centerPoint}vh`,
-      // head: `${head}vh`,
-      // halfHead: `${head / 2}vh`,
+      head: `${head}vh`,
+      halfHead: `${head / 2}vh`,
       baseSize: Number(size) * 0.85,
       delay,
       duration,
