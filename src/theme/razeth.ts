@@ -752,12 +752,12 @@ const customBaseTheme = createTheme({
                 // inset: 0,
                 // right: `calc(${star.size} * 2)`,
                 // left: 0,
-                right: 0,
+                right: `calc(${star.centerPoint} - ${star.halfHead})`,
                 // right: `calc(50% - ${star.centerPoint})`,
-                top: `calc(50% - ${star.centerPoint})`,
-                transform: `translateY(-50%) translateX(calc(50% - ${star.centerPoint}))`,
-                height: star.size,
-                width: star.size,
+                top: `calc(50% - ${star.halfHead})`,
+                transform: `translateY(calc(-50% + ${star.halfHead}))`,
+                height: star.head,
+                width: star.head,
                 // offsetPath: star.path,
                 // offsetRotate: "auto",
                 borderRadius: "50%",
@@ -777,7 +777,7 @@ const customBaseTheme = createTheme({
                 backgroundSize: "cover",
 
                 /* Apply the animation directly to this element */
-                animation: `${twinkle} ${star.twinkleDuration} linear alternate infinite, ${infiniteRotate} ${star.twinkleDuration} linear infinite`,
+                animation: `${twinkle} ${star.twinkleDuration} linear alternate infinite, ${infiniteRotate} calc(${star.twinkleDuration} + 0.123) linear infinite`,
               },
               "::before": {
                 content: '""',

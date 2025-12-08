@@ -456,7 +456,7 @@ export function generateShootingStars(
 
     const size = Math.max(Math.random() * baseSize, 0.125).toFixed(2);
     const centerPoint = Number(size) / 2;
-    const head = Number(size) * 1.25;
+    const head = Number(size) * 1.5;
     const blurRay = Number(size) * 3.5;
     const color = colors[Math.floor(Math.random() * colors.length)];
     // const glow = `
