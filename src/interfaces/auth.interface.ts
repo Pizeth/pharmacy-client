@@ -2,6 +2,7 @@ import { StyleComponent } from "@/types/classKey";
 import { Theme } from "@emotion/react";
 import { ButtonProps, SxProps } from "@mui/material";
 import { HtmlHTMLAttributes, ReactNode } from "react";
+import { MeteorConfig, MeteorState } from "./theme.interface";
 
 export interface LoginParams {
   // For form login
@@ -118,4 +119,18 @@ export interface FooterProps extends HtmlHTMLAttributes<HTMLDivElement> {
 
 export interface IconProps extends HtmlHTMLAttributes<SVGElement> {
   className?: string;
+}
+
+// Main MeteorShower component with props interface
+export interface MeteorShowerProps {
+  configs?: MeteorConfig[];
+  interval?: number;
+  enabled?: boolean;
+  className?: string;
+  sx?: SxProps<Theme>;
+}
+
+export interface MeteorElementProps {
+  meteor: MeteorState;
+  containerHeight: number;
 }

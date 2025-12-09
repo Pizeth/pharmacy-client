@@ -236,3 +236,14 @@ export function getSideImageConfig() {
     trajectoryMix,
   };
 }
+
+export const getMeteorConfig = () => {
+  const enabled = Boolean(process.env.NEXT_PUBLIC_METEOR_ENABLED) || false;
+  const interval = getEnvNumber(process.env.NEXT_PUBLIC_METEOR_INTERVAL, 5);
+  const configs = parseEnvJson(process.env.NEXT_PUBLIC_METEOR_CONFIGS, [
+    { size: 600, speed: 5, maxCount: 2, count: 0, zIndex: 10 },
+    { size: 300, speed: 10, maxCount: 3, count: 0, zIndex: 4 },
+    { size: 150, speed: 15, maxCount: 5, count: 0, zIndex: 0 },
+  ]);
+  return { enabled, interval, configs };
+};

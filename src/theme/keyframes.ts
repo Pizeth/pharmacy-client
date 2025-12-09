@@ -343,3 +343,8 @@ export const twinkle = keyframes`
 //   87.5%{ opacity: 0.4; --ray: 0.3vw; --core: 0.125vw; --halo: 0.25vw; }
 //   100% { opacity: 0.2; --ray: 0.vw; --core: 0.1vw; --halo: 0.125vw; }
 // `;
+
+export const meteorStrike = keyframes`    
+  0% { backgroundPosition: 0 0; }
+  100% { backgroundPosition: -28800px 0; }
+`;

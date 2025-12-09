@@ -9,6 +9,7 @@ export type ClassKey =
   | "effect"
   | "heading"
   | "content"
+  | "item"
   | "password"
   | "label"
   | "button"

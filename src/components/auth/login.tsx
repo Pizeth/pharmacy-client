@@ -19,6 +19,299 @@ import SocialButton from "./ui/socialButton";
 import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
 import MCS from "../icons/mcs";
 import { v7 } from "uuid";
+import { MeteorShower } from "./ui/meteor";
+
+const PREFIX = "RazethLogin";
+
+const Root = styled("div", {
+  name: PREFIX,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})<LoginProps>(() => ({}));
+
+const Overlay = styled(Box, {
+  name: PREFIX,
+  slot: "Overlay",
+  overridesResolver: (_props, styles) => styles.overlay,
+})(() => ({}));
+
+const Ambient = styled(Box, {
+  name: PREFIX,
+  slot: "Ambient",
+  overridesResolver: (_props, styles) => styles.ambient,
+})(() => ({}));
+
+const Effect = styled(Box, {
+  name: PREFIX,
+  slot: "Effect",
+  overridesResolver: (_props, styles) => styles.effect,
+})(() => ({}));
+
+const Astronaut = styled(Box, {
+  name: PREFIX,
+  slot: "Image",
+  overridesResolver: (_props, styles) => styles.image,
+})(() => ({}));
+
+const Heading = styled(Typography, {
+  name: PREFIX,
+  slot: "Heading",
+  overridesResolver: (_props, styles) => styles.heading,
+})(() => ({}));
+
+const Icons = styled(Box, {
+  name: PREFIX,
+  slot: "Icon",
+  overridesResolver: (_props, styles) => styles.icon,
+})(() => ({}));
+
+// Slot components
+const Content = styled(Box, {
+  name: PREFIX,
+  slot: "Content",
+  overridesResolver: (_props, styles) => styles.content,
+})(() => ({}));
+
+const LoginCard = styled(Card, {
+  name: PREFIX,
+  slot: "Card",
+  overridesResolver: (_props, styles) => styles.card,
+})(() => ({}));
+
+// Provider configuration
+const PROVIDERS = {
+  // web: {
+  //   name: "Web",
+  //   icon: <MCS />,
+  //   className: "web",
+  // },
+  meta: {
+    name: "Meta",
+    icon: <Meta />,
+    className: "meta",
+  },
+  instagram: {
+    name: "Instagram",
+    icon: <Instagram />,
+    className: "instagram",
+  },
+  telegram: {
+    name: "Telegram",
+    icon: <Telegram />,
+    className: "telegram",
+  },
+  youtube: {
+    name: "Youtube",
+    icon: <YouTube />,
+    className: "youtube",
+  },
+};
+
+// const LoginAvatar = styled(Box, {
+//   name: PREFIX,
+//   slot: "Avatar",
+//   overridesResolver: (_props, styles) => styles.avatar,
+// })(() => ({}));
+
+// Main component + slot API
+export const Login = (
+  inProps: LoginProps & {
+    Content?: StyleComponent;
+    Card?: StyleComponent;
+  }
+) => {
+  const props = useThemeProps({
+    props: inProps,
+    name: PREFIX,
+  });
+  const {
+    sideImage = defaultSideImage,
+    avatarIcon = defaultAvatar,
+    children = defaultLoginForm,
+    divider = defaultDivider,
+    social = defaultSocial,
+    signUp = defaultSignUp,
+    footer = defaultFooter,
+    variant = "full",
+    src = "/static/images/astronaut.png",
+    alt = "Picture of the astronaut",
+    // heading = "Find me on Social Media",
+    className,
+    sx,
+    // backgroundImage,
+    ...rest
+  } = props;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const checkAuth = useCheckAuth();
+  const theme = useTheme();
+  const navigate = useNavigate();
+  useEffect(() => {
+    checkAuth({}, false)
+      .then(() => {
+        // already authenticated, redirect to the home page
+        navigate("/");
+      })
+      .catch(() => {
+        // not authenticated, stay on the login page
+      });
+  }, [checkAuth, navigate]);
+
+  return (
+    <Root
+      ref={containerRef}
+      variant={variant}
+      className={className}
+      sx={sx}
+      {...rest}
+    >
+      <Login.overlay>
+        <Login.ambient />
+        <Login.effect
+          count={theme.custom.sideImage.shootingStarCount}
+          shootingStarClass={theme.custom.sideImage.shootingClass}
+          twinkleClass={theme.custom.sideImage.twinkleClass}
+        />
+        <Login.image src={src} alt={alt} />
+        <Login.content>
+          <Login.card>
+            <Grid container spacing={0}>
+              {/* Image section - hidden on mobile */}
+              {sideImage}
+
+              {/* Form section */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CardContent>
+                  <Box>
+                    {avatarIcon}
+                    {children}
+                    {divider}
+                    {social}
+                    {signUp}
+                  </Box>
+                </CardContent>
+              </Grid>
+            </Grid>
+          </Login.card>
+          {footer}
+        </Login.content>
+        {/* <Login.Heading>{heading}</Login.Heading> */}
+        <Login.icon>
+          {Object.entries(PROVIDERS).map(([key, provider]) => (
+            <SocialButton
+              key={key}
+              variant="outlined"
+              icon={provider.icon}
+              className={provider.className}
+            >
+              {/* {provider.name} */}
+            </SocialButton>
+          ))}
+        </Login.icon>
+      </Login.overlay>
+    </Root>
+  );
+};
+
+Login.overlay = Overlay;
+Login.ambient = () => (
+  <Ambient>
+    <Box className="stars" />
+    <Box className="twinkling" />
+    <Box className="clouds" />
+  </Ambient>
+);
+Login.image = ({ src, alt }: { src: string; alt: string }) => (
+  <Astronaut>
+    <Image src={src} alt={alt} fill style={{ objectFit: "contain" }} priority />
+  </Astronaut>
+);
+Login.effect = ({
+  count,
+  shootingStarClass,
+  twinkleClass,
+}: {
+  count: number;
+  shootingStarClass: string;
+  twinkleClass: string;
+}) => (
+  <Effect>
+    {Array.from({ length: count }).map((_, i) => (
+      <span key={v7()} className={shootingStarClass}>
+        <span key={i} />
+      </span>
+    ))}
+    {Array.from({ length: count }).map((_, i) => (
+      <Box key={i} className={twinkleClass} />
+    ))}
+    <MeteorShower />
+  </Effect>
+);
+// Login.heading = Heading;
+Login.icon = Icons;
+Login.content = Content;
+Login.card = LoginCard;
+// Login.Avatar = LoginAvatar;
+
+const defaultLoginForm = (
+  <PasswordLogin
+    forgotPasswordUrl={process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL}
+  />
+);
+const defaultSideImage = (
+  <SideImage src={process.env.NEXT_PUBLIC_PLACEHOLDER} />
+);
+// const defaultAvatar = <PersonIcon />;
+const defaultAvatar = (
+  <AvatarHeader
+    src={
+      // "https://api.dicebear.com/9.x/adventurer-neutral/svg?radius=50&seed=Razeth"
+      "https://pub-ce3376330760464f8be1e4a3b46318c0.r2.dev/sea-planet-water-Earth-map-Arctic-193611-wallhere.com.jpg"
+    }
+    avatarIcon={<PersonIcon />}
+  />
+);
+const defaultDivider = <Divider />;
+const defaultSocial = <SocialLogin />;
+const defaultSignUp = <SignupLink link="/auth/register" />;
+const defaultFooter = <Footer />;
+
+// ✅ Named exports (optional, for tree-shaking)
+export {
+  // Header as LoginHeader,
+  Content as LoginContent,
+  LoginCard,
+};
+
+export default Login;
+
+// export default function LoginPage() {
+//   return (
+//     <Login Content={Content} Card={LoginCard}>
+//       <Login.Content>
+//         <Login.Card>
+//           <Grid container spacing={0}>
+//             {/* Image section - hidden on mobile */}
+//             {defaultSideImage}
+
+//             {/* Form section */}
+//             <Grid size={{ xs: 12, md: 6 }}>
+//               <CardContent>
+//                 <Box>
+//                   {defaultAvatar}
+//                   {defaultLoginForm}
+//                   {defaultDivider}
+//                   {SocialLogin}
+//                   {defaultSignUp}
+//                 </Box>
+//               </CardContent>
+//             </Grid>
+//           </Grid>
+//         </Login.Card>
+//         {defaultFooter}
+//       </Login.Content>
+//     </Login>
+//   );
+// }
 
 // const LoginOld = (inProps: LoginProps) => {
 //   const props = useThemeProps({
@@ -251,294 +544,3 @@ import { v7 } from "uuid";
 // })<LoginProps>(({ theme }) => LoginStyles(theme));
 
 // Root styled component
-
-const PREFIX = "RazethLogin";
-
-const Root = styled("div", {
-  name: PREFIX,
-  slot: "Root",
-  overridesResolver: (_props, styles) => styles.root,
-})<LoginProps>(() => ({}));
-
-const Overlay = styled(Box, {
-  name: PREFIX,
-  slot: "Overlay",
-  overridesResolver: (_props, styles) => styles.overlay,
-})(() => ({}));
-
-const Ambient = styled(Box, {
-  name: PREFIX,
-  slot: "Ambient",
-  overridesResolver: (_props, styles) => styles.ambient,
-})(() => ({}));
-
-const Effect = styled(Box, {
-  name: PREFIX,
-  slot: "Effect",
-  overridesResolver: (_props, styles) => styles.effect,
-})(() => ({}));
-
-const Astronaut = styled(Box, {
-  name: PREFIX,
-  slot: "Image",
-  overridesResolver: (_props, styles) => styles.image,
-})(() => ({}));
-
-const Heading = styled(Typography, {
-  name: PREFIX,
-  slot: "Heading",
-  overridesResolver: (_props, styles) => styles.heading,
-})(() => ({}));
-
-const Icons = styled(Box, {
-  name: PREFIX,
-  slot: "Icon",
-  overridesResolver: (_props, styles) => styles.icon,
-})(() => ({}));
-
-// Slot components
-const Content = styled(Box, {
-  name: PREFIX,
-  slot: "Content",
-  overridesResolver: (_props, styles) => styles.content,
-})(() => ({}));
-
-const LoginCard = styled(Card, {
-  name: PREFIX,
-  slot: "Card",
-  overridesResolver: (_props, styles) => styles.card,
-})(() => ({}));
-
-// Provider configuration
-const PROVIDERS = {
-  // web: {
-  //   name: "Web",
-  //   icon: <MCS />,
-  //   className: "web",
-  // },
-  meta: {
-    name: "Meta",
-    icon: <Meta />,
-    className: "meta",
-  },
-  instagram: {
-    name: "Instagram",
-    icon: <Instagram />,
-    className: "instagram",
-  },
-  telegram: {
-    name: "Telegram",
-    icon: <Telegram />,
-    className: "telegram",
-  },
-  youtube: {
-    name: "Youtube",
-    icon: <YouTube />,
-    className: "youtube",
-  },
-};
-
-// const LoginAvatar = styled(Box, {
-//   name: PREFIX,
-//   slot: "Avatar",
-//   overridesResolver: (_props, styles) => styles.avatar,
-// })(() => ({}));
-
-// Main component + slot API
-export const Login = (
-  inProps: LoginProps & {
-    Content?: StyleComponent;
-    Card?: StyleComponent;
-  }
-) => {
-  const props = useThemeProps({
-    props: inProps,
-    name: PREFIX,
-  });
-  const {
-    sideImage = defaultSideImage,
-    avatarIcon = defaultAvatar,
-    children = defaultLoginForm,
-    divider = defaultDivider,
-    social = defaultSocial,
-    signUp = defaultSignUp,
-    footer = defaultFooter,
-    variant = "full",
-    src = "/static/images/astronaut.png",
-    alt = "Picture of the astronaut",
-    // heading = "Find me on Social Media",
-    className,
-    sx,
-    // backgroundImage,
-    ...rest
-  } = props;
-  const containerRef = useRef<HTMLDivElement>(null);
-  const checkAuth = useCheckAuth();
-  const theme = useTheme();
-  const navigate = useNavigate();
-  useEffect(() => {
-    checkAuth({}, false)
-      .then(() => {
-        // already authenticated, redirect to the home page
-        navigate("/");
-      })
-      .catch(() => {
-        // not authenticated, stay on the login page
-      });
-  }, [checkAuth, navigate]);
-
-  return (
-    <Root
-      ref={containerRef}
-      variant={variant}
-      className={className}
-      sx={sx}
-      {...rest}
-    >
-      <Login.overlay>
-        <Login.ambient />
-        <Login.effect
-          count={theme.custom.sideImage.shootingStarCount}
-          shootingStarClass={theme.custom.sideImage.shootingClass}
-          twinkleClass={theme.custom.sideImage.twinkleClass}
-        />
-        <Login.image src={src} alt={alt} />
-        <Login.content>
-          <Login.card>
-            <Grid container spacing={0}>
-              {/* Image section - hidden on mobile */}
-              {sideImage}
-
-              {/* Form section */}
-              <Grid size={{ xs: 12, md: 6 }}>
-                <CardContent>
-                  <Box>
-                    {avatarIcon}
-                    {children}
-                    {divider}
-                    {social}
-                    {signUp}
-                  </Box>
-                </CardContent>
-              </Grid>
-            </Grid>
-          </Login.card>
-          {footer}
-        </Login.content>
-        {/* <Login.Heading>{heading}</Login.Heading> */}
-        <Login.icon>
-          {Object.entries(PROVIDERS).map(([key, provider]) => (
-            <SocialButton
-              key={key}
-              variant="outlined"
-              icon={provider.icon}
-              className={provider.className}
-            >
-              {/* {provider.name} */}
-            </SocialButton>
-          ))}
-        </Login.icon>
-      </Login.overlay>
-    </Root>
-  );
-};
-
-Login.overlay = Overlay;
-Login.ambient = () => (
-  <Ambient>
-    <Box className="stars" />
-    <Box className="twinkling" />
-    <Box className="clouds" />
-  </Ambient>
-);
-Login.image = ({ src, alt }: { src: string; alt: string }) => (
-  <Astronaut>
-    <Image src={src} alt={alt} fill style={{ objectFit: "contain" }} priority />
-  </Astronaut>
-);
-Login.effect = ({
-  count,
-  shootingStarClass,
-  twinkleClass,
-}: {
-  count: number;
-  shootingStarClass: string;
-  twinkleClass: string;
-}) => (
-  <Effect>
-    {Array.from({ length: count }).map((_, i) => (
-      <span key={v7()} className={shootingStarClass}>
-        <span key={i} />
-      </span>
-    ))}
-    {Array.from({ length: count }).map((_, i) => (
-      <Box key={i} className={twinkleClass} />
-    ))}
-  </Effect>
-);
-// Login.heading = Heading;
-Login.icon = Icons;
-Login.content = Content;
-Login.card = LoginCard;
-// Login.Avatar = LoginAvatar;
-
-const defaultLoginForm = (
-  <PasswordLogin
-    forgotPasswordUrl={process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL}
-  />
-);
-const defaultSideImage = (
-  <SideImage src={process.env.NEXT_PUBLIC_PLACEHOLDER} />
-);
-// const defaultAvatar = <PersonIcon />;
-const defaultAvatar = (
-  <AvatarHeader
-    src={
-      // "https://api.dicebear.com/9.x/adventurer-neutral/svg?radius=50&seed=Razeth"
-      "https://pub-ce3376330760464f8be1e4a3b46318c0.r2.dev/sea-planet-water-Earth-map-Arctic-193611-wallhere.com.jpg"
-    }
-    avatarIcon={<PersonIcon />}
-  />
-);
-const defaultDivider = <Divider />;
-const defaultSocial = <SocialLogin />;
-const defaultSignUp = <SignupLink link="/auth/register" />;
-const defaultFooter = <Footer />;
-
-// ✅ Named exports (optional, for tree-shaking)
-export {
-  // Header as LoginHeader,
-  Content as LoginContent,
-  LoginCard,
-};
-
-export default Login;
-
-// export default function LoginPage() {
-//   return (
-//     <Login Content={Content} Card={LoginCard}>
-//       <Login.Content>
-//         <Login.Card>
-//           <Grid container spacing={0}>
-//             {/* Image section - hidden on mobile */}
-//             {defaultSideImage}
-
-//             {/* Form section */}
-//             <Grid size={{ xs: 12, md: 6 }}>
-//               <CardContent>
-//                 <Box>
-//                   {defaultAvatar}
-//                   {defaultLoginForm}
-//                   {defaultDivider}
-//                   {SocialLogin}
-//                   {defaultSignUp}
-//                 </Box>
-//               </CardContent>
-//             </Grid>
-//           </Grid>
-//         </Login.Card>
-//         {defaultFooter}
-//       </Login.Content>
-//     </Login>
-//   );
-// }

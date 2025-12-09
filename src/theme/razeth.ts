@@ -6,7 +6,8 @@ import { createTheme, Theme } from "@mui/material/styles";
 // import { LoginClasses } from "@/components/auth/login";
 import { ClassKey, CustomComponents } from "@/types/classKey";
 import {
-  line,
+  Line,
+  Meteor,
   RazethComponentsPropsList,
   SideImage,
 } from "@/interfaces/theme.interface";
@@ -20,7 +21,7 @@ import {
   useResponsiveShootingStars,
 } from "@/utils/colorUtils";
 // import "@fontsource/moul";
-import { getSideImageConfig } from "@/configs/themeConfig";
+import { getMeteorConfig, getSideImageConfig } from "@/configs/themeConfig";
 import {
   wee,
   filt,
@@ -56,13 +57,15 @@ declare module "@mui/material/styles" {
   interface Theme {
     custom: {
       sideImage: SideImage;
-      lines: line[];
+      lines: Line[];
+      meteor?: Meteor;
     };
   }
   interface ThemeOptions {
     custom?: {
       sideImage?: SideImage;
-      lines?: line[];
+      lines?: Line[];
+      meteor?: Meteor;
     };
   }
 
@@ -381,6 +384,7 @@ const customBaseTheme = createTheme({
   // cssVarPrefix: "app", // all vars will start with --app-
   custom: {
     sideImage: getSideImageConfig(),
+    meteor: getMeteorConfig(),
     lines: [
       { color: "#FF4500", delay: "0.5s" },
       { color: "#32CD32", delay: "1s" },
@@ -513,6 +517,10 @@ const customBaseTheme = createTheme({
           overflow: "hidden",
           zIndex: 1,
           // rowGap: "1em",
+          // Ensure meteor layer is positioned correctly
+          "& > *": {
+            position: "relative",
+          },
           "&::before": {
             content: '""',
             position: "absolute",
@@ -1301,6 +1309,40 @@ const customBaseTheme = createTheme({
           }),
         },
       ],
+    },
+    RazethMeteor: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          overflow: "hidden",
+          zIndex: 1,
+          // You can add custom styles here that will apply to all meteors
+          // Example: Add a subtle glow effect
+          filter:
+            props.theme.palette.mode === "dark"
+              ? "drop-shadow(0 0 10px rgba(255, 255, 255, 0.1))"
+              : "none",
+        }),
+        item: {
+          // Styles for individual meteor items
+          position: "absolute",
+          willChange: "transform",
+          pointerEvents: "none",
+        },
+        sprite: {
+          // Styles for meteor sprites
+          // You can override animation timing, filters, etc.
+        },
+      },
+      defaultProps: {
+        // Default props for all MeteorShower instances
+        enabled: true,
+        interval: 500,
+      },
     },
     RazethSideImage: {
       styleOverrides: {
