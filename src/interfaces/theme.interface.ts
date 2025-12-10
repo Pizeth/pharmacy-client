@@ -74,9 +74,9 @@ export interface Line {
 }
 
 export interface Meteor {
-  enabled?: boolean;
-  interval?: number;
-  configs?: MeteorConfig[];
+  enabled: boolean;
+  interval: number;
+  configs: MeteorConfig[];
 }
 
 interface responsive {
@@ -87,7 +87,7 @@ interface responsive {
 
 // Meteor configuration interface
 export interface MeteorConfig {
-  size: number;
+  size: string | number;
   speed: number;
   maxCount: number;
   count: number;
@@ -98,7 +98,7 @@ export interface MeteorState {
   id: string;
   top: string | number;
   left: string | number;
-  size: number;
+  size: string | number;
   speed: number;
   zIndex: number;
   startFromTop: boolean;

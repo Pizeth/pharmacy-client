@@ -1,5 +1,6 @@
+import { Meteor } from "@/interfaces/theme.interface";
 import { shootingStar } from "@/theme/keyframes";
-import { GradientPoint, GradientRow } from "@/types/theme";
+import { GradientPoint, GradientRow, MeteorVariant } from "@/types/theme";
 import { buildGradients, makePulseSequence } from "@/utils/colorUtils";
 
 /**
@@ -238,12 +239,54 @@ export function getSideImageConfig() {
 }
 
 export const getMeteorConfig = () => {
-  const enabled = Boolean(process.env.NEXT_PUBLIC_METEOR_ENABLED) || false;
-  const interval = getEnvNumber(process.env.NEXT_PUBLIC_METEOR_INTERVAL, 5);
-  const configs = parseEnvJson(process.env.NEXT_PUBLIC_METEOR_CONFIGS, [
-    { size: 600, speed: 5, maxCount: 2, count: 0, zIndex: 10 },
-    { size: 300, speed: 10, maxCount: 3, count: 0, zIndex: 4 },
-    { size: 150, speed: 15, maxCount: 5, count: 0, zIndex: 0 },
-  ]);
+  // const enabled = Boolean(process.env.NEXT_PUBLIC_METEOR_ENABLED) || false;
+  // const interval = getEnvNumber(process.env.NEXT_PUBLIC_METEOR_INTERVAL, 5);
+  const meteorVariant: MeteorVariant =
+    (process.env.NEXT_PUBLIC_METEOR_VARIANT as MeteorVariant) || "medium";
+  const meteorConfig = parseEnvJson(
+    process.env.NEXT_PUBLIC_METEOR_CONFIGS,
+    // { size: 600, speed: 5, maxCount: 2, count: 0, zIndex: 10 },
+    // { size: 300, speed: 10, maxCount: 3, count: 0, zIndex: 4 },
+    // { size: 150, speed: 15, maxCount: 5, count: 0, zIndex: 0 },
+    {
+      light: {
+        enabled: true,
+        interval: 750,
+        configs: [
+          { size: "0.5vh", speed: 10, maxCount: 1, count: 0, zIndex: 1 },
+          { size: "0.25vh", speed: 15, maxCount: 3, count: 0, zIndex: 0 },
+        ],
+      },
+      medium: {
+        enabled: true,
+        interval: 500,
+        configs: [
+          { size: "0.75vh", speed: 5, maxCount: 1, count: 0, zIndex: 2 },
+          { size: "0.5vh", speed: 10, maxCount: 3, count: 0, zIndex: 1 },
+          { size: "0.25vh", speed: 15, maxCount: 5, count: 0, zIndex: 0 },
+        ],
+      },
+      heavy: {
+        enabled: true,
+        interval: 300,
+        configs: [
+          { size: "1vh", speed: 2.5, maxCount: 3, count: 0, zIndex: 3 },
+          { size: "0.75vh", speed: 5, maxCount: 5, count: 0, zIndex: 2 },
+          { size: "0.5vh", speed: 10, maxCount: 7, count: 0, zIndex: 1 },
+          { size: "0.25vh", speed: 15, maxCount: 10, count: 0, zIndex: 0 },
+        ],
+      },
+    }
+  );
+  const { enabled, interval, configs } =
+    meteorConfig[meteorVariant as keyof typeof meteorConfig] ||
+    meteorConfig.medium;
+
+  // Predefined meteor variants
+  const meteorVariants = {};
+
+  console.log("Meteor enabled:", enabled);
+  console.log("Meteor interval:", interval);
+  console.log("Meteor configs:", configs);
   return { enabled, interval, configs };
 };

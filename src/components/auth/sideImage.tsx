@@ -82,11 +82,13 @@ SideImage.circle = Circle;
 SideImage.logo = ({ src, theme }: { src: string; theme: Theme }) => (
   <LogoWrapper>
     <Image
+      preload={false}
+      loading="eager"
       src={src}
-      alt="Logo"
+      alt="logo"
       fill
       style={{ objectFit: "contain" }}
-      priority
+      unoptimized
     />
     <SideImage.caption
       caption={theme.custom.sideImage.logoCaption}

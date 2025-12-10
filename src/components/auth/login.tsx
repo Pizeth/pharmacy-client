@@ -7,7 +7,7 @@ import PasswordLogin from "./passwordLogin";
 import SocialLogin from "./socialLogin";
 import SideImage from "./sideImage";
 import AvatarHeader from "./avatar";
-import { LoginProps } from "@/interfaces/auth.interface";
+import { EffectProps, LoginProps } from "@/interfaces/auth.interface";
 import { useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import { RazethDivider as Divider } from "./divider";
@@ -170,6 +170,14 @@ export const Login = (
           count={theme.custom.sideImage.shootingStarCount}
           shootingStarClass={theme.custom.sideImage.shootingClass}
           twinkleClass={theme.custom.sideImage.twinkleClass}
+          meteorVariant="custom"
+          customMeteorConfig={{
+            enabled: true,
+            interval: 400,
+            configs: [
+              { size: 500, speed: 7, maxCount: 3, count: 0, zIndex: 10 },
+            ],
+          }}
         />
         <Login.image src={src} alt={alt} />
         <Login.content>
@@ -195,7 +203,7 @@ export const Login = (
           {footer}
         </Login.content>
         {/* <Login.Heading>{heading}</Login.Heading> */}
-        <Login.icon>
+        {/* <Login.icon>
           {Object.entries(PROVIDERS).map(([key, provider]) => (
             <SocialButton
               key={key}
@@ -203,10 +211,10 @@ export const Login = (
               icon={provider.icon}
               className={provider.className}
             >
-              {/* {provider.name} */}
+              {provider.name}
             </SocialButton>
           ))}
-        </Login.icon>
+        </Login.icon> */}
       </Login.overlay>
     </Root>
   );
@@ -222,30 +230,101 @@ Login.ambient = () => (
 );
 Login.image = ({ src, alt }: { src: string; alt: string }) => (
   <Astronaut>
-    <Image src={src} alt={alt} fill style={{ objectFit: "contain" }} priority />
+    <Image
+      preload={false}
+      loading="lazy"
+      src={src}
+      alt={alt}
+      fill
+      style={{ objectFit: "contain" }}
+      unoptimized
+    />
   </Astronaut>
 );
 Login.effect = ({
   count,
   shootingStarClass,
   twinkleClass,
-}: {
-  count: number;
-  shootingStarClass: string;
-  twinkleClass: string;
-}) => (
-  <Effect>
-    {Array.from({ length: count }).map((_, i) => (
+}: // meteorEnabled = true,
+// meteorVariant = "medium",
+// customMeteorConfig,
+EffectProps) => {
+  const theme = useTheme();
+
+  // Predefined meteor variants
+  // const meteorVariants = {
+  //   light: {
+  //     enabled: true,
+  //     interval: 750,
+  //     configs: [
+  //       { size: "0.5vh", speed: 10, maxCount: 1, count: 0, zIndex: 1 },
+  //       { size: "0.25vh", speed: 15, maxCount: 3, count: 0, zIndex: 0 },
+  //     ],
+  //   },
+  //   medium: {
+  //     enabled: true,
+  //     interval: 500,
+  //     configs: [
+  //       { size: "0.75vh", speed: 5, maxCount: 1, count: 0, zIndex: 2 },
+  //       { size: "0.5vh", speed: 10, maxCount: 3, count: 0, zIndex: 1 },
+  //       { size: "0.25vh", speed: 15, maxCount: 5, count: 0, zIndex: 0 },
+  //     ],
+  //   },
+  //   heavy: {
+  //     enabled: true,
+  //     interval: 300,
+  //     configs: [
+  //       { size: "1vh", speed: 2.5, maxCount: 3, count: 0, zIndex: 3 },
+  //       { size: "0.75vh", speed: 5, maxCount: 5, count: 0, zIndex: 2 },
+  //       { size: "0.5vh", speed: 10, maxCount: 7, count: 0, zIndex: 1 },
+  //       { size: "0.25vh", speed: 15, maxCount: 10, count: 0, zIndex: 0 },
+  //     ],
+  //   },
+  //   custom: customMeteorConfig || {
+  //     enabled: true,
+  //     interval: 300,
+  //     configs: [
+  //       { size: 700, speed: 4, maxCount: 3, count: 0, zIndex: 10 },
+  //       { size: 400, speed: 8, maxCount: 5, count: 0, zIndex: 4 },
+  //       { size: 200, speed: 12, maxCount: 8, count: 0, zIndex: 0 },
+  //     ],
+  //   },
+  // };
+
+  // meteorVariants.custom = customMeteorConfig || meteorVariants.medium;
+
+  // Get meteor config from theme or use defaults
+  // const meteorConfig = theme.custom?.meteor || {
+  //   enabled: true,
+  //   interval: 500,
+  //   configs: [
+  //     { size: 600, speed: 5, maxCount: 2, count: 0, zIndex: 10 },
+  //     { size: 300, speed: 10, maxCount: 3, count: 0, zIndex: 4 },
+  //     { size: 150, speed: 15, maxCount: 5, count: 0, zIndex: 0 },
+  //   ],
+  // };
+  const meteorConfig = theme.custom?.meteor;
+  console.log("Meteor config:", meteorConfig);
+
+  return (
+    <Effect>
+      {/* {Array.from({ length: count }).map((_, i) => (
       <span key={v7()} className={shootingStarClass}>
         <span key={i} />
       </span>
     ))}
     {Array.from({ length: count }).map((_, i) => (
       <Box key={i} className={twinkleClass} />
-    ))}
-    <MeteorShower />
-  </Effect>
-);
+    ))} */}
+      {/* Meteor shower with theme config */}
+      <MeteorShower
+        enabled={meteorConfig?.enabled}
+        interval={meteorConfig?.interval}
+        configs={meteorConfig?.configs}
+      />
+    </Effect>
+  );
+};
 // Login.heading = Heading;
 Login.icon = Icons;
 Login.content = Content;

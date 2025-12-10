@@ -345,6 +345,6 @@ export const twinkle = keyframes`
 // `;
 
 export const meteorStrike = keyframes`    
-  0% { backgroundPosition: 0 0; }
-  100% { backgroundPosition: -28800px 0; }
+  0% { background-position: 0 0; }
+  100% { background-position: -28800px 0; }
 `;

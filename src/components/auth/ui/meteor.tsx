@@ -10,12 +10,6 @@ import { useEffect, useRef, useState } from "react";
 
 const PREFIX = "RazethMeteor";
 
-const Root = styled(Box, {
-  name: PREFIX,
-  slot: "Root",
-  overridesResolver: (_props, styles) => styles.root,
-})(() => ({}));
-
 // Styled root container
 const MeteorRoot = styled(Box, {
   name: PREFIX,
@@ -35,9 +29,9 @@ const MeteorSprite = styled(Box, {
   slot: "Content",
   shouldForwardProp: (prop: string) => prop !== "size",
   overridesResolver: (_props, styles) => styles.content,
-})<{ size: number }>(({ size }) => ({
-  width: `${size}px`,
-  height: `${size}px`,
+})<{ size: string | number }>(({ size }) => ({
+  width: `${size}`,
+  height: `${size}`,
   backgroundImage: "url(static/images/meteors-sprite.png)",
   backgroundSize: "auto 100%",
   animation: `${meteorStrike} 3s steps(48) infinite`,
@@ -102,17 +96,22 @@ export const MeteorShower = (
   const props = useThemeProps({ name: PREFIX, props: inProps });
   const {
     configs = [
-      { size: 600, speed: 5, maxCount: 2, count: 0, zIndex: 10 },
-      { size: 300, speed: 10, maxCount: 3, count: 0, zIndex: 4 },
-      { size: 150, speed: 15, maxCount: 5, count: 0, zIndex: 0 },
+      { size: "600px", speed: 5, maxCount: 2, count: 0, zIndex: 10 },
+      { size: "300px", speed: 10, maxCount: 3, count: 0, zIndex: 4 },
+      { size: "150px", speed: 15, maxCount: 5, count: 0, zIndex: 0 },
     ],
     interval = 500,
     enabled = true,
+    // configs,
+    // interval,
+    // enabled,
     className,
     sprite,
     sx,
     ...rest
   } = props;
+
+  // console.log("configs", configs);
 
   const [meteors, setMeteors] = useState<MeteorState[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -180,7 +179,7 @@ export const MeteorShower = (
       }
     };
 
-    const interval = setInterval(createMeteor, 500);
+    const interval = setInterval(createMeteor, 1000);
 
     return () => clearInterval(interval);
   }, [enabled, interval]);
@@ -188,7 +187,7 @@ export const MeteorShower = (
   if (!enabled) return null;
 
   return (
-    <MeteorRoot ref={containerRef} className={className} sx={sx}>
+    <MeteorRoot ref={containerRef} className={className} sx={sx} {...rest}>
       {meteors.map((meteor) => (
         <MeteorElement
           key={meteor.id}

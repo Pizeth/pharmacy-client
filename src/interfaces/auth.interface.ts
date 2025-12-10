@@ -2,7 +2,8 @@ import { StyleComponent } from "@/types/classKey";
 import { Theme } from "@emotion/react";
 import { ButtonProps, SxProps } from "@mui/material";
 import { HtmlHTMLAttributes, ReactNode } from "react";
-import { MeteorConfig, MeteorState } from "./theme.interface";
+import { Meteor, MeteorConfig, MeteorState } from "./theme.interface";
+import { MeteorVariant } from "@/types/theme";
 
 export interface LoginParams {
   // For form login
@@ -122,10 +123,10 @@ export interface IconProps extends HtmlHTMLAttributes<SVGElement> {
 }
 
 // Main MeteorShower component with props interface
-export interface MeteorShowerProps {
-  configs?: MeteorConfig[];
-  interval?: number;
-  enabled?: boolean;
+export interface MeteorShowerProps extends Partial<Meteor> {
+  // configs?: MeteorConfig[];
+  // interval?: number;
+  // enabled?: boolean;
   className?: string;
   sx?: SxProps<Theme>;
 }
@@ -133,4 +134,14 @@ export interface MeteorShowerProps {
 export interface MeteorElementProps {
   meteor: MeteorState;
   containerHeight: number;
+}
+
+export interface EffectProps {
+  count: number;
+  shootingStarClass: string;
+  twinkleClass: string;
+  meteorEnabled?: boolean;
+  meteorVariant?: MeteorVariant;
+  // customMeteorConfig?: Omit<MeteorShowerProps, "sx" | "className">;
+  customMeteorConfig?: Meteor;
 }
