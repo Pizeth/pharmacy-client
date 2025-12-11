@@ -19,7 +19,7 @@ import {
   makePulseKeyframes,
   makePulseVars,
   useResponsiveShootingStars,
-} from "@/utils/colorUtils";
+} from "@/utils/themeUtils";
 // import "@fontsource/moul";
 import { getMeteorConfig, getSideImageConfig } from "@/configs/themeConfig";
 import {

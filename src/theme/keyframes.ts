@@ -344,7 +344,12 @@ export const twinkle = keyframes`
 //   100% { opacity: 0.2; --ray: 0.vw; --core: 0.1vw; --halo: 0.125vw; }
 // `;
 
-export const meteorStrike = keyframes`    
-  0% { background-position: 0 0; }
-  100% { background-position: -28800px 0; }
+// export const meteorStrike = keyframes`
+//   0% { background-position: 0 0; }
+//   100% { background-position: -28800px 0; }
+// `;
+
+export const meteorStrike = keyframes`     
+  0% { background-position: 0% 0; }
+  100% { background-position: 100% 0; } /* 100% aligns the last frame */
 `;

@@ -1,7 +1,7 @@
-import { Meteor } from "@/interfaces/theme.interface";
+import { Meteor, MeteorConfig } from "@/interfaces/theme.interface";
 import { shootingStar } from "@/theme/keyframes";
-import { GradientPoint, GradientRow, MeteorVariant } from "@/types/theme";
-import { buildGradients, makePulseSequence } from "@/utils/colorUtils";
+import { GradientPoint, GradientRow } from "@/types/theme";
+import { buildGradients, makePulseSequence } from "@/utils/themeUtils";
 
 /**
  * Returns the parsed number or the fallback if parsing fails.
@@ -238,55 +238,123 @@ export function getSideImageConfig() {
   };
 }
 
+// export const getMeteorConfig = () => {
+//   // const enabled = Boolean(process.env.NEXT_PUBLIC_METEOR_ENABLED) || false;
+//   // const interval = getEnvNumber(process.env.NEXT_PUBLIC_METEOR_INTERVAL, 5);
+//   const meteorVariant: MeteorVariant =
+//     (process.env.NEXT_PUBLIC_METEOR_VARIANT as MeteorVariant) || "medium";
+//   const meteorConfig = parseEnvJson(
+//     process.env.NEXT_PUBLIC_METEOR_CONFIGS,
+//     // { size: 600, speed: 5, maxCount: 2, count: 0, zIndex: 10 },
+//     // { size: 300, speed: 10, maxCount: 3, count: 0, zIndex: 4 },
+//     // { size: 150, speed: 15, maxCount: 5, count: 0, zIndex: 0 },
+//     {
+//       light: {
+//         enabled: true,
+//         interval: 750,
+//         configs: [
+//           { size: "3vh", speed: 5, maxCount: 7, count: 0, zIndex: 1 },
+//           { size: "5vh", speed: 10, maxCount: 5, count: 0, zIndex: 2 },
+//           { size: "7vh", speed: 15, maxCount: 3, count: 0, zIndex: 3 },
+//         ],
+//       },
+//       medium: {
+//         enabled: true,
+//         interval: 500,
+//         configs: [
+//           { size: "3vh", speed: 5, maxCount: 9, count: 0, zIndex: 1 },
+//           { size: "5vh", speed: 10, maxCount: 7, count: 0, zIndex: 2 },
+//           { size: "7vh", speed: 15, maxCount: 5, count: 0, zIndex: 3 },
+//           { size: "10vh", speed: 20, maxCount: 3, count: 0, zIndex: 5 },
+//         ],
+//       },
+//       heavy: {
+//         enabled: true,
+//         interval: 300,
+//         configs: [
+//           { size: "3vh", speed: 5, maxCount: 12, count: 0, zIndex: 1 },
+//           { size: "5vh", speed: 10, maxCount: 10, count: 0, zIndex: 2 },
+//           { size: "7vh", speed: 15, maxCount: 7, count: 0, zIndex: 3 },
+//           { size: "10vh", speed: 20, maxCount: 5, count: 0, zIndex: 5 },
+//           { size: "50vh", speed: 25, maxCount: 3, count: 0, zIndex: 7 },
+//         ],
+//       },
+//     }
+//   );
+//   const { enabled, interval, configs } =
+//     meteorConfig[meteorVariant as keyof typeof meteorConfig] ||
+//     meteorConfig.medium;
+
+//   console.log("Meteor enabled:", enabled);
+//   console.log("Meteor interval:", interval);
+//   console.log("Meteor configs:", configs);
+//   return { enabled, interval, configs };
+// };
+
 export const getMeteorConfig = () => {
-  // const enabled = Boolean(process.env.NEXT_PUBLIC_METEOR_ENABLED) || false;
-  // const interval = getEnvNumber(process.env.NEXT_PUBLIC_METEOR_INTERVAL, 5);
-  const meteorVariant: MeteorVariant =
-    (process.env.NEXT_PUBLIC_METEOR_VARIANT as MeteorVariant) || "medium";
-  const meteorConfig = parseEnvJson(
-    process.env.NEXT_PUBLIC_METEOR_CONFIGS,
-    // { size: 600, speed: 5, maxCount: 2, count: 0, zIndex: 10 },
-    // { size: 300, speed: 10, maxCount: 3, count: 0, zIndex: 4 },
-    // { size: 150, speed: 15, maxCount: 5, count: 0, zIndex: 0 },
-    {
-      light: {
-        enabled: true,
-        interval: 750,
-        configs: [
-          { size: "0.5vh", speed: 10, maxCount: 1, count: 0, zIndex: 1 },
-          { size: "0.25vh", speed: 15, maxCount: 3, count: 0, zIndex: 0 },
-        ],
-      },
-      medium: {
-        enabled: true,
-        interval: 500,
-        configs: [
-          { size: "0.75vh", speed: 5, maxCount: 1, count: 0, zIndex: 2 },
-          { size: "0.5vh", speed: 10, maxCount: 3, count: 0, zIndex: 1 },
-          { size: "0.25vh", speed: 15, maxCount: 5, count: 0, zIndex: 0 },
-        ],
-      },
-      heavy: {
-        enabled: true,
-        interval: 300,
-        configs: [
-          { size: "1vh", speed: 2.5, maxCount: 3, count: 0, zIndex: 3 },
-          { size: "0.75vh", speed: 5, maxCount: 5, count: 0, zIndex: 2 },
-          { size: "0.5vh", speed: 10, maxCount: 7, count: 0, zIndex: 1 },
-          { size: "0.25vh", speed: 15, maxCount: 10, count: 0, zIndex: 0 },
-        ],
-      },
-    }
-  );
-  const { enabled, interval, configs } =
-    meteorConfig[meteorVariant as keyof typeof meteorConfig] ||
-    meteorConfig.medium;
+  const enabled = process.env.NEXT_PUBLIC_METEOR_ENABLED === "true";
 
-  // Predefined meteor variants
-  const meteorVariants = {};
+  // Default to 15 meteors if not set
+  const intensity = Number(process.env.NEXT_PUBLIC_METEOR_INTENSITY) || 15;
 
-  console.log("Meteor enabled:", enabled);
-  console.log("Meteor interval:", interval);
-  console.log("Meteor configs:", configs);
+  // 1. Calculate Interval based on Intensity
+  // More meteors = spawn faster (lower interval).
+  // 10 meteors = 800ms, 50 meteors = 200ms.
+  const baseInterval = 500000; // Arbitrary base constant
+  const interval = Math.max(100, Math.floor(baseInterval / intensity));
+
+  // 2. Generate Configs
+  const configs = generateProceduralConfigs(intensity);
+
+  if (process.env.NODE_ENV !== "production") {
+    console.log(
+      `[Meteor] Generated ${intensity} meteors with interval ${interval}ms`
+    );
+  }
+
   return { enabled, interval, configs };
+};
+
+/**
+ * Generates meteor configurations procedurally based on a total intensity.
+ * @param totalMeteors Total number of meteors allowed on screen at once.
+ */
+const generateProceduralConfigs = (totalMeteors: number): MeteorConfig[] => {
+  // 1. Define distinct buckets for variety (Small, Medium, Large, Giant)
+  // Ratios determine density: 55% Small, 30% Medium, 10% Large, 5% Giant
+  const buckets = [
+    { label: "tiny", ratio: 0.35, minSize: 1, maxSize: 2.5 }, // vh
+    { label: "small", ratio: 0.25, minSize: 3, maxSize: 5 }, // vh
+    { label: "medium", ratio: 0.2, minSize: 5.5, maxSize: 7.5 }, // vh
+    { label: "large", ratio: 0.15, minSize: 10, maxSize: 12.5 }, // vh
+    { label: "giant", ratio: 0.5, minSize: 13, maxSize: 17.5 }, // vh
+  ];
+
+  return buckets.map((bucket) => {
+    // A. Calculate Max Count for this bucket
+    const maxCount = Math.max(1, Math.floor(totalMeteors * bucket.ratio));
+
+    // B. Calculate Random Size for this bucket (average for consistent look)
+    const sizeVal = Math.floor((bucket.minSize + bucket.maxSize) / 2);
+
+    // C. Calculate Speed (Larger = Slower)
+    // Base speed 2s + factor based on size.
+    // Small (3vh) ≈ 3s duration. Giant (40vh) ≈ 15s duration.
+    // const speed = Math.floor(2 + sizeVal * 0.4);
+
+    // C. SPEED CALCULATION (Velocity Factor)
+    // Previously "5" meant 5 seconds. Now "5" means 5ms per pixel (slower).
+    // Small meteors (size 3) -> Speed Factor 2 (Fast)
+    // Giant meteors (size 40) -> Speed Factor 10 (Slow)
+    const velocityFactor = 10 + sizeVal * 0.25;
+
+    return {
+      size: `${sizeVal}vh`,
+      speed: velocityFactor, // Passed to component to calculate duration
+      maxCount: maxCount,
+      count: 0,
+      // D. Visual Hierarchy: Larger meteors are "closer", so higher zIndex
+      zIndex: sizeVal,
+    };
+  });
 };

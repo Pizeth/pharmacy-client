@@ -1,5 +1,6 @@
 // utils/colorStops.ts
 import { StarfieldOptions } from "@/interfaces/css.interface";
+import { MeteorConfig } from "@/interfaces/theme.interface";
 import { GradientOptions, GradientPoint } from "@/types/theme";
 import { alpha, keyframes } from "@mui/material/styles";
 
@@ -557,3 +558,19 @@ export function useResponsiveShootingStars(
 
   return stars;
 }
+
+export const parseUnit = (
+  value: string | number,
+  containerHeight: number
+): number => {
+  if (typeof value === "number") return value;
+  if (value.endsWith("px")) return parseFloat(value);
+  if (value.endsWith("vh"))
+    return (parseFloat(value) / 100) * window.innerHeight;
+  if (value.endsWith("vw"))
+    return (parseFloat(value) / 100) * window.innerWidth;
+  // Container-relative percentage
+  if (value.endsWith("%")) return (parseFloat(value) / 100) * containerHeight; // <-- Needs containerHeight
+  // Fallback for simple strings
+  return parseFloat(value);
+};

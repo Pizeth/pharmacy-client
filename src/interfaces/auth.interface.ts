@@ -3,7 +3,6 @@ import { Theme } from "@emotion/react";
 import { ButtonProps, SxProps } from "@mui/material";
 import { HtmlHTMLAttributes, ReactNode } from "react";
 import { Meteor, MeteorConfig, MeteorState } from "./theme.interface";
-import { MeteorVariant } from "@/types/theme";
 
 export interface LoginParams {
   // For form login
@@ -141,7 +140,7 @@ export interface EffectProps {
   shootingStarClass: string;
   twinkleClass: string;
   meteorEnabled?: boolean;
-  meteorVariant?: MeteorVariant;
+  // meteorVariant?: MeteorVariant;
   // customMeteorConfig?: Omit<MeteorShowerProps, "sx" | "className">;
   customMeteorConfig?: Meteor;
 }

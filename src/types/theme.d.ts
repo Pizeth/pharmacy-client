@@ -15,5 +15,3 @@ export type GradientOptions = {
   streakHeight?: number; // default 100
   color?: string; // default "var(--c)"
 };
-
-export type MeteorVariant = "light" | "medium" | "heavy" | "custom";

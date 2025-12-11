@@ -170,14 +170,14 @@ export const Login = (
           count={theme.custom.sideImage.shootingStarCount}
           shootingStarClass={theme.custom.sideImage.shootingClass}
           twinkleClass={theme.custom.sideImage.twinkleClass}
-          meteorVariant="custom"
-          customMeteorConfig={{
-            enabled: true,
-            interval: 400,
-            configs: [
-              { size: 500, speed: 7, maxCount: 3, count: 0, zIndex: 10 },
-            ],
-          }}
+          // meteorVariant="custom"
+          // customMeteorConfig={{
+          //   enabled: true,
+          //   interval: 400,
+          //   configs: [
+          //     { size: 500, speed: 7, maxCount: 3, count: 0, zIndex: 10 },
+          //   ],
+          // }}
         />
         <Login.image src={src} alt={alt} />
         <Login.content>
@@ -308,14 +308,14 @@ EffectProps) => {
 
   return (
     <Effect>
-      {/* {Array.from({ length: count }).map((_, i) => (
-      <span key={v7()} className={shootingStarClass}>
-        <span key={i} />
-      </span>
-    ))}
-    {Array.from({ length: count }).map((_, i) => (
-      <Box key={i} className={twinkleClass} />
-    ))} */}
+      {Array.from({ length: count }).map((_, i) => (
+        <span key={v7()} className={shootingStarClass}>
+          <span key={i} />
+        </span>
+      ))}
+      {Array.from({ length: count }).map((_, i) => (
+        <Box key={i} className={twinkleClass} />
+      ))}
       {/* Meteor shower with theme config */}
       <MeteorShower
         enabled={meteorConfig?.enabled}
