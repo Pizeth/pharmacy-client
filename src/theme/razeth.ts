@@ -40,6 +40,7 @@ import {
   twinkle,
   twinkling,
   infiniteRotate,
+  meteorStrike,
 } from "./keyframes";
 import { backdropClasses } from "@mui/material";
 
@@ -1324,14 +1325,35 @@ const customBaseTheme = createTheme({
           // Example: Add a subtle glow effect
           filter:
             props.theme.palette.mode === "dark"
-              ? "drop-shadow(0 0 10px rgba(255, 255, 255, 0.1))"
+              ? "drop-shadow(0 0 10px #ffffff1a)"
               : "none",
         }),
         item: {
           // Styles for individual meteor items
           position: "absolute",
-          willChange: "transform",
           pointerEvents: "none",
+          // STATIC TRANSITION RULES:
+          // We define WHAT animates and HOW here.
+          // The component only defines HOW LONG (duration).
+          transitionProperty: "transform",
+          transitionTimingFunction: "linear",
+          willChange: "transform", // Performance optimization
+
+          // HERE IS THE DYNAMIC STYLE, DEFINED IN THE THEME:
+          // We tell the browser: "Use the value provided in the variable --m-left"
+          // left: "var(--m-left, 0)",
+          // top: "var(--m-top, 0)",
+          // // zIndex: "var(--m-z, 1)",
+          // transform: "var(--m-transform)",
+          // transitionDuration: "var(--m-duration, 0s)",
+        },
+        content: {
+          // Base visual styles
+          backgroundImage: "url(static/images/meteors-sprite.png)",
+          backgroundSize: "4800% 100%", // 48 frames
+          backgroundRepeat: "no-repeat",
+          animation: `${meteorStrike} 1.5s steps(47) infinite`,
+          transform: "rotate(45deg)",
         },
         sprite: {
           // Styles for meteor sprites

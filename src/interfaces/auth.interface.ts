@@ -1,7 +1,7 @@
 import { StyleComponent } from "@/types/classKey";
 import { Theme } from "@emotion/react";
 import { ButtonProps, SxProps } from "@mui/material";
-import { HtmlHTMLAttributes, ReactNode } from "react";
+import { CSSProperties, HtmlHTMLAttributes, ReactNode } from "react";
 import { Meteor, MeteorConfig, MeteorState } from "./theme.interface";
 
 export interface LoginParams {
@@ -143,4 +143,12 @@ export interface EffectProps {
   // meteorVariant?: MeteorVariant;
   // customMeteorConfig?: Omit<MeteorShowerProps, "sx" | "className">;
   customMeteorConfig?: Meteor;
+}
+
+export interface MeteorVariables extends CSSProperties {
+  "--m-left"?: string | number;
+  "--m-top"?: string | number;
+  "--m-z"?: number;
+  "--m-transform"?: string;
+  "--m-duration"?: string;
 }

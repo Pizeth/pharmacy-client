@@ -300,7 +300,7 @@ export const getMeteorConfig = () => {
   // 1. Calculate Interval based on Intensity
   // More meteors = spawn faster (lower interval).
   // 10 meteors = 800ms, 50 meteors = 200ms.
-  const baseInterval = 500000; // Arbitrary base constant
+  const baseInterval = 1000000; // Arbitrary base constant
   const interval = Math.max(100, Math.floor(baseInterval / intensity));
 
   // 2. Generate Configs
@@ -323,11 +323,11 @@ const generateProceduralConfigs = (totalMeteors: number): MeteorConfig[] => {
   // 1. Define distinct buckets for variety (Small, Medium, Large, Giant)
   // Ratios determine density: 55% Small, 30% Medium, 10% Large, 5% Giant
   const buckets = [
-    { label: "tiny", ratio: 0.35, minSize: 1, maxSize: 2.5 }, // vh
-    { label: "small", ratio: 0.25, minSize: 3, maxSize: 5 }, // vh
-    { label: "medium", ratio: 0.2, minSize: 5.5, maxSize: 7.5 }, // vh
-    { label: "large", ratio: 0.15, minSize: 10, maxSize: 12.5 }, // vh
-    { label: "giant", ratio: 0.5, minSize: 13, maxSize: 17.5 }, // vh
+    { label: "tiny", ratio: 0.2, minSize: 3, maxSize: 5 }, // vh
+    { label: "small", ratio: 0.3, minSize: 5.5, maxSize: 7.5 }, // vh
+    { label: "medium", ratio: 0.25, minSize: 8, maxSize: 10 }, // vh
+    { label: "large", ratio: 0.15, minSize: 10.5, maxSize: 13.5 }, // vh
+    { label: "giant", ratio: 0.1, minSize: 15, maxSize: 20 }, // vh
   ];
 
   return buckets.map((bucket) => {
@@ -335,7 +335,12 @@ const generateProceduralConfigs = (totalMeteors: number): MeteorConfig[] => {
     const maxCount = Math.max(1, Math.floor(totalMeteors * bucket.ratio));
 
     // B. Calculate Random Size for this bucket (average for consistent look)
-    const sizeVal = Math.floor((bucket.minSize + bucket.maxSize) / 2);
+    // const sizeVal = Math.floor((bucket.minSize + bucket.maxSize) / 2);
+    const sizeVal = Math.floor(
+      Math.random() * (bucket.maxSize - bucket.minSize + 1) + bucket.minSize
+    );
+
+    console.log(`[Meteor] ${bucket.label} meteors: ${maxCount} x ${sizeVal}vh`);
 
     // C. Calculate Speed (Larger = Slower)
     // Base speed 2s + factor based on size.

@@ -203,18 +203,18 @@ export const Login = (
           {footer}
         </Login.content>
         {/* <Login.Heading>{heading}</Login.Heading> */}
-        {/* <Login.icon>
+        <Login.icon>
           {Object.entries(PROVIDERS).map(([key, provider]) => (
             <SocialButton
               key={key}
               variant="outlined"
               icon={provider.icon}
-              className={provider.className}
+              // className={provider.className}
             >
-              {provider.name}
+              {/* {provider.name} */}
             </SocialButton>
           ))}
-        </Login.icon> */}
+        </Login.icon>
       </Login.overlay>
     </Root>
   );
@@ -304,7 +304,6 @@ EffectProps) => {
   //   ],
   // };
   const meteorConfig = theme.custom?.meteor;
-  console.log("Meteor config:", meteorConfig);
 
   return (
     <Effect>

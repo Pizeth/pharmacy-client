@@ -1,6 +1,7 @@
 import {
   MeteorShowerProps,
   MeteorElementProps,
+  MeteorVariables,
 } from "@/interfaces/auth.interface";
 import { MeteorConfig, MeteorState } from "@/interfaces/theme.interface";
 import { meteorStrike } from "@/theme/keyframes";
@@ -11,36 +12,36 @@ import { useEffect, useRef, useState } from "react";
 
 const PREFIX = "RazethMeteor";
 
-// Styled root container
+// 1. Root Container
 const MeteorRoot = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
 })(() => ({}));
 
-// Meteor item container
+// 2. Meteor Item (The moving wrapper)
 const MeteorItem = styled(Box, {
   name: PREFIX,
   slot: "Item",
   overridesResolver: (_props, styles) => styles.item,
 })(() => ({}));
 
+// 3. Meteor Sprite (The visual content)
 const MeteorSprite = styled(Box, {
   name: PREFIX,
   slot: "Content",
+  // Prevent 'size' from being passed to the DOM element
   shouldForwardProp: (prop: string) => prop !== "size",
   overridesResolver: (_props, styles) => styles.content,
 })<{ size: string | number }>(({ size }) => ({
-  // width: `${size}px`,
-  // height: `${size}px`,
-  // Ensure size handles both string (100px) and number (100)
-  width: typeof size === "number" ? `${size}px` : size,
-  height: typeof size === "number" ? `${size}px` : size,
-  backgroundImage: "url(static/images/meteors-sprite.png)",
-  // backgroundSize: "auto 100%",
-  backgroundSize: "4800% 100%",
-  animation: `${meteorStrike} 1.5s steps(47) infinite`,
-  transform: "rotate(45deg)",
+  // We handle the dynamic size here because it changes per-meteor
+  // but relies on the CSS-in-JS engine.
+  width: size,
+  height: size,
+  // backgroundImage: "url(static/images/meteors-sprite.png)",
+  // backgroundSize: "4800% 100%",
+  // animation: `${meteorStrike} 1.5s steps(47) infinite`,
+  // transform: "rotate(45deg)",
 }));
 
 const MeteorElement: React.FC<MeteorElementProps> = ({
@@ -53,17 +54,19 @@ const MeteorElement: React.FC<MeteorElementProps> = ({
   // 2. Initial state: hidden slightly off-screen (top-right relative to spawn)
   // We use sizePx directly, no need to append 'px' manually if we assume pixels in transform
   const [transform, setTransform] = useState<string>(
-    `translate(${sizePx}px, -${sizePx}px)`
+    `translate3d(${sizePx}px, -${sizePx}px, 0)` // Use 3d for GPU acceleration
   );
 
   // State for dynamic duration
-  const [duration, setDuration] = useState<number>(0);
+  const [duration, setDuration] = useState<string>("0s");
 
   useEffect(() => {
     // 3. Calculate Travel Distance
     // The meteor travels from its random start point down to the bottom of the container.
     // distanceToTravel = Height of Container - Start Position + Offset
     const startY = meteor.startFromTop ? meteor.initialTop : 0;
+
+    // Total vertical distance to travel (Container + buffer to clear edge)
     const distanceY = containerHeight - startY + sizePx; // Add size to ensure it clears the bottom
 
     // 4. Calculate Duration based on Distance and Base Speed (Velocity)
@@ -71,37 +74,69 @@ const MeteorElement: React.FC<MeteorElementProps> = ({
     // Formula: Time = Distance * (Slowness Factor)
     // We divide by 1000 to keep numbers manageable.
     // Example: 800px distance * 0.005 factor = 4s duration.
+
+    // Velocity = Pixels per Second.
+    // We increase base velocity for longer distances to add "energy".
+    // Base speed comes from config (e.g., 5).
     const baseVelocity = meteor.speed * 0.00125;
 
     // "The longer the distance, the faster the speed"
     // We can reduce the duration slightly for very long distances to simulate acceleration
-    const accelerationFactor = distanceY > 1500 ? 0.85 : 1;
+    // const accelerationFactor = distanceY > 1500 ? 0.85 : 1;
 
-    const calculatedDuration = distanceY * baseVelocity * accelerationFactor;
+    // If distance is huge (>1000px), we boost velocity by 20%
+    // This makes long meteors zip across faster.
+    const accelerationFactor = distanceY > 1500 ? 1.2 : 1;
 
-    setDuration(calculatedDuration);
+    // const calculatedDuration = distanceY * baseVelocity * accelerationFactor;
+
+    // Time = (Distance * Velocity) / Acceleration
+    const calculatedDuration = (distanceY * baseVelocity) / accelerationFactor;
+
+    // setDuration(calculatedDuration);
+
+    setDuration(`${calculatedDuration.toFixed(2)}s`);
 
     // 5. Trigger Animation
     // Trigger animation after mount
     const timer = setTimeout(() => {
-      const distance =
-        containerHeight - (meteor.startFromTop ? meteor.initialTop : 0);
-      setTransform(`translate(-${distance}px, ${distance}px)`);
-    }, 100);
+      // const distance =
+      //   containerHeight - (meteor.startFromTop ? meteor.initialTop : 0);
+      setTransform(`translate3d(-${distanceY}px, ${distanceY}px, 0)`);
+    }, 50);
 
     return () => clearTimeout(timer);
   }, [meteor, containerHeight, sizePx]);
 
   return (
     <MeteorItem
-      sx={{
-        left: meteor.left, // This handles '100%' or numbers automatically via MUI
+      // sx={{
+      //   left: meteor.left, // This handles '100%' or numbers automatically via MUI
+      //   top: meteor.top,
+      //   // zIndex: meteor.zIndex,
+      //   transform: transform,
+      //   // transition: `transform ${meteor.speed}s linear`,
+      //   // Apply the calculated duration
+      //   transition: `transform ${duration} linear`,
+      // }}
+      // We pass DATA via CSS Variables.
+      // This is efficient and allows the Theme to decide how to use them.
+      // style={
+      //   {
+      //     "--m-left": meteor.left,
+      //     "--m-top": meteor.top,
+      //     // "--m-z": meteor.zIndex,
+      //     "--m-transform": transform,
+      //     "--m-duration": duration,
+      //   } as MeteorVariables
+      // }
+      style={{
+        left: meteor.left,
         top: meteor.top,
         zIndex: meteor.zIndex,
         transform: transform,
-        // transition: `transform ${meteor.speed}s linear`,
-        // Apply the calculated duration
-        transition: `transform ${duration}s linear`,
+        // We only set the duration here. The Property and Easing are in the Theme.
+        transitionDuration: duration,
       }}
     >
       {/* <MeteorItem.content size={meteor.size} /> */}
@@ -203,11 +238,11 @@ export const MeteorShower = (
         setTimeout(() => {
           setMeteors((prev) => prev.filter((m) => m.id !== newMeteor.id));
           config.count--;
-        }, config.speed * 1000);
+        }, config.speed * 1500);
       }
     };
 
-    const interval = setInterval(createMeteor, 1000);
+    const interval = setInterval(createMeteor, 1500);
 
     return () => clearInterval(interval);
   }, [enabled, interval]);

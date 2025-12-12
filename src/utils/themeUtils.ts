@@ -559,6 +559,13 @@ export function useResponsiveShootingStars(
   return stars;
 }
 
+/**
+ * Parse a CSS value string or number unit into a pixel value.
+ * Supports: number, "px", "vh", "vw", and container-relative percentage units.
+ * @param {string|number} value - The unit value to parse.
+ * @param {number} containerHeight - The height of the container element.
+ * @returns {number} - The parsed unit value in pixels.
+ */
 export const parseUnit = (
   value: string | number,
   containerHeight: number
