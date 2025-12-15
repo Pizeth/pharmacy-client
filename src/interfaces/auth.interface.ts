@@ -122,7 +122,7 @@ export interface IconProps extends HtmlHTMLAttributes<SVGElement> {
 }
 
 // Main MeteorShower component with props interface
-export interface MeteorShowerProps extends Partial<Meteor> {
+export interface MeteorShowerProps extends Meteor {
   // configs?: MeteorConfig[];
   // interval?: number;
   // enabled?: boolean;

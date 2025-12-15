@@ -14,11 +14,8 @@ import {
 import {
   buildResponsiveShadow,
   createStarfield,
-  generateShootingStars,
-  generateTwinkleStars,
   makePulseKeyframes,
   makePulseVars,
-  useResponsiveShootingStars,
 } from "@/utils/themeUtils";
 // import "@fontsource/moul";
 import { getMeteorConfig, getSideImageConfig } from "@/configs/themeConfig";
@@ -59,7 +56,7 @@ declare module "@mui/material/styles" {
     custom: {
       sideImage: SideImage;
       lines: Line[];
-      meteor?: Meteor;
+      meteor: Meteor;
     };
   }
   interface ThemeOptions {
@@ -308,15 +305,15 @@ const globalStyles = (theme: Theme) => ({
   },
 
   // Dynamically generated nth-child overrides
-  ...Object.fromEntries(
-    theme.custom.lines.map((line, i) => [
-      `.line:nth-of-type(${i + 1})::after`,
-      {
-        background: `linear-gradient(to bottom, rgba(255,255,255,0) 0%, ${line.color} 75%, ${line.color} 100%)`,
-        animationDelay: line.delay,
-      },
-    ])
-  ),
+  // ...Object.fromEntries(
+  //   theme.custom.lines.map((line, i) => [
+  //     `.line:nth-of-type(${i + 1})::after`,
+  //     {
+  //       background: `linear-gradient(to bottom, rgba(255,255,255,0) 0%, ${line.color} 75%, ${line.color} 100%)`,
+  //       animationDelay: line.delay,
+  //     },
+  //   ])
+  // ),
 });
 
 const defaultThemeInvariants = {
@@ -653,246 +650,242 @@ const customBaseTheme = createTheme({
           inset: 0,
           overflow: "hidden",
           zIndex: 0,
-          "& .shooting-star": {
-            position: "absolute",
-            // top: "-5vh", // random vertical
-            // top: "-50%",
-            // left: "15%",
-            // left: "100vw", // start off-screen right
-            // rotate: "315deg",
-            // width: "5em",
-            // width: "0.3vw",
-            // height: `${props.theme.custom.sideImage.starSize}vh`,
-            // borderRadius: "50%",
-            // borderRadius: "100%",
-            // boxShadow:
-            //   "0 0 0 4px rgba(255, 255, 255, 0.1), 0 0 0 8px rgba(255, 255, 255, 0.1), 0 0 20px rgba(255, 255, 255, 1)",
-            // background: "linear-gradient(90deg, #fff, transparent)",
-            // background: "#fff",
-            // background: "linear-gradient(-45deg, #FFF, rgba(0, 0, 255, 0))",
-            filter: "drop-shadow(0 0 7px var(--head-color))",
-            animation: `${shootingStar} var(--glow-duration) linear infinite, ${tail} var(--glow-duration) linear infinite`,
-            // animation: `${tail} 7s ease-in-out infinite`,
-            animationFillMode: "backwards",
-            // animationDirection: "reverse",
-            willChange: "transform, opacity",
-            offsetRotate: "auto" /* 👈 aligns with path direction */,
-            offsetAnchor: "right center",
-            offsetDistance: "0%",
-            // transition: "1s ease",
-            // animationDelay: `${Math.random() * 10}s`,
-            // "::before": {
-            //   content: '""',
-            //   position: "absolute",
-            //   // top: "-50%",
-            //   top: `calc(50% - 0.15vh)`,
-            //   right: 0,
-            //   // transform: "rotate(180deg) translateX(100%) translateY(-100%)",
-            //   // width: "10em",
-            //   height: "0.3vh",
-            //   // offsetRotate: "auto",
-            //   // background:
-            //   //   "linear-gradient(90deg, var(--head-color), transparent)",
-            //   background:
-            //     "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
-            //   borderRadius: "100%",
-            //   transform: "translateX(50%) rotateZ(45deg)",
-            //   animation: `${shining} 5s ease-in-out infinite`,
-            //   animationFillMode: "backwards",
-            // },
-            // "::after": {
-            //   content: '""',
-            //   position: "absolute",
-            //   top: `calc(50% - 0.15vh)`,
-            //   right: 0,
-            //   height: "0.3vh",
-            //   background:
-            //     "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
-            //   borderRadius: "100%",
-            //   transform: "translateX(50%) rotateZ(-45deg)",
-            //   animation: `${shining} 5s ease-in-out infinite`,
-            //   animationFillMode: "backwards",
-            // },
-          },
+          // "& .shooting-star": {
+          //   position: "absolute",
+          //   // top: "-5vh", // random vertical
+          //   // top: "-50%",
+          //   // left: "15%",
+          //   // left: "100vw", // start off-screen right
+          //   // rotate: "315deg",
+          //   // width: "5em",
+          //   // width: "0.3vw",
+          //   // height: `${props.theme.custom.sideImage.starSize}vh`,
+          //   // borderRadius: "50%",
+          //   // borderRadius: "100%",
+          //   // boxShadow:
+          //   //   "0 0 0 4px rgba(255, 255, 255, 0.1), 0 0 0 8px rgba(255, 255, 255, 0.1), 0 0 20px rgba(255, 255, 255, 1)",
+          //   // background: "linear-gradient(90deg, #fff, transparent)",
+          //   // background: "#fff",
+          //   // background: "linear-gradient(-45deg, #FFF, rgba(0, 0, 255, 0))",
+          //   filter: "drop-shadow(0 0 7px var(--head-color))",
+          //   animation: `${shootingStar} var(--glow-duration) linear infinite, ${tail} var(--glow-duration) linear infinite`,
+          //   // animation: `${tail} 7s ease-in-out infinite`,
+          //   animationFillMode: "backwards",
+          //   // animationDirection: "reverse",
+          //   willChange: "transform, opacity",
+          //   offsetRotate: "auto" /* 👈 aligns with path direction */,
+          //   offsetAnchor: "right center",
+          //   offsetDistance: "0%",
+          //   // transition: "1s ease",
+          //   // animationDelay: `${Math.random() * 10}s`,
+          //   // "::before": {
+          //   //   content: '""',
+          //   //   position: "absolute",
+          //   //   // top: "-50%",
+          //   //   top: `calc(50% - 0.15vh)`,
+          //   //   right: 0,
+          //   //   // transform: "rotate(180deg) translateX(100%) translateY(-100%)",
+          //   //   // width: "10em",
+          //   //   height: "0.3vh",
+          //   //   // offsetRotate: "auto",
+          //   //   // background:
+          //   //   //   "linear-gradient(90deg, var(--head-color), transparent)",
+          //   //   background:
+          //   //     "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
+          //   //   borderRadius: "100%",
+          //   //   transform: "translateX(50%) rotateZ(45deg)",
+          //   //   animation: `${shining} 5s ease-in-out infinite`,
+          //   //   animationFillMode: "backwards",
+          //   // },
+          //   // "::after": {
+          //   //   content: '""',
+          //   //   position: "absolute",
+          //   //   top: `calc(50% - 0.15vh)`,
+          //   //   right: 0,
+          //   //   height: "0.3vh",
+          //   //   background:
+          //   //     "linear-gradient(-45deg, rgba(0, 0, 255, 0), var(--head-color), rgba(0, 0, 255, 0))",
+          //   //   borderRadius: "100%",
+          //   //   transform: "translateX(50%) rotateZ(-45deg)",
+          //   //   animation: `${shining} 5s ease-in-out infinite`,
+          //   //   animationFillMode: "backwards",
+          //   // },
+          // },
           // dynamically inject nth-of-type rules
-          ...useResponsiveShootingStars(
-            props.theme.custom.sideImage.shootingStarCount,
-            // props.theme.custom.sideImage.minAngle,
-            // props.theme.custom.sideImage.maxAngle,
-            props.theme.custom.sideImage.shootingStarInterval,
-            props.theme.custom.sideImage.curveFactor,
-            props.theme.custom.sideImage.trajectoryMix,
-            props.theme.custom.sideImage.starColors,
-            props.theme.custom.sideImage.glowIntensity,
-            props.theme.custom.sideImage.baseSpeed,
-            props.theme.custom.sideImage.starSize
-          ).reduce((acc, star, i) => {
-            acc[
-              `& .${props.theme.custom.sideImage.shootingClass}:nth-of-type(${
-                i + 1
-              })`
-            ] = {
-              // Test Conent
-              // height: star.size,
-              height: star.size,
-              // width: star.size,
-              // width: `calc(${star.size} * 1.25)`,
-              borderRadius: "500% 100% 100% 500%",
-              // animation: `${shootingStar} ${star.duration} linear infinite, ${tail} ${star.duration} linear infinite, ${twinkle} ${star.delay} linear alternate infinite`,
-              // borderRadius: "50%",
-              // top: star.top,
-              // right: star.right,
-              // left: "initial",
-              // left: "100vw", // always start off-screen right
-              animationDelay: star.delay,
-              animationDuration: star.duration,
-              animationFillMode: "forwards",
-              // "--rot": star.rot, // per-star rotation variable
-              offsetPath: star.path, // 👈 px-based, regenerated on resize
-              // background: star.color,
-              background: `linear-gradient(-45deg, ${star.color}, rgba(0, 0, 255, 0))`,
-              "--head-color": star.color,
-              "--trail-path": star.path,
-              "--glow-duration": star.duration,
-              span: {
-                position: "absolute",
-                zIndex: 3,
-                boxShadow: star.glow,
-                // inset: 0,
-                // right: `calc(${star.size} * 2)`,
-                // left: 0,
-                right: `calc(${star.centerPoint} - ${star.halfHead})`,
-                // right: `calc(50% - ${star.centerPoint})`,
-                top: `calc(50% - ${star.halfHead})`,
-                transform: `translateY(calc(-50% + ${star.halfHead}))`,
-                height: star.head,
-                width: star.head,
-                // offsetPath: star.path,
-                // offsetRotate: "auto",
-                borderRadius: "50%",
-                // background: "#FFF",
-                // border: `0px solid ${star.color}`,
-                // borderWidth: `1vh`,
-                // borderColor: `${star.color}`,
-                //  display: flex;
-                justifyContent: "center",
-                alignItems: "center",
-
-                /* Apply your background directly to the main container */
-                background:
-                  "url('/static/images/moon_in_comic_style.svg') no-repeat center center",
-                // backgroundColor: "#FFFFFF10",
-                // backgroundBlendMode: "multiply",
-                backgroundSize: "cover",
-
-                /* Apply the animation directly to this element */
-                animation: `${twinkle} ${star.twinkleDuration} linear alternate infinite, ${infiniteRotate} calc(${star.twinkleDuration} + 0.123) linear infinite`,
-              },
-              "::before": {
-                content: '""',
-                position: "absolute",
-                // top: "-50%",
-                top: `calc(50% - ${star.centerPoint})`,
-                right: `calc(0% + ${star.centerPoint})`,
-                // transform: "rotate(180deg) translateX(100%) translateY(-100%)",
-                // width: "10em",
-                height: star.size,
-                // offsetRotate: "auto",
-                // background:
-                //   "linear-gradient(90deg, var(--head-color), transparent)",
-                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
-                borderRadius: "100%",
-                transform: "translateX(50%) rotateZ(45deg)",
-                // animation: `${shining} 5s ease-in-out infinite`,
-                animation: `${twinkling(star.baseSize)} ${
-                  star.twinkleDuration
-                } ease-in-out infinite`,
-                animationFillMode: "backwards",
-                // boxShadow: star.glow,
-                // border: `0px solid ${star.color}`,
-                // borderWidth: `0 1vh 1vh 1vh`,
-                // borderColor: "#FFFFFF10",
-              },
-              "::after": {
-                content: '""',
-                position: "absolute",
-                top: `calc(50% - ${star.centerPoint})`,
-                right: `calc(0% + ${star.centerPoint})`,
-                height: star.size,
-                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
-                borderRadius: "100%",
-                transform: "translateX(50%) rotateZ(-45deg)",
-                // animation: `${shining} 5s ease-in-out infinite`,
-                animation: `${twinkling(star.baseSize)} ${
-                  star.twinkleDuration
-                } ease-in-out infinite`,
-                animationFillMode: "backwards",
-                // boxShadow: star.glow,
-                // border: `0px solid ${star.color}`,
-                // borderWidth: `0 1vh 1vh 1vh`,
-                // borderColor: "#FFFFFF10",
-              },
-            };
-            return acc;
-          }, {} as Record<string, unknown>),
-          ...generateTwinkleStars(
-            props.theme.custom.sideImage.shootingStarCount,
-            props.theme.custom.sideImage.starColors,
-            props.theme.custom.sideImage.starSize
-          ).reduce((acc, star, i) => {
-            acc[
-              `& .${props.theme.custom.sideImage.twinkleClass}:nth-of-type(${
-                i + 1
-              })`
-            ] = {
-              // "--ray": "0.25vh",
-              // "--core": star.size,
-              // "--halo": "0.3vh",
-              // "--blurRay": `calc(${star.size}  * 3.5)`,
-              position: "absolute",
-              // left: `calc(${star.left} + ${star.centerPoint})`,
-              // top: `calc(${star.top} + ${star.centerPoint})`,
-              left: star.left,
-              top: star.top,
-              width: star.size,
-              height: star.size,
-              borderRadius: "50%",
-              boxShadow: star.glow,
-              animation: `${twinkle} ${star.delay} linear alternate infinite`,
-              pointerEvents: "none",
-              background: "#FFF",
-              zIndex: 3,
-              "::before": {
-                content: '""',
-                position: "absolute",
-                top: `calc(50% - ${star.centerPoint})`,
-                right: `calc(0% + ${star.centerPoint})`,
-                height: star.size,
-                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
-                borderRadius: "100%",
-                transform: "translateX(50%) rotateZ(45deg)",
-                animation: `${twinkling(star.baseSize)} ${
-                  star.delay
-                } ease-in-out infinite`,
-                // animationDelay: star.delay,
-              },
-              "::after": {
-                content: '""',
-                position: "absolute",
-                top: `calc(50% - ${star.centerPoint})`,
-                right: `calc(0% + ${star.centerPoint})`,
-                height: star.size,
-                background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
-                borderRadius: "100%",
-                transform: "translateX(50%) rotateZ(-45deg)",
-                animation: `${twinkling(star.baseSize)} ${
-                  star.delay
-                } ease-in-out infinite`,
-                // animationDelay: star.delay,
-              },
-            };
-            return acc;
-          }, {} as Record<string, unknown>),
+          // ...useResponsiveShootingStars(
+          //   props.theme.custom.sideImage.shootingStarCount,
+          //   // props.theme.custom.sideImage.minAngle,
+          //   // props.theme.custom.sideImage.maxAngle,
+          //   props.theme.custom.sideImage.shootingStarInterval,
+          //   props.theme.custom.sideImage.curveFactor,
+          //   props.theme.custom.sideImage.trajectoryMix,
+          //   props.theme.custom.sideImage.starColors,
+          //   props.theme.custom.sideImage.glowIntensity,
+          //   props.theme.custom.sideImage.baseSpeed,
+          //   props.theme.custom.sideImage.starSize
+          // ).reduce((acc, star, i) => {
+          //   acc[
+          //     `& .${props.theme.custom.sideImage.shootingClass}:nth-of-type(${
+          //       i + 1
+          //     })`
+          //   ] = {
+          //     // Test Conent
+          //     // height: star.size,
+          //     height: star.size,
+          //     // width: star.size,
+          //     // width: `calc(${star.size} * 1.25)`,
+          //     borderRadius: "500% 100% 100% 500%",
+          //     // animation: `${shootingStar} ${star.duration} linear infinite, ${tail} ${star.duration} linear infinite, ${twinkle} ${star.delay} linear alternate infinite`,
+          //     // borderRadius: "50%",
+          //     // top: star.top,
+          //     // right: star.right,
+          //     // left: "initial",
+          //     // left: "100vw", // always start off-screen right
+          //     animationDelay: star.delay,
+          //     animationDuration: star.duration,
+          //     animationFillMode: "forwards",
+          //     // "--rot": star.rot, // per-star rotation variable
+          //     offsetPath: star.path, // 👈 px-based, regenerated on resize
+          //     // background: star.color,
+          //     background: `linear-gradient(-45deg, ${star.color}, rgba(0, 0, 255, 0))`,
+          //     "--head-color": star.color,
+          //     "--trail-path": star.path,
+          //     "--glow-duration": star.duration,
+          //     span: {
+          //       position: "absolute",
+          //       zIndex: 3,
+          //       boxShadow: star.glow,
+          //       // inset: 0,
+          //       // right: `calc(${star.size} * 2)`,
+          //       // left: 0,
+          //       right: `calc(${star.centerPoint} - ${star.halfHead})`,
+          //       // right: `calc(50% - ${star.centerPoint})`,
+          //       top: `calc(50% - ${star.halfHead})`,
+          //       transform: `translateY(calc(-50% + ${star.halfHead}))`,
+          //       height: star.head,
+          //       width: star.head,
+          //       // offsetPath: star.path,
+          //       // offsetRotate: "auto",
+          //       borderRadius: "50%",
+          //       // background: "#FFF",
+          //       // border: `0px solid ${star.color}`,
+          //       // borderWidth: `1vh`,
+          //       // borderColor: `${star.color}`,
+          //       //  display: flex;
+          //       justifyContent: "center",
+          //       alignItems: "center",
+          //       background:
+          //         "url('/static/images/moon_in_comic_style.svg') no-repeat center center",
+          //       // backgroundColor: "#FFFFFF10",
+          //       // backgroundBlendMode: "multiply",
+          //       backgroundSize: "cover",
+          //       animation: `${twinkle} ${star.twinkleDuration} linear alternate infinite, ${infiniteRotate} calc(${star.twinkleDuration} + 0.123) linear infinite`,
+          //     },
+          //     "::before": {
+          //       content: '""',
+          //       position: "absolute",
+          //       // top: "-50%",
+          //       top: `calc(50% - ${star.centerPoint})`,
+          //       right: `calc(0% + ${star.centerPoint})`,
+          //       // transform: "rotate(180deg) translateX(100%) translateY(-100%)",
+          //       // width: "10em",
+          //       height: star.size,
+          //       // offsetRotate: "auto",
+          //       // background:
+          //       //   "linear-gradient(90deg, var(--head-color), transparent)",
+          //       background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
+          //       borderRadius: "100%",
+          //       transform: "translateX(50%) rotateZ(45deg)",
+          //       // animation: `${shining} 5s ease-in-out infinite`,
+          //       animation: `${twinkling(star.baseSize)} ${
+          //         star.twinkleDuration
+          //       } ease-in-out infinite`,
+          //       animationFillMode: "backwards",
+          //       // boxShadow: star.glow,
+          //       // border: `0px solid ${star.color}`,
+          //       // borderWidth: `0 1vh 1vh 1vh`,
+          //       // borderColor: "#FFFFFF10",
+          //     },
+          //     "::after": {
+          //       content: '""',
+          //       position: "absolute",
+          //       top: `calc(50% - ${star.centerPoint})`,
+          //       right: `calc(0% + ${star.centerPoint})`,
+          //       height: star.size,
+          //       background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
+          //       borderRadius: "100%",
+          //       transform: "translateX(50%) rotateZ(-45deg)",
+          //       // animation: `${shining} 5s ease-in-out infinite`,
+          //       animation: `${twinkling(star.baseSize)} ${
+          //         star.twinkleDuration
+          //       } ease-in-out infinite`,
+          //       animationFillMode: "backwards",
+          //       // boxShadow: star.glow,
+          //       // border: `0px solid ${star.color}`,
+          //       // borderWidth: `0 1vh 1vh 1vh`,
+          //       // borderColor: "#FFFFFF10",
+          //     },
+          //   };
+          //   return acc;
+          // }, {} as Record<string, unknown>),
+          // ...generateTwinkleStars(
+          //   props.theme.custom.sideImage.shootingStarCount,
+          //   props.theme.custom.sideImage.starColors,
+          //   props.theme.custom.sideImage.starSize
+          // ).reduce((acc, star, i) => {
+          //   acc[
+          //     `& .${props.theme.custom.sideImage.twinkleClass}:nth-of-type(${
+          //       i + 1
+          //     })`
+          //   ] = {
+          //     // "--ray": "0.25vh",
+          //     // "--core": star.size,
+          //     // "--halo": "0.3vh",
+          //     // "--blurRay": `calc(${star.size}  * 3.5)`,
+          //     position: "absolute",
+          //     // left: `calc(${star.left} + ${star.centerPoint})`,
+          //     // top: `calc(${star.top} + ${star.centerPoint})`,
+          //     left: star.left,
+          //     top: star.top,
+          //     width: star.size,
+          //     height: star.size,
+          //     borderRadius: "50%",
+          //     boxShadow: star.glow,
+          //     animation: `${twinkle} ${star.delay} linear alternate infinite`,
+          //     pointerEvents: "none",
+          //     background: "#FFF",
+          //     zIndex: 3,
+          //     "::before": {
+          //       content: '""',
+          //       position: "absolute",
+          //       top: `calc(50% - ${star.centerPoint})`,
+          //       right: `calc(0% + ${star.centerPoint})`,
+          //       height: star.size,
+          //       background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
+          //       borderRadius: "100%",
+          //       transform: "translateX(50%) rotateZ(45deg)",
+          //       animation: `${twinkling(star.baseSize)} ${
+          //         star.delay
+          //       } ease-in-out infinite`,
+          //       // animationDelay: star.delay,
+          //     },
+          //     "::after": {
+          //       content: '""',
+          //       position: "absolute",
+          //       top: `calc(50% - ${star.centerPoint})`,
+          //       right: `calc(0% + ${star.centerPoint})`,
+          //       height: star.size,
+          //       background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${star.color}, rgba(0, 0, 255, 0))`,
+          //       borderRadius: "100%",
+          //       transform: "translateX(50%) rotateZ(-45deg)",
+          //       animation: `${twinkling(star.baseSize)} ${
+          //         star.delay
+          //       } ease-in-out infinite`,
+          //       // animationDelay: star.delay,
+          //     },
+          //   };
+          //   return acc;
+          // }, {} as Record<string, unknown>),
           "&::before": {
             content: '""',
             position: "absolute",
@@ -1311,6 +1304,77 @@ const customBaseTheme = createTheme({
         },
       ],
     },
+    RazethShootingStar: {
+      styleOverrides: {
+        root: {
+          position: "absolute",
+          animationFillMode: "backwards",
+          willChange: "transform, opacity", // ✅ GPU optimization
+          offsetRotate: "auto" /* 👈 aligns with path direction */,
+          offsetAnchor: "right center",
+          offsetDistance: "0%",
+          borderRadius: "500% 100% 100% 500%",
+          span: {
+            position: "absolute",
+            zIndex: 3,
+            borderRadius: "50%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            /* Apply your background directly to the main container */
+            background:
+              'url("/static/images/moon_in_comic_style.svg") no-repeat center center',
+            // backgroundColor: "#FFFFFF10",
+            // backgroundBlendMode: "multiply",
+            backgroundSize: "cover",
+            willChange: "transform, opacity", // ✅ GPU optimization
+          },
+          "::before": {
+            content: '""',
+            position: "absolute",
+            borderRadius: "100%",
+            transform: "translateX(50%) rotateZ(45deg)",
+            animationFillMode: "backwards",
+            willChange: "width, transform", // ✅ GPU optimization
+          },
+          "::after": {
+            content: '""',
+            position: "absolute",
+            borderRadius: "100%",
+            transform: "translateX(50%) rotateZ(-45deg)",
+            animationFillMode: "backwards",
+            willChange: "width, transform", // ✅ GPU optimization
+          },
+        },
+      },
+    },
+
+    RazethTwinkleStar: {
+      styleOverrides: {
+        root: {
+          position: "absolute",
+          borderRadius: "50%",
+          pointerEvents: "none",
+          background: "#FFF",
+          willChange: "transform, opacity", // ✅ GPU optimization
+          zIndex: 3,
+          "::before": {
+            content: '""',
+            position: "absolute",
+            borderRadius: "100%",
+            transform: "translateX(50%) rotateZ(45deg)",
+            willChange: "width, transform", // ✅ GPU optimization
+          },
+          "::after": {
+            content: '""',
+            position: "absolute",
+            borderRadius: "100%",
+            transform: "translateX(50%) rotateZ(-45deg)",
+            willChange: "width, transform", // ✅ GPU optimization
+          },
+        },
+      },
+    },
     RazethMeteor: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
@@ -1352,7 +1416,7 @@ const customBaseTheme = createTheme({
           backgroundImage: "url(static/images/meteors-sprite.png)",
           backgroundSize: "4800% 100%", // 48 frames
           backgroundRepeat: "no-repeat",
-          animation: `${meteorStrike} 1.5s steps(47) infinite`,
+          animation: `${meteorStrike} 2.5s steps(47) infinite`,
           transform: "rotate(45deg)",
         },
         sprite: {

@@ -1,4 +1,8 @@
 // utils/colorStops.ts
+import {
+  ShootingStarData,
+  TwinkleStarData,
+} from "@/interfaces/component-props.interface";
 import { StarfieldOptions } from "@/interfaces/css.interface";
 import { MeteorConfig } from "@/interfaces/theme.interface";
 import { GradientOptions, GradientPoint } from "@/types/theme";
@@ -262,71 +266,115 @@ export function createStarfield(
   // return { boxShadow: stars };
 }
 
-export function generateTwinkleStars(
-  count = 12,
+export const generatTwinkleStar = (
+  index: number,
   colors: string[],
-  baseSize: number = 1
-) {
-  return Array.from({ length: count }).map((_, i) => {
-    const x = (Math.random() * 100).toFixed(2); // viewport width %
-    const y = (Math.random() * 100).toFixed(2); // viewport height %
-    const size = Math.max(Math.random() * baseSize, 0.125).toFixed(2);
+  baseSize = 1
+): TwinkleStarData => {
+  const x = (Math.random() * 100).toFixed(2); // viewport width %
+  const y = (Math.random() * 100).toFixed(2); // viewport height %
+  const size = Math.max(Math.random() * baseSize, 0.125).toFixed(2);
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  const delay = `${(Math.random() * index + 1.5).toFixed(2)}s`;
+  const centerPoint = Number(size) / 2;
+  const blurRay = Number(size) * 3.5;
 
-    // const size = 0.3;
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    const delay = `${(Math.random() * i + 1.5).toFixed(2)}s`;
-    const centerPoint = Number(size) / 2;
-    const blurRay = Number(size) * 3.5;
-    // const glow = `
-    //   ${centerPoint}vh 0 0 var(--core) ${color}BF,
-    //   /* cardinal rays */
-    //   ${centerPoint}vh calc(var(--ray) * -1) var(--blurRay) 0 ${color}80,
-    //   ${centerPoint}vh var(--ray) var(--blurRay) 0 ${color}80,
-    //   calc(${centerPoint}vh + var(--ray) * -1) 0 var(--blurRay) 0 ${color}80,
-    //   calc(${centerPoint}vh + var(--ray)) 0 var(--blurRay) 0 ${color}80,
-    //   /* diagonal rays (approx 45°) */
-    //   calc(${centerPoint}vh + var(--ray) * -0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
-    //   calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
-    //   calc(${centerPoint}vh + var(--ray) * -0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
-    //   calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
-    //   /* halo */
-    //   ${centerPoint}vh 0 var(--halo) 0 ${color}BF
-    // `;
-
-    const glow = `
+  const glow = `
       0 0 0 var(--core) ${color}25,
-      /* cardinal rays */
       0 calc(var(--ray) * -1) ${blurRay}vh 0 ${color},
       0 var(--ray) ${blurRay}vh 0 ${color},
       calc(var(--ray) * -1) 0 ${blurRay}vh 0 ${color},
       var(--ray) 0 ${blurRay}vh 0 ${color},
-      /* diagonal rays (approx 45°) */
       calc(var(--ray) * -0.707) calc(var(--ray) * -0.707) ${blurRay}vh 0 ${color},
       calc(var(--ray) * 0.707) calc(var(--ray) * -0.707) ${blurRay}vh 0 ${color},
       calc(var(--ray) * -0.707) calc(var(--ray) * 0.707) ${blurRay}vh 0 ${color},
       calc(var(--ray) * 0.707) calc(var(--ray) * 0.707) ${blurRay}vh 0 ${color},
-      /* halo */
       0 0 var(--halo) 0 ${color}
     `;
 
-    // const glow = `
-    //   0 0 0 ${3 * glowIntensity}px ${color}FF,
-    //   0 0 0 ${5 * glowIntensity}px ${color}80,
-    //   0 0 ${5 * glowIntensity}px ${color}FF
-    // `;
-    return {
-      top: `${y}vh`,
-      left: `${x}vw`,
-      size: `${size}vh`,
-      centerPoint: `${centerPoint}vh`,
-      baseSize: Number(size) * 0.85,
-      delay,
-      color,
-      glow,
-    };
-  });
-}
+  return {
+    id: `twinkle-star-${Date.now()}-${index}`,
+    top: `${y}vh`,
+    left: `${x}vw`,
+    size: `${size}vh`,
+    centerPoint: `${centerPoint}vh`,
+    baseSize: Number(size) * 0.85,
+    delay,
+    color,
+    glow,
+  };
+};
 
+// export function generateTwinkleStars(
+//   count = 12,
+//   colors: string[],
+//   baseSize: number = 1
+// ) {
+//   return Array.from({ length: count }).map((_, i) => {
+//     const x = (Math.random() * 100).toFixed(2); // viewport width %
+//     const y = (Math.random() * 100).toFixed(2); // viewport height %
+//     const size = Math.max(Math.random() * baseSize, 0.125).toFixed(2);
+
+//     // const size = 0.3;
+//     const color = colors[Math.floor(Math.random() * colors.length)];
+//     const delay = `${(Math.random() * i + 1.5).toFixed(2)}s`;
+//     const centerPoint = Number(size) / 2;
+//     const blurRay = Number(size) * 3.5;
+//     // const glow = `
+//     //   ${centerPoint}vh 0 0 var(--core) ${color}BF,
+//     //   /* cardinal rays */
+//     //   ${centerPoint}vh calc(var(--ray) * -1) var(--blurRay) 0 ${color}80,
+//     //   ${centerPoint}vh var(--ray) var(--blurRay) 0 ${color}80,
+//     //   calc(${centerPoint}vh + var(--ray) * -1) 0 var(--blurRay) 0 ${color}80,
+//     //   calc(${centerPoint}vh + var(--ray)) 0 var(--blurRay) 0 ${color}80,
+//     //   /* diagonal rays (approx 45°) */
+//     //   calc(${centerPoint}vh + var(--ray) * -0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
+//     //   calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * -0.707) var(--blurRay) 0 ${color}80,
+//     //   calc(${centerPoint}vh + var(--ray) * -0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
+//     //   calc(${centerPoint}vh + var(--ray) * 0.707) calc(var(--ray) * 0.707) var(--blurRay) 0 ${color}80,
+//     //   /* halo */
+//     //   ${centerPoint}vh 0 var(--halo) 0 ${color}BF
+//     // `;
+
+//     const glow = `
+//       0 0 0 var(--core) ${color}25,
+//       /* cardinal rays */
+//       0 calc(var(--ray) * -1) ${blurRay}vh 0 ${color},
+//       0 var(--ray) ${blurRay}vh 0 ${color},
+//       calc(var(--ray) * -1) 0 ${blurRay}vh 0 ${color},
+//       var(--ray) 0 ${blurRay}vh 0 ${color},
+//       /* diagonal rays (approx 45°) */
+//       calc(var(--ray) * -0.707) calc(var(--ray) * -0.707) ${blurRay}vh 0 ${color},
+//       calc(var(--ray) * 0.707) calc(var(--ray) * -0.707) ${blurRay}vh 0 ${color},
+//       calc(var(--ray) * -0.707) calc(var(--ray) * 0.707) ${blurRay}vh 0 ${color},
+//       calc(var(--ray) * 0.707) calc(var(--ray) * 0.707) ${blurRay}vh 0 ${color},
+//       /* halo */
+//       0 0 var(--halo) 0 ${color}
+//     `;
+
+//     // const glow = `
+//     //   0 0 0 ${3 * glowIntensity}px ${color}FF,
+//     //   0 0 0 ${5 * glowIntensity}px ${color}80,
+//     //   0 0 ${5 * glowIntensity}px ${color}FF
+//     // `;
+//     return {
+//       top: `${y}vh`,
+//       left: `${x}vw`,
+//       size: `${size}vh`,
+//       centerPoint: `${centerPoint}vh`,
+//       baseSize: Number(size) * 0.85,
+//       delay,
+//       color,
+//       glow,
+//     };
+//   });
+// }
+
+/**
+ * Pick a style based on the given mix.
+ * @param {{straight: number, shallow: number, deep: number}} mix
+ * @returns {"straight" | "shallow" | "deep"} style
+ */
 function pickStyle(mix: { straight: number; shallow: number; deep: number }) {
   const r = Math.random();
   if (r < mix.straight) return "straight";
@@ -334,6 +382,17 @@ function pickStyle(mix: { straight: number; shallow: number; deep: number }) {
   return "deep";
 }
 
+/**
+ * Roughly estimates the length of a quadratic Bézier curve
+ * using sampling.
+ * @param {number} x1 - The x-coordinate of the first control point.
+ * @param {number} y1 - The y-coordinate of the first control point.
+ * @param {number} cx - The x-coordinate of the second control point.
+ * @param {number} cy - The y-coordinate of the second control point.
+ * @param {number} x2 - The x-coordinate of the third control point.
+ * @param {number} y2 - The y-coordinate of the third control point.
+ * @returns {number} The estimated length of the curve.
+ */
 function pathLength(
   x1: number,
   y1: number,
@@ -358,206 +417,284 @@ function pathLength(
   return length;
 }
 
-export function generateShootingStars(
-  count: number,
-  // minAngle: number = -20, // shallow
-  // maxAngle: number = -70, // steep
+export const generateStar = (
+  index: number,
   interval: number = 5, // seconds between streaks
   curveFactor: number,
-  // trajectoryStyle: "straight" | "shallow" | "deep"
   mix: { straight: number; shallow: number; deep: number },
   colors: string[],
-  glowIntensity: number = 1,
+  glowIntensity: number = 1.25,
   baseSpeed: number = 20, // % per second (normalized)
   baseSize: number = 1
-) {
+): ShootingStarData => {
   const width = window.innerWidth;
   const height = window.innerHeight;
 
-  return Array.from({ length: count }).map((_, i) => {
-    // const top = `${Math.random() * 100}vh`; // random vertical position
-    // const right = `${Math.random() * 100}vw`; // start off-screen right
-    // const top = `${Math.random() * 100}%`;
-    // const right = `${Math.random() * 100}%`;
-    // const left = `${Math.random() * 100}vw`; // start off-screen right
-    const starDirection = Math.random() < 0.5 ? "left" : "right";
+  const starDirection = Math.random() < 0.5 ? "left" : "right";
+  const startX =
+    starDirection === "left"
+      ? width / 2 + (Math.random() * width) / 2
+      : width / 2 - (Math.random() * width) / 2;
+  const startY = Math.random() * height;
+  const endX = starDirection === "left" ? -100 : width + 100;
+  const endY = Math.random() * height;
 
-    // const startX = Math.random() * width;
-    // // const startX = 0;
-    // const startY = Math.random() * height;
-    // const endX = -100; // off-screen left
-    // // const endX = width + 100; // off-screen left
-    // const endY = Math.random() * height;
+  const style = pickStyle(mix);
+  let len: number;
+  let path: string;
 
-    const startX =
-      starDirection === "left"
-        ? width / 2 + (Math.random() * width) / 2
-        : width / 2 - (Math.random() * width) / 2;
-    const startY = Math.random() * height;
-    const endX = starDirection === "left" ? -100 : width + 100;
-    const endY = Math.random() * height;
+  if (style === "straight") {
+    path = `path("M ${startX} ${startY} L ${endX} ${endY}")`;
+    len = Math.hypot(endX - startX, endY - startY);
+  } else {
+    const controlX = Math.random() * (curveFactor / 100) * width;
+    const controlY =
+      style === "shallow"
+        ? Math.random() * (curveFactor / 200) * height
+        : Math.random() * (curveFactor / 50) * height;
+    path = `path("M ${startX} ${startY} Q ${controlX} ${controlY}, ${endX} ${endY}")`;
+    len = pathLength(startX, startY, controlX, controlY, endX, endY);
+  }
 
-    // console.log(
-    //   `Star ${i} Directtion: ${starDirection} - From (${startX.toFixed(
-    //     2
-    //   )}, ${startY.toFixed(2)}) to (${endX.toFixed(2)}, ${endY.toFixed(2)})`
-    // );
+  const duration = `${(len / (len * baseSpeed)).toFixed(2)}s`;
+  const delay = `${(index === 0
+    ? Math.floor(Math.random() * interval)
+    : Math.random() + interval + index + (index / interval) * interval
+  ).toFixed(2)}s`;
 
-    // const delay = `${i * interval}s`; // staggered by interval
-    // const duration = `${3 + Math.random() * 10}s`; // 3s to 10s duration
-    // random angle between minAngle and maxAngle
-    // const rot = `${
-    //   minAngle - Math.random() * Math.abs(maxAngle - minAngle)
-    // }deg`;
+  const size = Math.max(Math.random() * baseSize, 0.125).toFixed(2);
+  const centerPoint = Number(size) / 2;
+  const head = Number(size) * 1.5;
+  const blurRay = Number(size) * 3.5;
+  const color = colors[Math.floor(Math.random() * colors.length)];
 
-    const style = pickStyle(mix);
-    let len: number;
-    let path: string;
-
-    if (style === "straight") {
-      // straight line path
-      path = `path("M ${startX} ${startY} L ${endX} ${endY}")`;
-      len = Math.hypot(endX - startX, endY - startY);
-      // return {
-      //   // top,
-      //   // right,
-      //   delay,
-      //   duration,
-      //   // rot,
-      //   // path: `path("M ${right} ${top} L -100vw ${Math.random() * 100}vh")`,
-      //   path: `path("M ${startX} ${startY} L ${endX} ${endY}")`,
-      // };
-    } else {
-      // const controlX = `${Math.random() * curveFactor}vw`;
-      const controlX = Math.random() * (curveFactor / 100) * width;
-      // pick control point based on style
-      const controlY =
-        style === "shallow"
-          ? Math.random() * (curveFactor / 200) * height
-          : Math.random() * (curveFactor / 50) * height;
-      // ? `${Math.random() * (curveFactor / 2)}vh`
-      // : `${Math.random() * (curveFactor * 2)}vh`;
-      path = `path("M ${startX} ${startY} Q ${controlX} ${controlY}, ${endX} ${endY}")`;
-      len = pathLength(startX, startY, controlX, controlY, endX, endY);
-    }
-
-    // const baseSpeed = 20; // % per second (normalized)
-    const duration = `${(len / (len * baseSpeed)).toFixed(2)}s`;
-    // const duration = `${(len / 50).toFixed(2)}s`;
-    const delay = `${(i === 0
-      ? Math.floor(Math.random() * interval)
-      : Math.random() + interval + i + (i / interval) * interval
-    ).toFixed(2)}s`; // staggered by interval
-
-    // console.log(
-    //   `Star ${i} - Style: ${style}, Length: ${len.toFixed(
-    //     2
-    //   )}, Duration: ${duration}, Delay: ${delay}`
-    // );
-
-    const size = Math.max(Math.random() * baseSize, 0.125).toFixed(2);
-    const centerPoint = Number(size) / 2;
-    const head = Number(size) * 1.5;
-    const blurRay = Number(size) * 3.5;
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    // const glow = `
-    //   0 0 0 ${1 * glowIntensity}px ${color}40,
-    //   0 0 0 ${2 * glowIntensity}px ${color}10,
-    //   0 0 ${1 * glowIntensity}px ${color}10
-    // `;
-    const glow = `
-      0 0 0 calc(var(--core) * 1.25) ${color}80,
-      /* cardinal rays */
+  const glow = `
+      0 0 0 calc(var(--core) * ${glowIntensity}) ${color}80,
       0 calc(var(--ray) * -1) ${blurRay}vh 0 ${color}40,
       0 var(--ray) ${blurRay}vh 0 ${color}40,
       calc(var(--ray) * -1) 0 ${blurRay}vh 0 ${color}40,
       var(--ray) 0 ${blurRay}vh 0 ${color}40,
-      /* diagonal rays (approx 45°) */
       calc(var(--ray) * -0.707) calc(var(--ray) * -0.707) ${blurRay}vh 0 ${color}40,
       calc(var(--ray) * 0.707) calc(var(--ray) * -0.707) ${blurRay}vh 0 ${color}40,
       calc(var(--ray) * -0.707) calc(var(--ray) * 0.707) ${blurRay}vh 0 ${color}40,
       calc(var(--ray) * 0.707) calc(var(--ray) * 0.707) ${blurRay}vh 0 ${color}40,
-      /* halo */
       0 0 var(--halo) 0 ${color}
     `;
 
-    return {
-      // top,
-      // right,
-      size: `${size}vh`,
-      centerPoint: `${centerPoint}vh`,
-      head: `${head}vh`,
-      halfHead: `${head / 2}vh`,
-      baseSize: Number(size) * 0.85,
-      delay,
-      duration,
-      twinkleDuration: `${(len / (len * baseSpeed) / 5).toFixed(2)}s`,
-      // rot,
-      // path: `path("M ${right} ${top} Q ${controlX} ${controlY}, -100vw ${
-      //   Math.random() * 100
-      // }vh")`,
-      path,
-      color,
-      glow,
-    };
-  });
-}
+  return {
+    id: `shooting-star-${Date.now()}-${index}`,
+    size: `${size}vh`,
+    centerPoint: `${centerPoint}vh`,
+    head: `${head}vh`,
+    halfHead: `${head / 2}vh`,
+    baseSize: Number(size) * 0.85,
+    delay,
+    duration,
+    twinkleDuration: `${(len / (len * baseSpeed) / 5).toFixed(2)}s`,
+    path,
+    color,
+    glow,
+  };
+};
 
-import { useEffect, useState } from "react";
+// export function generateShootingStars(
+//   count: number,
+//   // minAngle: number = -20, // shallow
+//   // maxAngle: number = -70, // steep
+//   interval: number = 5, // seconds between streaks
+//   curveFactor: number,
+//   // trajectoryStyle: "straight" | "shallow" | "deep"
+//   mix: { straight: number; shallow: number; deep: number },
+//   colors: string[],
+//   glowIntensity: number = 1,
+//   baseSpeed: number = 20, // % per second (normalized)
+//   baseSize: number = 1
+// ) {
+//   const width = window.innerWidth;
+//   const height = window.innerHeight;
 
-export function useResponsiveShootingStars(
-  count: number,
-  interval: number,
-  curveFactor: number,
-  mix: { straight: number; shallow: number; deep: number },
-  colors: string[],
-  glowIntensity: number,
-  baseSpeed: number,
-  baseSize: number
-) {
-  const [stars, setStars] = useState(() =>
-    generateShootingStars(
-      count,
-      interval,
-      curveFactor,
-      mix,
-      colors,
-      glowIntensity,
-      baseSpeed,
-      baseSize
-    )
-  );
+//   return Array.from({ length: count }).map((_, i) => {
+//     // const top = `${Math.random() * 100}vh`; // random vertical position
+//     // const right = `${Math.random() * 100}vw`; // start off-screen right
+//     // const top = `${Math.random() * 100}%`;
+//     // const right = `${Math.random() * 100}%`;
+//     // const left = `${Math.random() * 100}vw`; // start off-screen right
+//     const starDirection = Math.random() < 0.5 ? "left" : "right";
 
-  useEffect(() => {
-    function handleResize() {
-      setStars(
-        generateShootingStars(
-          count,
-          interval,
-          curveFactor,
-          mix,
-          colors,
-          glowIntensity,
-          baseSpeed,
-          baseSize
-        )
-      );
-    }
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [
-    count,
-    interval,
-    curveFactor,
-    mix,
-    colors,
-    glowIntensity,
-    baseSpeed,
-    baseSize,
-  ]);
+//     // const startX = Math.random() * width;
+//     // // const startX = 0;
+//     // const startY = Math.random() * height;
+//     // const endX = -100; // off-screen left
+//     // // const endX = width + 100; // off-screen left
+//     // const endY = Math.random() * height;
 
-  return stars;
-}
+//     const startX =
+//       starDirection === "left"
+//         ? width / 2 + (Math.random() * width) / 2
+//         : width / 2 - (Math.random() * width) / 2;
+//     const startY = Math.random() * height;
+//     const endX = starDirection === "left" ? -100 : width + 100;
+//     const endY = Math.random() * height;
+
+//     // console.log(
+//     //   `Star ${i} Directtion: ${starDirection} - From (${startX.toFixed(
+//     //     2
+//     //   )}, ${startY.toFixed(2)}) to (${endX.toFixed(2)}, ${endY.toFixed(2)})`
+//     // );
+
+//     // const delay = `${i * interval}s`; // staggered by interval
+//     // const duration = `${3 + Math.random() * 10}s`; // 3s to 10s duration
+//     // random angle between minAngle and maxAngle
+//     // const rot = `${
+//     //   minAngle - Math.random() * Math.abs(maxAngle - minAngle)
+//     // }deg`;
+
+//     const style = pickStyle(mix);
+//     let len: number;
+//     let path: string;
+
+//     if (style === "straight") {
+//       // straight line path
+//       path = `path("M ${startX} ${startY} L ${endX} ${endY}")`;
+//       len = Math.hypot(endX - startX, endY - startY);
+//       // return {
+//       //   // top,
+//       //   // right,
+//       //   delay,
+//       //   duration,
+//       //   // rot,
+//       //   // path: `path("M ${right} ${top} L -100vw ${Math.random() * 100}vh")`,
+//       //   path: `path("M ${startX} ${startY} L ${endX} ${endY}")`,
+//       // };
+//     } else {
+//       // const controlX = `${Math.random() * curveFactor}vw`;
+//       const controlX = Math.random() * (curveFactor / 100) * width;
+//       // pick control point based on style
+//       const controlY =
+//         style === "shallow"
+//           ? Math.random() * (curveFactor / 200) * height
+//           : Math.random() * (curveFactor / 50) * height;
+//       // ? `${Math.random() * (curveFactor / 2)}vh`
+//       // : `${Math.random() * (curveFactor * 2)}vh`;
+//       path = `path("M ${startX} ${startY} Q ${controlX} ${controlY}, ${endX} ${endY}")`;
+//       len = pathLength(startX, startY, controlX, controlY, endX, endY);
+//     }
+
+//     // const baseSpeed = 20; // % per second (normalized)
+//     const duration = `${(len / (len * baseSpeed)).toFixed(2)}s`;
+//     // const duration = `${(len / 50).toFixed(2)}s`;
+//     const delay = `${(i === 0
+//       ? Math.floor(Math.random() * interval)
+//       : Math.random() + interval + i + (i / interval) * interval
+//     ).toFixed(2)}s`; // staggered by interval
+
+//     // console.log(
+//     //   `Star ${i} - Style: ${style}, Length: ${len.toFixed(
+//     //     2
+//     //   )}, Duration: ${duration}, Delay: ${delay}`
+//     // );
+
+//     const size = Math.max(Math.random() * baseSize, 0.125).toFixed(2);
+//     const centerPoint = Number(size) / 2;
+//     const head = Number(size) * 1.5;
+//     const blurRay = Number(size) * 3.5;
+//     const color = colors[Math.floor(Math.random() * colors.length)];
+//     // const glow = `
+//     //   0 0 0 ${1 * glowIntensity}px ${color}40,
+//     //   0 0 0 ${2 * glowIntensity}px ${color}10,
+//     //   0 0 ${1 * glowIntensity}px ${color}10
+//     // `;
+//     const glow = `
+//       0 0 0 calc(var(--core) * 1.25) ${color}80,
+//       /* cardinal rays */
+//       0 calc(var(--ray) * -1) ${blurRay}vh 0 ${color}40,
+//       0 var(--ray) ${blurRay}vh 0 ${color}40,
+//       calc(var(--ray) * -1) 0 ${blurRay}vh 0 ${color}40,
+//       var(--ray) 0 ${blurRay}vh 0 ${color}40,
+//       /* diagonal rays (approx 45°) */
+//       calc(var(--ray) * -0.707) calc(var(--ray) * -0.707) ${blurRay}vh 0 ${color}40,
+//       calc(var(--ray) * 0.707) calc(var(--ray) * -0.707) ${blurRay}vh 0 ${color}40,
+//       calc(var(--ray) * -0.707) calc(var(--ray) * 0.707) ${blurRay}vh 0 ${color}40,
+//       calc(var(--ray) * 0.707) calc(var(--ray) * 0.707) ${blurRay}vh 0 ${color}40,
+//       /* halo */
+//       0 0 var(--halo) 0 ${color}
+//     `;
+
+//     return {
+//       // top,
+//       // right,
+//       size: `${size}vh`,
+//       centerPoint: `${centerPoint}vh`,
+//       head: `${head}vh`,
+//       halfHead: `${head / 2}vh`,
+//       baseSize: Number(size) * 0.85,
+//       delay,
+//       duration,
+//       twinkleDuration: `${(len / (len * baseSpeed) / 5).toFixed(2)}s`,
+//       // rot,
+//       // path: `path("M ${right} ${top} Q ${controlX} ${controlY}, -100vw ${
+//       //   Math.random() * 100
+//       // }vh")`,
+//       path,
+//       color,
+//       glow,
+//     };
+//   });
+// }
+
+// export function useResponsiveShootingStars(
+//   count: number,
+//   interval: number,
+//   curveFactor: number,
+//   mix: { straight: number; shallow: number; deep: number },
+//   colors: string[],
+//   glowIntensity: number,
+//   baseSpeed: number,
+//   baseSize: number
+// ) {
+//   const [stars, setStars] = useState(() =>
+//     generateShootingStars(
+//       count,
+//       interval,
+//       curveFactor,
+//       mix,
+//       colors,
+//       glowIntensity,
+//       baseSpeed,
+//       baseSize
+//     )
+//   );
+
+//   useEffect(() => {
+//     function handleResize() {
+//       setStars(
+//         generateShootingStars(
+//           count,
+//           interval,
+//           curveFactor,
+//           mix,
+//           colors,
+//           glowIntensity,
+//           baseSpeed,
+//           baseSize
+//         )
+//       );
+//     }
+//     window.addEventListener("resize", handleResize);
+//     return () => window.removeEventListener("resize", handleResize);
+//   }, [
+//     count,
+//     interval,
+//     curveFactor,
+//     mix,
+//     colors,
+//     glowIntensity,
+//     baseSpeed,
+//     baseSize,
+//   ]);
+
+//   return stars;
+// }
 
 /**
  * Parse a CSS value string or number unit into a pixel value.

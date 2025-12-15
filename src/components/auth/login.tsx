@@ -20,6 +20,8 @@ import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
 import MCS from "../icons/mcs";
 import { v7 } from "uuid";
 import { MeteorShower } from "./ui/meteor";
+import ShootingStars from "./effects/shootingStar";
+import TwinkleStars from "./effects/twinkleStar";
 
 const PREFIX = "RazethLogin";
 
@@ -170,14 +172,6 @@ export const Login = (
           count={theme.custom.sideImage.shootingStarCount}
           shootingStarClass={theme.custom.sideImage.shootingClass}
           twinkleClass={theme.custom.sideImage.twinkleClass}
-          // meteorVariant="custom"
-          // customMeteorConfig={{
-          //   enabled: true,
-          //   interval: 400,
-          //   configs: [
-          //     { size: 500, speed: 7, maxCount: 3, count: 0, zIndex: 10 },
-          //   ],
-          // }}
         />
         <Login.image src={src} alt={alt} />
         <Login.content>
@@ -200,7 +194,7 @@ export const Login = (
               </Grid>
             </Grid>
           </Login.card>
-          {footer}
+          {/* {footer} */}
         </Login.content>
         {/* <Login.Heading>{heading}</Login.Heading> */}
         <Login.icon>
@@ -241,85 +235,46 @@ Login.image = ({ src, alt }: { src: string; alt: string }) => (
     />
   </Astronaut>
 );
-Login.effect = ({
-  count,
-  shootingStarClass,
-  twinkleClass,
-}: // meteorEnabled = true,
-// meteorVariant = "medium",
-// customMeteorConfig,
-EffectProps) => {
+Login.effect = ({ count, shootingStarClass, twinkleClass }: EffectProps) => {
   const theme = useTheme();
-
-  // Predefined meteor variants
-  // const meteorVariants = {
-  //   light: {
-  //     enabled: true,
-  //     interval: 750,
-  //     configs: [
-  //       { size: "0.5vh", speed: 10, maxCount: 1, count: 0, zIndex: 1 },
-  //       { size: "0.25vh", speed: 15, maxCount: 3, count: 0, zIndex: 0 },
-  //     ],
-  //   },
-  //   medium: {
-  //     enabled: true,
-  //     interval: 500,
-  //     configs: [
-  //       { size: "0.75vh", speed: 5, maxCount: 1, count: 0, zIndex: 2 },
-  //       { size: "0.5vh", speed: 10, maxCount: 3, count: 0, zIndex: 1 },
-  //       { size: "0.25vh", speed: 15, maxCount: 5, count: 0, zIndex: 0 },
-  //     ],
-  //   },
-  //   heavy: {
-  //     enabled: true,
-  //     interval: 300,
-  //     configs: [
-  //       { size: "1vh", speed: 2.5, maxCount: 3, count: 0, zIndex: 3 },
-  //       { size: "0.75vh", speed: 5, maxCount: 5, count: 0, zIndex: 2 },
-  //       { size: "0.5vh", speed: 10, maxCount: 7, count: 0, zIndex: 1 },
-  //       { size: "0.25vh", speed: 15, maxCount: 10, count: 0, zIndex: 0 },
-  //     ],
-  //   },
-  //   custom: customMeteorConfig || {
-  //     enabled: true,
-  //     interval: 300,
-  //     configs: [
-  //       { size: 700, speed: 4, maxCount: 3, count: 0, zIndex: 10 },
-  //       { size: 400, speed: 8, maxCount: 5, count: 0, zIndex: 4 },
-  //       { size: 200, speed: 12, maxCount: 8, count: 0, zIndex: 0 },
-  //     ],
-  //   },
-  // };
-
-  // meteorVariants.custom = customMeteorConfig || meteorVariants.medium;
-
-  // Get meteor config from theme or use defaults
-  // const meteorConfig = theme.custom?.meteor || {
-  //   enabled: true,
-  //   interval: 500,
-  //   configs: [
-  //     { size: 600, speed: 5, maxCount: 2, count: 0, zIndex: 10 },
-  //     { size: 300, speed: 10, maxCount: 3, count: 0, zIndex: 4 },
-  //     { size: 150, speed: 15, maxCount: 5, count: 0, zIndex: 0 },
-  //   ],
-  // };
+  // Get configurations from theme
   const meteorConfig = theme.custom?.meteor;
+  const sideImageConfig = theme.custom?.sideImage;
 
   return (
     <Effect>
-      {Array.from({ length: count }).map((_, i) => (
+      {/* {Array.from({ length: count }).map((_, i) => (
         <span key={v7()} className={shootingStarClass}>
           <span key={i} />
         </span>
       ))}
       {Array.from({ length: count }).map((_, i) => (
         <Box key={i} className={twinkleClass} />
-      ))}
-      {/* Meteor shower with theme config */}
+      ))} */}
+      {/* Dynamic Shooting Stars */}
+      <ShootingStars
+        count={sideImageConfig?.shootingStarCount || 20}
+        interval={sideImageConfig?.shootingStarInterval || 5}
+        curveFactor={sideImageConfig?.curveFactor || 50}
+        trajectoryMix={sideImageConfig?.trajectoryMix}
+        colors={sideImageConfig?.starColors}
+        glowIntensity={sideImageConfig?.glowIntensity}
+        baseSpeed={sideImageConfig?.baseSpeed}
+        baseSize={sideImageConfig?.starSize}
+      />
+
+      {/* Dynamic Twinkle Stars */}
+      <TwinkleStars
+        count={sideImageConfig?.shootingStarCount || 12}
+        colors={sideImageConfig?.starColors}
+        baseSize={sideImageConfig?.starSize}
+      />
+
+      {/* Dynamic Meteor shower */}
       <MeteorShower
-        enabled={meteorConfig?.enabled}
-        interval={meteorConfig?.interval}
-        configs={meteorConfig?.configs}
+        enabled={meteorConfig.enabled}
+        interval={meteorConfig.interval}
+        configs={meteorConfig.configs}
       />
     </Effect>
   );

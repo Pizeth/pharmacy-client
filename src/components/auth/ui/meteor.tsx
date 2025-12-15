@@ -78,7 +78,7 @@ const MeteorElement: React.FC<MeteorElementProps> = ({
     // Velocity = Pixels per Second.
     // We increase base velocity for longer distances to add "energy".
     // Base speed comes from config (e.g., 5).
-    const baseVelocity = meteor.speed * 0.00125;
+    const baseVelocity = meteor.speed * 0.0025;
 
     // "The longer the distance, the faster the speed"
     // We can reduce the duration slightly for very long distances to simulate acceleration
@@ -133,7 +133,7 @@ const MeteorElement: React.FC<MeteorElementProps> = ({
       style={{
         left: meteor.left,
         top: meteor.top,
-        zIndex: meteor.zIndex,
+        // zIndex: meteor.zIndex,
         transform: transform,
         // We only set the duration here. The Property and Easing are in the Theme.
         transitionDuration: duration,
@@ -160,19 +160,7 @@ export const MeteorShower = (
   }
 ) => {
   const props = useThemeProps({ name: PREFIX, props: inProps });
-  const {
-    configs = [
-      { size: "600px", speed: 5, maxCount: 2, count: 0, zIndex: 10 },
-      { size: "300px", speed: 10, maxCount: 3, count: 0, zIndex: 4 },
-      { size: "150px", speed: 15, maxCount: 5, count: 0, zIndex: 0 },
-    ],
-    interval = 500,
-    enabled = true,
-    className,
-    sprite,
-    sx,
-    ...rest
-  } = props;
+  const { configs, interval, enabled, className, sprite, sx, ...rest } = props;
 
   // console.log("configs", configs);
 
@@ -238,13 +226,13 @@ export const MeteorShower = (
         setTimeout(() => {
           setMeteors((prev) => prev.filter((m) => m.id !== newMeteor.id));
           config.count--;
-        }, config.speed * 1500);
+        }, config.speed * 1000);
       }
     };
 
-    const interval = setInterval(createMeteor, 1500);
+    const intervalId = setInterval(createMeteor, 3000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(intervalId);
   }, [enabled, interval]);
 
   if (!enabled) return null;

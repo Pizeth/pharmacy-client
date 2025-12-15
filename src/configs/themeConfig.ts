@@ -302,6 +302,7 @@ export const getMeteorConfig = () => {
   // 10 meteors = 800ms, 50 meteors = 200ms.
   const baseInterval = 1000000; // Arbitrary base constant
   const interval = Math.max(100, Math.floor(baseInterval / intensity));
+  console.log("Meteor interval:", interval);
 
   // 2. Generate Configs
   const configs = generateProceduralConfigs(intensity);
@@ -340,8 +341,6 @@ const generateProceduralConfigs = (totalMeteors: number): MeteorConfig[] => {
       Math.random() * (bucket.maxSize - bucket.minSize + 1) + bucket.minSize
     );
 
-    console.log(`[Meteor] ${bucket.label} meteors: ${maxCount} x ${sizeVal}vh`);
-
     // C. Calculate Speed (Larger = Slower)
     // Base speed 2s + factor based on size.
     // Small (3vh) ≈ 3s duration. Giant (40vh) ≈ 15s duration.
@@ -351,8 +350,11 @@ const generateProceduralConfigs = (totalMeteors: number): MeteorConfig[] => {
     // Previously "5" meant 5 seconds. Now "5" means 5ms per pixel (slower).
     // Small meteors (size 3) -> Speed Factor 2 (Fast)
     // Giant meteors (size 40) -> Speed Factor 10 (Slow)
-    const velocityFactor = 10 + sizeVal * 0.25;
+    const velocityFactor = 15 + sizeVal * 0.25;
 
+    console.log(
+      `[Meteor] Generated ${maxCount} ${bucket.label} meteors with size ${sizeVal}vh and speed ${velocityFactor}ms/pixel`
+    );
     return {
       size: `${sizeVal}vh`,
       speed: velocityFactor, // Passed to component to calculate duration
