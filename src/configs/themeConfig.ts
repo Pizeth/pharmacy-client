@@ -158,18 +158,34 @@ export function getSideImageConfig() {
     sm: "12px",
     md: "16px",
   });
-  const shootingStarCount = getEnvNumber(
-    process.env.NEXT_PUBLIC_SHOOTING_STAR_COUNT,
+  const shootingStarMaxCount = getEnvNumber(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_MAX_COUNT,
     15
   );
-  const shootingStarInterval = getEnvNumber(
-    process.env.NEXT_PUBLIC_SHOOTING_STAR_INTERVAL,
+  const shootingStarSpawnInterval = getEnvNumber(
+    process.env.NEXT_PUBLIC_SHOOTING_STAR_SPAWN_INTERVAL,
     5
   );
-  const shootingClass =
-    process.env.NEXT_PUBLIC_SHOOTING_STAR_CLASS || "shooting-star";
-  const twinkleClass =
-    process.env.NEXT_PUBLIC_TWINKLE_STAR_CLASS || "twinkle-star";
+  const twinkleStarMaxCount = getEnvNumber(
+    process.env.NEXT_PUBLIC_TWINKLE_STAR_MAX_COUNT,
+    10
+  );
+  const twinkleStarSpawnInterval = getEnvNumber(
+    process.env.NEXT_PUBLIC_TWINKLE_STAR_SPAWN_INTERVAL,
+    30000
+  );
+  const twinkleStarMinLifetime = getEnvNumber(
+    process.env.NEXT_PUBLIC_TWINKLE_STAR_MIN_LIFE_TIME,
+    10000
+  );
+  const twinkleStarMaxLifetime = getEnvNumber(
+    process.env.NEXT_PUBLIC_TWINKLE_STAR_MAX_LIFE_TIME,
+    25000
+  );
+  // const shootingClass =
+  //   process.env.NEXT_PUBLIC_SHOOTING_STAR_CLASS || "shooting-star";
+  // const twinkleClass =
+  //   process.env.NEXT_PUBLIC_TWINKLE_STAR_CLASS || "twinkle-star";
   const starSize = getEnvNumber(process.env.NEXT_PUBLIC_SHOOTING_STAR_SIZE, 1);
   const starColors = parseEnvJson(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_COLORS,
@@ -198,7 +214,7 @@ export function getSideImageConfig() {
   );
   const trajectoryMix = parseEnvJson(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_TRAJECTORY_MIX,
-    { straight: 0.3, shallow: 0.4, deep: 0.3 }
+    { straight: 0.5, shallow: 0.3, deep: 0.2 }
   );
 
   return {
@@ -223,10 +239,14 @@ export function getSideImageConfig() {
     captionShadowStrength,
     captionOffset,
     animationBackground: buildGradients(points, options),
-    shootingStarCount,
-    shootingStarInterval,
-    shootingClass,
-    twinkleClass,
+    shootingStarMaxCount,
+    shootingStarSpawnInterval,
+    twinkleStarMaxCount,
+    twinkleStarSpawnInterval,
+    twinkleStarMinLifetime,
+    twinkleStarMaxLifetime,
+    // shootingClass,
+    // twinkleClass,
     starSize,
     starColors,
     glowIntensity,
@@ -364,4 +384,50 @@ const generateProceduralConfigs = (totalMeteors: number): MeteorConfig[] => {
       zIndex: sizeVal,
     };
   });
+};
+
+// ============================================
+// PRESET CONFIGURATIONS
+// ============================================
+
+// Subtle effect - minimal and elegant
+export const subtleStarConfig = {
+  shootingStarMaxCount: 1,
+  shootingStarSpawnInterval: 5000,
+  twinkleStarMaxCount: 5,
+  twinkleStarSpawnInterval: 4000,
+  twinkleStarMinLifetime: 10000,
+  twinkleStarMaxLifetime: 20000,
+};
+
+// Normal effect - balanced (default)
+export const normalStarConfig = {
+  shootingStarMaxCount: 3,
+  shootingStarSpawnInterval: 2000,
+  twinkleStarMaxCount: 8,
+  twinkleStarSpawnInterval: 3000,
+  twinkleStarMinLifetime: 8000,
+  twinkleStarMaxLifetime: 15000,
+};
+
+// Intense effect - dramatic and busy
+export const intenseStarConfig = {
+  shootingStarMaxCount: 5,
+  shootingStarSpawnInterval: 1000,
+  twinkleStarMaxCount: 15,
+  twinkleStarSpawnInterval: 1500,
+  twinkleStarMinLifetime: 6000,
+  twinkleStarMaxLifetime: 12000,
+};
+
+// Mobile-optimized - battery friendly
+export const mobileStarConfig = {
+  shootingStarMaxCount: 2,
+  shootingStarSpawnInterval: 4000,
+  twinkleStarMaxCount: 5,
+  twinkleStarSpawnInterval: 5000,
+  twinkleStarMinLifetime: 8000,
+  twinkleStarMaxLifetime: 12000,
+  starSize: 0.8,
+  baseSpeed: 15,
 };

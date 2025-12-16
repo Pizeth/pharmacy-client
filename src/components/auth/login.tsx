@@ -19,7 +19,7 @@ import SocialButton from "./ui/socialButton";
 import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
 import MCS from "../icons/mcs";
 import { v7 } from "uuid";
-import { MeteorShower } from "./ui/meteor";
+import { MeteorShower } from "./effects/meteor";
 import ShootingStars from "./effects/shootingStar";
 import TwinkleStars from "./effects/twinkleStar";
 
@@ -169,9 +169,10 @@ export const Login = (
       <Login.overlay>
         <Login.ambient />
         <Login.effect
-          count={theme.custom.sideImage.shootingStarCount}
-          shootingStarClass={theme.custom.sideImage.shootingClass}
-          twinkleClass={theme.custom.sideImage.twinkleClass}
+          shootingStarCount={theme.custom.sideImage.shootingStarMaxCount}
+          twinkleStarCount={theme.custom.sideImage.twinkleStarMaxCount}
+          // shootingStarClass={theme.custom.sideImage.shootingClass}
+          // twinkleClass={theme.custom.sideImage.twinkleClass}
         />
         <Login.image src={src} alt={alt} />
         <Login.content>
@@ -235,7 +236,7 @@ Login.image = ({ src, alt }: { src: string; alt: string }) => (
     />
   </Astronaut>
 );
-Login.effect = ({ count, shootingStarClass, twinkleClass }: EffectProps) => {
+Login.effect = ({ shootingStarCount, twinkleStarCount }: EffectProps) => {
   const theme = useTheme();
   // Get configurations from theme
   const meteorConfig = theme.custom?.meteor;
@@ -252,7 +253,7 @@ Login.effect = ({ count, shootingStarClass, twinkleClass }: EffectProps) => {
         <Box key={i} className={twinkleClass} />
       ))} */}
       {/* Dynamic Shooting Stars */}
-      <ShootingStars
+      {/* <ShootingStars
         count={sideImageConfig?.shootingStarCount || 20}
         interval={sideImageConfig?.shootingStarInterval || 5}
         curveFactor={sideImageConfig?.curveFactor || 50}
@@ -261,13 +262,37 @@ Login.effect = ({ count, shootingStarClass, twinkleClass }: EffectProps) => {
         glowIntensity={sideImageConfig?.glowIntensity}
         baseSpeed={sideImageConfig?.baseSpeed}
         baseSize={sideImageConfig?.starSize}
+      /> */}
+
+      {/* Shooting Stars - Now spawns dynamically like meteors */}
+      <ShootingStars
+        maxCount={shootingStarCount || 5}
+        spawnInterval={sideImageConfig?.shootingStarSpawnInterval || 2000}
+        curveFactor={sideImageConfig?.curveFactor || 50}
+        trajectoryMix={sideImageConfig?.trajectoryMix}
+        colors={sideImageConfig?.starColors}
+        glowIntensity={sideImageConfig?.glowIntensity || 1.25}
+        baseSpeed={sideImageConfig?.baseSpeed || 0.075}
+        baseSize={sideImageConfig?.starSize || 0.5}
+        enabled={true}
       />
 
       {/* Dynamic Twinkle Stars */}
-      <TwinkleStars
+      {/* <TwinkleStars
         count={sideImageConfig?.shootingStarCount || 12}
         colors={sideImageConfig?.starColors}
         baseSize={sideImageConfig?.starSize}
+      /> */}
+
+      {/* Twinkle Stars - Now spawns dynamically with lifetime */}
+      <TwinkleStars
+        maxCount={twinkleStarCount || 10}
+        spawnInterval={sideImageConfig?.twinkleStarSpawnInterval || 3000}
+        minLifetime={sideImageConfig?.twinkleStarMinLifetime || 10000}
+        maxLifetime={sideImageConfig?.twinkleStarMaxLifetime || 25000}
+        colors={sideImageConfig?.starColors}
+        baseSize={sideImageConfig?.starSize || 0.5}
+        enabled={true}
       />
 
       {/* Dynamic Meteor shower */}

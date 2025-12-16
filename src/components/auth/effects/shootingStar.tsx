@@ -26,7 +26,7 @@ const ShootingStarRoot = styled(Box, {
 })<{
   path: string;
   duration: string;
-  delay: string;
+  // delay: string;
   color: string;
   size: string;
   glow: string;
@@ -39,7 +39,7 @@ const ShootingStarRoot = styled(Box, {
   ({
     path,
     duration,
-    delay,
+    // delay,
     color,
     size,
     glow,
@@ -51,13 +51,14 @@ const ShootingStarRoot = styled(Box, {
   }) => ({
     filter: `drop-shadow(0 0 7px ${color})`,
     animation: `${shootingStar} ${duration} linear infinite, ${tail} ${duration} linear infinite`,
-    animationDelay: delay,
+    // animationDelay: delay,
     offsetPath: path,
     height: size,
     background: `linear-gradient(-45deg, ${color}, rgba(0, 0, 255, 0))`,
     "--head-color": color,
     //   "--trail-path": path,
     //   "--glow-duration": duration,
+    // Head element (nested span)
     "& > span": {
       boxShadow: glow,
       right: `calc(${centerPoint} - ${halfHead})`,
@@ -116,7 +117,7 @@ const ShootingStar: React.FC<ShootingStarProps> = ({ star }) => {
     <ShootingStarRoot
       path={star.path}
       duration={star.duration}
-      delay={star.delay}
+      // delay={star.delay}
       color={star.color}
       size={star.size}
       glow={star.glow}
@@ -153,6 +154,8 @@ const ShootingStar: React.FC<ShootingStarProps> = ({ star }) => {
 export const ShootingStars: React.FC<ShootingStarsProps> = ({
   count = 20,
   interval = 5,
+  maxCount = 3,
+  spawnInterval = 2000,
   curveFactor = 50,
   trajectoryMix = { straight: 0.2, shallow: 0.3, deep: 0.5 },
   colors = ["#fff", "#9b40fc", "#00f", "#ff3300ff"],
@@ -165,49 +168,93 @@ export const ShootingStars: React.FC<ShootingStarsProps> = ({
 }) => {
   const [stars, setStars] = useState<ShootingStarData[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const activeCountRef = useRef(0);
+
+  // useEffect(() => {
+  //   if (!enabled) return;
+
+  //   // Generate initial stars
+  //   const initialStars = Array.from({ length: count }, (_, i) =>
+  //     generateStar(
+  //       curveFactor,
+  //       trajectoryMix,
+  //       colors,
+  //       glowIntensity,
+  //       baseSpeed,
+  //       baseSize
+  //     )
+  //   );
+  //   setStars(initialStars);
+
+  //   // Handle window resize
+  //   const handleResize = () => {
+  //     setStars(
+  //       Array.from({ length: count }, (_, i) =>
+  //         generateStar(
+  //           curveFactor,
+  //           trajectoryMix,
+  //           colors,
+  //           glowIntensity,
+  //           baseSpeed,
+  //           baseSize
+  //         )
+  //       )
+  //     );
+  //   };
+
+  //   window.addEventListener("resize", handleResize);
+  //   return () => window.removeEventListener("resize", handleResize);
+  // }, [
+  //   enabled,
+  //   count,
+  //   interval,
+  //   curveFactor,
+  //   trajectoryMix,
+  //   colors,
+  //   glowIntensity,
+  //   baseSpeed,
+  //   baseSize,
+  // ]);
 
   useEffect(() => {
     if (!enabled) return;
 
-    // Generate initial stars
-    const initialStars = Array.from({ length: count }, (_, i) =>
-      generateStar(
-        i,
-        interval,
+    const spawnStar = () => {
+      if (activeCountRef.current >= maxCount) return;
+
+      activeCountRef.current++;
+      const newStar = generateStar(
         curveFactor,
         trajectoryMix,
         colors,
         glowIntensity,
         baseSpeed,
         baseSize
-      )
-    );
-    setStars(initialStars);
-
-    // Handle window resize
-    const handleResize = () => {
-      setStars(
-        Array.from({ length: count }, (_, i) =>
-          generateStar(
-            i,
-            interval,
-            curveFactor,
-            trajectoryMix,
-            colors,
-            glowIntensity,
-            baseSpeed,
-            baseSize
-          )
-        )
       );
+      setStars((prev) => [...prev, newStar]);
+
+      // Remove star after animation completes
+      const durationMs = parseFloat(newStar.duration) * 1000;
+      setTimeout(() => {
+        setStars((prev) => prev.filter((s) => s.id !== newStar.id));
+        activeCountRef.current--;
+      }, durationMs);
     };
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    // Spawn stars at intervals
+    const intervalId = setInterval(spawnStar, spawnInterval);
+
+    // Spawn first star immediately
+    spawnStar();
+
+    return () => {
+      clearInterval(intervalId);
+      activeCountRef.current = 0;
+    };
   }, [
     enabled,
-    count,
-    interval,
+    maxCount,
+    spawnInterval,
     curveFactor,
     trajectoryMix,
     colors,
@@ -215,6 +262,20 @@ export const ShootingStars: React.FC<ShootingStarsProps> = ({
     baseSpeed,
     baseSize,
   ]);
+
+  // Handle window resize
+  useEffect(() => {
+    if (!enabled) return;
+
+    const handleResize = () => {
+      // Clear existing stars and reset on resize
+      setStars([]);
+      activeCountRef.current = 0;
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [enabled]);
 
   if (!enabled) return null;
 

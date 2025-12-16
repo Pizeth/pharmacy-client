@@ -136,10 +136,11 @@ export interface MeteorElementProps {
 }
 
 export interface EffectProps {
-  count: number;
-  shootingStarClass: string;
-  twinkleClass: string;
-  meteorEnabled?: boolean;
+  shootingStarCount: number;
+  twinkleStarCount: number;
+  // shootingStarClass: string;
+  // twinkleClass: string;
+  // meteorEnabled?: boolean;
   // meteorVariant?: MeteorVariant;
   // customMeteorConfig?: Omit<MeteorShowerProps, "sx" | "className">;
   customMeteorConfig?: Meteor;

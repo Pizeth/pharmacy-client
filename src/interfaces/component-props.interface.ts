@@ -7,7 +7,7 @@ export interface ShootingStarData {
   head: string;
   halfHead: string;
   baseSize: number;
-  delay: string;
+  // delay: string;
   duration: string;
   twinkleDuration: string;
   path: string;
@@ -22,6 +22,8 @@ export interface ShootingStarProps {
 export interface ShootingStarsProps {
   count?: number;
   interval?: number;
+  maxCount?: number;
+  spawnInterval?: number;
   curveFactor?: number;
   trajectoryMix?: { straight: number; shallow: number; deep: number };
   colors?: string[];
@@ -43,6 +45,8 @@ export interface TwinkleStarData {
   delay: string;
   color: string;
   glow: string;
+  lifetime: number;
+  isFadingOut: boolean;
 }
 
 export interface TwinkleStarProps {
@@ -51,6 +55,10 @@ export interface TwinkleStarProps {
 
 export interface TwinkleStarsProps {
   count?: number;
+  maxCount?: number;
+  spawnInterval?: number;
+  minLifetime?: number;
+  maxLifetime?: number;
   colors?: string[];
   baseSize?: number;
   enabled?: boolean;

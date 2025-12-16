@@ -50,10 +50,14 @@ export interface SideImage {
     backgroundImage: string;
     backgroundSize: string;
   };
-  shootingStarCount: number;
-  shootingStarInterval: number;
-  shootingClass: string;
-  twinkleClass: string;
+  shootingStarMaxCount: number;
+  shootingStarSpawnInterval: number;
+  twinkleStarMaxCount: number;
+  twinkleStarSpawnInterval: number;
+  twinkleStarMinLifetime: number;
+  twinkleStarMaxLifetime: number;
+  // shootingClass: string;
+  // twinkleClass: string;
   starSize: number;
   starColors: string[];
   glowIntensity: number;

@@ -353,3 +353,13 @@ export const meteorStrike = keyframes`
   0% { background-position: 0% 0; }
   100% { background-position: 100% 0; } /* 100% aligns the last frame */
 `;
+
+export const fadeIn = keyframes`
+  from { opacity: 0; transform: scale(0); }
+  to { opacity: 1; transform: scale(1); }
+`;
+
+export const fadeOut = keyframes`
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0); }
+`;

@@ -267,17 +267,20 @@ export function createStarfield(
 }
 
 export const generatTwinkleStar = (
-  index: number,
+  // index: number,
   colors: string[],
-  baseSize = 1
+  baseSize = 1,
+  minLifetime = 10000,
+  maxLifetime = 20000
 ): TwinkleStarData => {
   const x = (Math.random() * 100).toFixed(2); // viewport width %
   const y = (Math.random() * 100).toFixed(2); // viewport height %
   const size = Math.max(Math.random() * baseSize, 0.125).toFixed(2);
   const color = colors[Math.floor(Math.random() * colors.length)];
-  const delay = `${(Math.random() * index + 1.5).toFixed(2)}s`;
+  const delay = `${(Math.random() * 2 + 1.5).toFixed(2)}s`;
   const centerPoint = Number(size) / 2;
   const blurRay = Number(size) * 3.5;
+  const lifetime = Math.random() * (maxLifetime - minLifetime) + minLifetime;
 
   const glow = `
       0 0 0 var(--core) ${color}25,
@@ -293,7 +296,8 @@ export const generatTwinkleStar = (
     `;
 
   return {
-    id: `twinkle-star-${Date.now()}-${index}`,
+    // id: `twinkle-star-${Date.now()}-${index}`,
+    id: `twinkle-star-${Date.now()}-${Math.random()}`,
     top: `${y}vh`,
     left: `${x}vw`,
     size: `${size}vh`,
@@ -302,6 +306,8 @@ export const generatTwinkleStar = (
     delay,
     color,
     glow,
+    lifetime,
+    isFadingOut: false,
   };
 };
 
@@ -418,8 +424,8 @@ function pathLength(
 }
 
 export const generateStar = (
-  index: number,
-  interval: number = 5, // seconds between streaks
+  // index: number,
+  // interval: number = 5, // seconds between streaks
   curveFactor: number,
   mix: { straight: number; shallow: number; deep: number },
   colors: string[],
@@ -457,16 +463,15 @@ export const generateStar = (
   }
 
   const duration = `${(len / (len * baseSpeed)).toFixed(2)}s`;
-  const delay = `${(index === 0
-    ? Math.floor(Math.random() * interval)
-    : Math.random() + interval + index + (index / interval) * interval
-  ).toFixed(2)}s`;
-
   const size = Math.max(Math.random() * baseSize, 0.125).toFixed(2);
   const centerPoint = Number(size) / 2;
   const head = Number(size) * 1.5;
   const blurRay = Number(size) * 3.5;
   const color = colors[Math.floor(Math.random() * colors.length)];
+  // const delay = `${(index === 0
+  //   ? Math.floor(Math.random() * interval)
+  //   : Math.random() + interval + index + (index / interval) * interval
+  // ).toFixed(2)}s`;
 
   const glow = `
       0 0 0 calc(var(--core) * ${glowIntensity}) ${color}80,
@@ -482,13 +487,14 @@ export const generateStar = (
     `;
 
   return {
-    id: `shooting-star-${Date.now()}-${index}`,
+    // id: `shooting-star-${Date.now()}-${index}`,
+    id: `shooting-star-${Date.now()}-${Math.random()}`,
     size: `${size}vh`,
     centerPoint: `${centerPoint}vh`,
     head: `${head}vh`,
     halfHead: `${head / 2}vh`,
     baseSize: Number(size) * 0.85,
-    delay,
+    // delay,
     duration,
     twinkleDuration: `${(len / (len * baseSpeed) / 5).toFixed(2)}s`,
     path,
