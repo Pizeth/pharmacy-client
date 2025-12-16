@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useCheckAuth } from "ra-core";
 import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
 import { styled, useTheme, useThemeProps } from "@mui/material/styles";
@@ -17,8 +17,8 @@ import Image from "next/image";
 import { StyleComponent } from "@/types/classKey";
 import SocialButton from "./ui/socialButton";
 import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
-import MCS from "../icons/mcs";
-import { v7 } from "uuid";
+// import MCS from "../icons/mcs";
+// import { v7 } from "uuid";
 import { MeteorShower } from "./effects/meteor";
 import ShootingStars from "./effects/shootingStar";
 import TwinkleStars from "./effects/twinkleStar";
@@ -171,6 +171,7 @@ export const Login = (
         <Login.effect
           shootingStarCount={theme.custom.sideImage.shootingStarMaxCount}
           twinkleStarCount={theme.custom.sideImage.twinkleStarMaxCount}
+          // count={theme.custom.sideImage.shootingStarCount}
           // shootingStarClass={theme.custom.sideImage.shootingClass}
           // twinkleClass={theme.custom.sideImage.twinkleClass}
         />

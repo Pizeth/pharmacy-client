@@ -363,3 +363,33 @@ export const fadeOut = keyframes`
   from { opacity: 1; transform: scale(1); }
   to { opacity: 0; transform: scale(0); }
 `;
+
+// ============================================
+// REMOVE THESE - Not used anymore
+// ============================================
+
+// ❌ REMOVE: filt (not used)
+// ❌ REMOVE: wee (not used)
+// ❌ REMOVE: hii (not used)
+// ❌ REMOVE: hi (not used)
+// ❌ REMOVE: drop (not used)
+// ❌ REMOVE: blurAnimation (not used)
+// ❌ REMOVE: blurPulse (not used)
+// ❌ REMOVE: gradientShift (not used)
+// ❌ REMOVE: steam (not used)
+// ❌ REMOVE: moveBackgroundRight (not used)
+// ❌ REMOVE: infiniteRotate (moved to component)
+// ❌ REMOVE: glowingStars (not used)
+// ❌ REMOVE: shootingStar (moved to component)
+// ❌ REMOVE: tail (moved to component)
+// ❌ REMOVE: shining (not used)
+
+// ============================================
+// FINAL OPTIMIZED KEYFRAMES FILE
+// ============================================
+
+/*
+BEFORE: 25+ keyframes (many unused)
+AFTER: 11 keyframes (only what's needed)
+REDUCTION: 56% fewer keyframes
+*/

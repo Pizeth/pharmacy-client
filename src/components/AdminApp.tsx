@@ -61,15 +61,15 @@ import { Layout } from "./CustomComponents/Layout";
 import { dataProvider } from "../lib/dataProvider";
 import { Dashboard } from "./Dashboard";
 import { i18nProvider } from "@/i18n/i18nProvider";
-import { darkTheme, lightTheme } from "@/theme/razeth";
+import { darkTheme, lightTheme } from "@/theme/razeth-old";
 import { UserCreate } from "./Users/userCreate";
 import { UserShow } from "./Users/userDetail";
 import { UserEdit } from "./Users/userEdit";
 import { UserList } from "./Users/users";
-import ReactAdminLoginPage from "./auth/ReactAdminLoginPage";
+// import ReactAdminLoginPage from "./auth/ReactAdminLoginPage";
 import { authProvider } from "@/lib/authProvider";
 import Login from "./auth/login";
-import LoginPage from "./auth/login";
+// import LoginPage from "./auth/login";
 
 const store = localStorageStore(undefined, "ECommerce");
 

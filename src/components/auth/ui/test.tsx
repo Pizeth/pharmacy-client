@@ -1,214 +1,636 @@
-// components/ui/meteor.tsx
-import React, { useState, useEffect, useRef } from "react";
-import { Box } from "@mui/material";
-import { styled } from "@mui/material/styles";
+// /* eslint-disable @typescript-eslint/no-empty-object-type */
+// import { deepmerge } from "@mui/utils";
+// import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
+// import { red, blue } from "@mui/material/colors";
+// import { createTheme, Theme } from "@mui/material/styles";
+// import { ClassKey, CustomComponents } from "@/types/classKey";
+// import {
+//   Line,
+//   Meteor,
+//   RazethComponentsPropsList,
+//   SideImage,
+// } from "@/interfaces/theme.interface";
+// import { makePulseVars } from "@/utils/themeUtils";
+// import { getMeteorConfig, getSideImageConfig } from "@/configs/themeConfig";
+// import { shake } from "../../../theme/keyframes";
+// import {
+//   RazethAvatarOptimized,
+//   RazethLoginOptimized,
+//   RazethMeteorOptimized,
+//   RazethShootingStarOptimized,
+//   RazethSideImageOptimized,
+//   RazethTwinkleStarOptimized,
+// } from "@/theme/components";
 
-const PREFIX = "RazethMeteor";
+// declare module "@mui/material/styles" {
+//   interface Palette {
+//     passwordStrength: string[] | ((theme: Theme) => string[]);
+//   }
+//   interface PaletteOptions {
+//     passwordStrength?: string[] | ((theme: Theme) => string[]);
+//   }
 
-// Meteor configuration interface
-interface MeteorConfig {
-  size: number;
-  speed: number;
-  maxCount: number;
-  count: number;
-  zIndex: number;
-}
+//   interface ThemeVars {
+//     sideImage?: SideImage;
+//   }
+//   interface Theme {
+//     custom: {
+//       sideImage: SideImage;
+//       lines: Line[];
+//       meteor: Meteor;
+//     };
+//   }
+//   interface ThemeOptions {
+//     custom?: {
+//       sideImage?: SideImage;
+//       lines?: Line[];
+//       meteor?: Meteor;
+//     };
+//   }
 
-interface MeteorState {
-  id: string;
-  top: string | number;
-  left: string | number;
-  size: number;
-  speed: number;
-  zIndex: number;
-  startFromTop: boolean;
-  initialTop: number;
-  initialLeft: number;
-}
+//   // ComponentNameToClassKey can derive its keys from our map.
+//   // Note: If each component has different keys (e.g., 'root', 'card'),
+//   // this interface should be defined manually for full accuracy.
+//   interface ComponentNameToClassKey
+//     extends Record<keyof RazethComponentsPropsList, ClassKey> {}
 
-// Styled root container
-const MeteorRoot = styled(Box, {
-  name: PREFIX,
-  slot: "Root",
-  overridesResolver: (_props, styles) => styles.root,
-})(({ theme }) => ({
-  position: "absolute",
-  inset: 0,
-  width: "100%",
-  height: "100%",
-  pointerEvents: "none",
-  overflow: "hidden",
-  zIndex: 1,
-}));
+//   // ComponentsPropsList directly extends our map.
+//   interface ComponentsPropsList extends RazethComponentsPropsList {}
 
-// Meteor item container
-const MeteorItem = styled(Box, {
-  name: PREFIX,
-  slot: "Item",
-  overridesResolver: (_props, styles) => styles.item,
-})(({ theme }) => ({
-  position: "absolute",
-  willChange: "transform",
-  pointerEvents: "none",
-}));
+//   interface Components extends CustomComponents {
+//     // Your custom components are now automatically included
+//     // You can still add standard MUI component overrides here if needed
+//   }
+// }
 
-// Meteor sprite with animation
-const MeteorSprite = styled(Box, {
-  name: PREFIX,
-  slot: "Sprite",
-  overridesResolver: (_props, styles) => styles.sprite,
-})<{ size: number }>(({ theme, size }) => ({
-  width: size,
-  height: size,
-  backgroundImage:
-    "url(https://raw.githubusercontent.com/SochavaAG/example-mycode/master/pens/meteors-right/images/meteors-sprite.png)",
-  backgroundSize: "auto 100%",
-  animation: "meteorFrameAnimation 3s steps(48) infinite",
-  transform: "rotate(45deg)",
+// const globalStyles = (theme: Theme) => ({
+//   "html, body, #__next": {
+//     height: "100%",
+//     margin: 0,
+//     padding: 0,
+//   },
 
-  "@keyframes meteorFrameAnimation": {
-    "0%": {
-      backgroundPosition: "0 0",
-    },
-    "100%": {
-      backgroundPosition: "-28800px 0",
-    },
-  },
-}));
+//   ":root": {
+//     ...makePulseVars(
+//       theme.custom.sideImage.circleColor,
+//       theme.custom.sideImage.circleStopCount,
+//       theme.custom.sideImage.circlePulseSequence
+//     ),
+//     "--app-sideImage-circleSize": theme.custom.sideImage.circleSize,
+//     // "--app-sideImage-circleColor": "#1e40af",
+//     "--app-sideImage-circleColor": theme.custom.sideImage.circleColor,
+//     "--app-sideImage-logoOffset": theme.custom.sideImage.logoOffset,
+//     "--app-circle-stop-count": theme.custom.sideImage.circleStopCount,
+//   },
+//   // Custom styles for a text field with an icon
+//   ".icon-input .MuiInputLabel-root": {
+//     marginLeft: "2em",
+//   },
+//   // Style for the shrunken label
+//   ".icon-input .MuiInputLabel-root.MuiInputLabel-shrink": {
+//     marginLeft: 0,
+//   },
+//   // Style for the icon button within the input
+//   ".icon-input .MuiIconButton-root": {
+//     padding: 0,
+//   },
+//   // Style for the password hint text
+//   ".passHint": {
+//     marginTop: "1em",
+//   },
+//   // Centering utility class
+//   ".text-center": {
+//     display: "flex",
+//     justifyContent: "center",
+//     alignItems: "center",
+//     textAlign: "center",
+//   },
+//   /* Target ALL Boxes inside Stacks */
+//   ".MuiStack-root .MuiBox-root": {
+//     margin: `${theme.spacing(0)}`,
+//     padding: `${theme.spacing(0)}`,
+//     lineHeight: 0,
+//   },
+//   /* Specific to Password Strength Meter Box */
+//   ".MuiStack-root > .MuiBox-root:has(.MuiLinearProgress-root)": {
+//     marginTop: `${theme.spacing(0)}`,
+//     padding: `${theme.spacing(0)}`,
+//     // background-color: ${theme.palette.grey[100]};
+//   },
+//   /* For browsers without :has() support (fallback) */
+//   ".MuiStack-root > .MuiBox-root[data-pw-strength]": {
+//     marginTop: `${theme.spacing(0)}`,
+//     padding: `${theme.spacing(0)}`,
+//     // background-color: ${theme.palette.grey[100]};
+//   },
+// });
 
-// Individual meteor element component
-interface MeteorElementProps {
-  meteor: MeteorState;
-  containerHeight: number;
-}
+// const defaultThemeInvariants = {
+//   typography: {
+//     h6: {
+//       fontWeight: 400,
+//     },
+//   },
+//   sidebar: {
+//     width: 240,
+//     closedWidth: 50,
+//   },
+//   components: {
+//     MuiAutocomplete: {
+//       defaultProps: {
+//         fullWidth: true,
+//       },
+//       variants: [
+//         {
+//           props: {},
+//           style: ({ theme }: { theme: Theme }) => ({
+//             [theme.breakpoints.down("sm")]: { width: "100%" },
+//           }),
+//         },
+//       ],
+//     },
+//     MuiTextField: {
+//       defaultProps: {
+//         variant: "filled" as const,
+//         margin: "dense" as const,
+//         size: "small" as const,
+//         fullWidth: true,
+//       },
+//       variants: [
+//         {
+//           props: {},
+//           style: ({ theme }: { theme: Theme }) => ({
+//             [theme.breakpoints.down("sm")]: { width: "100%" },
+//           }),
+//         },
+//       ],
+//     },
+//     MuiFormControl: {
+//       defaultProps: {
+//         variant: "filled" as const,
+//         margin: "dense" as const,
+//         size: "small" as const,
+//         fullWidth: true,
+//       },
+//     },
+//     RaSimpleFormIterator: {
+//       defaultProps: {
+//         fullWidth: true,
+//       },
+//     },
+//     RaTranslatableInputs: {
+//       defaultProps: {
+//         fullWidth: true,
+//       },
+//     },
+//   },
+// };
 
-const MeteorElement: React.FC<MeteorElementProps> = ({
-  meteor,
-  containerHeight,
-}) => {
-  const [transform, setTransform] = useState(
-    `translate(${meteor.size}px, -${meteor.size}px)`
-  );
+// const customBaseTheme = createTheme({
+//   cssVariables: { cssVarPrefix: "app" },
+//   // cssVarPrefix: "app", // all vars will start with --app-
+//   custom: {
+//     sideImage: getSideImageConfig(),
+//     meteor: getMeteorConfig(),
+//     lines: [
+//       { color: "#FF4500", delay: "0.5s" },
+//       { color: "#32CD32", delay: "1s" },
+//       { color: "#1E90FF", delay: "1.5s" },
+//       { color: "#FFD700", delay: "2s" },
+//       { color: "#8A2BE2", delay: "2.5s" },
+//       { color: "#20B2AA", delay: "3s" },
+//       { color: "#DC143C", delay: "3.5s" },
+//       { color: "#00FA9A", delay: "4s" },
+//       { color: "#FF1493", delay: "4.5s" },
+//       { color: "#00BFFF", delay: "5s" },
+//     ],
+//   },
+//   palette: {
+//     primary: { main: "#e1232e", contrastText: "#fff" },
+//     secondary: { main: "#007bff" },
+//     error: { main: "#f58700" },
+//     warning: { main: "#FFD22B" },
+//     info: { main: "#f89696" },
+//     success: { main: "#2ece71" },
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const distance =
-        containerHeight - (meteor.startFromTop ? meteor.initialTop : 0);
-      setTransform(`translate(-${distance}px, ${distance}px)`);
-    }, 100);
+//     mode: "dark",
+//     background: { default: "#121212", paper: "#1d1d1dbf" },
+//     text: { primary: "#ffffff", secondary: "#aaaaaa" },
+//     passwordStrength: ["#aaaaaa", "#e76f51", "#f58700", "#0668d1", "#4caf50"],
+//   },
+//   components: {
+//     RazethLogin: RazethLoginOptimized,
 
-    return () => clearTimeout(timer);
-  }, [meteor, containerHeight]);
+//     // ============================================ //
+//     // STAR COMPONENTS - MINIMAL OVERRIDES          //
+//     // ============================================ //
+//     RazethShootingStar: RazethShootingStarOptimized,
+//     RazethTwinkleStar: RazethTwinkleStarOptimized,
+//     RazethMeteor: RazethMeteorOptimized,
 
-  return (
-    <MeteorItem
-      sx={{
-        left: meteor.left,
-        top: meteor.top,
-        zIndex: meteor.zIndex,
-        transform: transform,
-        transition: `transform ${meteor.speed}s linear`,
-      }}
-    >
-      <MeteorSprite size={meteor.size} />
-    </MeteorItem>
-  );
-};
+//     // ============================================ //
+//     //          SIDE IMAGE - SIMPLIFIED             //
+//     // ============================================ //
+//     RazethSideImage: RazethSideImageOptimized,
 
-// Main MeteorShower component with props interface
-export interface MeteorShowerProps {
-  configs?: MeteorConfig[];
-  interval?: number;
-  enabled?: boolean;
-  className?: string;
-  sx?: any;
-}
+//     // ============================================ //
+//     //          AVATAR - KEEP ESSENTIALS            //
+//     // ============================================ //
+//     RazethAvatar: RazethAvatarOptimized,
+//     RazethLoginForm: {
+//       styleOverrides: {
+//         root: (props: { theme: Theme }) => ({
+//           ["& .MuiCardContent-root"]: {
+//             minWidth: 300,
+//             padding: `${props.theme.spacing(0)}`,
+//           },
+//         }),
+//         content: (props: { theme: Theme }) => ({
+//           display: "flex",
+//           flexDirection: "column",
+//           gap: props.theme.spacing(0),
+//           input: {
+//             transition: props.theme.transitions.create("color", {
+//               easing: props.theme.transitions.easing.easeInOut,
+//               duration: props.theme.transitions.duration.short,
+//             }),
+//             "&:focus": {
+//               // color: "#e1232e", // focused
+//               color: props.theme.palette.primary.main, // focused
+//             },
+//           },
+//           // Apply custom styles to the last child element inside this container
+//           "& > :last-child": {
+//             // For example, you could add extra margin to the button
+//             // if it's the last item. Let's override its default top margin.
+//             marginTop: props.theme.spacing(1),
+//           },
+//         }),
+//         password: (props: { theme: Theme }) => ({
+//           display: "flex",
+//           flexDirection: "column",
+//           width: "100%",
+//           gap: props.theme.spacing(0),
+//         }),
+//         footer: (props: { theme: Theme }) => ({
+//           display: "flex",
+//           justifyContent: "space-between",
+//           alignItems: "center",
+//           fontWeight: 500,
+//           marginTop: "-0.5rem",
+//           width: "100%",
+//           gap: props.theme.spacing(0),
+//         }),
+//         button: (props: { theme: Theme }) => ({
+//           marginTop: props.theme.spacing(1),
+//           fontWeight: 700,
+//           ["& .MuiSvgIcon-root"]: { margin: props.theme.spacing(0.3) },
+//         }),
+//       },
+//     },
+//     RazethDivider: {
+//       styleOverrides: {
+//         root: (props: { theme: Theme }) => ({
+//           position: "relative",
+//           display: "flex",
+//           alignItems: "center",
+//           marginTop: props.theme.spacing(2),
+//           marginBottom: props.theme.spacing(2),
+//           ["& .MuiDivider-root"]: { flex: 1 },
+//           ["& .MuiTypography-root"]: {
+//             paddingLeft: props.theme.spacing(2),
+//             paddingRight: props.theme.spacing(2),
+//             backgroundColor: props.theme.palette.background.paper,
+//             color: props.theme.palette.text.secondary,
+//           },
+//         }),
+//       },
+//     },
+//     RazethSocialLogin: {
+//       styleOverrides: {
+//         content: (props: { theme: Theme }) => ({
+//           button: {
+//             display: "flex",
+//             alignItems: "center",
+//             justifyContent: "center",
+//             gap: props.theme.spacing(1),
+//             width: "100%",
+//             padding: props.theme.spacing(1),
+//             textTransform: "none",
+//             border: `1px solid ${props.theme.palette.divider}`,
+//             transition: props.theme.transitions.create(
+//               ["transform", "background-color"],
+//               {
+//                 duration: props.theme.transitions.duration.standard,
+//                 easing: props.theme.transitions.easing.easeInOut,
+//               }
+//             ),
+//             "&:hover": {
+//               border: `1px solid ${props.theme.palette.divider}`,
+//               backgroundColor: props.theme.palette.action.hover,
+//               transform: "scale(1.05)", // enlarge smoothly
+//               boxShadow: props.theme.shadows[3],
+//             },
+//             "& svg": {
+//               width: props.theme.spacing(2),
+//               height: props.theme.spacing(2),
+//             },
+//           },
+//         }),
+//       },
+//     },
+//     RazethSocialButton: {
+//       styleOverrides: {
+//         label: (props: { theme: Theme }) => ({
+//           fontWeight: "500",
+//           display: "none", // Hide by default
+//           [props.theme.breakpoints.up("sm")]: {
+//             display: "block", // This applies for 'sm' and larger breakpoints
+//           },
+//         }),
+//       },
+//     },
+//     RazethSignUpLink: {
+//       styleOverrides: {
+//         root: (props: { theme: Theme }) => ({
+//           display: "flex",
+//           alignItems: "center",
+//           justifyContent: "center",
+//           gap: props.theme.spacing(0.5), // The space is now handled by the gap property
+//           textAlign: "center",
+//           marginTop: props.theme.spacing(2),
+//           color: props.theme.palette.text.secondary,
+//           button: {
+//             textTransform: "uppercase",
+//             display: "inline-flex",
+//             alignItems: "center",
+//             svg: {
+//               marginLeft: props.theme.spacing(0.5),
+//               fontSize: "1rem",
+//             },
+//           },
+//         }),
+//       },
+//     },
+//     RazethFooter: {
+//       styleOverrides: {
+//         root: (props: { theme: Theme }) => ({
+//           textAlign: "center",
+//           marginTop: props.theme.spacing(1),
+//           color: props.theme.palette.text.secondary,
+//           position: "relative",
+//           ["& .MuiTypography-root"]: {
+//             marginTop: props.theme.spacing(0.5),
+//             fontSize: "0.75rem",
+//             display: "flex",
+//             alignItems: "center",
+//             justifyContent: "center",
+//             gap: props.theme.spacing(0.5), // The space is now handled by the gap property
+//             a: {
+//               margin: props.theme.spacing(0),
+//               display: "inline-flex",
+//               alignItems: "center",
+//             },
+//             "& > :last-child::after": {
+//               color: props.theme.palette.text.secondary,
+//               textDecoration: "none",
+//               marginLeft: props.theme.spacing(-0.5),
+//               content: '"."',
+//             },
+//             "& > :last-child:hover::after": {
+//               textDecoration: "none",
+//             },
+//           },
+//         }),
+//       },
+//     },
 
-export const MeteorShower: React.FC<MeteorShowerProps> = ({
-  configs = [
-    { size: 600, speed: 5, maxCount: 2, count: 0, zIndex: 10 },
-    { size: 300, speed: 10, maxCount: 3, count: 0, zIndex: 4 },
-    { size: 150, speed: 15, maxCount: 5, count: 0, zIndex: 0 },
-  ],
-  interval = 500,
-  enabled = true,
-  className,
-  sx,
-}) => {
-  const [meteors, setMeteors] = useState<MeteorState[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const configsRef = useRef<MeteorConfig[]>(configs);
+//     /***** MUI's COMPONENTs *****/
+//     MuiAppBar: {
+//       styleOverrides: {
+//         root: (props: { theme: Theme }) => ({
+//           backgroundColor: "#c40316", // Customize the AppBar background color
+//           color: props.theme.palette.text.primary, // Customize font color
+//         }),
+//       },
+//     },
+//     MuiInputLabel: {
+//       styleOverrides: {
+//         root: (props: { theme: Theme }) => ({
+//           "&.shake span": {
+//             animation: `${shake} 0.5s ease-in-out`,
+//             display: "inline-block",
+//             position: "relative",
+//           },
+//         }),
+//       },
+//     },
+//     MuiTextField: {
+//       defaultProps: {
+//         variant: "outlined",
+//       },
+//     },
+//     MuiFormControl: {
+//       styleOverrides: {
+//         root: {
+//           marginTop: "0.5em",
+//           marginBottom: "0.5em",
+//         },
+//       },
+//     },
+//     MuiFormHelperText: {
+//       styleOverrides: {
+//         root: {
+//           marginTop: "0.5em",
+//           marginBottom: "-0.5em",
+//           "&.hideHelper": {
+//             lineHeight: "0",
+//             marginTop: "0",
+//             marginBottom: "0",
+//           },
+//           "&.showHelper": {
+//             marginTop: "0.5em",
+//           },
+//           "&.Mui-error": {
+//             marginBottom: "-0.5em", // Negative margin adjustment
+//             marginTop: "0.5em",
+//           },
+//         },
+//       },
+//     },
+//     MuiTypography: {
+//       styleOverrides: {
+//         root: {
+//           "&.MuiTypography-caption": {},
+//           "&.MuiTypography-body1": {
+//             fontSize: "0.875rem",
+//           },
+//         },
+//       },
+//     },
+//     MuiFilledInput: {
+//       styleOverrides: {
+//         root: {
+//           backgroundColor: "rgba(0, 0, 0, 0.04)",
+//           "&$disabled": {
+//             backgroundColor: "rgba(0, 0, 0, 0.04)",
+//           },
+//         },
+//       },
+//     },
+//     MuiOutlinedInput: {
+//       styleOverrides: {
+//         root: (props: { theme: Theme }) => ({
+//           "&.Mui-focused .MuiSvgIcon-root": {
+//             color: props.theme.palette.primary.main,
+//           },
+//           "&.Mui-error .MuiSvgIcon-root": {
+//             color: props.theme.palette.error.main,
+//           },
+//         }),
+//       },
+//     },
+//     MuiButtonBase: {
+//       styleOverrides: {
+//         root: (props: { theme: Theme }) => ({
+//           "&.MuiButton-root": {
+//             color: props.theme.palette.text.primary,
+//           },
+//         }),
+//       },
+//     },
+//     MuiLink: {
+//       styleOverrides: {
+//         root: (props: { theme: Theme }) => ({
+//           color: props.theme.palette.primary.main,
+//           textDecoration: "none",
+//           "&:hover": {
+//             textDecoration: "underline",
+//             textUnderlineOffset: props.theme.spacing(0.5),
+//             color: "#9d1820ff",
+//           },
+//         }),
+//       },
+//     },
+//     MuiCssBaseline: {
+//       styleOverrides: (theme) => globalStyles(theme),
+//     },
+//     MuiCard: {
+//       styleOverrides: {
+//         root: {
+//           "&.MuiBox-root": {
+//             margin: "0px",
+//           },
+//         },
+//       },
+//     },
+//     MuiLinearProgress: {
+//       styleOverrides: {
+//         root: ({ theme }) => ({
+//           height: 5,
+//           borderRadius: 5,
+//         }),
+//       },
+//     },
+//   },
+// });
 
-  const getRandomInt = (min: number, max: number) => {
-    return Math.floor(min + Math.random() * (max + 1 - min));
-  };
+// // Merge custom base theme with defaults const
+// export const darkTheme: RaThemeOptions = deepmerge(
+//   defaultThemeInvariants,
+//   customBaseTheme
+// );
 
-  useEffect(() => {
-    configsRef.current = configs;
-  }, [configs]);
+// export const lightTheme = deepmerge(defaultTheme, {
+//   palette: {
+//     primary: red,
+//     secondary: blue,
+//     error: {
+//       main: "#ffa000",
+//       light: "#f58700",
+//       dark: "#FFD22B",
+//     },
+//     warning: {
+//       main: "#ffa000", // Custom color for warning
+//     },
+//     success: {
+//       main: "#079e0f", // Custom color for success
+//     },
+//   },
 
-  useEffect(() => {
-    if (!enabled) return;
+//   components: {
+//     MuiTextField: {
+//       defaultProps: {
+//         variant: "outlined",
+//       },
+//     },
+//     MuiFormControl: {
+//       defaultProps: {
+//         variant: "outlined",
+//       },
+//     },
+//     MuiFilledInput: {
+//       styleOverrides: {
+//         root: {
+//           backgroundColor: "rgba(0, 0, 0, 0.04)",
+//           "&$disabled": {
+//             backgroundColor: "rgba(0, 0, 0, 0.04)",
+//           },
+//         },
+//       },
+//     },
+//   },
+// });
 
-    const createMeteor = () => {
-      if (!containerRef.current) return;
+// export const darkTheme1 = deepmerge(defaultDarkTheme, {
+//   palette: {
+//     primary: {
+//       mode: "dark",
 
-      const containerWidth = containerRef.current.offsetWidth;
-      const containerHeight = containerRef.current.offsetHeight;
+//       main: "#e60023",
+//       contrastText: "#fff",
+//     },
+//     secondary: { main: "#03dac6" },
+//     text: { primary: "#ffffff", secondary: "#aaaaaa" },
+//     background: { default: "#313131" },
+//   },
+//   components: {
+//     MuiTextField: {
+//       defaultProps: {
+//         variant: "outlined",
+//       },
+//     },
+//     MuiFormControl: {
+//       defaultProps: {
+//         variant: "outlined",
+//       },
+//     },
+//     MuiFilledInput: {
+//       styleOverrides: {
+//         root: {
+//           backgroundColor: "rgba(0, 0, 0, 0.04)",
+//           "&$disabled": {
+//             backgroundColor: "rgba(0, 0, 0, 0.04)",
+//           },
+//         },
+//       },
+//     },
 
-      const currentConfigs = configsRef.current;
-      const index = getRandomInt(0, currentConfigs.length - 1);
-      const config = currentConfigs[index];
-
-      if (config.count < config.maxCount) {
-        config.count++;
-
-        const startFromTop = getRandomInt(0, 1) === 0;
-        const top = getRandomInt(0, containerHeight);
-        const left = getRandomInt(0, containerWidth);
-
-        const newMeteor: MeteorState = {
-          id: `meteor_${Date.now()}_${Math.random()}`,
-          top: startFromTop ? top + 1000 : 0,
-          left: startFromTop ? "100%" : `${left}px`,
-          size: config.size,
-          speed: config.speed,
-          zIndex: config.zIndex * 10,
-          startFromTop,
-          initialTop: top,
-          initialLeft: left,
-        };
-
-        setMeteors((prev) => [...prev, newMeteor]);
-
-        setTimeout(() => {
-          setMeteors((prev) => prev.filter((m) => m.id !== newMeteor.id));
-          config.count--;
-        }, config.speed * 1000);
-      }
-    };
-
-    const intervalId = setInterval(createMeteor, interval);
-    return () => clearInterval(intervalId);
-  }, [enabled, interval]);
-
-  if (!enabled) return null;
-
-  return (
-    <MeteorRoot ref={containerRef} className={className} sx={sx}>
-      {meteors.map((meteor) => (
-        <MeteorElement
-          key={meteor.id}
-          meteor={meteor}
-          containerHeight={containerRef.current?.offsetHeight || 0}
-        />
-      ))}
-    </MeteorRoot>
-  );
-};
-
-// Slot components for advanced customization
-// MeteorShower.Item = MeteorItem;
-// MeteorShower.Sprite = MeteorSprite;
-
-export default MeteorShower;
+//     MuiOutlinedInput: {
+//       styleOverrides: {
+//         root: (props: { theme: Theme }) => ({
+//           borderColor: props.theme.palette.error.main,
+//           "&.Mui-focused .MuiInputAdornment-root .MuiSvgIcon-root": {
+//             color: (theme: Theme) => theme.palette.primary.main,
+//           },
+//           "&.Mui-focused .MuiSvgIcon-root": {
+//             color: props.theme.palette.primary.main,
+//           },
+//           "&.Mui-error .MuiSvgIcon-root": {
+//             color: props.theme.palette.error.main,
+//           },
+//         }),
+//       },
+//     },
+//   },
+// });
