@@ -219,9 +219,9 @@ export const Login = (
 Login.overlay = Overlay;
 Login.ambient = () => (
   <Ambient>
-    <Box className="stars" />
+    {/* <Box className="stars" />
     <Box className="twinkling" />
-    <Box className="clouds" />
+    <Box className="clouds" /> */}
   </Ambient>
 );
 Login.image = ({ src, alt }: { src: string; alt: string }) => (
