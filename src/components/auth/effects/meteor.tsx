@@ -78,7 +78,7 @@ const MeteorElement: React.FC<MeteorElementProps> = ({
     // Velocity = Pixels per Second.
     // We increase base velocity for longer distances to add "energy".
     // Base speed comes from config (e.g., 5).
-    const baseVelocity = meteor.speed * 0.0025;
+    const baseVelocity = meteor.speed * 0.001;
 
     // "The longer the distance, the faster the speed"
     // We can reduce the duration slightly for very long distances to simulate acceleration
@@ -86,7 +86,7 @@ const MeteorElement: React.FC<MeteorElementProps> = ({
 
     // If distance is huge (>1000px), we boost velocity by 20%
     // This makes long meteors zip across faster.
-    const accelerationFactor = distanceY > 1500 ? 1.2 : 1;
+    const accelerationFactor = distanceY > 1500 ? 1.25 : 1;
 
     // const calculatedDuration = distanceY * baseVelocity * accelerationFactor;
 
@@ -103,7 +103,7 @@ const MeteorElement: React.FC<MeteorElementProps> = ({
       // const distance =
       //   containerHeight - (meteor.startFromTop ? meteor.initialTop : 0);
       setTransform(`translate3d(-${distanceY}px, ${distanceY}px, 0)`);
-    }, 50);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [meteor, containerHeight, sizePx]);

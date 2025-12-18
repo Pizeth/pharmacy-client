@@ -61,7 +61,7 @@ import { Layout } from "./CustomComponents/Layout";
 import { dataProvider } from "../lib/dataProvider";
 import { Dashboard } from "./Dashboard";
 import { i18nProvider } from "@/i18n/i18nProvider";
-import { darkTheme, lightTheme } from "@/theme/razeth-old";
+import { darkTheme, lightTheme } from "@/theme/razeth";
 import { UserCreate } from "./Users/userCreate";
 import { UserShow } from "./Users/userDetail";
 import { UserEdit } from "./Users/userEdit";
