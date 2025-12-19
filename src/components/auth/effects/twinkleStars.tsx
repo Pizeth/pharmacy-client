@@ -1,110 +1,14 @@
 // components/ui/twinkleStar.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { Box } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { fadeIn, fadeOut, twinkle, twinkling } from "@/theme/keyframes";
 import {
   TwinkleStarData,
-  TwinkleStarProps,
   TwinkleStarsProps,
 } from "@/interfaces/component-props.interface";
 import { generatTwinkleStar } from "@/utils/themeUtils";
-
-const PREFIX = "RazethTwinkleStar";
-
-// Styled components
-const TwinkleStarRoot = styled(Box, {
-  name: PREFIX,
-  slot: "Root",
-  overridesResolver: (_props, styles) => styles.root,
-})<{
-  top: string;
-  left: string;
-  size: string;
-  glow: string;
-  delay: string;
-  centerPoint: string;
-  color: string;
-  baseSize: number;
-  isFadingOut: boolean;
-}>(
-  ({
-    top,
-    left,
-    size,
-    glow,
-    delay,
-    centerPoint,
-    color,
-    baseSize,
-    isFadingOut,
-  }) => ({
-    left,
-    top,
-    width: size,
-    height: size,
-    boxShadow: glow,
-    animation: isFadingOut
-      ? `${fadeOut} 0.8s ease-out forwards`
-      : `${fadeIn} 0.5s ease-out, ${twinkle} ${delay} linear alternate infinite 0.5s`,
-
-    // ✅ RAY 1: Using ::before pseudo-element (45° rotation)
-    "::before": {
-      top: `calc(50% - ${centerPoint})`,
-      right: `calc(0% + ${centerPoint})`,
-      height: size,
-      background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${color}, rgba(0, 0, 255, 0))`,
-      animation: `${twinkling(baseSize)} ${delay} ease-in-out infinite`,
-    },
-
-    // ✅ RAY 2: Using ::after pseudo-element (-45° rotation)
-    "::after": {
-      top: `calc(50% - ${centerPoint})`,
-      right: `calc(0% + ${centerPoint})`,
-      height: size,
-      background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${color}, rgba(0, 0, 255, 0))`,
-      animation: `${twinkling(baseSize)} ${delay} ease-in-out infinite`,
-    },
-  })
-);
-
-// const TwinkleStarRay = styled(Box)<{
-//   centerPoint: string;
-//   size: string;
-//   color: string;
-//   baseSize: number;
-//   delay: string;
-//   rotation: number;
-// }>(({ centerPoint, size, color, baseSize, delay, rotation }) => ({
-//   content: '""',
-//   position: "absolute",
-//   top: `calc(50% - ${centerPoint})`,
-//   right: `calc(0% + ${centerPoint})`,
-//   height: size,
-//   background: `linear-gradient(-45deg, rgba(0, 0, 255, 0), ${color}, rgba(0, 0, 255, 0))`,
-//   borderRadius: "100%",
-//   transform: `translateX(50%) rotateZ(${rotation}deg)`,
-//   animation: `${twinkling(baseSize)} ${delay} ease-in-out infinite`,
-// }));
-
-const TwinkleStar: React.FC<TwinkleStarProps> = ({ star }) => {
-  return (
-    <TwinkleStarRoot
-      top={star.top}
-      left={star.left}
-      size={star.size}
-      glow={star.glow}
-      delay={star.delay}
-      centerPoint={star.centerPoint}
-      color={star.color}
-      baseSize={star.baseSize}
-      isFadingOut={star.isFadingOut}
-    />
-  );
-};
+import TwinkleStar from "@/theme/components/twinkleStar";
 
 // Main container component
-
 export const TwinkleStars: React.FC<TwinkleStarsProps> = ({
   // count = 15,
   maxCount = 10,

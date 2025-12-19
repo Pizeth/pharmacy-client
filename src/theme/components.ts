@@ -896,42 +896,18 @@ export const RazethShootingStarOptimized = {
   styleOverrides: {
     root: {
       position: "absolute",
-      animationFillMode: "backwards",
-      willChange: "transform, opacity", // ✅ GPU optimization
-      offsetRotate: "auto" /* 👈 aligns with path direction */,
-      offsetAnchor: "right center",
-      offsetDistance: "0%",
-      borderRadius: "500% 100% 100% 500%",
+      // animationFillMode: "backwards",
       span: {
         position: "absolute",
         zIndex: 3,
-        borderRadius: "50%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        /* Apply your background directly to the main container */
-        background:
-          'url("/static/images/moon_in_comic_style.svg") no-repeat center center',
-        // backgroundColor: "#FFFFFF10",
-        // backgroundBlendMode: "multiply",
-        backgroundSize: "cover",
-        willChange: "transform, opacity", // ✅ GPU optimization
       },
       "::before": {
         content: '""',
         position: "absolute",
-        borderRadius: "100%",
-        transform: "translateX(50%) rotateZ(45deg)",
-        animationFillMode: "backwards",
-        willChange: "width, transform", // ✅ GPU optimization
       },
       "::after": {
         content: '""',
         position: "absolute",
-        borderRadius: "100%",
-        transform: "translateX(50%) rotateZ(-45deg)",
-        animationFillMode: "backwards",
-        willChange: "width, transform", // ✅ GPU optimization
       },
     },
   },
@@ -941,24 +917,14 @@ export const RazethTwinkleStarOptimized = {
   styleOverrides: {
     root: {
       position: "absolute",
-      borderRadius: "50%",
-      pointerEvents: "none",
-      background: "#FFF",
-      willChange: "transform, opacity", // ✅ GPU optimization
       zIndex: 3,
       "::before": {
         content: '""',
         position: "absolute",
-        borderRadius: "100%",
-        transform: "translateX(50%) rotateZ(45deg)",
-        willChange: "width, transform", // ✅ GPU optimization
       },
       "::after": {
         content: '""',
         position: "absolute",
-        borderRadius: "100%",
-        transform: "translateX(50%) rotateZ(-45deg)",
-        willChange: "width, transform", // ✅ GPU optimization
       },
     },
   },
@@ -969,10 +935,6 @@ export const RazethMeteorOptimized = {
     root: (props: { theme: Theme }) => ({
       position: "absolute",
       inset: 0,
-      width: "100%",
-      height: "100%",
-      pointerEvents: "none",
-      overflow: "hidden",
       zIndex: 1,
       // You can add custom styles here that will apply to all meteors
       // Example: Add a subtle glow effect
@@ -984,13 +946,13 @@ export const RazethMeteorOptimized = {
     item: {
       // Styles for individual meteor items
       position: "absolute",
-      pointerEvents: "none",
+      // pointerEvents: "none",
       // STATIC TRANSITION RULES:
       // We define WHAT animates and HOW here.
       // The component only defines HOW LONG (duration).
-      transitionProperty: "transform",
-      transitionTimingFunction: "linear",
-      willChange: "transform", // Performance optimization
+      // transitionProperty: "transform",
+      // transitionTimingFunction: "linear",
+      // willChange: "transform", // Performance optimization
 
       // HERE IS THE DYNAMIC STYLE, DEFINED IN THE THEME:
       // We tell the browser: "Use the value provided in the variable --m-left"
@@ -1002,11 +964,6 @@ export const RazethMeteorOptimized = {
     },
     content: {
       // Base visual styles
-      backgroundImage: "url(static/images/meteors-sprite.png)",
-      backgroundSize: "4800% 100%", // 48 frames
-      backgroundRepeat: "no-repeat",
-      animation: `${meteorStrike} 2.5s steps(47) infinite`,
-      transform: "rotate(45deg)",
     },
     sprite: {
       // Styles for meteor sprites

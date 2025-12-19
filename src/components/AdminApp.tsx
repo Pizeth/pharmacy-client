@@ -99,8 +99,9 @@ export const AdminApp = () => {
       i18nProvider={i18nProvider}
       layout={Layout}
       dataProvider={dataProvider}
-      loginPage={Login}
       authProvider={authProvider}
+      requireAuth
+      loginPage={Login}
       disableTelemetry
       // theme={theme}
       lightTheme={lightTheme}

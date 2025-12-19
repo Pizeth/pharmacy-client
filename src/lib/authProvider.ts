@@ -153,7 +153,7 @@ class OidcAuthProvider implements AuthProvider {
       }
     }
 
-    return "/auth/login";
+    return "/login";
   }
 
   // Check error from API calls

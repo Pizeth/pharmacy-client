@@ -3,6 +3,7 @@ import { Avatar, Box, styled, Typography, useThemeProps } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import { AvatarProps } from "@/interfaces/auth.interface";
 import { useTranslate } from "ra-core";
+import RocketAnimation from "./effects/rocket";
 
 const AvatarHeader = (inProps: AvatarProps) => {
   const props = useThemeProps({
@@ -21,7 +22,22 @@ const AvatarHeader = (inProps: AvatarProps) => {
 
   return (
     <BoxAvatar className={className} sx={sx} {...rest}>
-      <Avatar alt="Razeth">{avatarIcon}</Avatar>
+      {/* <Avatar alt="Razeth">{avatarIcon}</Avatar> */}
+      <Box sx={{ position: "relative" }}>
+        <RocketAnimation />
+        <Avatar
+          alt="Razeth"
+          // sx={{
+          //   width: 80,
+          //   height: 80,
+          //   position: "relative",
+          //   zIndex: 1,
+          //   boxShadow: 3,
+          // }}
+        >
+          {avatarIcon}
+        </Avatar>
+      </Box>
       <Typography align="center" variant="h6" fontWeight="bold" gutterBottom>
         {translate("razeth.title.welcome") || title}
       </Typography>

@@ -19,9 +19,9 @@ import SocialButton from "./ui/socialButton";
 import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
 // import MCS from "../icons/mcs";
 // import { v7 } from "uuid";
-import { MeteorShower } from "./effects/meteor";
-import ShootingStars from "./effects/shootingStar";
-import TwinkleStars from "./effects/twinkleStar";
+import { MeteorShower } from "./effects/meteors";
+import ShootingStars from "./effects/shootingStars";
+import TwinkleStars from "./effects/twinkleStars";
 
 const PREFIX = "RazethLogin";
 
