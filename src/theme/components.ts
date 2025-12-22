@@ -529,8 +529,8 @@ export const RazethLoginOptimized = {
       // marginRight: "1em",
       top: "2.5rem",
       left: "2.5rem",
-      zIndex: 5,
-      img: { animation: `${move} 10s ease-in-out infinite` },
+      zIndex: 10,
+      img: { animation: `${move} 10s ease-in-out infinite`, zIndex: 10 },
       "&:hover": {
         cursor: "grab",
       },
@@ -1194,7 +1194,7 @@ export const RazethAvatarOptimized = {
         width: "var(--avatar-size)",
         height: "var(--avatar-size)",
 
-        marginBottom: props.theme.spacing(1),
+        // marginBottom: props.theme.spacing(1),
         backgroundImage: `url('https://pub-ce3376330760464f8be1e4a3b46318c0.r2.dev/sea-planet-water-Earth-map-Arctic-193611-wallhere.com.jpg')`,
         // backgroundColor: "#e72d32",
         // background: "linear-gradient(135deg, #1e1e24 10%, #050505 60%)",

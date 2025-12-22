@@ -22,22 +22,12 @@ const AvatarHeader = (inProps: AvatarProps) => {
 
   return (
     <BoxAvatar className={className} sx={sx} {...rest}>
-      {/* <Avatar alt="Razeth">{avatarIcon}</Avatar> */}
-      <Box sx={{ position: "relative" }}>
+      {/* <Box sx={{ display: "flex", position: "relative" }}>
         <RocketAnimation />
-        <Avatar
-          alt="Razeth"
-          // sx={{
-          //   width: 80,
-          //   height: 80,
-          //   position: "relative",
-          //   zIndex: 1,
-          //   boxShadow: 3,
-          // }}
-        >
-          {avatarIcon}
-        </Avatar>
-      </Box>
+        <Avatar alt="Razeth">{avatarIcon}</Avatar>
+      </Box> */}
+
+      <Avatar alt="Razeth">{avatarIcon}</Avatar>
       <Typography align="center" variant="h6" fontWeight="bold" gutterBottom>
         {translate("razeth.title.welcome") || title}
       </Typography>

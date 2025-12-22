@@ -22,6 +22,7 @@ import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
 import { MeteorShower } from "./effects/meteors";
 import ShootingStars from "./effects/shootingStars";
 import TwinkleStars from "./effects/twinkleStars";
+import RocketAnimation from "./effects/rocket";
 
 const PREFIX = "RazethLogin";
 
@@ -53,7 +54,10 @@ const Astronaut = styled(Box, {
   name: PREFIX,
   slot: "Image",
   overridesResolver: (_props, styles) => styles.image,
-})(() => ({}));
+})(() => ({
+  display: "flex",
+  position: "relative",
+}));
 
 const Heading = styled(Typography, {
   name: PREFIX,
@@ -234,6 +238,11 @@ Login.image = ({ src, alt }: { src: string; alt: string }) => (
       fill
       style={{ objectFit: "contain" }}
       unoptimized
+    />
+    <RocketAnimation
+      size="10em"
+      position="fixed"
+      transform="translate(-50%, -50%)"
     />
   </Astronaut>
 );

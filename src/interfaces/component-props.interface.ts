@@ -1,4 +1,5 @@
 import { SxProps, Theme } from "@mui/material";
+import { Property } from "csstype";
 
 export interface ShootingStarData {
   id: string;
@@ -62,6 +63,18 @@ export interface TwinkleStarsProps {
   colors?: string[];
   baseSize?: number;
   enabled?: boolean;
+  className?: string;
+  sx?: SxProps<Theme>;
+}
+
+export interface RocketProps {
+  orbitRadius?: number;
+  orbitSpeed?: number;
+  rocketScale?: number;
+  autoRotate?: boolean;
+  position?: Property.Position | undefined;
+  size?: string | number;
+  transform?: string;
   className?: string;
   sx?: SxProps<Theme>;
 }
