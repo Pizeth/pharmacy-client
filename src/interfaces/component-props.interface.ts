@@ -1,5 +1,30 @@
+import { StyleComponent } from "@/types/classKey";
 import { SxProps, Theme } from "@mui/material";
 import { Property } from "csstype";
+import { SignUpParams } from "./auth.interface";
+
+export interface LoginFormProps {
+  content?: StyleComponent;
+  password?: StyleComponent;
+  footer?: StyleComponent;
+  formButton?: StyleComponent;
+  redirectTo?: string;
+  className?: string;
+  sx?: SxProps<Theme>;
+  children?: React.ReactNode;
+  forgotPassword?: string;
+  forgotPasswordUrl?: string;
+}
+
+export interface SignUpFormProps extends LoginFormProps {
+  onSubmit?: (data: SignUpParams) => void | Promise<void>;
+  // redirectTo?: string;
+  // className?: string;
+  // sx?: SxProps<Theme>;
+  // children?: React.ReactNode;
+  termsUrl?: string;
+  privacyUrl?: string;
+}
 
 export interface ShootingStarData {
   id: string;

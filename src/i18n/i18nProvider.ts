@@ -20,7 +20,11 @@ const messages: { [key: string]: any } = {
       auth: {
         // welcome: "Welcome Back",
         credentail: "Username or Email",
+        username: "Username",
+        email: "Email",
         password: "Password",
+        re_password: "Re-enter Password",
+
         sign_in: "Sign In",
         sign_out: "Sign Out",
         sign_up: "Sign up",
@@ -50,8 +54,12 @@ const messages: { [key: string]: any } = {
       },
       footer: {
         description: "By clicking continue, you agree to our",
-        termsOfService: "Terms of Service",
-        privacyPolicy: "Privacy Policy",
+        // termsOfService: "Terms of Service",
+        // privacyPolicy: "Privacy Policy",
+        agree_to: "I agree to the",
+        terms: "Terms of Service",
+        and: "and",
+        privacy: "Privacy Policy",
         ampersand: "and",
         copyright: "Copyright © 2025 Razeth Inc. All rights reserved.",
       },

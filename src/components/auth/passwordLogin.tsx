@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { Form, useLogin, useNotify, useTranslate } from "ra-core";
 import { SubmitHandler, FieldValues } from "react-hook-form";
 import {
@@ -17,9 +17,11 @@ import IconInput from "../CustomInputs/IconInput";
 import { PermIdentity, Person, Password, Login } from "@mui/icons-material";
 import { useRequired } from "@/utils/validator";
 import PasswordValidationInput from "../CustomInputs/PasswordValidationInput";
-import { LoginFormProps, LoginParams } from "@/interfaces/auth.interface";
+import { LoginParams } from "@/interfaces/auth.interface";
+import { LoginFormProps } from "@/interfaces/component-props.interface";
 
 const PREFIX = "RazethLoginForm";
+
 const StyledLoginForm = styled(Form, {
   name: PREFIX,
   slot: "Root",
@@ -51,10 +53,8 @@ const FormButton = styled(Button, {
 })<LoginFormProps>(() => ({}));
 
 const PasswordLogin = (inProps: LoginFormProps) => {
-  const props = useThemeProps({
-    props: inProps,
-    name: PREFIX,
-  });
+  const props = useThemeProps({ props: inProps, name: PREFIX });
+
   const {
     redirectTo,
     className,
@@ -64,6 +64,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
     children,
     ...rest
   } = props;
+
   const [loading, setLoading] = useState(false);
   const login = useLogin();
   const translate = useTranslate();

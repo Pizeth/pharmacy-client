@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCheckAuth } from "ra-core";
 import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
 import { styled, useTheme, useThemeProps } from "@mui/material/styles";
@@ -23,6 +23,8 @@ import { MeteorShower } from "./effects/meteors";
 import ShootingStars from "./effects/shootingStars";
 import TwinkleStars from "./effects/twinkleStars";
 import RocketAnimation from "./effects/rocket";
+import SignUpForm from "./signUpForm";
+import AuthTabs from "./authTabs";
 
 const PREFIX = "RazethLogin";
 
@@ -124,6 +126,8 @@ export const Login = (
   inProps: LoginProps & {
     Content?: StyleComponent;
     Card?: StyleComponent;
+    enableTabs?: boolean; // New prop to enable tab mode
+    defaultTab?: "login" | "signup"; // New prop to set default tab
   }
 ) => {
   const props = useThemeProps({
@@ -142,6 +146,8 @@ export const Login = (
     src = "/static/images/astronaut.png",
     alt = "Picture of the astronaut",
     // heading = "Find me on Social Media",
+    enableTabs = true, // Enable tabs by default
+    defaultTab = "login",
     className,
     sx,
     // backgroundImage,
@@ -151,6 +157,8 @@ export const Login = (
   const checkAuth = useCheckAuth();
   const theme = useTheme();
   const navigate = useNavigate();
+  const [currentTab, setCurrentTab] = useState<"login" | "signup">(defaultTab);
+
   useEffect(() => {
     checkAuth({}, false)
       .then(() => {
@@ -161,6 +169,10 @@ export const Login = (
         // not authenticated, stay on the login page
       });
   }, [checkAuth, navigate]);
+
+  const handleTabChange = (tab: "login" | "signup") => {
+    setCurrentTab(tab);
+  };
 
   return (
     <Root
@@ -191,16 +203,45 @@ export const Login = (
                 <CardContent>
                   <Box>
                     {avatarIcon}
-                    {children}
+                    {/* {children}
                     {divider}
                     {social}
-                    {signUp}
+                    {signUp} */}
+                    {/* Conditional rendering: Tabs or Traditional */}
+                    {enableTabs ? (
+                      <AuthTabs
+                        loginForm={
+                          <>
+                            {children}
+                            {divider}
+                            {social}
+                            {signUp}
+                          </>
+                        }
+                        signUpForm={
+                          <>
+                            <SignUpForm />
+                            {divider}
+                            {social}
+                          </>
+                        }
+                        defaultTab={defaultTab}
+                        onTabChange={handleTabChange}
+                      />
+                    ) : (
+                      <>
+                        {children}
+                        {divider}
+                        {social}
+                        {signUp}
+                      </>
+                    )}
                   </Box>
                 </CardContent>
               </Grid>
             </Grid>
           </Login.card>
-          {/* {footer} */}
+          {footer}
         </Login.content>
         {/* <Login.Heading>{heading}</Login.Heading> */}
         <Login.icon>

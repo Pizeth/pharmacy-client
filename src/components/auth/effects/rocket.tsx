@@ -1,4 +1,6 @@
 import { RocketProps } from "@/interfaces/component-props.interface";
+import Box from "@mui/material/Box";
+import { styled, useThemeProps } from "@mui/material/styles";
 import React, { CSSProperties, useEffect, useRef, useState } from "react";
 
 /**
@@ -8,19 +10,66 @@ interface SmokeParticle extends SVGCircleElement {
   // Add any custom properties if needed, otherwise extends base
 }
 
+const PREFIX = "RazethRocket";
+
+const Root = styled(Box, {
+  name: PREFIX,
+  slot: "Root",
+  shouldForwardProp: (prop: string) => prop !== "isDragging",
+  overridesResolver: (_props, styles) => styles.root,
+})<RocketProps & { isDragging: boolean }>(
+  ({ position, size, transform, isDragging }) => ({
+    // Root styles can be defined here if needed
+    position: position, // Relative to BoxAvatar
+    width: size,
+    height: size,
+    // top: "50%",
+    // left: "50%",
+    top: 0,
+    left: 0,
+    transform: transform,
+    // width: `${(orbitRadius + 100) * 2}px`,
+    // height: `${(orbitRadius + 100) * 2}px`,
+    pointerEvents: isDragging ? "auto" : "none", // Only block when dragging
+    cursor: isDragging ? "grabbing" : "grab",
+    touchAction: "none",
+    zIndex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    // background: "#051622",
+    // overflow: "hidden",
+    svg: {
+      width: "100%",
+      height: "100%",
+      pointerEvents: "auto", // Allow the SVG itself to capture the drag events
+      overflow: "visible",
+    },
+  })
+);
+
 /**
  * RocketAnimation component designed to orbit around a central element (like an Avatar).
  * It should be placed inside a container with 'position: relative'.
  */
-export default function Rocket({
-  orbitRadius = 750,
-  orbitSpeed = 0.5,
-  rocketScale = 0.75,
-  autoRotate = true,
-  position = "absolute",
-  size = "100%",
-  transform = "translate(0%, 0%)",
-}: RocketProps) {
+export default function Rocket(inProps: RocketProps) {
+  const props = useThemeProps({
+    props: inProps,
+    name: PREFIX,
+  });
+  const {
+    orbitRadius = defaultRadius,
+    orbitSpeed = defaultOrbitSpeed,
+    rocketScale = defaultScale,
+    autoRotate = true,
+    position = "absolute",
+    size = defaultSize,
+    transform = defaultTransform,
+    className,
+    sx,
+    ...rest
+  } = props;
+
   // Typed Refs
   const rocketRef = useRef<SVGGElement | null>(null);
   const fireRef = useRef<SVGGElement | null>(null);
@@ -54,8 +103,8 @@ export default function Rocket({
   // Claude
   const currentRotation = useRef<number>(0);
   // Center of the SVG viewBox
-  const centerX = 600;
-  const centerY = 600;
+  const centerX = orbitRadius;
+  const centerY = orbitRadius;
 
   // State for cursor UI
   // const [cursor, setCursor] = useState<"grab" | "grabbing">("grab");
@@ -84,9 +133,9 @@ export default function Rocket({
       //   }
 
       // Smoke logic
-      if (Math.random() > 0.2) {
+      if (Math.random() > 0.125) {
         const p = getSmokeParticle();
-        if (p) fly(p, 1.2 - Math.abs(rotationSpeed.current) / 10);
+        if (p) fly(p, 1.5 - Math.abs(rotationSpeed.current) / 15);
       }
 
       // Create smoke particles
@@ -420,8 +469,8 @@ export default function Rocket({
     // const endY = 160 + Math.random() * 40;
     // const endX = (Math.random() - 0.5) * 30;
     const startTime = Date.now();
-    const duration = speed * 800;
-    // const duration = speed * 600;
+    // const duration = speed * 800;
+    const duration = speed * 1500;
 
     const animate = () => {
       const elapsed = Date.now() - startTime;
@@ -433,8 +482,8 @@ export default function Rocket({
 
       p.setAttribute("cy", y.toString());
       p.setAttribute("cx", x.toString());
-      p.setAttribute("opacity", (1 - progress).toString());
-      // p.setAttribute("opacity", (0.8 * (1 - progress)).toString());
+      // p.setAttribute("opacity", (1 - progress).toString());
+      p.setAttribute("opacity", (0.5 * (1 - progress)).toString());
       p.setAttribute("transform", `scale(${scale})`);
 
       if (progress < 1) requestAnimationFrame(animate);
@@ -498,32 +547,36 @@ export default function Rocket({
     awaitingParticles.current.push(p);
   };
 
-  const containerStyle: CSSProperties = {
-    position: position, // Relative to BoxAvatar
-    width: size,
-    height: size,
-    // top: "50%",
-    // left: "50%",
-    top: 0,
-    left: 0,
-    transform: transform,
-    // width: `${(orbitRadius + 100) * 2}px`,
-    // height: `${(orbitRadius + 100) * 2}px`,
-    pointerEvents: isDragging.current ? "auto" : "none", // Only block when dragging
-    cursor: isDragging.current ? "grabbing" : "grab",
-    touchAction: "none",
-    zIndex: 1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    // background: "#051622",
-    // overflow: "hidden",
-  };
+  // const containerStyle: CSSProperties = {
+  //   position: position, // Relative to BoxAvatar
+  //   width: size,
+  //   height: size,
+  //   // top: "50%",
+  //   // left: "50%",
+  //   top: 0,
+  //   left: 0,
+  //   transform: transform,
+  //   // width: `${(orbitRadius + 100) * 2}px`,
+  //   // height: `${(orbitRadius + 100) * 2}px`,
+  //   pointerEvents: isDragging.current ? "auto" : "none", // Only block when dragging
+  //   cursor: isDragging.current ? "grabbing" : "grab",
+  //   touchAction: "none",
+  //   zIndex: 1,
+  //   display: "flex",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   // background: "#051622",
+  //   // overflow: "hidden",
+  // };
 
   return (
-    <div
+    <Root
       // ref={containerRef}
-      style={containerStyle}
+      // style={containerStyle}
+      position={position}
+      size={size}
+      transform={transform}
+      isDragging={isDragging.current}
       onMouseDown={handleStart}
       onMouseMove={handleMove}
       onMouseUp={handleEnd}
@@ -531,6 +584,9 @@ export default function Rocket({
       onTouchStart={handleStart}
       onTouchMove={handleMove}
       onTouchEnd={handleEnd}
+      className={className}
+      sx={sx}
+      {...rest}
     >
       <svg
         ref={svgRef}
@@ -547,19 +603,19 @@ export default function Rocket({
         //   //   display: "block",
         //   pointerEvents: "none",
         // }}
-        style={{
-          width: "100%",
-          height: "100%",
-          pointerEvents: "auto", // Allow the SVG itself to capture the drag events
-          overflow: "visible",
-        }}
+        // style={{
+        //   width: "100%",
+        //   height: "100%",
+        //   pointerEvents: "auto", // Allow the SVG itself to capture the drag events
+        //   overflow: "visible",
+        // }}
       >
         {/* Only Rocket Content Group */}
         <g ref={rocketRef} id="rocket">
           {/* Rocket placement - Rotated -90 to face forward (CCW) */}
           <g
             transform={`translate(${centerX}, ${
-              centerY - orbitRadius
+              centerY - orbitRadius * 2
             }) rotate(-90) scale(${rocketScale})`}
           >
             <g ref={smokeRef} id="smoke" />
@@ -767,6 +823,12 @@ export default function Rocket({
       >
         Drag the rocket to orbit your Earth
       </div> */}
-    </div>
+    </Root>
   );
 }
+
+const defaultRadius = 600;
+const defaultOrbitSpeed = 0.25; // Degrees per frame
+const defaultScale = 0.75;
+const defaultSize = "100%";
+const defaultTransform = "translate(0%, 0%)";

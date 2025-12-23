@@ -14,6 +14,11 @@ export interface LoginParams {
   [key: string]: unknown;
 }
 
+export interface SignUpParams extends LoginParams {
+  confirmPassword?: string;
+  agreeToTerms?: boolean;
+}
+
 export interface AuthTokens {
   accessToken?: string;
   refreshToken?: string;
@@ -43,18 +48,18 @@ export interface LoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
   heading?: string;
 }
 
-export interface LoginFormProps {
-  content?: StyleComponent;
-  password?: StyleComponent;
-  footer?: StyleComponent;
-  formButton?: StyleComponent;
-  redirectTo?: string;
-  className?: string;
-  sx?: SxProps<Theme>;
-  children?: React.ReactNode;
-  forgotPassword?: string;
-  forgotPasswordUrl?: string;
-}
+// export interface LoginFormProps {
+//   content?: StyleComponent;
+//   password?: StyleComponent;
+//   footer?: StyleComponent;
+//   formButton?: StyleComponent;
+//   redirectTo?: string;
+//   className?: string;
+//   sx?: SxProps<Theme>;
+//   children?: React.ReactNode;
+//   forgotPassword?: string;
+//   forgotPasswordUrl?: string;
+// }
 
 export interface AvatarProps extends HtmlHTMLAttributes<HTMLDivElement> {
   avatarIcon?: ReactNode;
