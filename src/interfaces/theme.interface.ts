@@ -5,10 +5,10 @@ import {
   SideImageProps,
   SignUpProps,
   FooterProps,
-  LoginFormProps,
   SocialLoginProps,
   SocialButtonProps,
 } from "./auth.interface";
+import { LoginFormProps } from "./component-props.interface";
 
 // This interface maps each component's name to its specific props interface.
 // To add a new component, you only need to add a new line here.

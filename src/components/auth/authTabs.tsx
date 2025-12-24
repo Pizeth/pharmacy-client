@@ -5,6 +5,8 @@ import {
   Login as LoginIcon,
   PersonAdd as SignUpIcon,
 } from "@mui/icons-material";
+import SocialLogin from "./socialLogin";
+import Divider from "./divider";
 
 interface AuthTabsProps {
   loginForm: React.ReactNode;
@@ -52,7 +54,7 @@ const TabPanel = (props: TabPanelProps) => {
       aria-labelledby={`auth-tab-${index}`}
       {...other}
       sx={{
-        py: 3,
+        // py: 3,
         animation: value === index ? "fadeIn 0.3s ease-in" : "none",
         "@keyframes fadeIn": {
           from: { opacity: 0, transform: "translateY(10px)" },
@@ -145,6 +147,8 @@ const AuthTabs = (inProps: AuthTabsProps) => {
       <TabPanel value={value} index={1}>
         {signUpForm}
       </TabPanel>
+      <Divider />
+      <SocialLogin />
     </StyledAuthTabs>
   );
 };

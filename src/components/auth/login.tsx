@@ -213,16 +213,16 @@ export const Login = (
                         loginForm={
                           <>
                             {children}
-                            {divider}
-                            {social}
                             {signUp}
+                            {/* {divider} */}
+                            {/* {social} */}
                           </>
                         }
                         signUpForm={
                           <>
                             <SignUpForm />
-                            {divider}
-                            {social}
+                            {/* {divider} */}
+                            {/* {social} */}
                           </>
                         }
                         defaultTab={defaultTab}

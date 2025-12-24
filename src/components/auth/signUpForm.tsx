@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { SignUpFormProps } from "@/interfaces/component-props.interface";
 import { SignUpParams } from "@/interfaces/auth.interface";
 import PasswordFields from "../CustomInputs/PasswordComponents";
+import ValidationInput from "../CustomInputs/ValidationInput";
 
 // interface SignUpFormProps {
 //   onSubmit?: (data: SignUpData) => void | Promise<void>;
@@ -201,26 +202,24 @@ const SignUpForm = (inProps: SignUpFormProps) => {
         {children || (
           <SignUpForm.content>
             {/* Username Field */}
-            <IconInput
+            <ValidationInput
               source="username"
               className="icon-input"
               iconStart={<Person />}
               fullWidth
-              label={translate("razeth.auth.username")}
+              // label={translate("razeth.auth.username")}
               autoComplete="username"
-              validate={validateUsername}
               resettable
             />
 
             {/* Email Field */}
-            <IconInput
+            <ValidationInput
               source="email"
               className="icon-input"
               iconStart={<Email />}
               fullWidth
-              label={translate("razeth.auth.email") || "Email"}
+              // label={translate("razeth.auth.email") || "Email"}
               autoComplete="email"
-              validate={validateEmail}
               resettable
             />
 
@@ -245,21 +244,21 @@ const SignUpForm = (inProps: SignUpFormProps) => {
                 }
                 label={
                   <Typography variant="body2">
-                    {translate("razeth.auth.agree_to")}{" "}
+                    {translate("razeth.footer.agree_to")}{" "}
                     <a
                       href={termsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {translate("razeth.auth.terms")}
+                      {translate("razeth.footer.terms")}
                     </a>{" "}
-                    {translate("razeth.auth.and")}{" "}
+                    {translate("razeth.footer.and")}{" "}
                     <a
                       href={privacyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {translate("razeth.auth.privacy")}
+                      {translate("razeth.footer.privacy")}
                     </a>
                   </Typography>
                 }
@@ -273,6 +272,7 @@ const SignUpForm = (inProps: SignUpFormProps) => {
               color="primary"
               size="large"
               disabled={loading}
+              fullWidth
             >
               {loading ? (
                 <CircularProgress color="inherit" size={19} thickness={3} />
