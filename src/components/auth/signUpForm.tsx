@@ -11,7 +11,6 @@ import {
   Typography,
 } from "@mui/material";
 import { styled, useThemeProps } from "@mui/material/styles";
-import IconInput from "../CustomInputs/IconInput";
 import PasswordValidationInput from "../CustomInputs/PasswordValidationInput";
 import { Person, Email, Password, PersonAdd } from "@mui/icons-material";
 import { useRequired } from "@/utils/validator";
