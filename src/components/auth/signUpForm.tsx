@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Form, useNotify, useTranslate } from "ra-core";
-import { SubmitHandler, FieldValues } from "react-hook-form";
+import { useCallback, useState } from "react";
+import { Form, useCreate, useNotify, useRedirect, useTranslate } from "ra-core";
+import { SubmitHandler, FieldValues, useFormState } from "react-hook-form";
 import {
   Box,
   Button,
@@ -9,16 +9,17 @@ import {
   Checkbox,
   CardContent,
   Typography,
+  Link,
 } from "@mui/material";
 import { styled, useThemeProps } from "@mui/material/styles";
 import PasswordValidationInput from "../CustomInputs/PasswordValidationInput";
 import { Person, Email, Password, PersonAdd } from "@mui/icons-material";
 import { useRequired } from "@/utils/validator";
-import { useNavigate } from "react-router-dom";
 import { SignUpFormProps } from "@/interfaces/component-props.interface";
 import { SignUpParams } from "@/interfaces/auth.interface";
 import PasswordFields from "../CustomInputs/PasswordComponents";
 import ValidationInput from "../CustomInputs/ValidationInput";
+import { SaveButton, SaveButtonProps } from "react-admin";
 
 // interface SignUpFormProps {
 //   onSubmit?: (data: SignUpData) => void | Promise<void>;
@@ -64,17 +65,49 @@ const TermsArea = styled(Box, {
   overridesResolver: (_props, styles) => styles.terms,
 })<SignUpFormProps>(() => ({}));
 
+const VaidatedSaveButton = styled(Box, {
+  name: PREFIX,
+  slot: "Button",
+  overridesResolver: (_props, styles) => styles.button,
+})<SignUpFormProps>(() => ({}));
+
 const FormButton = styled(Button, {
   name: PREFIX,
   slot: "Button",
   overridesResolver: (_props, styles) => styles.button,
 })<SignUpFormProps>(() => ({}));
 
+const CustomSaveButton = ({ loading }: { loading: boolean }) => {
+  const { errors, isValid, isDirty } = useFormState();
+  // const hasErrors = Object.keys(errors).length > 0;
+  const hasErrors = Object.values(errors).some((error) => !!error);
+  return (
+    <VaidatedSaveButton>
+      <SaveButton
+        icon={
+          loading ? (
+            <CircularProgress color="inherit" size={19} thickness={3} />
+          ) : (
+            <PersonAdd />
+          )
+        }
+        label="razeth.auth.sign_up"
+        variant="contained"
+        color="primary"
+        size="large"
+        // disabled={loading}
+        disabled={hasErrors || !isValid || !isDirty}
+        fullWidth
+      />
+    </VaidatedSaveButton>
+  );
+};
+
 const SignUpForm = (inProps: SignUpFormProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
 
   const {
-    onSubmit,
+    // onSubmit,
     redirectTo,
     className,
     sx,
@@ -84,11 +117,21 @@ const SignUpForm = (inProps: SignUpFormProps) => {
     ...rest
   } = props;
 
+  const handleTerms = useCallback(() => {
+    // Navigate to registration page
+    window.location.href = termsUrl;
+  }, [termsUrl]);
+
+  const handlePrivacy = useCallback(() => {
+    // Navigate to registration page
+    window.location.href = privacyUrl;
+  }, [privacyUrl]);
+
   const [loading, setLoading] = useState(false);
   const translate = useTranslate();
   const notify = useNotify();
-  const required = useRequired();
-  const navigate = useNavigate();
+  const redirect = useRedirect();
+  // const required = useRequired();
 
   // Custom validation for password confirmation
   const validatePasswordMatch = (value: string, allValues: any) => {
@@ -137,52 +180,125 @@ const SignUpForm = (inProps: SignUpFormProps) => {
     return undefined;
   };
 
+  const [
+    create,
+    {
+      data,
+      error,
+      isError,
+      isIdle,
+      isPending,
+      isPaused,
+      isSuccess,
+      failureCount,
+      failureReason,
+      mutate,
+      mutateAsync,
+      reset,
+      status,
+      submittedAt,
+      variables,
+    },
+  ] = useCreate();
+
   const handleSubmit: SubmitHandler<FieldValues> = async (
     values: SignUpParams
   ) => {
     setLoading(true);
 
     try {
-      if (onSubmit) {
-        await onSubmit(values);
-      } else {
-        // Default behavior - replace with your actual signup API call
-        console.log("Sign up data:", values);
-
-        // Simulate API call
-        // await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        notify(
-          translate("razeth.auth.signup_success") ||
-            "Account created successfully!",
-          { type: "success" }
-        );
-
-        // Redirect if specified
-        if (redirectTo) {
-          navigate(redirectTo);
-          //   window.location.href = redirectTo;
-        }
-      }
-    } catch (error: any) {
-      notify(
-        typeof error === "string"
-          ? error
-          : typeof error === "undefined" || !error.message
-          ? translate("razeth.auth.signup_error") || "Registration failed"
-          : error.message,
+      // Default behavior - replace with your actual signup API call
+      console.log("Sign up data:", values);
+      const user = await create(
+        "users",
+        { data: values },
         {
-          type: "error",
-          messageArgs: {
-            _:
+          mutationMode: "pessimistic",
+          onSuccess: () => {
+            setLoading(false);
+            notify(
+              translate("razeth.auth.signup_success") ||
+                "Account created successfully!",
+              { type: "success" }
+            );
+
+            // Redirect if specified
+            redirect("/dashboard");
+          },
+          onSettled: (data, error) => {
+            setLoading(false);
+          },
+          onError: (error) => {
+            setLoading(false);
+            const errorMessage: string =
               typeof error === "string"
                 ? error
-                : error && error.message
-                ? error.message
-                : undefined,
+                : error && typeof error === "object" && "message" in error
+                ? String(error.message)
+                : translate("razeth.auth.sign_up_error") ||
+                  "Registration failed";
+            notify(errorMessage, {
+              type: "error",
+              messageArgs: {
+                _: typeof error === "string" ? error : undefined,
+              },
+            });
           },
+          returnPromise: true,
         }
       );
+      // if (onSubmit) {
+      //   await onSubmit(values);
+      // } else {
+      //   // Default behavior - replace with your actual signup API call
+      //   console.log("Sign up data:", values);
+
+      //   // Simulate API call
+      //   // await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      //   notify(
+      //     translate("razeth.auth.signup_success") ||
+      //       "Account created successfully!",
+      //     { type: "success" }
+      //   );
+
+      //   // Redirect if specified
+      //   if (redirectTo) {
+      //     redirect(redirectTo);
+      //     //   window.location.href = redirectTo;
+      //   }
+      // }
+    } catch (error) {
+      const errorMessage: string =
+        typeof error === "string"
+          ? error
+          : error && typeof error === "object" && "message" in error
+          ? String(error.message)
+          : translate("razeth.auth.sign_up_error") || "Registration failed";
+      notify(errorMessage, {
+        type: "error",
+        messageArgs: {
+          _: typeof error === "string" ? error : undefined,
+        },
+      });
+      // notify(
+      //   typeof error === "string"
+      //     ? error
+      //     : typeof error === "undefined" || !error.message
+      //     ? translate("razeth.auth.sign_up_error") || "Registration failed"
+      //     : error.message,
+      //   {
+      //     type: "error",
+      //     messageArgs: {
+      //       _:
+      //         typeof error === "string"
+      //           ? error
+      //           : error && error.message
+      //           ? error.message
+      //           : undefined,
+      //     },
+      //   }
+      // );
     } finally {
       setLoading(false);
     }
@@ -190,9 +306,11 @@ const SignUpForm = (inProps: SignUpFormProps) => {
 
   return (
     <StyledSignUpForm
-      //   onSubmit={handleSubmit}
+      onSubmit={handleSubmit}
       mode="onChange"
       noValidate
+      sanitizeEmptyValues
+      warnWhenUnsavedChanges
       className={className}
       sx={sx}
       {...rest}
@@ -210,7 +328,6 @@ const SignUpForm = (inProps: SignUpFormProps) => {
               autoComplete="username"
               resettable
             />
-
             {/* Email Field */}
             <ValidationInput
               source="email"
@@ -221,7 +338,6 @@ const SignUpForm = (inProps: SignUpFormProps) => {
               autoComplete="email"
               resettable
             />
-
             {/* Password Area */}
             <SignUpForm.password>
               <PasswordFields
@@ -231,9 +347,9 @@ const SignUpForm = (inProps: SignUpFormProps) => {
                 iconStart={<Password />}
               />
             </SignUpForm.password>
-
             {/* Terms and Conditions */}
             <SignUpForm.terms>
+              {/* <Typography variant="body2"> */}
               <FormControlLabel
                 control={
                   <Checkbox
@@ -243,29 +359,53 @@ const SignUpForm = (inProps: SignUpFormProps) => {
                 }
                 label={
                   <Typography variant="body2">
-                    {translate("razeth.footer.agree_to")}{" "}
-                    <a
-                      href={termsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    {translate("razeth.title.agree_to")}{" "}
+                    <Link
+                      component="button"
+                      type="button"
+                      variant="body2"
+                      onClick={handleTerms}
+                      // href={termsUrl}
+                      // target="_blank"
+                      // rel="noopener noreferrer"
                     >
-                      {translate("razeth.footer.terms")}
-                    </a>{" "}
-                    {translate("razeth.footer.and")}{" "}
-                    <a
-                      href={privacyUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      {translate("razeth.title.terms_of_service")}
+                    </Link>{" "}
+                    {translate("razeth.title.ampersand")}{" "}
+                    <Link
+                      component="button"
+                      type="button"
+                      variant="body2"
+                      onClick={handlePrivacy}
+                      // href={privacyUrl}
+                      // target="_blank"
+                      // rel="noopener noreferrer"
                     >
-                      {translate("razeth.footer.privacy")}
-                    </a>
+                      {translate("razeth.title.privacy_policy")}
+                    </Link>
                   </Typography>
                 }
               />
+              {/* </Typography> */}
             </SignUpForm.terms>
-
             {/* Submit Button */}
-            <SignUpForm.button
+            <CustomSaveButton
+              loading={loading}
+              // icon={
+              //   loading ? (
+              //     <CircularProgress color="inherit" size={19} thickness={3} />
+              //   ) : (
+              //     <PersonAdd />
+              //   )
+              // }
+              // label="razeth.auth.sign_up"
+              // variant="contained"
+              // color="primary"
+              // size="large"
+              // disabled={hasErrors || !isValid || !isDirty}
+              // fullWidth
+            />
+            {/* <SignUpForm.button
               type="submit"
               variant="contained"
               color="primary"
@@ -279,7 +419,7 @@ const SignUpForm = (inProps: SignUpFormProps) => {
                 translate("razeth.auth.sign_up") || "Sign Up"
               )}
               <PersonAdd />
-            </SignUpForm.button>
+            </SignUpForm.button> */}
           </SignUpForm.content>
         )}
       </CardContent>

@@ -2,6 +2,8 @@ import { StyleComponent } from "@/types/classKey";
 import { SxProps, Theme } from "@mui/material";
 import { Property } from "csstype";
 import { SignUpParams } from "./auth.interface";
+import { FieldValues, SubmitHandler } from "react-hook-form";
+import { SaveHandler } from "ra-core";
 
 export interface LoginFormProps {
   content?: StyleComponent;
@@ -17,7 +19,8 @@ export interface LoginFormProps {
 }
 
 export interface SignUpFormProps extends LoginFormProps {
-  onSubmit?: (data: SignUpParams) => void | Promise<void>;
+  // onSubmit?: (data: SignUpParams) => void | Promise<void>;
+  // onSubmit?: SubmitHandler<FieldValues> | SaveHandler<SignUpParams>;
   // redirectTo?: string;
   // className?: string;
   // sx?: SxProps<Theme>;

@@ -87,7 +87,7 @@ const memoize: Memoize = (fn: any) =>
 const zxcvbnAsync = await zxcvbn.loadZxcvbn();
 
 // const API_URL = import.meta.env.VITE_API_URL;
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const useAsyncValidator = (
   setMessage: (update: { source: string; message: string }) => void,

@@ -21,17 +21,17 @@ const Footer = (inProps: FooterProps) => {
   return (
     <StyledFooter className={className} sx={sx} {...rest}>
       <Typography variant="body2" component="div">
-        {description || translate("razeth.footer.description")}
+        {description || translate("razeth.title.description")}
         <Link href={termsOfServiceUrl}>
-          {termsOfService || translate("razeth.footer.terms")}
+          {termsOfService || translate("razeth.title.terms_of_service")}
         </Link>
-        {ampersand || translate("razeth.footer.ampersand")}
+        {ampersand || translate("razeth.title.ampersand")}
         <Link href={privacyPolicyUrl}>
-          {privacyPolicy || translate("razeth.footer.privacy")}
+          {privacyPolicy || translate("razeth.title.privacy_policy")}
         </Link>
       </Typography>
       <Typography variant="body2" component="span">
-        {copyright || translate("razeth.footer.copyright")}
+        {copyright || translate("razeth.title.copyright")}
       </Typography>
     </StyledFooter>
   );

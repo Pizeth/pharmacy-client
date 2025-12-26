@@ -72,7 +72,7 @@ const AuthTabs = (inProps: AuthTabsProps) => {
   const {
     loginForm,
     signUpForm,
-    defaultTab = "login",
+    defaultTab = "signup",
     className,
     sx,
     onTabChange,
