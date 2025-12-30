@@ -213,7 +213,7 @@ export const Login = (
                         loginForm={
                           <>
                             {children}
-                            {signUp}
+                            {/* {signUp} */}
                             {/* {divider} */}
                             {/* {social} */}
                           </>
@@ -225,17 +225,15 @@ export const Login = (
                             {/* {social} */}
                           </>
                         }
-                        defaultTab={defaultTab}
+                        defaultTab={currentTab}
                         onTabChange={handleTabChange}
                       />
                     ) : (
-                      <>
-                        {children}
-                        {divider}
-                        {social}
-                        {signUp}
-                      </>
+                      <>{children}</>
                     )}
+                    {signUp}
+                    {divider}
+                    {social}
                   </Box>
                 </CardContent>
               </Grid>

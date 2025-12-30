@@ -20,6 +20,8 @@ import { SignUpParams } from "@/interfaces/auth.interface";
 import PasswordFields from "../CustomInputs/PasswordComponents";
 import ValidationInput from "../CustomInputs/ValidationInput";
 import { SaveButton, SaveButtonProps } from "react-admin";
+import Loader from "./ui/loading";
+import ValidatedButton from "./ui/validatedButton";
 
 // interface SignUpFormProps {
 //   onSubmit?: (data: SignUpData) => void | Promise<void>;
@@ -65,43 +67,11 @@ const TermsArea = styled(Box, {
   overridesResolver: (_props, styles) => styles.terms,
 })<SignUpFormProps>(() => ({}));
 
-const VaidatedSaveButton = styled(Box, {
-  name: PREFIX,
-  slot: "Button",
-  overridesResolver: (_props, styles) => styles.button,
-})<SignUpFormProps>(() => ({}));
-
 const FormButton = styled(Button, {
   name: PREFIX,
   slot: "Button",
   overridesResolver: (_props, styles) => styles.button,
 })<SignUpFormProps>(() => ({}));
-
-const CustomSaveButton = ({ loading }: { loading: boolean }) => {
-  const { errors, isValid, isDirty } = useFormState();
-  // const hasErrors = Object.keys(errors).length > 0;
-  const hasErrors = Object.values(errors).some((error) => !!error);
-  return (
-    <VaidatedSaveButton>
-      <SaveButton
-        icon={
-          loading ? (
-            <CircularProgress color="inherit" size={19} thickness={3} />
-          ) : (
-            <PersonAdd />
-          )
-        }
-        label="razeth.auth.sign_up"
-        variant="contained"
-        color="primary"
-        size="large"
-        // disabled={loading}
-        disabled={hasErrors || !isValid || !isDirty}
-        fullWidth
-      />
-    </VaidatedSaveButton>
-  );
-};
 
 const SignUpForm = (inProps: SignUpFormProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
@@ -118,12 +88,12 @@ const SignUpForm = (inProps: SignUpFormProps) => {
   } = props;
 
   const handleTerms = useCallback(() => {
-    // Navigate to registration page
+    // Navigate to terms of service page
     window.location.href = termsUrl;
   }, [termsUrl]);
 
   const handlePrivacy = useCallback(() => {
-    // Navigate to registration page
+    // Navigate to privacy policy page
     window.location.href = privacyUrl;
   }, [privacyUrl]);
 
@@ -348,8 +318,7 @@ const SignUpForm = (inProps: SignUpFormProps) => {
               />
             </SignUpForm.password>
             {/* Terms and Conditions */}
-            <SignUpForm.terms>
-              {/* <Typography variant="body2"> */}
+            {/* <SignUpForm.terms>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -386,11 +355,11 @@ const SignUpForm = (inProps: SignUpFormProps) => {
                   </Typography>
                 }
               />
-              {/* </Typography> */}
-            </SignUpForm.terms>
+            </SignUpForm.terms> */}
             {/* Submit Button */}
-            <CustomSaveButton
+            <ValidatedButton
               loading={loading}
+              authType="signup"
               // icon={
               //   loading ? (
               //     <CircularProgress color="inherit" size={19} thickness={3} />

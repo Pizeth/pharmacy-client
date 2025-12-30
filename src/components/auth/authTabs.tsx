@@ -147,8 +147,8 @@ const AuthTabs = (inProps: AuthTabsProps) => {
       <TabPanel value={value} index={1}>
         {signUpForm}
       </TabPanel>
-      <Divider />
-      <SocialLogin />
+      {/* <Divider />
+      <SocialLogin /> */}
     </StyledAuthTabs>
   );
 };

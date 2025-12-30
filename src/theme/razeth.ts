@@ -288,6 +288,57 @@ const customBaseTheme = createTheme({
         }),
       },
     },
+    RazethSignUpForm: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          ["& .MuiCardContent-root"]: {
+            minWidth: 300,
+            padding: `${props.theme.spacing(0)}`,
+          },
+        }),
+        content: (props: { theme: Theme }) => ({
+          display: "flex",
+          flexDirection: "column",
+          gap: props.theme.spacing(0),
+          input: {
+            transition: props.theme.transitions.create("color", {
+              easing: props.theme.transitions.easing.easeInOut,
+              duration: props.theme.transitions.duration.short,
+            }),
+            "&:focus": {
+              // color: "#e1232e", // focused
+              color: props.theme.palette.primary.main, // focused
+            },
+          },
+          // Apply custom styles to the last child element inside this container
+          "& > :last-child": {
+            // For example, you could add extra margin to the button
+            // if it's the last item. Let's override its default top margin.
+            marginTop: props.theme.spacing(1),
+          },
+        }),
+        password: (props: { theme: Theme }) => ({
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          gap: props.theme.spacing(0),
+        }),
+        // footer: (props: { theme: Theme }) => ({
+        //   display: "flex",
+        //   justifyContent: "space-between",
+        //   alignItems: "center",
+        //   fontWeight: 500,
+        //   marginTop: "-0.5rem",
+        //   width: "100%",
+        //   gap: props.theme.spacing(0),
+        // }),
+        button: (props: { theme: Theme }) => ({
+          marginTop: props.theme.spacing(1),
+          fontWeight: 700,
+          ["& .MuiSvgIcon-root"]: { margin: props.theme.spacing(0.3) },
+        }),
+      },
+    },
     RazethDivider: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({

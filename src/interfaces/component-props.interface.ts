@@ -4,6 +4,8 @@ import { Property } from "csstype";
 import { SignUpParams } from "./auth.interface";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { SaveHandler } from "ra-core";
+import { SaveButtonProps } from "react-admin";
+import { AuthAction } from "@/types/theme";
 
 export interface LoginFormProps {
   content?: StyleComponent;
@@ -27,6 +29,13 @@ export interface SignUpFormProps extends LoginFormProps {
   // children?: React.ReactNode;
   termsUrl?: string;
   privacyUrl?: string;
+}
+
+export interface ValidatedButtonProps extends SaveButtonProps {
+  loading: boolean;
+  authType?: AuthAction;
+  className?: string;
+  sx?: any;
 }
 
 export interface ShootingStarData {
