@@ -3,7 +3,7 @@ import {
   DividerProps,
   LoginProps,
   SideImageProps,
-  SignUpProps,
+  AuthNavigationProps,
   FooterProps,
   SocialLoginProps,
   SocialButtonProps,
@@ -20,7 +20,7 @@ export interface RazethComponentsPropsList {
   RazethDivider: Partial<DividerProps>;
   RazethSocialLogin: Partial<SocialLoginProps>;
   RazethSocialButton: Partial<SocialButtonProps>;
-  RazethSignUpLink: Partial<SignUpProps>;
+  RazethAuthNavigation: Partial<AuthNavigationProps>;
   RazethFooter: Partial<FooterProps>;
 }
 

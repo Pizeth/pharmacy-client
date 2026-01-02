@@ -25,6 +25,7 @@ import TwinkleStars from "./effects/twinkleStars";
 import RocketAnimation from "./effects/rocket";
 import SignUpForm from "./signUpForm";
 import AuthTabs from "./authTabs";
+import { AuthAction } from "@/types/theme";
 
 const PREFIX = "RazethLogin";
 
@@ -126,8 +127,6 @@ export const Login = (
   inProps: LoginProps & {
     Content?: StyleComponent;
     Card?: StyleComponent;
-    enableTabs?: boolean; // New prop to enable tab mode
-    defaultTab?: "login" | "signup"; // New prop to set default tab
   }
 ) => {
   const props = useThemeProps({
@@ -140,14 +139,17 @@ export const Login = (
     children = defaultLoginForm,
     divider = defaultDivider,
     social = defaultSocial,
-    signUp = defaultSignUp,
+    authNavigationLinks = defaultAuthNavigationLinks,
     footer = defaultFooter,
     variant = "full",
     src = "/static/images/astronaut.png",
     alt = "Picture of the astronaut",
     // heading = "Find me on Social Media",
-    enableTabs = true, // Enable tabs by default
-    defaultTab = "login",
+    // enableTabs = true, // Enable tabs by default
+    // defaultMode = "login",
+    enableToggle = true, // Enable toggle by default
+    defaultMode = "signin",
+    // onSignUp,
     className,
     sx,
     // backgroundImage,
@@ -157,7 +159,9 @@ export const Login = (
   const checkAuth = useCheckAuth();
   const theme = useTheme();
   const navigate = useNavigate();
-  const [currentTab, setCurrentTab] = useState<"login" | "signup">(defaultTab);
+  // const [currentTab, setCurrentTab] = useState<"login" | "signup">(defaultTab);
+  // State to track current mode (login or signup)
+  const [currentMode, setCurrentMode] = useState<AuthAction>(defaultMode);
 
   useEffect(() => {
     checkAuth({}, false)
@@ -170,8 +174,13 @@ export const Login = (
       });
   }, [checkAuth, navigate]);
 
-  const handleTabChange = (tab: "login" | "signup") => {
-    setCurrentTab(tab);
+  // const handleTabChange = (tab: AuthAction) => {
+  //   setCurrentTab(tab);
+  // };
+
+  // Toggle between login and signup
+  const handleToggle = () => {
+    setCurrentMode((prev) => (prev === "signin" ? "signup" : "signin"));
   };
 
   return (
@@ -208,21 +217,16 @@ export const Login = (
                     {social}
                     {signUp} */}
                     {/* Conditional rendering: Tabs or Traditional */}
-                    {enableTabs ? (
+                    {/* {enableTabs ? (
                       <AuthTabs
                         loginForm={
                           <>
                             {children}
-                            {/* {signUp} */}
-                            {/* {divider} */}
-                            {/* {social} */}
                           </>
                         }
                         signUpForm={
                           <>
                             <SignUpForm />
-                            {/* {divider} */}
-                            {/* {social} */}
                           </>
                         }
                         defaultTab={currentTab}
@@ -230,8 +234,39 @@ export const Login = (
                       />
                     ) : (
                       <>{children}</>
+                    )} */}
+
+                    {/* Show Login or Signup form based on currentMode */}
+                    <Box
+                      key={currentMode} // ← This is the magic line! It forces remount and retriggers animation
+                      sx={{
+                        animation: "fadeIn 0.5s ease-in-out",
+                        "@keyframes fadeIn": {
+                          from: { opacity: 0, transform: "translateY(100px)" },
+                          to: { opacity: 1, transform: "translateY(0)" },
+                        },
+                      }}
+                    >
+                      {currentMode === "signin" ? (
+                        // Login Form
+                        <>{children}</>
+                      ) : (
+                        // Signup Form
+                        <>
+                          <SignUpForm />
+                        </>
+                      )}
+                    </Box>
+
+                    {/* Toggle Link - shown after form */}
+                    {enableToggle && (
+                      <AuthNavigationLink
+                        mode={currentMode}
+                        onToggle={handleToggle}
+                      />
                     )}
-                    {signUp}
+                    {/* {authNavigationLinks} */}
+                    {/* Divider and Social Login - shown for both forms */}
                     {divider}
                     {social}
                   </Box>
@@ -379,7 +414,7 @@ const defaultAvatar = (
 );
 const defaultDivider = <Divider />;
 const defaultSocial = <SocialLogin />;
-const defaultSignUp = <AuthNavigationLink link="/auth/register" />;
+const defaultAuthNavigationLinks = <AuthNavigationLink />;
 const defaultFooter = <Footer />;
 
 // ✅ Named exports (optional, for tree-shaking)

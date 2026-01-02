@@ -218,6 +218,18 @@ const customBaseTheme = createTheme({
     text: { primary: "#ffffff", secondary: "#aaaaaa" },
     passwordStrength: ["#aaaaaa", "#e76f51", "#f58700", "#0668d1", "#4caf50"],
   },
+  shape: {
+    borderRadius: 50,
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
   components: {
     RazethLogin: RazethLoginOptimized,
 
@@ -278,14 +290,16 @@ const customBaseTheme = createTheme({
           alignItems: "center",
           fontWeight: 500,
           marginTop: "-0.5rem",
+          marginBottom: "-0.5rem",
           width: "100%",
           gap: props.theme.spacing(0),
         }),
-        button: (props: { theme: Theme }) => ({
-          marginTop: props.theme.spacing(1),
-          fontWeight: 700,
-          ["& .MuiSvgIcon-root"]: { margin: props.theme.spacing(0.3) },
-        }),
+        // button: (props: { theme: Theme }) => ({
+        //   marginTop: props.theme.spacing(1),
+        //   fontWeight: 700,
+        //   fontSize: "1rem",
+        //   ["& .MuiSvgIcon-root"]: { margin: props.theme.spacing(0.3) },
+        // }),
       },
     },
     RazethSignUpForm: {
@@ -332,10 +346,32 @@ const customBaseTheme = createTheme({
         //   width: "100%",
         //   gap: props.theme.spacing(0),
         // }),
-        button: (props: { theme: Theme }) => ({
-          marginTop: props.theme.spacing(1),
-          fontWeight: 700,
-          ["& .MuiSvgIcon-root"]: { margin: props.theme.spacing(0.3) },
+        // button: (props: { theme: Theme }) => ({
+        //   marginTop: props.theme.spacing(1),
+        //   fontWeight: 700,
+        //   ["& .MuiSvgIcon-root"]: {
+        //     margin: props.theme.spacing(0.3),
+        //     fontSize: 18,
+        //   },
+        // }),
+      },
+    },
+    RazethValidatedButton: {
+      styleOverrides: {
+        root: (props: { theme: Theme }) => ({
+          // fontWeight: 700,
+          // fontSize: "0.9375rem",
+          // fontSize: "2.5rem",
+          button: {
+            // borderRadius: "2.5rem",
+            fontWeight: 700,
+            fontSize: "0.9375rem",
+            // fontSize: "2.5rem",
+            // ["& .MuiSvgIcon-root"]: {
+            //   margin: props.theme.spacing(0.3),
+            //   // fontSize: 18,
+            // },
+          },
         }),
       },
     },
@@ -401,7 +437,7 @@ const customBaseTheme = createTheme({
         }),
       },
     },
-    RazethSignUpLink: {
+    RazethAuthNavigation: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
           display: "flex",

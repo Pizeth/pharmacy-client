@@ -76,7 +76,7 @@ class OidcAuthProvider implements AuthProvider {
     }
 
     // Handle form login
-    if (params.email && params.password) {
+    if (params.credential && params.password) {
       try {
         const response = await fetch(`${this.backendUrl}/auth/login`, {
           method: "POST",
@@ -85,7 +85,7 @@ class OidcAuthProvider implements AuthProvider {
           },
           credentials: "include",
           body: JSON.stringify({
-            email: params.email,
+            credential: params.credential,
             password: params.password,
           }),
         });

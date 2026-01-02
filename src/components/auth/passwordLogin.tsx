@@ -162,7 +162,7 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                 {/* {forgotPasswordIcon} */}
               </Link>
             </PasswordLogin.footer>
-            <PasswordLogin.button loading={loading} authType="login" />
+            <PasswordLogin.button loading={loading} authType="signin" />
             {/* <ValidatedButton loading={loading} authType="login" /> */}
 
             {/* <PasswordLogin.button

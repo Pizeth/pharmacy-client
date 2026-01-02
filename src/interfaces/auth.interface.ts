@@ -3,6 +3,7 @@ import { Theme } from "@emotion/react";
 import { ButtonProps, SxProps } from "@mui/material";
 import { CSSProperties, HtmlHTMLAttributes, ReactNode } from "react";
 import { Meteor, MeteorConfig, MeteorState } from "./theme.interface";
+import { AuthAction } from "@/types/theme";
 
 export interface LoginParams {
   // For form login
@@ -38,7 +39,12 @@ export interface LoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
   children?: ReactNode;
   divider?: ReactNode;
   social?: ReactNode;
-  signUp?: ReactNode;
+  authNavigationLinks?: ReactNode;
+  // enableTabs?: boolean; // New prop to enable tab mode
+  // defaultTab?: "login" | "signup"; // New prop to set default tab
+  enableToggle?: boolean; // Enable link-based toggle
+  defaultMode?: AuthAction;
+  // onSignUp?: (data: any) => void | Promise<void>;
   footer?: ReactNode;
   className?: string;
   sx?: SxProps<Theme>;
@@ -103,11 +109,13 @@ export interface SocialButtonProps
 
 export interface AuthNavigationProps
   extends HtmlHTMLAttributes<HTMLDivElement> {
+  mode?: AuthAction; // Receives state from parent
+  onToggle?: () => void; // Toggle handler from parent
   className?: string;
-  message?: string;
-  title?: string;
-  link?: string;
-  icon?: ReactNode;
+  // message?: string;
+  // title?: string;
+  // link?: string;
+  // icon?: ReactNode;
   sx?: SxProps<Theme>;
 }
 

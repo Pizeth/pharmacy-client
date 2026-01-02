@@ -16,4 +16,4 @@ export type GradientOptions = {
   color?: string; // default "var(--c)"
 };
 
-export type AuthAction = "login" | "signup";
+export type AuthAction = "signin" | "signup";

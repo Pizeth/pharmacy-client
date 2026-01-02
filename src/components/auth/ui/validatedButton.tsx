@@ -13,8 +13,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 const PREFIX = "RazethValidatedButton";
 const VaidatedSaveButton = styled(Box, {
   name: PREFIX,
-  slot: "Button",
-  overridesResolver: (_props, styles) => styles.button,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
 })<SignUpFormProps>(() => ({}));
 const ValidatedButton = (inProps: ValidatedButtonProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
@@ -27,14 +27,17 @@ const ValidatedButton = (inProps: ValidatedButtonProps) => {
       {/* Conditional rendering */}
       {authType === "login" ? (
         <Button
-          icon={
-            loading ? (
-              <Loader />
-            ) : (
-              // <CircularProgress color="inherit" size={19} thickness={3} />
-              <Login />
-            )
-          }
+          loading={loading}
+          loadingPosition="start"
+          startIcon={<Login />}
+          // startIcon={
+          //   loading ? (
+          //     <Loader />
+          //   ) : (
+          //     // <CircularProgress color="inherit" size={19} thickness={3} />
+          //     <Login />
+          //   )
+          // }
           label="razeth.auth.sign_in"
           type="submit"
           variant="contained"
