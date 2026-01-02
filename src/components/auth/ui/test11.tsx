@@ -1,296 +1,298 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useLogin, useNotify } from "react-admin";
 import {
   Box,
-  TextField,
   Button,
-  Checkbox,
-  FormControlLabel,
-  InputAdornment,
-  IconButton,
-  styled,
-  useThemeProps,
+  TextField,
+  Typography,
+  Paper,
+  CssBaseline,
+  GlobalStyles,
 } from "@mui/material";
-import {
-  Visibility,
-  VisibilityOff,
-  Person,
-  Email,
-  Lock,
-} from "@mui/icons-material";
-import { useTranslate, useNotify } from "ra-core";
+import { styled } from "@mui/material/styles";
 
-interface SignUpFormProps {
-  onSubmit?: (data: SignUpData) => void;
-  className?: string;
-  sx?: any;
-}
+// --- Configuration ---
+const PRIMARY_GRADIENT =
+  "linear-gradient(rgb(255, 151, 207), rgb(255, 68, 146))";
+const ANIMATION_SPEED = "0.6s";
 
-interface SignUpData {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  agreeToTerms: boolean;
-}
+// Custom Styled Button
+const StyledButton = styled(Button)(({ theme, variant }) => ({
+  borderRadius: "20px",
+  padding: "12px 45px",
+  fontSize: "12px",
+  fontWeight: "bold",
+  letterSpacing: "1px",
+  textTransform: "uppercase",
+  transition: "transform 80ms ease-in",
+  "&:active": { transform: "scale(0.95)" },
+  ...(variant === "contained" && {
+    background: PRIMARY_GRADIENT,
+    color: "white",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+  }),
+  ...(variant === "outlined" && {
+    background: "transparent",
+    color: "white",
+    border: "1px solid white",
+    "&:hover": {
+      background: "rgba(255, 255, 255, 0.2)",
+      border: "1px solid white",
+    },
+  }),
+}));
 
-const PREFIX = "RazethSignUp";
+const CustomLoginPage = () => {
+  const [isSignUpMode, setIsSignUpMode] = useState(false);
 
-const StyledForm = styled(Box, {
-  name: PREFIX,
-  slot: "Root",
-  overridesResolver: (_props, styles) => styles.root,
-})<SignUpFormProps>(() => ({}));
-
-const SignUpForm = (inProps: SignUpFormProps) => {
-  const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { onSubmit, className, sx, ...rest } = props;
-
-  const translate = useTranslate();
+  // React-Admin hooks
+  const login = useLogin();
   const notify = useNotify();
 
-  const [formData, setFormData] = useState<SignUpData>({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    agreeToTerms: false,
-  });
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof SignUpData, string>>
-  >({});
-
-  const handleChange =
-    (field: keyof SignUpData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value =
-        field === "agreeToTerms" ? e.target.checked : e.target.value;
-      setFormData((prev) => ({ ...prev, [field]: value }));
-      // Clear error when user starts typing
-      if (errors[field]) {
-        setErrors((prev) => ({ ...prev, [field]: "" }));
-      }
-    };
-
-  const validateForm = (): boolean => {
-    const newErrors: Partial<Record<keyof SignUpData, string>> = {};
-
-    if (!formData.username.trim()) {
-      newErrors.username =
-        translate("razeth.auth.username_required") || "Username is required";
-    } else if (formData.username.length < 3) {
-      newErrors.username =
-        translate("razeth.auth.username_min_length") ||
-        "Username must be at least 3 characters";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email =
-        translate("razeth.auth.email_required") || "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email =
-        translate("razeth.auth.email_invalid") || "Invalid email address";
-    }
-
-    if (!formData.password) {
-      newErrors.password =
-        translate("razeth.auth.password_required") || "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password =
-        translate("razeth.auth.password_min_length") ||
-        "Password must be at least 8 characters";
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword =
-        translate("razeth.auth.confirm_password_required") ||
-        "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword =
-        translate("razeth.auth.passwords_dont_match") ||
-        "Passwords don't match";
-    }
-
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms =
-        translate("razeth.auth.terms_required") ||
-        "You must agree to the terms";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  // Form State
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      notify(
-        translate("razeth.auth.form_validation_error") ||
-          "Please fix the errors in the form",
-        { type: "error" }
-      );
-      return;
-    }
-
-    if (onSubmit) {
-      onSubmit(formData);
-    } else {
-      // Default behavior - you can replace this with your API call
-      console.log("Sign up data:", formData);
-      notify(
-        translate("razeth.auth.signup_success") ||
-          "Account created successfully!",
-        { type: "success" }
-      );
-    }
+    login({ username: email, password }).catch(() =>
+      notify("Invalid email or password")
+    );
   };
 
+  const handleToggle = () => setIsSignUpMode(!isSignUpMode);
+
   return (
-    <StyledForm
-      //   component="form"
-      //   onSubmit={handleSubmit}
-      className={className}
-      sx={sx}
-      {...rest}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f6f5f7",
+        fontFamily: '"Montserrat", sans-serif',
+      }}
     >
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        {/* Username Field */}
-        <TextField
-          fullWidth
-          label={translate("razeth.auth.username") || "Username"}
-          value={formData.username}
-          onChange={handleChange("username")}
-          error={!!errors.username}
-          helperText={errors.username}
-          required
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Person />
-              </InputAdornment>
-            ),
-          }}
-        />
+      <CssBaseline />
+      <GlobalStyles
+        styles={{
+          "@import":
+            'url("https://fonts.googleapis.com/css?family=Montserrat:400,800")',
+        }}
+      />
 
-        {/* Email Field */}
-        <TextField
-          fullWidth
-          type="email"
-          label={translate("razeth.auth.email") || "Email"}
-          value={formData.email}
-          onChange={handleChange("email")}
-          error={!!errors.email}
-          helperText={errors.email}
-          required
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Email />
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        {/* Password Field */}
-        <TextField
-          fullWidth
-          type={showPassword ? "text" : "password"}
-          label={translate("razeth.auth.password") || "Password"}
-          value={formData.password}
-          onChange={handleChange("password")}
-          error={!!errors.password}
-          helperText={errors.password}
-          required
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Lock />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        {/* Confirm Password Field */}
-        <TextField
-          fullWidth
-          type={showConfirmPassword ? "text" : "password"}
-          label={
-            translate("razeth.auth.confirm_password") || "Confirm Password"
-          }
-          value={formData.confirmPassword}
-          onChange={handleChange("confirmPassword")}
-          error={!!errors.confirmPassword}
-          helperText={errors.confirmPassword}
-          required
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Lock />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  edge="end"
-                >
-                  {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        {/* Terms and Conditions */}
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={formData.agreeToTerms}
-              onChange={handleChange("agreeToTerms")}
-              color="primary"
-            />
-          }
-          label={
-            translate("razeth.auth.agree_terms") ||
-            "I agree to the Terms and Conditions"
-          }
+      <Paper
+        elevation={10}
+        sx={{
+          backgroundColor: "#fff",
+          borderRadius: "10px",
+          boxShadow: "0 14px 28px rgba(0,0,0,0.25)",
+          position: "relative",
+          overflow: "hidden",
+          width: "768px",
+          maxWidth: "100%",
+          minHeight: "480px",
+          display: "flex", // Split layout: Left | Right
+        }}
+      >
+        {/* --- LEFT SIDE: Static Container, Changing Text --- */}
+        <Box
           sx={{
-            "& .MuiFormControlLabel-label": {
-              fontSize: "0.875rem",
-            },
+            width: "50%",
+            height: "100%",
+            background: PRIMARY_GRADIENT,
+            position: "relative", // Relative for absolute children
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
           }}
-        />
-        {errors.agreeToTerms && (
-          <Box sx={{ color: "error.main", fontSize: "0.75rem", mt: -1 }}>
-            {errors.agreeToTerms}
-          </Box>
-        )}
-
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          size="large"
-          sx={{ mt: 1 }}
         >
-          {translate("razeth.auth.sign_up") || "Sign Up"}
-        </Button>
-      </Box>
-    </StyledForm>
+          {/* Content A: Visible when in "Sign In" mode (Asking user to Sign Up) */}
+          <Box
+            sx={{
+              position: "absolute",
+              textAlign: "center",
+              padding: "0 40px",
+              opacity: isSignUpMode ? 0 : 1, // Fade Logic
+              transform: isSignUpMode ? "translateY(20px)" : "translateY(0)", // Subtle movement
+              pointerEvents: isSignUpMode ? "none" : "auto",
+              transition: `all ${ANIMATION_SPEED} ease-in-out`,
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold" gutterBottom>
+              Hello, Friend!
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 4 }}>
+              Enter your personal details and start your journey with us
+            </Typography>
+            <StyledButton variant="outlined" onClick={handleToggle}>
+              Sign Up
+            </StyledButton>
+          </Box>
+
+          {/* Content B: Visible when in "Sign Up" mode (Asking user to Sign In) */}
+          <Box
+            sx={{
+              position: "absolute",
+              textAlign: "center",
+              padding: "0 40px",
+              opacity: isSignUpMode ? 1 : 0, // Fade Logic
+              transform: isSignUpMode ? "translateY(0)" : "translateY(20px)",
+              pointerEvents: isSignUpMode ? "auto" : "none",
+              transition: `all ${ANIMATION_SPEED} ease-in-out`,
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold" gutterBottom>
+              Welcome Back!
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 4 }}>
+              To keep connected with us please login with your personal info
+            </Typography>
+            <StyledButton variant="outlined" onClick={handleToggle}>
+              Sign In
+            </StyledButton>
+          </Box>
+        </Box>
+
+        {/* --- RIGHT SIDE: Sliding Forms --- */}
+        <Box
+          sx={{
+            width: "50%",
+            height: "100%",
+            position: "relative",
+            overflow: "hidden", // Mask the sliding forms
+          }}
+        >
+          {/* Sign In Form */}
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+              position: "absolute",
+              top: isSignUpMode ? "-100%" : "0", // Slide Up/Down
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "0 50px",
+              textAlign: "center",
+              transition: `top ${ANIMATION_SPEED} ease-in-out`,
+              backgroundColor: "#fff",
+            }}
+          >
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              sx={{ mb: 2, color: "#000" }}
+            >
+              Sign in
+            </Typography>
+            <TextField
+              fullWidth
+              variant="filled"
+              label="Email"
+              margin="dense"
+              InputProps={{
+                disableUnderline: true,
+                sx: { backgroundColor: "#eee", borderRadius: 1 },
+              }}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <TextField
+              fullWidth
+              variant="filled"
+              label="Password"
+              type="password"
+              margin="dense"
+              InputProps={{
+                disableUnderline: true,
+                sx: { backgroundColor: "#eee", borderRadius: 1 },
+              }}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Typography
+              variant="body2"
+              sx={{ my: 2, cursor: "pointer", color: "#333" }}
+            >
+              Forgot your password?
+            </Typography>
+            <StyledButton variant="contained" type="submit">
+              Sign In
+            </StyledButton>
+          </Box>
+
+          {/* Sign Up Form */}
+          <Box
+            component="form"
+            sx={{
+              position: "absolute",
+              top: isSignUpMode ? "0" : "100%", // Slide Up/Down
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "0 50px",
+              textAlign: "center",
+              transition: `top ${ANIMATION_SPEED} ease-in-out`,
+              backgroundColor: "#fff",
+            }}
+          >
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              sx={{ mb: 2, color: "#000" }}
+            >
+              Create Account
+            </Typography>
+            <TextField
+              fullWidth
+              variant="filled"
+              label="Name"
+              margin="dense"
+              InputProps={{
+                disableUnderline: true,
+                sx: { backgroundColor: "#eee", borderRadius: 1 },
+              }}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <TextField
+              fullWidth
+              variant="filled"
+              label="Email"
+              margin="dense"
+              InputProps={{
+                disableUnderline: true,
+                sx: { backgroundColor: "#eee", borderRadius: 1 },
+              }}
+            />
+            <TextField
+              fullWidth
+              variant="filled"
+              label="Password"
+              type="password"
+              margin="dense"
+              InputProps={{
+                disableUnderline: true,
+                sx: { backgroundColor: "#eee", borderRadius: 1 },
+              }}
+            />
+            <Box sx={{ mt: 2 }}>
+              <StyledButton variant="contained">Sign Up</StyledButton>
+            </Box>
+          </Box>
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 
-export default SignUpForm;
+export default CustomLoginPage;

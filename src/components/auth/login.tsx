@@ -11,7 +11,7 @@ import { EffectProps, LoginProps } from "@/interfaces/auth.interface";
 import { useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import { RazethDivider as Divider } from "./divider";
-import SignupLink from "./ui/signUp";
+import AuthNavigationLink from "./ui/authNavaigation";
 import Footer from "./ui/footer";
 import Image from "next/image";
 import { StyleComponent } from "@/types/classKey";
@@ -379,7 +379,7 @@ const defaultAvatar = (
 );
 const defaultDivider = <Divider />;
 const defaultSocial = <SocialLogin />;
-const defaultSignUp = <SignupLink link="/auth/register" />;
+const defaultSignUp = <AuthNavigationLink link="/auth/register" />;
 const defaultFooter = <Footer />;
 
 // ✅ Named exports (optional, for tree-shaking)

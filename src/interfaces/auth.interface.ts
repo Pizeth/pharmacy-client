@@ -101,7 +101,8 @@ export interface SocialButtonProps
   // onClick?: MouseEventHandler<T> | undefined;
 }
 
-export interface SignUpProps extends HtmlHTMLAttributes<HTMLDivElement> {
+export interface AuthNavigationProps
+  extends HtmlHTMLAttributes<HTMLDivElement> {
   className?: string;
   message?: string;
   title?: string;
