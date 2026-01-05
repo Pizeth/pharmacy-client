@@ -22,7 +22,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https", // Or 'http' if applicable
-        hostname: "uiverse.io",
+        // hostname: "uiverse.io",
+        hostname: "hebbkx1anhila5yf.public.blob.vercel-storage.com",
         port: "", // Leave empty if no specific port
         pathname: "/**", // Allow all paths under this hostname
         search: "",

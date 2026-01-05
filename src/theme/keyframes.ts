@@ -355,14 +355,19 @@ export const meteorStrike = keyframes`
 `;
 
 export const fadeIn = keyframes`
-  from { opacity: 0; transform: scale(0); }
+  from { opacity: 0; transform: scale(0) translateY(-100%); }
   to { opacity: 1; transform: scale(1); }
 `;
 
 export const fadeOut = keyframes`
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0); }
+  from { opacity: 0; transform: scale(0) translateY(100%); }
+  to { opacity: 1; transform: scale(1); }
 `;
+
+// export const fadeOut = keyframes`
+//   from { opacity: 1; transform: scale(1) translateY(100%); }
+//   to { opacity: 0; transform: scale(0); }
+// `;
 
 // ============================================
 // REMOVE THESE - Not used anymore

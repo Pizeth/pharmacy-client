@@ -26,6 +26,7 @@ import RocketAnimation from "./effects/rocket";
 import SignUpForm from "./signUpForm";
 import AuthTabs from "./authTabs";
 import { AuthAction } from "@/types/theme";
+import { fadeIn, fadeOut } from "@/theme/keyframes";
 
 const PREFIX = "RazethLogin";
 
@@ -240,11 +241,9 @@ export const Login = (
                     <Box
                       key={currentMode} // ← This is the magic line! It forces remount and retriggers animation
                       sx={{
-                        animation: "fadeIn 0.5s ease-in-out",
-                        "@keyframes fadeIn": {
-                          from: { opacity: 0, transform: "translateY(100px)" },
-                          to: { opacity: 1, transform: "translateY(0)" },
-                        },
+                        animation: `${
+                          currentMode === "signin" ? fadeIn : fadeOut
+                        } 0.75s ease`,
                       }}
                     >
                       {currentMode === "signin" ? (
@@ -406,8 +405,9 @@ const defaultSideImage = (
 const defaultAvatar = (
   <AvatarHeader
     src={
-      // "https://api.dicebear.com/9.x/adventurer-neutral/svg?radius=50&seed=Razeth"
+      process.env.NEXT_PUBLIC_EARTH_IMAGE_URL ||
       "https://pub-ce3376330760464f8be1e4a3b46318c0.r2.dev/sea-planet-water-Earth-map-Arctic-193611-wallhere.com.jpg"
+      // "https://api.dicebear.com/9.x/adventurer-neutral/svg?radius=50&seed=Razeth"
     }
     avatarIcon={<PersonIcon />}
   />

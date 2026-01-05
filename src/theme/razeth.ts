@@ -716,6 +716,15 @@ export const darkTheme1 = deepmerge(defaultDarkTheme, {
           "&.Mui-error .MuiSvgIcon-root": {
             color: props.theme.palette.error.main,
           },
+          // TARGET THE INPUT TEXT COLOR HERE
+          "&.Mui-focused.Mui-error": {
+            // Target the actual input element inside the root
+            "& .MuiOutlinedInput-input": {
+              color: props.theme.palette.error.main,
+              // Use WebkitTextFillColor to ensure compatibility with some browser defaults
+              WebkitTextFillColor: props.theme.palette.error.main,
+            },
+          },
         }),
       },
     },

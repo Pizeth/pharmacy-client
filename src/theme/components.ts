@@ -1241,6 +1241,11 @@ export const RazethAvatarOptimized = {
         //   },
       },
       "& svg": { fill: "#fff" },
+      "& .MuiTypography-root": {
+        marginBottom: props.theme.spacing(0),
+        // fontWeight: 900,
+        color: props.theme.palette.text.primary,
+      },
     }),
   },
 };

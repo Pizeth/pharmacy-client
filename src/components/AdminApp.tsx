@@ -96,12 +96,13 @@ export const AdminApp = () => {
   // const darkTheme = themes.find((theme) => theme.name === themeName)?.dark;
   return (
     <Admin
+      title="Piseth Chesda Pharmacy Management System"
       i18nProvider={i18nProvider}
       layout={Layout}
       dataProvider={dataProvider}
       authProvider={authProvider}
-      requireAuth
       loginPage={Login}
+      requireAuth
       disableTelemetry
       // theme={theme}
       lightTheme={lightTheme}

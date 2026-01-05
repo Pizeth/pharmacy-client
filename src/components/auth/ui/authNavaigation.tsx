@@ -24,8 +24,9 @@ const AuthNavigationLink = (inProps: AuthNavigationProps) => {
     ? translate("razeth.auth.sign_up") || "Sign Up"
     : translate("razeth.auth.sign_in") || "Sign In";
 
-  const icon = isLoginMode ? <Login /> : <PersonAddIcon />;
-  // const icon = isSignUpMode ? <PersonAddIcon /> : <Login />;
+  // const icon = isLoginMode ? <Login /> : <PersonAddIcon />;
+  const icon = isLoginMode ? <PersonAddIcon /> : <Login />;
+  // const icon = isLoginMode ? <PersonAddIcon /> : <Login />;
   return (
     <StyledAuthNavigation className={className} sx={sx} {...rest}>
       {/* We wrap the message in a Typography component for consistency */}

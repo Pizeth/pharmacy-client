@@ -25,7 +25,7 @@ const ValidatedButton = (inProps: ValidatedButtonProps) => {
   return (
     <VaidatedSaveButton>
       {/* Conditional rendering */}
-      {authType === "login" ? (
+      {authType === "signin" ? (
         <Button
           loading={loading}
           loadingPosition="start"
