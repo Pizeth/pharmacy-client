@@ -1,0 +1,117 @@
+import { styled } from "@mui/material";
+
+const PREFIX = "RazethPlanetSaturn";
+const Root = styled("div", {
+  name: PREFIX,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})(() => ({
+  width: "25vmin",
+  height: "25vmin",
+  position: "relative",
+  margin: "auto",
+  transform: "rotateZ(-15deg)",
+  "&::before": {
+    content: '""',
+    width: "45%",
+    height: "45%",
+    position: "absolute",
+    top: "27.5%",
+    left: "27.5%",
+    borderRadius: "50%",
+    // clipPath: "rect(45%, 90%, 90%, 0px)",
+    clipPath: "inset(22.5% 45% 45% 0px)",
+    background: `radial-gradient(circle at top, 
+        rgba(0,0,0,0) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,1) 100%), 
+        radial-gradient(ellipse at center, 
+        rgba(0,0,0,0) 0%,rgba(0,0,0,0) 62%,rgba(0,0,0,1) 100%), 
+        linear-gradient(to top,  
+        rgba(131,129,117,1) 0%,rgba(131,129,117,1) 3%,rgba(150,144,130,1) 5%,
+        rgba(150,144,130,1) 9%,rgba(190,177,145,1) 20%,rgba(190,177,145,1) 32%,
+        rgba(202,176,153,1) 35%,rgba(202,176,153,1) 47%,rgba(205,186,156,1) 48%,
+        rgba(205,186,156,1) 49%,rgba(211,184,157,1) 51%,rgba(211,184,157,1) 59%,
+        rgba(218,188,162,1) 61%,rgba(218,188,162,1) 63%,rgba(208,180,158,1) 64%,
+        rgba(208,180,158,1) 68%,rgba(213,181,143,1) 74%,rgba(213,181,143,1) 78%,
+        rgba(221,203,157,1) 83%,rgba(221,203,157,1) 85%,rgba(212,203,174,1) 90%,
+        rgba(212,203,174,1) 100%)`,
+  },
+  "&::after": {
+    content: '""',
+    width: "45%",
+    height: "45%",
+    position: "absolute",
+    top: "27.5%",
+    left: "27.5%",
+    borderRadius: "50%",
+    // clipPath: "rect(0px, 90%, 45%, 0px)",
+    clipPath: "inset(0px 45% 22.5% 0px)",
+    background: `radial-gradient(circle at top, 
+        rgba(0,0,0,0) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,1) 100%), 
+        radial-gradient(ellipse at center, 
+        rgba(0,0,0,0) 0%,rgba(0,0,0,0) 62%,rgba(0,0,0,1) 100%), 
+        linear-gradient(to top,  
+        rgba(131,129,117,1) 0%,rgba(131,129,117,1) 3%,rgba(150,144,130,1) 5%,
+        rgba(150,144,130,1) 9%,rgba(190,177,145,1) 20%,rgba(190,177,145,1) 32%,
+        rgba(202,176,153,1) 35%,rgba(202,176,153,1) 47%,rgba(205,186,156,1) 48%,
+        rgba(205,186,156,1) 49%,rgba(211,184,157,1) 51%,rgba(211,184,157,1) 59%,
+        rgba(218,188,162,1) 61%,rgba(218,188,162,1) 63%,rgba(208,180,158,1) 64%,
+        rgba(208,180,158,1) 68%,rgba(213,181,143,1) 74%,rgba(213,181,143,1) 78%,
+        rgba(221,203,157,1) 83%,rgba(221,203,157,1) 85%,rgba(212,203,174,1) 90%,
+        rgba(212,203,174,1) 100%)`,
+  },
+}));
+
+const SaturnRings = styled("div", {
+  name: PREFIX,
+  slot: "content",
+  overridesResolver: (_props, styles) => styles.content,
+})(() => ({
+  position: "relative",
+  width: "100%",
+  height: "100%",
+  background: `radial-gradient(ellipse at center,  
+    rgba(24,19,25,0) 0%,
+    rgba(53,52,51,0) 34%,
+    rgba(55,54,52,1) 36%,
+    rgba(56,55,53,1) 37%,
+    rgba(68,67,66,1) 38%,
+    rgba(56,55,53,1) 39%,
+    rgba(68,67,66,1) 40%,
+    rgba(56,55,53,1) 41%,
+    rgba(87,77,76,1) 42%,
+    rgba(87,77,76,1) 44%,
+    rgba(113,110,103,1) 46%,
+    rgba(113,110,103,1) 48%,
+    rgba(113,98,93,1) 49%,
+    rgba(113,98,93,1) 51%,
+    rgba(122,115,105,1) 52%,
+    rgba(113,98,93,1) 53%,
+    rgba(113,98,93,1) 54%,
+    rgba(122,115,105,1) 55%,
+    rgba(106,99,89,1) 56%,
+    rgba(106,99,89,1) 58%,
+    rgba(79,76,76,0) 60%,
+    rgba(65,64,70,1) 61%,
+    rgba(65,64,70,1) 62%,
+    rgba(90,85,89,1) 63%,
+    rgba(78,74,73,1) 65%,
+    rgba(78,73,74,1) 67%,
+    rgba(78,73,74,0) 68%,
+    rgba(78,73,75,1) 69%,
+    rgba(78,73,75,1) 70%,
+    rgba(78,73,76,0) 71%,
+    rgba(77,72,76,0) 72%,
+    rgba(24,19,25,0) 100%)`,
+  filter:
+    "progid:DXImageTransform.Microsoft.gradient( startColorstr='#00181319', endColorstr='#00181319',GradientType=1 )",
+  transform: "rotateX(75deg)}))",
+}));
+function Saturn() {
+  return (
+    <Root>
+      <SaturnRings />
+    </Root>
+  );
+}
+
+export default Saturn;

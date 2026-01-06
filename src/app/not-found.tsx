@@ -1,8 +1,10 @@
-"use client";
+"use client"; // Directive to make this a Client Component
 
-import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // Import from next/navigation for App Router
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Saturn from "@/components/effect/planets/saturn";
 
 interface Star {
   id: number;
@@ -25,6 +27,27 @@ const generateStars = (count: number): Star[] => {
     direction: Math.random() > 0.5 ? "topLeft" : "topRight",
   }));
 };
+
+function BackButton() {
+  const router = useRouter();
+
+  return (
+    // <button type="button" onClick={() => router.back()}>
+    //   Go Back
+    // </button>
+    <div className="flex justify-center">
+      {/* <a className="btn-back" href="#"> */}
+      <button
+        className="btn-back px-6 py-3 text-white bg-purple-600/90 hover:bg-purple-600 rounded-lg transition-all shadow-lg shadow-purple-500/30 backdrop-blur-sm border border-purple-400/30"
+        type="button"
+        onClick={() => router.back()}
+      >
+        Back to previous page
+      </button>
+      {/* </a> */}
+    </div>
+  );
+}
 
 export default function NotFound() {
   const [stars, setStars] = useState<Star[]>([]);
@@ -64,7 +87,7 @@ export default function NotFound() {
         ))}
       </div>
       {/* UFO Container: Outer Float, Inner Tilt */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-float z-10">
+      <div className="absolute top-1/3 right-1 -translate-x-1/2 -translate-y-1/2 animate-float z-10">
         <div className="animate-tilt">
           <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/8794272-p5k6GdbD8O2RIat5GWtUGJGkDgXoxf.png"
@@ -76,20 +99,32 @@ export default function NotFound() {
           />
         </div>
       </div>
+
+      <div
+        style={{
+          position: "relative",
+          // width: "400px",
+          // height: "400px",
+          zIndex: 10,
+        }}
+      >
+        <Saturn />
+      </div>
       {/* Text Content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pt-60 px-4 text-center z-20">
-        <h1 className="mb-2 text-7xl font-bold text-white tracking-tighter drop-shadow-lg">
+        {/* <h1 className="mb-2 text-7xl font-bold text-white tracking-tighter drop-shadow-lg">
           404
-        </h1>
+        </h1> */}
         <p className="mb-8 text-xl text-gray-200 drop-shadow-md">
           Oops! Looks like this page got lost in space
         </p>
-        <Link
+        <BackButton />
+        {/* <Link
           href="/admin"
           className="px-6 py-3 text-white bg-purple-600/90 hover:bg-purple-600 rounded-lg transition-all shadow-lg shadow-purple-500/30 backdrop-blur-sm border border-purple-400/30"
         >
-          Return Home
-        </Link>
+          Back to previous page
+        </Link> */}
       </div>
 
       {/* Additional Decorative Stars */}
@@ -98,20 +133,21 @@ export default function NotFound() {
         src="https://assets.codepen.io/1538474/404.svg"
         className="logo-404"
       />
-      <img
+      {/* <img
         src="https://assets.codepen.io/1538474/meteor.svg"
         className="meteor"
-      />
+      /> */}
       <p className="title">Oh no!!</p>
       <p className="subtitle">
         You’re either misspelling the URL <br />
         or requesting a page that's no longer here.
       </p>
-      <div className="flex justify-center">
+      {/* <div className="flex justify-center">
         <a className="btn-back" href="#">
           Back to previous page
         </a>
-      </div>
+      </div> */}
+      {/* <BackButton /> */}
       <img
         src="https://assets.codepen.io/1538474/astronaut.svg"
         className="astronaut"
@@ -162,13 +198,9 @@ export default function NotFound() {
             src="http://salehriaz.com/404Page/img/404.svg"
             width="300px"
           /> */}
-          <a
-            href="http://salehriaz.com/404Page/404.html"
-            className="btn-go-home"
-            target="_blank"
-          >
+          <Link href="/admin" className="btn-go-home">
             GO BACK HOME
-          </a>
+          </Link>
         </div>
         <div className="objects">
           <img
