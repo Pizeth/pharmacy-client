@@ -174,6 +174,27 @@ export const earthRotate = keyframes`
   100% { background-position: 300px 0; }
 `;
 
+export const sunRotate = keyframes`
+  0% { background-position: 0 0; }
+  100% { background-position: 400px 0; }
+`;
+
+export const shadowPulse = keyframes`
+  0%,
+  100% {
+    box-shadow: 0px 0px 40px 20px RGBA(255, 140, 0, 0.8),
+      -5px 0px 10px 1px #ffb453 inset, 15px 2px 40px 20px #bb6d01c5 inset,
+      -24px -2px 50px 25px #ffa265c2 inset,
+      150px 0px 80px 35px #c55f00aa inset;
+  }
+  50% {
+    box-shadow: 0px 0px 60px 30px RGBA(255, 140, 0, 0.9),
+      -5px 0px 20px 5px #ffb453 inset, 15px 2px 60px 30px #bb6d01c5 inset,
+      -24px -2px 70px 35px #ffa265c2 inset,
+      150px 0px 100px 45px #c55f00aa inset;
+  }
+`;
+
 export const cloudMove = keyframes`
   0% { background-position: 0 0; }
   100% { background-position: 100% 0; }

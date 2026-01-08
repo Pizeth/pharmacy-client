@@ -5,6 +5,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Saturn from "@/components/effect/planets/saturn";
+import Earth from "@/components/effect/planets/earth";
+import Moon from "@/components/effect/planets/moon";
+import Mars from "@/components/effect/planets/mars";
+import Jupyter from "@/components/effect/planets/jupyter";
+import Sun from "@/components/effect/planets/sun";
 
 interface Star {
   id: number;
@@ -100,16 +105,20 @@ export default function NotFound() {
         </div>
       </div>
 
-      <div
-        style={{
-          position: "relative",
-          // width: "400px",
-          // height: "400px",
-          zIndex: 10,
-        }}
-      >
+      <div className="absolute top-1/7 right-1 -translate-x-1/2 -translate-y-1/2 z-10">
         <Saturn />
       </div>
+
+      <div>
+        {/* <Moon /> */}
+        {/* <Earth /> */}
+        {/* <Jupyter /> */}
+        <Sun />
+        {/* <Mars /> */}
+      </div>
+      {/* <div>
+        <Earth />
+      </div> */}
       {/* Text Content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pt-60 px-4 text-center z-20">
         {/* <h1 className="mb-2 text-7xl font-bold text-white tracking-tighter drop-shadow-lg">
