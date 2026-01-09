@@ -1,4 +1,5 @@
 import { styled } from "@mui/material";
+import { Sun } from "lucide-react";
 
 const PREFIX = "RazethPlanetEarth";
 const Root = styled("div", {
@@ -14,49 +15,53 @@ const Root = styled("div", {
   height: "100vh",
 }));
 
+const waterMask = `${PREFIX}-water-mask`;
+const groundMask = `${PREFIX}-ground-mask`;
+const cloudsMask = `${PREFIX}-clouds-mask`;
+const atmosphereMask = `${PREFIX}-atmosphere-mask`;
+const atmosphereGradient = `${PREFIX}-atmosphere-gradient`;
+const atmosphereMaskGradient = `${PREFIX}-atmosphere-mask-gradient`;
+const groundPattern = `${PREFIX}-ground-pattern`;
+const cloudsPattern = `${PREFIX}-clouds-pattern`;
+
 function Earth() {
   return (
     <Root>
       <svg id="earth" viewBox="-5 -5 110 110" width="700" height="700">
         <g transform="rotate(23.5, 50, 50)">
           <rect
-            id="layer-water"
             x="0"
             y="0"
             width="100"
             height="100"
             fill="rgba(0, 0, 200, 1)"
-            mask="url(#water-mask)"
+            mask={`url(#${waterMask})`}
           />
           <rect
-            id="layer-ground"
             x="0"
             y="0"
             width="100"
             height="100"
             fill="rgba(0, 100, 0, 1)"
-            mask="url(#ground-mask)"
+            mask={`url(#${groundMask})`}
           />
           <rect
-            id="layer-clouds"
             x="0"
             y="0"
             width="100"
             height="100"
             fill="rgba(255, 255, 255, .8)"
-            mask="url(#clouds-mask)"
+            mask={`url(#${cloudsMask})`}
           />
           <rect
-            id="layer-atmosphere"
             x="-5"
             y="-5"
             width="110"
             height="110"
-            fill="url(#atmosphere-gradient)"
-            mask="url(#atmosphere-mask)"
+            fill={`url(#${atmosphereGradient})`}
+            mask={`url(#${atmosphereMask})`}
           />
           <circle
-            id="layer-glare"
             cx="35"
             cy="35"
             r="20"
@@ -66,7 +71,7 @@ function Earth() {
         </g>
         <defs>
           <linearGradient
-            id="atmosphere-gradient"
+            id={atmosphereGradient}
             x1="0%"
             y1="0%"
             x2="100%"
@@ -75,16 +80,16 @@ function Earth() {
             <stop offset="0%" stopColor="rgb(0,127,255)" stopOpacity="1" />
             <stop offset="100%" stopColor="rgb(0,0,255)" stopOpacity=".5" />
           </linearGradient>
-          <mask id="atmosphere-mask">
+          <mask id={atmosphereMask}>
             <rect x="-5" y="-5" width="110" height="110" fill="black" />
             <circle
               cx="50"
               cy="50"
               r="55"
-              fill="url(#atmosphere-mask-gradient)"
+              fill={`url(#${atmosphereMaskGradient})`}
             />
           </mask>
-          <mask id="water-mask">
+          <mask id={waterMask}>
             <rect x="0" y="0" width="100" height="100" fill="black" />
             <circle
               cx="50"
@@ -94,23 +99,23 @@ function Earth() {
               filter="url(#fisheye-filter)"
             />
           </mask>
-          <mask id="ground-mask">
+          <mask id={groundMask}>
             <rect x="0" y="0" width="100" height="100" fill="black" />
             <circle
               cx="50"
               cy="50"
               r="50"
-              fill="url(#ground-pattern)"
+              fill={`url(#${groundPattern})`}
               filter="url(#fisheye-filter)"
             />
           </mask>
-          <mask id="clouds-mask">
+          <mask id={cloudsMask}>
             <rect x="0" y="0" width="100" height="100" fill="black" />
             <circle
               cx="50"
               cy="50"
               r="50"
-              fill="url(#clouds-pattern)"
+              fill={`url(#${cloudsPattern})`}
               filter="url(#fisheye-filter)"
             />
           </mask>
@@ -123,7 +128,7 @@ function Earth() {
             <feDisplacementMap in="SourceGraphic" in2="blur" scale="3" />
           </filter>
           <radialGradient
-            id="atmosphere-mask-gradient"
+            id={atmosphereMaskGradient}
             cx="50%"
             cy="50%"
             r="50%"
@@ -144,7 +149,7 @@ function Earth() {
             <feGaussianBlur stdDeviation="10" />
           </filter>
           <pattern
-            id="ground-pattern"
+            id={groundPattern}
             patternUnits="userSpaceOnUse"
             x="0"
             y="0"
@@ -167,7 +172,7 @@ function Earth() {
             />
           </pattern>
           <pattern
-            id="clouds-pattern"
+            id={cloudsPattern}
             patternUnits="userSpaceOnUse"
             x="0"
             y="0"

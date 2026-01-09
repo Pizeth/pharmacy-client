@@ -1,4 +1,5 @@
 import { styled } from "@mui/material";
+import { RectangleGogglesIcon } from "lucide-react";
 
 const PREFIX = "RazethPlanetMoon";
 const Root = styled("div", {
@@ -14,40 +15,45 @@ const Root = styled("div", {
   height: "100vh",
 }));
 
+const waterMask = `${PREFIX}-water-mask`;
+const groundMask = `${PREFIX}-ground-mask`;
+const cloudsMask = `${PREFIX}-clouds-mask`;
+const atmosphereMask = `${PREFIX}-atmosphere-mask`;
+const atmosphereGradient = `${PREFIX}-atmosphere-gradient`;
+const atmosphereMaskGradient = `${PREFIX}-atmosphere-mask-gradient`;
+const groundPattern = `${PREFIX}-ground-pattern`;
+const cloudsPattern = `${PREFIX}-clouds-pattern`;
+
 function Moon() {
   return (
     <Root>
       <svg id="moon" viewBox="-5 -5 110 110" width="700" height="700">
         <g transform="rotate(18.7, 50, 50)">
-          <rect
-            id="layer-water"
+          <RectangleGogglesIcon
             x="0"
             y="0"
             width="100"
             height="100"
             fill="rgba(0, 0, 0, 1)"
-            mask="url(#water-mask)"
+            mask={`url(#${waterMask})`}
           />
           <rect
-            id="layer-ground"
             x="0"
             y="0"
             width="100"
             height="100"
             fill="rgba(200, 200, 200, 1)"
-            mask="url(#ground-mask)"
+            mask={`url(#${groundMask})`}
           />
           <rect
-            id="layer-atmosphere"
             x="-5"
             y="-5"
             width="110"
             height="110"
-            fill="url(#atmosphere-gradient)"
-            mask="url(#atmosphere-mask)"
+            fill={`url(#${atmosphereGradient})`}
+            mask={`url(#${atmosphereMask})`}
           />
           <circle
-            id="layer-glare"
             cx="35"
             cy="35"
             r="20"
@@ -57,7 +63,7 @@ function Moon() {
         </g>
         <defs>
           <linearGradient
-            id="atmosphere-gradient"
+            id={atmosphereGradient}
             x1="0%"
             y1="0%"
             x2="100%"
@@ -74,16 +80,16 @@ function Moon() {
               style={{ stopOpacity: 0.1 }}
             />
           </linearGradient>
-          <mask id="atmosphere-mask">
+          <mask id={atmosphereMask}>
             <rect x="-5" y="-5" width="110" height="110" fill="black" />
             <circle
               cx="50"
               cy="50"
               r="52"
-              fill="url(#atmosphere-mask-gradient)"
+              fill={`url(#${atmosphereMaskGradient})`}
             />
           </mask>
-          <mask id="water-mask">
+          <mask id={waterMask}>
             <rect x="0" y="0" width="100" height="100" fill="black" />
             <circle
               cx="50"
@@ -93,23 +99,23 @@ function Moon() {
               filter="url(#fisheye-filter)"
             />
           </mask>
-          <mask id="ground-mask">
+          <mask id={groundMask}>
             <rect x="0" y="0" width="100" height="100" fill="black" />
             <circle
               cx="50"
               cy="50"
               r="50"
-              fill="url(#ground-pattern)"
+              fill={`url(#${groundPattern})`}
               filter="url(#fisheye-filter)"
             />
           </mask>
-          <mask id="clouds-mask">
+          <mask id={cloudsMask}>
             <rect x="0" y="0" width="100" height="100" fill="black" />
             <circle
               cx="50"
               cy="50"
               r="50"
-              fill="url(#clouds-pattern)"
+              fill={`url(#${cloudsPattern})`}
               filter="url(#fisheye-filter)"
             />
           </mask>
@@ -122,7 +128,7 @@ function Moon() {
             <feDisplacementMap in="SourceGraphic" in2="blur" scale="3" />
           </filter>
           <radialGradient
-            id="atmosphere-mask-gradient"
+            id={atmosphereMaskGradient}
             cx="50%"
             cy="50%"
             r="50%"
@@ -146,7 +152,7 @@ function Moon() {
             <feGaussianBlur stdDeviation="10" />
           </filter>
           <pattern
-            id="ground-pattern"
+            id={groundPattern}
             patternUnits="userSpaceOnUse"
             x="0"
             y="0"
@@ -169,7 +175,7 @@ function Moon() {
             />
           </pattern>
           <pattern
-            id="clouds-pattern"
+            id={cloudsPattern}
             patternUnits="userSpaceOnUse"
             x="0"
             y="0"

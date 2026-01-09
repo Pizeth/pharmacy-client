@@ -110,11 +110,11 @@ export default function NotFound() {
       </div>
 
       <div>
-        {/* <Moon /> */}
-        {/* <Earth /> */}
-        {/* <Jupyter /> */}
+        <Moon />
+        <Earth />
+        <Jupyter />
         <Sun />
-        {/* <Mars /> */}
+        <Mars />
       </div>
       {/* <div>
         <Earth />

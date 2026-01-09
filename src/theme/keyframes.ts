@@ -182,16 +182,18 @@ export const sunRotate = keyframes`
 export const shadowPulse = keyframes`
   0%,
   100% {
-    box-shadow: 0px 0px 40px 20px RGBA(255, 140, 0, 0.8),
-      -5px 0px 10px 1px #ffb453 inset, 15px 2px 40px 20px #bb6d01c5 inset,
-      -24px -2px 50px 25px #ffa265c2 inset,
-      150px 0px 80px 35px #c55f00aa inset;
+    box-shadow: 0px 0px 2vmin 1vmin rgba(255, 74, 0, 0.76),
+      -0.25vmin 0px 0.5vmin 0.05vmin rgba(255, 26, 0, 0.8) inset,
+      0.75vmin 0.1vmin 2vmin 1vmin rgba(255, 38, 0, 0.79) inset,
+      1.2vmin 0.1vmin 2.5vmin 1.25vmin rgba(255, 50, 0, 0.78) inset,
+      7.5vmin 0px 4vmin 1.75vmin rgba(255, 62, 0, 0.77) inset
   }
   50% {
-    box-shadow: 0px 0px 60px 30px RGBA(255, 140, 0, 0.9),
-      -5px 0px 20px 5px #ffb453 inset, 15px 2px 60px 30px #bb6d01c5 inset,
-      -24px -2px 70px 35px #ffa265c2 inset,
-      150px 0px 100px 45px #c55f00aa inset;
+    box-shadow: 0px 0px 4vmin 2vmin rgba(255, 74, 0, 0.76),
+      -0.5vmin 0px 1vmin 0.1vmin rgba(255, 26, 0, 0.8) inset, 
+      1.5vmin 0.2vmin 4vmin 2vmin rgba(255, 38, 0, 0.79)inset,
+      -2.4vmin -0.2vmin 5vmin 2.5vmin rgba(255, 50, 0, 0.78) inset,
+      15vmin 0px 8vmin 3.5vmin rgba(255, 62, 0, 0.77)  inset;
   }
 `;
 
