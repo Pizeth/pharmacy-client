@@ -1,4 +1,7 @@
+import { FISHEYE_ID } from "@/types/constants";
+import { CircleMask, Filter, Pattern } from "@/utils/componentUtils";
 import { styled } from "@mui/material";
+import { Fragment } from "react/jsx-runtime";
 
 const PREFIX = "RazethPlanetMars";
 const Root = styled("div", {
@@ -24,63 +27,55 @@ const groundPattern = `${PREFIX}-ground-pattern`;
 const cloudsPattern = `${PREFIX}-clouds-pattern`;
 
 function Mars() {
+  const clouds = [
+    { id: 1, dur: 13, color: "rgba(160, 40, 0, .5)" },
+    { id: 2, dur: 17, color: "rgba(200, 60, 0, .5)" },
+    { id: 3, dur: 19, color: "rgba(255, 100, 0, .5)" },
+  ];
+
   return (
     <Root>
       <svg id="mars" viewBox="-5 -5 110 110" width="700" height="700">
         <g transform="rotate(25.2, 50, 50)">
+          {/* Base Layers (Water and Ground) */}
           <rect
-            id="layer-water"
             x="0"
             y="0"
             width="100"
             height="100"
             fill="rgba(100, 50, 50, 1)"
-            mask="url(#water-mask)"
+            mask={`url(#${waterMask})`}
           />
           <rect
-            id="layer-ground"
             x="0"
             y="0"
             width="100"
             height="100"
             fill="rgba(255, 130, 100, 1)"
-            mask="url(#ground-mask)"
+            mask={`url(#${groundMask})`}
           />
+
+          {/* Render Cloud Layers via Map */}
+          {clouds.map((cloud) => (
+            <rect
+              key={cloud.id}
+              x="0"
+              y="0"
+              width="100"
+              height="100"
+              fill={cloud.color}
+              mask={`url(#${cloudsMask}-${cloud.id})`}
+            />
+          ))}
+
+          {/* Atmosphere and Glare */}
           <rect
-            id="layer-clouds"
-            x="0"
-            y="0"
-            width="100"
-            height="100"
-            fill="rgba(160, 40, 0, .5)"
-            mask="url(#clouds-mask)"
-          />
-          <rect
-            id="layer-clouds-2"
-            x="0"
-            y="0"
-            width="100"
-            height="100"
-            fill="rgba(200, 60, 0, .5)"
-            mask="url(#clouds-mask-2)"
-          />
-          <rect
-            id="layer-clouds-3"
-            x="0"
-            y="0"
-            width="100"
-            height="100"
-            fill="rgba(255, 100, 0, .5)"
-            mask="url(#clouds-mask-3)"
-          />
-          <rect
-            id="layer-atmosphere"
             x="-5"
             y="-5"
             width="110"
             height="110"
-            fill="url(#atmosphere-gradient)"
-            mask="url(#atmosphere-mask)"
+            fill={`url(#${atmosphereGradient})`}
+            mask={`url(#${atmosphereMask})`}
           />
           <circle
             id="layer-glare"
@@ -92,6 +87,19 @@ function Mars() {
           />
         </g>
         <defs>
+          {/* Filters */}
+          <Filter id={FISHEYE_ID} />
+          <filter
+            id="glare-blur-filter"
+            x="-100%"
+            y="-100%"
+            width="300%"
+            height="300%"
+          >
+            <feGaussianBlur stdDeviation="10" />
+          </filter>
+
+          {/* Gradient and Mask for Atmosphere */}
           <linearGradient
             id={atmosphereGradient}
             x1="0%"
@@ -102,73 +110,6 @@ function Mars() {
             <stop offset="0%" stopColor="rgb(255,150,100)" stopOpacity="1" />
             <stop offset="100%" stopColor="rgb(200,100,50)" stopOpacity=".5" />
           </linearGradient>
-          <mask id={atmosphereMask}>
-            <rect x="-5" y="-5" width="110" height="110" fill="black" />
-            <circle
-              cx="50"
-              cy="50"
-              r="55"
-              fill={`url(#${atmosphereMaskGradient})`}
-            />
-          </mask>
-          <mask id={waterMask}>
-            <rect x="0" y="0" width="100" height="100" fill="black" />
-            <circle
-              cx="50"
-              cy="50"
-              r="50"
-              fill="white"
-              filter="url(#fisheye-filter)"
-            />
-          </mask>
-          <mask id={groundMask}>
-            <rect x="0" y="0" width="100" height="100" fill="black" />
-            <circle
-              cx="50"
-              cy="50"
-              r="50"
-              fill={`url(#${groundPattern})`}
-              filter="url(#fisheye-filter)"
-            />
-          </mask>
-          <mask id={cloudsMask}>
-            <rect x="0" y="0" width="100" height="100" fill="black" />
-            <circle
-              cx="50"
-              cy="50"
-              r="50"
-              fill={`url(#${cloudsPattern})`}
-              filter="url(#fisheye-filter)"
-            />
-          </mask>
-          <mask id="clouds-mask-2">
-            <rect x="0" y="0" width="100" height="100" fill="black" />
-            <circle
-              cx="50"
-              cy="50"
-              r="50"
-              fill="url(#clouds-pattern-2)"
-              filter="url(#fisheye-filter)"
-            />
-          </mask>
-          <mask id="clouds-mask-3">
-            <rect x="0" y="0" width="100" height="100" fill="black" />
-            <circle
-              cx="50"
-              cy="50"
-              r="50"
-              fill="url(#clouds-pattern-3)"
-              filter="url(#fisheye-filter)"
-            />
-          </mask>
-          <filter id="fisheye-filter" x="0%" y="0%" width="100%" height="100%">
-            <feGaussianBlur
-              in="SourceGraphic"
-              stdDeviation="10"
-              result="blur"
-            />
-            <feDisplacementMap in="SourceGraphic" in2="blur" scale="3" />
-          </filter>
           <radialGradient
             id={atmosphereMaskGradient}
             cx="50%"
@@ -177,114 +118,48 @@ function Mars() {
             fx="50%"
             fy="50%"
           >
-            <stop offset="50%" style={{ stopColor: "white", stopOpacity: 0 }} />
+            {/* <stop offset="50%" style={{ stopColor: "white", stopOpacity: 0 }} />
             <stop offset="90%" style={{ stopColor: "white", stopOpacity: 1 }} />
             <stop
               offset="100%"
               style={{ stopColor: "white", stopOpacity: 0 }}
-            />
+            /> */}
+            <stop offset="50%" stopColor="white" stopOpacity="0" />
+            <stop offset="90%" stopColor="white" stopOpacity="1" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
           </radialGradient>
-          <filter
-            id="glare-blur-filter"
-            x="-100%"
-            y="-100%"
-            width="300%"
-            height="300%"
-          >
-            <feGaussianBlur stdDeviation="10" />
-          </filter>
-          <pattern
+          <CircleMask
+            id={atmosphereMask}
+            x={-5}
+            y={-5}
+            width={110}
+            height={110}
+            r={55}
+            pattern={`url(#${atmosphereMaskGradient})`}
+          />
+
+          {/* Water and Ground */}
+          <CircleMask id={waterMask} pattern="white" />
+          <Pattern
             id={groundPattern}
-            patternUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width="200"
-            height="100"
-          >
-            <animate
-              attributeName="x"
-              from="0"
-              to="200"
-              dur="30s"
-              repeatCount="indefinite"
-            />
-            <image
-              x="0"
-              y="0"
-              width="200"
-              height="100"
-              href="/static/textures/mars.png"
-            />
-          </pattern>
-          <pattern
-            id={cloudsPattern}
-            patternUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width="200"
-            height="100"
-          >
-            <animate
-              attributeName="x"
-              from="0"
-              to="200"
-              dur="13s"
-              repeatCount="indefinite"
-            />
-            <image
-              x="0"
-              y="0"
-              width="200"
-              height="100"
-              href="/static/textures/earth_cloud.png"
-            />
-          </pattern>
-          <pattern
-            id="clouds-pattern-2"
-            patternUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width="200"
-            height="100"
-          >
-            <animate
-              attributeName="x"
-              from="0"
-              to="200"
-              dur="17s"
-              repeatCount="indefinite"
-            />
-            <image
-              x="0"
-              y="0"
-              width="200"
-              height="100"
-              href="/static/textures/earth_cloud.png"
-            />
-          </pattern>
-          <pattern
-            id="clouds-pattern-3"
-            patternUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width="200"
-            height="100"
-          >
-            <animate
-              attributeName="x"
-              from="0"
-              to="200"
-              dur="19s"
-              repeatCount="indefinite"
-            />
-            <image
-              x="0"
-              y="0"
-              width="200"
-              height="100"
-              href="/static/textures/earth_cloud.png"
-            />
-          </pattern>
+            duration={30}
+            href="/static/textures/mars.png"
+          />
+          <CircleMask id={groundMask} pattern={`url(#${groundPattern})`} />
+
+          {/* Generate Definitions dynamically */}
+          {clouds.map((cloud) => (
+            <Fragment key={cloud.id}>
+              <Pattern
+                id={`${cloudsPattern}-${cloud.id}`}
+                duration={cloud.dur}
+              />
+              <CircleMask
+                id={`${cloudsMask}-${cloud.id}`}
+                pattern={`url(#${cloudsPattern}-${cloud.id}`}
+              />
+            </Fragment>
+          ))}
         </defs>
       </svg>
     </Root>

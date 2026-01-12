@@ -1,3 +1,5 @@
+import { FISHEYE_ID } from "@/types/constants";
+import { CircleMask, Filter, Pattern } from "@/utils/componentUtils";
 import { styled } from "@mui/material";
 import { RectangleGogglesIcon } from "lucide-react";
 
@@ -17,19 +19,18 @@ const Root = styled("div", {
 
 const waterMask = `${PREFIX}-water-mask`;
 const groundMask = `${PREFIX}-ground-mask`;
-const cloudsMask = `${PREFIX}-clouds-mask`;
 const atmosphereMask = `${PREFIX}-atmosphere-mask`;
 const atmosphereGradient = `${PREFIX}-atmosphere-gradient`;
 const atmosphereMaskGradient = `${PREFIX}-atmosphere-mask-gradient`;
 const groundPattern = `${PREFIX}-ground-pattern`;
-const cloudsPattern = `${PREFIX}-clouds-pattern`;
 
 function Moon() {
   return (
     <Root>
       <svg id="moon" viewBox="-5 -5 110 110" width="700" height="700">
         <g transform="rotate(18.7, 50, 50)">
-          <RectangleGogglesIcon
+          {/* Base Layers (Water and Ground) */}
+          <rect
             x="0"
             y="0"
             width="100"
@@ -45,6 +46,18 @@ function Moon() {
             fill="rgba(200, 200, 200, 1)"
             mask={`url(#${groundMask})`}
           />
+
+          {/* Atmosphere and Glare */}
+          <rect
+            x="-5"
+            y="-5"
+            width="110"
+            height="110"
+            fill={`url(#${atmosphereGradient})`}
+            mask={`url(#${atmosphereMask})`}
+          />
+
+          {/* Atmosphere and Glare */}
           <rect
             x="-5"
             y="-5"
@@ -62,86 +75,8 @@ function Moon() {
           />
         </g>
         <defs>
-          <linearGradient
-            id={atmosphereGradient}
-            x1="0%"
-            y1="0%"
-            x2="100%"
-            y2="100%"
-          >
-            <stop
-              offset="0%"
-              stopColor="rgb(255,255,255)"
-              style={{ stopOpacity: 1 }}
-            />
-            <stop
-              offset="100%"
-              stopColor="rgb(255,255,255)"
-              style={{ stopOpacity: 0.1 }}
-            />
-          </linearGradient>
-          <mask id={atmosphereMask}>
-            <rect x="-5" y="-5" width="110" height="110" fill="black" />
-            <circle
-              cx="50"
-              cy="50"
-              r="52"
-              fill={`url(#${atmosphereMaskGradient})`}
-            />
-          </mask>
-          <mask id={waterMask}>
-            <rect x="0" y="0" width="100" height="100" fill="black" />
-            <circle
-              cx="50"
-              cy="50"
-              r="50"
-              fill="white"
-              filter="url(#fisheye-filter)"
-            />
-          </mask>
-          <mask id={groundMask}>
-            <rect x="0" y="0" width="100" height="100" fill="black" />
-            <circle
-              cx="50"
-              cy="50"
-              r="50"
-              fill={`url(#${groundPattern})`}
-              filter="url(#fisheye-filter)"
-            />
-          </mask>
-          <mask id={cloudsMask}>
-            <rect x="0" y="0" width="100" height="100" fill="black" />
-            <circle
-              cx="50"
-              cy="50"
-              r="50"
-              fill={`url(#${cloudsPattern})`}
-              filter="url(#fisheye-filter)"
-            />
-          </mask>
-          <filter id="fisheye-filter" x="0%" y="0%" width="100%" height="100%">
-            <feGaussianBlur
-              in="SourceGraphic"
-              stdDeviation="10"
-              result="blur"
-            />
-            <feDisplacementMap in="SourceGraphic" in2="blur" scale="3" />
-          </filter>
-          <radialGradient
-            id={atmosphereMaskGradient}
-            cx="50%"
-            cy="50%"
-            r="50%"
-            fx="50%"
-            fy="50%"
-          >
-            <stop offset="50%" style={{ stopColor: "white", stopOpacity: 0 }} />
-            <stop offset="90%" style={{ stopColor: "white", stopOpacity: 1 }} />
-            <stop
-              offset="100%"
-              style={{ stopColor: "white", stopOpacity: 0 }}
-            />
-          </radialGradient>
+          {/* Filters */}
+          <Filter id={FISHEYE_ID} />
           <filter
             id="glare-blur-filter"
             x="-100%"
@@ -151,52 +86,55 @@ function Moon() {
           >
             <feGaussianBlur stdDeviation="10" />
           </filter>
-          <pattern
+
+          {/* Atmosphere */}
+          <linearGradient
+            id={atmosphereGradient}
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="100%"
+          >
+            <stop offset="0%" stopColor="rgb(255,255,255)" stopOpacity="1" />
+            <stop offset="100%" stopColor="rgb(255,255,255)" stopOpacity=".1" />
+          </linearGradient>
+          <radialGradient
+            id={atmosphereMaskGradient}
+            cx="50%"
+            cy="50%"
+            r="50%"
+            fx="50%"
+            fy="50%"
+          >
+            <stop offset="50%" stopColor="white" stopOpacity="0" />
+            <stop offset="90%" stopColor="white" stopOpacity="1" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </radialGradient>
+          {/* <mask id={atmosphereMask}>
+            <rect x="-5" y="-5" width="110" height="110" fill="black" />
+            <circle
+              cx="50"
+              cy="50"
+              r="52"
+              fill={`url(#${atmosphereMaskGradient})`}
+            />
+          </mask> */}
+          <CircleMask
+            id={atmosphereMask}
+            x={-5}
+            y={-5}
+            width={110}
+            height={110}
+            r={53}
+            pattern={`url(#${atmosphereMaskGradient})`}
+          />
+          <CircleMask id={waterMask} pattern="white" />
+          <CircleMask id={groundMask} pattern={`url(#${groundPattern})`} />
+          <Pattern
             id={groundPattern}
-            patternUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width="200"
-            height="100"
-          >
-            <animate
-              attributeName="x"
-              from="0"
-              to="200"
-              dur="30s"
-              repeatCount="indefinite"
-            />
-            <image
-              x="0"
-              y="0"
-              width="200"
-              height="100"
-              href="/static/textures/moon.png"
-            />
-          </pattern>
-          <pattern
-            id={cloudsPattern}
-            patternUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width="200"
-            height="100"
-          >
-            <animate
-              attributeName="x"
-              from="0"
-              to="200"
-              dur="60s"
-              repeatCount="indefinite"
-            />
-            <image
-              x="0"
-              y="0"
-              width="200"
-              height="100"
-              href="/static/textures/earth_clouds.png"
-            />
-          </pattern>
+            duration={30}
+            href="/static/textures/moon.png"
+          />
         </defs>
       </svg>
     </Root>

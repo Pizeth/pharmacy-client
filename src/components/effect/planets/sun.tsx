@@ -1,4 +1,6 @@
 import { shadowPulse, sunRotate } from "@/theme/keyframes";
+import { FISHEYE_ID } from "@/types/constants";
+import { Filter } from "@/utils/componentUtils";
 import { styled } from "@mui/material/styles";
 
 const PREFIX = "RazethPlanetSun";
@@ -66,7 +68,6 @@ function Sun() {
             />
 
             <circle
-              id="layer-cloud"
               cx="50"
               cy="50"
               r="50"
@@ -93,30 +94,8 @@ function Sun() {
             />
           </g>
           <defs>
-            <mask id="sun-mask">
-              <rect x="0" y="0" width="100" height="100" fill="black" />
-              <circle
-                cx="50"
-                cy="50"
-                r="50"
-                fill="url(#clouds-pattern)"
-                filter="url(#fisheye-filter)"
-              />
-            </mask>
-            <filter
-              id="fisheye-filter"
-              x="0%"
-              y="0%"
-              width="100%"
-              height="100%"
-            >
-              <feGaussianBlur
-                in="SourceGraphic"
-                stdDeviation="10"
-                result="blur"
-              />
-              <feDisplacementMap in="SourceGraphic" in2="blur" scale="3" />
-            </filter>
+            {/* Filters */}
+            <Filter id={FISHEYE_ID} />
             <filter
               id="glare-blur-filter"
               x="-100%"
@@ -132,6 +111,17 @@ function Sun() {
               <feGaussianBlur stdDeviation="10" result="blur" />
               <feComposite in="SourceGraphic" in2="blur" operator="over" />
             </filter>
+
+            <mask id="sun-mask">
+              <rect x="0" y="0" width="100" height="100" fill="black" />
+              <circle
+                cx="50"
+                cy="50"
+                r="50"
+                fill="url(#clouds-pattern)"
+                filter="url(#fisheye-filter)"
+              />
+            </mask>
 
             {/* Radial Gradient for depth/heat */}
             <radialGradient id="sun-gradient">
@@ -181,9 +171,10 @@ function Sun() {
                 y="0"
                 width="200"
                 height="100"
-                href="/static/textures/sun.png" // Replace with your sun texture path
+                href="/static/textures/sun.png"
               />
             </pattern>
+
             <pattern
               id="clouds-pattern"
               patternUnits="userSpaceOnUse"

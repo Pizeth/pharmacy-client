@@ -1,5 +1,6 @@
+import { FISHEYE_ID } from "@/types/constants";
+import { CircleMask, Filter, Pattern } from "@/utils/componentUtils";
 import { styled } from "@mui/material";
-import { Sun } from "lucide-react";
 
 const PREFIX = "RazethPlanetEarth";
 const Root = styled("div", {
@@ -29,6 +30,7 @@ function Earth() {
     <Root>
       <svg id="earth" viewBox="-5 -5 110 110" width="700" height="700">
         <g transform="rotate(23.5, 50, 50)">
+          {/* Base Layers (Water, Ground and Clouds) */}
           <rect
             x="0"
             y="0"
@@ -53,6 +55,8 @@ function Earth() {
             fill="rgba(255, 255, 255, .8)"
             mask={`url(#${cloudsMask})`}
           />
+
+          {/* Atmosphere and Glare */}
           <rect
             x="-5"
             y="-5"
@@ -70,6 +74,19 @@ function Earth() {
           />
         </g>
         <defs>
+          {/* Filters */}
+          <Filter id={FISHEYE_ID} />
+          <filter
+            id="glare-blur-filter"
+            x="-100%"
+            y="-100%"
+            width="300%"
+            height="300%"
+          >
+            <feGaussianBlur stdDeviation="10" />
+          </filter>
+
+          {/* Atmosphere */}
           <linearGradient
             id={atmosphereGradient}
             x1="0%"
@@ -80,7 +97,28 @@ function Earth() {
             <stop offset="0%" stopColor="rgb(0,127,255)" stopOpacity="1" />
             <stop offset="100%" stopColor="rgb(0,0,255)" stopOpacity=".5" />
           </linearGradient>
-          <mask id={atmosphereMask}>
+          <radialGradient
+            id={atmosphereMaskGradient}
+            cx="50%"
+            cy="50%"
+            r="50%"
+            fx="50%"
+            fy="50%"
+          >
+            <stop offset="50%" stopColor="white" stopOpacity="0" />
+            <stop offset="90%" stopColor="white" stopOpacity="1" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </radialGradient>
+          <CircleMask
+            id={atmosphereMask}
+            x={-5}
+            y={-5}
+            width={110}
+            height={110}
+            r={55}
+            pattern={`url(#${atmosphereMaskGradient})`}
+          />
+          {/* <mask id={atmosphereMask}>
             <rect x="-5" y="-5" width="110" height="110" fill="black" />
             <circle
               cx="50"
@@ -108,8 +146,24 @@ function Earth() {
               fill={`url(#${groundPattern})`}
               filter="url(#fisheye-filter)"
             />
-          </mask>
-          <mask id={cloudsMask}>
+          </mask> */}
+
+          {/* Water, Ground and Clouds */}
+          <CircleMask id={waterMask} pattern="white" />
+          <CircleMask id={groundMask} pattern={`url(#${groundPattern})`} />
+          <CircleMask id={cloudsMask} pattern={`url(#${cloudsPattern})`} />
+          <Pattern
+            id={groundPattern}
+            duration={50}
+            href="/static/textures/world_map.svg"
+          />
+          <Pattern
+            id={cloudsPattern}
+            duration={35}
+            href="/static/textures/earth_cloud.png"
+          />
+
+          {/* <mask id={cloudsMask}>
             <rect x="0" y="0" width="100" height="100" fill="black" />
             <circle
               cx="50"
@@ -126,29 +180,9 @@ function Earth() {
               result="blur"
             />
             <feDisplacementMap in="SourceGraphic" in2="blur" scale="3" />
-          </filter>
-          <radialGradient
-            id={atmosphereMaskGradient}
-            cx="50%"
-            cy="50%"
-            r="50%"
-            fx="50%"
-            fy="50%"
-          >
-            <stop offset="50%" stopColor="white" stopOpacity="0" />
-            <stop offset="90%" stopColor="white" stopOpacity="1" />
-            <stop offset="100%" stopColor="white" stopOpacity="0" />
-          </radialGradient>
-          <filter
-            id="glare-blur-filter"
-            x="-100%"
-            y="-100%"
-            width="300%"
-            height="300%"
-          >
-            <feGaussianBlur stdDeviation="10" />
-          </filter>
-          <pattern
+          </filter> */}
+
+          {/* <pattern
             id={groundPattern}
             patternUnits="userSpaceOnUse"
             x="0"
@@ -193,7 +227,7 @@ function Earth() {
               height="100"
               href="/static/textures/earth_cloud.png"
             />
-          </pattern>
+          </pattern> */}
         </defs>
       </svg>
     </Root>

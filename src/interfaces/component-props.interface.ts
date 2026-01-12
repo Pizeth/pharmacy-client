@@ -6,6 +6,7 @@ import { FieldValues, SubmitHandler } from "react-hook-form";
 import { SaveHandler } from "ra-core";
 import { SaveButtonProps } from "react-admin";
 import { AuthAction } from "@/types/theme";
+import { Circle } from "lucide-react";
 
 export interface LoginFormProps {
   content?: StyleComponent;
@@ -114,4 +115,41 @@ export interface RocketProps {
   transform?: string;
   className?: string;
   sx?: SxProps<Theme>;
+}
+
+interface BasicSVGProps {
+  id: string;
+  width?: number | string;
+  height?: number | string;
+  x?: number | string;
+  y?: number | string;
+  cx?: number | string;
+  cy?: number | string;
+  className?: string;
+  sx?: SxProps<Theme>;
+}
+
+export interface PatternProps extends BasicSVGProps {
+  patternUnits?: string;
+  attributeName?: string;
+  from?: string | number;
+  to?: string | number;
+  duration?: string | number;
+  repeatCount?: string | number;
+  href?: string;
+}
+
+export interface CircleMaskProps extends BasicSVGProps {
+  pattern: string;
+  filterId?: string;
+  fill?: string;
+  r?: number | string;
+}
+
+export interface FilterProps extends BasicSVGProps {
+  stdDeviation?: string | number;
+  result?: string;
+  inValue?: string;
+  in2?: string | number;
+  scale?: string | number;
 }

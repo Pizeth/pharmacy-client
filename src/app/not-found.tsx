@@ -8,7 +8,7 @@ import Saturn from "@/components/effect/planets/saturn";
 import Earth from "@/components/effect/planets/earth";
 import Moon from "@/components/effect/planets/moon";
 import Mars from "@/components/effect/planets/mars";
-import Jupyter from "@/components/effect/planets/jupyter";
+import Jupyter from "@/components/effect/planets/jupiter";
 import Sun from "@/components/effect/planets/sun";
 
 interface Star {
