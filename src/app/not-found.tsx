@@ -110,11 +110,21 @@ export default function NotFound() {
       </div>
 
       <div>
-        <Moon />
-        <Earth />
+        <Mars />
         <Jupyter />
         <Sun />
-        <Mars />
+        <Moon />
+        <Earth />
+        {/* <div
+          style={{
+            position: "absolute",
+            width: "35vmin",
+            height: "35vmin",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%,-50%)",
+          }}
+        ></div> */}
       </div>
       {/* <div>
         <Earth />

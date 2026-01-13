@@ -56,8 +56,8 @@ function Jupiter() {
             cx="50"
             cy="50"
             r="50"
-            fill="url(#jupiter-pattern)"
-            filter="url(#jupiter-glow)"
+            // fill={`url(#${groundPattern})`}
+            // filter="url(#jupiter-glow)"
           />
           {/* Base Layers (Water and Ground) */}
           {/* <rect
@@ -149,7 +149,7 @@ function Jupiter() {
           <CircleMask id="jupiter-mask" pattern={`url(#clouds-pattern)`} />
 
           {/* Radial Gradient for depth/heat */}
-          <radialGradient id={atmosphereGradient}>
+          {/* <radialGradient id={atmosphereGradient}>
             <stop offset="0.5%" stopColor="rgb(194, 103, 20, 0.05)" />
             <stop offset="7%" stopColor="rgb(167, 142, 113, 0.1)" />
             <stop offset="13.5%" stopColor="rgb(172, 128, 109, 0.15)" />
@@ -165,7 +165,45 @@ function Jupiter() {
             <stop offset="87%" stopColor="rgb(173, 159, 122, 0.65)" />
             <stop offset="93.5%" stopColor="rgb(215, 189, 140, 0.7)" />
             <stop offset="100%" stopColor="rgb(255, 208, 142, 0.75)" />
-          </radialGradient>
+          </radialGradient> */}
+
+          <linearGradient
+            id={atmosphereGradient}
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="100%"
+          >
+            <stop offset="0.4%" stopColor="rgb(255, 208, 142, 0.75)" />
+            <stop offset="3.8%" stopColor="rgb(215, 189, 140, 0.7)" />
+            <stop offset="7.2%" stopColor="rgb(173, 159, 122, 0.65)" />
+            <stop offset="10.6%" stopColor="rgb(141, 127, 92, 0.6)" />
+            <stop offset="14%" stopColor="rgb(167, 152, 111, 0.55)" />
+            <stop offset="17.4%" stopColor="rgb(183, 165, 125, 0.5)" />
+            <stop offset="20.8%" stopColor="rgb(216, 213, 196, 0.45)" />
+            <stop offset="24.2%" stopColor="rgb(188, 155, 114, 0.4)" />
+            <stop offset="27.6%" stopColor="rgb(212, 195, 165, 0.35)" />
+            <stop offset="31%" stopColor="rgb(177, 135, 110, 0.3)" />
+            <stop offset="34.4%" stopColor="rgb(148, 102, 76, 0.25)" />
+            <stop offset="37.8%" stopColor="rgb(198, 157, 94, 0.2)" />
+            <stop offset="41.2%" stopColor="rgb(172, 128, 109, 0.15)" />
+            <stop offset="44.6%" stopColor="rgb(167, 142, 113, 0.1)" />
+            <stop offset="50%" stopColor="rgb(194, 103, 20, 0.05)" />
+            <stop offset="56.5%" stopColor="rgb(167, 142, 113, 0.1)" />
+            <stop offset="59.9%" stopColor="rgb(172, 128, 109, 0.15)" />
+            <stop offset="63.3%" stopColor="rgb(198, 157, 94, 0.2)" />
+            <stop offset="66.7%" stopColor="rgb(148, 102, 76, 0.25)" />
+            <stop offset="70.1%" stopColor="rgb(177, 135, 110, 0.3)" />
+            <stop offset="73.5%" stopColor="rgb(212, 195, 165, 0.35)" />
+            <stop offset="76.9%" stopColor="rgb(188, 155, 114, 0.4)" />
+            <stop offset="80.3%" stopColor="rgb(216, 213, 196, 0.45)" />
+            <stop offset="83.7%" stopColor="rgb(183, 165, 125, 0.5)" />
+            <stop offset="87.1%" stopColor="rgb(167, 152, 111, 0.55)" />
+            <stop offset="90.5%" stopColor="rgb(141, 127, 92, 0.6)" />
+            <stop offset="93.9%" stopColor="rgb(173, 159, 122, 0.65)" />
+            <stop offset="97.3%" stopColor="rgb(215, 189, 140, 0.7)" />
+            <stop offset="100%" stopColor="rgb(255, 208, 142, 0.75)" />
+          </linearGradient>
 
           {/* Scrolling Jupiter Surface Pattern */}
           {/* <pattern

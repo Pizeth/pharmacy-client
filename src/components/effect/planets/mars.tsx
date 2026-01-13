@@ -153,6 +153,7 @@ function Mars() {
               <Pattern
                 id={`${cloudsPattern}-${cloud.id}`}
                 duration={cloud.dur}
+                href="/static/textures/earth_cloud.png"
               />
               <CircleMask
                 id={`${cloudsMask}-${cloud.id}`}
