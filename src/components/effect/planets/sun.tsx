@@ -109,7 +109,7 @@ function Sun() {
               y="0"
               width="100"
               height="100"
-              fill={"rgb(229,3,33, 0.75)"}
+              fill={"rgb(229,3,33, 0.5)"}
               mask={`url(#${cloudsMask})`}
             />
             {/* 
@@ -284,7 +284,9 @@ function Sun() {
 
             <Pattern
               id={cloudsPattern}
-              duration={45}
+              duration={150}
+              from={0}
+              to={-200}
               href="/static/textures/earth_cloud.png"
             />
 
