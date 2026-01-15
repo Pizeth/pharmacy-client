@@ -13,7 +13,7 @@ const Root = styled("div", {
   justifyContent: "center",
   alignItems: "center",
   minHeight: "15vmin",
-  height: "50vmin",
+  height: "75vmin",
   // height: "100vh",
 }));
 
@@ -80,14 +80,44 @@ const EarthWrapper = styled("div", {
     //     2.5vmin 0 4.4vmin #00000066 inset,
     //     5.5vmin 0 5.75vmin #000000aa inset
     //   `,
+    // boxShadow: `
+    //   0px 0 20px RGBA(255, 255, 255, 0.2),
+    //   -5px 0px 8px #c3f4ff inset,
+    //   15px 2px 25px #000 inset,
+    //   -24px -2px 34px #c3f4ff99 inset,
+    //   250px 0px 44px #00000066 inset,
+    //   150px 0px 38px #000000aa inset
+    //   `,
+
+    /* Inner bright turquoise glow (closest to surface) */
+    // boxShadow: `
+    //     0 0 30px 10px rgba(0, 255, 255, 0.6),
+    //     0 0 60px 20px rgba(135, 216, 255, 0.5),
+    //     0 0 100px 40px rgba(173, 239, 255, 0.3),
+    //     0 0 150px 60px rgba(200, 245, 255, 0.15)
+    //   `,
+    /* Optional: subtle inset shadow for planetary curvature/limb darkening */
+    /* Remove or adjust if your base image already has strong contrast */
+    /* box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.3), [the outer layers above]; */
+    // filter: `drop-shadow(0 0 30px rgba(0, 255, 255, 0.6))
+    // drop-shadow(0 0 60px rgba(135, 216, 255, 0.5))
+    // drop-shadow(0 0 100px rgba(173, 239, 255, 0.3))`,
     boxShadow: `
-      0px 0 20px RGBA(255, 255, 255, 0.2), 
-      -5px 0px 8px #c3f4ff inset,
-      15px 2px 25px #000 inset, 
-      -24px -2px 34px #c3f4ff99 inset,
-      250px 0px 44px #00000066 inset, 
-      150px 0px 38px #000000aa inset
-      `,
+      /* 1. Outer Atmosphere (Halo) - subtle blue glow outside the planet */
+      0 0 30px -5px rgba(64, 160, 255, 0.4),
+      
+      /* 2. Sunlit Surface Highlight - bright white/cyan hit on the left */
+      inset 10px 0 20px -5px rgba(200, 240, 255, 0.7),
+      
+      /* 3. Rayleigh Scattering - deeper blue atmosphere gradients */
+      inset 20px 0 50px 0px rgba(0, 100, 255, 0.4),
+      
+      /* 4. The Terminator - Deep shadow transition */
+      inset -20px 0 80px 0px rgba(0,0,0,0.5),
+      
+      /* 5. Deep Space Night - Pure black fill on the far right */
+      inset -50px 0 60px 20px rgba(0,0,0,0.75)
+    `,
   },
 
   // "& > svg": {
@@ -119,7 +149,8 @@ function Earth() {
               y="0"
               width="100"
               height="100"
-              fill="rgba(0, 0, 200, 1)"
+              // fill="rgba(0, 0, 200, 1)"
+              fill="url(#oceanGrad)"
               mask={`url(#${waterMask})`}
             />
             <rect
@@ -128,6 +159,7 @@ function Earth() {
               width="100"
               height="100"
               fill="rgba(0, 100, 0, 1)"
+              // fill="url(#earthSurface})"
               mask={`url(#${groundMask})`}
             />
             <rect
@@ -169,7 +201,7 @@ function Earth() {
             >
               <feGaussianBlur stdDeviation="10" />
             </filter>
-            {/* Jupiter Glow Filter */}
+            {/* Jupiter Earth Filter */}
             <filter
               id="earth-glow"
               x="-50%"
@@ -180,6 +212,13 @@ function Earth() {
               <feGaussianBlur stdDeviation="10" result="blur" />
               <feComposite in="SourceGraphic" in2="blur" operator="over" />
             </filter>
+
+            <radialGradient id="oceanGrad" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="rgb(30, 64, 175)" />{" "}
+              {/* Deep Blue */}
+              <stop offset="100%" stopColor="rgb(15, 23, 42)" />{" "}
+              {/* Dark Space Blue */}
+            </radialGradient>
 
             {/* Atmosphere */}
             <linearGradient
@@ -222,6 +261,11 @@ function Earth() {
               id={groundPattern}
               duration={50}
               href="/static/textures/world_map.svg"
+            />
+            <Pattern
+              id={"earthSurface"}
+              duration={50}
+              href="/static/textures/earth.png"
             />
             <Pattern
               id={cloudsPattern}

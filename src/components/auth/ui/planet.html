@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      :root {
+        --size: 640px;
+
+        /* Light direction (updated from JS) */
+        --lx: 30%;
+        --ly: 20%;
+
+        /* Atmosphere */
+        --atm-r: 90;
+        --atm-g: 160;
+        --atm-b: 255;
+
+        /* HDR exposure */
+        --exposure: 1.15;
+      }
+
+      html,
+      body {
+        margin: 0;
+        background: #000;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .scene {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        display: grid;
+        place-items: center;
+      }
+
+      /* ================= EARTH ================= */
+
+      .earth {
+        width: var(--size);
+        height: var(--size);
+        border-radius: 50%;
+        position: relative;
+
+        background: url("https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57730/land_ocean_ice_2048.png")
+          center / cover;
+
+        box-shadow: calc((50% - var(--lx)) * 0.7) calc((50% - var(--ly)) * 0.7)
+          140px rgba(0, 0, 0, 0.95);
+
+        transform: translateZ(0);
+        animation: earthSpin 120s linear infinite;
+      }
+
+      /* ---------- Terminator ---------- */
+      .earth::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at var(--lx) var(--ly),
+          rgba(0, 0, 0, 0) 40%,
+          rgba(0, 0, 0, 0.35) 62%,
+          rgba(0, 0, 0, 0.92) 100%
+        );
+        mix-blend-mode: multiply;
+        filter: blur(14px);
+      }
+
+      /* ---------- Atmosphere ---------- */
+      .earth::after {
+        content: "";
+        position: absolute;
+        inset: -6%;
+        border-radius: 50%;
+        background: radial-gradient(
+            circle at var(--lx) var(--ly),
+            rgba(255, 255, 255, 0.08) 0%,
+            rgba(var(--atm-r), var(--atm-g), var(--atm-b), 0.6) 0.7%,
+            rgba(var(--atm-r), var(--atm-g), var(--atm-b), 0.25) 2%,
+            rgba(var(--atm-r), var(--atm-g), var(--atm-b), 0.1) 5%,
+            transparent 12%
+          ),
+          radial-gradient(
+            circle,
+            rgba(var(--atm-r), var(--atm-g), var(--atm-b), 0.18),
+            transparent 38%
+          );
+        mix-blend-mode: screen;
+        filter: blur(18px);
+        pointer-events: none;
+      }
+
+      .earth .penumbra {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+
+        background: radial-gradient(
+          circle at var(--lx) var(--ly),
+          rgba(0, 0, 0, 0) 48%,
+          rgba(20, 60, 120, 0.18) 60%,
+          rgba(0, 0, 0, 0.65) 82%
+        );
+
+        mix-blend-mode: multiply;
+        filter: blur(28px);
+        pointer-events: none;
+      }
+
+      /* ================= NIGHT LIGHTS ================= */
+
+      .night {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: url("https://eoimages.gsfc.nasa.gov/images/imagerecords/144000/144898/BlackMarble_2016_3km.jpg")
+          center / cover;
+        mix-blend-mode: screen;
+        opacity: 0;
+        filter: brightness(1.9) saturate(1.2) blur(0.3px);
+      }
+
+      /* ================= CLOUDS ================= */
+
+      .clouds {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: url("https://www.solarsystemscope.com/textures/download/2k_earth_clouds.jpg")
+          center / cover;
+        opacity: 0.55;
+        mix-blend-mode: screen;
+        filter: blur(0.4px);
+        animation: cloudSpin 90s linear infinite;
+      }
+
+      /* ================= SPECULAR OCEAN ================= */
+      .specular {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+
+        /* Fresnel-style sun glint */
+        background: radial-gradient(
+            circle at var(--lx) var(--ly),
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.25) 18%,
+            transparent 42%
+          ),
+          /* Water mask */
+            url("https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73751/land_ocean_mask_2048.png")
+            center / cover;
+
+        background-blend-mode: screen, multiply;
+        mix-blend-mode: screen;
+        filter: blur(10px);
+        opacity: 0.45;
+        pointer-events: none;
+      }
+
+      /* ================= MOON ================= */
+      .moon {
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: url("https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg")
+          center / cover;
+        box-shadow: 0 0 60px rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+      }
+
+      .moon::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at var(--mlx) var(--mly),
+          rgba(0, 0, 0, 0) 45%,
+          rgba(0, 0, 0, 0.85) 100%
+        );
+
+        mix-blend-mode: multiply;
+      }
+
+      @keyframes earthSpin {
+        from {
+          background-position: 0% 50%;
+        }
+        to {
+          background-position: 200% 50%;
+        }
+      }
+
+      @keyframes cloudSpin {
+        from {
+          background-position: 0% 50%;
+        }
+        to {
+          background-position: 200% 50%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scene">
+      <div class="moon"></div>
+      <div class="earth">
+        <div class="specular"></div>
+        <div class="night"></div>
+        <div class="clouds"></div>
+        <div class="penumbra"></div>
+      </div>
+    </div>
+  </body>
+  <script>
+    const earth = document.querySelector(".earth");
+    const night = document.querySelector(".night");
+    const moon = document.querySelector(".moon");
+    const scene = document.querySelector(".scene");
+
+    let t = 0;
+
+    function animate() {
+      t += 0.0015;
+
+      /* ================= SUN DIRECTION ================= */
+      const tilt = 0.409; // 23.44°
+      const lx = Math.cos(t);
+      const ly = Math.sin(t) * Math.cos(tilt);
+
+      earth.style.setProperty("--lx", `${50 + lx * 50}%`);
+      earth.style.setProperty("--ly", `${50 + ly * 50}%`);
+
+      /* ================= NIGHT LIGHTS ================= */
+      //   const nightFactor = Math.max(0, -lx);
+      //   night.style.opacity = nightFactor * 0.85;
+
+      /* ================= NIGHT LIGHTS ================= */
+      const nightFactor = Math.max(0, -lx);
+      night.style.opacity = Math.pow(nightFactor, 1.4);
+
+      /* ================= MOON ORBIT ================= */
+      const earthRect = earth.getBoundingClientRect();
+      const sceneRect = scene.getBoundingClientRect();
+
+      const earthCX = earthRect.left + earthRect.width / 2 - sceneRect.left;
+      const earthCY = earthRect.top + earthRect.height / 2 - sceneRect.top;
+
+      const moonRadius = 420; // orbit radius
+      const moonPhase = t * 0.35;
+
+      const mx = Math.cos(moonPhase);
+      const my = Math.sin(moonPhase) * 0.35;
+
+      moon.style.transform = `translate(${earthCX + mx * moonRadius}px,
+               ${earthCY + my * moonRadius}px)`;
+
+      /* ================= ECLIPSE ================= */
+      const alignment = Math.abs(mx + lx);
+      const eclipse = Math.max(0, 1 - alignment * 2);
+
+      /* ================= MOON PHASE ================= */
+      moon.style.setProperty("--mlx", `${50 + lx * 50}%`);
+      moon.style.setProperty("--mly", `${50 + ly * 50}%`);
+
+      moon.style.filter = `brightness(${0.35 + eclipse})`;
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</html>
