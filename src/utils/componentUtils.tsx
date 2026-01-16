@@ -8,6 +8,7 @@ import {
 export const Pattern = (inProps: PatternProps) => {
   const {
     id,
+    patternUnits = "userSpaceOnUse",
     href,
     duration = 30,
     x = "0",

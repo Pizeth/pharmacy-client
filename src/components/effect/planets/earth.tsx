@@ -13,7 +13,7 @@ const Root = styled("div", {
   justifyContent: "center",
   alignItems: "center",
   minHeight: "15vmin",
-  height: "75vmin",
+  height: "90vmin",
   // height: "100vh",
 }));
 
@@ -27,7 +27,7 @@ const EarthWrapper = styled("div", {
   aspectRatio: "1 / 1",
   borderRadius: "50%", // Keeps the shadow circular
 
-  backgroundBlendMode: "multiply",
+  // backgroundBlendMode: "multiply",
   height: "85%", // ← Add this: adjust 80–95% (85% fills and leave some space)
 
   background: "transparent", // REQUIRED for inset shadows
@@ -104,19 +104,22 @@ const EarthWrapper = styled("div", {
     // drop-shadow(0 0 100px rgba(173, 239, 255, 0.3))`,
     boxShadow: `
       /* 1. Outer Atmosphere (Halo) - subtle blue glow outside the planet */
-      0 0 30px -5px rgba(64, 160, 255, 0.4),
+      // 0 0 30px -5px rgba(64, 160, 255, 0.4),
+      0 0 30px -5px rgb(70, 89, 181, 0.5),
       
       /* 2. Sunlit Surface Highlight - bright white/cyan hit on the left */
-      inset 10px 0 20px -5px rgba(200, 240, 255, 0.7),
+      // inset 10px 0 20px -5px rgba(200, 240, 255, 0.7),
+      inset 10px 0 20px -5px rgb(61, 76, 169, 0.7),
       
       /* 3. Rayleigh Scattering - deeper blue atmosphere gradients */
-      inset 20px 0 50px 0px rgba(0, 100, 255, 0.4),
+      // inset 20px 0 50px 0px rgba(0, 100, 255, 0.5),
+      inset 20px 0 50px 0px rgb(60, 75, 170, 0.5),
       
       /* 4. The Terminator - Deep shadow transition */
       inset -20px 0 80px 0px rgba(0,0,0,0.5),
       
       /* 5. Deep Space Night - Pure black fill on the far right */
-      inset -50px 0 60px 20px rgba(0,0,0,0.75)
+      inset -50px 0 60px 20px rgba(0,0,0,0.7)
     `,
   },
 
@@ -158,8 +161,9 @@ function Earth() {
               y="0"
               width="100"
               height="100"
-              fill="rgba(0, 100, 0, 1)"
-              // fill="url(#earthSurface})"
+              // fill="rgba(0, 100, 0, 1)"
+              // fill="transparent"
+              fill="url(#earthSurface)"
               mask={`url(#${groundMask})`}
             />
             <rect
@@ -181,10 +185,10 @@ function Earth() {
               mask={`url(#${atmosphereMask})`}
             />
             <circle
-              cx="75"
-              cy="15"
-              r="25"
-              fill="rgba(255, 255, 255, .6)"
+              cx="15"
+              cy="35"
+              r="15"
+              fill="rgba(255, 255, 255, .5)"
               filter="url(#glare-blur-filter)"
               overflow={"hidden"}
             />
@@ -213,10 +217,19 @@ function Earth() {
               <feComposite in="SourceGraphic" in2="blur" operator="over" />
             </filter>
 
-            <radialGradient id="oceanGrad" cx="30%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="rgb(30, 64, 175)" />{" "}
+            <radialGradient id="oceanGrad" cx="50%" cy="50%" r="85%">
+              {/* <stop offset="0%" stopColor="rgb(30, 64, 175)" /> */}
               {/* Deep Blue */}
-              <stop offset="100%" stopColor="rgb(15, 23, 42)" />{" "}
+              {/* <stop offset="100%" stopColor="rgb(15, 23, 42)" /> */}
+              {/* Dark Space Blue */}
+              <stop offset="0%" stopColor="rgb(1, 1, 35)" />
+              <stop offset="50%" stopColor="rgb(5, 5, 55)" />
+              <stop offset="65%" stopColor="rgb(16, 17, 73)" />
+
+              {/* Deep Blue */}
+              <stop offset="85%" stopColor="rgb(14, 20, 84)" />
+              {/* <stop offset="100%" stopColor="rgb(42, 53, 132)" /> */}
+              <stop offset="100%" stopColor="rgb(24, 31, 99)" />
               {/* Dark Space Blue */}
             </radialGradient>
 
@@ -228,8 +241,14 @@ function Earth() {
               x2="100%"
               y2="100%"
             >
-              <stop offset="0%" stopColor="rgb(0,127,255)" stopOpacity="1" />
-              <stop offset="100%" stopColor="rgb(0,0,255)" stopOpacity=".5" />
+              {/* <stop offset="0%" stopColor="rgb(0,127,255)" stopOpacity="1" />
+              <stop offset="100%" stopColor="rgb(0,0,255)" stopOpacity=".5" /> */}
+              <stop offset="0%" stopColor="rgb(72, 89, 180, 0.5)" />
+              <stop
+                offset="100%"
+                stopColor="rgb(20, 24, 87)"
+                stopOpacity="0.25"
+              />
             </linearGradient>
             <radialGradient
               id={atmosphereMaskGradient}
@@ -260,12 +279,13 @@ function Earth() {
             <Pattern
               id={groundPattern}
               duration={50}
-              href="/static/textures/world_map.svg"
+              href="/static/textures/earth.svg"
             />
             <Pattern
               id={"earthSurface"}
+              patternUnits={"objectBoundingBox"}
               duration={50}
-              href="/static/textures/earth.png"
+              href="/static/textures/earth_pattern.svg"
             />
             <Pattern
               id={cloudsPattern}

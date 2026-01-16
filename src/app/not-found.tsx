@@ -105,6 +105,20 @@ export default function NotFound() {
         </div>
       </div>
 
+      {/* UFO Container: Outer Float, Inner Tilt */}
+      <div className="absolute top-1/2 left-1/6 -translate-x-1/2 -translate-y-1/2  z-10">
+        <div>
+          <Image
+            src="/static/images/blue_marble.png"
+            alt="UFO"
+            width={500}
+            height={500}
+            priority
+            // className="drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+          />
+        </div>
+      </div>
+
       <div className="absolute top-1/7 right-1 -translate-x-1/2 -translate-y-1/2 z-10">
         <Saturn />
       </div>
