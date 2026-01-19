@@ -7,13 +7,14 @@ const Root = styled("div", {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})(({ theme }) => ({
+  // })(({ theme }) => ({
+})<{ size?: number }>(({ theme, size = 100 }) => ({
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  minHeight: "15vmin",
-  height: "90vmin",
+  minHeight: "5vmin",
+  height: `${size}vmin`, // Dynamic height
   // height: "100vh",
 }));
 
@@ -21,25 +22,24 @@ const Root = styled("div", {
 const EarthWrapper = styled("div", {
   name: PREFIX,
   slot: "Content",
+  shouldForwardProp: (prop: string) => prop !== "sizeFactor",
   overridesResolver: (_props, styles) => styles.content,
-})(({ theme }) => ({
+  // })(({ theme }) => ({
+})<{ sizeFactor: number }>(({ theme, sizeFactor }) => ({
   position: "relative",
   aspectRatio: "1 / 1",
   borderRadius: "50%", // Keeps the shadow circular
 
+  // width: "1em", // ← Use em for the base size
+  // height: "1em", // ← Square base
+  // Set a base font-size for em units to scale from
+  fontSize: `${sizeFactor}vmin`,
+
   // backgroundBlendMode: "multiply",
   height: "85%", // ← Add this: adjust 80–95% (85% fills and leave some space)
-
   background: "transparent", // REQUIRED for inset shadows
-  // Applying your requested complex shadow
-  // boxShadow: `
-  //   0px 0 0.2vmin RGBA(255, 255, 255, 0.2),
-  //   -0.05vmin 0px 0.8vmin #c3f4ff inset,
-  //   1.5vmin 0.2vmin 2.5vmin #000 inset,
-  //   -2.4vmin -0.2vmin 3.4vmin #c3f4ff99 inset,
-  //   25vmin 0px 4.4vmin #00000066 inset,
-  //   15vmin 0px 3.8vmin #000000aa inset`,
   overflow: "hidden", // Ensures the SVG texture doesn't spill out
+  "--size-factor": sizeFactor, // Critical CSS variable for scaling
   // --- THE FIX ---
   // We create a pseudo-element that sits ON TOP of the SVG
   // "&::before": {
@@ -63,8 +63,9 @@ const EarthWrapper = styled("div", {
   "&::after": {
     content: '""',
     position: "absolute",
-    top: 0,
-    left: 0,
+    // top: 0,
+    // left: 0,
+    inset: 0,
     width: "100%",
     height: "100%",
     borderRadius: "50%",
@@ -102,25 +103,104 @@ const EarthWrapper = styled("div", {
     // filter: `drop-shadow(0 0 30px rgba(0, 255, 255, 0.6))
     // drop-shadow(0 0 60px rgba(135, 216, 255, 0.5))
     // drop-shadow(0 0 100px rgba(173, 239, 255, 0.3))`,
+    // boxShadow: `
+    //   /* 1. Outer Atmosphere (Halo) - subtle blue glow outside the planet */
+    //   // 0 0 30px -5px rgba(64, 160, 255, 0.4),
+    //   0 0 30px -5px rgb(70, 89, 181, 0.5),
+
+    //   /* 2. Sunlit Surface Highlight - bright white/cyan hit on the left */
+    //   // inset 10px 0 20px -5px rgba(200, 240, 255, 0.7),
+    //   inset 10px 0 20px -5px rgb(61, 76, 169, 0.7),
+
+    //   /* 3. Rayleigh Scattering - deeper blue atmosphere gradients */
+    //   // inset 20px 0 50px 0px rgba(0, 100, 255, 0.5),
+    //   inset 20px 0 50px 0px rgb(60, 75, 170, 0.5),
+
+    //   /* 4. The Terminator - Deep shadow transition */
+    //   inset -20px 0 80px 0px rgba(0,0,0,0.5),
+
+    //   /* 5. Deep Space Night - Pure black fill on the far right */
+    //   inset -50px 0 60px 20px rgba(0,0,0,0.7)
+    // `,
+
+    // Scaled version of your current px-based shadow
+    // These em values are calibrated to closely match your px version at ~76.5vmin diameter
+    // (assuming your px values looked good at that size on your screen)
+    // boxShadow: `
+    //   /* 1. Outer Atmosphere Halo - subtle blue glow outside */
+    //   0 0 0.04em -0.006em rgb(70, 89, 181, 0.5),
+    //   /* softer sky-blue halo */
+    //   0 0 0.08em 0.02em rgba(135, 206, 255, 0.3),
+
+    //   /* 2. Sunlit Surface Highlight - brighter blue/cyan on the left */
+    //   inset 0.013em 0 0.026em -0.006em rgb(61, 76, 169, 0.7),
+
+    //   /* 3. Rayleigh Scattering - deeper blue atmosphere */
+    //   inset 0.026em 0 0.065em 0 rgb(60, 75, 170, 0.5),
+
+    //   /* 4. Terminator Transition - soft dark edge */
+    //   inset -0.026em 0 0.105em 0 rgba(0,0,0,0.5),
+
+    //   /* 5. Deep Night Side - strong black shadow on the right */
+    //   inset -0.065em 0 0.078em 0.026em rgba(0,0,0,0.7)
+    // `,
+
+    // 3. SCALABLE SHADOWS (converted px to em)
+    // Ratios based on 1em = Container Size (approx 1.17x Planet Diameter)
     boxShadow: `
-      /* 1. Outer Atmosphere (Halo) - subtle blue glow outside the planet */
-      // 0 0 30px -5px rgba(64, 160, 255, 0.4),
-      0 0 30px -5px rgb(70, 89, 181, 0.5),
-      
-      /* 2. Sunlit Surface Highlight - bright white/cyan hit on the left */
-      // inset 10px 0 20px -5px rgba(200, 240, 255, 0.7),
-      inset 10px 0 20px -5px rgb(61, 76, 169, 0.7),
-      
-      /* 3. Rayleigh Scattering - deeper blue atmosphere gradients */
-      // inset 20px 0 50px 0px rgba(0, 100, 255, 0.5),
-      inset 20px 0 50px 0px rgb(60, 75, 170, 0.5),
-      
-      /* 4. The Terminator - Deep shadow transition */
-      inset -20px 0 80px 0px rgba(0,0,0,0.5),
-      
-      /* 5. Deep Space Night - Pure black fill on the far right */
-      inset -50px 0 60px 20px rgba(0,0,0,0.7)
+      /* 1. Outer Atmosphere (Halo) */
+      0 0 0.05em -0.01em rgb(70, 89, 181, 0.5),
+      /* softer sky-blue halo */
+      0 0 0.08em 0.02em rgba(135, 206, 255, 0.3), 
+
+      /* 2. Sunlit Surface Highlight (Left) */
+      inset 0.02em 0 0.04em -0.01em rgb(61, 76, 169, 0.7),
+
+      /* 3. Rayleigh Scattering (Mid-Atmosphere) */
+      inset 0.04em 0 0.09em 0px rgb(60, 75, 170, 0.5),
+
+      /* 4. The Terminator (Shadow Start) */
+      inset -0.04em 0 0.15em 0px rgba(0,0,0,0.5),
+
+      /* 5. Deep Space Night (Far Right) */
+      inset -0.1em 0 0.12em 0.04em rgba(0,0,0,0.7)
     `,
+
+    // NASA-PERFECT SCALABLE SHADOWS
+    // boxShadow: `
+    //   /* Outer atmosphere glow */
+    //   0 0
+    //     calc(4px * var(--size-factor))
+    //     calc(-1.5px * var(--size-factor))
+    //     rgba(70, 89, 181, 0.55),
+
+    //   /* Sunlit highlight */
+    //   inset
+    //     calc(2.2px * var(--size-factor)) 0
+    //     calc(5px * var(--size-factor))
+    //     calc(-1.8px * var(--size-factor))
+    //     rgba(61, 76, 169, 0.75),
+
+    //   /* Atmospheric scattering */
+    //   inset
+    //     calc(4.5px * var(--size-factor)) 0
+    //     calc(11px * var(--size-factor))
+    //     calc(-0.5px * var(--size-factor))
+    //     rgba(60, 75, 170, 0.55),
+
+    //   /* Terminator shadow */
+    //   inset
+    //     calc(-4.8px * var(--size-factor)) 0
+    //     calc(18px * var(--size-factor))
+    //     rgba(0, 0, 0, 0.6),
+
+    //   /* Night side fill */
+    //   inset
+    //     calc(-11.5px * var(--size-factor)) 0
+    //     calc(14px * var(--size-factor))
+    //     calc(4.2px * var(--size-factor))
+    //     rgba(0, 0, 0, 0.8)
+    // `,
   },
 
   // "& > svg": {
@@ -140,10 +220,14 @@ const atmosphereMaskGradient = `${PREFIX}-atmosphere-mask-gradient`;
 const groundPattern = `${PREFIX}-ground-pattern`;
 const cloudsPattern = `${PREFIX}-clouds-pattern`;
 
-function Earth() {
+function Earth({ size = 90 }: { size?: number }) {
+  // Calculate precise scaling factor (90vmin = reference size)
+  // const sizeFactor = size / 90;
+  // const sizeFactor = Math.max(0.18, size / 90); // Prevents glow disappearance at tiny sizes
+  const sizeFactor = size; // Prevents glow disappearance at tiny sizes
   return (
-    <Root>
-      <EarthWrapper>
+    <Root size={size}>
+      <EarthWrapper sizeFactor={sizeFactor}>
         <svg id="earth" viewBox="-0.5 -0.5 101 101" width="100%" height="100%">
           <g transform="rotate(23.5, 50, 50)">
             {/* Base Layers (Water, Ground and Clouds) */}
@@ -171,24 +255,25 @@ function Earth() {
               y="0"
               width="100"
               height="100"
-              fill="rgba(255, 255, 255, .8)"
+              fill="rgba(255, 255, 255,1)"
               mask={`url(#${cloudsMask})`}
             />
 
             {/* Atmosphere and Glare */}
-            <rect
+            {/* <rect
               x="-5"
               y="-5"
               width="110"
               height="110"
               fill={`url(#${atmosphereGradient})`}
               mask={`url(#${atmosphereMask})`}
-            />
+            /> */}
             <circle
-              cx="15"
-              cy="35"
-              r="15"
-              fill="rgba(255, 255, 255, .5)"
+              cx="5"
+              cy="85"
+              r="25"
+              // fill="rgba(255, 255, 255, .5)"
+              fill="rgba(255, 255, 255, 0.35)"
               filter="url(#glare-blur-filter)"
               overflow={"hidden"}
             />
@@ -243,7 +328,8 @@ function Earth() {
             >
               {/* <stop offset="0%" stopColor="rgb(0,127,255)" stopOpacity="1" />
               <stop offset="100%" stopColor="rgb(0,0,255)" stopOpacity=".5" /> */}
-              <stop offset="0%" stopColor="rgb(72, 89, 180, 0.5)" />
+              <stop offset="0%" stopColor="rgb(255, 2555, 255, 1)" />
+              <stop offset="25%" stopColor="rgb(72, 89, 180, 0.15)" />
               <stop
                 offset="100%"
                 stopColor="rgb(20, 24, 87)"
@@ -274,22 +360,31 @@ function Earth() {
 
             {/* Water, Ground and Clouds */}
             <CircleMask id={waterMask} pattern="white" />
-            <CircleMask id={groundMask} pattern={`url(#${groundPattern})`} />
+            <CircleMask
+              id={groundMask}
+              pattern={`url(#${groundPattern})`}
+              fill="white"
+            />
             <CircleMask id={cloudsMask} pattern={`url(#${cloudsPattern})`} />
             <Pattern
               id={groundPattern}
               duration={50}
+              width={179.8}
+              to={179.8}
+              // patternUnits={"objectBoundingBox"}
               href="/static/textures/earth.svg"
             />
             <Pattern
               id={"earthSurface"}
-              patternUnits={"objectBoundingBox"}
               duration={50}
-              href="/static/textures/earth_pattern.svg"
+              width={179.8}
+              to={179.8}
+              href="/static/textures/earth_pattern.png"
             />
             <Pattern
               id={cloudsPattern}
-              duration={35}
+              duration={45}
+              // to={-200}
               href="/static/textures/earth_cloud.png"
             />
           </defs>

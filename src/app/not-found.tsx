@@ -10,6 +10,7 @@ import Moon from "@/components/effect/planets/moon";
 import Mars from "@/components/effect/planets/mars";
 import Jupyter from "@/components/effect/planets/jupiter";
 import Sun from "@/components/effect/planets/sun";
+import JupiterTest from "@/components/effect/planets/testPlanet";
 
 interface Star {
   id: number;
@@ -106,18 +107,18 @@ export default function NotFound() {
       </div>
 
       {/* UFO Container: Outer Float, Inner Tilt */}
-      <div className="absolute top-1/2 left-1/6 -translate-x-1/2 -translate-y-1/2  z-10">
+      {/* <div className="absolute top-1/2 left-1/6 -translate-x-1/2 -translate-y-1/2  z-10">
         <div>
           <Image
             src="/static/images/blue_marble.png"
             alt="UFO"
-            width={500}
-            height={500}
+            width={300}
+            height={300}
             priority
             // className="drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="absolute top-1/7 right-1 -translate-x-1/2 -translate-y-1/2 z-10">
         <Saturn />
@@ -126,9 +127,10 @@ export default function NotFound() {
       <div>
         {/* <Mars /> */}
         <Jupyter />
+        {/* <JupiterTest /> */}
         {/* <Sun /> */}
         {/* <Moon /> */}
-        <Earth />
+        <Earth size={90} />
         {/* <div
           style={{
             position: "absolute",
@@ -148,10 +150,10 @@ export default function NotFound() {
         {/* <h1 className="mb-2 text-7xl font-bold text-white tracking-tighter drop-shadow-lg">
           404
         </h1> */}
-        <p className="mb-8 text-xl text-gray-200 drop-shadow-md">
+        {/* <p className="mb-8 text-xl text-gray-200 drop-shadow-md">
           Oops! Looks like this page got lost in space
         </p>
-        <BackButton />
+        <BackButton /> */}
         {/* <Link
           href="/admin"
           className="px-6 py-3 text-white bg-purple-600/90 hover:bg-purple-600 rounded-lg transition-all shadow-lg shadow-purple-500/30 backdrop-blur-sm border border-purple-400/30"

@@ -24,7 +24,8 @@ export const Pattern = (inProps: PatternProps) => {
   return (
     <pattern
       id={id}
-      patternUnits="userSpaceOnUse"
+      patternUnits={patternUnits}
+      patternContentUnits={patternUnits}
       x={x}
       y={y}
       width={width}
