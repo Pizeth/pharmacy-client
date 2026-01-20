@@ -115,7 +115,7 @@ export default function NotFound() {
             width={300}
             height={300}
             priority
-            // className="drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+            // className="rounded-[1000] drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
           />
         </div>
       </div> */}
@@ -130,7 +130,7 @@ export default function NotFound() {
         {/* <JupiterTest /> */}
         {/* <Sun /> */}
         {/* <Moon /> */}
-        <Earth size={90} />
+        <Earth size={100} />
         {/* <div
           style={{
             position: "absolute",

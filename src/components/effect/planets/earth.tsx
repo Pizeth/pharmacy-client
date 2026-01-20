@@ -211,12 +211,14 @@ const EarthWrapper = styled("div", {
   // },
 }));
 
+const lightMask = `${PREFIX}-light-mask`;
 const waterMask = `${PREFIX}-water-mask`;
 const groundMask = `${PREFIX}-ground-mask`;
 const cloudsMask = `${PREFIX}-clouds-mask`;
 const atmosphereMask = `${PREFIX}-atmosphere-mask`;
 const atmosphereGradient = `${PREFIX}-atmosphere-gradient`;
 const atmosphereMaskGradient = `${PREFIX}-atmosphere-mask-gradient`;
+const lightFilter = `${PREFIX}-light-filter`;
 const groundPattern = `${PREFIX}-ground-pattern`;
 const cloudsPattern = `${PREFIX}-clouds-pattern`;
 
@@ -229,6 +231,10 @@ function Earth({ size = 90 }: { size?: number }) {
     <Root size={size}>
       <EarthWrapper sizeFactor={sizeFactor}>
         <svg id="earth" viewBox="-0.5 -0.5 101 101" width="100%" height="100%">
+          {/* Apply the new lighting filter to this group. 
+              Note: We keep the rotation on a child group or apply the filter AFTER rotation 
+              so the light stays "fixed" relative to the view, or rotates with it depending on preference.
+          */}
           <g transform="rotate(23.5, 50, 50)">
             {/* Base Layers (Water, Ground and Clouds) */}
             <rect
@@ -260,14 +266,14 @@ function Earth({ size = 90 }: { size?: number }) {
             />
 
             {/* Atmosphere and Glare */}
-            {/* <rect
+            <rect
               x="-5"
               y="-5"
               width="110"
               height="110"
               fill={`url(#${atmosphereGradient})`}
               mask={`url(#${atmosphereMask})`}
-            /> */}
+            />
             <circle
               cx="5"
               cy="85"
@@ -280,7 +286,7 @@ function Earth({ size = 90 }: { size?: number }) {
           </g>
           <defs>
             {/* Filters */}
-            <Filter id={FISHEYE_ID} />
+            {/* <Filter id={FISHEYE_ID} /> */}
             <filter
               id="glare-blur-filter"
               x="-100%"
@@ -290,7 +296,7 @@ function Earth({ size = 90 }: { size?: number }) {
             >
               <feGaussianBlur stdDeviation="10" />
             </filter>
-            {/* Jupiter Earth Filter */}
+            {/* Earth Filter */}
             <filter
               id="earth-glow"
               x="-50%"
@@ -301,7 +307,129 @@ function Earth({ size = 90 }: { size?: number }) {
               <feGaussianBlur stdDeviation="10" result="blur" />
               <feComposite in="SourceGraphic" in2="blur" operator="over" />
             </filter>
+            <filter id="my-filter">
+              <feComponentTransfer>
+                <feFuncR type="linear" slope="2" />
+                <feFuncG type="linear" slope="2" />
+                <feFuncB type="linear" slope="2" />
+              </feComponentTransfer>
+            </filter>
+            {/* --- NEW SUN LIGHTING FILTER --- 
+              This uses feSpecularLighting with a fePointLight.
+              It creates a bright "shiny" spot in the center (50,50) 
+              that mimics direct overhead sunlight.
+            */}
+            <filter
+              id={lightFilter}
+              // x="-50%"
+              // y="-50%"
+              // width="200%"
+              // height="200%"
+            >
+              {/* 1. Define the lens map using feImage with a Data URI. 
+                This is a radial gradient: White center (displacement) 
+                -> Black edge (no displacement).
+              */}
+              {/* <feImage
+                href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23fff'/%3E%3Cstop offset='100%25' stop-color='%23000'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E"
+                result="lens"
+              /> */}
 
+              {/* 2. Apply the displacement. 
+              scale="25": How strong the 'bulge' is.
+              xChannelSelector="R": Use the Red channel of the lens to shift pixels horizontally.
+              yChannelSelector="G": Use Green channel for vertical. 
+              Since our lens is grayscale, R=G, so it shifts diagonally outward from the dark edges.
+            */}
+
+              {/* 1. feGaussianBlur: Optional, slightly softens the input before lighting 
+                     to avoid sharp pixel artifacts on the light map.
+              */}
+              <feGaussianBlur
+                in="SourceGraphic"
+                stdDeviation="10"
+                result="blur"
+              />
+
+              <feDisplacementMap in="SourceGraphic" in2="blur" scale="3" />
+              {/* <feDisplacementMap
+                in="SourceGraphic"
+                in2="lens"
+                scale="25"
+                xChannelSelector="R"
+                yChannelSelector="G"
+              /> */}
+
+              {/* 2. feSpecularLighting: Creates the shiny highlight.
+                     - specularConstant: Intensity of the light (1.2 is bright)
+                     - specularExponent: Sharpness of the spot (lower = broader soft light, higher = sharp tiny spot)
+                     - lighting-color: The color of the sun (slightly warm white)
+              */}
+              <feSpecularLighting
+                in="SourceAlpha"
+                result="specOut"
+                specularConstant="1.5"
+                specularExponent="25"
+                // lightingColor="#ffffee"
+                lightingColor="$#FFFFFF"
+              >
+                {/* fePointLight: The bulb.
+                    x, y: 50, 50 places it in the dead center.
+                    z: The height above the screen. Lower Z = more intense, smaller spot. Higher Z = softer, wider spread.
+                */}
+                <fePointLight x="15" y="50" z="25" />
+              </feSpecularLighting>
+
+              {/* 3. feComposite: Blends the shiny highlight ON TOP of the original image.
+                     operator="arithmetic" k1=0, k2=1, k3=1, k4=0
+                     Formula: Result = k1*in1*in2 + k2*in1 + k3*in2 + k4
+                     So: (Original Image * 1) + (Light Map * 1) -> Additive blending
+              */}
+              <feComposite
+                in="SourceGraphic"
+                in2="specOut"
+                operator="arithmetic"
+                k1="0"
+                k2="1"
+                k3="1"
+                k4="0"
+              />
+            </filter>
+            {/* // --- NEW FISHEYE FILTER --- // 
+            This creates a "lens" distortion map using a radial gradient. 
+            When applied to the sliding texture, it magnifies the center and compresses the edges, 
+            simulating spherical rotation. This gives the illusion of a 3D sphere rotating,
+            spherical rotation. */}
+            <filter
+              id={FISHEYE_ID + "lala"}
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
+            >
+              {/* 1. Define the lens map using feImage with a Data URI. 
+                This is a radial gradient: White center (displacement) 
+                -> Black edge (no displacement).
+              */}
+              <feImage
+                href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23fff'/%3E%3Cstop offset='100%25' stop-color='%23000'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E"
+                result="lens"
+              />
+
+              {/* 2. Apply the displacement. 
+              scale="25": How strong the 'bulge' is.
+              xChannelSelector="R": Use the Red channel of the lens to shift pixels horizontally.
+              yChannelSelector="G": Use Green channel for vertical. 
+              Since our lens is grayscale, R=G, so it shifts diagonally outward from the dark edges.
+            */}
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="lens"
+                scale="25"
+                xChannelSelector="R"
+                yChannelSelector="G"
+              />
+            </filter>
             <radialGradient id="oceanGrad" cx="50%" cy="50%" r="85%">
               {/* <stop offset="0%" stopColor="rgb(30, 64, 175)" /> */}
               {/* Deep Blue */}
@@ -317,7 +445,6 @@ function Earth({ size = 90 }: { size?: number }) {
               <stop offset="100%" stopColor="rgb(24, 31, 99)" />
               {/* Dark Space Blue */}
             </radialGradient>
-
             {/* Atmosphere */}
             <linearGradient
               id={atmosphereGradient}
@@ -357,13 +484,13 @@ function Earth({ size = 90 }: { size?: number }) {
               r={55}
               pattern={`url(#${atmosphereMaskGradient})`}
             />
-
             {/* Water, Ground and Clouds */}
             <CircleMask id={waterMask} pattern="white" />
             <CircleMask
               id={groundMask}
               pattern={`url(#${groundPattern})`}
               fill="white"
+              filterId={lightFilter}
             />
             <CircleMask id={cloudsMask} pattern={`url(#${cloudsPattern})`} />
             <Pattern
