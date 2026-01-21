@@ -40,6 +40,9 @@ const EarthWrapper = styled("div", {
   background: "transparent", // REQUIRED for inset shadows
   overflow: "hidden", // Ensures the SVG texture doesn't spill out
   "--size-factor": sizeFactor, // Critical CSS variable for scaling
+  willChange: "transform",
+  transform: "translate3d(0,0,0)",
+  backfaceVisibility: "hidden",
   // --- THE FIX ---
   // We create a pseudo-element that sits ON TOP of the SVG
   // "&::before": {
@@ -253,6 +256,7 @@ function Earth({ size = 90 }: { size?: number }) {
               height="100"
               // fill="rgba(0, 100, 0, 1)"
               // fill="transparent"
+              // filter={`url(#${lightFilter})`}
               fill="url(#earthSurface)"
               mask={`url(#${groundMask})`}
             />
@@ -261,7 +265,7 @@ function Earth({ size = 90 }: { size?: number }) {
               y="0"
               width="100"
               height="100"
-              fill="rgba(255, 255, 255,1)"
+              fill="rgba(255, 255, 255, 1)"
               mask={`url(#${cloudsMask})`}
             />
 
@@ -370,8 +374,8 @@ function Earth({ size = 90 }: { size?: number }) {
                 result="specOut"
                 specularConstant="1.5"
                 specularExponent="25"
-                // lightingColor="#ffffee"
-                lightingColor="$#FFFFFF"
+                lightingColor="#ffffee"
+                // lightingColor="rgba(255, 255, 255, 0.1)"
               >
                 {/* fePointLight: The bulb.
                     x, y: 50, 50 places it in the dead center.
@@ -483,16 +487,28 @@ function Earth({ size = 90 }: { size?: number }) {
               height={110}
               r={55}
               pattern={`url(#${atmosphereMaskGradient})`}
+              // fill="white"
+              filterId={lightFilter}
             />
             {/* Water, Ground and Clouds */}
-            <CircleMask id={waterMask} pattern="white" />
+            <CircleMask
+              id={waterMask}
+              pattern="white"
+              // fill="white"
+              // filterId={lightFilter}
+            />
             <CircleMask
               id={groundMask}
               pattern={`url(#${groundPattern})`}
               fill="white"
               filterId={lightFilter}
             />
-            <CircleMask id={cloudsMask} pattern={`url(#${cloudsPattern})`} />
+            <CircleMask
+              id={cloudsMask}
+              pattern={`url(#${cloudsPattern})`}
+              // fill="white"
+              // filterId={lightFilter}
+            />
             <Pattern
               id={groundPattern}
               duration={50}
