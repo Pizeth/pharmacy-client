@@ -224,6 +224,7 @@ const atmosphereMaskGradient = `${PREFIX}-atmosphere-mask-gradient`;
 const lightFilter = `${PREFIX}-light-filter`;
 const groundPattern = `${PREFIX}-ground-pattern`;
 const cloudsPattern = `${PREFIX}-clouds-pattern`;
+const sphericalWarp = `${PREFIX}-spherical-warp`;
 
 function Earth({ size = 90 }: { size?: number }) {
   // Calculate precise scaling factor (90vmin = reference size)
@@ -259,6 +260,7 @@ function Earth({ size = 90 }: { size?: number }) {
               // filter={`url(#${lightFilter})`}
               fill="url(#earthSurface)"
               mask={`url(#${groundMask})`}
+              // filter={`url(#${sphericalWarp})`}
             />
             <rect
               x="0"
@@ -267,6 +269,8 @@ function Earth({ size = 90 }: { size?: number }) {
               height="100"
               fill="rgba(255, 255, 255, 1)"
               mask={`url(#${cloudsMask})`}
+              // filter={`url(#${sphericalWarp})`}
+              filter={`url(#${lightFilter})`}
             />
 
             {/* Atmosphere and Glare */}
@@ -291,6 +295,66 @@ function Earth({ size = 90 }: { size?: number }) {
           <defs>
             {/* Filters */}
             {/* <Filter id={FISHEYE_ID} /> */}
+            {/* Spherical Warp Filter - Creates the 3D wrap effect */}
+            <filter
+              id={sphericalWarp}
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
+            >
+              {/* Create a radial displacement map for spherical distortion */}
+              <feGaussianBlur
+                in="SourceGraphic"
+                stdDeviation="0"
+                result="blur"
+              />
+
+              {/* Displacement using radial gradient for sphere effect */}
+              <feImage href="#sphereDisplacementMap" result="displacementMap" />
+
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="displacementMap"
+                scale="35"
+                xChannelSelector="R"
+                yChannelSelector="G"
+                result="displaced"
+              />
+
+              {/* Add subtle blur to edges for realism */}
+              <feGaussianBlur
+                in="displaced"
+                // stdDeviation="0.1"
+                result="softened"
+              />
+
+              {/* Composite back */}
+              <feComposite in="softened" in2="SourceGraphic" operator="atop" />
+            </filter>
+            {/* Alternative: Fisheye-style displacement (stronger effect) */}
+            <filter
+              id="spherical-fisheye"
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
+            >
+              <feTurbulence
+                type="turbulence"
+                baseFrequency="0.01"
+                numOctaves="1"
+                result="turbulence"
+              />
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="turbulence"
+                scale="8"
+                xChannelSelector="R"
+                yChannelSelector="G"
+              />
+            </filter>
+
             <filter
               id="glare-blur-filter"
               x="-100%"
@@ -325,19 +389,28 @@ function Earth({ size = 90 }: { size?: number }) {
             */}
             <filter
               id={lightFilter}
-              // x="-50%"
-              // y="-50%"
-              // width="200%"
-              // height="200%"
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
             >
               {/* 1. Define the lens map using feImage with a Data URI. 
                 This is a radial gradient: White center (displacement) 
                 -> Black edge (no displacement).
               */}
-              {/* <feImage
-                href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23fff'/%3E%3Cstop offset='100%25' stop-color='%23000'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E"
+              <feImage
+                href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='15%25' cy='35%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23fff'/%3E%3Cstop offset='100%25' stop-color='%23000'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E"
                 result="lens"
-              /> */}
+              />
+
+              {/* 1. feGaussianBlur: Optional, slightly softens the input before lighting 
+                     to avoid sharp pixel artifacts on the light map.
+              */}
+              <feGaussianBlur
+                in="SourceGraphic"
+                stdDeviation="0"
+                result="lens"
+              />
 
               {/* 2. Apply the displacement. 
               scale="25": How strong the 'bulge' is.
@@ -346,16 +419,7 @@ function Earth({ size = 90 }: { size?: number }) {
               Since our lens is grayscale, R=G, so it shifts diagonally outward from the dark edges.
             */}
 
-              {/* 1. feGaussianBlur: Optional, slightly softens the input before lighting 
-                     to avoid sharp pixel artifacts on the light map.
-              */}
-              <feGaussianBlur
-                in="SourceGraphic"
-                stdDeviation="10"
-                result="blur"
-              />
-
-              <feDisplacementMap in="SourceGraphic" in2="blur" scale="3" />
+              <feDisplacementMap in="SourceGraphic" in2="lens" scale="3" />
               {/* <feDisplacementMap
                 in="SourceGraphic"
                 in2="lens"
@@ -375,12 +439,13 @@ function Earth({ size = 90 }: { size?: number }) {
                 specularConstant="1.5"
                 specularExponent="25"
                 lightingColor="#ffffee"
-                // lightingColor="rgba(255, 255, 255, 0.1)"
+                // lightingColor={`url(#${atmosphereGradient})`}
               >
                 {/* fePointLight: The bulb.
                     x, y: 50, 50 places it in the dead center.
                     z: The height above the screen. Lower Z = more intense, smaller spot. Higher Z = softer, wider spread.
                 */}
+                {/* <fePointLight x="-15" y="75" z="15" /> */}
                 <fePointLight x="15" y="50" z="25" />
               </feSpecularLighting>
 
@@ -416,7 +481,7 @@ function Earth({ size = 90 }: { size?: number }) {
                 -> Black edge (no displacement).
               */}
               <feImage
-                href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23fff'/%3E%3Cstop offset='100%25' stop-color='%23000'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E"
+                href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='15%25' cy='35%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23fff'/%3E%3Cstop offset='100%25' stop-color='%23000'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E"
                 result="lens"
               />
 
@@ -479,6 +544,18 @@ function Earth({ size = 90 }: { size?: number }) {
               <stop offset="90%" stopColor="white" stopOpacity="1" />
               <stop offset="100%" stopColor="white" stopOpacity="0" />
             </radialGradient>
+            {/* Sphere Displacement Map (hidden element used by filter) */}
+            <radialGradient
+              id="sphereDisplacementMap"
+              cx="50%"
+              cy="50%"
+              r="50%"
+            >
+              <stop offset="0%" stopColor="rgb(128, 128, 128)" />
+              <stop offset="60%" stopColor="rgb(140, 140, 140)" />
+              <stop offset="85%" stopColor="rgb(180, 180, 180)" />
+              <stop offset="100%" stopColor="rgb(128, 128, 128)" />
+            </radialGradient>
             <CircleMask
               id={atmosphereMask}
               x={-5}
@@ -506,7 +583,7 @@ function Earth({ size = 90 }: { size?: number }) {
             <CircleMask
               id={cloudsMask}
               pattern={`url(#${cloudsPattern})`}
-              // fill="white"
+              fill={`url(#${atmosphereGradient})`}
               // filterId={lightFilter}
             />
             <Pattern

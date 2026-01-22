@@ -130,7 +130,7 @@ export default function NotFound() {
         {/* <TestPlanet /> */}
         {/* <Sun /> */}
         {/* <Moon /> */}
-        <Earth size={100} />
+        <Earth size={43} />
         {/* <div
           style={{
             position: "absolute",
