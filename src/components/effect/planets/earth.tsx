@@ -234,11 +234,18 @@ function Earth({ size = 90 }: { size?: number }) {
   return (
     <Root size={size}>
       <EarthWrapper sizeFactor={sizeFactor}>
-        <svg id="earth" viewBox="-0.5 -0.5 101 101" width="100%" height="100%">
+        <svg
+          id="earth"
+          viewBox="-0.5 -0.5 101 101"
+          width="100%"
+          height="100%"
+          preserveAspectRatio="xMidYMid slice"
+        >
           {/* Apply the new lighting filter to this group. 
               Note: We keep the rotation on a child group or apply the filter AFTER rotation 
               so the light stays "fixed" relative to the view, or rotates with it depending on preference.
           */}
+          {/* <g filter={`url(#${sphericalWarp})`}> */}
           <g transform="rotate(23.5, 50, 50)">
             {/* Base Layers (Water, Ground and Clouds) */}
             <rect
@@ -260,8 +267,19 @@ function Earth({ size = 90 }: { size?: number }) {
               // filter={`url(#${lightFilter})`}
               fill="url(#earthSurface)"
               mask={`url(#${groundMask})`}
-              // filter={`url(#${sphericalWarp})`}
+              filter={`url(#${sphericalWarp})`}
             />
+
+            {/* <circle
+              cx="50"
+              cy="50"
+              r="60"
+              fill="url(#earthSurface)"
+              filter={`url(#${sphericalWarp})`}
+              // filter="url(#sun-glow)"
+              // mask={`url(#${atmosphereMask})`}
+            /> */}
+
             <rect
               x="0"
               y="0"
@@ -270,7 +288,7 @@ function Earth({ size = 90 }: { size?: number }) {
               fill="rgba(255, 255, 255, 1)"
               mask={`url(#${cloudsMask})`}
               // filter={`url(#${sphericalWarp})`}
-              filter={`url(#${lightFilter})`}
+              // filter={`url(#${lightFilter})`}
             />
 
             {/* Atmosphere and Glare */}
@@ -292,12 +310,50 @@ function Earth({ size = 90 }: { size?: number }) {
               overflow={"hidden"}
             />
           </g>
+          {/* </g> */}
           <defs>
             {/* Filters */}
             {/* <Filter id={FISHEYE_ID} /> */}
             {/* Spherical Warp Filter - Creates the 3D wrap effect */}
             <filter
               id={sphericalWarp}
+              // colorInterpolationFilters="sRGB"
+              // width="1"
+              // height="1"
+              // x="0"
+              // y="0"
+            >
+              {/* <feImage
+              href="data:image/svg+xml;charset=utf-8,%3Csvg width='100%' height='100%' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='gR' x1='0%25' y1='0%25' x2='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23000'/%3E%3Cstop offset='100%25' stop-color='%23f00'/%3E%3C/linearGradient%3E%3ClinearGradient id='gB' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23000'/%3E%3Cstop offset='100%25' stop-color='%2300f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23gR)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23gB)' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
+              preserveAspectRatio="none"
+              result="MAP"
+            />  */}
+
+              <feImage
+                href="data:image/svg+xml;charset=utf-8,%3Csvg width='256' height='256' viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='gR' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23800000'/%3E%3Cstop offset='100%25' stop-color='%23ff0000'/%3E%3C/radialGradient%3E%3CradialGradient id='gB' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23000080'/%3E%3Cstop offset='100%25' stop-color='%230000ff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23gR)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23gB)' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                preserveAspectRatio="none"
+                result="MAP"
+              />
+
+              <feDisplacementMap
+                id="dispMap"
+                in="SourceGraphic"
+                in2="MAP"
+                scale="15"
+                xChannelSelector="R"
+                yChannelSelector="B"
+              ></feDisplacementMap>
+            </filter>
+            <filter
+              id={sphericalWarp + "01"}
               x="-50%"
               y="-50%"
               width="200%"
@@ -578,7 +634,8 @@ function Earth({ size = 90 }: { size?: number }) {
               id={groundMask}
               pattern={`url(#${groundPattern})`}
               fill="white"
-              filterId={lightFilter}
+              // filterId={lightFilter}
+              // filterId={sphericalWarp}
             />
             <CircleMask
               id={cloudsMask}
@@ -596,6 +653,8 @@ function Earth({ size = 90 }: { size?: number }) {
             />
             <Pattern
               id={"earthSurface"}
+              y={4.5}
+              // x={}
               duration={50}
               width={179.8}
               to={179.8}
