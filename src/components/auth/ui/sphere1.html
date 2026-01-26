@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-      Pure SVG Realistic Spherical Earth (Axial Tilt + Balanced Lighting)
+      Pure SVG Realistic Spherical Earth + Clouds + Terminator + Stars + City
+      Lights
     </title>
     <style>
       body {
@@ -141,7 +142,7 @@
             </filter>
 
             <!-- Subtle glow blur for city lights -->
-            <!-- <filter
+            <filter
               id="lightsBlur"
               x="-50%"
               y="-50%"
@@ -149,16 +150,16 @@
               height="200%"
             >
               <feGaussianBlur stdDeviation="4" />
-            </filter> -->
+            </filter>
 
             <!-- Limb darkening -->
-            <!-- <radialGradient id="limbGrad">
+            <radialGradient id="limbGrad">
               <stop offset="0%" stop-color="#ffffff" />
               <stop offset="100%" stop-color="#000000" stop-opacity="0.35" />
-            </radialGradient> -->
+            </radialGradient>
 
-            <!-- Specular highlight (matched to sun position) -->
-            <radialGradient id="specGrad" cx="50%" cy="40%">
+            <!-- Specular highlight -->
+            <radialGradient id="specGrad" cx="35%" cy="35%">
               <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7" />
               <stop offset="40%" stop-color="#ffffff" stop-opacity="0.15" />
               <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
@@ -177,8 +178,18 @@
               <feGaussianBlur stdDeviation="15" />
             </filter>
 
+            <!-- Day/night terminator -->
+            <radialGradient id="nightGrad" cx="35%" cy="35%">
+              <stop offset="0%" stop-color="#000000" stop-opacity="0" />
+              <stop offset="65%" stop-color="#000000" stop-opacity="0" />
+              <stop offset="100%" stop-color="#000000" stop-opacity="0.85" />
+            </radialGradient>
+            <filter id="terminatorBlur">
+              <feGaussianBlur stdDeviation="30" />
+            </filter>
+
             <!-- Day/night terminator – now nearly full day with small soft night area -->
-            <radialGradient id="nightGrad" cx="50%" cy="40%">
+            <radialGradient id="nightGradNew" cx="50%" cy="40%">
               <stop offset="0%" stop-color="#000000" stop-opacity="0" />
               <stop offset="80%" stop-color="#000000" stop-opacity="0" />
               <stop offset="100%" stop-color="#000000" stop-opacity="0.75" />
@@ -188,7 +199,7 @@
             </filter>
           </defs>
 
-          <!-- Base Earth map (day) – shifted vertically for axial tilt (~23.4°) -->
+          <!-- Base Earth map (day) -->
           <image
             id="map"
             href="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/3840px-Blue_Marble_2002.png"
@@ -213,7 +224,7 @@
             style="mix-blend-mode: screen"
           />
 
-          <!-- Day/night terminator (soft, mostly day with small night area for city lights) -->
+          <!-- Day/night terminator (darkens night side) -->
           <rect
             x="0"
             y="0"
@@ -224,20 +235,20 @@
             style="mix-blend-mode: multiply"
           />
 
-          <!-- City lights with subtle glow blur -->
-          <g filter="url(#lightsBlur)">
-            <image
-              id="lights"
-              href="https://www.solarsystemscope.com/textures/download/8k_earth_nightmap.jpg"
-              filter="url(#conform)"
-              x="-100%"
-              y="-13%"
-              width="200%"
-              height="100%"
-              preserveAspectRatio="none"
-              style="mix-blend-mode: screen"
-            />
-          </g>
+          <!-- City lights on night side (screen blend on top to illuminate dark areas) -->
+          <!-- <g filter="url(#lightsBlur)"> -->
+          <image
+            id="lights"
+            href="https://www.solarsystemscope.com/textures/download/8k_earth_nightmap.jpg"
+            filter="url(#conform)"
+            x="-100%"
+            y="-13%"
+            width="200%"
+            height="100%"
+            preserveAspectRatio="none"
+            style="mix-blend-mode: screen"
+          />
+          <!-- </g> -->
 
           <!-- Fixed realism overlays -->
           <g>
@@ -277,9 +288,9 @@
             id="scaleSlider"
             min="-200"
             max="200"
-            value="55"
+            value="15"
           />
-          <div id="scaleVal">55</div>
+          <div id="scaleVal">15</div>
         </div>
 
         <div>
@@ -343,7 +354,7 @@
         for (let i = 0; i < num; i++) {
           const star = document.createElementNS(
             "http://www.w3.org/2000/svg",
-            "circle"
+            "circle",
           );
           star.setAttribute("cx", Math.random() * 400);
           star.setAttribute("cy", Math.random() * 400);
@@ -358,19 +369,17 @@
         }
       }
 
-      //   addStars();
+      // addStars();
 
       function animate() {
         if (isAnimating) {
           groundOffset += 0.15;
-          if (groundOffset >= 0) groundOffset = -100;
-
           cloudOffset += 0.15 * cloudMultiplier;
+          if (groundOffset >= 0) groundOffset = -100;
           if (cloudOffset >= 0) cloudOffset = -100;
-
           mapImage.setAttribute("x", `${groundOffset}%`);
-          lights.setAttribute("x", `${groundOffset}%`);
           clouds.setAttribute("x", `${cloudOffset}%`);
+          lights.setAttribute("x", `${cloudOffset}%`);
         }
         requestAnimationFrame(animate);
       }
