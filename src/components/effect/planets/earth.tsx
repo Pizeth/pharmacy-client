@@ -248,7 +248,7 @@ function Earth({ size = 90 }: { size?: number }) {
           {/* <g filter={`url(#${sphericalWarp})`}> */}
           <g transform="rotate(23.5, 50, 50)">
             {/* Base Layers (Water, Ground and Clouds) */}
-            <rect
+            {/* <rect
               x="0"
               y="0"
               width="100"
@@ -267,27 +267,27 @@ function Earth({ size = 90 }: { size?: number }) {
               // filter={`url(#${lightFilter})`}
               fill="url(#earthSurface)"
               mask={`url(#${groundMask})`}
-              filter={`url(#${sphericalWarp})`}
-            />
+              // filter={`url(#${sphericalWarp})`}
+            /> */}
 
-            {/* <circle
+            <circle
               cx="50"
               cy="50"
-              r="60"
+              r="100"
               fill="url(#earthSurface)"
               filter={`url(#${sphericalWarp})`}
               // filter="url(#sun-glow)"
               // mask={`url(#${atmosphereMask})`}
-            /> */}
+            />
 
             <rect
               x="0"
               y="0"
-              width="100"
-              height="100"
+              width="150"
+              height="150"
               fill="rgba(255, 255, 255, 1)"
               mask={`url(#${cloudsMask})`}
-              // filter={`url(#${sphericalWarp})`}
+              filter={`url(#${sphericalWarp})`}
               // filter={`url(#${lightFilter})`}
             />
 
@@ -332,9 +332,18 @@ function Earth({ size = 90 }: { size?: number }) {
               preserveAspectRatio="none"
               result="MAP"
             />  */}
-
+              {/* 
               <feImage
                 href="data:image/svg+xml;charset=utf-8,%3Csvg width='256' height='256' viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='gR' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23800000'/%3E%3Cstop offset='100%25' stop-color='%23ff0000'/%3E%3C/radialGradient%3E%3CradialGradient id='gB' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23000080'/%3E%3Cstop offset='100%25' stop-color='%230000ff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23gR)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23gB)' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                preserveAspectRatio="none"
+                result="MAP"
+              /> */}
+              <feImage
+                href="data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='horiz' x1='0%25' x2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff0000'/%3E%3Cstop offset='50%25' stop-color='%23808080'/%3E%3Cstop offset='100%25' stop-color='%23000000'/%3E%3C/linearGradient%3E%3ClinearGradient id='vertmod' y1='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='35%25' stop-color='%23404040'/%3E%3Cstop offset='65%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/linearGradient%3E%3CradialGradient id='radmod' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23horiz)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23vertmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='url(%23radmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='%23000080' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
                 x="0"
                 y="0"
                 width="100%"
@@ -347,7 +356,7 @@ function Earth({ size = 90 }: { size?: number }) {
                 id="dispMap"
                 in="SourceGraphic"
                 in2="MAP"
-                scale="15"
+                scale="-25"
                 xChannelSelector="R"
                 yChannelSelector="B"
               ></feDisplacementMap>
@@ -635,7 +644,7 @@ function Earth({ size = 90 }: { size?: number }) {
               pattern={`url(#${groundPattern})`}
               fill="white"
               // filterId={lightFilter}
-              // filterId={sphericalWarp}
+              filterId={sphericalWarp}
             />
             <CircleMask
               id={cloudsMask}

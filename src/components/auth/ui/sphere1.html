@@ -26,8 +26,8 @@
       }
 
       #glass {
-        width: 400px;
-        height: 400px;
+        width: 100vmin;
+        height: 100vmin;
         border-radius: 50%;
         box-shadow:
           inset -20px -20px 50px rgba(0, 0, 0, 0.8),
@@ -82,16 +82,6 @@
       button:hover {
         background: #005fa3;
       }
-
-      @keyframes twinkle {
-        0%,
-        100% {
-          opacity: 0.4;
-        }
-        50% {
-          opacity: 1;
-        }
-      }
     </style>
   </head>
   <body>
@@ -100,11 +90,13 @@
         <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
           <defs>
             <!-- Ground displacement map -->
+            <!-- href="data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='horiz' x1='0%25' x2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff0000'/%3E%3Cstop offset='50%25' stop-color='%23808080'/%3E%3Cstop offset='100%25' stop-color='%23000000'/%3E%3C/linearGradient%3E%3ClinearGradient id='vertmod' y1='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='35%25' stop-color='%23404040'/%3E%3Cstop offset='65%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/linearGradient%3E%3CradialGradient id='radmod' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23horiz)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23vertmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='url(%23radmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='%23000080' style='mix-blend-mode:screen'/%3E%3C/svg%3E" -->
+            <!-- href="/public/static/svg/bump.svg" -->
             <filter id="conform">
               <feImage
-                href="data:image/svg+xml;charset=utf-8,%3Csvg width='256' height='256' viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='horiz' x1='0%25' x2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff0000'/%3E%3Cstop offset='50%25' stop-color='%23808080'/%3E%3Cstop offset='100%25' stop-color='%23000000'/%3E%3C/linearGradient%3E%3ClinearGradient id='vertmod' y1='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='35%25' stop-color='%23404040'/%3E%3Cstop offset='65%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/linearGradient%3E%3CradialGradient id='radmod' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23horiz)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23vertmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='url(%23radmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='%23000080' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
-                x="0"
-                y="0"
+                href="data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='horiz' x1='0%25' x2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff0000'/%3E%3Cstop offset='50%25' stop-color='%23808080'/%3E%3Cstop offset='100%25' stop-color='%23000000'/%3E%3C/linearGradient%3E%3ClinearGradient id='vertmod' y1='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='35%25' stop-color='%23404040'/%3E%3Cstop offset='65%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/linearGradient%3E%3CradialGradient id='radmod' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23horiz)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23vertmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='url(%23radmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='%23000080' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
+                x="0%"
+                y="0%"
                 width="100%"
                 height="100%"
                 preserveAspectRatio="none"
@@ -114,7 +106,7 @@
                 id="dispMap"
                 in="SourceGraphic"
                 in2="MAP"
-                scale="55"
+                scale="-150"
                 xChannelSelector="R"
                 yChannelSelector="B"
               />
@@ -123,7 +115,7 @@
             <!-- Clouds displacement (weaker for parallax) -->
             <filter id="cloudsConform">
               <feImage
-                href="data:image/svg+xml;charset=utf-8,%3Csvg width='256' height='256' viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='horiz' x1='0%25' x2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff0000'/%3E%3Cstop offset='50%25' stop-color='%23808080'/%3E%3Cstop offset='100%25' stop-color='%23000000'/%3E%3C/linearGradient%3E%3ClinearGradient id='vertmod' y1='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='35%25' stop-color='%23404040'/%3E%3Cstop offset='65%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/linearGradient%3E%3CradialGradient id='radmod' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23horiz)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23vertmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='url(%23radmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='%23000080' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
+                href="data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='horiz' x1='0%25' x2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff0000'/%3E%3Cstop offset='50%25' stop-color='%23808080'/%3E%3Cstop offset='100%25' stop-color='%23000000'/%3E%3C/linearGradient%3E%3ClinearGradient id='vertmod' y1='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='35%25' stop-color='%23404040'/%3E%3Cstop offset='65%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/linearGradient%3E%3CradialGradient id='radmod' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23horiz)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23vertmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='url(%23radmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='%23000080' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
                 x="0"
                 y="0"
                 width="100%"
@@ -135,27 +127,42 @@
                 id="cloudDisp"
                 in="SourceGraphic"
                 in2="MAP"
-                scale="44"
+                scale="-25"
                 xChannelSelector="R"
                 yChannelSelector="B"
               />
             </filter>
 
             <!-- Subtle glow blur for city lights -->
-            <filter
+            <!-- <filter
               id="lightsBlur"
               x="-50%"
               y="-50%"
               width="200%"
               height="200%"
             >
-              <feGaussianBlur stdDeviation="4" />
+              <feGaussianBlur stdDeviation="0.25" />
+            </filter> -->
+
+            <!-- Fixed city lights glow (larger filter region to prevent clipping + stronger blur) -->
+            <filter
+              id="lightsGlow"
+              x="-100%"
+              y="-100%"
+              width="300%"
+              height="300%"
+            >
+              <feGaussianBlur stdDeviation="8" result="blur" />
+              <!-- Make glow brighter and more visible on night side -->
+              <feComponentTransfer in="blur" result="brighter">
+                <feFuncA type="linear" slope="2" intercept="0" />
+              </feComponentTransfer>
             </filter>
 
             <!-- Limb darkening -->
             <radialGradient id="limbGrad">
               <stop offset="0%" stop-color="#ffffff" />
-              <stop offset="100%" stop-color="#000000" stop-opacity="0.35" />
+              <stop offset="100%" stop-color="#000000" stop-opacity="0.25" />
             </radialGradient>
 
             <!-- Specular highlight -->
@@ -179,24 +186,34 @@
             </filter>
 
             <!-- Day/night terminator -->
-            <radialGradient id="nightGrad" cx="35%" cy="35%">
+            <!-- <radialGradient id="nightGrad" cx="35%" cy="35%">
               <stop offset="0%" stop-color="#000000" stop-opacity="0" />
               <stop offset="65%" stop-color="#000000" stop-opacity="0" />
               <stop offset="100%" stop-color="#000000" stop-opacity="0.85" />
             </radialGradient>
             <filter id="terminatorBlur">
               <feGaussianBlur stdDeviation="30" />
+            </filter> -->
+
+            <!-- Day/night terminator (larger day area, sun higher for northern summer) -->
+            <radialGradient id="nightGrad" cx="50%" cy="30%">
+              <stop offset="0%" stop-color="#000000" stop-opacity="0" />
+              <stop offset="85%" stop-color="#000000" stop-opacity="0" />
+              <stop offset="100%" stop-color="#000000" stop-opacity="0.8" />
+            </radialGradient>
+            <filter id="terminatorBlur">
+              <feGaussianBlur stdDeviation="60" />
             </filter>
 
             <!-- Day/night terminator – now nearly full day with small soft night area -->
-            <radialGradient id="nightGradNew" cx="50%" cy="40%">
+            <!-- <radialGradient id="nightGradNew" cx="50%" cy="40%">
               <stop offset="0%" stop-color="#000000" stop-opacity="0" />
               <stop offset="80%" stop-color="#000000" stop-opacity="0" />
               <stop offset="100%" stop-color="#000000" stop-opacity="0.75" />
             </radialGradient>
             <filter id="terminatorBlur">
               <feGaussianBlur stdDeviation="50" />
-            </filter>
+            </filter> -->
           </defs>
 
           <!-- Base Earth map (day) -->
@@ -204,25 +221,25 @@
             id="map"
             href="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/3840px-Blue_Marble_2002.png"
             filter="url(#conform)"
-            x="-100%"
-            y="-13%"
+            x="0%"
+            y="5%"
             width="200%"
             height="100%"
             preserveAspectRatio="none"
           />
 
           <!-- Clouds -->
-          <image
+          <!-- <image
             id="clouds"
             href="https://upload.wikimedia.org/wikipedia/commons/d/df/Earth-clouds.png"
             filter="url(#cloudsConform)"
-            x="-100%"
-            y="-13%"
+            x="-100%%"
+            y="0%"
             width="200%"
             height="100%"
             preserveAspectRatio="none"
             style="mix-blend-mode: screen"
-          />
+          /> -->
 
           <!-- Day/night terminator (darkens night side) -->
           <rect
@@ -237,7 +254,8 @@
 
           <!-- City lights on night side (screen blend on top to illuminate dark areas) -->
           <!-- <g filter="url(#lightsBlur)"> -->
-          <image
+          <g>
+            <!-- <image
             id="lights"
             href="https://www.solarsystemscope.com/textures/download/8k_earth_nightmap.jpg"
             filter="url(#conform)"
@@ -247,8 +265,33 @@
             height="100%"
             preserveAspectRatio="none"
             style="mix-blend-mode: screen"
-          />
-          <!-- </g> -->
+          /> -->
+            <!-- Base city lights (displaced exactly like day map) -->
+            <!-- <image
+              id="lights"
+              href="https://www.solarsystemscope.com/textures/download/8k_earth_nightmap.jpg"
+              filter="url(#conform)"
+              x="-100%"
+              y="-13%"
+              width="200%"
+              height="100%"
+              preserveAspectRatio="none"
+              style="mix-blend-mode: screen; opacity: 0.9"
+            /> -->
+
+            <!-- Glow layer (same source, heavily blurred and brightened) -->
+            <!-- <image
+              href="https://www.solarsystemscope.com/textures/download/8k_earth_nightmap.jpg"
+              filter="url(#conform)"
+              x="-100%"
+              y="-13%"
+              width="200%"
+              height="100%"
+              preserveAspectRatio="none"
+              style="mix-blend-mode: screen; opacity: 0.6"
+              filter="url(#lightsGlow)"
+            /> -->
+          </g>
 
           <!-- Fixed realism overlays -->
           <g>
@@ -288,9 +331,9 @@
             id="scaleSlider"
             min="-200"
             max="200"
-            value="15"
+            value="-15"
           />
-          <div id="scaleVal">15</div>
+          <div id="scaleVal">-15</div>
         </div>
 
         <div>
@@ -320,8 +363,8 @@
       const valDisplay = document.getElementById("scaleVal");
       const cloudSpeedVal = document.getElementById("cloudSpeedVal");
       const mapImage = document.getElementById("map");
-      const clouds = document.getElementById("clouds");
-      const lights = document.getElementById("lights");
+      // const clouds = document.getElementById("clouds");
+      // const lights = document.getElementById("lights");
       const toggleBtn = document.getElementById("toggleAnim");
       const svg = document.querySelector("#glass svg");
 
@@ -375,11 +418,11 @@
         if (isAnimating) {
           groundOffset += 0.15;
           cloudOffset += 0.15 * cloudMultiplier;
-          if (groundOffset >= 0) groundOffset = -100;
+          if (groundOffset >= 0) groundOffset = -50;
           if (cloudOffset >= 0) cloudOffset = -100;
           mapImage.setAttribute("x", `${groundOffset}%`);
-          clouds.setAttribute("x", `${cloudOffset}%`);
-          lights.setAttribute("x", `${cloudOffset}%`);
+          // clouds.setAttribute("x", `${cloudOffset}%`);
+          // lights.setAttribute("x", `${cloudOffset}%`);
         }
         requestAnimationFrame(animate);
       }
