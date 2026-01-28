@@ -245,10 +245,10 @@ function Earth({ size = 90 }: { size?: number }) {
               Note: We keep the rotation on a child group or apply the filter AFTER rotation 
               so the light stays "fixed" relative to the view, or rotates with it depending on preference.
           */}
-          {/* <g filter={`url(#${sphericalWarp})`}> */}
-          <g transform="rotate(23.5, 50, 50)">
-            {/* Base Layers (Water, Ground and Clouds) */}
-            {/* <rect
+          <g filter={`url(#${sphericalWarp})`}>
+            <g transform="rotate(23.5, 50, 50)">
+              {/* Base Layers (Water, Ground and Clouds) */}
+              {/* <rect
               x="0"
               y="0"
               width="100"
@@ -270,29 +270,29 @@ function Earth({ size = 90 }: { size?: number }) {
               // filter={`url(#${sphericalWarp})`}
             /> */}
 
-            <circle
-              cx="50"
-              cy="50"
-              r="100"
-              fill="url(#earthSurface)"
-              filter={`url(#${sphericalWarp})`}
-              // filter="url(#sun-glow)"
-              // mask={`url(#${atmosphereMask})`}
-            />
+              <circle
+                cx="50"
+                cy="50"
+                r="100"
+                fill="url(#earthSurface1)"
+                // filter={`url(#${sphericalWarp})`}
+                // filter="url(#sun-glow)"
+                // mask={`url(#${atmosphereMask})`}
+              />
 
-            <rect
-              x="0"
-              y="0"
-              width="150"
-              height="150"
-              fill="rgba(255, 255, 255, 1)"
-              mask={`url(#${cloudsMask})`}
-              filter={`url(#${sphericalWarp})`}
-              // filter={`url(#${lightFilter})`}
-            />
+              {/* <rect
+                x="0"
+                y="0"
+                width="150"
+                height="150"
+                fill="rgba(255, 255, 255, 1)"
+                mask={`url(#${cloudsMask})`}
+                filter={`url(#${sphericalWarp})`}
+                // filter={`url(#${lightFilter})`}
+              /> */}
 
-            {/* Atmosphere and Glare */}
-            <rect
+              {/* Atmosphere and Glare */}
+              {/* <rect
               x="-5"
               y="-5"
               width="110"
@@ -308,9 +308,9 @@ function Earth({ size = 90 }: { size?: number }) {
               fill="rgba(255, 255, 255, 0.35)"
               filter="url(#glare-blur-filter)"
               overflow={"hidden"}
-            />
+            /> */}
+            </g>
           </g>
-          {/* </g> */}
           <defs>
             {/* Filters */}
             {/* <Filter id={FISHEYE_ID} /> */}
@@ -344,10 +344,10 @@ function Earth({ size = 90 }: { size?: number }) {
               /> */}
               <feImage
                 href="data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='horiz' x1='0%25' x2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff0000'/%3E%3Cstop offset='50%25' stop-color='%23808080'/%3E%3Cstop offset='100%25' stop-color='%23000000'/%3E%3C/linearGradient%3E%3ClinearGradient id='vertmod' y1='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='35%25' stop-color='%23404040'/%3E%3Cstop offset='65%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/linearGradient%3E%3CradialGradient id='radmod' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23horiz)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23vertmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='url(%23radmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='%23000080' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
-                x="0"
-                y="0"
-                width="100%"
-                height="100%"
+                x="-25"
+                y="-25"
+                width="125%"
+                height="125%"
                 preserveAspectRatio="none"
                 result="MAP"
               />
@@ -356,7 +356,7 @@ function Earth({ size = 90 }: { size?: number }) {
                 id="dispMap"
                 in="SourceGraphic"
                 in2="MAP"
-                scale="-25"
+                scale="-50"
                 xChannelSelector="R"
                 yChannelSelector="B"
               ></feDisplacementMap>
@@ -668,6 +668,15 @@ function Earth({ size = 90 }: { size?: number }) {
               width={179.8}
               to={179.8}
               href="/static/textures/earth_pattern.png"
+            />
+            <Pattern
+              id={"earthSurface1"}
+              y={0}
+              // x={}
+              duration={50}
+              width={200}
+              to={200}
+              href="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/3840px-Blue_Marble_2002.png"
             />
             <Pattern
               id={cloudsPattern}
