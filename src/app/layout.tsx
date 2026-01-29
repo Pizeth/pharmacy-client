@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@mui/material/styles";
+import { Siemreap, Moul } from "next/font/google";
+import { darkTheme } from "@/theme/razeth";
+// import { useEffect, useState } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,17 +21,49 @@ export const metadata: Metadata = {
   description: "The Ultimate Pharmacy Management Solution",
 };
 
+// Load Khmer Fonts
+const siemreap = Siemreap({
+  subsets: ["khmer"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-siemreap",
+});
+
+const moul = Moul({
+  subsets: ["khmer"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-moul",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // const [mode, setMode] = useState("light");
+  // // Logic to toggle dark mode automatically based on official Tailwind guide
+  // useEffect(() => {
+  //   const isDark =
+  //     localStorage.theme === "dark" ||
+  //     (!("theme" in localStorage) &&
+  //       window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  //   setMode(isDark ? "dark" : "light");
+
+  //   if (isDark) {
+  //     document.documentElement.classList.add("dark");
+  //   } else {
+  //     document.documentElement.classList.remove("dark");
+  //   }
+  // }, []);
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${siemreap.variable} ${moul.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>
       </body>
     </html>
   );

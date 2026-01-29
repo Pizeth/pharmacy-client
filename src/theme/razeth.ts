@@ -1,8 +1,9 @@
+"use client";
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 import { deepmerge } from "@mui/utils";
 import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
 import { red, blue } from "@mui/material/colors";
-import { createTheme, Theme } from "@mui/material/styles";
+import { createTheme, PaletteMode, Theme } from "@mui/material/styles";
 import { ClassKey, CustomComponents } from "@/types/classKey";
 import {
   Line,
@@ -11,7 +12,7 @@ import {
   SideImage,
 } from "@/interfaces/theme.interface";
 import { makePulseVars } from "@/utils/themeUtils";
-import { getMeteorConfig, getSideImageConfig } from "@/configs/themeConfig";
+import { /*getMeteorConfig,*/ getSideImageConfig } from "@/configs/themeConfig";
 import { shake } from "./keyframes";
 import {
   RazethAvatarOptimized,
@@ -51,8 +52,10 @@ declare module "@mui/material/styles" {
   // ComponentNameToClassKey can derive its keys from our map.
   // Note: If each component has different keys (e.g., 'root', 'card'),
   // this interface should be defined manually for full accuracy.
-  interface ComponentNameToClassKey
-    extends Record<keyof RazethComponentsPropsList, ClassKey> {}
+  interface ComponentNameToClassKey extends Record<
+    keyof RazethComponentsPropsList,
+    ClassKey
+  > {}
 
   // ComponentsPropsList directly extends our map.
   interface ComponentsPropsList extends RazethComponentsPropsList {}
@@ -74,7 +77,7 @@ const globalStyles = (theme: Theme) => ({
     ...makePulseVars(
       theme.custom.sideImage.circleColor,
       theme.custom.sideImage.circleStopCount,
-      theme.custom.sideImage.circlePulseSequence
+      theme.custom.sideImage.circlePulseSequence,
     ),
     "--app-sideImage-circleSize": theme.custom.sideImage.circleSize,
     // "--app-sideImage-circleColor": "#1e40af",
@@ -127,8 +130,13 @@ const globalStyles = (theme: Theme) => ({
 
 const defaultThemeInvariants = {
   typography: {
+    // fontFamily: "var(--font-siemreap)",
+    // h5: {
+    //   fontFamily: "var(--font-siemreap)",
+    // },
     h6: {
-      fontWeight: 400,
+      fontWeight: 700,
+      fontFamily: "var(--font-moul)", // Use Moul for headers like "Kingdom of Cambodia"
     },
   },
   sidebar: {
@@ -186,446 +194,482 @@ const defaultThemeInvariants = {
   },
 };
 
-const customBaseTheme = createTheme({
-  cssVariables: { cssVarPrefix: "app" },
-  // cssVarPrefix: "app", // all vars will start with --app-
-  custom: {
-    sideImage: getSideImageConfig(),
-    meteor: getMeteorConfig(),
-    lines: [
-      { color: "#FF4500", delay: "0.5s" },
-      { color: "#32CD32", delay: "1s" },
-      { color: "#1E90FF", delay: "1.5s" },
-      { color: "#FFD700", delay: "2s" },
-      { color: "#8A2BE2", delay: "2.5s" },
-      { color: "#20B2AA", delay: "3s" },
-      { color: "#DC143C", delay: "3.5s" },
-      { color: "#00FA9A", delay: "4s" },
-      { color: "#FF1493", delay: "4.5s" },
-      { color: "#00BFFF", delay: "5s" },
-    ],
-  },
-  palette: {
-    primary: { main: "#e1232e", contrastText: "#fff" },
-    secondary: { main: "#007bff" },
-    error: { main: "#f58700" },
-    warning: { main: "#FFD22B" },
-    info: { main: "#f89696" },
-    success: { main: "#2ece71" },
-
-    mode: "dark",
-    background: { default: "#121212", paper: "#1d1d1dbf" },
-    text: { primary: "#ffffff", secondary: "#aaaaaa" },
-    passwordStrength: ["#aaaaaa", "#e76f51", "#f58700", "#0668d1", "#4caf50"],
-  },
-  shape: {
-    borderRadius: 50,
-  },
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 900,
-      lg: 1200,
-      xl: 1536,
+const RazethBaseTheme = (mode: PaletteMode = "dark") =>
+  createTheme({
+    cssVariables: {
+      cssVarPrefix: "app",
+      colorSchemeSelector: "class",
     },
-  },
-  components: {
-    RazethLogin: RazethLoginOptimized,
+    // cssVarPrefix: "app", // all vars will start with --app-
+    custom: {
+      sideImage: getSideImageConfig(),
+      // meteor: getMeteorConfig(),
+      lines: [
+        { color: "#FF4500", delay: "0.5s" },
+        { color: "#32CD32", delay: "1s" },
+        { color: "#1E90FF", delay: "1.5s" },
+        { color: "#FFD700", delay: "2s" },
+        { color: "#8A2BE2", delay: "2.5s" },
+        { color: "#20B2AA", delay: "3s" },
+        { color: "#DC143C", delay: "3.5s" },
+        { color: "#00FA9A", delay: "4s" },
+        { color: "#FF1493", delay: "4.5s" },
+        { color: "#00BFFF", delay: "5s" },
+      ],
+    },
+    palette: {
+      primary: { main: "#e1232e", contrastText: "#fff" },
+      secondary: { main: "#007bff" },
+      error: { main: "#f58700" },
+      warning: { main: "#FFD22B" },
+      info: { main: "#f89696" },
+      success: { main: "#2ece71" },
 
-    // ============================================ //
-    // STAR COMPONENTS - MINIMAL OVERRIDES          //
-    // ============================================ //
-    RazethShootingStar: RazethShootingStarOptimized,
-    RazethTwinkleStar: RazethTwinkleStarOptimized,
-    RazethMeteor: RazethMeteorOptimized,
-
-    // ============================================ //
-    //          SIDE IMAGE - SIMPLIFIED             //
-    // ============================================ //
-    RazethSideImage: RazethSideImageOptimized,
-
-    // ============================================ //
-    //          AVATAR - KEEP ESSENTIALS            //
-    // ============================================ //
-    RazethAvatar: RazethAvatarOptimized,
-    RazethLoginForm: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          ["& .MuiCardContent-root"]: {
-            minWidth: 300,
-            padding: `${props.theme.spacing(0)}`,
-          },
-        }),
-        content: (props: { theme: Theme }) => ({
-          display: "flex",
-          flexDirection: "column",
-          gap: props.theme.spacing(0),
-          input: {
-            transition: props.theme.transitions.create("color", {
-              easing: props.theme.transitions.easing.easeInOut,
-              duration: props.theme.transitions.duration.short,
-            }),
-            "&:focus": {
-              // color: "#e1232e", // focused
-              color: props.theme.palette.primary.main, // focused
-            },
-          },
-          // Apply custom styles to the last child element inside this container
-          "& > :last-child": {
-            // For example, you could add extra margin to the button
-            // if it's the last item. Let's override its default top margin.
-            marginTop: props.theme.spacing(1),
-          },
-        }),
-        password: (props: { theme: Theme }) => ({
-          display: "flex",
-          flexDirection: "column",
-          width: "100%",
-          gap: props.theme.spacing(0),
-        }),
-        footer: (props: { theme: Theme }) => ({
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          fontWeight: 500,
-          marginTop: "-0.5rem",
-          marginBottom: "-0.5rem",
-          width: "100%",
-          gap: props.theme.spacing(0),
-        }),
-        // button: (props: { theme: Theme }) => ({
-        //   marginTop: props.theme.spacing(1),
-        //   fontWeight: 700,
-        //   fontSize: "1rem",
-        //   ["& .MuiSvgIcon-root"]: { margin: props.theme.spacing(0.3) },
-        // }),
+      mode,
+      // background: { default: "#121212", paper: "#1d1d1dbf" },
+      background: {
+        default: mode === "dark" ? "#121212" : "#f4f6f8",
+        paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
+      },
+      text: { primary: "#ffffff", secondary: "#aaaaaa" },
+      passwordStrength: ["#aaaaaa", "#e76f51", "#f58700", "#0668d1", "#4caf50"],
+    },
+    colorSchemes: {
+      light: true, // MUI's default mode
+      dark: true,
+    },
+    shape: {
+      borderRadius: 50,
+    },
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: 600,
+        md: 900,
+        lg: 1200,
+        xl: 1536,
       },
     },
-    RazethSignUpForm: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          ["& .MuiCardContent-root"]: {
-            minWidth: 300,
-            padding: `${props.theme.spacing(0)}`,
-          },
-        }),
-        content: (props: { theme: Theme }) => ({
-          display: "flex",
-          flexDirection: "column",
-          gap: props.theme.spacing(0),
-          input: {
-            transition: props.theme.transitions.create("color", {
-              easing: props.theme.transitions.easing.easeInOut,
-              duration: props.theme.transitions.duration.short,
-            }),
-            "&:focus": {
-              // color: "#e1232e", // focused
-              color: props.theme.palette.primary.main, // focused
+    components: {
+      RazethLogin: RazethLoginOptimized,
+
+      // ============================================ //
+      // STAR COMPONENTS - MINIMAL OVERRIDES          //
+      // ============================================ //
+      RazethShootingStar: RazethShootingStarOptimized,
+      RazethTwinkleStar: RazethTwinkleStarOptimized,
+      RazethMeteor: RazethMeteorOptimized,
+
+      // ============================================ //
+      //          SIDE IMAGE - SIMPLIFIED             //
+      // ============================================ //
+      RazethSideImage: RazethSideImageOptimized,
+
+      // ============================================ //
+      //          AVATAR - KEEP ESSENTIALS            //
+      // ============================================ //
+      RazethAvatar: RazethAvatarOptimized,
+      RazethLoginForm: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            ["& .MuiCardContent-root"]: {
+              minWidth: 300,
+              padding: `${props.theme.spacing(0)}`,
             },
-          },
-          // Apply custom styles to the last child element inside this container
-          "& > :last-child": {
-            // For example, you could add extra margin to the button
-            // if it's the last item. Let's override its default top margin.
-            marginTop: props.theme.spacing(1),
-          },
-        }),
-        password: (props: { theme: Theme }) => ({
-          display: "flex",
-          flexDirection: "column",
-          width: "100%",
-          gap: props.theme.spacing(0),
-        }),
-        // footer: (props: { theme: Theme }) => ({
-        //   display: "flex",
-        //   justifyContent: "space-between",
-        //   alignItems: "center",
-        //   fontWeight: 500,
-        //   marginTop: "-0.5rem",
-        //   width: "100%",
-        //   gap: props.theme.spacing(0),
-        // }),
-        // button: (props: { theme: Theme }) => ({
-        //   marginTop: props.theme.spacing(1),
-        //   fontWeight: 700,
-        //   ["& .MuiSvgIcon-root"]: {
-        //     margin: props.theme.spacing(0.3),
-        //     fontSize: 18,
-        //   },
-        // }),
+          }),
+          content: (props: { theme: Theme }) => ({
+            display: "flex",
+            flexDirection: "column",
+            gap: props.theme.spacing(0),
+            input: {
+              transition: props.theme.transitions.create("color", {
+                easing: props.theme.transitions.easing.easeInOut,
+                duration: props.theme.transitions.duration.short,
+              }),
+              "&:focus": {
+                // color: "#e1232e", // focused
+                color: props.theme.palette.primary.main, // focused
+              },
+            },
+            // Apply custom styles to the last child element inside this container
+            "& > :last-child": {
+              // For example, you could add extra margin to the button
+              // if it's the last item. Let's override its default top margin.
+              marginTop: props.theme.spacing(1),
+            },
+          }),
+          password: (props: { theme: Theme }) => ({
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            gap: props.theme.spacing(0),
+          }),
+          footer: (props: { theme: Theme }) => ({
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontWeight: 500,
+            marginTop: "-0.5rem",
+            marginBottom: "-0.5rem",
+            width: "100%",
+            gap: props.theme.spacing(0),
+          }),
+          // button: (props: { theme: Theme }) => ({
+          //   marginTop: props.theme.spacing(1),
+          //   fontWeight: 700,
+          //   fontSize: "1rem",
+          //   ["& .MuiSvgIcon-root"]: { margin: props.theme.spacing(0.3) },
+          // }),
+        },
       },
-    },
-    RazethValidatedButton: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          // fontWeight: 700,
-          // fontSize: "0.9375rem",
-          // fontSize: "2.5rem",
-          button: {
-            // borderRadius: "2.5rem",
-            fontWeight: 700,
-            fontSize: "0.9375rem",
+      RazethSignUpForm: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            ["& .MuiCardContent-root"]: {
+              minWidth: 300,
+              padding: `${props.theme.spacing(0)}`,
+            },
+          }),
+          content: (props: { theme: Theme }) => ({
+            display: "flex",
+            flexDirection: "column",
+            gap: props.theme.spacing(0),
+            input: {
+              transition: props.theme.transitions.create("color", {
+                easing: props.theme.transitions.easing.easeInOut,
+                duration: props.theme.transitions.duration.short,
+              }),
+              "&:focus": {
+                // color: "#e1232e", // focused
+                color: props.theme.palette.primary.main, // focused
+              },
+            },
+            // Apply custom styles to the last child element inside this container
+            "& > :last-child": {
+              // For example, you could add extra margin to the button
+              // if it's the last item. Let's override its default top margin.
+              marginTop: props.theme.spacing(1),
+            },
+          }),
+          password: (props: { theme: Theme }) => ({
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            gap: props.theme.spacing(0),
+          }),
+          // footer: (props: { theme: Theme }) => ({
+          //   display: "flex",
+          //   justifyContent: "space-between",
+          //   alignItems: "center",
+          //   fontWeight: 500,
+          //   marginTop: "-0.5rem",
+          //   width: "100%",
+          //   gap: props.theme.spacing(0),
+          // }),
+          // button: (props: { theme: Theme }) => ({
+          //   marginTop: props.theme.spacing(1),
+          //   fontWeight: 700,
+          //   ["& .MuiSvgIcon-root"]: {
+          //     margin: props.theme.spacing(0.3),
+          //     fontSize: 18,
+          //   },
+          // }),
+        },
+      },
+      RazethValidatedButton: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            // fontWeight: 700,
+            // fontSize: "0.9375rem",
             // fontSize: "2.5rem",
-            // ["& .MuiSvgIcon-root"]: {
-            //   margin: props.theme.spacing(0.3),
-            //   // fontSize: 18,
-            // },
-          },
-        }),
+            button: {
+              // borderRadius: "2.5rem",
+              fontWeight: 700,
+              fontSize: "0.9375rem",
+              // fontSize: "2.5rem",
+              // ["& .MuiSvgIcon-root"]: {
+              //   margin: props.theme.spacing(0.3),
+              //   // fontSize: 18,
+              // },
+            },
+          }),
+        },
       },
-    },
-    RazethDivider: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          marginTop: props.theme.spacing(2),
-          marginBottom: props.theme.spacing(2),
-          ["& .MuiDivider-root"]: { flex: 1 },
-          ["& .MuiTypography-root"]: {
-            paddingLeft: props.theme.spacing(2),
-            paddingRight: props.theme.spacing(2),
-            backgroundColor: props.theme.palette.background.paper,
-            color: props.theme.palette.text.secondary,
-          },
-        }),
-      },
-    },
-    RazethSocialLogin: {
-      styleOverrides: {
-        content: (props: { theme: Theme }) => ({
-          button: {
+      RazethDivider: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            position: "relative",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            gap: props.theme.spacing(1),
-            width: "100%",
-            padding: props.theme.spacing(1),
-            textTransform: "none",
-            border: `1px solid ${props.theme.palette.divider}`,
-            transition: props.theme.transitions.create(
-              ["transform", "background-color"],
-              {
-                duration: props.theme.transitions.duration.standard,
-                easing: props.theme.transitions.easing.easeInOut,
-              }
-            ),
-            "&:hover": {
+            marginTop: props.theme.spacing(2),
+            marginBottom: props.theme.spacing(2),
+            ["& .MuiDivider-root"]: { flex: 1 },
+            ["& .MuiTypography-root"]: {
+              paddingLeft: props.theme.spacing(2),
+              paddingRight: props.theme.spacing(2),
+              backgroundColor: props.theme.palette.background.paper,
+              color: props.theme.palette.text.secondary,
+            },
+          }),
+        },
+      },
+      RazethSocialLogin: {
+        styleOverrides: {
+          content: (props: { theme: Theme }) => ({
+            button: {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: props.theme.spacing(1),
+              width: "100%",
+              padding: props.theme.spacing(1),
+              textTransform: "none",
               border: `1px solid ${props.theme.palette.divider}`,
-              backgroundColor: props.theme.palette.action.hover,
-              transform: "scale(1.05)", // enlarge smoothly
-              boxShadow: props.theme.shadows[3],
+              transition: props.theme.transitions.create(
+                ["transform", "background-color"],
+                {
+                  duration: props.theme.transitions.duration.standard,
+                  easing: props.theme.transitions.easing.easeInOut,
+                },
+              ),
+              "&:hover": {
+                border: `1px solid ${props.theme.palette.divider}`,
+                backgroundColor: props.theme.palette.action.hover,
+                transform: "scale(1.05)", // enlarge smoothly
+                boxShadow: props.theme.shadows[3],
+              },
+              "& svg": {
+                width: props.theme.spacing(2),
+                height: props.theme.spacing(2),
+              },
             },
-            "& svg": {
-              width: props.theme.spacing(2),
-              height: props.theme.spacing(2),
+          }),
+        },
+      },
+      RazethSocialButton: {
+        styleOverrides: {
+          label: (props: { theme: Theme }) => ({
+            fontWeight: "500",
+            display: "none", // Hide by default
+            [props.theme.breakpoints.up("sm")]: {
+              display: "block", // This applies for 'sm' and larger breakpoints
             },
-          },
-        }),
+          }),
+        },
       },
-    },
-    RazethSocialButton: {
-      styleOverrides: {
-        label: (props: { theme: Theme }) => ({
-          fontWeight: "500",
-          display: "none", // Hide by default
-          [props.theme.breakpoints.up("sm")]: {
-            display: "block", // This applies for 'sm' and larger breakpoints
-          },
-        }),
-      },
-    },
-    RazethAuthNavigation: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: props.theme.spacing(0.5), // The space is now handled by the gap property
-          textAlign: "center",
-          marginTop: props.theme.spacing(2),
-          color: props.theme.palette.text.secondary,
-          button: {
-            textTransform: "uppercase",
-            display: "inline-flex",
-            alignItems: "center",
-            svg: {
-              marginLeft: props.theme.spacing(0.5),
-              fontSize: "1rem",
-            },
-          },
-        }),
-      },
-    },
-    RazethFooter: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          textAlign: "center",
-          marginTop: props.theme.spacing(1),
-          color: props.theme.palette.text.secondary,
-          position: "relative",
-          ["& .MuiTypography-root"]: {
-            marginTop: props.theme.spacing(0.5),
-            fontSize: "0.75rem",
+      RazethAuthNavigation: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             gap: props.theme.spacing(0.5), // The space is now handled by the gap property
-            a: {
-              margin: props.theme.spacing(0),
+            textAlign: "center",
+            marginTop: props.theme.spacing(2),
+            color: props.theme.palette.text.secondary,
+            button: {
+              textTransform: "uppercase",
               display: "inline-flex",
               alignItems: "center",
+              svg: {
+                marginLeft: props.theme.spacing(0.5),
+                fontSize: "1rem",
+              },
             },
-            "& > :last-child::after": {
-              color: props.theme.palette.text.secondary,
-              textDecoration: "none",
-              marginLeft: props.theme.spacing(-0.5),
-              content: '"."',
-            },
-            "& > :last-child:hover::after": {
-              textDecoration: "none",
-            },
-          },
-        }),
+          }),
+        },
       },
-    },
-
-    /***** MUI's COMPONENTs *****/
-    MuiAppBar: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          backgroundColor: "#c40316", // Customize the AppBar background color
-          color: props.theme.palette.text.primary, // Customize font color
-        }),
-      },
-    },
-    MuiInputLabel: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          "&.shake span": {
-            animation: `${shake} 0.5s ease-in-out`,
-            display: "inline-block",
+      RazethFooter: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            textAlign: "center",
+            marginTop: props.theme.spacing(1),
+            color: props.theme.palette.text.secondary,
             position: "relative",
-          },
-        }),
-      },
-    },
-    MuiTextField: {
-      defaultProps: {
-        variant: "outlined",
-      },
-    },
-    MuiFormControl: {
-      styleOverrides: {
-        root: {
-          marginTop: "0.5em",
-          marginBottom: "0.5em",
+            ["& .MuiTypography-root"]: {
+              marginTop: props.theme.spacing(0.5),
+              fontSize: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: props.theme.spacing(0.5), // The space is now handled by the gap property
+              a: {
+                margin: props.theme.spacing(0),
+                display: "inline-flex",
+                alignItems: "center",
+              },
+              "& > :last-child::after": {
+                color: props.theme.palette.text.secondary,
+                textDecoration: "none",
+                marginLeft: props.theme.spacing(-0.5),
+                content: '"."',
+              },
+              "& > :last-child:hover::after": {
+                textDecoration: "none",
+              },
+            },
+          }),
         },
       },
-    },
-    MuiFormHelperText: {
-      styleOverrides: {
-        root: {
-          marginTop: "0.5em",
-          marginBottom: "-0.5em",
-          "&.hideHelper": {
-            lineHeight: "0",
-            marginTop: "0",
-            marginBottom: "0",
-          },
-          "&.showHelper": {
+
+      /***** MUI's COMPONENTs *****/
+      MuiAppBar: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            backgroundColor: "#c40316", // Customize the AppBar background color
+            color: props.theme.palette.text.primary, // Customize font color
+          }),
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            "&.shake span": {
+              animation: `${shake} 0.5s ease-in-out`,
+              display: "inline-block",
+              position: "relative",
+            },
+          }),
+        },
+      },
+      MuiTextField: {
+        defaultProps: {
+          variant: "outlined",
+        },
+      },
+      MuiFormControl: {
+        styleOverrides: {
+          root: {
             marginTop: "0.5em",
+            marginBottom: "0.5em",
           },
-          "&.Mui-error": {
-            marginBottom: "-0.5em", // Negative margin adjustment
+        },
+      },
+      MuiFormHelperText: {
+        styleOverrides: {
+          root: {
             marginTop: "0.5em",
+            marginBottom: "-0.5em",
+            "&.hideHelper": {
+              lineHeight: "0",
+              marginTop: "0",
+              marginBottom: "0",
+            },
+            "&.showHelper": {
+              marginTop: "0.5em",
+            },
+            "&.Mui-error": {
+              marginBottom: "-0.5em", // Negative margin adjustment
+              marginTop: "0.5em",
+            },
           },
         },
       },
-    },
-    MuiTypography: {
-      styleOverrides: {
-        root: {
-          "&.MuiTypography-caption": {},
-          "&.MuiTypography-body1": {
-            fontSize: "0.875rem",
+      MuiTypography: {
+        styleOverrides: {
+          root: {
+            fontFamily: [
+              "Roboto",
+              "Helvetica",
+              "sans-serif",
+              "var(--font-siemreap)",
+            ].join(","),
+            h6: {
+              fontFamily: "var(--font-moul)",
+            },
+            h5: {
+              fontFamily: "var(--font-moul)",
+            },
+            // h4: {
+            //   fontFamily: "--fonts-moul",
+            // },
+            // h3: {
+            //   fontFamily: "--fonts-moul",
+            // },
+            // h2: {
+            //   fontFamily: "--fonts-moul",
+            // },
+            // h1: {
+            //   fontFamily: "--fonts-moul",
+            // },
+            // "&.MuiTypography-caption": {},
+            "&.MuiTypography-body1": {
+              fontSize: "0.875rem",
+            },
           },
         },
       },
-    },
-    MuiFilledInput: {
-      styleOverrides: {
-        root: {
-          backgroundColor: "rgba(0, 0, 0, 0.04)",
-          "&$disabled": {
+      MuiFilledInput: {
+        styleOverrides: {
+          root: {
             backgroundColor: "rgba(0, 0, 0, 0.04)",
+            "&$disabled": {
+              backgroundColor: "rgba(0, 0, 0, 0.04)",
+            },
           },
         },
       },
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          "&.Mui-focused .MuiSvgIcon-root": {
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            "&.Mui-focused .MuiSvgIcon-root": {
+              color: props.theme.palette.primary.main,
+            },
+            "&.Mui-error .MuiSvgIcon-root": {
+              color: props.theme.palette.error.main,
+            },
+          }),
+        },
+      },
+      MuiButtonBase: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            "&.MuiButton-root": {
+              color: props.theme.palette.text.primary,
+            },
+          }),
+        },
+      },
+      MuiLink: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
             color: props.theme.palette.primary.main,
-          },
-          "&.Mui-error .MuiSvgIcon-root": {
-            color: props.theme.palette.error.main,
-          },
-        }),
+            textDecoration: "none",
+            "&:hover": {
+              textDecoration: "underline",
+              textUnderlineOffset: props.theme.spacing(0.5),
+              color: "#9d1820ff",
+            },
+          }),
+        },
       },
-    },
-    MuiButtonBase: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          "&.MuiButton-root": {
-            color: props.theme.palette.text.primary,
-          },
-        }),
+      MuiCssBaseline: {
+        styleOverrides: (theme) => globalStyles(theme),
       },
-    },
-    MuiLink: {
-      styleOverrides: {
-        root: (props: { theme: Theme }) => ({
-          color: props.theme.palette.primary.main,
-          textDecoration: "none",
-          "&:hover": {
-            textDecoration: "underline",
-            textUnderlineOffset: props.theme.spacing(0.5),
-            color: "#9d1820ff",
-          },
-        }),
-      },
-    },
-    MuiCssBaseline: {
-      styleOverrides: (theme) => globalStyles(theme),
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          "&.MuiBox-root": {
-            margin: "0px",
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            "&.MuiBox-root": {
+              margin: "0px",
+            },
           },
         },
       },
-    },
-    MuiLinearProgress: {
-      styleOverrides: {
-        root: ({ theme }) => ({
-          height: 5,
-          borderRadius: 5,
-        }),
+      MuiLinearProgress: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            height: 5,
+            borderRadius: 5,
+          }),
+        },
       },
     },
-  },
-});
+  });
 
 // Merge custom base theme with defaults const
 export const darkTheme: RaThemeOptions = deepmerge(
   defaultThemeInvariants,
-  customBaseTheme
+  RazethBaseTheme,
 );
 
 export const lightTheme = deepmerge(defaultTheme, {

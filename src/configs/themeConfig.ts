@@ -12,7 +12,7 @@ import { buildGradients, makePulseSequence } from "@/utils/themeUtils";
  */
 export function getEnvNumber(
   value: string | undefined,
-  fallback: number
+  fallback: number,
 ): number {
   /**
    * The parsed number or NaN if parsing fails.
@@ -124,15 +124,15 @@ export function getSideImageConfig() {
   const logoOffset = process.env.NEXT_PUBLIC_LOGO_OFFSET || "3%";
   const circleStopCount = getEnvNumber(
     process.env.NEXT_PUBLIC_CIRCLE_STOP_COUNT,
-    35
+    35,
   );
   const circlePulseMin = getEnvNumber(
     process.env.NEXT_PUBLIC_CIRCLE_PULSE_MIN,
-    0.25
+    0.25,
   );
   const circlePulseMax = getEnvNumber(
     process.env.NEXT_PUBLIC_CIRCLE_PULSE_MAX,
-    0.95
+    0.95,
   );
   const circlePulseDuration =
     process.env.NEXT_PUBLIC_CIRCLE_PULSE_SPEED || "5s";
@@ -149,7 +149,7 @@ export function getSideImageConfig() {
       xs: "0.55rem",
       sm: "0.65rem",
       md: "0.75rem",
-    }
+    },
   );
   const captionShadowStrength =
     process.env.NEXT_PUBLIC_CAPTION_SHADOW_STRENGTH || 7.5;
@@ -160,27 +160,27 @@ export function getSideImageConfig() {
   });
   const shootingStarMaxCount = getEnvNumber(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_MAX_COUNT,
-    15
+    15,
   );
   const shootingStarSpawnInterval = getEnvNumber(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_SPAWN_INTERVAL,
-    5
+    5,
   );
   const twinkleStarMaxCount = getEnvNumber(
     process.env.NEXT_PUBLIC_TWINKLE_STAR_MAX_COUNT,
-    10
+    10,
   );
   const twinkleStarSpawnInterval = getEnvNumber(
     process.env.NEXT_PUBLIC_TWINKLE_STAR_SPAWN_INTERVAL,
-    30000
+    30000,
   );
   const twinkleStarMinLifetime = getEnvNumber(
     process.env.NEXT_PUBLIC_TWINKLE_STAR_MIN_LIFE_TIME,
-    10000
+    10000,
   );
   const twinkleStarMaxLifetime = getEnvNumber(
     process.env.NEXT_PUBLIC_TWINKLE_STAR_MAX_LIFE_TIME,
-    25000
+    25000,
   );
   // const shootingClass =
   //   process.env.NEXT_PUBLIC_SHOOTING_STAR_CLASS || "shooting-star";
@@ -189,32 +189,32 @@ export function getSideImageConfig() {
   const starSize = getEnvNumber(process.env.NEXT_PUBLIC_SHOOTING_STAR_SIZE, 1);
   const starColors = parseEnvJson(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_COLORS,
-    ["#fff", "#9b40fc", "#4fc3f7", "#f06292", "#ff3300ff", "#40b809ff"]
+    ["#fff", "#9b40fc", "#4fc3f7", "#f06292", "#ff3300ff", "#40b809ff"],
   );
   // console.log("Shooting star colors:", starColors);
   const glowIntensity = getEnvNumber(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_GLOW_INTENSITY,
-    1
+    1,
   );
   const baseSpeed = getEnvNumber(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_BASE_SPEED,
-    20
+    20,
   );
   const minAngle = getEnvNumber(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_MIN_ANGLE,
-    -20
+    -20,
   );
   const maxAngle = getEnvNumber(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_MAX_ANGLE,
-    -70
+    -70,
   );
   const curveFactor = getEnvNumber(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_CURVE_FACTOR,
-    0.5
+    0.5,
   );
   const trajectoryMix = parseEnvJson(
     process.env.NEXT_PUBLIC_SHOOTING_STAR_TRAJECTORY_MIX,
-    { straight: 0.5, shallow: 0.3, deep: 0.2 }
+    { straight: 0.5, shallow: 0.3, deep: 0.2 },
   );
 
   return {
@@ -228,7 +228,7 @@ export function getSideImageConfig() {
     circlePulseSequence: makePulseSequence(
       circleStopCount,
       circlePulseMin,
-      circlePulseMax
+      circlePulseMax,
     ),
     circlePulseDuration,
     maxOpacity,
@@ -329,7 +329,7 @@ export const getMeteorConfig = () => {
 
   if (process.env.NODE_ENV !== "production") {
     console.log(
-      `[Meteor] Generated ${intensity} meteors with interval ${interval}ms`
+      `[Meteor] Generated ${intensity} meteors with interval ${interval}ms`,
     );
   }
 
@@ -358,7 +358,7 @@ const generateProceduralConfigs = (totalMeteors: number): MeteorConfig[] => {
     // B. Calculate Random Size for this bucket (average for consistent look)
     // const sizeVal = Math.floor((bucket.minSize + bucket.maxSize) / 2);
     const sizeVal = Math.floor(
-      Math.random() * (bucket.maxSize - bucket.minSize + 1) + bucket.minSize
+      Math.random() * (bucket.maxSize - bucket.minSize + 1) + bucket.minSize,
     );
 
     // C. Calculate Speed (Larger = Slower)
@@ -373,7 +373,7 @@ const generateProceduralConfigs = (totalMeteors: number): MeteorConfig[] => {
     const velocityFactor = 15 + sizeVal * 0.25;
 
     console.log(
-      `[Meteor] Generated ${maxCount} ${bucket.label} meteors with size ${sizeVal}vh and speed ${velocityFactor}ms/pixel`
+      `[Meteor] Generated ${maxCount} ${bucket.label} meteors with size ${sizeVal}vh and speed ${velocityFactor}ms/pixel`,
     );
     return {
       size: `${sizeVal}vh`,

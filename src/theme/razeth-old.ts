@@ -70,8 +70,10 @@ declare module "@mui/material/styles" {
   // ComponentNameToClassKey can derive its keys from our map.
   // Note: If each component has different keys (e.g., 'root', 'card'),
   // this interface should be defined manually for full accuracy.
-  interface ComponentNameToClassKey
-    extends Record<keyof RazethComponentsPropsList, ClassKey> {}
+  interface ComponentNameToClassKey extends Record<
+    keyof RazethComponentsPropsList,
+    ClassKey
+  > {}
 
   // ComponentsPropsList directly extends our map.
   interface ComponentsPropsList extends RazethComponentsPropsList {}
@@ -195,7 +197,7 @@ const globalStyles = (theme: Theme) => ({
     ...makePulseVars(
       theme.custom.sideImage.circleColor,
       theme.custom.sideImage.circleStopCount,
-      theme.custom.sideImage.circlePulseSequence
+      theme.custom.sideImage.circlePulseSequence,
     ),
     "--app-sideImage-circleSize": theme.custom.sideImage.circleSize,
     // "--app-sideImage-circleColor": "#1e40af",
@@ -1542,7 +1544,7 @@ const customBaseTheme = createTheme({
             //   )}
             // )`,
             animation: `${makePulseKeyframes(
-              props.theme.custom.sideImage.circlePulseSequence
+              props.theme.custom.sideImage.circlePulseSequence,
             )} ${
               props.theme.custom.sideImage.circlePulseDuration
             } ease-in-out infinite`,
@@ -1801,7 +1803,7 @@ const customBaseTheme = createTheme({
               {
                 duration: props.theme.transitions.duration.standard,
                 easing: props.theme.transitions.easing.easeInOut,
-              }
+              },
             ),
             // "& .MuiTypography-root": {
             //   fontWeight: "500",
@@ -2191,7 +2193,7 @@ const customBaseTheme = createTheme({
 // Merge custom base theme with defaults const
 export const darkTheme: RaThemeOptions = deepmerge(
   defaultThemeInvariants,
-  customBaseTheme
+  customBaseTheme,
 );
 
 export const lightTheme = deepmerge(defaultTheme, {

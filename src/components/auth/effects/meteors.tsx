@@ -24,7 +24,7 @@ export const MeteorShower = (
   inProps: MeteorShowerProps & {
     content?: StyleComponent;
     sprite?: StyleComponent;
-  }
+  },
 ) => {
   const props = useThemeProps({ name: PREFIX, props: inProps });
   const { configs, interval, enabled, className, sprite, sx, ...rest } = props;
@@ -65,6 +65,7 @@ export const MeteorShower = (
       const containerHeight = containerRef.current.offsetHeight;
 
       const configs = configsRef.current;
+      if (!configs) return;
       const index = getRandomInt(0, configs.length - 1);
       const config = configs[index];
 

@@ -128,7 +128,7 @@ export const Login = (
   inProps: LoginProps & {
     Content?: StyleComponent;
     Card?: StyleComponent;
-  }
+  },
 ) => {
   const props = useThemeProps({
     props: inProps,
@@ -380,9 +380,9 @@ Login.effect = ({ shootingStarCount, twinkleStarCount }: EffectProps) => {
 
       {/* Dynamic Meteor shower */}
       <MeteorShower
-        enabled={meteorConfig.enabled}
-        interval={meteorConfig.interval}
-        configs={meteorConfig.configs}
+        enabled={meteorConfig?.enabled}
+        interval={meteorConfig?.interval}
+        configs={meteorConfig?.configs}
       />
     </Effect>
   );
