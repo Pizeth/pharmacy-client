@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, createContext, useContext } from "react";
 import { ThemeProvider, ThemeProviderProps } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { DefaultTheme } from "@mui/system";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 // import { getCustomTheme } from "../theme";
 
 const ThemeContext = createContext({
@@ -44,15 +45,17 @@ export default function ThemeProviderWrapper<Theme = DefaultTheme>({
 
   return (
     <ThemeContext.Provider value={{ toggleTheme, mode }}>
-      <ThemeProvider theme={theme} {...props}>
-        <CssBaseline />
-        {/* We use a fragment here because the html/body tags are in the Server Layout */}
-        {mounted ? (
-          children
-        ) : (
-          <div style={{ visibility: "hidden" }}>{children}</div>
-        )}
-      </ThemeProvider>
+      <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+        <ThemeProvider theme={theme} {...props}>
+          <CssBaseline />
+          {/* We use a fragment here because the html/body tags are in the Server Layout */}
+          {mounted ? (
+            children
+          ) : (
+            <div style={{ visibility: "hidden" }}>{children}</div>
+          )}
+        </ThemeProvider>
+      </AppRouterCacheProvider>
     </ThemeContext.Provider>
   );
 }
