@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { Siemreap, Moul } from "next/font/google";
 import { darkTheme } from "@/theme/razeth";
+import ThemeProviderWrapper from "@/components/effect/themes/theme-wrapper";
 // import { useEffect, useState } from "react";
 
 const geistSans = Geist({
@@ -64,6 +65,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${siemreap.variable} ${moul.variable} antialiased`}
       >
         <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>
+        {/* <ThemeProviderWrapper theme={darkTheme}>
+          {children}
+        </ThemeProviderWrapper> */}
       </body>
     </html>
   );

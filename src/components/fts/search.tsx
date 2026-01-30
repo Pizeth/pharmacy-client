@@ -11,21 +11,30 @@ import {
   MenuItem,
   Select,
   FormControl,
+  IconButton,
 } from "@mui/material";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
 import SearchIcon from "@mui/icons-material/Search";
-import { darkTheme } from "@/theme/razeth";
+import { useThemeControl } from "../effect/themes/theme-wrapper";
+import { Moon, Sun } from "lucide-react";
 
 export default function AdministrativeForm() {
+  const { toggleTheme, mode } = useThemeControl();
   return (
     // <ThemeProvider theme={darkTheme}>
     //   <CssBaseline />
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* --- HEADER --- */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          mb: 4,
+          alignItems: "center",
+        }}
+      >
         {/* Logo Section */}
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
+        {/* <Box sx={{ display: "flex", flexDirection: "column" }}> */}
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           {/* Placeholder for Logo */}
           <Box
             sx={{
@@ -39,18 +48,29 @@ export default function AdministrativeForm() {
               justifyContent: "center",
             }}
           >
-            <span style={{ fontSize: 10 }}>Logo</span>
+            <span
+              style={{ fontSize: 10, color: mode === "dark" ? "#fff" : "#333" }}
+            >
+              Logo
+            </span>
           </Box>
-          <Typography
-            variant="h6"
-            //   sx={{ fontWeight: "bold" }}
-          >
-            ក្រសួងមុខងារសាធារណៈ
-          </Typography>
+          <Typography variant="h6">ក្រសួងមុខងារសាធារណៈ</Typography>
         </Box>
 
         {/* National Motto Section */}
         <Box sx={{ textAlign: "right" }}>
+          <IconButton
+            onClick={toggleTheme}
+            color="inherit"
+            sx={{
+              border: "1px solid",
+              borderColor: "divider",
+              mt: 0.5,
+              borderRadius: 2,
+            }}
+          >
+            {mode === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </IconButton>
           <Typography variant="h6" sx={{ color: "#333" }}>
             ព្រះរាជាណាចក្រកម្ពុជា
           </Typography>
@@ -62,17 +82,25 @@ export default function AdministrativeForm() {
       <Typography
         variant="h5"
         align="center"
-        sx={{ mb: 4, fontWeight: "bold", color: "#0D47A1" }}
+        sx={{
+          mb: 4,
+          fontWeight: "bold",
+          color: mode === "dark" ? "#90caf9" : "#0D47A1",
+        }}
       >
         ប្រព័ន្ធចុះលេខឯកសាររបស់នាយកដ្ឋានធនធានមនុស្ស សម្រាប់ឆ្នាំ២០២៦
       </Typography>
 
-      {/* --- SEARCH BAR (Blue Box 1) --- */}
+      {/* --- SEARCH BOX --- */}
       {/* Note: In Grid2, we don't use 'item'. We use 'size' */}
       <Paper
         elevation={0}
         square
-        sx={{ backgroundColor: "#0D47A1", p: 2, mb: 2 }}
+        sx={{
+          backgroundColor: mode === "dark" ? "#0D47A1" : "#0D47A1",
+          p: 2,
+          mb: 2,
+        }}
       >
         <Grid container spacing={2} alignItems="center">
           <Grid size={{ xs: 12, md: 2 }}>
@@ -89,7 +117,7 @@ export default function AdministrativeForm() {
               startIcon={<SearchIcon />}
               fullWidth
               sx={{
-                backgroundColor: "#ECEFF1",
+                bgcolor: "#ECEFF1",
                 color: "black",
                 "&:hover": { backgroundColor: "#CFD8DC" },
               }}
@@ -125,10 +153,19 @@ export default function AdministrativeForm() {
 
       {/* --- MAIN FORM (Blue Box 2) --- */}
       <Paper elevation={0} square sx={{ backgroundColor: "#0D47A1", p: 0 }}>
-        <Box sx={{ p: 1, borderBottom: "1px solid rgba(255,255,255,0.2)" }}>
+        <Box
+          sx={{
+            p: 1,
+            borderBottom: "1px solid rgba(255,255,255,0.2)",
+            textAlign: "center",
+          }}
+        >
           <Typography
             align="center"
-            sx={{ color: "white", fontWeight: "bold" }}
+            sx={{
+              color: mode === "dark" ? "#ECEFF1" : "#0D47A1",
+              fontWeight: "bold",
+            }}
           >
             ព័ត៌មានឯកសារ
           </Typography>
@@ -163,21 +200,21 @@ export default function AdministrativeForm() {
               <Label text="កម្រិតនៃស្ថានភាព" />
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <CustomSelect />
+              <CustomSelect mode={mode} />
             </Grid>
 
             <Grid size={{ xs: 12, md: 1 }}>
               <Label text="ប្រភេទ" />
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <CustomSelect />
+              <CustomSelect mode={mode} />
             </Grid>
 
             <Grid size={{ xs: 12, md: 2 }}>
               <Label text="ការិយាល័យទទួលបន្ទុក" />
             </Grid>
             <Grid size={{ xs: 12, md: 3 }}>
-              <CustomSelect />
+              <CustomSelect mode={mode} />
             </Grid>
 
             {/* Row 3: Leave Type, Receiver, Buttons */}
@@ -185,14 +222,14 @@ export default function AdministrativeForm() {
               <Label text="ប្រភេទច្បាប់របស់សម្រាក" />
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <CustomSelect />
+              <CustomSelect mode={mode} />
             </Grid>
 
             <Grid size={{ xs: 12, md: 2 }}>
               <Label text="អ្នកទទួលឯកសារ" />
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <CustomSelect />
+              <CustomSelect mode={mode} />
             </Grid>
 
             {/* Action Buttons */}
@@ -250,33 +287,11 @@ const Label = ({ text, align = "right" }: { text: string; align?: string }) => (
 );
 
 // Select Component
-const CustomSelect = () => (
-  <FormControl
-    fullWidth
-    size="small"
-    sx={{ backgroundColor: "white", borderRadius: 1 }}
-  >
-    <Select displayEmpty inputProps={{ "aria-label": "Without label" }}>
-      <MenuItem value="">
-        <em>ជ្រើសរើស</em>
-      </MenuItem>
-      {dropdownOptions.map((option) => (
-        <MenuItem key={option.value} value={option.value}>
-          {option.label}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-);
-
 // const CustomSelect = () => (
 //   <FormControl
 //     fullWidth
 //     size="small"
-//     sx={{
-//       backgroundColor: mode === "dark" ? "#2c2c2c" : "white",
-//       borderRadius: 1,
-//     }}
+//     sx={{ backgroundColor: "white", borderRadius: 1 }}
 //   >
 //     <Select displayEmpty inputProps={{ "aria-label": "Without label" }}>
 //       <MenuItem value="">
@@ -290,3 +305,25 @@ const CustomSelect = () => (
 //     </Select>
 //   </FormControl>
 // );
+
+const CustomSelect = ({ mode }: { mode: "light" | "dark" }) => (
+  <FormControl
+    fullWidth
+    size="small"
+    sx={{
+      backgroundColor: mode === "dark" ? "#2c2c2c" : "white",
+      borderRadius: 1,
+    }}
+  >
+    <Select displayEmpty inputProps={{ "aria-label": "Without label" }}>
+      <MenuItem value="">
+        <em>ជ្រើសរើស</em>
+      </MenuItem>
+      {dropdownOptions.map((option) => (
+        <MenuItem key={option.value} value={option.value}>
+          {option.label}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+);
