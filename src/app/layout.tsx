@@ -3,9 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { Siemreap, Moul } from "next/font/google";
-import { darkTheme } from "@/theme/razeth";
+import { darkTheme, RazethBaseTheme } from "@/theme/razeth";
 import ThemeProviderWrapper from "@/components/effect/themes/theme-wrapper";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
+// import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 // import { useEffect, useState } from "react";
 
 const geistSans = Geist({
@@ -65,11 +65,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${siemreap.variable} ${moul.variable} antialiased`}
       >
+        {/* {children} */}
         {/* <ThemeProvider theme={darkTheme}>{children}</ThemeProvider> */}
-        <AppRouterCacheProvider>{children}+ </AppRouterCacheProvider>
-        {/* <ThemeProviderWrapper theme={darkTheme}>
+        {/* <AppRouterCacheProvider>{children}+ </AppRouterCacheProvider> */}
+        <ThemeProviderWrapper theme={darkTheme}>
           {children}
-        </ThemeProviderWrapper> */}
+        </ThemeProviderWrapper>
       </body>
     </html>
   );

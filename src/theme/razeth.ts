@@ -12,7 +12,7 @@ import {
   SideImage,
 } from "@/interfaces/theme.interface";
 import { makePulseVars } from "@/utils/themeUtils";
-import { /*getMeteorConfig,*/ getSideImageConfig } from "@/configs/themeConfig";
+import { getMeteorConfig, getSideImageConfig } from "@/configs/themeConfig";
 import { shake } from "./keyframes";
 import {
   RazethAvatarOptimized,
@@ -71,6 +71,16 @@ const globalStyles = (theme: Theme) => ({
     height: "100%",
     margin: 0,
     padding: 0,
+    fontFamily: [
+      "Roboto",
+      "Helvetica",
+      "sans-serif",
+      "var(--font-siemreap)",
+    ].join(","),
+  },
+
+  main: {
+    marginTop: "65px",
   },
 
   ":root": {
@@ -194,7 +204,7 @@ const defaultThemeInvariants = {
   },
 };
 
-const RazethBaseTheme = (mode: PaletteMode = "dark") =>
+export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
   createTheme({
     cssVariables: {
       cssVarPrefix: "app",
@@ -203,7 +213,7 @@ const RazethBaseTheme = (mode: PaletteMode = "dark") =>
     // cssVarPrefix: "app", // all vars will start with --app-
     custom: {
       sideImage: getSideImageConfig(),
-      // meteor: getMeteorConfig(),
+      meteor: getMeteorConfig(),
       lines: [
         { color: "#FF4500", delay: "0.5s" },
         { color: "#32CD32", delay: "1s" },
@@ -574,9 +584,7 @@ const RazethBaseTheme = (mode: PaletteMode = "dark") =>
               "sans-serif",
               "var(--font-siemreap)",
             ].join(","),
-            h6: {
-              fontFamily: "var(--font-moul)",
-            },
+
             h5: {
               fontFamily: "var(--font-moul)",
             },
@@ -596,6 +604,9 @@ const RazethBaseTheme = (mode: PaletteMode = "dark") =>
             "&.MuiTypography-body1": {
               fontSize: "0.875rem",
             },
+          },
+          h6: {
+            fontFamily: "var(--font-moul)",
           },
         },
       },
@@ -669,7 +680,7 @@ const RazethBaseTheme = (mode: PaletteMode = "dark") =>
 // Merge custom base theme with defaults const
 export const darkTheme: RaThemeOptions = deepmerge(
   defaultThemeInvariants,
-  RazethBaseTheme,
+  RazethBaseTheme(),
 );
 
 export const lightTheme = deepmerge(defaultTheme, {

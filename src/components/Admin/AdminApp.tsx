@@ -57,18 +57,18 @@ import {
 // import { UserShow } from "./userDetail";
 // import PostIcon from "@mui/icons-material/Book";
 import UserIcon from "@mui/icons-material/Group";
-import { Layout } from "./CustomComponents/Layout";
-import { dataProvider } from "../lib/dataProvider";
+import { Layout } from "../CustomComponents/Layout";
+import { dataProvider } from "../../lib/dataProvider";
 import { Dashboard } from "./Dashboard";
 import { i18nProvider } from "@/i18n/i18nProvider";
-import { darkTheme, lightTheme } from "@/theme/razeth";
-import { UserCreate } from "./Users/userCreate";
-import { UserShow } from "./Users/userDetail";
-import { UserEdit } from "./Users/userEdit";
-import { UserList } from "./Users/users";
+import { darkTheme, lightTheme, RazethBaseTheme } from "@/theme/razeth";
+import { UserCreate } from "../Users/userCreate";
+import { UserShow } from "../Users/userDetail";
+import { UserEdit } from "../Users/userEdit";
+import { UserList } from "../Users/users";
 // import ReactAdminLoginPage from "./auth/ReactAdminLoginPage";
 import { authProvider } from "@/lib/authProvider";
-import Login from "./auth/login";
+import Login from "../auth/login";
 // import LoginPage from "./auth/login";
 
 const store = localStorageStore(undefined, "ECommerce");
@@ -91,6 +91,7 @@ const store = localStorageStore(undefined, "ECommerce");
 // };
 
 export const AdminApp = () => {
+  console.log("AdminApp rendered", darkTheme);
   // const [themeName] = useStore<ThemeName>("themename", "soft");
   // const lightTheme = themes.find((theme) => theme.name === themeName)?.light;
   // const darkTheme = themes.find((theme) => theme.name === themeName)?.dark;
@@ -104,8 +105,8 @@ export const AdminApp = () => {
       loginPage={Login}
       requireAuth
       disableTelemetry
-      // theme={theme}
-      lightTheme={lightTheme}
+      theme={darkTheme}
+      // lightTheme={lightTheme}
       darkTheme={darkTheme}
       defaultTheme="dark"
       dashboard={Dashboard}

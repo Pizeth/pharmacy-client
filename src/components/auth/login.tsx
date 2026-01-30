@@ -184,6 +184,9 @@ export const Login = (
     setCurrentMode((prev) => (prev === "signin" ? "signup" : "signin"));
   };
 
+  console.log("Login Component Rendered. Current Mode:", currentMode);
+  console.log("Theme info", theme.custom);
+
   return (
     <Root
       ref={containerRef}
@@ -380,9 +383,9 @@ Login.effect = ({ shootingStarCount, twinkleStarCount }: EffectProps) => {
 
       {/* Dynamic Meteor shower */}
       <MeteorShower
-        enabled={meteorConfig?.enabled}
-        interval={meteorConfig?.interval}
-        configs={meteorConfig?.configs}
+        enabled={meteorConfig.enabled}
+        interval={meteorConfig.interval}
+        configs={meteorConfig.configs}
       />
     </Effect>
   );

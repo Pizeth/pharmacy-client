@@ -1,3 +1,4 @@
+"use client";
 import { keyframes } from "@mui/material";
 
 export const shake = keyframes`

@@ -15,10 +15,9 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useThemeControl } from "../effect/themes/theme-wrapper";
-import { Moon, Sun } from "lucide-react";
 
 export default function AdministrativeForm() {
-  const { toggleTheme, mode } = useThemeControl();
+  // const { toggleTheme, mode } = useThemeControl();
   return (
     // <ThemeProvider theme={darkTheme}>
     //   <CssBaseline />
@@ -49,7 +48,7 @@ export default function AdministrativeForm() {
             }}
           >
             <span
-              style={{ fontSize: 10, color: mode === "dark" ? "#fff" : "#333" }}
+            // style={{ fontSize: 10, color: mode === "dark" ? "#fff" : "#333" }}
             >
               Logo
             </span>
@@ -59,7 +58,7 @@ export default function AdministrativeForm() {
 
         {/* National Motto Section */}
         <Box sx={{ textAlign: "right" }}>
-          <IconButton
+          {/* <IconButton
             onClick={toggleTheme}
             color="inherit"
             sx={{
@@ -70,7 +69,7 @@ export default function AdministrativeForm() {
             }}
           >
             {mode === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </IconButton>
+          </IconButton> */}
           <Typography variant="h6" sx={{ color: "#333" }}>
             ព្រះរាជាណាចក្រកម្ពុជា
           </Typography>
@@ -85,7 +84,7 @@ export default function AdministrativeForm() {
         sx={{
           mb: 4,
           fontWeight: "bold",
-          color: mode === "dark" ? "#90caf9" : "#0D47A1",
+          // color: mode === "dark" ? "#90caf9" : "#0D47A1",
         }}
       >
         ប្រព័ន្ធចុះលេខឯកសាររបស់នាយកដ្ឋានធនធានមនុស្ស សម្រាប់ឆ្នាំ២០២៦
@@ -97,7 +96,7 @@ export default function AdministrativeForm() {
         elevation={0}
         square
         sx={{
-          backgroundColor: mode === "dark" ? "#0D47A1" : "#0D47A1",
+          // backgroundColor: mode === "dark" ? "#0D47A1" : "#0D47A1",
           p: 2,
           mb: 2,
         }}
@@ -163,7 +162,7 @@ export default function AdministrativeForm() {
           <Typography
             align="center"
             sx={{
-              color: mode === "dark" ? "#ECEFF1" : "#0D47A1",
+              // color: mode === "dark" ? "#ECEFF1" : "#0D47A1",
               fontWeight: "bold",
             }}
           >
@@ -200,21 +199,21 @@ export default function AdministrativeForm() {
               <Label text="កម្រិតនៃស្ថានភាព" />
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <CustomSelect mode={mode} />
+              <CustomSelect />
             </Grid>
 
             <Grid size={{ xs: 12, md: 1 }}>
               <Label text="ប្រភេទ" />
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <CustomSelect mode={mode} />
+              <CustomSelect />
             </Grid>
 
             <Grid size={{ xs: 12, md: 2 }}>
               <Label text="ការិយាល័យទទួលបន្ទុក" />
             </Grid>
             <Grid size={{ xs: 12, md: 3 }}>
-              <CustomSelect mode={mode} />
+              <CustomSelect />
             </Grid>
 
             {/* Row 3: Leave Type, Receiver, Buttons */}
@@ -222,14 +221,14 @@ export default function AdministrativeForm() {
               <Label text="ប្រភេទច្បាប់របស់សម្រាក" />
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <CustomSelect mode={mode} />
+              <CustomSelect />
             </Grid>
 
             <Grid size={{ xs: 12, md: 2 }}>
               <Label text="អ្នកទទួលឯកសារ" />
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <CustomSelect mode={mode} />
+              <CustomSelect />
             </Grid>
 
             {/* Action Buttons */}
@@ -287,33 +286,11 @@ const Label = ({ text, align = "right" }: { text: string; align?: string }) => (
 );
 
 // Select Component
-// const CustomSelect = () => (
-//   <FormControl
-//     fullWidth
-//     size="small"
-//     sx={{ backgroundColor: "white", borderRadius: 1 }}
-//   >
-//     <Select displayEmpty inputProps={{ "aria-label": "Without label" }}>
-//       <MenuItem value="">
-//         <em>ជ្រើសរើស</em>
-//       </MenuItem>
-//       {dropdownOptions.map((option) => (
-//         <MenuItem key={option.value} value={option.value}>
-//           {option.label}
-//         </MenuItem>
-//       ))}
-//     </Select>
-//   </FormControl>
-// );
-
-const CustomSelect = ({ mode }: { mode: "light" | "dark" }) => (
+const CustomSelect = () => (
   <FormControl
     fullWidth
     size="small"
-    sx={{
-      backgroundColor: mode === "dark" ? "#2c2c2c" : "white",
-      borderRadius: 1,
-    }}
+    sx={{ backgroundColor: "white", borderRadius: 1 }}
   >
     <Select displayEmpty inputProps={{ "aria-label": "Without label" }}>
       <MenuItem value="">
@@ -327,3 +304,25 @@ const CustomSelect = ({ mode }: { mode: "light" | "dark" }) => (
     </Select>
   </FormControl>
 );
+
+// const CustomSelect = ({ mode }: { mode: "light" | "dark" }) => (
+//   <FormControl
+//     fullWidth
+//     size="small"
+//     sx={{
+//       backgroundColor: mode === "dark" ? "#2c2c2c" : "white",
+//       borderRadius: 1,
+//     }}
+//   >
+//     <Select displayEmpty inputProps={{ "aria-label": "Without label" }}>
+//       <MenuItem value="">
+//         <em>ជ្រើសរើស</em>
+//       </MenuItem>
+//       {dropdownOptions.map((option) => (
+//         <MenuItem key={option.value} value={option.value}>
+//           {option.label}
+//         </MenuItem>
+//       ))}
+//     </Select>
+//   </FormControl>
+// );

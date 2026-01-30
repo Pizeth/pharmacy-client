@@ -5,7 +5,7 @@ import { ThemeProvider, ThemeProviderProps } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { DefaultTheme } from "@mui/system";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-// import { getCustomTheme } from "../theme";
+import ResponsiveAppBar from "@/components/Navigations/AppBar"; // PrimarySearchAppBar,
 
 const ThemeContext = createContext({
   toggleTheme: () => {},
@@ -48,6 +48,9 @@ export default function ThemeProviderWrapper<Theme = DefaultTheme>({
       <AppRouterCacheProvider options={{ enableCssLayer: true }}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
+
+          <ResponsiveAppBar />
+          {/* <PrimarySearchAppBar /> */}
           {/* We use a fragment here because the html/body tags are in the Server Layout */}
           {mounted ? (
             children
