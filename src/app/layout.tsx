@@ -64,10 +64,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${siemreap.variable} ${moul.variable} antialiased`}
       >
-        <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>
-        {/* <ThemeProviderWrapper theme={darkTheme}>
+        {/* <ThemeProvider theme={darkTheme}>{children}</ThemeProvider> */}
+        <ThemeProviderWrapper theme={darkTheme}>
           {children}
-        </ThemeProviderWrapper> */}
+        </ThemeProviderWrapper>
       </body>
     </html>
   );
