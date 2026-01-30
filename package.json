@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@bicstone/ra-language-japanese": "^5.12.1",
+    "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource/moul": "^5.2.7",
     "@mui/material": "^7.3.7",
+    "@mui/material-nextjs": "^7.3.7",
     "@next/env": "^16.1.6",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-avatar": "^1.1.11",
