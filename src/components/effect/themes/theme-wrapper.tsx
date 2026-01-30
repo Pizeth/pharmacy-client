@@ -16,7 +16,7 @@ export const useThemeControl = () => useContext(ThemeContext);
 export default function ThemeProviderWrapper<Theme = DefaultTheme>({
   theme,
   children,
-  ...props
+  // ...props
 }: ThemeProviderProps<Theme>) {
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
@@ -46,7 +46,7 @@ export default function ThemeProviderWrapper<Theme = DefaultTheme>({
   return (
     <ThemeContext.Provider value={{ toggleTheme, mode }}>
       <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-        <ThemeProvider theme={theme} {...props}>
+        <ThemeProvider theme={theme}>
           <CssBaseline />
           {/* We use a fragment here because the html/body tags are in the Server Layout */}
           {mounted ? (
