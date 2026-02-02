@@ -144,6 +144,12 @@ const defaultThemeInvariants = {
     // h5: {
     //   fontFamily: "var(--font-siemreap)",
     // },
+    fontFamily: [
+      "Roboto",
+      "Helvetica",
+      "sans-serif",
+      "var(--font-siemreap)",
+    ].join(","),
     h6: {
       fontWeight: 700,
       fontFamily: "var(--font-moul)", // Use Moul for headers like "Kingdom of Cambodia"
@@ -258,6 +264,22 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
         md: 900,
         lg: 1200,
         xl: 1536,
+      },
+    },
+    typography: {
+      fontFamily: [
+        "Roboto",
+        "Helvetica",
+        "sans-serif",
+        "var(--font-siemreap)",
+      ].join(","),
+      h6: {
+        fontFamily: "var(--font-moul)", // Use Moul for headers like "Kingdom of Cambodia"
+        fontSize: "1rem",
+      },
+      h5: {
+        fontFamily: "var(--font-moul)",
+        fontSize: "1.15rem",
       },
     },
     components: {
@@ -552,6 +574,14 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
           root: {
             marginTop: "0.5em",
             marginBottom: "0.5em",
+            // textAlign: "center",
+            // label: {
+            //   display: "flex",
+            //   justifyContent: "center" /* Centers horizontally */,
+            //   alignItems: "center" /* Centers vertically */,
+            //   textAlign: "center",
+            //   width: "100%",
+            // },
           },
         },
       },
@@ -585,9 +615,6 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
               "var(--font-siemreap)",
             ].join(","),
 
-            h5: {
-              fontFamily: "var(--font-moul)",
-            },
             // h4: {
             //   fontFamily: "--fonts-moul",
             // },
@@ -606,6 +633,9 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
             },
           },
           h6: {
+            fontFamily: "var(--font-moul)",
+          },
+          h5: {
             fontFamily: "var(--font-moul)",
           },
         },

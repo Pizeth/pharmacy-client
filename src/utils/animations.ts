@@ -47,7 +47,7 @@ export class Animations {
     clearErrors: (name: string) => void,
     source: string,
     className: string = "shake",
-    interval: number = 500
+    interval: number = 500,
   ): void => {
     if (!isValidating && invalid && shakeRef.current) {
       // Get the target element to animate
@@ -76,4 +76,4 @@ export class Animations {
   };
 }
 
-export default Animation;
+export default Animations;

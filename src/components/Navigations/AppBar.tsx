@@ -18,7 +18,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import Image from "next/image";
 import ThemeToggle from "../effect/themes/themeToggle";
 
-const pages = ["Products", "Pricing", "Blog"];
+const pages = ["ទំព័រដើម", "ប្រព័ន្ធចរន្តឯកសារ", "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const Search = styled("div")(({ theme }) => ({
@@ -98,8 +98,8 @@ function ResponsiveAppBar() {
               display: { xs: "none", md: "flex" },
               mr: 1,
               position: "relative",
-              width: 40,
-              height: 40,
+              width: 50,
+              height: 50,
             }}
           >
             <Image
@@ -158,7 +158,9 @@ function ResponsiveAppBar() {
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: "center" }}>{page}</Typography>
+                  <Typography variant="h6" sx={{ textAlign: "center" }}>
+                    {page}
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -189,7 +191,10 @@ function ResponsiveAppBar() {
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
-                {page}
+                {/* {page} */}
+                <Typography variant="h6" sx={{ textAlign: "center" }}>
+                  {page}
+                </Typography>
               </Button>
             ))}
           </Box>
