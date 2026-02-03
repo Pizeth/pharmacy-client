@@ -8,7 +8,7 @@ const StickyFAB = () => {
       {/* <Fab color="primary" aria-label="add">
         <AddIcon />
       </Fab> */}
-      <Fab variant="extended" size="medium" color="primary" aria-label="add">
+      <Fab variant="extended" size="medium" color="success" aria-label="add">
         <AddIcon sx={{ mr: 1 }} />
         បញ្ចូលឯកសារថ្មី
       </Fab>

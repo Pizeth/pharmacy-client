@@ -148,11 +148,14 @@ const defaultThemeInvariants = {
       "Roboto",
       "Helvetica",
       "sans-serif",
+      "var(--font-interkhmerloopless)",
+      "var(--font-mef1)",
+      "var(--font-mef2)",
       "var(--font-siemreap)",
     ].join(","),
     h6: {
       fontWeight: 700,
-      fontFamily: "var(--font-moul)", // Use Moul for headers like "Kingdom of Cambodia"
+      fontFamily: "var(--font-mef2)", // Use Moul for headers like "Kingdom of Cambodia"
     },
   },
   sidebar: {
@@ -239,7 +242,7 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
       error: { main: "#f58700" },
       warning: { main: "#FFD22B" },
       info: { main: "#f89696" },
-      success: { main: "#2ece71" },
+      success: { main: "#2ece71", contrastText: "#fff" },
 
       mode,
       // background: { default: "#121212", paper: "#1d1d1dbf" },
@@ -271,14 +274,20 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
         "Roboto",
         "Helvetica",
         "sans-serif",
+        // "var(--font-interkhmerloopless)",
+        // "var(--font-google)",
+        // "var(--font-interkhmer)",
+        // "var(--font-mef1)",
         "var(--font-siemreap)",
+        "var(--font-mef2)",
+        "var(--font-moul)",
       ].join(","),
       h6: {
-        fontFamily: "var(--font-moul)", // Use Moul for headers like "Kingdom of Cambodia"
+        fontFamily: "var(--font-mef2)", // Use Moul for headers like "Kingdom of Cambodia"
         fontSize: "1rem",
       },
       h5: {
-        fontFamily: "var(--font-moul)",
+        fontFamily: "var(--font-mef2)", // Use Moul for headers like "Kingdom of Cambodia"
         fontSize: "1.15rem",
       },
     },
@@ -612,7 +621,13 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
               "Roboto",
               "Helvetica",
               "sans-serif",
+              "var(--font-interkhmerloopless)",
+              "var(--font-google)",
+              "var(--font-interkhmer)",
+              "var(--font-mef1)",
+              "var(--font-mef2)",
               "var(--font-siemreap)",
+              "var(--font-moul)",
             ].join(","),
 
             // h4: {
@@ -633,10 +648,20 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
             },
           },
           h6: {
-            fontFamily: "var(--font-moul)",
+            fontFamily: [
+              "Roboto",
+              "Helvetica",
+              "sans-serif",
+              "var(--font-moul)",
+            ].join(","),
           },
           h5: {
-            fontFamily: "var(--font-moul)",
+            fontFamily: [
+              "Roboto",
+              "Helvetica",
+              "sans-serif",
+              "var(--font-moul)",
+            ].join(","),
           },
         },
       },

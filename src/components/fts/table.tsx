@@ -25,108 +25,241 @@ import EditIcon from "@mui/icons-material/Edit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Collapse from "@mui/material/Collapse";
 import { visuallyHidden } from "@mui/utils";
+import { Link } from "@mui/material";
 
 interface Data {
   id: number;
+  title: string;
   status: string;
-  types: string;
   days: number;
-  name: string;
+  types: string;
+  categories: string;
   office: string;
+  // permissionTypes?: string;
   description?: string;
   details?: {
+    originId?: string;
     acceptedDate: string;
     acceptedTime: string;
+    originDoc?: string;
     recieptant: string;
-    originId: string;
-    originDoc: string;
-    finishedDoc: string;
+    currentProcessor: string;
+    deliverBy: string;
+    recievedBy: string;
+    retrievedBy: string;
+    retreivedDate: string;
+    stampedBy?: string;
+    stampedDate?: string;
+    issuanceNumber?: string;
+    issuanceDate?: string;
+    lastRecipient: string;
+    finishedDoc?: string;
+    shelveNo?: string;
+    archiveNo?: string;
+    docSequence?: string;
   };
 }
 
 function createData(
   id: number,
-  name: string,
+  title: string,
   status: string,
   days: number,
   types: string,
+  categories: string,
   office: string,
+  // permissionTypes?: string,
   description?: string,
   details?: {
+    originId?: string;
     acceptedDate: string;
     acceptedTime: string;
+    originDoc?: string;
     recieptant: string;
-    originId: string;
-    originDoc: string;
-    finishedDoc: string;
+    currentProcessor: string;
+    deliverBy: string;
+    recievedBy: string;
+    retrievedBy: string;
+    retreivedDate: string;
+    stampedBy?: string;
+    stampedDate?: string;
+    issuanceNumber?: string;
+    issuanceDate?: string;
+    lastRecipient: string;
+    finishedDoc?: string;
+    shelveNo?: string;
+    archiveNo?: string;
+    docSequence?: string;
   },
 ): Data {
   return {
     id,
-    name,
+    title,
     status,
     days,
     types,
+    categories,
     office,
     description,
     details,
   };
 }
 
-const rows = [
-  createData(1, "Cupcake", 305, 3.7, 67, 4.3, "Sweet dessert", {
-    serving: "1 cupcake",
-    ingredients: ["Flour", "Sugar", "Butter", "Eggs"],
-  }),
-  createData(2, "Donut", 452, 25.0, 51, 4.9, "Fried dough", {
-    serving: "1 donut",
-    ingredients: ["Flour", "Sugar", "Oil", "Yeast"],
-  }),
-  createData(3, "Eclair", 262, 16.0, 24, 6.0, "French pastry", {
-    serving: "1 eclair",
-    ingredients: ["Pastry", "Cream", "Chocolate"],
-  }),
-  createData(4, "Frozen yoghurt", 159, 6.0, 24, 4.0, "Cold treat", {
-    serving: "100g",
-    ingredients: ["Yogurt", "Sugar", "Fruit"],
-  }),
-  createData(5, "Gingerbread", 356, 16.0, 49, 3.9, "Spiced cookie", {
-    serving: "1 cookie",
-    ingredients: ["Flour", "Ginger", "Molasses"],
-  }),
-  createData(6, "Honeycomb", 408, 3.2, 87, 6.5, "Toffee candy", {
-    serving: "50g",
-    ingredients: ["Sugar", "Honey", "Baking soda"],
-  }),
-  createData(7, "Ice cream sandwich", 237, 9.0, 37, 4.3, "Frozen dessert", {
-    serving: "1 sandwich",
-    ingredients: ["Ice cream", "Cookies"],
-  }),
-  createData(8, "Jelly Bean", 375, 0.0, 94, 0.0, "Chewy candy", {
-    serving: "10 beans",
-    ingredients: ["Sugar", "Corn syrup", "Gelatin"],
-  }),
-  createData(9, "KitKat", 518, 26.0, 65, 7.0, "Chocolate wafer", {
-    serving: "1 bar",
-    ingredients: ["Chocolate", "Wafer", "Sugar"],
-  }),
-  createData(10, "Lollipop", 392, 0.2, 98, 0.0, "Hard candy", {
-    serving: "1 lollipop",
-    ingredients: ["Sugar", "Corn syrup", "Flavoring"],
-  }),
-  createData(11, "Marshmallow", 318, 0, 81, 2.0, "Soft candy", {
-    serving: "4 pieces",
-    ingredients: ["Sugar", "Gelatin", "Corn syrup"],
-  }),
-  createData(12, "Nougat", 360, 19.0, 9, 37.0, "Chewy confection", {
-    serving: "50g",
-    ingredients: ["Sugar", "Honey", "Nuts", "Egg whites"],
-  }),
-  createData(13, "Oreo", 437, 18.0, 63, 4.0, "Sandwich cookie", {
-    serving: "3 cookies",
-    ingredients: ["Flour", "Sugar", "Cocoa", "Cream"],
-  }),
+// const rows = [
+//   createData(
+//     1,
+//     "ប្រកាសស្ដីពីការដាក់លោក ក ឱ្យស្ថិតក្នុងភាពទំេរគ្មានបៀវត្ស",
+//     "កំពុងដំណើការ",
+//     5,
+//     "ឯកសាមុខការ",
+//     "ទំនេរគ្មានបៀវត្ស",
+//     "ការិយាល័យក្របខណ្ឌនិងបៀវត្ស",
+//     "ឯកសារបានដាក់ជូនបងខេង( 1/27/2026) -ឯកសារបានដាក់ជូនបងវីរៈ1/12/2026",
+//     {
+//       originId: "",
+//       acceptedDate: "20-Jan-2026",
+//       acceptedTime: "2:00PM",
+//       originDoc:
+//         "https://drive.google.com/open?id=1T2LGZ8RQ3_Dz5GRX935lJWKTX2oJ0B9A",
+//       recieptant: "ម៉ាលី",
+//       currentProcessor: "រដ្ឋលេខាធិការ",
+//       deliverBy: "ធារ៉ូត",
+//       recievedBy: "វិរៈ",
+//       retrievedBy: "",
+//       retreivedDate: "",
+//       stampedBy: "",
+//       stampedDate: "",
+//       issuanceNumber: "",
+//       issuanceDate: "",
+//       lastRecipient: "",
+//       finishedDoc: "",
+//       shelveNo: "",
+//       archiveNo: "",
+//       docSequence: "",
+//     },
+//   ),
+// ];
+
+// Helper arrays for random data generation
+const titles = [
+  "ប្រកាសស្ដីពីការដាក់លោក ក ឱ្យស្ថិតក្នុងភាពទំេរគ្មានបៀវត្ស",
+  "សំណើសុំដំឡើងកាំប្រាក់ជូនមន្ត្រីរាជការ",
+  "របាយការណ៍បូកសរុបការងារប្រចាំខែ",
+  "លិខិតអញ្ជើញចូលរួមកិច្ចប្រជុំបូកសរុបការងារ",
+  "សេចក្តីសម្រេចស្តីពីការបង្កើតគណៈកម្មការ",
+  "សំណើទិញសម្ភារៈការិយាល័យសម្រាប់ឆ្នាំ២០២៦",
+  "លិខិតសុំច្បាប់ឈប់សម្រាកប្រចាំឆ្នាំ",
+  "ដីកាបញ្ជូនឯកសារទៅនាយកដ្ឋានពាក់ព័ន្ធ",
+  "កិច្ចសន្យាជួលរថយន្តសម្រាប់ចុះបំពេញបេសកកម្ម",
+  "សេចក្តីជូនដំណឹងស្តីពីការរៀបចំពិធីបុណ្យចូលឆ្នាំខ្មែរ",
 ];
+
+const statuses = [
+  "កំពុងដំណើរការ",
+  "បានបញ្ចប់",
+  "រង់ចាំហត្ថលេខា",
+  "ត្រួតពិនិត្យ",
+  "បានបដិសេធ",
+];
+const docTypes = [
+  "ឯកសាមុខការ",
+  "រដ្ឋបាល",
+  "ហិរញ្ញវត្ថុ",
+  "បុគ្គលិក",
+  "បច្ចេកទេស",
+];
+const categories = [
+  "ទំនេរគ្មានបៀវត្ស",
+  "ដំឡើងថ្នាក់",
+  "តែងតាំង",
+  "ផ្ទេរភារកិច្ច",
+  "ចូលនិវត្តន៍",
+];
+const offices = [
+  "ការិយាល័យក្របខណ្ឌនិងបៀវត្ស",
+  "ការិយាល័យរដ្ឋបាលនិងហិរញ្ញវត្ថុ",
+  "ការិយាល័យផែនការនិងស្ថិតិ",
+  "ការិយាល័យបណ្តុះបណ្តាល",
+  "ការិយាល័យសហប្រតិបត្តិការអន្តរជាតិ",
+];
+const names = [
+  "ម៉ាលី",
+  "វិរៈ",
+  "ធារ៉ូត",
+  "សុខា",
+  "ចាន់ណា",
+  "វណ្ណៈ",
+  "ពិសិដ្ឋ",
+  "ដារ៉ា",
+  "សម្បត្តិ",
+  "បូផា",
+];
+const positions = [
+  "រដ្ឋលេខាធិការ",
+  "អនុរដ្ឋលេខាធិការ",
+  "អគ្គនាយក",
+  "ប្រធាននាយកដ្ឋាន",
+  "ប្រធានការិយាល័យ",
+];
+
+// Generator function
+const generateRows = (count: number): Data[] => {
+  const data: Data[] = [];
+
+  for (let i = 1; i <= count; i++) {
+    const randomTitle = titles[Math.floor(Math.random() * titles.length)];
+    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+    const randomType = docTypes[Math.floor(Math.random() * docTypes.length)];
+    const randomCat = categories[Math.floor(Math.random() * categories.length)];
+    const randomOffice = offices[Math.floor(Math.random() * offices.length)];
+    const randomName1 = names[Math.floor(Math.random() * names.length)];
+    const randomName2 = names[Math.floor(Math.random() * names.length)];
+    const randomName3 = names[Math.floor(Math.random() * names.length)];
+    const randomPos = positions[Math.floor(Math.random() * positions.length)];
+    const day = Math.floor(Math.random() * 28) + 1;
+    const month = Math.floor(Math.random() * 12) + 1;
+    const dateStr = `${day}/${month}/2026`;
+
+    data.push(
+      createData(
+        i,
+        randomTitle,
+        randomStatus,
+        Math.floor(Math.random() * 15) + 1, // 1-15 days
+        randomType,
+        randomCat,
+        randomOffice,
+        `ឯកសារបានដាក់ជូនបង${randomName1} (${dateStr})`,
+        {
+          originId: `DOC-${2026000 + i}`,
+          acceptedDate: `${day}-Jan-2026`,
+          acceptedTime: `${Math.floor(Math.random() * 12) + 7}:00 ${Math.random() > 0.5 ? "AM" : "PM"}`,
+          originDoc:
+            Math.random() > 0.3 ? "https://drive.google.com/..." : undefined,
+          recieptant: randomName1,
+          currentProcessor: randomPos,
+          deliverBy: randomName2,
+          recievedBy: randomName3,
+          retrievedBy: Math.random() > 0.7 ? randomName2 : "",
+          retreivedDate: Math.random() > 0.7 ? dateStr : "",
+          stampedBy: Math.random() > 0.5 ? randomName1 : undefined,
+          stampedDate: Math.random() > 0.5 ? dateStr : undefined,
+          issuanceNumber: Math.random() > 0.5 ? `No.${100 + i}/26` : undefined,
+          issuanceDate: Math.random() > 0.5 ? dateStr : undefined,
+          lastRecipient: randomName3,
+          finishedDoc:
+            Math.random() > 0.8 ? "https://drive.google.com/..." : undefined,
+          shelveNo: `S-${Math.floor(Math.random() * 10)}`,
+          archiveNo: `A-${Math.floor(Math.random() * 100)}`,
+          docSequence: `${i.toString().padStart(4, "0")}`,
+        },
+      ),
+    );
+  }
+  return data;
+};
+
+const rows = generateRows(100);
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -164,7 +297,7 @@ const headCells: readonly HeadCell[] = [
     label: "ល.រ នធម",
   },
   {
-    id: "name",
+    id: "title",
     numeric: false,
     disablePadding: true,
     label: "ឈ្មោះឯកសារ",
@@ -183,9 +316,15 @@ const headCells: readonly HeadCell[] = [
   },
   {
     id: "types",
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: "ប្រភេទឯកសារ",
+  },
+  {
+    id: "categories",
+    numeric: false,
+    disablePadding: false,
+    label: "ឯកសារ",
   },
   {
     id: "office",
@@ -227,7 +366,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
         <TableCell padding="checkbox" sx={{ bgcolor: "background.paper" }} />
         <TableCell padding="checkbox" sx={{ bgcolor: "background.paper" }}>
           <Checkbox
-            color="primary"
+            color="error"
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
@@ -239,10 +378,18 @@ function EnhancedTableHead(props: EnhancedTableProps) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? "right" : "left"}
+            // align={headCell.numeric ? "right" : "left"}
+            align={"center"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
-            sx={{ bgcolor: "background.paper" }}
+            sx={{
+              bgcolor: "background.paper",
+              h6: {
+                fontFamily: "var(--font-interkhmerloopless)",
+                fontWeight: 700,
+              },
+            }}
+            // variant="head"
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -258,7 +405,16 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             </TableSortLabel>
           </TableCell>
         ))}
-        <TableCell align="right" sx={{ bgcolor: "background.paper" }}>
+        <TableCell
+          align="center"
+          sx={{
+            bgcolor: "background.paper",
+            h6: {
+              fontFamily: "var(--font-interkhmerloopless)",
+              fontWeight: 700,
+            },
+          }}
+        >
           <Typography variant="h6">ចំណាត់ការឯកសារ</Typography>
         </TableCell>
       </TableRow>
@@ -359,7 +515,7 @@ function Row(props: RowProps) {
         key={row.id}
         selected={isItemSelected}
       >
-        <TableCell>
+        <TableCell align="center">
           <IconButton
             aria-label="expand row"
             size="small"
@@ -368,9 +524,9 @@ function Row(props: RowProps) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell padding="checkbox">
+        <TableCell padding="checkbox" align="center">
           <Checkbox
-            color="primary"
+            color="error"
             checked={isItemSelected}
             onClick={(event) => handleClick(event, row.id)}
             inputProps={{
@@ -378,15 +534,32 @@ function Row(props: RowProps) {
             }}
           />
         </TableCell>
-        <TableCell component="th" id={labelId} scope="row" padding="none">
+        <TableCell
+          component="th"
+          id={labelId}
+          scope="row"
+          padding="none"
+          align="center"
+        >
           {row.id}
         </TableCell>
-        <TableCell align="right">{row.name}</TableCell>
-        <TableCell align="right">{row.status}</TableCell>
-        <TableCell align="right">{row.days}</TableCell>
-        <TableCell align="right">{row.types}</TableCell>
-        <TableCell align="right">{row.office}</TableCell>
-        <TableCell align="right">
+        <TableCell align="left">{row.title}</TableCell>
+        <TableCell align="left" padding="none">
+          {row.status}
+        </TableCell>
+        <TableCell align="center" padding="none">
+          {row.days}
+        </TableCell>
+        <TableCell align="left" padding="none">
+          {row.types}
+        </TableCell>
+        <TableCell align="left" padding="none">
+          {row.categories}
+        </TableCell>
+        <TableCell align="left" padding="none">
+          {row.office}
+        </TableCell>
+        <TableCell align="center" padding="none">
           <Tooltip title="Edit">
             <IconButton
               size="small"
@@ -394,6 +567,7 @@ function Row(props: RowProps) {
                 e.stopPropagation();
                 handleEdit(row.id);
               }}
+              color="error"
             >
               <EditIcon fontSize="small" />
             </IconButton>
@@ -405,6 +579,7 @@ function Row(props: RowProps) {
                 e.stopPropagation();
                 handleDelete(row.id);
               }}
+              color="primary"
             >
               <DeleteIcon fontSize="small" />
             </IconButton>
@@ -427,7 +602,7 @@ function Row(props: RowProps) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
-                Details
+                លម្អិត
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph>
                 {row.description}
@@ -435,11 +610,75 @@ function Row(props: RowProps) {
               {row.details && (
                 <Box>
                   <Typography variant="body2">
-                    <strong>Serving:</strong> {row.details.serving}
+                    <strong>លេខលិខិតដើម: </strong> {row.details.originId}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Ingredients:</strong>{" "}
-                    {row.details.ingredients.join(", ")}
+                    <strong>កាលបរិច្ឆេទលិខិតចូល: </strong>
+                    {row.details.acceptedDate}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>ម៉ោងចូល: </strong> {row.details.acceptedTime}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>រូបភាពឯកសារ: </strong>{" "}
+                    <Link href={row.details.originDoc} target="_blank">
+                      រូបភាពឯកសារដើម
+                    </Link>
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>អ្នកទទួលឯកសារ: </strong> {row.details.recieptant}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>កំពុងប្រតិបត្តិការនៅ: </strong>
+                    {row.details.currentProcessor}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>អ្នកបញ្ជូនឯកសារ: </strong> {row.details.deliverBy}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>អ្នកទទួលឯកសារបន្ត: </strong>
+                    {row.details.recievedBy}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>អ្នកទទួលឯកសារពីខុទ្ទកាល័យ: </strong>
+                    {row.details.retrievedBy}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>កាលបរិច្ឆេទទទួលឯកសារពីខុទ្ទកាល័យ: </strong>
+                    {row.details.retreivedDate}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>អ្នកប្រថាប់ត្រា: </strong> {row.details.stampedBy}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>កាលបរិច្ឆេទប្រថាប់ត្រា: </strong>
+                    {row.details.stampedDate}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>លេខលិខិតចេញ: </strong> {row.details.issuanceNumber}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>កាលបរិច្ឆេទបញ្ជូនចេញ: </strong>
+                    {row.details.issuanceDate}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>អ្នកទទួលឯកសារចេញ:</strong>
+                    {row.details.lastRecipient}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>រូបភាពឯកសារបញ្ចប់: </strong>
+                    <Link href={row.details.finishedDoc} target="_blank">
+                      រូបភាពឯកសារដើម
+                    </Link>
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>លេខទូរ: </strong> {row.details.shelveNo}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>លេខក្រូណូ: </strong> {row.details.archiveNo}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>លេខរៀងឯកសារ: </strong> {row.details.docSequence}
                   </Typography>
                 </Box>
               )}
@@ -560,7 +799,6 @@ export default function EnhancedTable() {
               {visibleRows.map((row, index) => {
                 const isItemSelected = selected.includes(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
-
                 return (
                   <Row
                     key={row.id}
@@ -599,7 +837,7 @@ export default function EnhancedTable() {
       </Paper>
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
+        label="បង្រួមគម្លាតតារាង"
       />
     </Box>
   );

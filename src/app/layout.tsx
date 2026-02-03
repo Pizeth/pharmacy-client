@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { Siemreap, Moul } from "next/font/google";
@@ -38,6 +39,72 @@ const moul = Moul({
   variable: "--font-moul",
 });
 
+const FONT_PATH = "../../public/fonts/";
+
+const mef1 = localFont({
+  src: [
+    {
+      path: "../../public/fonts/KHMERMEF1.ttf",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  variable: "--font-mef1",
+});
+
+const mef2 = localFont({
+  src: [
+    {
+      path: "../../public/fonts/KHMERMEF2.ttf",
+      // weight: "200",
+      style: "normal",
+    },
+  ],
+  variable: "--font-mef2",
+});
+
+const interKhmerLooped = localFont({
+  src: [
+    {
+      path: "../../public/fonts/interkhmer/InterKhmerLooped[wght].ttf",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/interkhmer/InterKhmerLooped-Italic[wght].ttf",
+      style: "italic",
+    },
+  ],
+  variable: "--font-interkhmer",
+});
+
+const interKhmerLoopless = localFont({
+  src: [
+    {
+      path: "../../public/fonts/interkhmer/InterKhmerLoopless[wght].ttf",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/interkhmer/InterKhmerLoopless-Italic[wght].ttf",
+      style: "italic",
+    },
+  ],
+  variable: "--font-interkhmerloopless",
+});
+
+const googleSans = localFont({
+  src: [
+    {
+      path: "../../public/fonts/googlesan/GoogleSans-VariableFont_GRAD,opsz,wght.ttf",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/googlesan/GoogleSans-Italic-VariableFont_GRAD,opsz,wght.ttf",
+      style: "italic",
+    },
+  ],
+  variable: "--font-google",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -63,7 +130,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${siemreap.variable} ${moul.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} antialiased`}
       >
         {/* {children} */}
         {/* <ThemeProvider theme={darkTheme}>{children}</ThemeProvider> */}
