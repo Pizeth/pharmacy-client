@@ -258,7 +258,7 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
       dark: true,
     },
     shape: {
-      borderRadius: 50,
+      // borderRadius: 50,
     },
     breakpoints: {
       values: {
@@ -665,6 +665,20 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
           },
         },
       },
+      MuiInputBase: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            borderRadius: 50,
+            "&.Mui-focused .MuiSvgIcon-root": {
+              color: props.theme.palette.primary.main,
+              borderRadius: 50,
+            },
+            "&.Mui-error .MuiSvgIcon-root": {
+              color: props.theme.palette.error.main,
+            },
+          }),
+        },
+      },
       MuiFilledInput: {
         styleOverrides: {
           root: {
@@ -678,6 +692,7 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
       MuiOutlinedInput: {
         styleOverrides: {
           root: (props: { theme: Theme }) => ({
+            borderRadius: 50,
             "&.Mui-focused .MuiSvgIcon-root": {
               color: props.theme.palette.primary.main,
             },
@@ -685,6 +700,10 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
               color: props.theme.palette.error.main,
             },
           }),
+          notchedOutline: {
+            // Target the border element for the outlined variant
+            borderRadius: 50,
+          },
         },
       },
       MuiButtonBase: {

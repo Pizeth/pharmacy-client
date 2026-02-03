@@ -254,7 +254,9 @@
   top: 33%;
   left: 50%;
   transform: translate(-50%, -50%);
-  animation: float 6s ease-in-out infinite, tilt 6s ease-in-out infinite;
+  animation:
+    float 6s ease-in-out infinite,
+    tilt 6s ease-in-out infinite;
 }
 
 /* 404 Page Styles */
@@ -449,11 +451,11 @@
   text-transform: uppercase;
 }
 
-ul {
+/* ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
-  /*    overflow: hidden;*/
+  overflow: hidden;
   display: flex;
   align-items: center;
 }
@@ -480,7 +482,7 @@ li a {
 
 li a:hover {
   color: #ffcb39;
-}
+} */
 
 .btn-request {
   padding: 10px 25px;
