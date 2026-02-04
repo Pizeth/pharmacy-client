@@ -23,6 +23,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import DirectionsIcon from "@mui/icons-material/Directions";
 import EnhancedTable from "./table";
 import StickyFAB from "../CustomComponents/StickyFab";
+import DataGridTable from "./menu";
+import DocumentFormDialog from "./menu";
 
 export default function AdministrativeForm() {
   // const { toggleTheme, mode } = useThemeControl();
@@ -161,7 +163,6 @@ export default function AdministrativeForm() {
 
         {/* <Box sx={{ display: "flex", flexDirection: "column" }}> */}
       </Box>
-
       {/* --- MAIN TITLE --- */}
       <Typography
         variant="h6"
@@ -257,9 +258,11 @@ export default function AdministrativeForm() {
           </Paper>
 
           <EnhancedTable />
+          {/* <DataGridTable /> */}
           <StickyFAB />
         </form>
       </FormProvider>
+      {/* <DocumentFormDialog /> */}
     </Container>
     // </ThemeProvider>
   );

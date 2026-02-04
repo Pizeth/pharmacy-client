@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -32,10 +33,10 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import generateRows, { Data } from "./mockData";
+import generateRows, { createData, Data } from "./mockData";
 import { Article, AssignmentTurnedIn, Print } from "@mui/icons-material";
-
-const rows = generateRows(200);
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -172,7 +173,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
               direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
             >
-              <Typography variant="h6">{headCell.label}</Typography>
+              <Typography variant="h6" color="error">
+                {headCell.label}
+              </Typography>
               {orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
                   {order === "desc" ? "sorted descending" : "sorted ascending"}
@@ -191,7 +194,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             },
           }}
         >
-          <Typography variant="h6">ចំណាត់ការឯកសារ</Typography>
+          <Typography variant="h6" color="error">
+            ចំណាត់ការឯកសារ
+          </Typography>
         </TableCell>
       </TableRow>
     </TableHead>
@@ -200,13 +205,17 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
+  dense: boolean;
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
+  const { numSelected, dense, handleChange } = props;
 
   return (
     <Toolbar
+      disableGutters
+      variant={dense ? "dense" : "regular"}
       sx={[
         {
           pl: { sm: 2 },
@@ -240,6 +249,10 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           បញ្ជីឯកសារ
         </Typography>
       )}
+      <FormControlLabel
+        control={<Switch checked={dense} onChange={handleChange} />}
+        label="បង្រួមគម្លាត"
+      />
       {numSelected > 0 ? (
         <Tooltip title="Delete">
           <IconButton>
@@ -286,7 +299,19 @@ function Row(props: RowProps) {
     open,
     dense,
   } = props;
-  const [exspanded, setExspanded] = React.useState(false);
+  const [exspanded, setExspanded] = useState(false);
+  const router = useRouter();
+
+  const handleExpandClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setExspanded(!exspanded);
+  };
+  const handleRowClick = (id: number) => {
+    console.log("Row clicked:", id);
+    // Navigate to detail page
+    router.push(`/documents/${id}`);
+    // or with react-router: navigate(`/desserts/${params.row.id}`);
+  };
 
   return (
     <>
@@ -297,12 +322,14 @@ function Row(props: RowProps) {
         tabIndex={-1}
         key={row.id}
         selected={isItemSelected}
+        onClick={() => handleRowClick(row.id)} // ADD THIS
+        sx={{ cursor: "pointer" }}
       >
         <TableCell align="center">
           <IconButton
             aria-label="expand row"
             size="small"
-            onClick={() => setExspanded(!exspanded)}
+            onClick={(event) => handleExpandClick(event)}
           >
             {exspanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
@@ -312,8 +339,8 @@ function Row(props: RowProps) {
             color="error"
             checked={isItemSelected}
             onClick={(event) => handleClick(event, row.id)}
-            inputProps={{
-              "aria-labelledby": labelId,
+            slotProps={{
+              input: { "aria-labelledby": labelId },
             }}
           />
         </TableCell>
@@ -433,43 +460,232 @@ function Row(props: RowProps) {
               <ListItemIcon>
                 <Print fontSize="small" color="warning" />
               </ListItemIcon>
-              <ListItemText>បោះពុម្ភ</ListItemText>
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                ⌘V
+              <ListItemText>បោះពុម្ភ </ListItemText>
+              <Typography
+                variant="body2"
+                ml={1}
+                sx={{ color: "text.secondary" }}
+              >
+                ⌘+P
               </Typography>
             </MenuItem>
             <MenuItem onClick={handleClose}>
               <ListItemIcon>
                 <Article fontSize="small" color="secondary" />
               </ListItemIcon>
-              <ListItemText>មើលលម្អិត</ListItemText>
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                ⌘V
+              <ListItemText>មើលលម្អិត </ListItemText>
+              <Typography
+                variant="body2"
+                ml={1}
+                sx={{ color: "text.secondary" }}
+              >
+                ⌘+D
               </Typography>
             </MenuItem>
             <MenuItem onClick={handleClose}>
               <ListItemIcon>
                 <AssignmentTurnedIn fontSize="small" color="success" />
               </ListItemIcon>
-              <ListItemText>បញ្ចប់ប្រតិបត្តិការ</ListItemText>
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                ⌘V
+              <ListItemText>បញ្ចប់ប្រតិបត្តិការ </ListItemText>
+              <Typography
+                variant="body2"
+                ml={1}
+                sx={{ color: "text.secondary" }}
+              >
+                ⌘+F
               </Typography>
             </MenuItem>
           </Menu>
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
           <Collapse in={exspanded} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
                 លម្អិត
               </Typography>
-              <Typography variant="body2" color="text.secondary" paragraph>
+              <Typography variant="body2" color="text.secondary" mb={2}>
                 {row.description}
               </Typography>
-              {row.details && (
+              <TableContainer component={Paper}>
+                <Table
+                  size={dense ? "small" : "medium"}
+                  aria-label="detail information"
+                  aria-labelledby="tableDetail"
+                  sx={{ minWidth: "50vmin" }}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="body2" color="error">
+                          <strong>បរិយាយ </strong>
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="error">
+                          <strong>ទិន្នន័យ </strong>
+                        </Typography>
+                      </TableCell>
+                      {/* <TableCell align="right">Amount</TableCell>
+                      <TableCell align="right">Total price ($)</TableCell> */}
+                    </TableRow>
+                  </TableHead>
+                  {row.details && (
+                    <TableBody>
+                      <TableRow key={row.details.originId + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>លេខលិខិតដើម: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.originId}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.acceptedDate + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>កាលបរិច្ឆេទលិខិតចូល: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.acceptedDate}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.acceptedTime + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>ម៉ោងចូល: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.acceptedTime}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.originDoc + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>រូបភាពឯកសារ: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Link href={row.details.originDoc} target="_blank">
+                            រូបភាពឯកសារដើម
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.recieptant + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>អ្នកទទួលឯកសារ: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.recieptant}</TableCell>
+                      </TableRow>
+                      <TableRow
+                        key={row.details.currentProcessor + "" + row.id}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>កំពុងប្រតិបត្តិការនៅ: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.currentProcessor}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.recievedBy + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>អ្នកបញ្ជូនឯកសារ: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.recievedBy}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.retreivedDate + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>អ្នកទទួលឯកសារពីខុទ្ទកាល័យ: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.retreivedDate}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.stampedBy + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>អ្នកប្រថាប់ត្រា: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.stampedBy}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.stampedDate + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>កាលបរិច្ឆេទប្រថាប់ត្រា: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.stampedDate}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.issuanceNumber + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>លេខលិខិតចេញ: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.issuanceNumber}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.issuanceDate + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>កាលបរិច្ឆេទបញ្ជូនចេញ: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.issuanceDate}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.lastRecipient + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>អ្នកទទួលឯកសារចេញ:</strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.lastRecipient}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.finishedDoc + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>រូបភាពឯកសារបញ្ចប់: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {" "}
+                          <Link href={row.details.finishedDoc} target="_blank">
+                            រូបភាពឯកសារបញ្ចប់
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.shelveNo + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>លេខទូរ: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.shelveNo}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.archiveNo + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>លេខក្រូណូ: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.archiveNo}</TableCell>
+                      </TableRow>
+                      <TableRow key={row.details.docSequence + "" + row.id}>
+                        <TableCell component="th" scope="row">
+                          <Typography variant="body2">
+                            <strong>លេខរៀងឯកសារ: </strong>
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.details.docSequence}</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  )}
+                </Table>
+              </TableContainer>
+
+              {/* {row.details && (
                 <Box>
                   <Typography variant="body2">
                     <strong>លេខលិខិតដើម: </strong> {row.details.originId}
@@ -543,7 +759,7 @@ function Row(props: RowProps) {
                     <strong>លេខរៀងឯកសារ: </strong> {row.details.docSequence}
                   </Typography>
                 </Box>
-              )}
+              )} */}
             </Box>
           </Collapse>
         </TableCell>
@@ -560,6 +776,46 @@ export default function EnhancedTable() {
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
 
+  // const [rows, setRows] = React.useState<Data[]>([]);
+  // React.useEffect(() => {
+  //   setRows(generateRows(200));
+  // }, []);
+  const rows = generateRows(200);
+
+  // const rows = [
+  //   createData(
+  //     1,
+  //     "ប្រកាសស្ដីពីការដាក់លោក ក ឱ្យស្ថិតក្នុងភាពទំេរគ្មានបៀវត្ស",
+  //     "កំពុងដំណើការ",
+  //     5,
+  //     "ឯកសាមុខការ",
+  //     "ទំនេរគ្មានបៀវត្ស",
+  //     "ការិយាល័យក្របខណ្ឌនិងបៀវត្ស",
+  //     "ឯកសារបានដាក់ជូនបងខេង( 1/27/2026) -ឯកសារបានដាក់ជូនបងវីរៈ1/12/2026",
+  //     {
+  //       originId: "",
+  //       acceptedDate: "20-Jan-2026",
+  //       acceptedTime: "2:00PM",
+  //       originDoc:
+  //         "https://drive.google.com/open?id=1T2LGZ8RQ3_Dz5GRX935lJWKTX2oJ0B9A",
+  //       recieptant: "ម៉ាលី",
+  //       currentProcessor: "រដ្ឋលេខាធិការ",
+  //       deliverBy: "ធារ៉ូត",
+  //       recievedBy: "វិរៈ",
+  //       retrievedBy: "",
+  //       retreivedDate: "",
+  //       stampedBy: "",
+  //       stampedDate: "",
+  //       issuanceNumber: "",
+  //       issuanceDate: "",
+  //       lastRecipient: "",
+  //       finishedDoc: "",
+  //       shelveNo: "",
+  //       archiveNo: "",
+  //       docSequence: "",
+  //     },
+  //   ),
+  // ];
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof Data,
@@ -579,6 +835,7 @@ export default function EnhancedTable() {
   };
 
   const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+    event.stopPropagation();
     const selectedIndex = selected.indexOf(id);
     let newSelected: readonly number[] = [];
 
@@ -634,7 +891,8 @@ export default function EnhancedTable() {
     // Add your more actions logic here
   };
 
-  const handleClose = () => {
+  const handleClose = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
     setAnchorElAction(null);
   };
 
@@ -652,7 +910,11 @@ export default function EnhancedTable() {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }} square variant="outlined">
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          dense={dense}
+          handleChange={handleChangeDense}
+        />
         <TableContainer sx={{ maxHeight: "70vmin" }}>
           <Table
             stickyHeader
@@ -719,10 +981,10 @@ export default function EnhancedTable() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
+      {/* <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="បង្រួមគម្លាតតារាង"
-      />
+      /> */}
     </Box>
   );
 }

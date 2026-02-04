@@ -99,8 +99,8 @@ function ResponsiveAppBar() {
               display: { xs: "none", md: "flex" },
               mr: 1,
               position: "relative",
-              width: 50,
-              height: 50,
+              width: "7vmin",
+              height: "7vmin",
             }}
           >
             <Image
@@ -113,7 +113,7 @@ function ResponsiveAppBar() {
               unoptimized
             />
           </Box>
-          <Typography
+          {/* <Typography
             variant="h6"
             noWrap
             component="a"
@@ -129,7 +129,7 @@ function ResponsiveAppBar() {
             }}
           >
             LOGO
-          </Typography>
+          </Typography> */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"

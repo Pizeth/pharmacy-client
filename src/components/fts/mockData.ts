@@ -31,7 +31,7 @@ export interface Data {
   };
 }
 
-function createData(
+export function createData(
   id: number,
   title: string,
   status: string,
@@ -75,41 +75,6 @@ function createData(
     details,
   };
 }
-
-// const rows = [
-//   createData(
-//     1,
-//     "ប្រកាសស្ដីពីការដាក់លោក ក ឱ្យស្ថិតក្នុងភាពទំេរគ្មានបៀវត្ស",
-//     "កំពុងដំណើការ",
-//     5,
-//     "ឯកសាមុខការ",
-//     "ទំនេរគ្មានបៀវត្ស",
-//     "ការិយាល័យក្របខណ្ឌនិងបៀវត្ស",
-//     "ឯកសារបានដាក់ជូនបងខេង( 1/27/2026) -ឯកសារបានដាក់ជូនបងវីរៈ1/12/2026",
-//     {
-//       originId: "",
-//       acceptedDate: "20-Jan-2026",
-//       acceptedTime: "2:00PM",
-//       originDoc:
-//         "https://drive.google.com/open?id=1T2LGZ8RQ3_Dz5GRX935lJWKTX2oJ0B9A",
-//       recieptant: "ម៉ាលី",
-//       currentProcessor: "រដ្ឋលេខាធិការ",
-//       deliverBy: "ធារ៉ូត",
-//       recievedBy: "វិរៈ",
-//       retrievedBy: "",
-//       retreivedDate: "",
-//       stampedBy: "",
-//       stampedDate: "",
-//       issuanceNumber: "",
-//       issuanceDate: "",
-//       lastRecipient: "",
-//       finishedDoc: "",
-//       shelveNo: "",
-//       archiveNo: "",
-//       docSequence: "",
-//     },
-//   ),
-// ];
 
 // Helper arrays for random data generation
 const titles = [
