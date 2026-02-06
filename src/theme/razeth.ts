@@ -577,6 +577,14 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
         defaultProps: {
           variant: "outlined",
         },
+        // styleOverrides: {
+        //   root: {
+        //     // Use this to ensure the container itself has the radius
+        //     "& .MuiOutlinedInput-root": {
+        //       borderRadius: 50,
+        //     },
+        //   },
+        // },
       },
       MuiFormControl: {
         styleOverrides: {
@@ -682,6 +690,7 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
       MuiFilledInput: {
         styleOverrides: {
           root: {
+            borderRadius: 50,
             backgroundColor: "rgba(0, 0, 0, 0.04)",
             "&$disabled": {
               backgroundColor: "rgba(0, 0, 0, 0.04)",
@@ -702,6 +711,13 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
           }),
           notchedOutline: {
             // Target the border element for the outlined variant
+            borderRadius: 50,
+          },
+        },
+      },
+      MuiDateCalendar: {
+        styleOverrides: {
+          root: {
             borderRadius: 50,
           },
         },
