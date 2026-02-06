@@ -47,7 +47,15 @@ const FormItem = ({
   colSpan?: number;
 }) => (
   <Grid size={{ xs: 12, md: colSpan }}>
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 0,
+        alignContent: "center",
+        // alignItems: "center",
+      }}
+    >
       <Grid container spacing={0} alignItems="center">
         {/* <Grid size={{ xs: 4, md: 4 }} sx={{ textAlign: "right" }}>
           <Typography>{label}</Typography>
@@ -171,29 +179,33 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
         //   sx: { borderRadius: 5, overflow: "hidden" },
         // }}
       >
-        <DialogTitle
-          color="error"
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderBottom: (theme) => `1px solid ${theme.palette.error.main}`,
-          }}
-        >
-          បញ្ចូលព័ត៌មានឯកសារ
-          <IconButton onClick={handleClose} color="primary">
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
+        <FormProvider {...methods}>
+          <form>
+            <DialogTitle
+              color="error"
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderBottom: (theme) =>
+                  `1px solid ${theme.palette.error.main}`,
+              }}
+            >
+              បញ្ចូលព័ត៌មានឯកសារ
+              <IconButton onClick={handleClose} color="primary">
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
 
-        {/* Wrap content in LocalizationProvider for Date/Time pickers */}
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={km}>
-          <DialogContent>
-            {/* SECTION 1: FORM DETAILS */}
-            <Box p={2}>
-              <FormProvider {...methods}>
-                <form>
-                  <Grid container spacing={2}>
+            {/* Wrap content in LocalizationProvider for Date/Time pickers */}
+            <LocalizationProvider
+              dateAdapter={AdapterDateFns}
+              adapterLocale={km}
+            >
+              <DialogContent>
+                {/* SECTION 1: FORM DETAILS */}
+                <Box p={2}>
+                  <Grid container columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                     {/* Row 1 */}
                     <FormItem colSpan={12}>
                       <IconInput
@@ -380,6 +392,7 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
                     </Box>
                   </Grid> */}
                     <FormItem colSpan={4}>
+                      {/* <Grid container justifyContent="center"> */}
                       <Button
                         component="label"
                         role={undefined}
@@ -387,7 +400,9 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
                         color="error"
                         fullWidth
                         tabIndex={-1}
+                        size="large"
                         startIcon={<CloudUploadIcon />}
+                        sx={{ my: "0.5em" }}
                       >
                         <Typography variant="body2">
                           <strong>បញ្ចូលរូបភាពឯកសារដើម</strong>
@@ -398,51 +413,62 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
                           multiple
                         />
                       </Button>
+                      {/* </Grid> */}
                     </FormItem>
                   </Grid>
-                </form>
-              </FormProvider>
-            </Box>
-          </DialogContent>
-        </LocalizationProvider>
+                </Box>
+              </DialogContent>
+            </LocalizationProvider>
 
-        <DialogActions>
-          {/* <Button onClick={handleClose}>Cancel</Button>
+            <DialogActions
+              sx={{
+                // display: "flex",
+                // justifyContent: "space-between",
+                // alignItems: "center",
+                borderTop: (theme) => `1px solid ${theme.palette.error.main}`,
+                px: 1.5,
+                py: 2,
+              }}
+            >
+              {/* <Button onClick={handleClose}>Cancel</Button>
             <Button onClick={handleClose} variant="contained">
               Subscribe
             </Button> */}
-          <Box width={"100%"}>
-            <Grid container spacing={2} justifyContent="right" mb={1}>
-              <Grid size={{ xs: 5, md: 2 }}>
-                <Button
-                  variant="contained"
-                  startIcon={<SaveIcon />}
-                  fullWidth
-                  color="success"
-                  autoFocus
-                >
-                  <Typography variant="body2">
-                    <strong>រក្សាទុក</strong>
-                  </Typography>
-                </Button>
-              </Grid>
-              <Grid size={{ xs: 5, md: 2 }}>
-                <Button
-                  variant="contained"
-                  startIcon={<CancelIcon />}
-                  fullWidth
-                  color="primary"
-                  onClick={handleInternalClose}
-                >
-                  <Typography variant="body2">
-                    <strong>បិទ</strong>
-                  </Typography>
-                </Button>
-              </Grid>
-            </Grid>
-          </Box>
+              <Box width={"100%"}>
+                <Grid container spacing={2} justifyContent="right">
+                  <Grid size={{ xs: 5, md: 2 }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<SaveIcon />}
+                      fullWidth
+                      size="large"
+                      color="success"
+                      autoFocus
+                      type="submit"
+                    >
+                      <Typography variant="body2">
+                        <strong>រក្សាទុក</strong>
+                      </Typography>
+                    </Button>
+                  </Grid>
+                  <Grid size={{ xs: 5, md: 2 }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<CancelIcon />}
+                      fullWidth
+                      size="large"
+                      color="primary"
+                      onClick={handleInternalClose}
+                    >
+                      <Typography variant="body2">
+                        <strong>បិទ</strong>
+                      </Typography>
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
 
-          {/* <Button
+              {/* <Button
             variant="contained"
             color="secondary"
             sx={{
@@ -453,7 +479,9 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
               <strong>បញ្ជូនឯកសារ</strong>
             </Typography>
           </Button> */}
-        </DialogActions>
+            </DialogActions>
+          </form>
+        </FormProvider>
       </Dialog>
     </Box>
   );
