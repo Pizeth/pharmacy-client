@@ -248,23 +248,24 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
                         label="ឈ្មោះឯកសារ"
                         validate={required()}
                         resettable
+                        helperText="ឈ្មោះឯកសារ ឬកម្មវត្ថុ"
                         // slotProps={{
+                        // helperText: "ថ្ងៃ/ខែ/ឆ្នាំ",
+                        // textField: {
+                        //   size: "small",
                         //   helperText: "ថ្ងៃ/ខែ/ឆ្នាំ",
-                        //   textField: {
-                        //     size: "small",
-                        //     helperText: "ថ្ងៃ/ខែ/ឆ្នាំ",
-                        //     fullWidth: true,
-                        //     // sx: inputStyles,
-                        //     InputProps: {
-                        //       sx: {
-                        //         borderRadius: 50, // Apply specific border radius
-                        //       },
+                        //   fullWidth: true,
+                        //   // sx: inputStyles,
+                        //   InputProps: {
+                        //     sx: {
+                        //       borderRadius: 50, // Apply specific border radius
                         //     },
                         //   },
-                        //   field: {
-                        //     clearable: true,
-                        //     // onClear: () => setCleared(true),
-                        //   },
+                        // },
+                        // field: {
+                        //   clearable: true,
+                        //   // onClear: () => setCleared(true),
+                        // },
                         // }}
                       />
                     </FormItem>

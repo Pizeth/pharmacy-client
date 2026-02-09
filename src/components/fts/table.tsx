@@ -37,6 +37,8 @@ import generateRows, { createData, Data } from "./mockData";
 import { Article, AssignmentTurnedIn, Print } from "@mui/icons-material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import DocumentFormDialog from "./dialogForm";
+import { set } from "lodash";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -371,45 +373,51 @@ function Row(props: RowProps) {
         </TableCell>
         <TableCell align="center" padding="none">
           <Tooltip title="Edit">
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEdit(row.id);
-              }}
-              disabled={!isItemSelected}
-              color="error"
-            >
-              <EditIcon fontSize="small" />
-            </IconButton>
+            <span>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEdit(row.id);
+                }}
+                disabled={!isItemSelected}
+                color="error"
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </span>
           </Tooltip>
           <Tooltip title="Delete">
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(row.id);
-              }}
-              disabled={!isItemSelected}
-              color="primary"
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
+            <span>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(row.id);
+                }}
+                disabled={!isItemSelected}
+                color="primary"
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </span>
           </Tooltip>
           <Tooltip title="More">
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleMore(row.id, e);
-              }}
-              disabled={!isItemSelected}
-              aria-controls={open ? "more-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-            >
-              <MoreVertIcon fontSize="small" />
-            </IconButton>
+            <span>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMore(row.id, e);
+                }}
+                disabled={!isItemSelected}
+                aria-controls={open ? "more-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+              >
+                <MoreVertIcon fontSize="small" />
+              </IconButton>
+            </span>
           </Tooltip>
           <Menu
             anchorEl={anchorEl}
@@ -422,7 +430,6 @@ function Row(props: RowProps) {
                 elevation: 0,
                 sx: {
                   overflow: "visible",
-                  // filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
                   mt: 1.5,
                   "& .MuiAvatar-root": {
                     width: 32,
@@ -430,18 +437,6 @@ function Row(props: RowProps) {
                     ml: -0.5,
                     mr: 1,
                   },
-                  // "&::before": {
-                  //   content: '""',
-                  //   display: "block",
-                  //   position: "absolute",
-                  //   top: 0,
-                  //   right: 14,
-                  //   width: 10,
-                  //   height: 10,
-                  //   bgcolor: "background.paper",
-                  //   transform: "translateY(-50%) rotate(45deg)",
-                  //   zIndex: 0,
-                  // },
                 },
               },
               list: { dense: dense },
@@ -449,13 +444,6 @@ function Row(props: RowProps) {
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            {/* <MenuItem onClick={handleClose}>
-              <Avatar /> Profile
-            </MenuItem>
-            <MenuItem onClick={handleClose}>
-              <Avatar /> My account
-            </MenuItem>
-            <Divider /> */}
             <MenuItem onClick={handleClose}>
               <ListItemIcon>
                 <Print fontSize="small" color="warning" />
@@ -684,82 +672,6 @@ function Row(props: RowProps) {
                   )}
                 </Table>
               </TableContainer>
-
-              {/* {row.details && (
-                <Box>
-                  <Typography variant="body2">
-                    <strong>លេខលិខិតដើម: </strong> {row.details.originId}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>កាលបរិច្ឆេទលិខិតចូល: </strong>
-                    {row.details.acceptedDate}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>ម៉ោងចូល: </strong> {row.details.acceptedTime}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>រូបភាពឯកសារ: </strong>
-                    <Link href={row.details.originDoc} target="_blank">
-                      រូបភាពឯកសារដើម
-                    </Link>
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>អ្នកទទួលឯកសារ: </strong> {row.details.recieptant}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>កំពុងប្រតិបត្តិការនៅ: </strong>
-                    {row.details.currentProcessor}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>អ្នកបញ្ជូនឯកសារ: </strong> {row.details.deliverBy}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>អ្នកទទួលឯកសារបន្ត: </strong>
-                    {row.details.recievedBy}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>អ្នកទទួលឯកសារពីខុទ្ទកាល័យ: </strong>
-                    {row.details.retrievedBy}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>កាលបរិច្ឆេទទទួលឯកសារពីខុទ្ទកាល័យ: </strong>
-                    {row.details.retreivedDate}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>អ្នកប្រថាប់ត្រា: </strong> {row.details.stampedBy}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>កាលបរិច្ឆេទប្រថាប់ត្រា: </strong>
-                    {row.details.stampedDate}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>លេខលិខិតចេញ: </strong> {row.details.issuanceNumber}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>កាលបរិច្ឆេទបញ្ជូនចេញ: </strong>
-                    {row.details.issuanceDate}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>អ្នកទទួលឯកសារចេញ:</strong>
-                    {row.details.lastRecipient}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>រូបភាពឯកសារបញ្ចប់: </strong>
-                    <Link href={row.details.finishedDoc} target="_blank">
-                      រូបភាពឯកសារដើម
-                    </Link>
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>លេខទូរ: </strong> {row.details.shelveNo}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>លេខក្រូណូ: </strong> {row.details.archiveNo}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>លេខរៀងឯកសារ: </strong> {row.details.docSequence}
-                  </Typography>
-                </Box>
-              )} */}
             </Box>
           </Collapse>
         </TableCell>
@@ -776,46 +688,19 @@ export default function EnhancedTable() {
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
 
-  // const [rows, setRows] = React.useState<Data[]>([]);
-  // React.useEffect(() => {
-  //   setRows(generateRows(200));
-  // }, []);
+  // --- POPUP STATE ---
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingRowId, setEditingRowId] = useState<number | null>(null);
+
   const rows = generateRows(200);
 
-  // const rows = [
-  //   createData(
-  //     1,
-  //     "ប្រកាសស្ដីពីការដាក់លោក ក ឱ្យស្ថិតក្នុងភាពទំេរគ្មានបៀវត្ស",
-  //     "កំពុងដំណើការ",
-  //     5,
-  //     "ឯកសាមុខការ",
-  //     "ទំនេរគ្មានបៀវត្ស",
-  //     "ការិយាល័យក្របខណ្ឌនិងបៀវត្ស",
-  //     "ឯកសារបានដាក់ជូនបងខេង( 1/27/2026) -ឯកសារបានដាក់ជូនបងវីរៈ1/12/2026",
-  //     {
-  //       originId: "",
-  //       acceptedDate: "20-Jan-2026",
-  //       acceptedTime: "2:00PM",
-  //       originDoc:
-  //         "https://drive.google.com/open?id=1T2LGZ8RQ3_Dz5GRX935lJWKTX2oJ0B9A",
-  //       recieptant: "ម៉ាលី",
-  //       currentProcessor: "រដ្ឋលេខាធិការ",
-  //       deliverBy: "ធារ៉ូត",
-  //       recievedBy: "វិរៈ",
-  //       retrievedBy: "",
-  //       retreivedDate: "",
-  //       stampedBy: "",
-  //       stampedDate: "",
-  //       issuanceNumber: "",
-  //       issuanceDate: "",
-  //       lastRecipient: "",
-  //       finishedDoc: "",
-  //       shelveNo: "",
-  //       archiveNo: "",
-  //       docSequence: "",
-  //     },
-  //   ),
-  // ];
+  // const handleDialogClose = (reason?: string) => {
+  //   // Only close the dialog if the reason is NOT a backdrop click
+  //   if (reason && reason === "backdropClick") return;
+  //   console.log("Dialog closed");
+  //   setEditDialogOpen(false);
+  // };
+
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof Data,
@@ -872,6 +757,8 @@ export default function EnhancedTable() {
   const handleEdit = (id: number) => {
     console.log("Edit row:", id);
     // Add your edit logic here
+    setEditingRowId(id);
+    setEditDialogOpen(true);
   };
 
   const handleDelete = (id: number) => {
@@ -985,6 +872,48 @@ export default function EnhancedTable() {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="បង្រួមគម្លាតតារាង"
       /> */}
+
+      {/* --- RENDER DIALOG HERE --- */}
+      <DocumentFormDialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        initialData={editingRowId}
+      />
     </Box>
   );
 }
+
+// const rows = [
+//   createData(
+//     1,
+//     "ប្រកាសស្ដីពីការដាក់លោក ក ឱ្យស្ថិតក្នុងភាពទំេរគ្មានបៀវត្ស",
+//     "កំពុងដំណើការ",
+//     5,
+//     "ឯកសាមុខការ",
+//     "ទំនេរគ្មានបៀវត្ស",
+//     "ការិយាល័យក្របខណ្ឌនិងបៀវត្ស",
+//     "ឯកសារបានដាក់ជូនបងខេង( 1/27/2026) -ឯកសារបានដាក់ជូនបងវីរៈ1/12/2026",
+//     {
+//       originId: "",
+//       acceptedDate: "20-Jan-2026",
+//       acceptedTime: "2:00PM",
+//       originDoc:
+//         "https://drive.google.com/open?id=1T2LGZ8RQ3_Dz5GRX935lJWKTX2oJ0B9A",
+//       recieptant: "ម៉ាលី",
+//       currentProcessor: "រដ្ឋលេខាធិការ",
+//       deliverBy: "ធារ៉ូត",
+//       recievedBy: "វិរៈ",
+//       retrievedBy: "",
+//       retreivedDate: "",
+//       stampedBy: "",
+//       stampedDate: "",
+//       issuanceNumber: "",
+//       issuanceDate: "",
+//       lastRecipient: "",
+//       finishedDoc: "",
+//       shelveNo: "",
+//       archiveNo: "",
+//       docSequence: "",
+//     },
+//   ),
+// ];

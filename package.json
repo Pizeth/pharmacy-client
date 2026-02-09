@@ -6,7 +6,11 @@
     "dev": "next dev --turbopack -p 8080",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
     "@bicstone/ra-language-japanese": "^5.12.1",
@@ -20,6 +24,7 @@
     "@mui/x-data-grid": "^8.27.0",
     "@mui/x-date-pickers": "^8.27.0",
     "@next/env": "^16.1.6",
+    "@opennextjs/cloudflare": "^1.16.3",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-checkbox": "^1.3.3",
@@ -39,7 +44,7 @@
     "@zxcvbn-ts/language-common": "^3.0.4",
     "@zxcvbn-ts/language-en": "^3.0.2",
     "@zxcvbn-ts/matcher-pwned": "^3.0.4",
-    "axios": "^1.13.4",
+    "axios": "^1.13.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -47,7 +52,7 @@
     "diacritic": "^0.0.2",
     "http-status-codes": "^2.3.0",
     "inflection": "^3.0.2",
-    "jotai": "^2.17.0",
+    "jotai": "^2.17.1",
     "lodash": "^4.17.23",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
@@ -76,13 +81,14 @@
     "@tailwindcss/postcss": "^4.1.18",
     "@types/lodash": "^4.17.23",
     "@types/node": "^25",
-    "@types/react": "^19.2.10",
+    "@types/react": "^19.2.13",
     "@types/react-dom": "^19",
     "baseline-browser-mapping": "^2.9.19",
-    "eslint": "^9",
+    "eslint": "^10",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4.1.18",
     "tw-animate-css": "^1.4.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.63.0"
   }
 }
