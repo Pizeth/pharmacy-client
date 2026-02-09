@@ -570,6 +570,9 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
               display: "inline-block",
               position: "relative",
             },
+            "&.Mui-disabled": {
+              cursor: "not-allowed",
+            },
           }),
         },
       },
@@ -707,6 +710,30 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
             },
             "&.Mui-error .MuiSvgIcon-root": {
               color: props.theme.palette.error.main,
+            },
+            // Targets the root container when disabled
+            "&.Mui-disabled": {
+              backgroundColor: "#7974745c",
+              // 1. Set cursor for standard TextFields
+              pointerEvents: "auto",
+              cursor: "not-allowed",
+              // Styles the inner input text
+              "& .MuiOutlinedInput-input": {
+                WebkitTextFillColor: "#666666",
+                cursor: "not-allowed",
+              },
+              // 2. Set cursor specifically for Select components
+              "& .MuiSelect-select": {
+                cursor: "not-allowed",
+              },
+              // Styles the border
+              "& .MuiOutlinedInput-notchedOutline": {
+                // borderColor: "rgba(0, 0, 0, 0.12) !important",
+              },
+              // 3. Ensure the border doesn't react to hover
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "rgba(0, 0, 0, 0.12) !important",
+              },
             },
           }),
           notchedOutline: {

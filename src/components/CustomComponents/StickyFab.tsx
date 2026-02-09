@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -10,12 +10,19 @@ import {
   IconButton,
   Typography,
   DialogActions,
+  FormControl,
   styled,
 } from "@mui/material";
 import IconInput from "../CustomInputs/IconInput";
 import { useRequired } from "@/utils/validator";
-import { FormProvider, useForm } from "react-hook-form";
-import { DateInput, SelectInput } from "react-admin";
+import {
+  FormProvider,
+  useForm,
+  useWatch,
+  Controller,
+  useFormContext,
+} from "react-hook-form";
+import { DateInput, FormDataConsumer, SelectInput } from "react-admin";
 import ArticleIcon from "@mui/icons-material/Article";
 import {
   AccessTimeFilledOutlined,
@@ -82,6 +89,30 @@ const VisuallyHiddenInput = styled("input")({
 const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: { text?: string }) => {
   const methods = useForm();
   const [open, setOpen] = useState(false);
+  const { setValue } = useFormContext();
+
+  // const { control, setValue } = useForm({
+  //   defaultValues: {
+  //     category: "",
+  //     permissionType: "",
+  //   },
+  // });
+
+  // 1. "Watch" the value of the first select
+  // const category = useWatch({
+  //   control,
+  //   name: "category",
+  // });
+
+  // 2. Logic: Should the second input be enabled?
+  // const isEnabled = category === "សំណើសុំច្បាប់ឈប់សម្រាក";
+
+  // 3. Reset Logic: Clear the second select whenever it becomes disabled
+  // useEffect(() => {
+  //   if (!isEnabled) {
+  //     setValue("permissionType", "");
+  //   }
+  // }, [isEnabled, setValue]);
 
   // Mock data for dropdowns
   const statuses = [
@@ -105,6 +136,7 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
     "តែងតាំង",
     "ផ្ទេរភារកិច្ច",
     "ចូលនិវត្តន៍",
+    "សំណើសុំច្បាប់ឈប់សម្រាក",
   ];
   const offices = [
     "ការិយាល័យបុគ្គលិក",
@@ -239,7 +271,7 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
                     <FormItem colSpan={4}>
                       <IconInput
                         iconStart={<FormatListNumberedOutlined />}
-                        source="title"
+                        source="docNo"
                         className="icon-input"
                         fullWidth
                         label="លេខលិខិត"
@@ -349,8 +381,27 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
                       />
                       {/* </FormControl> */}
                     </FormItem>
+
+                    {/* <FormItem colSpan={4}>
+                      <FormControl fullWidth>
+                        <Controller
+                          name="category"
+                          control={control}
+                          render={({ field }) => (
+                            <SelectInput
+                              {...field}
+                              source="category"
+                              label="ឯកសារ"
+                              choices={categories}
+                              emptyText="សូមជ្រើសរើស"
+                              required
+                            />
+                          )}
+                        />
+                      </FormControl>
+                    </FormItem> */}
+
                     <FormItem colSpan={4}>
-                      {/* <FormControl fullWidth size="small"> */}
                       <SelectInput
                         source="category"
                         label="ឯកសារ"
@@ -358,12 +409,30 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
                         emptyText="សូមជ្រើសរើស"
                         required
                       />
-                      {/* </FormControl> */}
                     </FormItem>
 
+                    {/* <FormItem colSpan={4}>
+                      <FormControl disabled={!isEnabled}>
+                        <Controller
+                          name="permissionType"
+                          control={control}
+                          render={({ field }) => (
+                            <SelectInput
+                              {...field}
+                              disabled={!isEnabled}
+                              source="office"
+                              label="ប្រភេទច្បាប់ឈប់សម្រាក"
+                              choices={permissionType}
+                              emptyText="សូមជ្រើសរើស"
+                              required
+                            />
+                          )}
+                        />
+                      </FormControl>
+                    </FormItem> */}
+
                     {/* Row 3 */}
-                    <FormItem colSpan={4}>
-                      {/* <FormControl fullWidth size="small"> */}
+                    {/* <FormItem colSpan={4}>
                       <SelectInput
                         source="permissionType"
                         label="ប្រភេទច្បាប់ឈប់សម្រាក"
@@ -371,7 +440,36 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
                         emptyText="សូមជ្រើសរើស"
                         required
                       />
-                      {/* </FormControl> */}
+                    </FormItem> */}
+
+                    <FormItem colSpan={4}>
+                      <FormDataConsumer>
+                        {({ formData, ...rest }) => {
+                          const isEnabled =
+                            formData.category === "សំណើសុំច្បាប់ឈប់សម្រាក";
+
+                          // Reset logic: clear the value if disabled
+                          useEffect(() => {
+                            if (!isEnabled) {
+                              // setValue("permissionType", null);
+                              setValue("permissionType", "", {
+                                shouldValidate: true,
+                              });
+                            }
+                          }, [isEnabled, setValue]);
+
+                          return (
+                            <SelectInput
+                              disabled={!isEnabled}
+                              source="permissionType"
+                              label="ប្រភេទច្បាប់ឈប់សម្រាក"
+                              choices={permissionType}
+                              emptyText="សូមជ្រើសរើស"
+                              // required
+                            />
+                          );
+                        }}
+                      </FormDataConsumer>
                     </FormItem>
 
                     {/* Action Buttons Row */}
