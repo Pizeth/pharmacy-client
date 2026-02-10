@@ -23,8 +23,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import DirectionsIcon from "@mui/icons-material/Directions";
 import EnhancedTable from "./table";
 import StickyFAB from "../CustomComponents/StickyFab";
-import DataGridTable from "./menu";
-import DocumentFormDialog from "./menu";
+import BackToTopFab from "../Navigations/BackToTop";
 
 export default function AdministrativeForm() {
   // const { toggleTheme, mode } = useThemeControl();
@@ -33,11 +32,13 @@ export default function AdministrativeForm() {
   // const onSubmit = (data) => console.log(data);
   const { register, reset } = methods;
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* --- HEADER --- */}
       <Box
         sx={{
           // display: "flex",
+          display: { xs: "none", md: "inherit" },
+          // position: "relative",
           justifyContent: "space-between",
           mb: 7,
         }}
@@ -55,31 +56,11 @@ export default function AdministrativeForm() {
               justifyContent: "center",
             }}
           >
-            {/* <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}></Box> */}
-            {/* <Box
-              sx={{
-                alignItems: "center",
-                position: "absolute",
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              abc
-            </Box> */}
-            {/* Placeholder for Logo */}
             <Box
               sx={{
-                // width: 80,
-                // height: 80,
-                // bgcolor: "#eee",
-                // borderRadius: "50%",
-                // mb: 1,
                 // display: "flex",
                 // alignItems: "center",
                 // justifyContent: "center",
-                // position: "relative",
-                // width: 50,
-                // height: 50,
                 position: "relative",
                 zIndex: 2,
 
@@ -91,11 +72,6 @@ export default function AdministrativeForm() {
                 objectFit: "cover",
               }}
             >
-              {/* <span
-            // style={{ fontSize: 10, color: mode === "dark" ? "#fff" : "#333" }}
-            >
-              Logo
-            </span> */}
               <Image
                 src="/static/images/logo.svg"
                 alt="Logo"
@@ -148,7 +124,6 @@ export default function AdministrativeForm() {
                 <Typography variant="h6">ក្រសួងមុខងារសាធារណៈ</Typography>
               </Box>
             </Box>
-            {/* </Box> */}
           </Grid>
           {/* National Motto Section */}
           <Grid size={{ xs: 12, md: 2 }} offset={{ md: 8 }}>
@@ -160,8 +135,6 @@ export default function AdministrativeForm() {
             </Box>
           </Grid>
         </Grid>
-
-        {/* <Box sx={{ display: "flex", flexDirection: "column" }}> */}
       </Box>
       {/* --- MAIN TITLE --- */}
       <Typography
@@ -171,7 +144,7 @@ export default function AdministrativeForm() {
           mb: 2.5,
         }}
       >
-        ប្រព័ន្ធចរន្តឯកសាររបស់នាយកដ្ឋានធនធានមនុស្ស សម្រាប់ឆ្នាំ២០២៦
+        ប្រព័ន្ធចរន្តឯកសាររបស់នាយកដ្ឋានធនធានមនុស្ស
       </Typography>
       <FormProvider {...methods}>
         <form>
@@ -194,7 +167,7 @@ export default function AdministrativeForm() {
                 <Label text="ស្វែងរកឯកសារតាមរយៈ ល.ន.ធ.ម" align="center" />
               </Grid> */}
 
-              <Grid size={{ xs: 12, md: 4 }} offset={{ md: 4 }}>
+              <Grid size={{ xs: 12, md: 4 }} offset={{ md: 4 }} px={1}>
                 {/* <TextField fullWidth size="small" variant="outlined" /> */}
                 <SearchInputWithIcon />
               </Grid>
@@ -262,6 +235,7 @@ export default function AdministrativeForm() {
           <StickyFAB />
         </form>
       </FormProvider>
+      {/* <BackToTopFab /> */}
       {/* <DocumentFormDialog /> */}
     </Container>
     // </ThemeProvider>

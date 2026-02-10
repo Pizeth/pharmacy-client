@@ -802,7 +802,7 @@ export default function EnhancedTable() {
           dense={dense}
           handleChange={handleChangeDense}
         />
-        <TableContainer sx={{ maxHeight: "70vmin" }}>
+        <TableContainer sx={{ maxHeight: "70vh" }}>
           <Table
             stickyHeader
             sx={{ minWidth: "90vmin" }}

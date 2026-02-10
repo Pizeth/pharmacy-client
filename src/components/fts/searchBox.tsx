@@ -31,14 +31,14 @@ const SearchInputWithIcon = () => {
         }
       }}
       variant="outlined"
-      sx={{
-        "& .MuiInputBase-root": {
-          backgroundColor: "var(--app-palette-background-paper)", // Your custom background color
-          //   transition: "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-          boxShadow: "var(--Paper-shadow)",
-          //   backgroundImage: "var(--Paper-overlay)",
-        },
-      }}
+      // sx={{
+      //   "& .MuiInputBase-root": {
+      //     backgroundColor: "var(--app-palette-background-paper)", // Your custom background color
+      //     //   transition: "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+      //     boxShadow: "var(--Paper-shadow)",
+      //     //   backgroundImage: "var(--Paper-overlay)",
+      //   },
+      // }}
     />
     // <TextField
     //   label="Search"

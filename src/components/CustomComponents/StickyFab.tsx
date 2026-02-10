@@ -180,7 +180,15 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
   const required = useRequired();
 
   return (
-    <Box sx={{ position: "fixed", bottom: "2.5vmin", right: "2.5vmin" }}>
+    <Box
+      sx={{
+        position: "fixed",
+        bottom: "2.5vmin",
+        right: "2.5vmin",
+        // left: "50%", // move to horizontal middle
+        // transform: "translateX(-50%)", // offset by half its own width
+      }}
+    >
       {/* <Fab color="primary" aria-label="add">
         <AddIcon />
       </Fab> */}

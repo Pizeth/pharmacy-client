@@ -17,6 +17,7 @@ import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import Image from "next/image";
 import ThemeToggle from "../effect/themes/themeToggle";
+import HideOnScroll from "./HideOnScroll";
 
 const pages = ["ទំព័រដើម", "ប្រព័ន្ធចរន្តឯកសារ", "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -86,13 +87,14 @@ function ResponsiveAppBar() {
   };
 
   return (
+    // <HideOnScroll>
     <AppBar
       position="sticky"
       color="primary"
       // enableColorOnDark
     >
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
+        <Toolbar disableGutters variant="dense">
           {/* <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} /> */}
           <Box
             sx={{
@@ -275,6 +277,7 @@ function ResponsiveAppBar() {
         </Toolbar>
       </Container>
     </AppBar>
+    // </HideOnScroll>
   );
 }
 export default ResponsiveAppBar;
