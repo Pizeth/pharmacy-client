@@ -8,6 +8,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import ResponsiveAppBar from "@/components/Navigations/AppBar"; // PrimarySearchAppBar,
 import BackToTopFab from "@/components/Navigations/BackToTop";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
+import PersistentDrawerLeft from "@/components/fts/menu";
 
 const ThemeContext = createContext({
   toggleTheme: () => {},
@@ -49,15 +50,17 @@ export default function ThemeProviderWrapper<Theme = DefaultTheme>({
     <ThemeContext.Provider value={{ toggleTheme, mode }}>
       <AppRouterCacheProvider options={{ enableCssLayer: true }}>
         <ThemeProvider theme={theme}>
-          <CssBaseline />
-
+          {/* <CssBaseline /> */}
           {/* <ResponsiveAppBar /> */}
-          <DrawerAppBar />
           {/* <PrimarySearchAppBar /> */}
+          {/* <PersistentDrawerLeft /> */}
           {/* We use a fragment here because the html/body tags are in the Server Layout */}
           {mounted ? (
-            children
+            // children
+            <DrawerAppBar>{children}</DrawerAppBar>
           ) : (
+            // children
+            // children
             <div style={{ visibility: "hidden" }}>{children}</div>
           )}
           <BackToTopFab />

@@ -126,7 +126,7 @@ export default function AdministrativeForm() {
             </Box>
           </Grid>
           {/* National Motto Section */}
-          <Grid size={{ xs: 12, md: 2 }} offset={{ md: 8 }}>
+          <Grid size={{ xs: 12, md: 3 }} offset={{ md: 7 }}>
             <Box sx={{ textAlign: "center" }}>
               <Typography variant="h5" sx={{ mb: 1 }}>
                 ព្រះរាជាណាចក្រកម្ពុជា

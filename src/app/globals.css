@@ -98,6 +98,11 @@
   height: 100vh;
 }
 */
+/* * {
+  background-color: rgba(0, 128, 0, 0.05) !important;
+  border: rgba(225, 35, 45, 0.5) solid 1px !important;
+} */
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

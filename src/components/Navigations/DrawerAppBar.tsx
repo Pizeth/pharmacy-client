@@ -1,7 +1,21 @@
-import AppBar from "@mui/material/AppBar";
+// import AppBar from "@mui/material/AppBar";
+import { Fragment, ReactNode, useState } from "react";
+import {
+  Avatar,
+  Container,
+  InputBase,
+  ListItemIcon,
+  Menu,
+  MenuItem,
+  // SwipeableDrawer,
+  Tooltip,
+} from "@mui/material";
+import { styled, alpha } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
-// import Drawer from "@mui/material/Drawer";
+import MuiDrawer, { DrawerProps } from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -10,18 +24,6 @@ import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import {
-  Avatar,
-  Container,
-  InputBase,
-  ListItemIcon,
-  Menu,
-  MenuItem,
-  SwipeableDrawer,
-  Tooltip,
-} from "@mui/material";
-import { styled, alpha, useTheme } from "@mui/material/styles";
-import { useState } from "react";
 import Image from "next/image";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
@@ -29,12 +31,77 @@ import SearchIcon from "@mui/icons-material/Search";
 import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import ThemeToggle from "../effect/themes/themeToggle";
+import RielIcon from "../icons/riel";
 
-const Drawer = styled(SwipeableDrawer)(({ theme }) => ({
+// const drawerWidth = 250;
+// 1. Define the responsive width once
+const drawerWidth = "clamp(250px, 30vmin, 300px)";
+
+const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
+  open?: boolean;
+}>(({ theme }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  transition: theme.transitions.create("margin", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  // marginLeft: `-${drawerWidth}px`,
+  marginLeft: `calc(-1 * ${drawerWidth})`,
+  variants: [
+    {
+      props: ({ open }) => open,
+      style: {
+        transition: theme.transitions.create("margin", {
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+        marginLeft: 0,
+      },
+    },
+  ],
+}));
+
+interface AppBarProps extends MuiAppBarProps {
+  open?: boolean;
+}
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<AppBarProps>(({ theme }) => ({
+  transition: theme.transitions.create(["margin", "width"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  variants: [
+    {
+      props: ({ open }) => open,
+      style: {
+        // width: `calc(100% - ${drawerWidth}px)`,
+        // marginLeft: `${drawerWidth}px`,
+
+        // 2. Use it directly for margin (negative values work too!)
+        marginLeft: `${drawerWidth}`,
+
+        // 3. Subtract it from 100% for the main content width
+        width: `calc(100% - ${drawerWidth})`,
+        transition: theme.transitions.create(["margin", "width"], {
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+      },
+    },
+  ],
+}));
+
+const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
   "& .MuiDrawer-paper": {
+    width: drawerWidth,
     boxSizing: "border-box",
-    width: "20vw",
-    minWidth: 240,
+    // minWidth: 230,
+    // maxWidth: 300,
   },
   [theme.breakpoints.up("sm")]: {
     display: "none",
@@ -50,7 +117,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
+  // justifyContent: "flex-end",
+  justifyContent: "center",
 }));
 
 const Search = styled("div")(({ theme }) => ({
@@ -97,22 +165,23 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-// const drawerWidth = 240;
 const navItems = [
   { title: "ទំព័រដើម", icon: <HomeIcon /> },
   { title: "ប្រព័ន្ធចរន្តឯកសារ", icon: <ContentPasteSearchIcon /> },
-  { title: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស", icon: <CurrencyExchangeIcon /> },
+  {
+    title: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស",
+    icon: <RielIcon sx={{ color: "success" }} />,
+  },
 ];
 
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
-export default function DrawerAppBar() {
-  const theme = useTheme();
-  const [mobileOpen, setMobileOpen] = useState(false);
+export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
+  const [open, setOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const handleDrawerToggle = () => {
-    setMobileOpen((prevState) => !prevState);
+    setOpen((prevState) => !prevState);
   };
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -133,11 +202,11 @@ export default function DrawerAppBar() {
       return;
     }
 
-    setMobileOpen(mobileOpen);
+    setOpen(open);
   };
 
   const drawer = (
-    <Box onClick={handleDrawerToggle}>
+    <Fragment>
       {/* <Box
         sx={{
           display: { xs: "flex", md: "flex" },
@@ -160,16 +229,17 @@ export default function DrawerAppBar() {
         />
       </Box> */}
       <DrawerHeader>
-        <IconButton onClick={handleDrawerToggle}>
+        <IconButton onClick={handleDrawerToggle} sx={{ height: "100%", p: 0 }}>
           <Box
             sx={{
-              //   display: { xs: "flex", md: "flex" },
-              //   alignItems: "center",
-              //   justifyContent: "center",
-              mr: 1,
+              // display: { xs: "flex", md: "flex" },
+              // mr: 1,
               position: "relative",
-              //   width: "7vmin",
-              height: "7vmin",
+              width: "100vmin",
+              height: `max(40px, 7vmin)`,
+              img: {
+                p: 0.5,
+              },
             }}
           >
             <Image
@@ -195,11 +265,12 @@ export default function DrawerAppBar() {
           </ListItem>
         ))}
       </List>
-    </Box>
+    </Fragment>
   );
 
   return (
     <Box sx={{ display: "flex" }}>
+      <CssBaseline />
       <AppBar position="fixed" color="primary" component="nav">
         <Container maxWidth="xl">
           <Toolbar disableGutters variant="dense">
@@ -208,17 +279,23 @@ export default function DrawerAppBar() {
               aria-label="open drawer"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={[{ mr: 2 }, mobileOpen && { display: "none" }]}
+              sx={[
+                { mr: 2, p: 0.5 },
+                open && { display: { xs: "none", sm: "block" } },
+              ]}
             >
               {/* <MenuIcon /> */}
               <Box
                 sx={{
                   flexGrow: 1,
                   display: { xs: "flex", sm: "block" },
-                  mr: 1,
+                  // mr: 1,
                   position: "relative",
-                  width: "7vmin",
-                  height: "7vmin",
+                  width: `max(40px, 7vmin)`,
+                  height: `max(40px, 7vmin)`,
+                  img: {
+                    p: 0.5,
+                  },
                 }}
               >
                 <Image
@@ -231,6 +308,7 @@ export default function DrawerAppBar() {
                   unoptimized
                 />
               </Box>
+              {/* <Avatar src="/static/images/logo.svg" /> */}
             </IconButton>
             {/* <Typography
               variant="h6"
@@ -242,13 +320,24 @@ export default function DrawerAppBar() {
             <Box
               sx={{
                 flexGrow: 1,
-                display: { xs: "none", sm: "block", md: "flex" },
+                display: {
+                  xs: "none",
+                  sm: "block",
+                  md: "flex",
+                  // height: "100%",
+                },
               }}
             >
               {navItems.map((item) => (
                 <Button
                   key={item.title}
-                  sx={{ my: 1, color: "#fff", display: "block" }}
+                  sx={{
+                    my: "-webkit-fill-available",
+                    py: "-webkit-fill-available",
+                    height: "100%",
+                  }}
+                  startIcon={item.icon}
+                  size="large"
                 >
                   <Typography variant="h6" sx={{ textAlign: "center" }}>
                     {item.title}
@@ -303,19 +392,26 @@ export default function DrawerAppBar() {
         </Container>
       </AppBar>
       <Drawer
-        variant="temporary"
-        open={mobileOpen}
+        variant="persistent"
+        anchor="left"
+        open={open}
         onClose={handleDrawerToggle}
-        onOpen={toggleDrawer}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
+        // onOpen={toggleDrawer}
+        // ModalProps={{
+        //   keepMounted: true, // Better open performance on mobile.
+        // }}
       >
         {drawer}
       </Drawer>
+      <Main open={open}>
+        {/* <DrawerHeader /> */}
+        {children}
+      </Main>
     </Box>
   );
-}
+};
+
+export default DrawerAppBar;
 
 {
   /* <nav>
