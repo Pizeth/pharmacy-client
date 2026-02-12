@@ -4,6 +4,7 @@ import {
   Avatar,
   Container,
   InputBase,
+  Link,
   ListItemIcon,
   Menu,
   MenuItem,
@@ -32,6 +33,7 @@ import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import ThemeToggle from "../effect/themes/themeToggle";
 import RielIcon from "../icons/riel";
+import { navigate } from "next/dist/client/components/segment-cache/navigation";
 
 // const drawerWidth = 250;
 // 1. Define the responsive width once
@@ -41,7 +43,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme }) => ({
   flexGrow: 1,
-  padding: theme.spacing(3),
+  // padding: `0 ${theme.spacing(3)}`,
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -344,6 +346,17 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   </Typography>
                 </Button>
               ))}
+              <Link
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  window.location.href = "/staff";
+                }}
+              >
+                <Typography variant="h6" sx={{ textAlign: "center" }}>
+                  ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក
+                </Typography>
+              </Link>
             </Box>
             <Search>
               <SearchIconWrapper>
