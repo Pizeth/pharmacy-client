@@ -1,44 +1,29 @@
 "use client";
-
 import {
   Box,
   Container,
   Grid,
   Typography,
-  TextField,
-  Button,
   Paper,
   MenuItem,
   Select,
   FormControl,
-  IconButton,
-  InputBase,
-  Divider,
-  Fab,
 } from "@mui/material";
 import Image from "next/image";
 import SearchInputWithIcon from "./searchBox";
 import { FormProvider, useForm } from "react-hook-form";
-import MenuIcon from "@mui/icons-material/Menu";
-import DirectionsIcon from "@mui/icons-material/Directions";
 import EnhancedTable from "./table";
 import StickyFAB from "../CustomComponents/StickyFab";
-import BackToTopFab from "../Navigations/BackToTop";
+import DocumentTable from "./testTable";
 
 export default function AdministrativeForm() {
-  // const { toggleTheme, mode } = useThemeControl();
   const methods = useForm();
-
-  // const onSubmit = (data) => console.log(data);
-  const { register, reset } = methods;
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* --- HEADER --- */}
       <Box
         sx={{
-          // display: "flex",
           display: { xs: "none", md: "inherit" },
-          // position: "relative",
           justifyContent: "space-between",
           mb: 7,
         }}
@@ -58,9 +43,6 @@ export default function AdministrativeForm() {
           >
             <Box
               sx={{
-                // display: "flex",
-                // alignItems: "center",
-                // justifyContent: "center",
                 position: "relative",
                 zIndex: 2,
 
@@ -104,21 +86,8 @@ export default function AdministrativeForm() {
                       0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
                       0    0   7px ${theme.custom.sideImage.captionGlowColor}
                     `,
-                  // "-webkit-text-stroke": `0.125px ${props.theme.custom.sideImage.captionOutlineColor}`,
                   WebkitTextStroke: (theme) =>
                     `0.125px ${theme.custom.sideImage.captionOutlineColor}`,
-                  // [theme.breakpoints.up("sm")]: {
-                  //   top: (theme) =>
-                  //     `calc(100% + ${theme.custom.sideImage.captionOffset.sm})`,
-                  //   fontSize: (theme) =>
-                  //     theme.custom.sideImage.captionFontSize.sm,
-                  // },
-                  // [theme.breakpoints.up("md")]: {
-                  //   top: (theme) =>
-                  //     `calc(100% + ${theme.custom.sideImage.captionOffset.md})`,
-                  //   fontSize: (theme) =>
-                  //     theme.custom.sideImage.captionFontSize.md,
-                  // },
                 }}
               >
                 <Typography variant="h6">ក្រសួងមុខងារសាធារណៈ</Typography>
@@ -150,95 +119,19 @@ export default function AdministrativeForm() {
         <form>
           {/* --- SEARCH BOX --- */}
           {/* Note: In Grid2, we don't use 'item'. We use 'size' */}
-          <Paper
-            elevation={3}
-            square
-            variant="outlined"
-            sx={
-              {
-                // backgroundColor: mode === "dark" ? "#0D47A1" : "#0D47A1",
-                // p: 2,
-                // mb: 1,
-              }
-            }
-          >
+          {/* <Paper elevation={3} square variant="outlined">
             <Grid container spacing={2} alignItems="center">
-              {/* <Grid size={{ xs: 12, md: 2 }}>
-                <Label text="ស្វែងរកឯកសារតាមរយៈ ល.ន.ធ.ម" align="center" />
-              </Grid> */}
-
               <Grid size={{ xs: 12, md: 4 }} offset={{ md: 4 }} px={1}>
-                {/* <TextField fullWidth size="small" variant="outlined" /> */}
                 <SearchInputWithIcon />
               </Grid>
-
-              {/* <Grid size={{ xs: 12, md: 2 }}>
-                <Paper
-                  component="form"
-                  sx={{
-                    // p: "5px",
-                    display: "flex",
-                    alignItems: "center",
-                    width: "100%",
-                    border: "1px solid rgba(0,0,0,0.25)",
-                  }}
-                >
-                  <IconButton sx={{ p: "10px" }} aria-label="menu">
-                    <MenuIcon />
-                  </IconButton>
-                  <InputBase
-                    sx={{ ml: 1, flex: 1 }}
-                    placeholder="ស្វែងរក..."
-                    inputProps={{ "aria-label": "ស្វែងរកឯកសារ" }}
-                  />
-                  <IconButton type="button" aria-label="search">
-                    <SearchIcon />
-                  </IconButton>
-                  <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                  <IconButton
-                    color="primary"
-                    sx={{ p: "10px" }}
-                    aria-label="directions"
-                  >
-                    <DirectionsIcon />
-                  </IconButton>
-                </Paper>
-              </Grid> */}
-
-              {/* <Grid size={{ xs: 12, md: 4 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 1,
-                    justifyContent: { xs: "flex-start", md: "flex-end" },
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    sx={{ backgroundColor: "#ECEFF1", color: "black" }}
-                  >
-                    សម្អាត
-                  </Button>
-                  <Button
-                    variant="contained"
-                    sx={{ backgroundColor: "#ECEFF1", color: "black" }}
-                  >
-                    លុបទិន្នន័យ
-                  </Button>
-                </Box>
-              </Grid> */}
             </Grid>
-          </Paper>
-
+          </Paper> */}
           <EnhancedTable />
-          {/* <DataGridTable /> */}
+          <DocumentTable />
           <StickyFAB />
         </form>
       </FormProvider>
-      {/* <BackToTopFab /> */}
-      {/* <DocumentFormDialog /> */}
     </Container>
-    // </ThemeProvider>
   );
 }
 
