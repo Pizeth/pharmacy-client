@@ -42,6 +42,13 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { km } from "date-fns/locale/km";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import {
+  statuses,
+  offices,
+  categories,
+  permissionType,
+  docTypes,
+} from "../fts/mockData";
 // import dayjs from 'dayjs';
 
 const FormItem = ({
@@ -90,79 +97,6 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
   const methods = useForm();
   const [open, setOpen] = useState(false);
   const { setValue } = useFormContext();
-
-  // const { control, setValue } = useForm({
-  //   defaultValues: {
-  //     category: "",
-  //     permissionType: "",
-  //   },
-  // });
-
-  // 1. "Watch" the value of the first select
-  // const category = useWatch({
-  //   control,
-  //   name: "category",
-  // });
-
-  // 2. Logic: Should the second input be enabled?
-  // const isEnabled = category === "សំណើសុំច្បាប់ឈប់សម្រាក";
-
-  // 3. Reset Logic: Clear the second select whenever it becomes disabled
-  // useEffect(() => {
-  //   if (!isEnabled) {
-  //     setValue("permissionType", "");
-  //   }
-  // }, [isEnabled, setValue]);
-
-  // Mock data for dropdowns
-  const statuses = [
-    "កំពុងដំណើរការ",
-
-    "រង់ចាំហត្ថលេខា",
-    "ត្រួតពិនិត្យ",
-    "បានបដិសេធ",
-    "បានបញ្ចប់",
-  ];
-  const types = [
-    "ឯកសាមុខការ",
-    "រដ្ឋបាល",
-    "ហិរញ្ញវត្ថុ",
-    "បុគ្គលិក",
-    "បច្ចេកទេស",
-  ];
-  const categories = [
-    "ទំនេរគ្មានបៀវត្ស",
-    "ដំឡើងថ្នាក់",
-    "តែងតាំង",
-    "ផ្ទេរភារកិច្ច",
-    "ចូលនិវត្តន៍",
-    "សំណើសុំច្បាប់ឈប់សម្រាក",
-  ];
-  const offices = [
-    "ការិយាល័យបុគ្គលិក",
-    "ការិយាល័យក្របខណ្ឌនិងបៀវត្ស",
-    "ការិយាល័យអភិវឌ្ឍធនធានមនុស្ស",
-    "ការិយាល័យកិច្ចការទូទៅ",
-  ];
-  const recieptant = [
-    "ម៉ាលី",
-    "វិរៈ",
-    "ធារ៉ូត",
-    "សុខា",
-    "ចាន់ណា",
-    "វណ្ណៈ",
-    "ពិសិដ្ឋ",
-    "ដារ៉ា",
-    "សម្បត្តិ",
-    "បូផា",
-  ];
-  const permissionType = [
-    "ច្បាប់ឈប់ប្រចាំឆ្នាំ",
-    "ច្បាប់ឈប់រយៈពេលខ្លី",
-    "ច្បាប់ឈប់សម្រាកលំហែមាតុភាព",
-    "ច្បាប់ឈប់សម្រាកព្យាបាលជម្ងឺ",
-    "ឈប់សម្រាកដោយមានកិច្ចការផ្ទាល់ខ្លួន",
-  ];
 
   const handleClickOpen = () => setOpen(true);
   // const handleClose = () => setOpen(false);
@@ -373,7 +307,7 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
                       <SelectInput
                         source="type"
                         label="ប្រភេទ"
-                        choices={types}
+                        choices={docTypes}
                         emptyText="សូមជ្រើសរើស"
                         required
                       />

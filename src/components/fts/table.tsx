@@ -38,7 +38,6 @@ import { Article, AssignmentTurnedIn, Print } from "@mui/icons-material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import DocumentFormDialog from "./dialogForm";
-import { set } from "lodash";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -680,6 +679,7 @@ function Row(props: RowProps) {
   );
 }
 
+const rows = generateRows(200);
 export default function EnhancedTable() {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Data>("status");
@@ -691,8 +691,6 @@ export default function EnhancedTable() {
   // --- POPUP STATE ---
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingRowId, setEditingRowId] = useState<number | null>(null);
-
-  const rows = generateRows(200);
 
   // const handleDialogClose = (reason?: string) => {
   //   // Only close the dialog if the reason is NOT a backdrop click

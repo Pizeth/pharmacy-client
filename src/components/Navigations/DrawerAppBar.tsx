@@ -43,7 +43,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme }) => ({
   flexGrow: 1,
-  // padding: `0 ${theme.spacing(3)}`,
+  // // padding: `0 ${theme.spacing(3)}`,
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
