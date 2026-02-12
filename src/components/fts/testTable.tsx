@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 // Assuming Next.js, swap if using react-router-dom
-// import { useRouter } from "next/router";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -121,9 +120,11 @@ const RowActionMenu = ({ row }: { row: any }) => {
   return (
     <>
       <Tooltip title="More">
-        <IconButton size="small" onClick={handleClick}>
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
+        <span>
+          <IconButton size="small" onClick={handleClick}>
+            <MoreVertIcon fontSize="small" />
+          </IconButton>
+        </span>
       </Tooltip>
       <Menu
         anchorEl={anchorEl}
