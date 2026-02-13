@@ -190,7 +190,12 @@ export default function DocumentTable() {
       {
         accessorKey: "id",
         header: "ល.រ នធម",
-        // size: 50, // equivalent to specific width/padding
+        // Header: {
+        //   style: { width: "10%" },
+        // },
+        // size: 25, // equivalent to specific width/padding
+        // minSize: 20,
+        // maxSize: 30,
         grow: false,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
@@ -205,27 +210,27 @@ export default function DocumentTable() {
         accessorKey: "status",
         header: "ស្ថានភាព",
         muiTableHeadCellProps: { align: "center" },
-        muiTableBodyCellProps: { align: "left" },
+        muiTableBodyCellProps: { align: "center" },
       },
       {
         accessorKey: "days",
         header: "ចំនួនថ្ងៃ",
         // grow: false,
         muiTableHeadCellProps: { align: "center" },
-        muiTableBodyCellProps: { align: "right" },
+        muiTableBodyCellProps: { align: "center" },
       },
       {
         accessorKey: "types",
         header: "ប្រភេទឯកសារ",
         // grow: false,
         muiTableHeadCellProps: { align: "center" },
-        muiTableBodyCellProps: { align: "left" },
+        muiTableBodyCellProps: { align: "center" },
       },
       {
         accessorKey: "categories",
         header: "ឯកសារ",
         muiTableHeadCellProps: { align: "center" },
-        muiTableBodyCellProps: { align: "left" },
+        muiTableBodyCellProps: { align: "center" },
       },
       {
         accessorKey: "office",
@@ -241,18 +246,39 @@ export default function DocumentTable() {
   const table = useMaterialReactTable({
     columns,
     data, // Pass your API data here
+    defaultColumn: {
+      minSize: 20, //allow columns to get smaller than default
+      maxSize: 10000, //allow columns to get larger than default
+      size: 25, //make columns wider by default
+    },
+    displayColumnDefOptions: {
+      "mrt-row-select": {
+        size: 10, //adjust the size of the row select column
+        grow: false, //new in v2.8 (default is false for this column)
+      },
+      "mrt-row-expand": {
+        size: 10, //adjust the size of the row expand column
+        grow: false, //new in v2.8 (default is false for this column)
+      },
+      "mrt-row-numbers": {
+        size: 10,
+        grow: true, //new in v2.8 (allow this column to grow to fill in remaining space)
+      },
+    },
 
     // Core features matching your original table
     enableRowSelection: true,
     enableGlobalFilter: true, // Enables the search box
     enableRowActions: true,
     positionActionsColumn: "last",
-    positionGlobalFilter: "right",
+    positionGlobalFilter: "left",
     muiTableContainerProps: {
-      sx: { maxHeight: "calc(100vh - 200px)", table: { width: "90vmin" } },
+      sx: { maxHeight: "calc(100vh - 200px)" },
     },
     // enableColumnResizing: true,
-    muiTableHeadCellProps: { align: "center" },
+    muiTableHeadCellProps: {
+      align: "center",
+    },
     muiTableBodyCellProps: { align: "center" },
     enableStickyHeader: true,
     enableStickyFooter: true,
@@ -266,7 +292,12 @@ export default function DocumentTable() {
     // UI Styling / Densities
     initialState: {
       density: "compact", // Translates to your dense = true state
-      // showGlobalFilter: true, // Keep search box open by default
+      // showColumnFilters: true,
+      columnPinning: {
+        left: ["mrt-row-expand", "mrt-row-select"],
+        right: ["mrt-row-actions"],
+      },
+      showGlobalFilter: true, // Keep search box open by default
     },
 
     // Customize the built-in search box to look like your SearchInputWithIcon
