@@ -190,7 +190,8 @@ export default function DocumentTable() {
       {
         accessorKey: "id",
         header: "ល.រ នធម",
-        // size: 100, // equivalent to specific width/padding
+        // size: 50, // equivalent to specific width/padding
+        grow: false,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
       },
@@ -209,12 +210,14 @@ export default function DocumentTable() {
       {
         accessorKey: "days",
         header: "ចំនួនថ្ងៃ",
+        // grow: false,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "right" },
       },
       {
         accessorKey: "types",
         header: "ប្រភេទឯកសារ",
+        // grow: false,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "left" },
       },
@@ -237,25 +240,44 @@ export default function DocumentTable() {
   // --- MRT Hook Initialization ---
   const table = useMaterialReactTable({
     columns,
-    data: data, // Pass your API data here
+    data, // Pass your API data here
 
     // Core features matching your original table
     enableRowSelection: true,
     enableGlobalFilter: true, // Enables the search box
     enableRowActions: true,
     positionActionsColumn: "last",
+    positionGlobalFilter: "right",
+    muiTableContainerProps: {
+      sx: { maxHeight: "calc(100vh - 200px)", table: { width: "90vmin" } },
+    },
+    // enableColumnResizing: true,
+    muiTableHeadCellProps: { align: "center" },
+    muiTableBodyCellProps: { align: "center" },
+    enableStickyHeader: true,
+    enableStickyFooter: true,
+    enableColumnPinning: true,
+    // layoutMode: "grid",
+    enableRowPinning: true,
+    rowPinningDisplayMode: "select-sticky",
+    // enableRowNumbers: true,
+    // rowNumberDisplayMode: "original",
 
     // UI Styling / Densities
     initialState: {
       density: "compact", // Translates to your dense = true state
-      showGlobalFilter: true, // Keep search box open by default
+      // showGlobalFilter: true, // Keep search box open by default
     },
 
     // Customize the built-in search box to look like your SearchInputWithIcon
     muiSearchTextFieldProps: {
-      placeholder: "ស្វែងរកឯកសារតាមរយៈ ល.ន.ធ.ម",
+      InputLabelProps: {
+        shrink: true,
+      },
+      label: "ស្វែងរក",
+      placeholder: "ល.ន.ធ.ម",
       variant: "outlined",
-      size: "small",
+      // size: "small",
       InputProps: {
         startAdornment: (
           <SearchOutlinedIcon
