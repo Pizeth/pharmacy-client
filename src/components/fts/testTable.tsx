@@ -2,6 +2,15 @@ import React, { useMemo, useState } from "react";
 // Assuming Next.js, swap if using react-router-dom
 import {
   MaterialReactTable,
+  MRT_GlobalFilterTextField,
+  MRT_ShowHideColumnsButton,
+  MRT_TableContainer,
+  MRT_TablePagination,
+  MRT_ToggleDensePaddingButton,
+  MRT_ToggleFiltersButton,
+  MRT_ToggleFullScreenButton,
+  MRT_ToggleGlobalFilterButton,
+  MRT_ToolbarAlertBanner,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
@@ -22,6 +31,8 @@ import {
   TableHead,
   TableRow,
   Link,
+  Button,
+  styled,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -31,10 +42,58 @@ import {
   Article,
   AssignmentTurnedIn,
   SearchOutlined as SearchOutlinedIcon,
+  Add,
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import generateRows, { Data } from "./mockData";
 
+const Root = styled(Box)(({ theme }) => ({
+  width: "100%",
+  typography: "body1",
+  border: "1px solid rgba(255, 255, 255, 0.1)",
+  // borderRadius: theme.shape.borderRadius,
+  borderRadius: "5px",
+}));
+
+const ToolBar = styled(Box)(({ theme }) => ({
+  display: "flex",
+  // backgroundColor: "var(--app-palette-background-paper)",
+  // borderRadius: "4px",
+  flexDirection: "row",
+  alignContent: "center",
+  alignItems: "center",
+  gap: "0.5rem",
+  justifyContent: "space-between",
+  padding: "0.5rem",
+  "@media max-width: 768px": {
+    flexDirection: "column",
+  },
+  color: theme.palette.text.primary,
+  // box-shadow: var(--Paper-shadow);
+  // background-image: var(--Paper-overlay);
+  backgroundColor: "rgb(29, 29, 29)",
+  backgroundImage: "unset",
+  overflow: "hidden",
+  transition: "all 100ms ease-in-out",
+  // borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+  borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+}));
+
+const BottomBar = styled(Box)(({ theme }) => ({
+  alignItems: "flex-start",
+  backgroundColor: "rgb(29, 29, 29)",
+  display: "grid",
+  flexWrap: "wrap-reverse",
+  minHeight: "3.5rem",
+  overflow: "hidden",
+  position: "relative",
+  transition: "all 150ms ease-in-out",
+  zIndex: 1,
+  boxShadow: "0 1px 2px -1px rgba(97, 97, 97, 0.5) inset",
+  left: 0,
+  right: 0,
+  // borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+}));
 // --- Types ---
 // export interface DocumentDetails {
 //   originId: string;
@@ -121,7 +180,11 @@ const RowActionMenu = ({ row }: { row: any }) => {
     <>
       <Tooltip title="More">
         <span>
-          <IconButton size="small" onClick={handleClick}>
+          <IconButton
+            size="small"
+            onClick={handleClick}
+            // disabled={!table.getIsSomeRowsSelected()}
+          >
             <MoreVertIcon fontSize="small" />
           </IconButton>
         </span>
@@ -130,6 +193,23 @@ const RowActionMenu = ({ row }: { row: any }) => {
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        onClick={handleClose}
+        slotProps={{
+          paper: {
+            elevation: 0,
+            sx: {
+              overflow: "visible",
+              mt: 1.5,
+              "& .MuiAvatar-root": {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
+              },
+            },
+          },
+          // list: { dense: dense },
+        }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
@@ -180,8 +260,8 @@ export default function DocumentTable() {
     setEditDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    console.log("Delete row:", id);
+  const handleDelete = (ids: number[] | number) => {
+    console.log("Delete row(s):", ids);
   };
 
   // --- MRT Columns Configuration ---
@@ -190,13 +270,12 @@ export default function DocumentTable() {
       {
         accessorKey: "id",
         header: "ល.រ នធម",
-        // Header: {
-        //   style: { width: "10%" },
-        // },
         // size: 25, // equivalent to specific width/padding
         // minSize: 20,
         // maxSize: 30,
+        enableColumnActions: false,
         grow: false,
+        size: 10,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
       },
@@ -209,20 +288,25 @@ export default function DocumentTable() {
       {
         accessorKey: "status",
         header: "ស្ថានភាព",
+        grow: false,
+        size: 10,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
       },
       {
         accessorKey: "days",
         header: "ចំនួនថ្ងៃ",
-        // grow: false,
+        grow: false,
+        size: 10,
+        enableColumnActions: false,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
       },
       {
         accessorKey: "types",
         header: "ប្រភេទឯកសារ",
-        // grow: false,
+        grow: false,
+        size: 10,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
       },
@@ -247,31 +331,31 @@ export default function DocumentTable() {
     columns,
     data, // Pass your API data here
     defaultColumn: {
-      minSize: 20, //allow columns to get smaller than default
+      Header: ({ column }) => (
+        <Typography
+          variant="h6"
+          color="error"
+          sx={{
+            fontFamily: "var(--font-interkhmerloopless)",
+            fontWeight: 700,
+          }}
+        >
+          <strong>{column.columnDef.header} </strong>
+        </Typography> //re-use the header we already defined
+      ), //arrow function
+      minSize: 10, //allow columns to get smaller than default
       maxSize: 10000, //allow columns to get larger than default
-      size: 25, //make columns wider by default
-    },
-    displayColumnDefOptions: {
-      "mrt-row-select": {
-        size: 10, //adjust the size of the row select column
-        grow: false, //new in v2.8 (default is false for this column)
-      },
-      "mrt-row-expand": {
-        size: 10, //adjust the size of the row expand column
-        grow: false, //new in v2.8 (default is false for this column)
-      },
-      "mrt-row-numbers": {
-        size: 10,
-        grow: true, //new in v2.8 (allow this column to grow to fill in remaining space)
-      },
+      size: 15, //make columns wider by default
     },
 
     // Core features matching your original table
     enableRowSelection: true,
+    getRowId: (originalRow) => originalRow.id.toString(),
     enableGlobalFilter: true, // Enables the search box
     enableRowActions: true,
     positionActionsColumn: "last",
-    positionGlobalFilter: "left",
+    // positionGlobalFilter: "left",
+    positionToolbarAlertBanner: "bottom", //show selected rows count on bottom toolbar
     muiTableContainerProps: {
       sx: { maxHeight: "calc(100vh - 200px)" },
     },
@@ -288,6 +372,13 @@ export default function DocumentTable() {
     rowPinningDisplayMode: "select-sticky",
     // enableRowNumbers: true,
     // rowNumberDisplayMode: "original",
+    // muiPaginationProps: {
+    //   color: "primary",
+    //   shape: "rounded",
+    //   showRowsPerPage: false,
+    //   variant: "outlined",
+    // },
+    // paginationDisplayMode: "pages",
 
     // UI Styling / Densities
     initialState: {
@@ -298,8 +389,9 @@ export default function DocumentTable() {
         right: ["mrt-row-actions"],
       },
       showGlobalFilter: true, // Keep search box open by default
+      pagination: { pageSize: 100, pageIndex: 0 },
+      // showProgressBars: true,
     },
-
     // Customize the built-in search box to look like your SearchInputWithIcon
     muiSearchTextFieldProps: {
       InputLabelProps: {
@@ -321,13 +413,104 @@ export default function DocumentTable() {
 
     // --- Action Buttons Definition ---
     displayColumnDefOptions: {
+      "mrt-row-select": {
+        size: 10, //adjust the size of the row select column
+        grow: false, //new in v2.8 (default is false for this column)
+      },
+      "mrt-row-expand": {
+        // size: 10, //adjust the size of the row expand column
+        grow: false, //new in v2.8 (default is false for this column)
+        // enablePinning: true,
+        // enableColumnActions: true,
+      },
+      // "mrt-row-numbers": {
+      //   size: 10,
+      //   grow: true, //new in v2.8 (allow this column to grow to fill in remaining space)
+      // },
       "mrt-row-actions": {
         header: "ចំណាត់ការឯកសារ", // Custom Header for actions column
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
-        size: 150,
+        size: 100,
       },
     },
+
+    //add custom action buttons to top-left of top toolbar
+    renderTopToolbarCustomActions: ({ table }) => (
+      // <Box sx={{ display: "flex", gap: "1rem", p: "4px" }}>
+      <Box>
+        {/* <Button
+          color="secondary"
+          onClick={() => {
+            alert("Create New Account");
+          }}
+          variant="contained"
+        >
+          Create Account
+        </Button> */}
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          // fullWidth
+          // size="large"
+          color="secondary"
+          // autoFocus
+          type="submit"
+        >
+          <Typography variant="body2">
+            <strong>បញ្ចូលឯកសារថ្មី</strong>
+          </Typography>
+        </Button>
+        <Tooltip title="Delete">
+          <IconButton
+            // size="small"
+            color="primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              const selectedIds = Object.keys(
+                table.getState().rowSelection,
+              ).map((id) => parseInt(id, 10));
+              console.log(selectedIds);
+              handleDelete(selectedIds);
+            }}
+            disabled={!table.getIsSomeRowsSelected()}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+        {/* <MRT_GlobalFilterTextField table={table} /> */}
+        {/* <IconButton
+          color="primary"
+          disabled={!table.getIsSomeRowsSelected()}
+          onClick={() => {
+            alert("Delete Selected Accounts");
+          }}
+          // variant="contained"
+        >
+          <DeleteIcon />
+        </IconButton> */}
+      </Box>
+    ),
+
+    // renderToolbarInternalActions: ({ table }) => (
+    //   <Box>
+    //     <MRT_ToggleGlobalFilterButton table={table} />
+    //     {/* add custom button to print table  */}
+    //     <IconButton
+    //       onClick={() => {
+    //         window.print();
+    //       }}
+    //     >
+    //       <Print />
+    //     </IconButton>
+    //     {/* built-in buttons (must pass in table prop for them to work!) */}
+    //     <MRT_ToggleFiltersButton table={table} />
+    //     <MRT_ShowHideColumnsButton table={table} />
+    //     <MRT_ToggleDensePaddingButton table={table} />
+    //     <MRT_ToggleFullScreenButton table={table} />
+    //   </Box>
+    // ),
+
     renderRowActions: ({ row }) => (
       <Box
         sx={{
@@ -341,6 +524,7 @@ export default function DocumentTable() {
           <IconButton
             size="small"
             color="error"
+            disabled={!table.getIsSomeRowsSelected}
             onClick={(e) => {
               e.stopPropagation(); // Ensure row click isn't triggered
               handleEdit(row.original.id);
@@ -353,6 +537,7 @@ export default function DocumentTable() {
           <IconButton
             size="small"
             color="primary"
+            disabled={!table.getIsSomeRowsSelected()}
             onClick={(e) => {
               e.stopPropagation();
               handleDelete(row.original.id);
@@ -528,8 +713,86 @@ export default function DocumentTable() {
   });
 
   return (
-    <Box sx={{ width: "100%", typography: "body1" }}>
-      <MaterialReactTable table={table} />
+    <Root>
+      <ToolBar>
+        <Box
+          sx={{
+            display: "flex",
+            gap: (theme) => theme.spacing(1),
+            p: (theme) => theme.spacing(1),
+          }}
+        >
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            // fullWidth
+            size="large"
+            color="error"
+            // autoFocus
+            type="submit"
+          >
+            <Typography variant="body2">
+              <strong>បញ្ចូលឯកសារថ្មី</strong>
+            </Typography>
+          </Button>
+          <Tooltip title="Delete">
+            <IconButton
+              // size="small"
+              color="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                const selectedIds = Object.keys(
+                  table.getState().rowSelection,
+                ).map((id) => parseInt(id, 10));
+                console.log(selectedIds);
+                handleDelete(selectedIds);
+              }}
+              disabled={!table.getIsSomeRowsSelected()}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+          {/* <MRT_GlobalFilterTextField table={table} /> */}
+        </Box>
+        <MRT_GlobalFilterTextField table={table} />
+        {/* <Box sx={{ display: "flex", alignItems: "center" }}> */}
+        <Box>
+          {/* <MRT_ToggleFiltersButton table={table} />
+          <MRT_ShowHideColumnsButton table={table} />
+          <MRT_ToggleDensePaddingButton table={table} />
+          <Tooltip title="Print">
+            <IconButton onClick={() => window.print()}>
+              <Print />
+            </IconButton>
+          </Tooltip> */}
+          <MRT_ToggleGlobalFilterButton table={table} />
+          {/* add custom button to print table  */}
+          <IconButton
+            onClick={() => {
+              window.print();
+            }}
+          >
+            <Print />
+          </IconButton>
+          {/* built-in buttons (must pass in table prop for them to work!) */}
+          <MRT_ToggleFiltersButton table={table} />
+          <MRT_ShowHideColumnsButton table={table} />
+          <MRT_ToggleDensePaddingButton table={table} />
+          <MRT_ToggleFullScreenButton table={table} />
+        </Box>
+      </ToolBar>
+      {/* The MRT Table with no toolbars built-in */}
+      <MRT_TableContainer table={table} />
+      {/* Our Custom Bottom Toolbar */}
+      <BottomBar>
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <MRT_TablePagination table={table} />
+        </Box>
+        <Box sx={{ display: "grid", width: "100%" }}>
+          <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
+        </Box>
+      </BottomBar>
+      {/* <MaterialReactTable table={table} /> */}
 
       {/* Put your dialog logic back here */}
       {/* <DocumentFormDialog
@@ -537,6 +800,6 @@ export default function DocumentTable() {
         onClose={() => setEditDialogOpen(false)}
         initialData={editingRowId}
       /> */}
-    </Box>
+    </Root>
   );
 }
