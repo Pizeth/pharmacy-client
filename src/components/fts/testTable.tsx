@@ -46,6 +46,7 @@ import {
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import generateRows, { Data } from "./mockData";
+import { th } from "date-fns/locale";
 
 const Root = styled(Box)(({ theme }) => ({
   width: "100%",
@@ -92,7 +93,68 @@ const BottomBar = styled(Box)(({ theme }) => ({
   boxShadow: "0 1px 2px -1px rgba(97, 97, 97, 0.5) inset",
   left: 0,
   right: 0,
-  // borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+  // fontFamily: [
+  //   "Roboto",
+  //   "Helvetica",
+  //   "sans-serif",
+  //   "var(--font-interkhmerloopless)",
+  // ].join(","),
+  // 1. Target the Alert message container
+  "& .MuiAlert-message": {
+    fontSize: "0.875rem",
+    fontFamily: [
+      "Roboto",
+      "Helvetica",
+      "sans-serif",
+      "var(--font-interkhmerloopless)",
+    ].join(","),
+    button: {
+      background: theme.palette.primary.main,
+      color: theme.palette.text.primary,
+      fontSize: "0.875rem",
+      fontFamily: [
+        "Roboto",
+        "Helvetica",
+        "sans-serif",
+        "var(--font-interkhmerloopless)",
+      ].join(","),
+      "&:hover": {
+        background: theme.palette.primary.dark,
+      },
+    },
+  },
+  label: {
+    fontSize: "0.875rem",
+    fontFamily: [
+      "Roboto",
+      "Helvetica",
+      "sans-serif",
+      "var(--font-interkhmerloopless)",
+    ].join(","),
+  },
+}));
+
+const PaginationRow = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  boxSizing: "border-box",
+  padding: "0.5rem",
+  width: "100%",
+  // fontFamily: [
+  //   "Roboto",
+  //   "Helvetica",
+  //   "sans-serif",
+  //   "var(--font-interkhmerloopless)",
+  // ].join(","),
+  // "&.MuiStack-root": {
+  //   fontFamily: [
+  //     "Roboto",
+  //     "Helvetica",
+  //     "sans-serif",
+  //     "var(--font-interkhmerloopless)",
+  //   ].join(","),
+  // },
 }));
 // --- Types ---
 // export interface DocumentDetails {
@@ -183,7 +245,12 @@ const RowActionMenu = ({ row }: { row: any }) => {
           <IconButton
             size="small"
             onClick={handleClick}
-            // disabled={!table.getIsSomeRowsSelected()}
+            disabled={!row.getIsSelected()}
+            sx={{
+              "&:hover": {
+                cursor: !row.getIsSelected() ? "not-allowed" : "pointer",
+              },
+            }}
           >
             <MoreVertIcon fontSize="small" />
           </IconButton>
@@ -521,30 +588,46 @@ export default function DocumentTable() {
         }}
       >
         <Tooltip title="Edit">
-          <IconButton
-            size="small"
-            color="error"
-            disabled={!table.getIsSomeRowsSelected}
-            onClick={(e) => {
-              e.stopPropagation(); // Ensure row click isn't triggered
-              handleEdit(row.original.id);
-            }}
-          >
-            <EditIcon fontSize="small" />
-          </IconButton>
+          <span>
+            {/* span wrapper needed so Tooltip works on disabled buttons */}
+            <IconButton
+              size="small"
+              color="error"
+              disabled={!row.getIsSelected()}
+              sx={{
+                "&:hover": {
+                  cursor: !row.getIsSelected() ? "not-allowed" : "pointer",
+                },
+              }}
+              onClick={(e) => {
+                e.stopPropagation(); // Ensure row click isn't triggered
+                handleEdit(row.original.id);
+              }}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </span>
         </Tooltip>
         <Tooltip title="Delete">
-          <IconButton
-            size="small"
-            color="primary"
-            disabled={!table.getIsSomeRowsSelected()}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(row.original.id);
-            }}
-          >
-            <DeleteIcon fontSize="small" />
-          </IconButton>
+          <span>
+            {/* span wrapper needed so Tooltip works on disabled buttons */}
+            <IconButton
+              size="small"
+              color="primary"
+              disabled={!row.getIsSelected()}
+              sx={{
+                "&:hover": {
+                  cursor: !row.getIsSelected() ? "not-allowed" : "pointer",
+                },
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(row.original.id);
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </span>
         </Tooltip>
         <RowActionMenu row={row} />
       </Box>
@@ -553,15 +636,113 @@ export default function DocumentTable() {
     // --- Row Click Navigation ---
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
-        router.push(`/documents/${row.original.id}`);
+        // router.push(`/documents/${row.original.id}`);
       },
-      sx: {
-        cursor: "pointer",
-        "&:hover": {
-          backgroundColor: "rgba(0, 0, 0, 0.04)",
-        },
-      },
+      // sx: {
+      //   cursor: "pointer",
+      //   "&:hover": {
+      //     backgroundColor: "rgba(0, 0, 0, 0.04)",
+      //   },
+      // },
     }),
+
+    localization: {
+      language: "km", //
+      actions: "ចំណាត់ការ",
+      and: "និង",
+      cancel: "បោះបង់",
+      changeFilterMode: "ប្ដូរករបៀបច្រោះទិន្ន័យ",
+      changeSearchMode: "ប្ដូររបៀបស្វែងរក",
+      clearFilter: "សម្អាតការច្រោះទិន្ន័យ",
+      clearSearch: "សម្អាតការស្វែងរក",
+      clearSelection: "សម្អាត",
+      clearSort: "សម្អាតលំដាប់ការរៀប",
+      clickToCopy: "ចុចដើម្បីថតចម្លង",
+      copy: "ថតចម្លង",
+      collapse: "បង្រួម",
+      collapseAll: "បង្រួមទាំងអស់",
+      columnActions: "សកម្មភាពជួរឈរ",
+      copiedToClipboard: "បានថតចម្លងទុក",
+      dropToGroupBy: "Drop to group by {column}",
+      edit: "កែប្រែ",
+      expand: "ពង្រីក",
+      expandAll: "ពង្រីកទាំងអស់",
+      filterArrIncludes: "រួមបញ្ចូល",
+      filterArrIncludesAll: "រួមបញ្ចូលទាំងអស់",
+      filterArrIncludesSome: "រួមបញ្ចូល",
+      filterBetween: "ចន្លោះ",
+      filterBetweenInclusive: "រាប់បញ្ចូលក្នុងចន្លោះ",
+      filterByColumn: "ច្រោះតាមរយៈ {column}",
+      filterContains: "ដែលមាន",
+      filterEmpty: "ទទេ",
+      filterEndsWith: "បញ្ចប់ដោយ",
+      filterEquals: "ស្មើ",
+      filterEqualsString: "ស្មើ",
+      filterFuzzy: "ប្រហែលៗ",
+      filterGreaterThan: "ច្រើនជាង",
+      filterGreaterThanOrEqualTo: "ច្រើនជាង ឬស្មើទៅនឹង",
+      filterInNumberRange: "ចន្លោះ",
+      filterIncludesString: "ដែលមាន",
+      filterIncludesStringSensitive: "ដែលមាន",
+      filterLessThan: "តិចជាង",
+      filterLessThanOrEqualTo: "តិចជាង ឬស្មើទៅនឹង",
+      filterMode: "ច្រោះតាមរយៈ: {filterType}",
+      filterNotEmpty: "មិនទទេ",
+      filterNotEquals: "មិនស្មើ",
+      filterStartsWith: "ចាប់ផ្ដើមដោយ",
+      filterWeakEquals: "ស្មើ",
+      filteringByColumn: "ច្រោះតាមរយៈ {column} - {filterType} {filterValue}",
+      goToFirstPage: "ទៅទំពរដំបូង",
+      goToLastPage: "ទៅទំ័រចុងក្រោយ",
+      goToNextPage: "ទំព័របន្ទាប់",
+      goToPreviousPage: "ទំព័រមុន",
+      grab: "ទាញ",
+      groupByColumn: "ទាមតាមរយៈ {column}",
+      groupedBy: "ក្រុមតាម ",
+      hideAll: "លាក់ទាំងអស់",
+      hideColumn: "លាក់ជួរ{column}",
+      max: "អតិបរិមា",
+      min: "អប្បរិមា",
+      move: "ផ្លាស់ទី",
+      noRecordsToDisplay: "មិនមានទិន្នន័យបង្ហាញ",
+      noResultsFound: "រកមិនឃើញទិន្ន័យ",
+      of: "នៃ",
+      or: "ឬ",
+      pin: "ខ្ទាស់",
+      pinToLeft: "ខ្ទាស់ទៅឆ្វេង",
+      pinToRight: "ខ្ទាស់ទៅស្ដាំ",
+      resetColumnSize: "ប្ដូរជួរដេកទៅទំហំដើម",
+      resetOrder: "រក្សាលំដាប់ដើម",
+      rowActions: "សកម្មភាពជួរដេក",
+      rowNumber: "#",
+      rowNumbers: "លេខជួរដេក",
+      rowsPerPage: "ចំនួនជួរដេកក្នុងមួយទំព័រ",
+      save: "រក្សាទុក",
+      search: "ស្វែងរក",
+      selectedCountOfRowCountRowsSelected:
+        "បានជ្រើសយក {selectedCount} ជួរនៃ {rowCount} ជួរដេក",
+      // selectedCountOfRowCountRowsSelected:
+      //   "{selectedCount} ក្នុង {rowCount} ជួរដេកបានជ្រើសយក",
+      select: "ជ្រើសយក",
+      showAll: "បង្ហាញទាំងអស់",
+      showAllColumns: "បង្ហាញជួរឈរទាំងអស់",
+      showHideColumns: "បង្ហញ/លាក់ ជួរឈរ",
+      showHideFilters: "បង្ហាញ/លាក់ តម្រងចោះ",
+      showHideSearch: "បង្ហាញ/លាក់ ស្វែងរក",
+      sortByColumnAsc: "តម្រៀបតាម {column} ពីលើចុះក្រោម",
+      sortByColumnDesc: "តម្រៀបតាម {column} ពីក្រោមឡើងលើ",
+      sortedByColumnAsc: "បានតម្រៀបតាម {column} ពីលើចុះក្រោម",
+      sortedByColumnDesc: "បានតម្រៀបតាម {column} ពីក្រោមឡើងលើ",
+      thenBy: " ហើយតាមរយៈ ",
+      toggleDensity: "ពង្រីកពង្រួមគម្លាត",
+      toggleFullScreen: "ប្ដូរទៅពេញអេក្រង់",
+      toggleSelectAll: "ចុចរើសយកទាំងអស់",
+      toggleSelectRow: "ចុចរើសយកជួរដេក",
+      toggleVisibility: "បិទ/បើក",
+      ungroupByColumn: "ដកក្រុមដោយ {column}",
+      unpin: "ដកខ្ទាស់",
+      unpinAll: "ខ្ទាស់ទាំងអស់",
+    },
 
     // --- Detail Panel / Expandable Row ---
     // This replaces your <Collapse> logic seamlessly
@@ -784,14 +965,48 @@ export default function DocumentTable() {
       {/* The MRT Table with no toolbars built-in */}
       <MRT_TableContainer table={table} />
       {/* Our Custom Bottom Toolbar */}
-      <BottomBar>
+      {/* <BottomBar>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
           <MRT_TablePagination table={table} />
         </Box>
         <Box sx={{ display: "grid", width: "100%" }}>
           <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
         </Box>
+      </BottomBar> */}
+
+      {/* Custom Bottom Toolbar */}
+      {/* <BottomBar>
+        <Box sx={{ flex: 1 }} width={"100%"}>
+          <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
+        </Box>
+
+        <MRT_TablePagination table={table} />
+      </BottomBar> */}
+
+      {/* Custom Bottom Toolbar */}
+      <BottomBar>
+        {/* Left side: alert banner renders inline here, collapses to nothing when no selection */}
+        <MRT_ToolbarAlertBanner table={table} sx={{ width: "100%" }} />
+
+        {/* Right side: pagination */}
+        <PaginationRow>
+          {/* <span></span> */}
+          <Box
+            sx={{
+              display: "flex",
+              webkitBoxPack: "end",
+              justifyContent: "flex-end",
+              position: "absolute",
+              right: 0,
+              top: 0,
+            }}
+            width={"100%"}
+          >
+            <MRT_TablePagination table={table} />
+          </Box>
+        </PaginationRow>
       </BottomBar>
+
       {/* <MaterialReactTable table={table} /> */}
 
       {/* Put your dialog logic back here */}

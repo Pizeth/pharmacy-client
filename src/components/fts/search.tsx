@@ -119,14 +119,14 @@ export default function AdministrativeForm() {
         <form>
           {/* --- SEARCH BOX --- */}
           {/* Note: In Grid2, we don't use 'item'. We use 'size' */}
-          <Paper elevation={3} square variant="outlined">
+          {/* <Paper elevation={3} square variant="outlined">
             <Grid container spacing={2} alignItems="center">
               <Grid size={{ xs: 12, md: 4 }} offset={{ md: 4 }} px={1}>
                 <SearchInputWithIcon />
               </Grid>
             </Grid>
           </Paper>
-          <EnhancedTable />
+          <EnhancedTable /> */}
           <DocumentTable />
           {/* <StickyFAB /> */}
         </form>
