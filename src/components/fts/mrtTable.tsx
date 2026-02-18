@@ -34,7 +34,6 @@ import {
   Link,
   Button,
   styled,
-  Avatar,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -47,11 +46,12 @@ import {
   Add,
   PictureAsPdf,
   ImageNotSupported,
-  NoAccounts,
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import generateRows, { Data } from "./mockData";
 import DocumentFormDialog from "./dialogForm";
+import { mrt } from "@/i18n/kh/mrt-kh";
+import RenderAvatar from "../CustomComponents/ColunmAvatar";
 
 const Root = styled(Box)(({ theme }) => ({
   width: "100%",
@@ -263,6 +263,32 @@ const RowActionMenu = ({ row }: { row: MRT_Row<Data> }) => {
     </MenuBox>
   );
 };
+
+const detailPaneHeader_1 = [
+  { title: "លេខលិខិតដើម", color: "error" },
+  { title: "កាលបរិច្ឆេទលិខិតចូល", color: "error" },
+  { title: "ម៉ោងចូល", color: "error" },
+  { title: "រូបភាពឯកសារ", color: "error" },
+  { title: "អ្នកទទួលឯកសារ", color: "error" },
+  { title: "កំពុងប្រតិបត្តិការនៅ", color: "error" },
+  { title: "អ្នកបញ្ជូនឯកសារ", color: "error" },
+  { title: "កំណត់សម្គាល់", color: "error" },
+];
+const detailPaneHeader_2 = [
+  { title: "អ្នកទទួលឯកសារពីខុទ្ទកាល័យ", color: "error" },
+  { title: "កាលបរិច្ឆេទទទួលឯកសារ", color: "error" },
+  { title: "អ្នកប្រថាប់ត្រា", color: "error" },
+  { title: "កាលបរិច្ឆេទប្រថាប់ត្រា", color: "error" },
+  { title: "លេខលិខិតចេញ", color: "error" },
+  { title: "កាលបរិច្ឆេទបញ្ជូនចេញ", color: "error" },
+  { title: "អ្នកទទួលឯកសារចេញ", color: "error" },
+  { title: "រូបភាពឯកសារបញ្ចប់", color: "error" },
+];
+const detailPaneHeader_3 = [
+  { title: "លេខទូរ", color: "error", span: 2 },
+  { title: "លេខក្រូណូ", color: "error", span: 3 },
+  { title: "លេខរៀងឯកសារ", color: "error", span: 3 },
+];
 
 const data = generateRows(200);
 
@@ -635,103 +661,7 @@ export default function DocumentTable() {
       // },
     }),
 
-    localization: {
-      language: "km", //
-      actions: "ចំណាត់ការ",
-      and: "និង",
-      cancel: "បោះបង់",
-      changeFilterMode: "ប្ដូរករបៀបច្រោះទិន្ន័យ",
-      changeSearchMode: "ប្ដូររបៀបស្វែងរក",
-      clearFilter: "សម្អាតការច្រោះទិន្ន័យ",
-      clearSearch: "សម្អាតការស្វែងរក",
-      clearSelection: "សម្អាត",
-      clearSort: "សម្អាតលំដាប់ការរៀប",
-      clickToCopy: "ចុចដើម្បីថតចម្លង",
-      copy: "ថតចម្លង",
-      collapse: "បង្រួម",
-      collapseAll: "បង្រួមទាំងអស់",
-      columnActions: "សកម្មភាពជួរឈរ",
-      copiedToClipboard: "បានថតចម្លងទុក",
-      dropToGroupBy: "Drop to group by {column}",
-      edit: "កែប្រែ",
-      expand: "ពង្រីក",
-      expandAll: "ពង្រីកទាំងអស់",
-      filterArrIncludes: "រួមបញ្ចូល",
-      filterArrIncludesAll: "រួមបញ្ចូលទាំងអស់",
-      filterArrIncludesSome: "រួមបញ្ចូល",
-      filterBetween: "ចន្លោះ",
-      filterBetweenInclusive: "រាប់បញ្ចូលក្នុងចន្លោះ",
-      filterByColumn: "ច្រោះតាមរយៈ {column}",
-      filterContains: "ដែលមាន",
-      filterEmpty: "ទទេ",
-      filterEndsWith: "បញ្ចប់ដោយ",
-      filterEquals: "ស្មើ",
-      filterEqualsString: "ស្មើ",
-      filterFuzzy: "ប្រហែលៗ",
-      filterGreaterThan: "ច្រើនជាង",
-      filterGreaterThanOrEqualTo: "ច្រើនជាង ឬស្មើទៅនឹង",
-      filterInNumberRange: "ចន្លោះ",
-      filterIncludesString: "ដែលមាន",
-      filterIncludesStringSensitive: "ដែលមាន",
-      filterLessThan: "តិចជាង",
-      filterLessThanOrEqualTo: "តិចជាង ឬស្មើទៅនឹង",
-      filterMode: "ច្រោះតាមរយៈ: {filterType}",
-      filterNotEmpty: "មិនទទេ",
-      filterNotEquals: "មិនស្មើ",
-      filterStartsWith: "ចាប់ផ្ដើមដោយ",
-      filterWeakEquals: "ស្មើ",
-      filteringByColumn: "ច្រោះតាមរយៈ {column} - {filterType} {filterValue}",
-      goToFirstPage: "ទៅទំពរដំបូង",
-      goToLastPage: "ទៅទំ័រចុងក្រោយ",
-      goToNextPage: "ទំព័របន្ទាប់",
-      goToPreviousPage: "ទំព័រមុន",
-      grab: "ទាញ",
-      groupByColumn: "ទាមតាមរយៈ {column}",
-      groupedBy: "ក្រុមតាម ",
-      hideAll: "លាក់ទាំងអស់",
-      hideColumn: "លាក់ជួរ{column}",
-      max: "អតិបរិមា",
-      min: "អប្បរិមា",
-      move: "ផ្លាស់ទី",
-      noRecordsToDisplay: "មិនមានទិន្នន័យបង្ហាញ",
-      noResultsFound: "រកមិនឃើញទិន្ន័យ",
-      of: "នៃ",
-      or: "ឬ",
-      pin: "ខ្ទាស់",
-      pinToLeft: "ខ្ទាស់ទៅឆ្វេង",
-      pinToRight: "ខ្ទាស់ទៅស្ដាំ",
-      resetColumnSize: "ប្ដូរជួរដេកទៅទំហំដើម",
-      resetOrder: "រក្សាលំដាប់ដើម",
-      rowActions: "សកម្មភាពជួរដេក",
-      rowNumber: "#",
-      rowNumbers: "លេខជួរដេក",
-      rowsPerPage: "ចំនួនជួរដេកក្នុងមួយទំព័រ",
-      save: "រក្សាទុក",
-      search: "ស្វែងរក",
-      selectedCountOfRowCountRowsSelected:
-        "បានជ្រើសយក {selectedCount} ជួរនៃ {rowCount} ជួរដេក",
-      // selectedCountOfRowCountRowsSelected:
-      //   "{selectedCount} ក្នុង {rowCount} ជួរដេកបានជ្រើសយក",
-      select: "ជ្រើសយក",
-      showAll: "បង្ហាញទាំងអស់",
-      showAllColumns: "បង្ហាញជួរឈរទាំងអស់",
-      showHideColumns: "បង្ហញ/លាក់ ជួរឈរ",
-      showHideFilters: "បង្ហាញ/លាក់ តម្រងចោះ",
-      showHideSearch: "បង្ហាញ/លាក់ ស្វែងរក",
-      sortByColumnAsc: "តម្រៀបតាម {column} ពីលើចុះក្រោម",
-      sortByColumnDesc: "តម្រៀបតាម {column} ពីក្រោមឡើងលើ",
-      sortedByColumnAsc: "បានតម្រៀបតាម {column} ពីលើចុះក្រោម",
-      sortedByColumnDesc: "បានតម្រៀបតាម {column} ពីក្រោមឡើងលើ",
-      thenBy: " ហើយតាមរយៈ ",
-      toggleDensity: "ពង្រីកពង្រួមគម្លាត",
-      toggleFullScreen: "ប្ដូរទៅពេញអេក្រង់",
-      toggleSelectAll: "ចុចរើសយកទាំងអស់",
-      toggleSelectRow: "ចុចរើសយកជួរដេក",
-      toggleVisibility: "បិទ/បើក",
-      ungroupByColumn: "ដកក្រុមដោយ {column}",
-      unpin: "ដកខ្ទាស់",
-      unpinAll: "ខ្ទាស់ទាំងអស់",
-    },
+    localization: mrt,
 
     // --- Detail Panel / Expandable Row ---
     // This replaces your <Collapse> logic seamlessly
@@ -751,51 +681,17 @@ export default function DocumentTable() {
                 size="small"
                 ria-label="detail information"
                 aria-labelledby="tableDetail"
-                // sx={{ minWidth: "50vmin" }}
               >
                 {/* Origin Doc info */}
                 <TableHead>
                   <TableRow>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>លេខលិខិតដើម</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>កាលបរិច្ឆេទលិខិតចូល</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>ម៉ោងចូល</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>រូបភាពឯកសារ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>អ្នកទទួលឯកសារ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>កំពុងប្រតិបត្តិការនៅ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>អ្នកបញ្ជូនឯកសារ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>កំណត់សម្គាល់</strong>
-                      </Typography>
-                    </TableCell>
+                    {detailPaneHeader_1.map((column) => (
+                      <TableCell key={column.title}>
+                        <Typography variant="body2" color={column.color}>
+                          <strong>{column.title}</strong>
+                        </Typography>
+                      </TableCell>
+                    ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -803,9 +699,9 @@ export default function DocumentTable() {
                     <TableCell>{details.originId}</TableCell>
                     <TableCell>{details.acceptedDate}</TableCell>
                     <TableCell>{details.acceptedTime}</TableCell>
-                    <TableCell>
+                    <TableCell align={"center"}>
                       {!details.originDoc ? (
-                        <ImageNotSupported />
+                        <ImageNotSupported color="primary" />
                       ) : (
                         <Link href={details.finishedDoc} target="_blank">
                           <PictureAsPdf />
@@ -813,43 +709,20 @@ export default function DocumentTable() {
                         </Link>
                       )}
                     </TableCell>
-                    <TableCell>
-                      {!details.recieptant ? (
-                        <NoAccounts />
-                      ) : (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "1rem",
-                          }}
-                        >
-                          <Avatar
-                            alt="avatar"
-                            src="https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8"
-                          />
-                          {details.recieptant}
-                        </Box>
-                      )}
-                      {/* {details.recieptant} */}
+                    <TableCell align={"center"}>
+                      {RenderAvatar({
+                        children: details.recieptant,
+                        src: "https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8",
+                        alt: "avatar",
+                      })}
                     </TableCell>
                     <TableCell>{details.currentProcessor}</TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "1rem",
-                        }}
-                      >
-                        <Avatar
-                          alt="avatar"
-                          src="https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8"
-                        ></Avatar>
-                        {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
-                        {details.recievedBy}
-                      </Box>
-                      {/* {details.recievedBy} */}
+                    <TableCell align={"center"}>
+                      {RenderAvatar({
+                        children: details.recievedBy,
+                        src: "https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8",
+                        alt: "avatar",
+                      })}
                     </TableCell>
                     <TableCell>{details.note}</TableCell>
                   </TableRow>
@@ -857,108 +730,45 @@ export default function DocumentTable() {
                 {/* Current Do info */}
                 <TableHead>
                   <TableRow>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>អ្នកទទួលឯកសារពីខុទ្ទកាល័យ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>កាលបរិច្ឆេទទទួលឯកសារ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>អ្នកប្រថាប់ត្រា</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>កាលបរិច្ឆេទប្រថាប់ត្រា</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>លេខលិខិតចេញ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>កាលបរិច្ឆេទបញ្ជូនចេញ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>អ្នកទទួលឯកសារចេញ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error">
-                        <strong>រូបភាពឯកសារបញ្ចប់</strong>
-                      </Typography>
-                    </TableCell>
+                    {detailPaneHeader_2.map((column) => (
+                      <TableCell key={column.title}>
+                        <Typography variant="body2" color={column.color}>
+                          <strong>{column.title}</strong>
+                        </Typography>
+                      </TableCell>
+                    ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <TableRow>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "1rem",
-                        }}
-                      >
-                        <Avatar
-                          alt="avatar"
-                          src="https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8"
-                        ></Avatar>
-                        {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
-                        {details.retrievedBy}
-                      </Box>
-                      {/* {details.retrievedBy} */}
+                    <TableCell align={"center"}>
+                      {RenderAvatar({
+                        children: details.retrievedBy,
+                        src: "https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8",
+                        alt: "avatar",
+                      })}
                     </TableCell>
                     <TableCell>{details.retreivedDate}</TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "1rem",
-                        }}
-                      >
-                        <Avatar
-                          alt="avatar"
-                          src="https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8"
-                        ></Avatar>
-                        {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
-                        {details.stampedBy}
-                      </Box>
-                      {/* {details.stampedBy} */}
+                    <TableCell align={"center"}>
+                      {RenderAvatar({
+                        children: details.stampedBy,
+                        src: "https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8",
+                        alt: "avatar",
+                      })}
                     </TableCell>
                     <TableCell>{details.stampedDate}</TableCell>
                     <TableCell>{details.issuanceNumber}</TableCell>
                     <TableCell>{details.issuanceDate}</TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "1rem",
-                        }}
-                      >
-                        <Avatar
-                          alt="avatar"
-                          src="https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8"
-                        ></Avatar>
-                        {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
-                        {details.lastRecipient}
-                      </Box>
-                      {/* {details.lastRecipient} */}
+                    <TableCell align={"center"}>
+                      {RenderAvatar({
+                        children: details.lastRecipient,
+                        src: "https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8",
+                        alt: "avatar",
+                      })}
                     </TableCell>
-                    <TableCell>
+                    <TableCell align={"center"}>
                       {!details.finishedDoc ? (
-                        <ImageNotSupported />
+                        <ImageNotSupported color="primary" />
                       ) : (
                         <Link href={details.finishedDoc} target="_blank">
                           <PictureAsPdf />
@@ -971,21 +781,13 @@ export default function DocumentTable() {
                 {/* Archive info */}
                 <TableHead>
                   <TableRow>
-                    <TableCell colSpan={2}>
-                      <Typography variant="body2" color="error">
-                        <strong>លេខទូរ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell colSpan={3}>
-                      <Typography variant="body2" color="error">
-                        <strong>លេខក្រូណូ</strong>
-                      </Typography>
-                    </TableCell>
-                    <TableCell colSpan={3}>
-                      <Typography variant="body2" color="error">
-                        <strong>លេខរៀងឯកសារ</strong>
-                      </Typography>
-                    </TableCell>
+                    {detailPaneHeader_3.map((column) => (
+                      <TableCell key={column.title} colSpan={column.span}>
+                        <Typography variant="body2" color={column.color}>
+                          <strong>{column.title}</strong>
+                        </Typography>
+                      </TableCell>
+                    ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>

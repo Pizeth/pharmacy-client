@@ -1,5 +1,5 @@
 import { StyleComponent } from "@/types/classKey";
-import { SxProps, Theme } from "@mui/material";
+import { AvatarOwnProps, SxProps, Theme } from "@mui/material";
 import { Property } from "csstype";
 import { SignUpParams } from "./auth.interface";
 import { FieldValues, SubmitHandler } from "react-hook-form";
@@ -152,4 +152,9 @@ export interface FilterProps extends BasicSVGProps {
   inValue?: string;
   in2?: string | number;
   scale?: string | number;
+}
+
+export interface ColumnAvatarProps extends Omit<AvatarOwnProps, "children"> {
+  children?: string;
+  icon?: React.ReactNode;
 }
