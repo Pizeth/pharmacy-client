@@ -16,6 +16,7 @@ export interface Data {
     recieptant: string;
     currentProcessor: string;
     deliverBy: string;
+    note?: string;
     recievedBy: string;
     retrievedBy: string;
     retreivedDate: string;
@@ -49,6 +50,7 @@ export function createData(
     recieptant: string;
     currentProcessor: string;
     deliverBy: string;
+    note?: string;
     recievedBy: string;
     retrievedBy: string;
     retreivedDate: string;

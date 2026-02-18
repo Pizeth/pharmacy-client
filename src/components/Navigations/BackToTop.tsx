@@ -28,7 +28,7 @@ function BackToTopFab() {
         onClick={handleClick}
         sx={{
           position: "fixed",
-          bottom: "10vmin",
+          bottom: "2.5vmin",
           right: "2.5vmin",
           img: { objectFit: "contain" },
         }}

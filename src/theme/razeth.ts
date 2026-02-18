@@ -764,6 +764,7 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
             color: props.theme.palette.primary.main,
             textDecoration: "none",
             "&:hover": {
+              cursor: "pointer",
               textDecoration: "underline",
               textUnderlineOffset: props.theme.spacing(0.5),
               color: "#9d1820ff",

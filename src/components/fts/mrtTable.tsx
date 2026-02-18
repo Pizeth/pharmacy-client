@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import {
   MaterialReactTable,
   MRT_GlobalFilterTextField,
+  MRT_Row,
   MRT_ShowHideColumnsButton,
   MRT_TableContainer,
   MRT_TablePagination,
@@ -33,6 +34,7 @@ import {
   Link,
   Button,
   styled,
+  Avatar,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -43,10 +45,13 @@ import {
   AssignmentTurnedIn,
   SearchOutlined as SearchOutlinedIcon,
   Add,
+  PictureAsPdf,
+  ImageNotSupported,
+  NoAccounts,
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import generateRows, { Data } from "./mockData";
-import { th } from "date-fns/locale";
+import DocumentFormDialog from "./dialogForm";
 
 const Root = styled(Box)(({ theme }) => ({
   width: "100%",
@@ -156,75 +161,22 @@ const PaginationRow = styled(Box)(({ theme }) => ({
   //   ].join(","),
   // },
 }));
-// --- Types ---
-// export interface DocumentDetails {
-//   originId: string;
-//   acceptedDate: string;
-//   acceptedTime: string;
-//   originDoc: string;
-//   recieptant: string;
-//   currentProcessor: string;
-//   recievedBy: string;
-//   retreivedDate: string;
-//   stampedBy: string;
-//   stampedDate: string;
-//   issuanceNumber: string;
-//   issuanceDate: string;
-//   lastRecipient: string;
-//   finishedDoc: string;
-//   shelveNo: string;
-//   archiveNo: string;
-//   docSequence: string;
-// }
 
-// export interface Data {
-//   id: number;
-//   title: string;
-//   status: string;
-//   days: number;
-//   types: string;
-//   categories: string;
-//   office: string;
-//   description: string;
-//   details?: DocumentDetails;
-// }
+const DetailPane = styled(Box)(({ theme }) => ({
+  margin: 1,
+  fontFamily: "var(--font-interkhmerloopless)",
+  th: {
+    background: theme.palette.background.paper,
+  },
+  td: {
+    fontFamily: "var(--font-interkhmerloopless)",
+  },
+}));
 
-// // --- Mock Data (Replace with your actual fetch logic) ---
-// const mockData: Data[] = [
-//   {
-//     id: 1,
-//     title: "សេចក្តីព្រាងច្បាប់",
-//     status: "កំពុងដំណើរការ",
-//     days: 5,
-//     types: "ច្បាប់",
-//     categories: "ឯកសាររដ្ឋបាល",
-//     office: "ការិយាល័យកណ្តាល",
-//     description: "នេះគឺជាការពិពណ៌នាលម្អិតអំពីសេចក្តីព្រាងច្បាប់នេះ។",
-//     details: {
-//       originId: "១២៣៤៥",
-//       acceptedDate: "2024-01-01",
-//       acceptedTime: "08:30 AM",
-//       originDoc: "https://example.com/doc1",
-//       recieptant: "មន្រ្តី ក",
-//       currentProcessor: "ប្រធាននាយកដ្ឋាន",
-//       recievedBy: "បុគ្គលិក ខ",
-//       retreivedDate: "2024-01-02",
-//       stampedBy: "មន្ត្រីគណនេយ្យ",
-//       stampedDate: "2024-01-03",
-//       issuanceNumber: "០០១/២៤",
-//       issuanceDate: "2024-01-04",
-//       lastRecipient: "មន្រ្តី គ",
-//       finishedDoc: "https://example.com/doc1_final",
-//       shelveNo: "A-01",
-//       archiveNo: "AR-2024-001",
-//       docSequence: "00001",
-//     },
-//   },
-// ];
-
+const MenuBox = styled(Box)(({ theme }) => ({}));
 // --- Custom Action Menu Component ---
 // Extracted to manage its own anchorEl state for the MoreVert menu
-const RowActionMenu = ({ row }: { row: any }) => {
+const RowActionMenu = ({ row }: { row: MRT_Row<Data> }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -239,7 +191,7 @@ const RowActionMenu = ({ row }: { row: any }) => {
   };
 
   return (
-    <>
+    <MenuBox>
       <Tooltip title="More">
         <span>
           <IconButton
@@ -308,7 +260,7 @@ const RowActionMenu = ({ row }: { row: any }) => {
           </Typography>
         </MenuItem>
       </Menu>
-    </>
+    </MenuBox>
   );
 };
 
@@ -319,12 +271,16 @@ export default function DocumentTable() {
   const router = useRouter();
 
   // Dialog State (from your original code)
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingRowId, setEditingRowId] = useState<number | null>(null);
 
   const handleEdit = (id: number) => {
     setEditingRowId(id);
-    setEditDialogOpen(true);
+    setFormDialogOpen(true);
+  };
+
+  const handleDialogForm = () => {
+    setFormDialogOpen(true);
   };
 
   const handleDelete = (ids: number[] | number) => {
@@ -345,16 +301,38 @@ export default function DocumentTable() {
         size: 10,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
+        // Cell: ({ renderedCellValue, row }) => (
+        //   <Box
+        //     sx={{
+        //       display: "flex",
+        //       alignItems: "center",
+        //       gap: "1rem",
+        //     }}
+        //   >
+        //     <img
+        //       alt="avatar"
+        //       height={30}
+        //       src={row.original.avatar}
+        //       loading="lazy"
+        //       style={{ borderRadius: "50%" }}
+        //     />
+        //     <Avatar alt="avatar"></Avatar>
+        //     {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
+        //     <span>{renderedCellValue}</span>
+        //   </Box>
+        // ),
       },
       {
         accessorKey: "title",
         header: "ឈ្មោះឯកសារ",
+        enableClickToCopy: true,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "left" },
       },
       {
         accessorKey: "status",
         header: "ស្ថានភាព",
+        filterVariant: "autocomplete",
         grow: false,
         size: 10,
         muiTableHeadCellProps: { align: "center" },
@@ -363,15 +341,43 @@ export default function DocumentTable() {
       {
         accessorKey: "days",
         header: "ចំនួនថ្ងៃ",
+        filterFn: "between",
         grow: false,
         size: 10,
         enableColumnActions: false,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
+        //custom conditional format and styling
+        Cell: ({ cell }) => (
+          <Box
+            component="span"
+            sx={(theme) => ({
+              backgroundColor:
+                cell.getValue<number>() < 7
+                  ? theme.palette.success.dark
+                  : cell.getValue<number>() >= 7 && cell.getValue<number>() < 30
+                    ? theme.palette.warning.dark
+                    : theme.palette.primary.dark,
+              borderRadius: "0.25rem",
+              color: "#fff",
+              maxWidth: "5ch",
+              p: "0.25rem",
+            })}
+          >
+            {cell.getValue<number>()?.toLocaleString?.("km-KH", {
+              style: "decimal",
+              currency: "KHR",
+              // minimumFractionDigits: 0,
+              // maximumFractionDigits: 0,
+              // unit: "ថ្ងៃ",
+            })}
+          </Box>
+        ),
       },
       {
         accessorKey: "types",
         header: "ប្រភេទឯកសារ",
+        filterVariant: "autocomplete",
         grow: false,
         size: 10,
         muiTableHeadCellProps: { align: "center" },
@@ -380,11 +386,13 @@ export default function DocumentTable() {
       {
         accessorKey: "categories",
         header: "ឯកសារ",
+        filterVariant: "autocomplete",
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
       },
       {
         accessorKey: "office",
+        filterVariant: "autocomplete",
         header: "ការិយាល័យទទួលបន្ទុក",
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "left" },
@@ -490,10 +498,6 @@ export default function DocumentTable() {
         // enablePinning: true,
         // enableColumnActions: true,
       },
-      // "mrt-row-numbers": {
-      //   size: 10,
-      //   grow: true, //new in v2.8 (allow this column to grow to fill in remaining space)
-      // },
       "mrt-row-actions": {
         header: "ចំណាត់ការឯកសារ", // Custom Header for actions column
         muiTableHeadCellProps: { align: "center" },
@@ -504,58 +508,36 @@ export default function DocumentTable() {
 
     //add custom action buttons to top-left of top toolbar
     renderTopToolbarCustomActions: ({ table }) => (
-      // <Box sx={{ display: "flex", gap: "1rem", p: "4px" }}>
       <Box>
-        {/* <Button
-          color="secondary"
-          onClick={() => {
-            alert("Create New Account");
-          }}
-          variant="contained"
-        >
-          Create Account
-        </Button> */}
         <Button
           variant="contained"
           startIcon={<Add />}
-          // fullWidth
-          // size="large"
           color="secondary"
-          // autoFocus
-          type="submit"
+          type="button"
+          onClick={handleDialogForm}
         >
           <Typography variant="body2">
             <strong>បញ្ចូលឯកសារថ្មី</strong>
           </Typography>
         </Button>
         <Tooltip title="Delete">
-          <IconButton
-            // size="small"
-            color="primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              const selectedIds = Object.keys(
-                table.getState().rowSelection,
-              ).map((id) => parseInt(id, 10));
-              console.log(selectedIds);
-              handleDelete(selectedIds);
-            }}
-            disabled={!table.getIsSomeRowsSelected()}
-          >
-            <DeleteIcon />
-          </IconButton>
+          <span>
+            <IconButton
+              color="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                const selectedIds = Object.keys(
+                  table.getState().rowSelection,
+                ).map((id) => parseInt(id, 10));
+                console.log(selectedIds);
+                handleDelete(selectedIds);
+              }}
+              disabled={!table.getIsSomeRowsSelected()}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </span>
         </Tooltip>
-        {/* <MRT_GlobalFilterTextField table={table} /> */}
-        {/* <IconButton
-          color="primary"
-          disabled={!table.getIsSomeRowsSelected()}
-          onClick={() => {
-            alert("Delete Selected Accounts");
-          }}
-          // variant="contained"
-        >
-          <DeleteIcon />
-        </IconButton> */}
       </Box>
     ),
 
@@ -632,6 +614,13 @@ export default function DocumentTable() {
         <RowActionMenu row={row} />
       </Box>
     ),
+
+    muiTablePaperProps: ({ table }) => ({
+      //not sx
+      style: {
+        zIndex: table.getState().isFullScreen ? 1000 : undefined,
+      },
+    }),
 
     // --- Row Click Navigation ---
     muiTableBodyRowProps: ({ row }) => ({
@@ -749,7 +738,7 @@ export default function DocumentTable() {
     renderDetailPanel: ({ row }) => {
       const details = row.original.details;
       return (
-        <Box sx={{ margin: 2 }}>
+        <DetailPane>
           <Typography variant="h6" gutterBottom>
             លម្អិត
           </Typography>
@@ -758,17 +747,154 @@ export default function DocumentTable() {
           </Typography>
           {details && (
             <TableContainer component={Paper} elevation={1}>
-              <Table size="small" sx={{ minWidth: "50vmin" }}>
+              <Table
+                size="small"
+                ria-label="detail information"
+                aria-labelledby="tableDetail"
+                // sx={{ minWidth: "50vmin" }}
+              >
+                {/* Origin Doc info */}
                 <TableHead>
                   <TableRow>
                     <TableCell>
                       <Typography variant="body2" color="error">
-                        <strong>បរិយាយ</strong>
+                        <strong>លេខលិខិតដើម</strong>
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" color="error">
-                        <strong>ទិន្នន័យ</strong>
+                        <strong>កាលបរិច្ឆេទលិខិតចូល</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>ម៉ោងចូល</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>រូបភាពឯកសារ</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>អ្នកទទួលឯកសារ</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>កំពុងប្រតិបត្តិការនៅ</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>អ្នកបញ្ជូនឯកសារ</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>កំណត់សម្គាល់</strong>
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>{details.originId}</TableCell>
+                    <TableCell>{details.acceptedDate}</TableCell>
+                    <TableCell>{details.acceptedTime}</TableCell>
+                    <TableCell>
+                      {!details.originDoc ? (
+                        <ImageNotSupported />
+                      ) : (
+                        <Link href={details.finishedDoc} target="_blank">
+                          <PictureAsPdf />
+                          រូបភាពឯកសារដើម
+                        </Link>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {!details.recieptant ? (
+                        <NoAccounts />
+                      ) : (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "1rem",
+                          }}
+                        >
+                          <Avatar
+                            alt="avatar"
+                            src="https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8"
+                          />
+                          {details.recieptant}
+                        </Box>
+                      )}
+                      {/* {details.recieptant} */}
+                    </TableCell>
+                    <TableCell>{details.currentProcessor}</TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "1rem",
+                        }}
+                      >
+                        <Avatar
+                          alt="avatar"
+                          src="https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8"
+                        ></Avatar>
+                        {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
+                        {details.recievedBy}
+                      </Box>
+                      {/* {details.recievedBy} */}
+                    </TableCell>
+                    <TableCell>{details.note}</TableCell>
+                  </TableRow>
+                </TableBody>
+                {/* Current Do info */}
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>អ្នកទទួលឯកសារពីខុទ្ទកាល័យ</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>កាលបរិច្ឆេទទទួលឯកសារ</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>អ្នកប្រថាប់ត្រា</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>កាលបរិច្ឆេទប្រថាប់ត្រា</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>លេខលិខិតចេញ</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>កាលបរិច្ឆេទបញ្ជូនចេញ</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>អ្នកទទួលឯកសារចេញ</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error">
+                        <strong>រូបភាពឯកសារបញ្ចប់</strong>
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -776,119 +902,103 @@ export default function DocumentTable() {
                 <TableBody>
                   <TableRow>
                     <TableCell>
-                      <strong>លេខលិខិតដើម:</strong>
-                    </TableCell>
-                    <TableCell>{details.originId}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>កាលបរិច្ឆេទលិខិតចូល:</strong>
-                    </TableCell>
-                    <TableCell>{details.acceptedDate}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>ម៉ោងចូល:</strong>
-                    </TableCell>
-                    <TableCell>{details.acceptedTime}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>រូបភាពឯកសារ:</strong>
-                    </TableCell>
-                    <TableCell>
-                      <Link href={details.originDoc} target="_blank">
-                        រូបភាពឯកសារដើម
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>អ្នកទទួលឯកសារ:</strong>
-                    </TableCell>
-                    <TableCell>{details.recieptant}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>កំពុងប្រតិបត្តិការនៅ:</strong>
-                    </TableCell>
-                    <TableCell>{details.currentProcessor}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>អ្នកបញ្ជូនឯកសារ:</strong>
-                    </TableCell>
-                    <TableCell>{details.recievedBy}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>អ្នកទទួលឯកសារពីខុទ្ទកាល័យ:</strong>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "1rem",
+                        }}
+                      >
+                        <Avatar
+                          alt="avatar"
+                          src="https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8"
+                        ></Avatar>
+                        {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
+                        {details.retrievedBy}
+                      </Box>
+                      {/* {details.retrievedBy} */}
                     </TableCell>
                     <TableCell>{details.retreivedDate}</TableCell>
-                  </TableRow>
-                  <TableRow>
                     <TableCell>
-                      <strong>អ្នកប្រថាប់ត្រា:</strong>
-                    </TableCell>
-                    <TableCell>{details.stampedBy}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>កាលបរិច្ឆេទប្រថាប់ត្រា:</strong>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "1rem",
+                        }}
+                      >
+                        <Avatar
+                          alt="avatar"
+                          src="https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8"
+                        ></Avatar>
+                        {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
+                        {details.stampedBy}
+                      </Box>
+                      {/* {details.stampedBy} */}
                     </TableCell>
                     <TableCell>{details.stampedDate}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>លេខលិខិតចេញ:</strong>
-                    </TableCell>
                     <TableCell>{details.issuanceNumber}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>កាលបរិច្ឆេទបញ្ជូនចេញ:</strong>
-                    </TableCell>
                     <TableCell>{details.issuanceDate}</TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "1rem",
+                        }}
+                      >
+                        <Avatar
+                          alt="avatar"
+                          src="https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8"
+                        ></Avatar>
+                        {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
+                        {details.lastRecipient}
+                      </Box>
+                      {/* {details.lastRecipient} */}
+                    </TableCell>
+                    <TableCell>
+                      {!details.finishedDoc ? (
+                        <ImageNotSupported />
+                      ) : (
+                        <Link href={details.finishedDoc} target="_blank">
+                          <PictureAsPdf />
+                          រូបភាពឯកសារបញ្ចប់
+                        </Link>
+                      )}
+                    </TableCell>
                   </TableRow>
+                </TableBody>
+                {/* Archive info */}
+                <TableHead>
                   <TableRow>
-                    <TableCell>
-                      <strong>អ្នកទទួលឯកសារចេញ:</strong>
+                    <TableCell colSpan={2}>
+                      <Typography variant="body2" color="error">
+                        <strong>លេខទូរ</strong>
+                      </Typography>
                     </TableCell>
-                    <TableCell>{details.lastRecipient}</TableCell>
+                    <TableCell colSpan={3}>
+                      <Typography variant="body2" color="error">
+                        <strong>លេខក្រូណូ</strong>
+                      </Typography>
+                    </TableCell>
+                    <TableCell colSpan={3}>
+                      <Typography variant="body2" color="error">
+                        <strong>លេខរៀងឯកសារ</strong>
+                      </Typography>
+                    </TableCell>
                   </TableRow>
+                </TableHead>
+                <TableBody>
                   <TableRow>
-                    <TableCell>
-                      <strong>រូបភាពឯកសារបញ្ចប់:</strong>
-                    </TableCell>
-                    <TableCell>
-                      <Link href={details.finishedDoc} target="_blank">
-                        រូបភាពឯកសារបញ្ចប់
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>លេខទូរ:</strong>
-                    </TableCell>
-                    <TableCell>{details.shelveNo}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>លេខក្រូណូ:</strong>
-                    </TableCell>
-                    <TableCell>{details.archiveNo}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>លេខរៀងឯកសារ:</strong>
-                    </TableCell>
-                    <TableCell>{details.docSequence}</TableCell>
+                    <TableCell colSpan={2}>{details.shelveNo}</TableCell>
+                    <TableCell colSpan={3}>{details.archiveNo}</TableCell>
+                    <TableCell colSpan={3}>{details.docSequence}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
             </TableContainer>
           )}
-        </Box>
+        </DetailPane>
       );
     },
   });
@@ -910,43 +1020,18 @@ export default function DocumentTable() {
             size="large"
             color="error"
             // autoFocus
-            type="submit"
+            type="button"
+            onClick={handleDialogForm}
           >
             <Typography variant="body2">
               <strong>បញ្ចូលឯកសារថ្មី</strong>
             </Typography>
           </Button>
-          <Tooltip title="Delete">
-            <IconButton
-              // size="small"
-              color="primary"
-              onClick={(e) => {
-                e.stopPropagation();
-                const selectedIds = Object.keys(
-                  table.getState().rowSelection,
-                ).map((id) => parseInt(id, 10));
-                console.log(selectedIds);
-                handleDelete(selectedIds);
-              }}
-              disabled={!table.getIsSomeRowsSelected()}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-          {/* <MRT_GlobalFilterTextField table={table} /> */}
         </Box>
         <MRT_GlobalFilterTextField table={table} />
-        {/* <Box sx={{ display: "flex", alignItems: "center" }}> */}
         <Box>
-          {/* <MRT_ToggleFiltersButton table={table} />
-          <MRT_ShowHideColumnsButton table={table} />
-          <MRT_ToggleDensePaddingButton table={table} />
-          <Tooltip title="Print">
-            <IconButton onClick={() => window.print()}>
-              <Print />
-            </IconButton>
-          </Tooltip> */}
           <MRT_ToggleGlobalFilterButton table={table} />
+
           {/* add custom button to print table  */}
           <IconButton
             onClick={() => {
@@ -955,6 +1040,27 @@ export default function DocumentTable() {
           >
             <Print />
           </IconButton>
+
+          {/* add custom button to delete selected rows  */}
+          <Tooltip title="Delete">
+            <span>
+              <IconButton
+                color="primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const selectedIds = Object.keys(
+                    table.getState().rowSelection,
+                  ).map((id) => parseInt(id, 10));
+                  console.log(selectedIds);
+                  handleDelete(selectedIds);
+                }}
+                disabled={!table.getIsSomeRowsSelected()}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+
           {/* built-in buttons (must pass in table prop for them to work!) */}
           <MRT_ToggleFiltersButton table={table} />
           <MRT_ShowHideColumnsButton table={table} />
@@ -964,24 +1070,6 @@ export default function DocumentTable() {
       </ToolBar>
       {/* The MRT Table with no toolbars built-in */}
       <MRT_TableContainer table={table} />
-      {/* Our Custom Bottom Toolbar */}
-      {/* <BottomBar>
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <MRT_TablePagination table={table} />
-        </Box>
-        <Box sx={{ display: "grid", width: "100%" }}>
-          <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
-        </Box>
-      </BottomBar> */}
-
-      {/* Custom Bottom Toolbar */}
-      {/* <BottomBar>
-        <Box sx={{ flex: 1 }} width={"100%"}>
-          <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
-        </Box>
-
-        <MRT_TablePagination table={table} />
-      </BottomBar> */}
 
       {/* Custom Bottom Toolbar */}
       <BottomBar>
@@ -1009,12 +1097,12 @@ export default function DocumentTable() {
 
       {/* <MaterialReactTable table={table} /> */}
 
-      {/* Put your dialog logic back here */}
-      {/* <DocumentFormDialog
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
+      {/* Pop-up dialog form */}
+      <DocumentFormDialog
+        open={formDialogOpen}
+        onClose={() => setFormDialogOpen(false)}
         initialData={editingRowId}
-      /> */}
+      />
     </Root>
   );
 }
