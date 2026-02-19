@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import { styled } from "@mui/material/styles";
+import { styled, Theme } from "@mui/material/styles";
 import { meteorStrike } from "../keyframes";
 import { MeteorElementProps } from "@/interfaces/auth.interface";
 import { parseUnit } from "@/utils/themeUtils";
@@ -12,15 +12,19 @@ const MeteorRoot = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})(() => ({
-  //   position: "absolute",
-  //   inset: 0,
-  //   width: "100%",
-  //   height: "100%",
+})((props: { theme: Theme }) => ({
+  position: "absolute",
+  inset: 0,
   pointerEvents: "none",
   overflow: "hidden",
-  //   zIndex: 1,
+  zIndex: 1,
   willChange: "contents", // ✅ Optimize for dynamic content
+  // You can add custom styles here that will apply to all meteors
+  // Example: Add a subtle glow effect
+  filter:
+    props.theme.palette.mode === "dark"
+      ? "drop-shadow(0 0 10px #ffffff1a)"
+      : "none",
 }));
 
 // Meteor item container
@@ -29,9 +33,24 @@ const MeteorItem = styled(Box, {
   slot: "Item",
   overridesResolver: (_props, styles) => styles.item,
 })(() => ({
-  //   position: "absolute",
+  // Styles for individual meteor items
+  position: "absolute",
   willChange: "transform", // ✅ GPU optimization for animations
   pointerEvents: "none",
+  // STATIC TRANSITION RULES:
+  // We define WHAT animates and HOW here.
+  // The component only defines HOW LONG (duration).
+  // transitionProperty: "transform",
+  // transitionTimingFunction: "linear",
+  // willChange: "transform", // Performance optimization
+
+  // HERE IS THE DYNAMIC STYLE, DEFINED IN THE THEME:
+  // We tell the browser: "Use the value provided in the variable --m-left"
+  // left: "var(--m-left, 0)",
+  // top: "var(--m-top, 0)",
+  // // zIndex: "var(--m-z, 1)",
+  // transform: "var(--m-transform)",
+  // transitionDuration: "var(--m-duration, 0s)",
 }));
 
 // Meteor sprite with animation
@@ -94,7 +113,7 @@ const MeteorElement: React.FC<MeteorElementProps> = ({
   // 2. Initial state: hidden slightly off-screen (top-right relative to spawn)
   // We use sizePx directly, no need to append 'px' manually if we assume pixels in transform
   const [transform, setTransform] = useState<string>(
-    `translate3d(${sizePx}px, -${sizePx}px, 0)` // Use 3d for GPU acceleration
+    `translate3d(${sizePx}px, -${sizePx}px, 0)`, // Use 3d for GPU acceleration
   );
 
   // State for dynamic duration

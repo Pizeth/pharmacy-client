@@ -1,4 +1,10 @@
-import { CircularProgress, Grid, styled, useThemeProps } from "@mui/material";
+import {
+  CircularProgress,
+  Grid,
+  styled,
+  Theme,
+  useThemeProps,
+} from "@mui/material";
 import {
   Apple,
   Discord,
@@ -29,7 +35,35 @@ const SocialLoginContent = styled(Grid, {
   name: PREFIX,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
-})(() => ({}));
+})((props: { theme: Theme }) => ({
+  button: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: props.theme.spacing(1),
+    width: "100%",
+    padding: props.theme.spacing(1),
+    textTransform: "none",
+    border: `1px solid ${props.theme.palette.divider}`,
+    transition: props.theme.transitions.create(
+      ["transform", "background-color"],
+      {
+        duration: props.theme.transitions.duration.standard,
+        easing: props.theme.transitions.easing.easeInOut,
+      },
+    ),
+    "&:hover": {
+      border: `1px solid ${props.theme.palette.divider}`,
+      backgroundColor: props.theme.palette.action.hover,
+      transform: "scale(1.05)", // enlarge smoothly
+      boxShadow: props.theme.shadows[3],
+    },
+    "& svg": {
+      width: props.theme.spacing(2),
+      height: props.theme.spacing(2),
+    },
+  },
+}));
 
 // Provider configuration
 const PROVIDERS = {
@@ -107,7 +141,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
         // }
       }
     },
-    [notify]
+    [notify],
   );
 
   const isLoading = useCallback((type: string) => loading === type, [loading]);

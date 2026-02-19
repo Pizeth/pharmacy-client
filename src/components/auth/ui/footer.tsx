@@ -1,4 +1,11 @@
-import { Box, Link, styled, Typography, useThemeProps } from "@mui/material";
+import {
+  Box,
+  Link,
+  styled,
+  Theme,
+  Typography,
+  useThemeProps,
+} from "@mui/material";
 import { FooterProps } from "@/interfaces/auth.interface";
 import { useTranslate } from "ra-core";
 
@@ -43,7 +50,34 @@ const StyledFooter = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<FooterProps>(() => ({}));
+})<FooterProps>((props: { theme: Theme }) => ({
+  textAlign: "center",
+  marginTop: props.theme.spacing(1),
+  color: props.theme.palette.text.secondary,
+  position: "relative",
+  ["& .MuiTypography-root"]: {
+    marginTop: props.theme.spacing(0.5),
+    fontSize: "0.75rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: props.theme.spacing(0.5), // The space is now handled by the gap property
+    a: {
+      margin: props.theme.spacing(0),
+      display: "inline-flex",
+      alignItems: "center",
+    },
+    "& > :last-child::after": {
+      color: props.theme.palette.text.secondary,
+      textDecoration: "none",
+      marginLeft: props.theme.spacing(-0.5),
+      content: '"."',
+    },
+    "& > :last-child:hover::after": {
+      textDecoration: "none",
+    },
+  },
+}));
 
 export default Footer;
 

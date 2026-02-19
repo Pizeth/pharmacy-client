@@ -52,6 +52,7 @@ import generateRows, { Data } from "./mockData";
 import DocumentFormDialog from "./dialogForm";
 import { mrt } from "@/i18n/kh/mrt-kh";
 import RenderAvatar from "../CustomComponents/ColunmAvatar";
+import MsgUtils from "@/utils/msgUtils";
 
 const Root = styled(Box)(({ theme }) => ({
   width: "100%",
@@ -363,6 +364,28 @@ export default function DocumentTable() {
         size: 10,
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
+        Cell: ({ cell }) => {
+          const value = cell.getValue<string>();
+          return (
+            <Box
+              component="span"
+              sx={(theme) => ({
+                backgroundColor:
+                  value === "ធម្មតា"
+                    ? theme.palette.success.dark
+                    : value === "ប្រញ៉ាប់"
+                      ? theme.palette.error.dark
+                      : theme.palette.primary.dark,
+                borderRadius: "0.25rem",
+                color: "#fff",
+                maxWidth: "5ch",
+                p: "0.25rem",
+              })}
+            >
+              {value}
+            </Box>
+          );
+        },
       },
       {
         accessorKey: "days",
@@ -374,31 +397,35 @@ export default function DocumentTable() {
         muiTableHeadCellProps: { align: "center" },
         muiTableBodyCellProps: { align: "center" },
         //custom conditional format and styling
-        Cell: ({ cell }) => (
-          <Box
-            component="span"
-            sx={(theme) => ({
-              backgroundColor:
-                cell.getValue<number>() < 7
-                  ? theme.palette.success.dark
-                  : cell.getValue<number>() >= 7 && cell.getValue<number>() < 30
-                    ? theme.palette.warning.dark
-                    : theme.palette.primary.dark,
-              borderRadius: "0.25rem",
-              color: "#fff",
-              maxWidth: "5ch",
-              p: "0.25rem",
-            })}
-          >
-            {cell.getValue<number>()?.toLocaleString?.("km-KH", {
-              style: "decimal",
-              currency: "KHR",
-              // minimumFractionDigits: 0,
-              // maximumFractionDigits: 0,
-              // unit: "ថ្ងៃ",
-            })}
-          </Box>
-        ),
+        Cell: ({ cell }) => {
+          const value = cell.getValue<number>();
+          return (
+            <Box
+              component="span"
+              // color={
+              //   value < 7
+              //     ? "success"
+              //     : value >= 7 && value < 30
+              //       ? "warning"
+              //       : "primary"
+              // }
+              sx={(theme) => ({
+                color:
+                  value < 7
+                    ? theme.palette.text.primary
+                    : value >= 7 && value < 30
+                      ? theme.palette.warning.dark
+                      : theme.palette.error.dark,
+                borderRadius: "0.25rem",
+                // color: "#fff",
+                maxWidth: "5ch",
+                p: "0.25rem",
+              })}
+            >
+              {MsgUtils.toLocaleNumerals(value, "km-KH")}ថ្ងៃ
+            </Box>
+          );
+        },
       },
       {
         accessorKey: "types",
@@ -697,9 +724,14 @@ export default function DocumentTable() {
                 <TableBody>
                   <TableRow>
                     <TableCell>{details.originId}</TableCell>
-                    <TableCell>{details.acceptedDate}</TableCell>
+                    <TableCell>
+                      {new Date(details.acceptedDate).toLocaleDateString(
+                        "km-KH",
+                        { year: "numeric", month: "short", day: "numeric" },
+                      )}
+                    </TableCell>
                     <TableCell>{details.acceptedTime}</TableCell>
-                    <TableCell align={"center"}>
+                    <TableCell>
                       {!details.originDoc ? (
                         <ImageNotSupported color="primary" />
                       ) : (
@@ -709,7 +741,7 @@ export default function DocumentTable() {
                         </Link>
                       )}
                     </TableCell>
-                    <TableCell align={"center"}>
+                    <TableCell>
                       {RenderAvatar({
                         children: details.recieptant,
                         src: "https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8",
@@ -717,7 +749,7 @@ export default function DocumentTable() {
                       })}
                     </TableCell>
                     <TableCell>{details.currentProcessor}</TableCell>
-                    <TableCell align={"center"}>
+                    <TableCell>
                       {RenderAvatar({
                         children: details.recievedBy,
                         src: "https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8",
@@ -741,7 +773,7 @@ export default function DocumentTable() {
                 </TableHead>
                 <TableBody>
                   <TableRow>
-                    <TableCell align={"center"}>
+                    <TableCell>
                       {RenderAvatar({
                         children: details.retrievedBy,
                         src: "https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8",
@@ -749,7 +781,7 @@ export default function DocumentTable() {
                       })}
                     </TableCell>
                     <TableCell>{details.retreivedDate}</TableCell>
-                    <TableCell align={"center"}>
+                    <TableCell>
                       {RenderAvatar({
                         children: details.stampedBy,
                         src: "https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8",
@@ -759,14 +791,14 @@ export default function DocumentTable() {
                     <TableCell>{details.stampedDate}</TableCell>
                     <TableCell>{details.issuanceNumber}</TableCell>
                     <TableCell>{details.issuanceDate}</TableCell>
-                    <TableCell align={"center"}>
+                    <TableCell>
                       {RenderAvatar({
                         children: details.lastRecipient,
                         src: "https://api.dicebear.com/9.x/lorelei/svg?seed=%E1%9E%98%E1%9F%89%E1%9E%B6%E1%9E%9B%E1%9E%B8",
                         alt: "avatar",
                       })}
                     </TableCell>
-                    <TableCell align={"center"}>
+                    <TableCell>
                       {!details.finishedDoc ? (
                         <ImageNotSupported color="primary" />
                       ) : (

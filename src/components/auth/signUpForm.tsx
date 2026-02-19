@@ -10,6 +10,7 @@ import {
   CardContent,
   Typography,
   Link,
+  Theme,
 } from "@mui/material";
 import { styled, useThemeProps } from "@mui/material/styles";
 import PasswordValidationInput from "../CustomInputs/PasswordValidationInput";
@@ -47,19 +48,49 @@ const StyledSignUpForm = styled(Form, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<SignUpFormProps>(() => ({}));
+})<SignUpFormProps>((props: { theme: Theme }) => ({
+  ["& .MuiCardContent-root"]: {
+    minWidth: 300,
+    padding: `${props.theme.spacing(0)}`,
+  },
+}));
 
 const Content = styled(Box, {
   name: PREFIX,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
-})<SignUpFormProps>(() => ({}));
+})<SignUpFormProps>((props: { theme: Theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: props.theme.spacing(0),
+  input: {
+    transition: props.theme.transitions.create("color", {
+      easing: props.theme.transitions.easing.easeInOut,
+      duration: props.theme.transitions.duration.short,
+    }),
+    "&:focus": {
+      // color: "#e1232e", // focused
+      color: props.theme.palette.primary.main, // focused
+    },
+  },
+  // Apply custom styles to the last child element inside this container
+  "& > :last-child": {
+    // For example, you could add extra margin to the button
+    // if it's the last item. Let's override its default top margin.
+    marginTop: props.theme.spacing(1),
+  },
+}));
 
 const PasswordArea = styled(Box, {
   name: PREFIX,
   slot: "Password",
   overridesResolver: (_props, styles) => styles.password,
-})<SignUpFormProps>(() => ({}));
+})<SignUpFormProps>((props: { theme: Theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  gap: props.theme.spacing(0),
+}));
 
 const TermsArea = styled(Box, {
   name: PREFIX,
@@ -172,7 +203,7 @@ const SignUpForm = (inProps: SignUpFormProps) => {
   ] = useCreate();
 
   const handleSubmit: SubmitHandler<FieldValues> = async (
-    values: SignUpParams
+    values: SignUpParams,
   ) => {
     setLoading(true);
 
@@ -189,7 +220,7 @@ const SignUpForm = (inProps: SignUpFormProps) => {
             notify(
               translate("razeth.auth.signup_success") ||
                 "Account created successfully!",
-              { type: "success" }
+              { type: "success" },
             );
 
             // Redirect if specified
@@ -204,9 +235,9 @@ const SignUpForm = (inProps: SignUpFormProps) => {
               typeof error === "string"
                 ? error
                 : error && typeof error === "object" && "message" in error
-                ? String(error.message)
-                : translate("razeth.auth.sign_up_error") ||
-                  "Registration failed";
+                  ? String(error.message)
+                  : translate("razeth.auth.sign_up_error") ||
+                    "Registration failed";
             notify(errorMessage, {
               type: "error",
               messageArgs: {
@@ -215,7 +246,7 @@ const SignUpForm = (inProps: SignUpFormProps) => {
             });
           },
           returnPromise: true,
-        }
+        },
       );
       // if (onSubmit) {
       //   await onSubmit(values);
@@ -243,8 +274,8 @@ const SignUpForm = (inProps: SignUpFormProps) => {
         typeof error === "string"
           ? error
           : error && typeof error === "object" && "message" in error
-          ? String(error.message)
-          : translate("razeth.auth.sign_up_error") || "Registration failed";
+            ? String(error.message)
+            : translate("razeth.auth.sign_up_error") || "Registration failed";
       notify(errorMessage, {
         type: "error",
         messageArgs: {

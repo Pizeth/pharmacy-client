@@ -1,5 +1,11 @@
 import { SocialButtonProps } from "@/interfaces/auth.interface";
-import { Button, styled, Typography, useThemeProps } from "@mui/material";
+import {
+  Button,
+  styled,
+  Theme,
+  Typography,
+  useThemeProps,
+} from "@mui/material";
 
 const PREFIX = "RazethSocialButton";
 
@@ -17,8 +23,13 @@ const SocialButtonLabel = styled(Typography, {
   name: PREFIX,
   slot: "Label",
   overridesResolver: (_props, styles) => styles.label,
-})(() => ({
+})((props: { theme: Theme }) => ({
   /* base styles for the label, if any */
+  fontWeight: "500",
+  display: "none", // Hide by default
+  [props.theme.breakpoints.up("sm")]: {
+    display: "block", // This applies for 'sm' and larger breakpoints
+  },
 }));
 
 // Custom styled button for social login

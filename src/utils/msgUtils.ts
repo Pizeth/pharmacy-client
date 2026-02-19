@@ -17,7 +17,7 @@ export class MsgUtils {
   static setMsg(
     message: string | AsyncValidationErrorMessage | any,
     args?: object,
-    status?: boolean | number
+    status?: boolean | number,
   ): string | AsyncValidationErrorMessage | undefined {
     return {
       message: message?.message || message,
@@ -30,7 +30,7 @@ export class MsgUtils {
     message: string | MessageFunc,
     messageArgs: any,
     value: any,
-    values: any
+    values: any,
   ) =>
     typeof message === "function"
       ? message({
@@ -39,17 +39,17 @@ export class MsgUtils {
           values,
         })
       : messageArgs
-      ? {
-          message,
-          args: messageArgs,
-        }
-      : message;
+        ? {
+            message,
+            args: messageArgs,
+          }
+        : message;
 
   static getMessage1(
     message: string | MessageFunc,
     args: object,
     value?: any,
-    values?: any
+    values?: any,
   ): ValidationErrorMessage | undefined {
     if (!message) return undefined;
 
@@ -57,6 +57,48 @@ export class MsgUtils {
       ? message({ args, value, values })
       : { message, args };
   }
+
+  /**
+   * Convert a number to locale-specific numerals (Unicode)
+   * @param value - The number to convert
+   * @param locale - Locale code (e.g., 'km-KH' for Khmer, 'ar' for Arabic, 'th' for Thai)
+   * @returns String with locale-specific numerals
+   */
+  static toLocaleNumerals(value: number | string, locale: string): string {
+    // Map locale codes to Unicode digit starting points
+    const numeralSystems: Record<string, number> = {
+      km: 0x17e0, // Khmer: ០-៩
+      "km-KH": 0x17e0, // Khmer: ០-៩
+      ar: 0x0660, // Arabic-Indic: ٠-٩
+      "ar-SA": 0x0660, // Arabic-Indic: ٠-٩
+      fa: 0x06f0, // Persian: ۰-۹
+      "fa-IR": 0x06f0, // Persian: ۰-۹
+      hi: 0x0966, // Devanagari: ०-९
+      "hi-IN": 0x0966, // Devanagari: ०-९
+      bn: 0x09e6, // Bengali: ০-৯
+      "bn-BD": 0x09e6, // Bengali: ০-৯
+      th: 0x0e50, // Thai: ๐-๙
+      "th-TH": 0x0e50, // Thai: ๐-๙
+      my: 0x1040, // Myanmar: ၀-၉
+      "my-MM": 0x1040, // Myanmar: ၀-၉
+    };
+
+    // Get the base code point for the locale (default to Western digits)
+    const baseCodePoint =
+      numeralSystems[locale] || numeralSystems[locale.split("-")[0]];
+
+    // If no special numeral system found, return as-is
+    if (!baseCodePoint) {
+      return String(value);
+    }
+
+    // Convert each digit
+    return String(value).replace(/[0-9]/g, (digit) => {
+      return String.fromCharCode(baseCodePoint + parseInt(digit, 10));
+    });
+  }
+
+  // Usage in your MRT column:
 }
 
 export default MsgUtils;

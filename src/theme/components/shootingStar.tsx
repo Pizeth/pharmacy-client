@@ -56,10 +56,11 @@ const ShootingStarRoot = styled(Box, {
     baseSize,
     twinkleDuration,
   }) => ({
-    // position: "absolute",
+    position: "absolute",
     filter: `drop-shadow(0 0 7px ${color})`,
     animation: `${shootingStar} ${duration} linear forwards, ${tail} ${duration} linear forwards`,
     animationFillMode: "forwards",
+    // animationFillMode: "backwards",
     willChange: "transform, opacity", // ✅ GPU optimization
     offsetRotate: "auto" /* 👈 aligns with path direction */,
     offsetAnchor: "right center",
@@ -74,8 +75,8 @@ const ShootingStarRoot = styled(Box, {
 
     // Head element (nested span)
     "& > span": {
-      // position: "absolute",
-      // zIndex: 3,
+      position: "absolute",
+      zIndex: 3,
       boxShadow: glow,
       right: `calc(${centerPoint} - ${halfHead})`,
       top: `calc(50% - ${halfHead})`,
@@ -97,8 +98,8 @@ const ShootingStarRoot = styled(Box, {
 
     // ✅ TAIL 1: Using ::before pseudo-element
     "::before": {
-      // content: '""',
-      // position: "absolute",
+      content: '""',
+      position: "absolute",
       top: `calc(50% - ${centerPoint})`,
       right: `calc(0% + ${centerPoint})`,
       height: size,
@@ -106,7 +107,7 @@ const ShootingStarRoot = styled(Box, {
       borderRadius: "100%",
       transform: "translateX(50%) rotateZ(45deg)",
       animation: `${twinkling(
-        baseSize
+        baseSize,
       )} ${twinkleDuration} ease-in-out infinite`,
       animationFillMode: "backwards",
       willChange: "width, transform", // ✅ GPU optimization
@@ -115,8 +116,8 @@ const ShootingStarRoot = styled(Box, {
 
     // ✅ TAIL 2: Using ::after pseudo-element
     "::after": {
-      // content: '""',
-      // position: "absolute",
+      content: '""',
+      position: "absolute",
       top: `calc(50% - ${centerPoint})`,
       right: `calc(0% + ${centerPoint})`,
       height: size,
@@ -124,13 +125,13 @@ const ShootingStarRoot = styled(Box, {
       borderRadius: "100%",
       transform: "translateX(50%) rotateZ(-45deg)",
       animation: `${twinkling(
-        baseSize
+        baseSize,
       )} ${twinkleDuration} ease-in-out infinite`,
       animationFillMode: "backwards",
       willChange: "width, transform", // ✅ GPU optimization
       // boxShadow: glow,
     },
-  })
+  }),
 );
 
 /**

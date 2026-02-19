@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Checkbox,
   CardContent,
+  Theme,
 } from "@mui/material";
 // import PersonIcon from "@mui/icons-material/Person";
 import { styled, useThemeProps } from "@mui/material/styles";
@@ -27,25 +28,64 @@ const StyledLoginForm = styled(Form, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<LoginFormProps>(() => ({}));
+})<LoginFormProps>((props: { theme: Theme }) => ({
+  ["& .MuiCardContent-root"]: {
+    minWidth: 300,
+    padding: `${props.theme.spacing(0)}`,
+  },
+}));
 
 const Content = styled(Box, {
   name: PREFIX,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
-})<LoginFormProps>(() => ({}));
+})<LoginFormProps>((props: { theme: Theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: props.theme.spacing(0),
+  input: {
+    transition: props.theme.transitions.create("color", {
+      easing: props.theme.transitions.easing.easeInOut,
+      duration: props.theme.transitions.duration.short,
+    }),
+    "&:focus": {
+      // color: "#e1232e", // focused
+      color: props.theme.palette.primary.main, // focused
+    },
+  },
+  // Apply custom styles to the last child element inside this container
+  "& > :last-child": {
+    // For example, you could add extra margin to the button
+    // if it's the last item. Let's override its default top margin.
+    marginTop: props.theme.spacing(1),
+  },
+}));
 
 const PasswordArea = styled(Box, {
   name: PREFIX,
   slot: "Password",
   overridesResolver: (_props, styles) => styles.password,
-})<LoginFormProps>(() => ({}));
+})<LoginFormProps>((props: { theme: Theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  gap: props.theme.spacing(0),
+}));
 
 const Footer = styled(Box, {
   name: PREFIX,
   slot: "Footer",
   overridesResolver: (_props, styles) => styles.footer,
-})<LoginFormProps>(() => ({}));
+})<LoginFormProps>((props: { theme: Theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  fontWeight: 500,
+  marginTop: "-0.5rem",
+  marginBottom: "-0.5rem",
+  width: "100%",
+  gap: props.theme.spacing(0),
+}));
 
 const FormButton = styled(ValidatedButton, {
   name: PREFIX,
@@ -85,8 +125,8 @@ const PasswordLogin = (inProps: LoginFormProps) => {
           typeof error === "string"
             ? error
             : typeof error === "undefined" || !error.message
-            ? "ra.auth.sign_in_error"
-            : error.message,
+              ? "ra.auth.sign_in_error"
+              : error.message,
           {
             type: "error",
             messageArgs: {
@@ -94,10 +134,10 @@ const PasswordLogin = (inProps: LoginFormProps) => {
                 typeof error === "string"
                   ? error
                   : error && error.message
-                  ? error.message
-                  : undefined,
+                    ? error.message
+                    : undefined,
             },
-          }
+          },
         );
       });
   };

@@ -1,5 +1,12 @@
 import { DividerProps } from "@/interfaces/auth.interface";
-import { Box, Divider, styled, Typography, useThemeProps } from "@mui/material";
+import {
+  Box,
+  Divider,
+  styled,
+  Theme,
+  Typography,
+  useThemeProps,
+} from "@mui/material";
 import { useTranslate } from "ra-core";
 
 export const RazethDivider = (inProps: DividerProps) => {
@@ -23,7 +30,20 @@ const StyledDivider = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<DividerProps>(() => ({}));
+})<DividerProps>((props: { theme: Theme }) => ({
+  position: "relative",
+  display: "flex",
+  alignItems: "center",
+  marginTop: props.theme.spacing(2),
+  marginBottom: props.theme.spacing(2),
+  ["& .MuiDivider-root"]: { flex: 1 },
+  ["& .MuiTypography-root"]: {
+    paddingLeft: props.theme.spacing(2),
+    paddingRight: props.theme.spacing(2),
+    backgroundColor: props.theme.palette.background.paper,
+    color: props.theme.palette.text.secondary,
+  },
+}));
 
 export default RazethDivider;
 

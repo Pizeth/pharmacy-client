@@ -15,7 +15,18 @@ const VaidatedSaveButton = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<SignUpFormProps>(() => ({}));
+})<SignUpFormProps>(() => ({
+  button: {
+    // borderRadius: "2.5rem",
+    fontWeight: 700,
+    fontSize: "0.9375rem",
+    // fontSize: "2.5rem",
+    // ["& .MuiSvgIcon-root"]: {
+    //   margin: props.theme.spacing(0.3),
+    //   // fontSize: 18,
+    // },
+  },
+}));
 const ValidatedButton = (inProps: ValidatedButtonProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
   const { errors, isValid, isDirty } = useFormState();

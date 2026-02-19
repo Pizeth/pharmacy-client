@@ -56,11 +56,9 @@ export default function ThemeProviderWrapper<Theme = DefaultTheme>({
           {/* <PersistentDrawerLeft /> */}
           {/* We use a fragment here because the html/body tags are in the Server Layout */}
           {mounted ? (
-            // children
-            <DrawerAppBar>{children}</DrawerAppBar>
+            children
           ) : (
-            // children
-            // children
+            // <DrawerAppBar>{children}</DrawerAppBar>
             <div style={{ visibility: "hidden" }}>{children}</div>
           )}
           <BackToTopFab />

@@ -1,8 +1,14 @@
-import { Box, Link, styled, Typography, useThemeProps } from "@mui/material";
+import {
+  Box,
+  Link,
+  styled,
+  Theme,
+  Typography,
+  useThemeProps,
+} from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { AuthNavigationProps } from "@/interfaces/auth.interface";
 import { useTranslate } from "ra-core";
-import { useCallback, useState } from "react";
 import { Login } from "@mui/icons-material";
 
 const AuthNavigationLink = (inProps: AuthNavigationProps) => {
@@ -46,7 +52,24 @@ const StyledAuthNavigation = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<AuthNavigationProps>(() => ({}));
+})((props: { theme: Theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: props.theme.spacing(0.5), // The space is now handled by the gap property
+  textAlign: "center",
+  marginTop: props.theme.spacing(2),
+  color: props.theme.palette.text.secondary,
+  button: {
+    textTransform: "uppercase",
+    display: "inline-flex",
+    alignItems: "center",
+    svg: {
+      marginLeft: props.theme.spacing(0.5),
+      fontSize: "1rem",
+    },
+  },
+}));
 
 export default AuthNavigationLink;
 

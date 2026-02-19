@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ThemeProvider } from "@mui/material/styles";
 import { Siemreap, Moul } from "next/font/google";
-import { darkTheme, RazethBaseTheme } from "@/theme/razeth";
+import { darkTheme } from "@/theme/razeth";
 import ThemeProviderWrapper from "@/components/effect/themes/theme-wrapper";
 // import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 // import { useEffect, useState } from "react";
@@ -20,8 +19,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Welcome to Razeth Systems",
-  description: "The Ultimate Pharmacy Management Solution",
+  title: "ប្រព័ន្ធគ្រប់គ្រងការងាររបស់នាយកដ្ឋានធនធានមនុស្ស",
+  description:
+    "ស្វាគមន៍មកកាន់ប្រព័ន្ធគ្រប់គ្រងការងាររបស់នាយកដ្ឋានធនធានមនុស្ស នៃក្រសួងមុខងារសាធារណៈ",
 };
 
 // Load Khmer Fonts

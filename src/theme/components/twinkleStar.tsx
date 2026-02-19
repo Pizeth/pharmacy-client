@@ -34,7 +34,7 @@ const TwinkleStarRoot = styled(Box, {
     baseSize,
     isFadingOut,
   }) => ({
-    // position: "absolute",
+    position: "absolute",
     left,
     top,
     width: size,
@@ -48,11 +48,11 @@ const TwinkleStarRoot = styled(Box, {
     background: "#FFF",
     // zIndex: 3,
     willChange: "transform, opacity", // ✅ GPU optimization
-
+    zIndex: 3,
     // ✅ RAY 1: Using ::before pseudo-element (45° rotation)
     "::before": {
-      //   content: '""',
-      //   position: "absolute",
+      content: '""',
+      position: "absolute",
       top: `calc(50% - ${centerPoint})`,
       right: `calc(0% + ${centerPoint})`,
       height: size,
@@ -65,8 +65,8 @@ const TwinkleStarRoot = styled(Box, {
 
     // ✅ RAY 2: Using ::after pseudo-element (-45° rotation)
     "::after": {
-      //   content: '""',
-      //   position: "absolute",
+      content: '""',
+      position: "absolute",
       top: `calc(50% - ${centerPoint})`,
       right: `calc(0% + ${centerPoint})`,
       height: size,
@@ -76,7 +76,7 @@ const TwinkleStarRoot = styled(Box, {
       animation: `${twinkling(baseSize)} ${delay} ease-in-out infinite`,
       willChange: "width, transform", // ✅ GPU optimization
     },
-  })
+  }),
 );
 
 /**
