@@ -12,6 +12,8 @@ const DEFAULT_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
   hour12: true,
 };
 
+const DEFAULT_TIME_FORMAT = "h:mmនាទី A";
+
 const DEFAULT_LOCALE = "km-KH";
 export const formatLocaleDate = (
   date: string | Date,
@@ -28,7 +30,7 @@ export const formatLocaleDate = (
 
 export const formatLocalTime = (
   date: string | Date,
-  //   formatString: string,
+  formatString = DEFAULT_TIME_FORMAT,
   locale = DEFAULT_LOCALE,
   options = DEFAULT_TIME_OPTIONS,
 ): string => {
@@ -36,7 +38,7 @@ export const formatLocalTime = (
     date = new Date(date);
   }
   return locale === DEFAULT_LOCALE
-    ? momentKH.formatTime(momentKH.fromDate(date))
+    ? momentKH.formatTime(momentKH.fromDate(date), formatString)
     : date.toLocaleTimeString(locale, options);
   // : date.toLocaleDateString(locale, options);
 };
