@@ -48,11 +48,14 @@ import {
   ImageNotSupported,
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
+import { parse } from "date-fns";
 import generateRows, { Data } from "./mockData";
 import DocumentFormDialog from "./dialogForm";
 import { mrt } from "@/i18n/kh/mrt-kh";
 import RenderAvatar from "../CustomComponents/ColunmAvatar";
 import MsgUtils from "@/utils/msgUtils";
+import formatLocaleDate, { formatLocalTime } from "@/utils/dateUtils";
+import NAIcon from "../icons/na";
 
 const Root = styled(Box)(({ theme }) => ({
   width: "100%",
@@ -725,12 +728,28 @@ export default function DocumentTable() {
                   <TableRow>
                     <TableCell>{details.originId}</TableCell>
                     <TableCell>
-                      {new Date(details.acceptedDate).toLocaleDateString(
-                        "km-KH",
-                        { year: "numeric", month: "short", day: "numeric" },
+                      {details.acceptedDate ? (
+                        formatLocaleDate(new Date(details.acceptedDate))
+                      ) : (
+                        <NAIcon fontSize="large" color="primary" />
                       )}
                     </TableCell>
-                    <TableCell>{details.acceptedTime}</TableCell>
+
+                    <TableCell>
+                      {details.acceptedTime ? (
+                        formatLocalTime(
+                          parse(details.acceptedTime, "h:mm a", new Date()),
+                        )
+                      ) : (
+                        <NAIcon fontSize="large" color="primary" />
+                      )}
+                      {/* {details.acceptedTime
+                        ? parse(details.acceptedTime, "h:mm a", new Date()) +
+                          " " +
+                          details.acceptedTime
+                        : details.acceptedTime} */}
+                      {/* {details.acceptedTime} */}
+                    </TableCell>
                     <TableCell>
                       {!details.originDoc ? (
                         <ImageNotSupported color="primary" />
@@ -780,7 +799,13 @@ export default function DocumentTable() {
                         alt: "avatar",
                       })}
                     </TableCell>
-                    <TableCell>{details.retreivedDate}</TableCell>
+                    <TableCell>
+                      {details.retreivedDate ? (
+                        formatLocaleDate(new Date(details.retreivedDate))
+                      ) : (
+                        <NAIcon fontSize="large" color="primary" />
+                      )}
+                    </TableCell>
                     <TableCell>
                       {RenderAvatar({
                         children: details.stampedBy,
@@ -788,9 +813,22 @@ export default function DocumentTable() {
                         alt: "avatar",
                       })}
                     </TableCell>
-                    <TableCell>{details.stampedDate}</TableCell>
+                    <TableCell>
+                      {details.stampedDate ? (
+                        formatLocaleDate(new Date(details.stampedDate))
+                      ) : (
+                        <NAIcon fontSize="large" color="primary" />
+                      )}
+                    </TableCell>
                     <TableCell>{details.issuanceNumber}</TableCell>
-                    <TableCell>{details.issuanceDate}</TableCell>
+                    <TableCell>
+                      {details.issuanceDate ? (
+                        formatLocaleDate(new Date(details.issuanceDate))
+                      ) : (
+                        <NAIcon fontSize="large" color="primary" />
+                      )}
+                      {details.issuanceDate}
+                    </TableCell>
                     <TableCell>
                       {RenderAvatar({
                         children: details.lastRecipient,

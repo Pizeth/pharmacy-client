@@ -441,6 +441,25 @@ function getDayOfWeek(year: number, month: number, day: number): number {
   return (jdn + 1) % 7;
 }
 
+/**
+ * Get Khmer time period name based on hour
+ * @param hour - Hour in 24-hour format (0-23)
+ * @returns Khmer time period name
+ */
+function getKhmerTimePeriod(hour: number): string {
+  if (hour >= 0 && hour < 5) {
+    return "យប់"; // Night (00:00 - 04:59)
+  } else if (hour >= 5 && hour < 12) {
+    return "ព្រឹក"; // Morning (05:00 - 11:59)
+  } else if (hour >= 12 && hour < 18) {
+    return "រសៀល"; // Afternoon (12:00 - 17:59)
+  } else if (hour >= 18 && hour < 21) {
+    return "ល្ងាច"; // Evening (18:00 - 20:59)
+  } else {
+    return "យប់"; // Night (21:00 - 23:59)
+  }
+}
+
 // ============================================================================
 // Input Validation Functions
 // ============================================================================
@@ -1647,8 +1666,13 @@ function formatKhmer(
     if (escaped) {
       return escaped;
     }
-    const value = formatRules[token]();
-    return String(value);
+    // const value = formatRules[token]();
+    // return String(value);
+    if (formatRules[token]) {
+      const value = formatRules[token]();
+      return String(value);
+    }
+    return match;
   });
 
   return result;
@@ -1742,6 +1766,205 @@ export function toDate(
   return new Date(greg.year, greg.month - 1, greg.day);
 }
 
+/**
+ * Convert time to Khmer format with time period label
+ * @param date - Date object or hour (if minute is also provided)
+ * @param minute - Optional minute (only used if first param is hour)
+ * @param format - Optional format: '12h' for 12-hour with period, '24h' for 24-hour without period (default: '12h')
+ * @returns Formatted time in Khmer (e.g., "១១:៤៥ ព្រឹក" or "២៣:៣០")
+ *
+ * @example
+ * // From Date object
+ * toKhmerTime(new Date(2024, 0, 1, 11, 45)); // "១១:៤៥ ព្រឹក"
+ *
+ * // From hour and minute
+ * toKhmerTime(14, 38); // "០២:៣៨ រសៀល" (12h format)
+ * toKhmerTime(14, 38, '24h'); // "១៤:៣៨" (24h format)
+ */
+export function toKhmerTime(
+  date: Date | number,
+  minute?: number,
+  format: "12h" | "24h" = "12h",
+): string {
+  let hour: number;
+  let min: number;
+
+  if (date instanceof Date) {
+    hour = date.getHours();
+    min = date.getMinutes();
+  } else {
+    if (minute === undefined) {
+      throw new Error(
+        "When providing hour as a number, minute must also be provided",
+      );
+    }
+    hour = date;
+    min = minute;
+  }
+
+  // Validate hour and minute
+  if (hour < 0 || hour > 23) {
+    throw new Error(`Invalid hour: ${hour}. Hour must be between 0 and 23.`);
+  }
+  if (min < 0 || min > 59) {
+    throw new Error(`Invalid minute: ${min}. Minute must be between 0 and 59.`);
+  }
+
+  if (format === "24h") {
+    // 24-hour format without time period
+    const hourStr = toKhmerNumeral(hour.toString().padStart(2, "0"));
+    const minStr = toKhmerNumeral(min.toString().padStart(2, "0"));
+    return `${hourStr}:${minStr}`;
+  } else {
+    // 12-hour format with time period
+    const period = getKhmerTimePeriod(hour);
+    const hour12 = hour % 12 || 12; // Convert to 12-hour format (0 becomes 12)
+    const hourStr = toKhmerNumeral(hour12.toString().padStart(2, "0"));
+    const minStr = toKhmerNumeral(min.toString().padStart(2, "0"));
+    return `${hourStr}:${minStr} ${period}`;
+  }
+}
+
+/**
+ * Format time with custom format string
+ * @param date - Date object or time object with hour, minute, and optional second
+ * @param formatString - Format string with tokens (see documentation)
+ * @returns Formatted time string in Khmer
+ *
+ * Format tokens:
+ * - H   : Hour in 24-hour format (0-23) in Khmer numerals
+ * - HH  : Hour in 24-hour format (00-23) padded, in Khmer numerals
+ * - Hr  : Hour in 24-hour format in Arabic numerals
+ * - HHr : Hour in 24-hour format padded, in Arabic numerals
+ * - h   : Hour in 12-hour format (1-12) in Khmer numerals
+ * - hh  : Hour in 12-hour format (01-12) padded, in Khmer numerals
+ * - hr  : Hour in 12-hour format in Arabic numerals
+ * - hhr : Hour in 12-hour format padded, in Arabic numerals
+ * - m   : Minute (0-59) in Khmer numerals
+ * - mm  : Minute (00-59) padded, in Khmer numerals
+ * - mr  : Minute in Arabic numerals
+ * - mmr : Minute padded, in Arabic numerals
+ * - s   : Second (0-59) in Khmer numerals
+ * - ss  : Second (00-59) padded, in Khmer numerals
+ * - sr  : Second in Arabic numerals
+ * - ssr : Second padded, in Arabic numerals
+ * - A   : Time period (ព្រឹក, រសៀល, ល្ងាច, យប់)
+ * - [text] : Literal text (escaped)
+ *
+ * @example
+ * const date = new Date(2024, 0, 1, 13, 25, 45);
+ *
+ * formatTime(date, 'Hម៉ោង mនាទី sវិនាទី');
+ * // Output: "១៣ម៉ោង ២៥នាទី ៤៥វិនាទី"
+ *
+ * formatTime(date, 'ម៉ោង hh:mm A');
+ * // Output: "ម៉ោង ០១:២៥ រសៀល"
+ *
+ * formatTime(date, 'HH:mm:ss');
+ * // Output: "១៣:២៥:៤៥"
+ *
+ * formatTime({ hour: 14, minute: 30, second: 0 }, 'hម៉ោង mនាទី A');
+ * // Output: "២ម៉ោង ៣០នាទី រសៀល"
+ */
+export function formatTime(
+  // date: Date | { hour: number; minute: number; second?: number },
+  date: KhmerConversionResult,
+  formatString?: string,
+): string {
+  const { gregorian } = date;
+
+  // let hour: number;
+  // let minute: number;
+  // let second: number;
+
+  // if (date instanceof Date) {
+  //   hour = date.getHours();
+  //   minute = date.getMinutes();
+  //   second = date.getSeconds();
+  // } else {
+  //   hour = gregorian.hour;
+  //   minute = gregorian.minute;
+  //   second = gregorian.second !== undefined ? gregorian.second : 0;
+  // }
+
+  const hour = gregorian.hour;
+  const minute = gregorian.minute;
+  const second = gregorian.second !== undefined ? gregorian.second : 0;
+
+  // Validate inputs
+  if (hour < 0 || hour > 23) {
+    throw new Error(`Invalid hour: ${hour}. Hour must be between 0 and 23.`);
+  }
+  if (minute < 0 || minute > 59) {
+    throw new Error(
+      `Invalid minute: ${minute}. Minute must be between 0 and 59.`,
+    );
+  }
+  if (second < 0 || second > 59) {
+    throw new Error(
+      `Invalid second: ${second}. Second must be between 0 and 59.`,
+    );
+  }
+
+  const hour12 = hour % 12 || 12;
+  const timePeriod = getKhmerTimePeriod(hour);
+
+  if (!formatString) {
+    // Default format
+    return toKhmerNumeral(
+      `ម៉ោង ${hour}:${minute.toString().padStart(2, "0")}នាទី ${timePeriod}`,
+    );
+  }
+
+  const formatRules: Record<string, () => string | number> = {
+    // 24-hour format
+    HHr: () => hour.toString().padStart(2, "0"),
+    Hr: () => hour,
+    HH: () => toKhmerNumeral(hour.toString().padStart(2, "0")),
+    H: () => toKhmerNumeral(hour),
+
+    // 12-hour format
+    hhr: () => hour12.toString().padStart(2, "0"),
+    hr: () => hour12,
+    hh: () => toKhmerNumeral(hour12.toString().padStart(2, "0")),
+    h: () => toKhmerNumeral(hour12),
+
+    // Minute
+    mmr: () => minute.toString().padStart(2, "0"),
+    mr: () => minute,
+    mm: () => toKhmerNumeral(minute.toString().padStart(2, "0")),
+    m: () => toKhmerNumeral(minute),
+
+    // Second
+    ssr: () => second.toString().padStart(2, "0"),
+    sr: () => second,
+    ss: () => toKhmerNumeral(second.toString().padStart(2, "0")),
+    s: () => toKhmerNumeral(second),
+
+    // Time period
+    A: () => timePeriod,
+  };
+
+  // Sort keys by length descending to match longer tokens first
+  const sortedKeys = Object.keys(formatRules).sort(
+    (a, b) => b.length - a.length,
+  );
+  const regex = new RegExp(`\\[([^\\]]+)\\]|(${sortedKeys.join("|")})`, "g");
+
+  const result = formatString.replace(regex, (match, escaped, token) => {
+    if (escaped) {
+      return escaped;
+    }
+    if (formatRules[token]) {
+      const value = formatRules[token]();
+      return String(value);
+    }
+    return match;
+  });
+
+  return result;
+}
+
 // Constants export
 export const constants = {
   LunarMonths,
@@ -1762,6 +1985,7 @@ export default {
   fromKhmer,
   getNewYear,
   format,
+  formatTime,
   fromDate,
   toDate,
   constants,

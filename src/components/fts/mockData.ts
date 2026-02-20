@@ -141,6 +141,21 @@ export const permissionType = [
   "ឈប់សម្រាកដោយមានកិច្ចការផ្ទាល់ខ្លួន",
 ];
 
+const months = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
 // Generator function
 const generateRows = (count: number): Data[] => {
   const data: Data[] = [];
@@ -156,8 +171,11 @@ const generateRows = (count: number): Data[] => {
     const randomName3 = names[Math.floor(Math.random() * names.length)];
     const randomPos = positions[Math.floor(Math.random() * positions.length)];
     const day = Math.floor(Math.random() * 28) + 1;
-    const month = Math.floor(Math.random() * 12) + 1;
-    const dateStr = `${day}/${month}/2026`;
+    const month = months[Math.floor(Math.random() * months.length)];
+    const dateStr = `${day}-${month}-2026`;
+    const hour = Math.floor(Math.random() * 11 + 1);
+    const minute = Math.floor(Math.random() * 59);
+    const ampm = Math.random() > 0.5 ? "AM" : "PM";
 
     data.push(
       createData(
@@ -172,7 +190,7 @@ const generateRows = (count: number): Data[] => {
         {
           originId: `DOC-${2026000 + i}`,
           acceptedDate: `${day}-Jan-2026`,
-          acceptedTime: `${Math.floor(Math.random() * 12) + 7}:00 ${Math.random() > 0.5 ? "AM" : "PM"}`,
+          acceptedTime: `${hour}:${minute.toString().padStart(2, "0")} ${ampm}`,
           originDoc:
             Math.random() > 0.3 ? "https://drive.google.com/..." : undefined,
           recieptant: randomName1,

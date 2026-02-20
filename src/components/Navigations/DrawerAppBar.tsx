@@ -34,6 +34,7 @@ import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import ThemeToggle from "../effect/themes/themeToggle";
 import RielIcon from "../icons/riel";
 import { navigate } from "next/dist/client/components/segment-cache/navigation";
+import FaHome from "../icons/home";
 
 // const drawerWidth = 250;
 // 1. Define the responsive width once
@@ -168,11 +169,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const navItems = [
-  { title: "ទំព័រដើម", icon: <HomeIcon /> },
-  { title: "ប្រព័ន្ធចរន្តឯកសារ", icon: <ContentPasteSearchIcon /> },
+  { title: "ទំព័រដើម", icon: <HomeIcon color="error" fontSize="medium" /> },
+  {
+    title: "ប្រព័ន្ធចរន្តឯកសារ",
+    icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />,
+  },
   {
     title: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស",
-    icon: <RielIcon sx={{ color: "success" }} />,
+    icon: <RielIcon color="success" fontSize="medium" />,
   },
 ];
 
