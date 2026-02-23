@@ -127,10 +127,10 @@ export default function NotFound() {
       <div>
         {/* <Mars /> */}
         <Jupyter />
-        {/* <TestPlanet /> */}
+        <TestPlanet />
         {/* <Sun /> */}
         {/* <Moon /> */}
-        <Earth size={100} />
+        {/* <Earth size={100} /> */}
         {/* <div
           style={{
             position: "absolute",

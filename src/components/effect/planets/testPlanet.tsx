@@ -1,320 +1,6 @@
-// import { FISHEYE_ID } from "@/types/constants";
-// import { CircleMask, Filter, Pattern } from "@/utils/componentUtils";
-// import { styled } from "@mui/material";
-
-// const PREFIX = "RazethPlanetJupiter";
-// const Root = styled("div", {
-//   name: PREFIX,
-//   slot: "Root",
-//   overridesResolver: (_props, styles) => styles.root,
-// })(({ theme }) => ({
-//   display: "flex",
-//   flexDirection: "column",
-//   justifyContent: "center",
-//   alignItems: "center",
-//   minHeight: "15vmin",
-//   height: "100vh",
-// }));
-
-// // Simplify the wrapper - we'll handle shadows in SVG
-// const JupiterWrapper = styled("div", {
-//   name: PREFIX,
-//   slot: "Content",
-//   overridesResolver: (_props, styles) => styles.content,
-// })(({ theme }) => ({
-//   position: "relative",
-//   borderRadius: "50%",
-//   overflow: "hidden",
-//   zIndex: 3,
-// }));
-
-// const waterMask = `${PREFIX}-water-mask`;
-// const groundMask = `${PREFIX}-ground-mask`;
-// const atmosphereMask = `${PREFIX}-atmosphere-mask`;
-// const atmosphereGradient = `${PREFIX}-atmosphere-gradient`;
-// const atmosphereMaskGradient = `${PREFIX}-atmosphere-mask-gradient`;
-// const groundPattern = `${PREFIX}-ground-pattern`;
-// const cloudsPattern = `${PREFIX}-clouds-pattern`;
-
-// function JupiterTest() {
-//   return (
-//     <Root>
-//       <JupiterWrapper>
-//         <svg id="jupiter" viewBox="-0.5 -0.5 101 101" width="200" height="200">
-//           <g transform="rotate(3.2, 50, 50)">
-//             {/* The Core Jupiter Circle with the complex shadow filter */}
-//             <circle
-//               cx="50"
-//               cy="50"
-//               r="50"
-//               fill={`url(#${groundPattern})`}
-//               filter="url(#complex-inset-shadow)"
-//             />
-
-//             {/* Overlay Gradient to give it a spherical/hot edge look */}
-//             <circle
-//               cx="50"
-//               cy="50"
-//               r="50"
-//               fill={`url(#${atmosphereGradient})`}
-//               mask={`url(#${atmosphereMask})`}
-//               pointerEvents="none"
-//             />
-
-//             <circle
-//               cx="35"
-//               cy="35"
-//               r="20"
-//               fill="rgba(255, 255, 255, .6)"
-//               filter="url(#glare-blur-filter)"
-//             />
-//           </g>
-//           <defs>
-//             {/* Filters */}
-//             <Filter id={FISHEYE_ID} />
-//             <filter
-//               id="glare-blur-filter"
-//               x="-100%"
-//               y="-100%"
-//               width="300%"
-//               height="300%"
-//             >
-//               <feGaussianBlur stdDeviation="10" />
-//             </filter>
-
-//             {/* Complex Inset Shadow Filter */}
-//             <filter
-//               id="complex-inset-shadow"
-//               x="-50%"
-//               y="-50%"
-//               width="200%"
-//               height="200%"
-//             >
-//               {/* Base source for shadows */}
-//               <feFlood
-//                 flood-color="#c3f4ff"
-//                 flood-opacity="0"
-//                 result="shadowSource"
-//               />
-
-//               {/* Outer white glow */}
-//               <feDropShadow
-//                 dx="0"
-//                 dy="0"
-//                 stdDeviation="0.1"
-//                 flood-color="white"
-//                 flood-opacity="0.2"
-//               />
-
-//               {/* First inner light blue glow */}
-//               <feFlood flood-color="#c3f4ff" result="color1" />
-//               <feComposite in2="SourceAlpha" operator="out" result="comp1" />
-//               <feGaussianBlur in="comp1" stdDeviation="0.4" result="blur1" />
-//               <feOffset dx="-0.05" dy="0" result="offset1" />
-//               <feComposite
-//                 operator="over"
-//                 in="offset1"
-//                 in2="SourceGraphic"
-//                 result="compOver1"
-//               />
-
-//               {/* Second inner black shadow */}
-//               <feFlood flood-color="black" result="color2" />
-//               <feComposite in2="SourceAlpha" operator="out" result="comp2" />
-//               <feGaussianBlur in="comp2" stdDeviation="1.25" result="blur2" />
-//               <feOffset dx="1.5" dy="0.2" result="offset2" />
-//               <feComposite
-//                 operator="over"
-//                 in="offset2"
-//                 in2="SourceGraphic"
-//                 result="compOver2"
-//               />
-
-//               {/* Third inner light blue glow with transparency */}
-//               <feFlood
-//                 floodColor="#c3f4ff"
-//                 floodOpacity="0.6"
-//                 result="color3"
-//               />
-//               <feComposite in2="SourceAlpha" operator="out" result="comp3" />
-//               <feGaussianBlur in="comp3" stdDeviation="1.7" result="blur3" />
-//               <feOffset dx="-2.4" dy="-0.2" result="offset3" />
-//               <feComposite
-//                 operator="over"
-//                 in="offset3"
-//                 in2="SourceGraphic"
-//                 result="compOver3"
-//               />
-
-//               {/* Fourth large black inner shadow */}
-//               <feFlood
-//                 flood-color="black"
-//                 flood-opacity="0.4"
-//                 result="color4"
-//               />
-//               <feComposite in2="SourceAlpha" operator="out" result="comp4" />
-//               <feGaussianBlur in="comp4" stdDeviation="2.2" result="blur4" />
-//               <feOffset dx="25" dy="0" result="offset4" />
-//               <feComposite
-//                 operator="over"
-//                 in="offset4"
-//                 in2="SourceGraphic"
-//                 result="compOver4"
-//               />
-
-//               {/* Fifth medium black inner shadow */}
-//               <feFlood
-//                 flood-color="black"
-//                 flood-opacity="0.666"
-//                 result="color5"
-//               />
-//               <feComposite in2="SourceAlpha" operator="out" result="comp5" />
-//               <feGaussianBlur in="comp5" stdDeviation="1.9" result="blur5" />
-//               <feOffset dx="15" dy="0" result="offset5" />
-//               <feComposite
-//                 operator="over"
-//                 in="offset5"
-//                 in2="SourceGraphic"
-//                 result="compOver5"
-//               />
-
-//               <feMerge>
-//                 <feMergeNode in="SourceGraphic" />
-//                 <feMergeNode in="offset1" />
-//                 <feMergeNode in="offset2" />
-//                 <feMergeNode in="offset3" />
-//                 <feMergeNode in="offset4" />
-//                 <feMergeNode in="offset5" />
-//               </feMerge>
-//             </filter>
-
-//             {/* Alternative Simplified Filter (often works better) */}
-//             <filter
-//               id="jupiter-shadow-simple"
-//               x="-100%"
-//               y="-100%"
-//               width="300%"
-//               height="300%"
-//             >
-//               <feDropShadow
-//                 dx="0"
-//                 dy="0"
-//                 stdDeviation="0.1"
-//                 flood-color="white"
-//                 flood-opacity="0.2"
-//               />
-
-//               <feMorphology
-//                 operator="dilate"
-//                 radius="0.5"
-//                 in="SourceAlpha"
-//                 result="thicker"
-//               />
-//               <feGaussianBlur in="thicker" stdDeviation="1" result="blurred" />
-
-//               <feFlood flood-color="#c3f4ff" result="blueGlow" />
-//               <feComposite
-//                 in="blueGlow"
-//                 in2="blurred"
-//                 operator="in"
-//                 result="blueInner"
-//               />
-//               <feOffset dx="-0.5" dy="0" />
-
-//               <feFlood flood-color="black" result="blackShadow" />
-//               <feComposite
-//                 in="blackShadow"
-//                 in2="blurred"
-//                 operator="in"
-//                 result="blackInner"
-//               />
-//               <feOffset dx="1.5" dy="0.2" />
-
-//               <feMerge>
-//                 <feMergeNode in="blueInner" />
-//                 <feMergeNode in="blackInner" />
-//                 <feMergeNode in="SourceGraphic" />
-//               </feMerge>
-//             </filter>
-
-//             <CircleMask
-//               id={atmosphereMask}
-//               x={-5}
-//               y={-5}
-//               width={110}
-//               height={110}
-//               r={55}
-//               pattern={`url(#${atmosphereMaskGradient})`}
-//             />
-
-//             <radialGradient
-//               id={atmosphereMaskGradient}
-//               cx="50%"
-//               cy="50%"
-//               r="50%"
-//               fx="50%"
-//               fy="50%"
-//             >
-//               <stop offset="50%" stopColor="white" stopOpacity="0" />
-//               <stop offset="90%" stopColor="white" stopOpacity="1" />
-//               <stop offset="100%" stopColor="white" stopOpacity="0" />
-//             </radialGradient>
-
-//             <linearGradient
-//               id={atmosphereGradient}
-//               x1="0%"
-//               y1="0%"
-//               x2="0%"
-//               y2="100%"
-//             >
-//               <stop offset="0%" stopColor="rgb(248, 199, 117)" />
-//               <stop offset="5%" stopColor="rgb(184, 160, 107)" />
-//               <stop offset="10%" stopColor="rgb(164, 136, 83)" />
-//               <stop offset="15%" stopColor="rgb(189, 163, 114)" />
-//               <stop offset="20%" stopColor="rgb(156, 124, 82)" />
-//               <stop offset="25%" stopColor="rgb(229, 226, 195)" />
-//               <stop offset="30%" stopColor="rgb(189, 150, 96)" />
-//               <stop offset="35%" stopColor="rgb(200, 220, 226)" />
-//               <stop offset="40%" stopColor="rgb(123, 48, 0)" />
-//               <stop offset="45%" stopColor="rgb(223, 174, 100)" />
-//               <stop offset="55%" stopColor="rgb(221, 199, 109)" />
-//               <stop offset="60%" stopColor="rgb(203, 167, 96)" />
-//               <stop offset="65%" stopColor="rgb(208, 146, 83)" />
-//               <stop offset="70%" stopColor="rgb(233, 249, 254)" />
-//               <stop offset="75%" stopColor="rgb(214, 197, 151)" />
-//               <stop offset="80%" stopColor="rgb(183, 151, 115)" />
-//               <stop offset="85%" stopColor="rgb(183, 175, 160)" />
-//               <stop offset="90%" stopColor="rgb(206, 204, 169)" />
-//               <stop offset="95%" stopColor="rgb(165, 147, 90)" />
-//               <stop offset="100%" stopColor="rgb(181, 160, 117)" />
-//             </linearGradient>
-
-//             <Pattern
-//               id={groundPattern}
-//               duration={60}
-//               width={225.45}
-//               to={225.45}
-//               href="/static/textures/jupiter_4k.png"
-//             />
-
-//             <Pattern
-//               id={cloudsPattern}
-//               duration={35}
-//               href="/static/textures/earth_cloud.png"
-//             />
-//           </defs>
-//         </svg>
-//       </JupiterWrapper>
-//     </Root>
-//   );
-// }
-
-// export default JupiterTest;
-
 import { FISHEYE_ID } from "@/types/constants";
 import { CircleMask, Filter, Pattern } from "@/utils/componentUtils";
 import { styled } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
 
 const PREFIX = "RazethPlanetEarth";
 const Root = styled("div", {
@@ -332,6 +18,7 @@ const Root = styled("div", {
   // height: "100vh",
 }));
 
+// Create a styled wrapper that matches the Sun's shape
 const EarthWrapper = styled("div", {
   name: PREFIX,
   slot: "Content",
@@ -356,7 +43,6 @@ const EarthWrapper = styled("div", {
   willChange: "transform",
   transform: "translate3d(0,0,0)",
   backfaceVisibility: "hidden",
-  // webkit-backface-visibility": "hidden",
   // --- THE FIX ---
   // We create a pseudo-element that sits ON TOP of the SVG
   // "&::before": {
@@ -538,58 +224,76 @@ const atmosphereMaskGradient = `${PREFIX}-atmosphere-mask-gradient`;
 const lightFilter = `${PREFIX}-light-filter`;
 const groundPattern = `${PREFIX}-ground-pattern`;
 const cloudsPattern = `${PREFIX}-clouds-pattern`;
+const sphericalWarp = `${PREFIX}-spherical-warp`;
 
-function TestPlanet({ size = 90 }: { size?: number }) {
-  const sizeFactor = size / 90;
-
+function Earth({ size = 90 }: { size?: number }) {
+  // Calculate precise scaling factor (90vmin = reference size)
+  // const sizeFactor = size / 90;
+  // const sizeFactor = Math.max(0.18, size / 90); // Prevents glow disappearance at tiny sizes
+  const sizeFactor = size; // Prevents glow disappearance at tiny sizes
   return (
     <Root size={size}>
       <EarthWrapper sizeFactor={sizeFactor}>
-        <svg id="earth" viewBox="-0.5 -0.5 101 101" width="100%" height="100%">
-          <g transform="rotate(23.5, 50, 50)">
-            {" "}
-            {/* Your existing rotation */}
-            {/* ... water layer remains the same ... */}
-            <rect
-              x="0"
-              y="0"
-              width="100"
-              height="100"
-              // fill="rgba(0, 0, 200, 1)"
-              fill="url(#oceanGrad)"
-              mask={`url(#${waterMask})`}
-            />
-            {/* REALISTIC SPHERICAL GROUND LAYER */}
-            <rect
-              x="0"
-              y="0"
-              width="100"
-              height="100"
-              fill="url(#earthSurface)"
-              mask={`url(#${groundMask})`}
-              filter="url(#spherical-distortion)"
-            />
-            {/* ... clouds layer remains the same ... */}
-            {/* <rect
-              x="0"
-              y="0"
-              width="100"
-              height="100"
-              fill="rgba(255, 255, 255,1)"
-              mask={`url(#${cloudsMask})`}
-            /> */}
-            {/* REALISTIC LIGHTING (MATCHES NASA SUN ANGLE) */}
-            <rect
-              x="0"
-              y="0"
-              width="100"
-              height="100"
-              fill="url(#spherical-lighting)"
-              // mask={`url(#${groundMask})`}
-              opacity="0.25"
-            />
-            {/* ... atmosphere and glare remain the same ... */}
-            <rect
+        <svg
+          id="earth"
+          viewBox="-0.5 -0.5 101 101"
+          width="100%"
+          height="100%"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          {/* Apply the new lighting filter to this group. 
+              Note: We keep the rotation on a child group or apply the filter AFTER rotation 
+              so the light stays "fixed" relative to the view, or rotates with it depending on preference.
+          */}
+          {/* <g filter={`url(#${sphericalWarp})`}> */}
+          <g>
+            <g transform="rotate(23.5, 50, 50)">
+              {/* Base Layers (Water, Ground and Clouds) */}
+              {/* <rect
+                x="0"
+                y="0"
+                width="100"
+                height="100"
+                // fill="rgba(0, 0, 200, 1)"
+                fill="url(#oceanGrad)"
+                mask={`url(#${waterMask})`}
+              /> */}
+              {/* <rect
+                x="0"
+                y="0"
+                width="100"
+                height="100"
+                fill="rgba(0, 100, 0, 1)"
+                // fill="transparent"
+                // filter={`url(#${lightFilter})`}
+                // fill="url(#earthSurface)"
+                mask={`url(#${groundMask})`}
+                filter={`url(#${sphericalWarp})`}
+              /> */}
+
+              <circle
+                cx="50"
+                cy="50"
+                r="100"
+                fill="url(#earthSurface)"
+                filter={`url(#${sphericalWarp})`}
+                // filter="url(#sun-glow)"
+                // mask={`url(#${atmosphereMask})`}
+              />
+
+              {/* <rect
+                x="0"
+                y="0"
+                width="150"
+                height="150"
+                fill="rgba(255, 255, 255, 1)"
+                mask={`url(#${cloudsMask})`}
+                filter={`url(#${sphericalWarp})`}
+                // filter={`url(#${lightFilter})`}
+              /> */}
+
+              {/* Atmosphere and Glare */}
+              {/* <rect
               x="-5"
               y="-5"
               width="110"
@@ -605,11 +309,107 @@ function TestPlanet({ size = 90 }: { size?: number }) {
               fill="rgba(255, 255, 255, 0.35)"
               filter="url(#glare-blur-filter)"
               overflow={"hidden"}
-            />
+            /> */}
+            </g>
           </g>
-
           <defs>
-            {/* ... your existing filters and masks ... */}
+            {/* Filters */}
+            {/* <Filter id={FISHEYE_ID} /> */}
+            {/* Spherical Warp Filter - Creates the 3D wrap effect */}
+            <filter
+              id={sphericalWarp}
+              // height="360"
+              // width="360"
+              // x="-90"
+              // y="-90"
+              // colorInterpolationFilters="sRGB"
+              // width="1"
+              // height="1"
+              // x="0"
+              // y="0"
+            >
+              {/* <feImage
+              href="data:image/svg+xml;charset=utf-8,%3Csvg width='100%' height='100%' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='gR' x1='0%25' y1='0%25' x2='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23000'/%3E%3Cstop offset='100%25' stop-color='%23f00'/%3E%3C/linearGradient%3E%3ClinearGradient id='gB' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23000'/%3E%3Cstop offset='100%25' stop-color='%2300f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23gR)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23gB)' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
+              preserveAspectRatio="none"
+              result="MAP"
+            />  */}
+              {/* 
+              <feImage
+                href="data:image/svg+xml;charset=utf-8,%3Csvg width='256' height='256' viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='gR' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23800000'/%3E%3Cstop offset='100%25' stop-color='%23ff0000'/%3E%3C/radialGradient%3E%3CradialGradient id='gB' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23000080'/%3E%3Cstop offset='100%25' stop-color='%230000ff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23gR)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23gB)' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                preserveAspectRatio="none"
+                result="MAP"
+              /> */}
+              <feImage
+                // href="data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='horiz' x1='0%25' x2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff0000'/%3E%3Cstop offset='50%25' stop-color='%23808080'/%3E%3Cstop offset='100%25' stop-color='%23000000'/%3E%3C/linearGradient%3E%3ClinearGradient id='vertmod' y1='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='35%25' stop-color='%23404040'/%3E%3Cstop offset='65%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/linearGradient%3E%3CradialGradient id='radmod' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23horiz)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23vertmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='url(%23radmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='%23000080' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
+                // href="data:image/svg+xml,%3Csvg%20class%3D%22displacement-image%22%20viewBox%3D%220%200%20336%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%22red%22%20x1%3D%22100%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%220%25%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23000%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22red%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%22blue%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23000%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22blue%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%20%20%3C!--%20backdrop%20--%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22336%22%20height%3D%2296%22%20fill%3D%22black%22%2F%3E%0A%20%20%20%20%20%20%3C!--%20red%20linear%20--%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22336%22%20height%3D%2296%22%20rx%3D%2216%22%20fill%3D%22url(%23red)%22%2F%3E%0A%20%20%20%20%20%20%3C!--%20blue%20linear%20--%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22336%22%20height%3D%2296%22%20rx%3D%2216%22%20fill%3D%22url(%23blue)%22%20style%3D%22mix-blend-mode%3A%20difference%22%2F%3E%0A%20%20%20%20%20%20%3C!--%20block%20out%20distortion%20--%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%223.3600000000000003%22%20y%3D%223.3600000000000003%22%20width%3D%22329.28%22%20height%3D%2289.28%22%20rx%3D%2216%22%20fill%3D%22hsl(0%200%25%2050%25%20%2F%200.93%22%20style%3D%22filter%3Ablur(11px)%22%2F%3E%0A%20%20%20%20%3C%2Fsvg%3E"
+                href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 100 100'%3E %3Cdefs%3E %3C!-- Red and blue gradients for X/Y displacement --%3E %3ClinearGradient id='redGradient20' x1='1' x2='0' y1='0' y2='0' color-interpolation='sRGB' gradientUnits='objectBoundingBox'%3E %3Cstop offset='0%25' stop-color='rgb(255,0,0)' /%3E %3Cstop offset='100%25' stop-color='rgba(255,0,0,0)' /%3E %3C/linearGradient%3E %3ClinearGradient id='blueGradient20' x1='0' x2='0' y1='1' y2='0' color-interpolation='sRGB' gradientUnits='objectBoundingBox'%3E %3Cstop offset='0%25' stop-color='rgb(0,0,255)' /%3E %3Cstop offset='100%25' stop-color='rgba(0,0,255,0)' /%3E %3C/linearGradient%3E %3CradialGradient id='orthographicGradient' cx='0.5' cy='0.5' r='0.5'%3E %3Cstop offset='0%25' stop-color='white' stop-opacity='0.000' /%3E %3Cstop offset='10%25' stop-color='white' stop-opacity='0.005' /%3E %3Cstop offset='20%25' stop-color='white' stop-opacity='0.020' /%3E %3Cstop offset='30%25' stop-color='white' stop-opacity='0.046' /%3E %3Cstop offset='40%25' stop-color='white' stop-opacity='0.083' /%3E %3Cstop offset='50%25' stop-color='white' stop-opacity='0.134' /%3E %3Cstop offset='60%25' stop-color='white' stop-opacity='0.200' /%3E %3Cstop offset='70%25' stop-color='white' stop-opacity='0.286' /%3E %3Cstop offset='80%25' stop-color='white' stop-opacity='0.400' /%3E %3Cstop offset='90%25' stop-color='white' stop-opacity='0.564' /%3E %3Cstop offset='100%25' stop-color='white' stop-opacity='1.000' /%3E %3C/radialGradient%3E %3C!-- Apply as mask --%3E %3Cmask id='displacementMask'%3E %3Crect width='100' height='100' fill='black' /%3E %3Ccircle cx='50' cy='50' r='50' fill='url(%23orthographicGradient)' /%3E %3C/mask%3E %3C/defs%3E %3C!-- Neutral gray background --%3E %3Crect fill='rgb(127,127,127)' width='100' height='100' /%3E %3Cg mask='url(%23displacementMask)'%3E %3Crect fill='rgb(0,255,0)' width='100' height='100' /%3E %3Crect style='mix-blend-mode: normal' fill='url(%23redGradient20)' width='100' height='100' /%3E %3Crect style='mix-blend-mode: exclusion' fill='url(%23blueGradient20)' width='100' height='100' /%3E %3C/g%3E%3C/svg%3E"
+                // x="-25"
+                // y="-25"
+                // width="125%"
+                // height="125%"
+                width="180"
+                height="180"
+                x="-90"
+                y="-90"
+                preserveAspectRatio="none"
+                result="MAP"
+              />
+
+              <feDisplacementMap
+                id="dispMap"
+                in="SourceGraphic"
+                in2="MAP"
+                // scale="-50"
+                scale="90"
+                xChannelSelector="R"
+                yChannelSelector="B"
+              ></feDisplacementMap>
+            </filter>
+            <filter
+              id={sphericalWarp + "01"}
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
+            >
+              {/* Create a radial displacement map for spherical distortion */}
+              <feGaussianBlur
+                in="SourceGraphic"
+                stdDeviation="0"
+                result="blur"
+              />
+
+              {/* Displacement using radial gradient for sphere effect */}
+              <feImage href="#sphereDisplacementMap" result="displacementMap" />
+
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="displacementMap"
+                scale="35"
+                xChannelSelector="R"
+                yChannelSelector="G"
+                result="displaced"
+              />
+
+              {/* Add subtle blur to edges for realism */}
+              <feGaussianBlur
+                in="displaced"
+                // stdDeviation="0.1"
+                result="softened"
+              />
+
+              {/* Composite back */}
+              <feComposite in="softened" in2="SourceGraphic" operator="atop" />
+            </filter>
+
             <filter
               id="glare-blur-filter"
               x="-100%"
@@ -644,19 +444,28 @@ function TestPlanet({ size = 90 }: { size?: number }) {
             */}
             <filter
               id={lightFilter}
-              // x="-50%"
-              // y="-50%"
-              // width="200%"
-              // height="200%"
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
             >
               {/* 1. Define the lens map using feImage with a Data URI. 
                 This is a radial gradient: White center (displacement) 
                 -> Black edge (no displacement).
               */}
-              {/* <feImage
-                href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23fff'/%3E%3Cstop offset='100%25' stop-color='%23000'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E"
+              <feImage
+                href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='15%25' cy='35%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23fff'/%3E%3Cstop offset='100%25' stop-color='%23000'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E"
                 result="lens"
-              /> */}
+              />
+
+              {/* 1. feGaussianBlur: Optional, slightly softens the input before lighting 
+                     to avoid sharp pixel artifacts on the light map.
+              */}
+              <feGaussianBlur
+                in="SourceGraphic"
+                stdDeviation="0"
+                result="lens"
+              />
 
               {/* 2. Apply the displacement. 
               scale="25": How strong the 'bulge' is.
@@ -665,16 +474,7 @@ function TestPlanet({ size = 90 }: { size?: number }) {
               Since our lens is grayscale, R=G, so it shifts diagonally outward from the dark edges.
             */}
 
-              {/* 1. feGaussianBlur: Optional, slightly softens the input before lighting 
-                     to avoid sharp pixel artifacts on the light map.
-              */}
-              <feGaussianBlur
-                in="SourceGraphic"
-                stdDeviation="10"
-                result="blur"
-              />
-
-              <feDisplacementMap in="SourceGraphic" in2="blur" scale="3" />
+              <feDisplacementMap in="SourceGraphic" in2="lens" scale="3" />
               {/* <feDisplacementMap
                 in="SourceGraphic"
                 in2="lens"
@@ -693,13 +493,14 @@ function TestPlanet({ size = 90 }: { size?: number }) {
                 result="specOut"
                 specularConstant="1.5"
                 specularExponent="25"
-                // lightingColor="#ffffee"
-                lightingColor="$#FFFFFF"
+                lightingColor="#ffffee"
+                // lightingColor={`url(#${atmosphereGradient})`}
               >
                 {/* fePointLight: The bulb.
                     x, y: 50, 50 places it in the dead center.
                     z: The height above the screen. Lower Z = more intense, smaller spot. Higher Z = softer, wider spread.
                 */}
+                {/* <fePointLight x="-15" y="75" z="15" /> */}
                 <fePointLight x="15" y="50" z="25" />
               </feSpecularLighting>
 
@@ -718,82 +519,7 @@ function TestPlanet({ size = 90 }: { size?: number }) {
                 k4="0"
               />
             </filter>
-            {/* // --- NEW FISHEYE FILTER --- // 
-            This creates a "lens" distortion map using a radial gradient. 
-            When applied to the sliding texture, it magnifies the center and compresses the edges, 
-            simulating spherical rotation. This gives the illusion of a 3D sphere rotating,
-            spherical rotation. */}
-            <filter
-              id={FISHEYE_ID + "lala"}
-              x="-50%"
-              y="-50%"
-              width="200%"
-              height="200%"
-            >
-              {/* 1. Define the lens map using feImage with a Data URI. 
-                This is a radial gradient: White center (displacement) 
-                -> Black edge (no displacement).
-              */}
-              <feImage
-                href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23fff'/%3E%3Cstop offset='100%25' stop-color='%23000'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E"
-                result="lens"
-              />
 
-              {/* 2. Apply the displacement. 
-              scale="25": How strong the 'bulge' is.
-              xChannelSelector="R": Use the Red channel of the lens to shift pixels horizontally.
-              yChannelSelector="G": Use Green channel for vertical. 
-              Since our lens is grayscale, R=G, so it shifts diagonally outward from the dark edges.
-            */}
-              <feDisplacementMap
-                in="SourceGraphic"
-                in2="lens"
-                scale="25"
-                xChannelSelector="R"
-                yChannelSelector="G"
-              />
-            </filter>
-            {/* SPHERICAL PROJECTION FILTER */}
-            <filter
-              id="spherical-distortion"
-              x="-50%"
-              y="-50%"
-              width="200%"
-              height="200%"
-            >
-              <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur" />{" "}
-              {/* Reduced from 10 */}
-              {/* NASA-optimized distortion curve */}
-              <feComponentTransfer in="blur" result="distortion-map">
-                <feFuncA
-                  type="table"
-                  tableValues="0 0 0 0.05 0.15 0.3 0.5 0.7 0.85 0.95 1"
-                />
-              </feComponentTransfer>
-              {/* Perfect scale for NASA texture */}
-              <feDisplacementMap
-                in="SourceGraphic"
-                in2="distortion-map"
-                scale="18"
-                xChannelSelector="A"
-                yChannelSelector="A"
-              />
-              <feComposite in="SourceGraphic" in2="Result" operator="in" />
-              {/* Critical: Add atmospheric limb enhancement */}
-              <feComponentTransfer>
-                <feFuncR type="gamma" amplitude="1.1" exponent="0.9" />
-                <feFuncG type="gamma" amplitude="1.1" exponent="0.9" />
-                <feFuncB type="gamma" amplitude="1.2" exponent="0.85" />
-              </feComponentTransfer>
-            </filter>
-            {/* REALISTIC SUNLIGHT GRADIENT */}
-
-            <radialGradient id="spherical-lighting" cx="42%" cy="48%" r="110%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.4)" />
-              <stop offset="30%" stopColor="rgba(255,255,255,0.25)" />
-              <stop offset="65%" stopColor="rgba(255,255,255,0.08)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-            </radialGradient>
             <radialGradient id="oceanGrad" cx="50%" cy="50%" r="85%">
               {/* <stop offset="0%" stopColor="rgb(30, 64, 175)" /> */}
               {/* Deep Blue */}
@@ -818,7 +544,7 @@ function TestPlanet({ size = 90 }: { size?: number }) {
               y2="100%"
             >
               {/* <stop offset="0%" stopColor="rgb(0,127,255)" stopOpacity="1" />
-                          <stop offset="100%" stopColor="rgb(0,0,255)" stopOpacity=".5" /> */}
+              <stop offset="100%" stopColor="rgb(0,0,255)" stopOpacity=".5" /> */}
               <stop offset="0%" stopColor="rgb(255, 2555, 255, 1)" />
               <stop offset="25%" stopColor="rgb(72, 89, 180, 0.15)" />
               <stop
@@ -838,6 +564,18 @@ function TestPlanet({ size = 90 }: { size?: number }) {
               <stop offset="50%" stopColor="white" stopOpacity="0" />
               <stop offset="90%" stopColor="white" stopOpacity="1" />
               <stop offset="100%" stopColor="white" stopOpacity="0" />
+            </radialGradient>
+            {/* Sphere Displacement Map (hidden element used by filter) */}
+            <radialGradient
+              id="sphereDisplacementMap"
+              cx="50%"
+              cy="50%"
+              r="50%"
+            >
+              <stop offset="0%" stopColor="rgb(128, 128, 128)" />
+              <stop offset="60%" stopColor="rgb(140, 140, 140)" />
+              <stop offset="85%" stopColor="rgb(180, 180, 180)" />
+              <stop offset="100%" stopColor="rgb(128, 128, 128)" />
             </radialGradient>
             <CircleMask
               id={atmosphereMask}
@@ -861,38 +599,34 @@ function TestPlanet({ size = 90 }: { size?: number }) {
               id={groundMask}
               pattern={`url(#${groundPattern})`}
               fill="white"
-              filterId={lightFilter}
+              // filterId={lightFilter}
+              // filterId={sphericalWarp}
             />
             <CircleMask
               id={cloudsMask}
               pattern={`url(#${cloudsPattern})`}
-              // fill="white"
+              fill={`url(#${atmosphereGradient})`}
               // filterId={lightFilter}
             />
             <Pattern
               id={groundPattern}
               duration={50}
-              width={179.8}
-              to={179.8}
+              // width={179.8}
+              // to={179.8}
+              // width={200}
+              // to={200}
               // patternUnits={"objectBoundingBox"}
-              href="/static/textures/earth.svg"
+              href="/static/textures/earth-globe.svg"
             />
-            {/* <Pattern
-              id={"earthSurface"}
-              duration={50}
-              width={179.8}
-              to={179.8}
-              href="/static/textures/earth_pattern.png"
-            /> */}
-            {/* // Replace your current earthSurface pattern with this EXACT */}
-            {/* implementation */}
             <Pattern
-              id="earthSurface"
+              id={"earthSurface"}
+              // y={4.5}
+              // x={}
               duration={50}
-              width={200}
-              to={200}
-              href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/july/world.topo.bathy.200407.3x21600x10800.jpg"
-              // preserveAspectRatio="none"
+              // width={200}
+              // to={200}
+              // href="/static/textures/globe.jpg"
+              href="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/3840px-Blue_Marble_2002.png"
             />
             <Pattern
               id={cloudsPattern}
@@ -907,4 +641,4 @@ function TestPlanet({ size = 90 }: { size?: number }) {
   );
 }
 
-export default TestPlanet;
+export default Earth;
