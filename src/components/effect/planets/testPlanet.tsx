@@ -249,7 +249,7 @@ function Earth({ size = 90 }: { size?: number }) {
           <g>
             <g transform="rotate(23.5, 50, 50)">
               {/* Base Layers (Water, Ground and Clouds) */}
-              {/* <rect
+              <rect
                 x="0"
                 y="0"
                 width="100"
@@ -257,29 +257,29 @@ function Earth({ size = 90 }: { size?: number }) {
                 // fill="rgba(0, 0, 200, 1)"
                 fill="url(#oceanGrad)"
                 mask={`url(#${waterMask})`}
-              /> */}
-              {/* <rect
+              />
+              <rect
                 x="0"
                 y="0"
                 width="100"
                 height="100"
-                fill="rgba(0, 100, 0, 1)"
+                // fill="rgba(0, 100, 0, 1)"
                 // fill="transparent"
                 // filter={`url(#${lightFilter})`}
-                // fill="url(#earthSurface)"
+                fill="url(#earthSurface)"
                 mask={`url(#${groundMask})`}
-                filter={`url(#${sphericalWarp})`}
-              /> */}
+                // filter={`url(#${sphericalWarp})`}
+              />
 
-              <circle
+              {/* <circle
                 cx="50"
                 cy="50"
                 r="100"
                 fill="url(#earthSurface)"
-                filter={`url(#${sphericalWarp})`}
+                // filter={`url(#${sphericalWarp})`}
                 // filter="url(#sun-glow)"
                 // mask={`url(#${atmosphereMask})`}
-              />
+              /> */}
 
               {/* <rect
                 x="0"
@@ -318,10 +318,10 @@ function Earth({ size = 90 }: { size?: number }) {
             {/* Spherical Warp Filter - Creates the 3D wrap effect */}
             <filter
               id={sphericalWarp}
-              // height="360"
-              // width="360"
-              // x="-90"
-              // y="-90"
+              height="360"
+              width="360"
+              x="-90"
+              y="-90"
               // colorInterpolationFilters="sRGB"
               // width="1"
               // height="1"
@@ -337,16 +337,7 @@ function Earth({ size = 90 }: { size?: number }) {
               preserveAspectRatio="none"
               result="MAP"
             />  */}
-              {/* 
-              <feImage
-                href="data:image/svg+xml;charset=utf-8,%3Csvg width='256' height='256' viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='gR' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23800000'/%3E%3Cstop offset='100%25' stop-color='%23ff0000'/%3E%3C/radialGradient%3E%3CradialGradient id='gB' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23000080'/%3E%3Cstop offset='100%25' stop-color='%230000ff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23gR)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23gB)' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
-                x="0"
-                y="0"
-                width="100%"
-                height="100%"
-                preserveAspectRatio="none"
-                result="MAP"
-              /> */}
+
               <feImage
                 // href="data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='horiz' x1='0%25' x2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff0000'/%3E%3Cstop offset='50%25' stop-color='%23808080'/%3E%3Cstop offset='100%25' stop-color='%23000000'/%3E%3C/linearGradient%3E%3ClinearGradient id='vertmod' y1='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='35%25' stop-color='%23404040'/%3E%3Cstop offset='65%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/linearGradient%3E%3CradialGradient id='radmod' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23404040'/%3E%3Cstop offset='100%25' stop-color='%23ffffff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23horiz)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23vertmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='url(%23radmod)' style='mix-blend-mode:multiply'/%3E%3Crect width='100%25' height='100%25' fill='%23000080' style='mix-blend-mode:screen'/%3E%3C/svg%3E"
                 // href="data:image/svg+xml,%3Csvg%20class%3D%22displacement-image%22%20viewBox%3D%220%200%20336%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%22red%22%20x1%3D%22100%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%220%25%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23000%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22red%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%22blue%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23000%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22blue%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%20%20%3C!--%20backdrop%20--%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22336%22%20height%3D%2296%22%20fill%3D%22black%22%2F%3E%0A%20%20%20%20%20%20%3C!--%20red%20linear%20--%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22336%22%20height%3D%2296%22%20rx%3D%2216%22%20fill%3D%22url(%23red)%22%2F%3E%0A%20%20%20%20%20%20%3C!--%20blue%20linear%20--%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22336%22%20height%3D%2296%22%20rx%3D%2216%22%20fill%3D%22url(%23blue)%22%20style%3D%22mix-blend-mode%3A%20difference%22%2F%3E%0A%20%20%20%20%20%20%3C!--%20block%20out%20distortion%20--%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%223.3600000000000003%22%20y%3D%223.3600000000000003%22%20width%3D%22329.28%22%20height%3D%2289.28%22%20rx%3D%2216%22%20fill%3D%22hsl(0%200%25%2050%25%20%2F%200.93%22%20style%3D%22filter%3Ablur(11px)%22%2F%3E%0A%20%20%20%20%3C%2Fsvg%3E"
@@ -359,7 +350,7 @@ function Earth({ size = 90 }: { size?: number }) {
                 height="180"
                 x="-90"
                 y="-90"
-                preserveAspectRatio="none"
+                // preserveAspectRatio="none"
                 result="MAP"
               />
 
@@ -368,7 +359,7 @@ function Earth({ size = 90 }: { size?: number }) {
                 in="SourceGraphic"
                 in2="MAP"
                 // scale="-50"
-                scale="90"
+                scale="100"
                 xChannelSelector="R"
                 yChannelSelector="B"
               ></feDisplacementMap>
@@ -597,10 +588,12 @@ function Earth({ size = 90 }: { size?: number }) {
             />
             <CircleMask
               id={groundMask}
+              // x={-50}
+              // y={-50}
               pattern={`url(#${groundPattern})`}
-              fill="white"
+              // fill="white"
               // filterId={lightFilter}
-              // filterId={sphericalWarp}
+              filterId={sphericalWarp}
             />
             <CircleMask
               id={cloudsMask}
@@ -616,7 +609,7 @@ function Earth({ size = 90 }: { size?: number }) {
               // width={200}
               // to={200}
               // patternUnits={"objectBoundingBox"}
-              href="/static/textures/earth-globe.svg"
+              href="/static/textures/globe-01.svg"
             />
             <Pattern
               id={"earthSurface"}

@@ -13,14 +13,14 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        /* height: 215px; */
+        height: 215px;
       }
       #globeMap {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        /* height: 200px; */
+        height: 200px;
       }
       #scl {
         transition: 1s;
@@ -28,17 +28,17 @@
     </style>
   </head>
   <body>
-    <svg viewBox="-0.5 -0.5 101 101" width="100%" height="100%" id="glow">
-      <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+    <svg viewBox="0 0 100 100" width="100%" height="100%" id="glow">
+      <filter id="blur" x="-100%" y="-100%" width="300%" height="300%">
         <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
       </filter>
-      <filter id="turb" x="-50%" y="-50%" width="200%" height="200%">
+      <filter id="turb" x="-100%" y="-100%" width="300%" height="300%">
         <feTurbulence
           type="turbulence"
           baseFrequency="0.05"
           numOctaves="102.5"
           result="turbulence"
-          seed="70"
+          seed="69"
         />
         <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="5">
           <animate
@@ -51,18 +51,15 @@
         </feDisplacementMap>
       </filter>
       <circle
-        cx="50"
-        cy="50"
-        r="45"
-        fill="rgb(20, 24, 87)"
+        cx="-2"
+        cy="-2"
+        r="80"
+        fill="#fff"
         filter="url(#blur) url(#turb)"
       ></circle>
     </svg>
     <svg
-      viewBox="-0.5 -0.5 101 101"
-      width="100%"
-      height="100%"
-      preserveAspectRatio="xMidYMid slice"
+      viewBox="-90 -90 180 180"
       xmlns="http://www.w3.org/2000/svg"
       id="globeMap"
     >
@@ -95,7 +92,7 @@
       </filter>
 
       <mask id="globe">
-        <circle cx="50" cy="50" r="50" fill="#fff" />
+        <circle cx="0" cy="0" r="90" fill="#fff" />
       </mask>
       <radialGradient id="grad">
         <stop offset="33%" stop-color="rgba(0,0,0,0)" />
