@@ -39,7 +39,14 @@ export const Pattern = (inProps: PatternProps) => {
         dur={`${duration}s`}
         repeatCount={repeatCount}
       />
-      <image x={x} y={y} width={width} height={height} href={href} />
+      <image
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        href={href}
+        preserveAspectRatio="none"
+      />
     </pattern>
   );
 };
