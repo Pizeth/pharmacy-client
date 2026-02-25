@@ -76,11 +76,10 @@ export default function NotFound() {
           <div
             key={star.id}
             // Using the custom animations defined in tailwind.config.ts
-            className={`absolute rounded-full bg-white opacity-80 ${
-              star.direction === "topLeft"
-                ? "animate-fall-topLeft"
-                : "animate-fall-topRight"
-            }`}
+            className={`absolute rounded-full bg-white opacity-80 ${star.direction === "topLeft"
+              ? "animate-fall-topLeft"
+              : "animate-fall-topRight"
+              }`}
             style={{
               top: star.top,
               left: star.left,
@@ -115,7 +114,7 @@ export default function NotFound() {
             width={300}
             height={300}
             priority
-            // className="rounded-[1000] drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+          // className="rounded-[1000] drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
           />
         </div>
       </div>
@@ -127,10 +126,10 @@ export default function NotFound() {
       <div>
         {/* <Mars /> */}
         <Jupyter />
-        <TestPlanet />
+        {/* <TestPlanet /> */}
         {/* <Sun /> */}
         {/* <Moon /> */}
-        {/* <Earth size={100} /> */}
+        <Earth size={100} />
         {/* <div
           style={{
             position: "absolute",

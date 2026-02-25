@@ -89,36 +89,6 @@ function Earth({ size = 90 }: { size?: number }) {
   return (
     <Root size={size}>
       <EarthWrapper sizeFactor={sizeFactor}>
-        {/* <svg viewBox="0 -0 100 100" width="100%" height="100%" className="glow">
-          <filter id="blur" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
-          </filter>
-          <filter id="turb" x="-100%" y="-100%" width="300%" height="300%">
-            <feTurbulence
-              type="turbulence"
-              baseFrequency="0.05"
-              numOctaves="102.5"
-              result="turbulence"
-              seed="69"
-            />
-            <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="5">
-              <animate
-                attributeName="scale"
-                values="5;9;2;5"
-                dur="5s"
-                begin="0s"
-                repeatCount="indefinite"
-              />
-            </feDisplacementMap>
-          </filter>
-          <circle
-            cx="52"
-            cy="48"
-            r="45"
-            fill="rgb(20, 24, 87)"
-            filter="url(#blur) url(#turb)"
-          ></circle>
-        </svg> */}
         <svg
           id="earth"
           viewBox="0 0 100 100"
@@ -127,11 +97,14 @@ function Earth({ size = 90 }: { size?: number }) {
           preserveAspectRatio="xMidYMid slice"
         >
           <g>
-            {/* <g transform="rotate(23.5, 0, 0)"> */}
-            <g>
+            <g transform="rotate(23.5, 50, 50)">
+              {/* <g> */}
               {/* Base Layers (Water, Ground and Clouds) */}
               <g filter={`url(#${sphericalWarp})`}>
-                <g transform="scale(1.5 1.5)">
+                <g
+                  id="world"
+                  transform="translate(50,50) scale(1.5) translate(-50,-50)"
+                >
                   <rect
                     x="0"
                     y="0"
@@ -151,7 +124,7 @@ function Earth({ size = 90 }: { size?: number }) {
                     // filter={`url(#${lightFilter})`}
                     fill="url(#earthSurface)"
                     mask={`url(#${groundMask})`}
-                    // filter={`url(#${sphericalWarp})`}
+                  // filter={`url(#${sphericalWarp})`}
                   />
                 </g>
               </g>
@@ -184,10 +157,10 @@ function Earth({ size = 90 }: { size?: number }) {
             <filter
               id={sphericalWarp}
               filterUnits="userSpaceOnUse"
-              height="100%"
-              width="100%"
-              x="0"
-              y="0"
+              height="120"
+              width="120"
+              x="-10"
+              y="-10"
             >
               <feImage
                 id="feImg"
@@ -202,7 +175,7 @@ function Earth({ size = 90 }: { size?: number }) {
                 id="scl"
                 in="SourceGraphic"
                 in2="dispMap"
-                scale="90"
+                scale="37"
                 xChannelSelector="R"
                 yChannelSelector="B"
               />
@@ -259,7 +232,7 @@ function Earth({ size = 90 }: { size?: number }) {
                 specularConstant="1.5"
                 specularExponent="25"
                 lightingColor="#ffffee"
-                // lightingColor={`url(#${atmosphereGradient})`}
+              // lightingColor={`url(#${atmosphereGradient})`}
               >
                 <fePointLight x="15" y="50" z="25" />
               </feSpecularLighting>
@@ -338,8 +311,8 @@ function Earth({ size = 90 }: { size?: number }) {
             <CircleMask
               id={groundMask}
               pattern={`url(#${groundPattern})`}
-              // fill="white"
-              // filterId={sphericalWarp}
+              fill="rgb(255, 255, 255, 1)"
+            // filterId={sphericalWarp}
             />
             <CircleMask
               id={cloudsMask}
@@ -348,19 +321,13 @@ function Earth({ size = 90 }: { size?: number }) {
             />
             <Pattern
               id={groundPattern}
-              x="0"
-              y="0"
-              duration={10}
+              duration={50}
               href="/static/textures/globe-01.svg"
             />
             <Pattern
               id={"earthSurface"}
-              x="-50"
-              y="-50"
-              duration={10}
+              duration={50}
               // href="/static/textures/globe.jpg"
-              // width="100" // matches your viewBox width
-              // height="100" // matches your viewBox height
               href="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/3840px-Blue_Marble_2002.png"
             />
             <Pattern
@@ -369,6 +336,37 @@ function Earth({ size = 90 }: { size?: number }) {
               href="/static/textures/earth_cloud.png"
             />
           </defs>
+        </svg>
+
+        <svg viewBox="0 -0 100 100" width="100%" height="100%" className="glow">
+          <filter id="blur" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
+          </filter>
+          <filter id="turb" x="-100%" y="-100%" width="300%" height="300%">
+            <feTurbulence
+              type="turbulence"
+              baseFrequency="0.05"
+              numOctaves="102.5"
+              result="turbulence"
+              seed="69"
+            />
+            <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="5">
+              <animate
+                attributeName="scale"
+                values="5;9;2;5"
+                dur="5s"
+                begin="0s"
+                repeatCount="indefinite"
+              />
+            </feDisplacementMap>
+          </filter>
+          <circle
+            cx="52"
+            cy="48"
+            r="45"
+            fill="rgb(20, 24, 87)"
+            filter="url(#blur) url(#turb)"
+          ></circle>
         </svg>
       </EarthWrapper>
     </Root>
