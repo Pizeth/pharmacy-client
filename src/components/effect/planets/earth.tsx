@@ -42,7 +42,7 @@ const EarthWrapper = styled("div", {
   fontSize: `${sizeFactor}vmin`,
 
   // backgroundBlendMode: "multiply",
-  height: "95%", // ← Add this: adjust 80–95% (85% fills and leave some space)
+  height: "85%", // ← Add this: adjust 80–95% (85% fills and leave some space)
   background: "transparent", // REQUIRED for inset shadows
   overflow: "hidden", // Ensures the SVG texture doesn't spill out
   "--size-factor": sizeFactor, // Critical CSS variable for scaling
@@ -235,14 +235,14 @@ const AtmosphereWrapper = styled("div", {
   position: "absolute",
   aspectRatio: "1 / 1",
   borderRadius: "50%",
-  height: "100%", // Slightly bigger than EarthWrapper's 95%
+  height: "95%", // Slightly bigger than EarthWrapper's 95%
   zIndex: 0,      // Keep it behind
 
   // THE FIX: Move to center manually to avoid Flexbox clipping
   left: "50%",
   top: "50%",
   transform: "translate(-50%, -50%)",
-  border: "1px red solid",
+  // border: "1px red solid",
   overflow: "visible",
 }));
 
@@ -292,17 +292,17 @@ function Earth({ size = 90 }: { size?: number }) {
           <filter id="atmoBlur" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="1.5" />
           </filter>
-          <circle cx="50" cy="50" r="50"
+          <circle cx="50" cy="50" r="43"
             fill="none"
             stroke="rgba(80, 130, 255, 0.35)"
-            stroke-width="3"
+            strokeWidth="3"
             filter="url(#atmoBlur)"
           />
 
           <circle
             cx="50"
             cy="50"
-            r="50"
+            r="40"
             fill="rgb(20, 24, 87)"
             // fill="#fff"
             filter="url(#blur) url(#turb)"
@@ -709,10 +709,10 @@ function Earth({ size = 90 }: { size?: number }) {
             </radialGradient> */}
 
             <radialGradient id="grad" cx="50%" cy="50%" r="50%">
-              <stop offset="55%" stop-color="rgba(0,0,0,0)" />
-              <stop offset="80%" stop-color="rgba(0,0,10,0.4)" />
-              <stop offset="92%" stop-color="rgba(0,0,20,0.85)" />
-              <stop offset="100%" stop-color="rgba(0,0,0,1)" />
+              <stop offset="55%" stopColor="rgba(0,0,0,0)" />
+              <stop offset="80%" stopColor="rgba(0,0,10,0.4)" />
+              <stop offset="92%" stopColor="rgba(0,0,20,0.85)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,1)" />
             </radialGradient>
             {/* Atmosphere */}
             <linearGradient

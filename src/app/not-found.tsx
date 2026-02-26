@@ -58,13 +58,13 @@ function BackButton() {
 export default function NotFound() {
   const [stars, setStars] = useState<Star[]>([]);
 
-  useEffect(() => {
-    setStars(generateStars(30));
-    const interval = setInterval(() => {
-      setStars((prev) => [...prev.slice(-20), ...generateStars(10)]);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   setStars(generateStars(30));
+  //   const interval = setInterval(() => {
+  //     setStars((prev) => [...prev.slice(-20), ...generateStars(10)]);
+  //   }, 4000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   return (
     <div className="relative min-h-screen w-full bg-black text-white overflow-hidden font-sans">
@@ -106,7 +106,7 @@ export default function NotFound() {
       </div>
 
       {/* UFO Container: Outer Float, Inner Tilt */}
-      <div className="absolute top-1/2 left-1/6 -translate-x-1/2 -translate-y-1/2  z-10">
+      {/* <div className="absolute top-1/2 left-1/6 -translate-x-1/2 -translate-y-1/2  z-10">
         <div>
           <Image
             src="/static/images/blue_marble.png"
@@ -117,7 +117,7 @@ export default function NotFound() {
           // className="rounded-[1000] drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="absolute top-1/7 right-1 -translate-x-1/2 -translate-y-1/2 z-10">
         <Saturn />
@@ -125,11 +125,11 @@ export default function NotFound() {
 
       <div>
         {/* <Mars /> */}
-        <Jupyter />
+        {/* <Jupyter /> */}
         {/* <TestPlanet /> */}
         {/* <Sun /> */}
         {/* <Moon /> */}
-        <Earth size={100} />
+        <Earth size={85} />
         {/* <div
           style={{
             position: "absolute",
@@ -163,10 +163,10 @@ export default function NotFound() {
 
       {/* Additional Decorative Stars */}
       <div className="mars"></div>
-      <img
+      {/* <img
         src="https://assets.codepen.io/1538474/404.svg"
         className="logo-404"
-      />
+      /> */}
       {/* <img
         src="https://assets.codepen.io/1538474/meteor.svg"
         className="meteor"
