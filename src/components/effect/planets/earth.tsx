@@ -243,18 +243,115 @@ const AtmosphereWrapper = styled("div", {
   top: "50%",
   transform: "translate(-50%, -50%)",
   // border: "1px red solid",
-  overflow: "visible",
+  overflow: "hidden", // Ensures the SVG texture doesn't spill out
 }));
+
+const AtmosphereDepth = styled("div", {
+  name: PREFIX,
+  slot: "AtmosphereDepth",
+  shouldForwardProp: (prop: string) => prop !== "sizeFactor",
+  overridesResolver: (_props, styles) => styles.content,
+  // })(({ theme }) => ({
+})<{ sizeFactor: number }>(({ theme, sizeFactor }) => ({
+  position: "absolute",
+  aspectRatio: "1 / 1",
+  borderRadius: "50%",
+  height: "86%", // Slightly bigger than EarthWrapper's 95%
+  zIndex: 1,      // Keep it infront of the atmosphere wrapper and the Earth
+  fontSize: `${sizeFactor + 1}vmin`,
+  // THE FIX: Move to center manually to avoid Flexbox clipping
+  left: "50%",
+  top: "50%",
+  transform: "translate(-50%, -50%)",
+  overflow: "hidden", // Ensures the SVG texture doesn't spill out
+  // "&::after": {
+  //   content: '""',
+  //   position: "absolute",
+  //   inset: 0,
+  //   width: "100%",
+  //   height: "100%",
+  //   borderRadius: "50%",
+  //   pointerEvents: "none", // Ensures you can still click/hover the planet underneath
+  //   zIndex: 10, // Must be higher than the SVG's stacking context
+
+  //   // 3. SCALABLE SHADOWS (converted px to em)
+  //   // Ratios based on 1em = Container Size (approx 1.17x Planet Diameter)
+  //   boxShadow: `
+  //     /* 1. Outer Atmosphere (Halo) */
+  //     0 0 0.05em -0.01em rgb(70, 89, 181, 0.5),
+  //     /* softer sky-blue halo */
+  //     0 0 0.08em 0.02em rgba(135, 206, 255, 0.3), 
+
+  //     /* 2. Sunlit Surface Highlight (Left) */
+  //     inset 0.02em 0 0.04em -0.01em rgb(61, 76, 169, 0.7),
+
+  //     /* 3. Rayleigh Scattering (Mid-Atmosphere) */
+  //     inset 0.04em 0 0.09em 0px rgb(60, 75, 170, 0.5),
+
+  //     /* 4. The Terminator (Shadow Start) */
+  //     inset -0.04em 0 0.15em 0px rgba(0,0,0,0.5),
+
+  //     /* 5. Deep Space Night (Far Right) */
+  //     inset -0.1em 0 0.12em 0.04em rgba(0,0,0,0.7)
+  //   `,
+
+  //   // NASA-PERFECT SCALABLE SHADOWS
+  //   // boxShadow: `
+  //   //   /* Outer atmosphere glow */
+  //   //   0 0
+  //   //     calc(4px * var(--size-factor))
+  //   //     calc(-1.5px * var(--size-factor))
+  //   //     rgba(70, 89, 181, 0.55),
+
+  //   //   /* Sunlit highlight */
+  //   //   inset
+  //   //     calc(2.2px * var(--size-factor)) 0
+  //   //     calc(5px * var(--size-factor))
+  //   //     calc(-1.8px * var(--size-factor))
+  //   //     rgba(61, 76, 169, 0.75),
+
+  //   //   /* Atmospheric scattering */
+  //   //   inset
+  //   //     calc(4.5px * var(--size-factor)) 0
+  //   //     calc(11px * var(--size-factor))
+  //   //     calc(-0.5px * var(--size-factor))
+  //   //     rgba(60, 75, 170, 0.55),
+
+  //   //   /* Terminator shadow */
+  //   //   inset
+  //   //     calc(-4.8px * var(--size-factor)) 0
+  //   //     calc(18px * var(--size-factor))
+  //   //     rgba(0, 0, 0, 0.6),
+
+  //   //   /* Night side fill */
+  //   //   inset
+  //   //     calc(-11.5px * var(--size-factor)) 0
+  //   //     calc(14px * var(--size-factor))
+  //   //     calc(4.2px * var(--size-factor))
+  //   //     rgba(0, 0, 0, 0.8)
+  //   // `,
+  // },
+}))
 
 const lightMask = `${PREFIX}-light-mask`;
 const waterMask = `${PREFIX}-water-mask`;
 const groundMask = `${PREFIX}-ground-mask`;
+const nightMask = `${PREFIX}-night-mask`;
 const cloudsMask = `${PREFIX}-clouds-mask`;
+const topographyMask = `${PREFIX}-topography-mask`;
+const bathymetryMask = `${PREFIX}-bathymetry-mask`;
 const atmosphereMask = `${PREFIX}-atmosphere-mask`;
 const atmosphereGradient = `${PREFIX}-atmosphere-gradient`;
+const nightMaskGradient = `${PREFIX}-night-mask-gradient`;
 const atmosphereMaskGradient = `${PREFIX}-atmosphere-mask-gradient`;
 const lightFilter = `${PREFIX}-light-filter`;
 const groundPattern = `${PREFIX}-ground-pattern`;
+const topographyPattern = `${PREFIX}-topography-pattern`;
+const bathymetryPattern = `${PREFIX}-bathymetry-pattern`;
+const earthSurfacePattern = `${PREFIX}-earth-surface-pattern`;
+const earthNightSurfacePattern = `${PREFIX}-earth-night-surface-pattern`;
+const bathymetrySurfacePattern = `${PREFIX}-bathymetry-surface-pattern`;
+const topographySurfacePattern = `${PREFIX}-topography-surface-pattern`;
 const cloudsPattern = `${PREFIX}-clouds-pattern`;
 const sphericalWarp = `${PREFIX}-spherical-warp`;
 
@@ -268,45 +365,50 @@ function Earth({ size = 90 }: { size?: number }) {
       <AtmosphereWrapper>
         {/* <svg viewBox="0 0 100 100" width="100%" height="100%"></svg> */}
         <svg viewBox="0 0 100 100" width="100%" height="100%" className="glow">
-          <filter id="blur" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
-          </filter>
-          <filter id="turb" x="-100%" y="-100%" width="300%" height="300%">
-            <feTurbulence
-              type="turbulence"
-              baseFrequency="0.05"
-              numOctaves="102.5"
-              result="turbulence"
-              seed="70"
-            />
-            <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="5">
-              <animate
-                attributeName="scale"
-                values="5;9;2;5"
-                dur="5s"
-                begin="0s"
-                repeatCount="indefinite"
+          <defs>
+            {/* Filters */}
+            <filter id="blur" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
+            </filter>
+            <filter id="turb" x="-100%" y="-100%" width="300%" height="300%">
+              <feTurbulence
+                type="turbulence"
+                baseFrequency="0.05"
+                numOctaves="102.5"
+                result="turbulence"
+                seed="70"
               />
-            </feDisplacementMap>
-          </filter>
-          <filter id="atmoBlur" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="1.5" />
-          </filter>
-          <circle cx="50" cy="50" r="43"
-            fill="none"
-            stroke="rgba(80, 130, 255, 0.35)"
-            strokeWidth="3"
-            filter="url(#atmoBlur)"
-          />
-
-          <circle
-            cx="50"
-            cy="50"
-            r="40"
-            fill="rgb(20, 24, 87)"
-            // fill="#fff"
-            filter="url(#blur) url(#turb)"
-          ></circle>
+              <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="5">
+                <animate
+                  attributeName="scale"
+                  values="5;9;2;5"
+                  dur="5s"
+                  begin="0s"
+                  repeatCount="indefinite"
+                />
+              </feDisplacementMap>
+            </filter>
+            <filter id="atmoBlur" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="1.5" />
+            </filter>
+          </defs>
+          <g>
+            <circle cx="50" cy="50" r="45"
+              fill="none"
+              stroke="rgba(80, 130, 255, 0.35)"
+              // stroke="rgb(20, 24, 87, 0.75)"
+              strokeWidth="3"
+              filter="url(#atmoBlur)"
+            />
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              fill="rgb(20, 24, 87)"
+              // fill="#fff"
+              filter="url(#blur) url(#turb)"
+            />
+          </g>
         </svg>
       </AtmosphereWrapper>
       <EarthWrapper sizeFactor={sizeFactor}>
@@ -341,13 +443,43 @@ function Earth({ size = 90 }: { size?: number }) {
                   y="0"
                   width="100"
                   height="100"
+                  // fill="blue"
+                  fill={"#1a4780"}
+                  // fill={`url(#${bathymetrySurfacePattern})`}
+                  mask={`url(#${bathymetryMask})`}
+                />
+                <rect
+                  x="0"
+                  y="0"
+                  width="100"
+                  height="100"
                   // fill="rgba(0, 100, 0, 1)"
                   // fill="transparent"
                   // filter={`url(#${lightFilter})`}
-                  fill="url(#earthSurface)"
+                  fill={`url(#${earthSurfacePattern})`}
                   mask={`url(#${groundMask})`}
                 // filter={`url(#${sphericalWarp})`}
                 />
+                <rect
+                  x="0"
+                  y="0"
+                  width="100"
+                  height="100"
+                  // fill="white"
+                  fill={`url(#${earthNightSurfacePattern})`}
+                  // fill="red"
+                  mask={`url(#${nightMask})`}
+                />
+                <rect
+                  x="0"
+                  y="0"
+                  width="100"
+                  height="100"
+                  // fill="white"
+                  fill={`url(#${topographySurfacePattern})`}
+                  mask={`url(#${topographyMask})`}
+                />
+
                 <rect
                   x="0"
                   y="0"
@@ -728,8 +860,8 @@ function Earth({ size = 90 }: { size?: number }) {
               <stop offset="25%" stopColor="rgb(72, 89, 180, 0.15)" />
               <stop
                 offset="100%"
-                stopColor="rgb(20, 24, 87)"
-                stopOpacity="0.25"
+                stopColor="rgb(20, 24, 87, 0.25)"
+              // stopOpacity="0.25"
               />
             </linearGradient>
             <radialGradient
@@ -743,6 +875,19 @@ function Earth({ size = 90 }: { size?: number }) {
               <stop offset="50%" stopColor="white" stopOpacity="0" />
               <stop offset="90%" stopColor="white" stopOpacity="1" />
               <stop offset="100%" stopColor="white" stopOpacity="0" />
+            </radialGradient>
+
+            <radialGradient
+              id={nightMaskGradient}
+              cx="10%"
+              cy="30%"
+              r="70%"
+              fx="50%"
+              fy="70%"
+            >
+              <stop offset="50%" stopColor="white" stopOpacity="0" />
+              <stop offset="90%" stopColor="white" stopOpacity="1" />
+              <stop offset="100%" stopColor="white" stopOpacity="1" />
             </radialGradient>
             {/* Sphere Displacement Map (hidden element used by filter) */}
             <radialGradient
@@ -782,8 +927,28 @@ function Earth({ size = 90 }: { size?: number }) {
             <CircleMask
               id={groundMask}
               pattern={`url(#${groundPattern})`}
-              fill="white"
+              // fill="white"
               filterId={lightFilter}
+            />
+            <CircleMask
+              id={nightMask}
+              pattern={`url(#${nightMaskGradient})`}
+            // fill="white"
+            // filterId={lightFilter}
+            />
+            <CircleMask
+              id={topographyMask}
+              pattern={`url(#${topographyPattern})`}
+              // fill={`url(#${atmosphereGradient})`}
+              fill="white"
+            // filterId={lightFilter}
+            />
+            <CircleMask
+              id={bathymetryMask}
+              pattern={`url(#${bathymetryPattern})`}
+              // fill={`url(#${atmosphereGradient})`}
+              fill="white"
+            // filterId={lightFilter}
             />
             <CircleMask
               id={cloudsMask}
@@ -797,14 +962,42 @@ function Earth({ size = 90 }: { size?: number }) {
               href="/static/textures/globe-01.svg"
             />
             <Pattern
-              id={"earthSurface"}
+              id={earthSurfacePattern}
               // y={4.5}
               // x={}
               duration={50}
               // width={200}
               // to={200}
               // href="/static/textures/globe.jpg"
-              href="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/3840px-Blue_Marble_2002.png"
+              href="https://upload.wikimedia.org/wikipedia/commons/4/4d/Whole_world_-_land_and_oceans.jpg"
+            />
+            <Pattern
+              id={earthNightSurfacePattern}
+
+              duration={50}
+
+              href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/imagerecords/144000/144898/BlackMarble_2016_3km.jpg"
+            />
+            <Pattern
+              id={topographyPattern}
+              duration={50}
+              href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/topography/gebco_08_rev_elev_21600x10800.jpg"
+            />
+            <Pattern
+              id={topographySurfacePattern}
+              duration={50}
+              href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/july/world.topo.200407.3x21600x10800.jpg"
+            />
+            <Pattern
+              id={bathymetryPattern}
+              duration={50}
+              // href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bathymetry/gebco_08_rev_bath_21600x10800.jpg"
+              href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/july/world.topo.bathy.200407.3x21600x10800.jpg"
+            />
+            <Pattern
+              id={bathymetrySurfacePattern}
+              duration={50}
+              href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/july/world.topo.bathy.200407.3x21600x10800.jpg"
             />
             <Pattern
               id={cloudsPattern}
@@ -815,7 +1008,53 @@ function Earth({ size = 90 }: { size?: number }) {
           </defs>
         </svg>
       </EarthWrapper>
+      <AtmosphereDepth sizeFactor={sizeFactor}>
+        <svg
+          viewBox="0 0 100 100"
+          width="100%"
+          height="100%"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g transform="rotate(23.5, 50, 50)">
+            <g filter={`url(#${sphericalWarp})`}>
+              <g transform="translate(50,50) scale(1.5) translate(-50,-50)">
 
+                {/* <circle
+                  id="edges"
+                  width="100"
+                  height="100"
+                  x="0"
+                  y="0"
+                  cx="50"
+                  cy="50"
+                  r="50"
+                  fill="url(#grad)"
+                ></circle> */}
+                {/* <rect
+                  x="0"
+                  y="0"
+                  width="150"
+                  height="150"
+                  fill="rgba(255, 255, 255, 1)"
+                  mask={`url(#${cloudsMask})`}
+                /> */}
+              </g>
+            </g>
+          </g>
+          <defs>
+            {/* <CircleMask
+              id={cloudsMask}
+              pattern={`url(#${cloudsPattern})`}
+              fill={`url(#${atmosphereGradient})`}
+            />
+            <Pattern
+              id={cloudsPattern}
+              duration={55}
+              href="/static/textures/earth_cloud.png"
+            /> */}
+          </defs>
+        </svg>
+      </AtmosphereDepth>
     </Root>
   );
 }
