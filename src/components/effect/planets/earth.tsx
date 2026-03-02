@@ -410,7 +410,7 @@ function Earth({ size = 90 }: { size?: number }) {
             />
           </g>
         </svg>
-      </AtmosphereWrapper>
+      </AtmosphereWrapper >
       <EarthWrapper sizeFactor={sizeFactor}>
         <svg
           id="earth"
@@ -465,10 +465,9 @@ function Earth({ size = 90 }: { size?: number }) {
                   y="0"
                   width="100"
                   height="100"
-                  // fill="white"
-                  fill={`url(#${earthNightSurfacePattern})`}
-                  // fill="red"
-                  mask={`url(#${nightMask})`}
+                  fill="white"
+                  // fill={`url(#${topographySurfacePattern})`}
+                  mask={`url(#${topographyMask})`}
                 />
                 <rect
                   x="0"
@@ -476,9 +475,11 @@ function Earth({ size = 90 }: { size?: number }) {
                   width="100"
                   height="100"
                   // fill="white"
-                  fill={`url(#${topographySurfacePattern})`}
-                  mask={`url(#${topographyMask})`}
+                  fill={`url(#${earthNightSurfacePattern})`}
+                  // fill="red"
+                  mask={`url(#${nightMask})`}
                 />
+
 
                 <rect
                   x="0"
@@ -880,12 +881,12 @@ function Earth({ size = 90 }: { size?: number }) {
             <radialGradient
               id={nightMaskGradient}
               cx="10%"
-              cy="30%"
+              cy="35%"
               r="70%"
-              fx="50%"
-              fy="70%"
+              fx="35%"
+              fy="75%"
             >
-              <stop offset="50%" stopColor="white" stopOpacity="0" />
+              <stop offset="30%" stopColor="white" stopOpacity="0" />
               <stop offset="90%" stopColor="white" stopOpacity="1" />
               <stop offset="100%" stopColor="white" stopOpacity="1" />
             </radialGradient>
@@ -958,14 +959,14 @@ function Earth({ size = 90 }: { size?: number }) {
             />
             <Pattern
               id={groundPattern}
-              duration={50}
+              duration={60}
               href="/static/textures/globe-01.svg"
             />
             <Pattern
               id={earthSurfacePattern}
               // y={4.5}
               // x={}
-              duration={50}
+              duration={60}
               // width={200}
               // to={200}
               // href="/static/textures/globe.jpg"
@@ -974,34 +975,34 @@ function Earth({ size = 90 }: { size?: number }) {
             <Pattern
               id={earthNightSurfacePattern}
 
-              duration={50}
+              duration={60}
 
               href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/imagerecords/144000/144898/BlackMarble_2016_3km.jpg"
             />
             <Pattern
               id={topographyPattern}
-              duration={50}
+              duration={60}
               href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/topography/gebco_08_rev_elev_21600x10800.jpg"
             />
             <Pattern
               id={topographySurfacePattern}
-              duration={50}
+              duration={60}
               href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/july/world.topo.200407.3x21600x10800.jpg"
             />
             <Pattern
               id={bathymetryPattern}
-              duration={50}
+              duration={60}
               // href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bathymetry/gebco_08_rev_bath_21600x10800.jpg"
               href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/july/world.topo.bathy.200407.3x21600x10800.jpg"
             />
             <Pattern
               id={bathymetrySurfacePattern}
-              duration={50}
+              duration={60}
               href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/july/world.topo.bathy.200407.3x21600x10800.jpg"
             />
             <Pattern
               id={cloudsPattern}
-              duration={55}
+              duration={70}
               // to={-200}
               href="/static/textures/earth_cloud.png"
             />
@@ -1055,7 +1056,7 @@ function Earth({ size = 90 }: { size?: number }) {
           </defs>
         </svg>
       </AtmosphereDepth>
-    </Root>
+    </Root >
   );
 }
 
