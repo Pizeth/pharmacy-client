@@ -1,6 +1,8 @@
 import { FISHEYE_ID } from "@/types/constants";
 import { CircleMask, Filter, Pattern } from "@/utils/componentUtils";
 import { styled } from "@mui/material";
+import { useEffect, useState } from "react";
+// import Globe from "@/assets/svg/globe.svg";
 
 const PREFIX = "RazethPlanetEarth";
 const Root = styled("div", {
@@ -360,6 +362,24 @@ function Earth({ size = 90 }: { size?: number }) {
   // const sizeFactor = size / 90;
   // const sizeFactor = Math.max(0.18, size / 90); // Prevents glow disappearance at tiny sizes
   const sizeFactor = size; // Prevents glow disappearance at tiny sizes
+  const [landPaths, setLandPaths] = useState<string>("");
+
+  useEffect(() => {
+    fetch("/static/textures/globe.svg")                        // Next.js serves /public at root
+      .then((r) => r.text())
+      .then((text) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "image/svg+xml");
+
+        // Grab all path/polygon elements and serialize them
+        const shapes = doc.querySelectorAll("path, polygon, rect, circle");
+        const inner = Array.from(shapes)
+          .map((el) => el.outerHTML)
+          .join("\n");
+
+        setLandPaths(inner);
+      });
+  }, []);
   return (
     <Root size={size}>
       <AtmosphereWrapper>
@@ -477,6 +497,7 @@ function Earth({ size = 90 }: { size?: number }) {
                   // fill="white"
                   fill={`url(#${earthNightSurfacePattern})`}
                   // fill="red"
+                  // clipPath="url(#landClip)"
                   mask={`url(#${nightMask})`}
                 />
 
@@ -880,16 +901,31 @@ function Earth({ size = 90 }: { size?: number }) {
 
             <radialGradient
               id={nightMaskGradient}
+              // gradientUnits="userSpaceOnUse"   // use absolute coords
               cx="10%"
-              cy="35%"
+              cy="30%"
               r="70%"
               fx="35%"
               fy="75%"
+            // gradientTransform="scale(57.6, 28.8)"  // inverse of our 100/5760 scale
             >
-              <stop offset="30%" stopColor="white" stopOpacity="0" />
-              <stop offset="90%" stopColor="white" stopOpacity="1" />
+              <stop offset="45%" stopColor="black" stopOpacity="0" />
+              <stop offset="75%" stopColor="white" stopOpacity="1" />
               <stop offset="100%" stopColor="white" stopOpacity="1" />
             </radialGradient>
+
+            {/* <radialGradient
+              id={nightMaskGradient}
+              cx="10%"
+              cy="30%"
+              r="70%"
+              fx="50%"
+              fy="70%"
+            >
+              <stop offset="50%" stopColor="white" stopOpacity="0" />
+              <stop offset="90%" stopColor="white" stopOpacity="1" />
+              <stop offset="100%" stopColor="white" stopOpacity="1" />
+            </radialGradient> */}
             {/* Sphere Displacement Map (hidden element used by filter) */}
             <radialGradient
               id="sphereDisplacementMap"
@@ -902,6 +938,16 @@ function Earth({ size = 90 }: { size?: number }) {
               <stop offset="85%" stopColor="rgb(180, 180, 180)" />
               <stop offset="100%" stopColor="rgb(128, 128, 128)" />
             </radialGradient>
+
+            {/* 3. Render the actual map but hide it from view (or use it as the base layer) */}
+            {/* We give it an ID so the clipPath can find it */}
+            <g id="my-global-map" style={{ display: 'none' }}>
+              {/* <Globe /> */}
+            </g>
+            <clipPath id="landClip">
+              {/* <use href="/static/textures/globe-01.svg" /> */}
+              {/* <use href={globeAssetPath} /> */}
+            </clipPath>
             <CircleMask
               id={atmosphereMask}
               // x={-5}
@@ -934,9 +980,39 @@ function Earth({ size = 90 }: { size?: number }) {
             <CircleMask
               id={nightMask}
               pattern={`url(#${nightMaskGradient})`}
-            // fill="white"
+            // fill={`url(#${groundPattern})`}
+            // fill={`url(#${nightMaskGradient})`}
+            // pattern={`url(#${groundPattern})`}
             // filterId={lightFilter}
             />
+            {/* <mask id={nightMask}>
+              <rect x="0" y="0" width="100" height="100" fill="black" />
+              <g
+                transform="scale(0.017361, 0.034722)"   
+                filter={`url(#fisheye-filter)`}
+                fill={`url(#${nightMaskGradient})`}
+                dangerouslySetInnerHTML={{ __html: landPaths }}
+              />
+            </mask> */}
+            <mask id={nightMask + "111"}>
+              {/* Black canvas */}
+              <rect x="0" y="0" width="100" height="100" fill="black" />
+
+              {/* Land area = white, animated in sync with day map */}
+              <rect
+                x="0" y="0"
+                width="100" height="100"
+                fill={`url(#${groundPattern})`}
+              />
+
+              {/* Punch out the day side */}
+              <rect
+                x="0" y="0"
+                width="100" height="100"
+                fill={`url(#${nightMaskGradient})`}
+                style={{ mixBlendMode: "multiply" }}
+              />
+            </mask>
             <CircleMask
               id={topographyMask}
               pattern={`url(#${topographyPattern})`}
@@ -960,7 +1036,7 @@ function Earth({ size = 90 }: { size?: number }) {
             <Pattern
               id={groundPattern}
               duration={60}
-              href="/static/textures/globe-01.svg"
+              href="/static/textures/globe.svg"
             />
             <Pattern
               id={earthSurfacePattern}
@@ -974,9 +1050,7 @@ function Earth({ size = 90 }: { size?: number }) {
             />
             <Pattern
               id={earthNightSurfacePattern}
-
               duration={60}
-
               href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/imagerecords/144000/144898/BlackMarble_2016_3km.jpg"
             />
             <Pattern
