@@ -362,24 +362,25 @@ function Earth({ size = 90 }: { size?: number }) {
   // const sizeFactor = size / 90;
   // const sizeFactor = Math.max(0.18, size / 90); // Prevents glow disappearance at tiny sizes
   const sizeFactor = size; // Prevents glow disappearance at tiny sizes
-  const [landPaths, setLandPaths] = useState<string>("");
+  // const [landPaths, setLandPaths] = useState<string>("");
 
-  useEffect(() => {
-    fetch("/static/textures/globe.svg")                        // Next.js serves /public at root
-      .then((r) => r.text())
-      .then((text) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, "image/svg+xml");
+  // useEffect(() => {
+  //   fetch("/static/textures/globe.svg")                        // Next.js serves /public at root
+  //     .then((r) => r.text())
+  //     .then((text) => {
+  //       const parser = new DOMParser();
+  //       const doc = parser.parseFromString(text, "image/svg+xml");
 
-        // Grab all path/polygon elements and serialize them
-        const shapes = doc.querySelectorAll("path, polygon, rect, circle");
-        const inner = Array.from(shapes)
-          .map((el) => el.outerHTML)
-          .join("\n");
+  //       // Grab all path/polygon elements and serialize them
+  //       const shapes = doc.querySelectorAll("path, polygon, rect, circle");
+  //       const inner = Array.from(shapes)
+  //         .map((el) => el.outerHTML)
+  //         .join("\n");
 
-        setLandPaths(inner);
-      });
-  }, []);
+  //       setLandPaths(inner);
+  //     });
+  // }, []);
+
   return (
     <Root size={size}>
       <AtmosphereWrapper>
@@ -485,7 +486,7 @@ function Earth({ size = 90 }: { size?: number }) {
                   y="0"
                   width="100"
                   height="100"
-                  fill="white"
+                  fill="#FFFAFA"
                   // fill={`url(#${topographySurfacePattern})`}
                   mask={`url(#${topographyMask})`}
                 />
@@ -494,13 +495,9 @@ function Earth({ size = 90 }: { size?: number }) {
                   y="0"
                   width="100"
                   height="100"
-                  // fill="white"
                   fill={`url(#${earthNightSurfacePattern})`}
-                  // fill="red"
-                  // clipPath="url(#landClip)"
                   mask={`url(#${nightMask})`}
                 />
-
 
                 <rect
                   x="0"
@@ -508,6 +505,7 @@ function Earth({ size = 90 }: { size?: number }) {
                   width="150"
                   height="150"
                   fill="rgba(255, 255, 255, 1)"
+                  // fill="#C7C4BF"
                   mask={`url(#${cloudsMask})`}
                 // filter={`url(#${sphericalWarp})`}
                 // filter={`url(#${lightFilter})`}
@@ -530,21 +528,7 @@ function Earth({ size = 90 }: { size?: number }) {
                   stroke-width="3"
                   filter="url(#atmoBlur)"
                 /> */}
-
-                {/* <circle
-                  cx="50"
-                  cy="50"
-                  r="100"
-                  fill="url(#earthSurface1)"
-                // filter={`url(#${sphericalWarp})`}
-                // filter="url(#sun-glow)"
-                // mask={`url(#${atmosphereMask})`}
-                /> */}
-
-
               </g>
-
-
             </g>
 
 
@@ -901,15 +885,15 @@ function Earth({ size = 90 }: { size?: number }) {
 
             <radialGradient
               id={nightMaskGradient}
-              // gradientUnits="userSpaceOnUse"   // use absolute coords
-              cx="10%"
-              cy="30%"
-              r="70%"
-              fx="35%"
-              fy="75%"
+              gradientUnits="userSpaceOnUse"   // use absolute coords
+              cx="10"
+              cy="35"
+              r="75"
+              fx="15"
+              fy="75"
             // gradientTransform="scale(57.6, 28.8)"  // inverse of our 100/5760 scale
             >
-              <stop offset="45%" stopColor="black" stopOpacity="0" />
+              <stop offset="35%" stopColor="black" stopOpacity="0" />
               <stop offset="75%" stopColor="white" stopOpacity="1" />
               <stop offset="100%" stopColor="white" stopOpacity="1" />
             </radialGradient>
@@ -939,15 +923,6 @@ function Earth({ size = 90 }: { size?: number }) {
               <stop offset="100%" stopColor="rgb(128, 128, 128)" />
             </radialGradient>
 
-            {/* 3. Render the actual map but hide it from view (or use it as the base layer) */}
-            {/* We give it an ID so the clipPath can find it */}
-            <g id="my-global-map" style={{ display: 'none' }}>
-              {/* <Globe /> */}
-            </g>
-            <clipPath id="landClip">
-              {/* <use href="/static/textures/globe-01.svg" /> */}
-              {/* <use href={globeAssetPath} /> */}
-            </clipPath>
             <CircleMask
               id={atmosphereMask}
               // x={-5}
@@ -968,7 +943,6 @@ function Earth({ size = 90 }: { size?: number }) {
             <CircleMask
               id={waterMask}
               pattern="white"
-            // fill="black"
             // filterId={lightFilter}
             />
             <CircleMask
@@ -980,39 +954,8 @@ function Earth({ size = 90 }: { size?: number }) {
             <CircleMask
               id={nightMask}
               pattern={`url(#${nightMaskGradient})`}
-            // fill={`url(#${groundPattern})`}
             // fill={`url(#${nightMaskGradient})`}
-            // pattern={`url(#${groundPattern})`}
-            // filterId={lightFilter}
             />
-            {/* <mask id={nightMask}>
-              <rect x="0" y="0" width="100" height="100" fill="black" />
-              <g
-                transform="scale(0.017361, 0.034722)"   
-                filter={`url(#fisheye-filter)`}
-                fill={`url(#${nightMaskGradient})`}
-                dangerouslySetInnerHTML={{ __html: landPaths }}
-              />
-            </mask> */}
-            <mask id={nightMask + "111"}>
-              {/* Black canvas */}
-              <rect x="0" y="0" width="100" height="100" fill="black" />
-
-              {/* Land area = white, animated in sync with day map */}
-              <rect
-                x="0" y="0"
-                width="100" height="100"
-                fill={`url(#${groundPattern})`}
-              />
-
-              {/* Punch out the day side */}
-              <rect
-                x="0" y="0"
-                width="100" height="100"
-                fill={`url(#${nightMaskGradient})`}
-                style={{ mixBlendMode: "multiply" }}
-              />
-            </mask>
             <CircleMask
               id={topographyMask}
               pattern={`url(#${topographyPattern})`}
@@ -1051,7 +994,8 @@ function Earth({ size = 90 }: { size?: number }) {
             <Pattern
               id={earthNightSurfacePattern}
               duration={60}
-              href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/imagerecords/144000/144898/BlackMarble_2016_3km.jpg"
+              // href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/imagerecords/144000/144898/BlackMarble_2016_3km.jpg"
+              href="/static/textures/black_marble.webp"
             />
             <Pattern
               id={topographyPattern}
