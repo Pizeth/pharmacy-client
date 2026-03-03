@@ -2,13 +2,6 @@
   "name": "pharmacy-client",
   "version": "0.1.0",
   "private": true,
-  "include": [
-    "svgr.d.ts",
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
   "scripts": {
     "dev": "next dev --turbopack -p 8080",
     "build": "next build",
@@ -52,6 +45,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "diacritic": "^0.0.2",
+    "googleapis": "^171.4.0",
     "http-status-codes": "^2.3.0",
     "inflection": "^3.0.2",
     "jotai": "^2.18.0",
@@ -82,7 +76,6 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.4",
     "@eslint/eslintrc": "^3",
-    "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/lodash": "^4.17.24",
     "@types/node": "^25",
