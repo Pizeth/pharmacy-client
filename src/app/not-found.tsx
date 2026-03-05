@@ -11,6 +11,7 @@ import Mars from "@/components/effect/planets/mars";
 import Jupyter from "@/components/effect/planets/jupiter";
 import Sun from "@/components/effect/planets/sun";
 import TestPlanet from "@/components/effect/planets/testPlanet";
+import TV from "@/components/effect/customs/tv";
 
 interface Star {
   id: number;
@@ -124,12 +125,13 @@ export default function NotFound() {
       </div>
 
       <div>
+        <TV />
         {/* <Mars /> */}
         {/* <Jupyter /> */}
         {/* <TestPlanet /> */}
         {/* <Sun /> */}
         {/* <Moon /> */}
-        <Earth size={85} />
+        <Earth size={100} />
         {/* <div
           style={{
             position: "absolute",

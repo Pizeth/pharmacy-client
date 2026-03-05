@@ -418,7 +418,7 @@ function Earth({ size = 90 }: { size?: number }) {
               fill="none"
               stroke="rgba(80, 130, 255, 0.35)"
               // stroke="rgb(20, 24, 87, 0.75)"
-              strokeWidth="3"
+              strokeWidth="1.5"
               filter="url(#atmoBlur)"
             />
             <circle
@@ -490,14 +490,25 @@ function Earth({ size = 90 }: { size?: number }) {
                   // fill={`url(#${topographySurfacePattern})`}
                   mask={`url(#${topographyMask})`}
                 />
+                {/* <rect
+                  x="0"
+                  y="0"
+                  width="100"
+                  height="100"
+                  // fill={`url(#${earthNightSurfacePattern})`}
+                  // fill={"#FFEE8C "}
+                  mask={`url(#light-mask)`}
+                /> */}
                 <rect
                   x="0"
                   y="0"
                   width="100"
                   height="100"
                   fill={`url(#${earthNightSurfacePattern})`}
+                  // fill={`url(#lightPattern)`}
                   mask={`url(#${nightMask})`}
                 />
+
 
                 <rect
                   x="0"
@@ -956,11 +967,17 @@ function Earth({ size = 90 }: { size?: number }) {
               pattern={`url(#${nightMaskGradient})`}
             // fill={`url(#${nightMaskGradient})`}
             />
+            {/* <CircleMask
+              id={"light-mask"}
+              fill={`url(#lightPattern)`}
+              pattern={`url(#${nightMaskGradient})`}
+            // fill="white"
+            /> */}
             <CircleMask
               id={topographyMask}
               pattern={`url(#${topographyPattern})`}
-              // fill={`url(#${atmosphereGradient})`}
-              fill="white"
+            // fill={`url(#${atmosphereGradient})`}
+            // fill="white"
             // filterId={lightFilter}
             />
             <CircleMask
@@ -996,6 +1013,12 @@ function Earth({ size = 90 }: { size?: number }) {
               duration={60}
               // href="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/imagerecords/144000/144898/BlackMarble_2016_3km.jpg"
               href="/static/textures/black_marble.webp"
+            />
+            <Pattern
+              id={"lightPattern"}
+              duration={60}
+              // to={-200}
+              href="/static/textures/black-marble-mask.jpg"
             />
             <Pattern
               id={topographyPattern}
