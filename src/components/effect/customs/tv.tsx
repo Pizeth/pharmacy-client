@@ -1,407 +1,377 @@
+import { bAnimation } from "@/theme/keyframes";
 import { styled } from "@mui/material/styles";
 
 
 const PREFIX = "RazethTV";
 const Root = styled("div", {
-    name: PREFIX,
-    slot: "Root",
-    overridesResolver: (_props, styles) => styles.root,
-    // })(({ theme }) => ({
+  name: PREFIX,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+  // })(({ theme }) => ({
 })<{ size?: number }>(({ theme, size = 100 }) => ({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    // minHeight: "5vmin",
-    // height: `${size}vmin`, // Dynamic height
-    position: "relative",
-    overflow: "visible",
-    // height: "100vh",
-    // position: "absolute",
-    // top: "50%",
-    // left: "50%",
-    // transform: "translate(-50%, -50%)",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  // minHeight: "5vmin",
+  // height: `${size}vmin`, // Dynamic height
+  position: "relative",
+  overflow: "visible",
+  // height: "100vh",
+  // position: "absolute",
+  // top: "50%",
+  // left: "50%",
+  // transform: "translate(-50%, -50%)",
 }));
 
 const TVWrapper = styled("div", {
-    name: PREFIX,
-    slot: "content",
-    // shouldForwardProp: (prop: string) => prop !== "sizeFactor",
-    // overridesResolver: (_props, styles) => styles.tvWrapper,
+  name: PREFIX,
+  slot: "content",
 })(() => ({
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "30em",
-    height: "30em",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "30em",
+  height: "30em",
 }));
 
 const Main = styled("div", {
-    name: PREFIX,
-    slot: "main",
-    // shouldForwardProp: (prop: string) => prop !== "sizeFactor",
-    // overridesResolver: (_props, styles) => styles.main,
+  name: PREFIX,
+  slot: "main",
 })(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: "5em",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  marginTop: "5em",
 }));
 
 const Antenna = styled("div", {
-    name: PREFIX,
-    slot: "antenna",
-    // shouldForwardProp: (prop: string) => prop !== "sizeFactor",
-    // overridesResolver: (_props, styles) => styles.antenna,
+  name: PREFIX,
+  slot: "antenna",
 })(({ theme }) => ({
-    width: "5em",
-    height: "5em",
+  width: "5em",
+  height: "5em",
+  borderRadius: "50%",
+  border: "2px solid black",
+  backgroundColor: "#f27405",
+  marginBottom: "-6em",
+  marginLeft: "0em",
+  zIndex: -1,
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    marginTop: "0.2em",
+    marginLeft: "1.25em",
+    transform: "rotate(-20deg)",
+    width: "1.5em",
+    height: "0.8em",
+    borderRadius: "50%",
+    backgroundColor: "#f69e50",
+  },
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    marginTop: "0.2em",
+    marginLeft: "1.25em",
+    transform: "rotate(-20deg)",
+    width: "1.5em",
+    height: "0.8em",
+    borderRadius: "50%",
+    backgroundColor: "#f69e50",
+  },
+  "&. antenna_shadow": {
+    position: 'absolute',
+    backgroundColor: 'transparent',
+    width: '50px',
+    height: '56px',
+    marginLeft: '1.68em',
+    borderRadius: '45%',
+    transform: 'rotate(140deg)',
+    border: '4px solid transparent',
+    boxShadow: 'inset 0px 16px #a85103, inset 0px 16px 1px 1px #a85103',
+
+  },
+  "& .a1": {
+    position: "relative",
+    top: "-102%",
+    left: "-130%",
+    width: "12em",
+    height: "5.5em",
+    borderRadius: "50px",
+    background: "linear-gradient(#171717, #171717, #353535, #353535, #171717)",
+    transform: "rotate(-29deg)",
+    clipPath: "polygon(50% 0%, 49% 100%, 52% 100%)",
+  },
+  "& .a1d": {
+    position: "relative",
+    top: "-211%",
+    left: "-35%",
+    transform: "rotate(45deg)",
+    width: "0.5em",
+    height: "0.5em",
     borderRadius: "50%",
     border: "2px solid black",
-    backgroundColor: "#f27405",
-    marginBottom: "-6em",
-    marginLeft: "0em",
-    zIndex: -1,
-    "&::before": {
-        content: '""',
-        position: "absolute",
-        marginTop: "0.2em",
-        marginLeft: "1.25em",
-        transform: "rotate(-20deg)",
-        width: "1.5em",
-        height: "0.8em",
-        borderRadius: "50%",
-        backgroundColor: "#f69e50",
-    },
-    "&::after": {
-        content: '""',
-        position: "absolute",
-        marginTop: "0.2em",
-        marginLeft: "1.25em",
-        transform: "rotate(-20deg)",
-        width: "1.5em",
-        height: "0.8em",
-        borderRadius: "50%",
-        backgroundColor: "#f69e50",
-    },
-    "&. antenna_shadow": {
-        position: "absolute",
-        backgroundColor: "transparent",
-        width: "50px",
-        height: "56px",
-        marginLeft: "1.68em",
-        borderRadius: "45%",
-        transform: "rotate(140deg)",
-        border: "4px solid transparent",
-        boxShadow:
-            `inset 0px 16px #a85103,
-            inset 0px 16px 1px 1px #a85103`,
-    },
-    "& .a1": {
-        position: "relative",
-        top: "-102%",
-        left: "-130%",
-        width: "12em",
-        height: "5.5em",
-        borderRadius: "50px",
-        background: "linear-gradient(#171717, #171717, #353535, #353535, #171717)",
-        transform: "rotate(-29deg)",
-        clipPath: "polygon(50% 0%, 49% 100%, 52% 100%)",
-    },
-    "& .a1d": {
-        position: "relative",
-        top: "-211%",
-        left: "-35%",
-        transform: "rotate(45deg)",
-        width: "0.5em",
-        height: "0.5em",
-        borderRadius: "50%",
-        border: "2px solid black",
-        backgroundColor: "#979797",
-        zIndex: "99",
-    },
-    "& .a2": {
-        position: "relative",
-        top: "-210%",
-        left: "-10%",
-        width: "12em",
-        height: "4em",
-        borderRadius: "50px",
-        background: "linear-gradient(#171717, #171717, #353535, #353535, #171717)",
-        marginRight: "5em",
-        clipPath: "polygon(47% 0, 47% 0, 34% 34%, 54% 25%, 32% 100%, 29% 96%, 49% 32%, 30% 38%)",
-        transform: "rotate(-8deg)",
-    },
-    "& .a2d": {
-        position: "relative",
-        top: "-294%",
-        left: "-94%",
-        transform: "rotate(45deg)",
-        width: "0.5em",
-        height: "0.5em",
-        borderRadius: "50%",
-        border: "2px solid black",
-        backgroundColor: "#979797",
-        zIndex: "99",
-    },
+    backgroundColor: "#979797",
+    zIndex: "99",
+  },
+  "& .a2": {
+    position: "relative",
+    top: "-210%",
+    left: "-10%",
+    width: "12em",
+    height: "4em",
+    borderRadius: "50px",
+    background: "linear-gradient(#171717, #171717, #353535, #353535, #171717)",
+    marginRight: "5em",
+    clipPath: "polygon(47% 0, 47% 0, 34% 34%, 54% 25%, 32% 100%, 29% 96%, 49% 32%, 30% 38%)",
+    transform: "rotate(-8deg)",
+  },
+  "& .a2d": {
+    position: "relative",
+    top: "-294%",
+    left: "-94%",
+    transform: "rotate(45deg)",
+    width: "0.5em",
+    height: "0.5em",
+    borderRadius: "50%",
+    border: "2px solid black",
+    backgroundColor: "#979797",
+    zIndex: "99",
+  },
 }));
 
 const NotFound = styled("div", {
-    name: PREFIX,
-    slot: "notfound",
-    // shouldForwardProp: (prop: string) => prop !== "sizeFactor",
-    // overridesResolver: (_props, styles) => styles.notfound,
+  name: PREFIX,
+  slot: "notfound",
+  // shouldForwardProp: (prop: string) => prop !== "sizeFactor",
+  // overridesResolver: (_props, styles) => styles.notfound,
 })(() => ({
-    backgroundColor: "black",
-    paddingLeft: "0.3em",
-    paddingRight: "0.3em",
-    fontSize: "0.75em",
-    color: "white",
-    letterSpacing: 0,
-    borderRadius: "5px",
-    zIndex: "10",
+  backgroundColor: "black",
+  paddingLeft: "0.3em",
+  paddingRight: "0.3em",
+  fontSize: "0.75em",
+  color: "white",
+  letterSpacing: 0,
+  borderRadius: "5px",
+  zIndex: "10",
 }));
 
 const TVFrame = styled("div", {
-    name: PREFIX,
-    slot: "frame",
-    // shouldForwardProp: (prop: string) => prop !== "sizeFactor",
-    // overridesResolver: (_props, styles) => styles.frame,
+  name: PREFIX,
+  slot: "frame",
+  // shouldForwardProp: (prop: string) => prop !== "sizeFactor",
+  // overridesResolver: (_props, styles) => styles.frame,
 })(({ theme }) => ({
+  width: "17em",
+  height: "9em",
+  marginTop: "3em",
+  borderRadius: "15px",
+  backgroundColor: "#d36604",
+  display: "flex",
+  justifyContent: "center",
+  border: "2px solid #1d0e01",
+  boxShadow: "inset 0.2em 0.2em #e69635",
+  "&::after": {
+    content: "",
+    position: "absolute",
     width: "17em",
     height: "9em",
-    marginTop: "3em",
     borderRadius: "15px",
-    backgroundColor: "#d36604",
-    display: "flex",
-    justifyContent: "center",
-    border: "2px solid #1d0e01",
-    boxShadow: "inset 0.2em 0.2em #e69635",
-    "&::after": {
-        content: "",
-        position: "absolute",
-        width: "17em",
-        height: "9em",
-        borderRadius: "15px",
-        background:
-            `repeating - radial - gradient(#d36604 0 0.0001 %, #00000070 0 0.0002 %) 50% 0 / 2500px
-            2500px,
-            repeating- conic - gradient(#d36604 0 0.0001 %, #00000070 0 0.0002 %) 60 % 60 %/2500px
-            2500px`,
-        backgroundBlendMode: "difference",
-        opacity: 0.09,
-    },
-    "& .cruve_svg": {
-        position: "absolute",
-        marginTop: "0.25em",
-        marginLeft: "-0.25em",
-        height: "12px",
-        width: "12px",
-    },
-    "& .display_div": {
+    background: `
+      repeating-radial-gradient(#d36604 0 0.0001%, #00000070 0 0.0002%) 50% 0/2500px 2500px,
+      repeating-conic-gradient(#d36604 0 0.0001%, #00000070 0 0.0002%) 60% 60%/2500px 2500px
+    `,
+    backgroundBlendMode: 'difference',
+    opacity: 0.09,
+  },
+  "& .cruve_svg": {
+    position: "absolute",
+    marginTop: "0.25em",
+    marginLeft: "-0.25em",
+    height: "12px",
+    width: "12px",
+  },
+  "& .display_div": {
+    display: 'flex',
+    alignItems: 'center',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    borderRadius: '15px',
+    boxShadow: '3.5px 3.5px 0px #e69635',
+    "& .screen_out": {
+      width: "auto",
+      height: "auto",
+      borderRadius: "10px",
+      "& .screen_out1": {
+        width: "11em",
+        height: "7.75em",
         display: "flex",
         alignItems: "center",
-        alignSelf: "center",
         justifyContent: "center",
-        borderRadius: "15px",
-        boxShadow: "3.5px 3.5px 0px #e69635",
-        "& .screen_out": {
-            width: "auto",
-            height: "auto",
-            borderRadius: "10px",
-            "& .screen_out1": {
-                width: "11em",
-                height: "7.75em",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "10px",
-                "& .screen": {
-                    width: "13em",
-                    height: "7.85em",
-                    fontFamily: "Montserrat",
-                    border: "2px solid #1d0e01",
-                    backgroundColor:
-                        `repeating - radial - gradient(#000 0 0.0001 %, #ffffff 0 0.0002 %) 50% 0 / 2500px
-            2500px,
-            repeating- conic - gradient(#000 0 0.0001 %, #ffffff 0 0.0002 %) 60 % 60 %/2500px
-            2500px`,
-                    backgroundBlendMode: "difference",
-                    animation: "b 0.2s infinite alternate",
-                    borderRadius: "10px",
-                    zIndex: 99,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: "bold",
-                    color: "#252525",
-                    letterSpacing: "0.15em",
-                    textAlign: "center",
-                },
-                "&. screenM": {
-                    width: "13em",
-                    height: "7.85em",
-                    position: "relative",
-                    fontFamily: "Montserrat",
-                    background:
-                        `linear-gradient(
-                    to right,
-                    #002fc6 0%,
-                    #002bb2 14.2857142857%,
-                    #3a3a3a 14.2857142857%,
-                    #303030 28.5714285714%,
-                    #ff0afe 28.5714285714%,
-                    #f500f4 42.8571428571%,
-                    #6c6c6c 42.8571428571%,
-                    #626262 57.1428571429%,
-                    #0affd9 57.1428571429%,
-                    #00f5ce 71.4285714286%,
-                    #3a3a3a 71.4285714286%,
-                    #303030 85.7142857143%,
-                    white 85.7142857143%,
-                    #fafafa 100%
-                )`,
-                    borderRadius: "10px",
-                    border: "2px solid black",
-                    zIndex: 99,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: "bold",
-                    color: "#252525",
-                    letterSpacing: "0.15em",
-                    textAlign: "center",
-                    "&::before": {
-                        content: "",
-                        position: "absolute",
-                        left: 0,
-                        zIndex: 1,
-                        width: "100%",
-                        top: 0,
-                        height: "68.4782608696%",
-                        background:
-                            `linear - gradient(
-                        to right,
-                        white 0 %,
-                        #fafafa 14.2857142857 %,
-                        #ffe60a 14.2857142857 %,
-                        #f5dc00 28.5714285714 %,
-                        #0affd9 28.5714285714 %,
-                        #00f5ce 42.8571428571 %,
-                        #10ea00 42.8571428571 %,
-                        #0ed600 57.1428571429 %,
-                        #ff0afe 57.1428571429 %,
-                        #f500f4 71.4285714286 %,
-                        #ed0014 71.4285714286 %,
-                        #d90012 85.7142857143 %,
-                        #002fc6 85.7142857143 %,
-                        #002bb2 100 %
-                    )`,
-                    },
-                    "&::after": {
-                        content: "",
-                        position: "absolute",
-                        left: 0,
-                        zIndex: 1,
-                        width: "100%",
-                        bottom: 0,
-                        height: "21.7391304348%",
-                        background:
-                            `linear - gradient(
-                        to right,
-                        #006c6b 0 %,
-                        #005857 16.6666666667 %,
-                        white 16.6666666667 %,
-                        #fafafa 33.3333333333 %,
-                        #001b75 33.3333333333 %,
-                        #001761 50 %,
-                        #6c6c6c 50 %,
-                        #626262 66.6666666667 %,
-                        #929292 66.6666666667 %,
-                        #888888 83.3333333333 %,
-                        #3a3a3a 83.3333333333 %,
-                        #303030 100 %
-                    )`,
-                    }
-                },
-            },
+        borderRadius: "10px",
+        "& .screen": {
+          width: '13em',
+          height: '7.85em',
+          fontFamily: 'Montserrat',
+          border: '2px solid #1d0e01',
+          background: `
+                      repeating-radial-gradient(#000 0 0.0001%, #ffffff 0 0.0002%) 50% 0/2500px 2500px,
+                      repeating-conic-gradient(#000 0 0.0001%, #ffffff 0 0.0002%) 60% 60%/2500px 2500px
+                    `,
+          backgroundBlendMode: 'difference',
+          animation: `${bAnimation} 0.2s infinite alternate`,
+          borderRadius: '10px',
+          zIndex: 99,
+          display: { xs: 'none', lg: 'flex' },
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 'bold',
+          color: '#252525',
+          letterSpacing: '0.15em',
+          textAlign: 'center',
         },
+        "&. screenM": {
+          width: '13em',
+          height: '7.85em',
+          position: 'relative',
+          fontFamily: 'Montserrat',
+          background: `linear-gradient(
+            to right,
+            #002fc6 0%, #002bb2 14.2857142857%,
+            #3a3a3a 14.2857142857%, #303030 28.5714285714%,
+            #ff0afe 28.5714285714%, #f500f4 42.8571428571%,
+            #6c6c6c 42.8571428571%, #626262 57.1428571429%,
+            #0affd9 57.1428571429%, #00f5ce 71.4285714286%,
+            #3a3a3a 71.4285714286%, #303030 85.7142857143%,
+            white 85.7142857143%, #fafafa 100%
+          )`,
+          borderRadius: '10px',
+          border: '2px solid black',
+          zIndex: 99,
+          display: { xs: 'flex', lg: 'none' },
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 'bold',
+          color: '#252525',
+          letterSpacing: '0.15em',
+          textAlign: 'center',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 1,
+            width: '100%',
+            height: '68.4782608696%',
+            background: `linear-gradient(
+              to right,
+              white 0%, #fafafa 14.2857142857%,
+              #ffe60a 14.2857142857%, #f5dc00 28.5714285714%,
+              #0affd9 28.5714285714%, #00f5ce 42.8571428571%,
+              #10ea00 42.8571428571%, #0ed600 57.1428571429%,
+              #ff0afe 57.1428571429%, #f500f4 71.4285714286%,
+              #ed0014 71.4285714286%, #d90012 85.7142857143%,
+              #002fc6 85.7142857143%, #002bb2 100%
+            )`,
+          },
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            zIndex: 1,
+            width: '100%',
+            height: '21.7391304348%',
+            background: `linear-gradient(
+              to right,
+              #006c6b 0%, #005857 16.6666666667%,
+              white 16.6666666667%, #fafafa 33.3333333333%,
+              #001b75 33.3333333333%, #001761 50%,
+              #6c6c6c 50%, #626262 66.6666666667%,
+              #929292 66.6666666667%, #888888 83.3333333333%,
+              #3a3a3a 83.3333333333%, #303030 100%
+            )`,
+          },
+        },
+      },
     },
-    "& .lines": {
-        display: "flex",
-        columnGap: "0.1rem",
-        alignSelf: "flex-end",
-    }
+  },
+  "& .lines": {
+    display: "flex",
+    columnGap: "0.1rem",
+    alignSelf: "flex-end",
+  }
 
 }));
 
 const TV = () => {
-    return (
-        <Root><StyledWrapper>
-            <div className="main_wrapper">
-                <div className="main">
-                    <div className="antenna">
-                        <div className="antenna_shadow" />
-                        <div className="a1" />
-                        <div className="a1d" />
-                        <div className="a2" />
-                        <div className="a2d" />
-                        <div className="a_base" />
-                    </div>
-                    <div className="tv">
-                        <div className="cruve">
-                            <svg className="curve_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 189.929 189.929" xmlSpace="preserve">
-                                <path d="M70.343,70.343c-30.554,30.553-44.806,72.7-39.102,115.635l-29.738,3.951C-5.442,137.659,11.917,86.34,49.129,49.13
+  return (
+    <Root><StyledWrapper>
+      <div className="main_wrapper">
+        <div className="main">
+          <div className="antenna">
+            <div className="antenna_shadow" />
+            <div className="a1" />
+            <div className="a1d" />
+            <div className="a2" />
+            <div className="a2d" />
+            <div className="a_base" />
+          </div>
+          <div className="tv">
+            <div className="cruve">
+              <svg className="curve_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 189.929 189.929" xmlSpace="preserve">
+                <path d="M70.343,70.343c-30.554,30.553-44.806,72.7-39.102,115.635l-29.738,3.951C-5.442,137.659,11.917,86.34,49.129,49.13
         C86.34,11.918,137.664-5.445,189.928,1.502l-3.95,29.738C143.041,25.54,100.895,39.789,70.343,70.343z" />
-                            </svg>
-                        </div>
-                        <div className="display_div">
-                            <div className="screen_out">
-                                <div className="screen_out1">
-                                    <div className="screen">
-                                        <span className="notfound_text"> NOT FOUND</span>
-                                    </div>
-                                    <div className="screenM">
-                                        <span className="notfound_text"> NOT FOUND</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="lines">
-                            <div className="line1" />
-                            <div className="line2" />
-                            <div className="line3" />
-                        </div>
-                        <div className="buttons_div">
-                            <div className="b1"><div /></div>
-                            <div className="b2" />
-                            <div className="speakers">
-                                <div className="g1">
-                                    <div className="g11" />
-                                    <div className="g12" />
-                                    <div className="g13" />
-                                </div>
-                                <div className="g" />
-                                <div className="g" />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bottom">
-                        <div className="base1" />
-                        <div className="base2" />
-                        <div className="base3" />
-                    </div>
-                </div>
-                <div className="text_404">
-                    <div className="text_4041">4</div>
-                    <div className="text_4042">0</div>
-                    <div className="text_4043">4</div>
-                </div>
+              </svg>
             </div>
-        </StyledWrapper></Root>
+            <div className="display_div">
+              <div className="screen_out">
+                <div className="screen_out1">
+                  <div className="screen">
+                    <span className="notfound_text"> NOT FOUND</span>
+                  </div>
+                  <div className="screenM">
+                    <span className="notfound_text"> NOT FOUND</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="lines">
+              <div className="line1" />
+              <div className="line2" />
+              <div className="line3" />
+            </div>
+            <div className="buttons_div">
+              <div className="b1"><div /></div>
+              <div className="b2" />
+              <div className="speakers">
+                <div className="g1">
+                  <div className="g11" />
+                  <div className="g12" />
+                  <div className="g13" />
+                </div>
+                <div className="g" />
+                <div className="g" />
+              </div>
+            </div>
+          </div>
+          <div className="bottom">
+            <div className="base1" />
+            <div className="base2" />
+            <div className="base3" />
+          </div>
+        </div>
+        <div className="text_404">
+          <div className="text_4041">4</div>
+          <div className="text_4042">0</div>
+          <div className="text_4043">4</div>
+        </div>
+      </div>
+    </StyledWrapper></Root>
 
-    );
+  );
 }
 
 const StyledWrapper = styled.div`
