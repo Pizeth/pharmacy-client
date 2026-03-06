@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Siemreap, Moul } from "next/font/google";
@@ -104,6 +104,11 @@ const googleSans = localFont({
   ],
   variable: "--font-google",
 });
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+})
 
 export default function RootLayout({
   children,

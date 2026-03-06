@@ -8,7 +8,7 @@ import {
   SocialLoginProps,
   SocialButtonProps,
 } from "./auth.interface";
-import { LoginFormProps } from "./component-props.interface";
+import { LoginFormProps, TVProps } from "./component-props.interface";
 
 // This interface maps each component's name to its specific props interface.
 // To add a new component, you only need to add a new line here.
@@ -22,6 +22,7 @@ export interface RazethComponentsPropsList {
   RazethSocialButton: Partial<SocialButtonProps>;
   RazethAuthNavigation: Partial<AuthNavigationProps>;
   RazethFooter: Partial<FooterProps>;
+  RazethTV: Partial<TVProps>;
 }
 
 export interface SideImage {

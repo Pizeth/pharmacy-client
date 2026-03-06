@@ -11,7 +11,7 @@ import Mars from "@/components/effect/planets/mars";
 import Jupyter from "@/components/effect/planets/jupiter";
 import Sun from "@/components/effect/planets/sun";
 import TestPlanet from "@/components/effect/planets/testPlanet";
-import TV from "@/components/effect/customs/tv";
+import TV from "@/components/effect/customs/tv/tv";
 
 interface Star {
   id: number;

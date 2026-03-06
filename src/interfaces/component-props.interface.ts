@@ -7,6 +7,7 @@ import { SaveHandler } from "ra-core";
 import { SaveButtonProps } from "react-admin";
 import { AuthAction } from "@/types/theme";
 import { Circle } from "lucide-react";
+import { HtmlHTMLAttributes } from "react";
 
 export interface LoginFormProps {
   content?: StyleComponent;
@@ -157,4 +158,9 @@ export interface FilterProps extends BasicSVGProps {
 export interface ColumnAvatarProps extends Omit<AvatarOwnProps, "children"> {
   children?: string;
   icon?: React.ReactNode;
+}
+
+export interface TVProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  className?: string;
+  sx?: SxProps<Theme>;
 }

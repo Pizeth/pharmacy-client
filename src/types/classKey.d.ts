@@ -4,9 +4,12 @@ import { ComponentsOverrides, Theme } from "@mui/material";
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 export type ClassKey =
   | "root"
+  | "main"
+  | "wrapper"
   | "overlay"
   | "ambient"
   | "effect"
+  | "mobile"
   | "heading"
   | "content"
   | "item"
