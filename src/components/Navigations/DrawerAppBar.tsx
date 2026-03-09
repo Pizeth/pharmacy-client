@@ -35,7 +35,8 @@ import ThemeToggle from "../effect/themes/themeToggle";
 import RielIcon from "../icons/riel";
 import { navigate } from "next/dist/client/components/segment-cache/navigation";
 import FaHome from "../icons/home";
-import { filt, wee } from "@/theme/keyframes";
+import { filt, hi, hii, wee } from "@/theme/keyframes";
+import { makePulseKeyframes } from "@/utils/themeUtils";
 
 // const drawerWidth = 250;
 // 1. Define the responsive width once
@@ -175,7 +176,7 @@ const HamBurgerNav = styled(Box)(({ theme }) => ({
     position: "absolute",
     inset: 0,
     "--c": "7px",
-    // backgroundColor: "#000",
+    backgroundColor: "#000",
     backgroundImage: `
                 radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
                 radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
@@ -202,6 +203,95 @@ const HamBurgerNav = styled(Box)(({ theme }) => ({
     animation: `${wee} 40s linear infinite, ${filt} 6s linear infinite`,
     zIndex: 0,
   }
+}));
+
+const Logo = styled(Box)(({ theme }) => ({
+  // flexGrow: 1,
+  // display: { xs: "flex", sm: "block" },
+  // mr: 1,
+  // position: "relative",
+  // width: `max(40px, 7vmin)`,
+  // height: `max(40px, 7vmin)`,
+  // img: {
+  //   p: 0.5,
+  // },
+
+  position: "absolute",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  borderRadius: "50%",
+  width: "7.5%", // one-third of parent width
+  aspectRatio: "1 / 1", // keep height equal to width
+  // paddingTop: "var(--app-sideImage-circleSize)", // makes height equal to width
+  // backgroundImage:
+  //   props.theme.custom.sideImage.circleColor || "#02020280", // blue circle
+  // backgroundSize: "100% 100%",
+  // backgroundBlendMode: "multiply",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)", // center it
+  // boxShadow: "0 0 20px 10px rgba(30, 64, 175, 0.5)",
+  boxShadow: `0 0 20px 10px ${theme.palette.primary.main}50`,
+  "&::before": {
+    content: "''",
+    position: "absolute",
+    inset: 0,
+    borderRadius: "50%",
+    // backgroundImage:
+    //   props.theme.custom.sideImage.circleColor || "#02020280", // blue circle
+
+    // zIndex: 0, // keep it behind children
+    // pointerEvents: "none", // don’t block clicks
+    // background: `radial-gradient(
+    //   circle,
+    //       ${props.theme.custom.sideImage.circleColor} ${
+    //   props.theme.custom.sideImage.circleSoftStop
+    // },
+    //   transparent ${props.theme.custom.sideImage.circleSoftFade}
+    //   // ${props.theme.custom.sideImage.circleColor || "#1e40af"} 70%,
+    //   // transparent 100%
+    // )`,
+    // backgroundImage: `radial-gradient(
+    //   circle at 50% 50%,
+    //   ${makeRadialStops(
+    //     props.theme.custom.sideImage.circleColor,
+    //     props.theme.custom.sideImage.circleStopCount,
+    //     props.theme.custom.sideImage.maxOpacity
+    //   )}
+    // )`,
+    animation: `${makePulseKeyframes(
+      theme.custom.sideImage.circlePulseSequence,
+    )} ${theme.custom.sideImage.circlePulseDuration
+      } ease-in-out infinite`,
+    // backgroundSize: "100% 100%",
+  },
+
+  /*** Animation ***/
+  // "--c": "#09f",
+  backgroundColor: "#000",
+  backgroundImage:
+    theme.custom.sideImage.animationBackground.backgroundImage,
+  backgroundSize:
+    theme.custom.sideImage.animationBackground.backgroundSize,
+
+  animation: `${hi} 150s linear infinite`,
+  "&::after": {
+    content: "''",
+    borderRadius: "50%",
+    position: "absolute",
+    inset: 0,
+    zIndex: 1,
+    backgroundImage: `radial-gradient(
+                circle at 50% 50%,
+                #0000 0,
+                #0000 2px,
+                hsl(0 0 4%) 2px
+              )`,
+    backgroundSize: "8px 8px",
+    "--f": "blur(1em) brightness(6)",
+    animation: `${hii} 10s linear infinite`,
+  },
 }));
 
 const navItems = [
@@ -284,6 +374,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
               },
             }}
           >
+            <Logo />
             <Image
               src="/static/images/logo.svg"
               alt="Logo"
