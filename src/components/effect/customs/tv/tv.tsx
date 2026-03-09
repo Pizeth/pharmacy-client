@@ -125,7 +125,7 @@ const TV = () => {
                     </TVBody>
                     <Bottom />
                 </Main>
-                <Text404 />
+                {/* <Text404 /> */}
             </TVWrapper>
         </Root>
     )

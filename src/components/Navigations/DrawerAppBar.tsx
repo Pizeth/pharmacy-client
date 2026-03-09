@@ -169,7 +169,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const navItems = [
-  { title: "ទំព័រដើម", icon: <HomeIcon color="error" fontSize="medium" /> },
+  { title: "ទំព័រដើម", icon: <FaHome color="error" fontSize="medium" /> },
   {
     title: "ប្រព័ន្ធចរន្តឯកសារ",
     icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />,
@@ -413,10 +413,10 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         anchor="left"
         open={open}
         onClose={handleDrawerToggle}
-        // onOpen={toggleDrawer}
-        // ModalProps={{
-        //   keepMounted: true, // Better open performance on mobile.
-        // }}
+      // onOpen={toggleDrawer}
+      // ModalProps={{
+      //   keepMounted: true, // Better open performance on mobile.
+      // }}
       >
         {drawer}
       </Drawer>
