@@ -281,6 +281,7 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
         "var(--font-siemreap)",
         "var(--font-mef2)",
         "var(--font-moul)",
+        "var(--font-kantumruy)",
       ].join(","),
       h6: {
         fontFamily: "var(--font-mef2)", // Use Moul for headers like "Kingdom of Cambodia"
@@ -289,6 +290,10 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
       h5: {
         fontFamily: "var(--font-mef2)", // Use Moul for headers like "Kingdom of Cambodia"
         fontSize: "1.15rem",
+      },
+      h4: {
+        fontFamily: "var(--font-kantumruy)", // Use Moul for headers like "Kingdom of Cambodia"
+        fontSize: "1.3rem",
       },
     },
     components: {
@@ -673,6 +678,15 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
               "sans-serif",
               "var(--font-moul)",
             ].join(","),
+          },
+          h4: {
+            fontFamily: [
+              "Roboto",
+              "Helvetica",
+              "sans-serif",
+              "var(--font-kantumruy)",
+            ].join(","),
+            fontWeight: "inherit",
           },
         },
       },

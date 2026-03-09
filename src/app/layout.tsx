@@ -91,6 +91,16 @@ const interKhmerLoopless = localFont({
   variable: "--font-interkhmerloopless",
 });
 
+const kantumruy = localFont({
+  src: [
+    {
+      path: "../../public/fonts/kantumruy/KantumruyPro-VariableFont_wght.ttf",
+      style: "normal",
+    },
+  ],
+  variable: "--font-kantumruy",
+})
+
 const googleSans = localFont({
   src: [
     {
@@ -135,7 +145,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} ${kantumruy.variable} ${montserrat.variable} antialiased`}
       >
         {/* {children} */}
         {/* <ThemeProvider theme={darkTheme}>{children}</ThemeProvider> */}

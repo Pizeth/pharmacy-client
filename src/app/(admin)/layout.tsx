@@ -5,5 +5,6 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   /* Place children where you want to render a page or nested layout */
-  return <main>{children}</main>;
+  return children;
+  // return <main>{children}</main>;
 }

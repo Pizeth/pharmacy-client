@@ -35,6 +35,7 @@ import ThemeToggle from "../effect/themes/themeToggle";
 import RielIcon from "../icons/riel";
 import { navigate } from "next/dist/client/components/segment-cache/navigation";
 import FaHome from "../icons/home";
+import { filt, wee } from "@/theme/keyframes";
 
 // const drawerWidth = 250;
 // 1. Define the responsive width once
@@ -168,6 +169,41 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const HamBurgerNav = styled(Box)(({ theme }) => ({
+  "&::before": {
+    content: "''",
+    position: "absolute",
+    inset: 0,
+    "--c": "7px",
+    // backgroundColor: "#000",
+    backgroundImage: `
+                radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+                radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+                radial-gradient(circle at 50% 50%, #f00, #f000 60%),
+                radial-gradient(circle at 50% 50%, #ff0, #ff00 60%),
+                radial-gradient(circle at 50% 50%, #0f0, #0f00 60%),
+                radial-gradient(ellipse at 50% 50%, #00f, #00f0 60%)
+              `,
+    backgroundSize: `
+                12px 20.7846097px,
+                12px 20.7846097px,
+                200% 200%,
+                200% 200%,
+                200% 200%,
+                200% 20.7846097px
+              `,
+    "--p": "0px 0px, 6px 10.39230485px",
+    backgroundPosition: `
+                var(--p),
+                0% 0%,
+                0% 0%,
+                0% 0px
+              `,
+    animation: `${wee} 40s linear infinite, ${filt} 6s linear infinite`,
+    zIndex: 0,
+  }
+}));
+
 const navItems = [
   { title: "ទំព័រដើម", icon: <FaHome color="error" fontSize="medium" /> },
   {
@@ -236,7 +272,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
       </Box> */}
       <DrawerHeader>
         <IconButton onClick={handleDrawerToggle} sx={{ height: "100%", p: 0 }}>
-          <Box
+          <HamBurgerNav
             sx={{
               // display: { xs: "flex", md: "flex" },
               // mr: 1,
@@ -257,7 +293,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
               style={{ objectFit: "contain" }}
               unoptimized
             />
-          </Box>
+          </HamBurgerNav>
         </IconButton>
       </DrawerHeader>
       <Divider />
@@ -345,7 +381,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   startIcon={item.icon}
                   size="large"
                 >
-                  <Typography variant="h6" sx={{ textAlign: "center" }}>
+                  <Typography variant="h4" align="center">
                     {item.title}
                   </Typography>
                 </Button>
@@ -357,7 +393,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   window.location.href = "/staff";
                 }}
               >
-                <Typography variant="h6" sx={{ textAlign: "center" }}>
+                <Typography variant="h4" align="center">
                   ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក
                 </Typography>
               </Link>
