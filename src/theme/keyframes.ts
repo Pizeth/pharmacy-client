@@ -394,6 +394,11 @@ export const bAnimation = keyframes`
   }
 `;
 
+export const indicatorSpin = keyframes`
+  0%, 100% { transform: rotate(35deg); }
+  50%       { transform: rotate(55deg); }
+`;
+
 // export const fadeOut = keyframes`
 //   from { opacity: 1; transform: scale(1) translateY(100%); }
 //   to { opacity: 0; transform: scale(0); }

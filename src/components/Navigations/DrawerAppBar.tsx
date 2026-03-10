@@ -34,9 +34,12 @@ import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import ThemeToggle from "../effect/themes/themeToggle";
 import RielIcon from "../icons/riel";
 import { navigate } from "next/dist/client/components/segment-cache/navigation";
-import FaHome from "../icons/home";
+import RazHome from "../icons/home";
 import { filt, hi, hii, wee } from "@/theme/keyframes";
 import { makePulseKeyframes } from "@/utils/themeUtils";
+import NavigationMenu from "./Navigation/NavigationMenu";
+import RazPeople from "../icons/people";
+import RazContact from "../icons/contact";
 
 // const drawerWidth = 250;
 // 1. Define the responsive width once
@@ -294,16 +297,24 @@ const Logo = styled(Box)(({ theme }) => ({
   },
 }));
 
+// const navItems = [
+//   { title: "ទំព័រដើម", icon: <RazHome color="error" fontSize="medium" /> },
+//   {
+//     title: "ប្រព័ន្ធចរន្តឯកសារ",
+//     icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />,
+//   },
+//   {
+//     title: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស",
+//     icon: <RielIcon color="success" fontSize="medium" />,
+//   },
+// ];
+
 const navItems = [
-  { title: "ទំព័រដើម", icon: <FaHome color="error" fontSize="medium" /> },
-  {
-    title: "ប្រព័ន្ធចរន្តឯកសារ",
-    icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />,
-  },
-  {
-    title: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស",
-    icon: <RielIcon color="success" fontSize="medium" />,
-  },
+  { title: "ទំព័រដើម", icon: <RazHome color="error" fontSize="medium" />, href: "/" },
+  { title: "ប្រព័ន្ធចរន្តឯកសារ", icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />, href: "/fts" },
+  { title: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស", icon: <RielIcon color="success" fontSize="medium" />, href: "/payrolls" },
+  { title: "ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក", icon: <RazPeople color="primary" fontSize="medium" />, href: "/photos" },
+  { title: "អំពីក្រសួង", icon: <RazContact color="warning" fontSize="medium" />, href: "/about" },
 ];
 
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -450,7 +461,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
             >
               MUI
             </Typography> */}
-            <Box
+            {/* <Box
               sx={{
                 flexGrow: 1,
                 display: {
@@ -488,7 +499,8 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក
                 </Typography>
               </Link>
-            </Box>
+            </Box> */}
+            <NavigationMenu />
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />

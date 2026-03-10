@@ -6,7 +6,7 @@ import {
 import { StarfieldOptions } from "@/interfaces/css.interface";
 import { MeteorConfig } from "@/interfaces/theme.interface";
 import { GradientOptions, GradientPoint } from "@/types/theme";
-import { alpha, keyframes } from "@mui/material/styles";
+import { alpha, keyframes, Theme } from "@mui/material/styles";
 
 // export function makeSoftStops(color: string) {
 //   return [
@@ -39,7 +39,7 @@ import { alpha, keyframes } from "@mui/material/styles";
 export function makeRadialStops(
   color: string,
   count = 5,
-  maxOpacity = 0.3
+  maxOpacity = 0.3,
 ): string {
   const stops: string[] = [];
   for (let i = 0; i <= count; i++) {
@@ -60,7 +60,7 @@ export function makeRadialStops(
 export function makePulseSequence(
   ringCount: number,
   min: number,
-  max: number
+  max: number,
 ): number[] {
   // if (ringCount < 3) throw new Error("ringCount must be >= 3");
   // if (ringCount % 2 === 0)
@@ -89,7 +89,7 @@ export function makePulseSequence(
 export function makePulseVars(
   color: string,
   count: number,
-  sequence: number[]
+  sequence: number[],
 ) {
   const vars: Record<string, string> = {};
   sequence.forEach((opacity, i) => {
@@ -115,7 +115,7 @@ export function makePulseKeyframes(sequence: number[]) {
 
 export function buildGradients(
   points: GradientPoint[],
-  opts: GradientOptions = {}
+  opts: GradientOptions = {},
 ): {
   backgroundImage: string;
   backgroundSize: string;
@@ -136,7 +136,7 @@ export function buildGradients(
   const gradients = points.map((p) =>
     p.small
       ? `radial-gradient(${dotSize}px ${dotSize}px at ${p.x}px ${p.y}px, ${color} 100%, #0000 150%)`
-      : `radial-gradient(${streakWidth}px ${streakHeight}px at ${p.x}px ${p.y}px, ${color}, #0000)`
+      : `radial-gradient(${streakWidth}px ${streakHeight}px at ${p.x}px ${p.y}px, ${color}, #0000)`,
   );
 
   // const sizes = points.map((p) =>
@@ -190,7 +190,7 @@ export function buildResponsiveShadow(sizeVar = "--avatar-size") {
 export function createStarfield(
   count = 50,
   colors: string[],
-  glowIntensity: number = 1
+  glowIntensity: number = 1,
 ): string {
   // static stars
   return Array.from({ length: count })
@@ -271,7 +271,7 @@ export const generatTwinkleStar = (
   colors: string[],
   baseSize = 1,
   minLifetime = 10000,
-  maxLifetime = 20000
+  maxLifetime = 20000,
 ): TwinkleStarData => {
   const x = (Math.random() * 100).toFixed(2); // viewport width %
   const y = (Math.random() * 100).toFixed(2); // viewport height %
@@ -405,7 +405,7 @@ function pathLength(
   cx: number,
   cy: number,
   x2: number,
-  y2: number
+  y2: number,
 ) {
   // rough quadratic Bézier length via sampling
   const steps = 20;
@@ -431,7 +431,7 @@ export const generateStar = (
   colors: string[],
   glowIntensity: number = 1.25,
   baseSpeed: number = 20, // % per second (normalized)
-  baseSize: number = 1
+  baseSize: number = 1,
 ): ShootingStarData => {
   const width = window.innerWidth;
   const height = window.innerHeight;
@@ -711,7 +711,7 @@ export const generateStar = (
  */
 export const parseUnit = (
   value: string | number,
-  containerHeight: number
+  containerHeight: number,
 ): number => {
   if (typeof value === "number") return value;
   if (value.endsWith("px")) return parseFloat(value);
@@ -724,3 +724,50 @@ export const parseUnit = (
   // Fallback for simple strings
   return parseFloat(value);
 };
+
+/**
+ * Resolves a color string to an actual CSS color value.
+ * Accepts either:
+ *  - a theme palette key  → "error" | "warning" | "success" | "primary" etc.
+ *  - a palette path       → "error.dark" | "primary.light"
+ *  - any raw CSS color    → "orange" | "#fe3e00" | "rgb(...)"
+ */
+export function resolveColor(color: string, theme: Theme): string {
+  // try dot-path first e.g. "error.dark"
+  const parts = color.split(".");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let node: any = theme.palette;
+  // console.log("color:", node);
+
+  for (const part of parts) {
+    node = node[part];
+    if (node === undefined) break;
+  }
+
+  // landed on a palette token object e.g. theme.palette.error → grab .main
+  if (typeof node === "object" && node !== null && "main" in node) {
+    return node.main;
+  }
+
+  console.log("color:", node);
+
+  // landed on a direct string e.g. theme.palette.error.dark
+  if (typeof node === "string") return node;
+
+  // fall back to the raw value (plain CSS color)
+  return color;
+}
+
+// function getContrastColor(hex) {
+//   const r = parseInt(hex.substr(1, 2), 16);
+//   const g = parseInt(hex.substr(3, 2), 16);
+//   const b = parseInt(hex.substr(5, 2), 16);
+//   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+//   return luminance > 0.5 ? "#000000" : "#ffffff";
+// }
+
+// // Example usage:
+// const dynamicColor = "#ff00ff";
+// document.getElementById("myElement").style.backgroundColor = dynamicColor;
+// document.getElementById("myElement").style.color =
+//   getContrastColor(dynamicColor);

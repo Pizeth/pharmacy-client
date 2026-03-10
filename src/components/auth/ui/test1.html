@@ -4,220 +4,201 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <style>
-      @import url("https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900");
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Poppins", sans-serif;
-      }
-
-      body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        background: #282a36;
-      }
-
-      .navigation {
-        position: relative;
-        width: 400px;
-        height: 70px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #333;
-        border-radius: 10px;
-      }
-
-      .navigation ul {
-        position: relative;
-        display: flex;
-        width: 350px;
-      }
-
-      .navigation ul li {
-        position: relative;
-        list-style: none;
-        width: 70px;
-        height: 70px;
-        z-index: 1;
-      }
-
-      .navigation ul li a {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        width: 100%;
-        text-align: center;
-        font-weight: 500;
-      }
-
-      .navigation ul li a .icon {
-        position: relative;
-        display: block;
-        font-size: 1.5em;
-        line-height: 75px;
-        transition: 0.5s;
-        color: rgba(255, 255, 255, 0.5);
-      }
-
-      .navigation ul li:hover a .icon {
-        color: rgba(255, 255, 255, 1);
-      }
-
-      .navigation ul li.active a .icon {
-        transform: translateY(-8px);
-        color: #29fd53;
-      }
-
-      .navigation ul li a .text {
-        position: absolute;
-        opacity: 0;
-        font-weight: 600;
-        font-size: 0.5em;
-        color: #222327;
-        transition: 0.5s;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        transform: translateY(0px);
-      }
-
-      .navigation ul li.active a .text {
-        transform: translateY(13px);
-        opacity: 1;
-      }
-
-      .indicator {
-        position: absolute;
-        width: 70px;
-        height: 70px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: 0.5s;
-      }
-
-      .indicator::before {
-        content: "";
-        position: absolute;
-        bottom: 13px;
-        width: 80%;
-        height: 14px;
-        background: #29fd53;
-        border-radius: 10px;
-      }
-
-      .indicator::after {
-        content: "";
-        position: absolute;
-        top: -3px;
-        width: 7.5px;
-        height: 7.5px;
-        border-radius: 50%;
-        background: #333;
-        box-shadow:
-          0 0 0 2px #29fd53,
-          50px 50px #29fd53,
-          40px 0 #29fd53,
-          0 40px #29fd53;
-        transform: rotate(45deg);
-        animation: animate 2s ease-in-out infinite;
-      }
-
-      @keyframes animate {
-        0%,
-        100% {
-          transform: rotate(35deg);
-        }
-        50% {
-          transform: rotate(55deg);
-        }
-      }
-
-      .navigation ul li:nth-child(2).active ~ .indicator {
-        transform: translateX(calc(70px * 1));
-      }
-
-      .navigation ul li:nth-child(3).active ~ .indicator {
-        transform: translateX(calc(70px * 2));
-      }
-
-      .navigation ul li:nth-child(4).active ~ .indicator {
-        transform: translateX(calc(70px * 3));
-      }
-
-      .navigation ul li:nth-child(5).active ~ .indicator {
-        transform: translateX(calc(70px * 4));
-      }
-    </style>
   </head>
   <body>
-    <div class="navigation">
-      <ul>
-        <li class="list active">
-          <a href="#">
-            <span class="icon">
-              <ion-icon name="home-outline"></ion-icon>
-            </span>
-            <span class="text">Home</span>
-          </a>
-        </li>
-        <li class="list">
-          <a href="#">
-            <span class="icon">
-              <ion-icon name="person-outline"></ion-icon>
-            </span>
-            <span class="text">Profile</span>
-          </a>
-        </li>
-        <li class="list">
-          <a href="#">
-            <span class="icon">
-              <ion-icon name="chatbubble-outline"></ion-icon>
-            </span>
-            <span class="text">Messages</span>
-          </a>
-        </li>
-        <li class="list">
-          <a href="#">
-            <span class="icon">
-              <ion-icon name="camera-outline"></ion-icon>
-            </span>
-            <span class="text">Photos</span>
-          </a>
-        </li>
-        <li class="list">
-          <a href="#">
-            <span class="icon">
-              <ion-icon name="settings-outline"></ion-icon>
-            </span>
-            <span class="text">Settings</span>
-          </a>
-        </li>
-        <div class="indicator"></div>
-      </ul>
-    </div>
-    <script>
-      let list = document.querySelectorAll(".list");
-      function activeLink() {
-        list.forEach((item) => item.classList.remove("active"));
-        this.classList.add("active");
-      }
-      list.forEach((item) => item.addEventListener("click", activeLink));
-    </script>
-    <script
-      type="module"
-      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
-    ></script>
-    <!-- <script
-      nomodule
-      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
-    ></script> -->
+    <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Colorfull Navbar</title>
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          overflow: none;
+        }
+
+        body {
+          background-color: #000;
+        }
+
+        nav {
+          display: flex;
+          justify-content: center;
+          height: 50px;
+          background-color: #000;
+        }
+
+        ul {
+          list-style-type: none;
+        }
+
+        ul li {
+          display: inline;
+          float: left;
+          margin: 0;
+          padding: 0;
+        }
+
+        ul li a {
+          display: inline-block;
+          color: #fff;
+          font-size: 16pt;
+          text-decoration: none;
+          text-align: center;
+          padding: 12.7px 12.7px;
+          box-sizing: border-box;
+          height: 45px;
+        }
+
+        .home,
+        .services,
+        .products,
+        .pricing,
+        .team,
+        .careers,
+        .about,
+        .contact {
+          background-size: 100% 200%;
+          transition: background-position 0.5s;
+        }
+
+        .home:hover,
+        .services:hover,
+        .products:hover,
+        .pricing:hover,
+        .team:hover,
+        .careers:hover,
+        .about:hover,
+        .contact:hover {
+          background-position: 0 100%;
+          transition: all 0.25s ease-in;
+        }
+
+        .home {
+          border-bottom: 5px solid orange;
+          background-image: linear-gradient(to top, orange 50%, black 50%);
+        }
+        .home:hover {
+          background-color: orange;
+        }
+
+        .services {
+          border-bottom: 5px solid coral;
+          background-image: linear-gradient(to top, coral 50%, black 50%);
+        }
+        .services:hover {
+          background-color: coral;
+        }
+
+        .products {
+          border-bottom: 5px solid #fe3e00;
+          background-image: linear-gradient(to top, #fe3e00 50%, black 50%);
+        }
+        .products:hover {
+          background-color: #fe3e00;
+        }
+
+        .pricing {
+          border-bottom: 5px solid #922b3e;
+          background-image: linear-gradient(to top, #922b3e 50%, black 50%);
+        }
+        .pricing:hover {
+          background-color: #922b3e;
+        }
+
+        .team {
+          border-bottom: 5px solid purple;
+          background-image: linear-gradient(to top, purple 50%, black 50%);
+        }
+        .team:hover {
+          background-color: purple;
+        }
+        .careers {
+          border-bottom: 5px solid #1c1aaf;
+          background-image: linear-gradient(to top, #1c1aaf 50%, black 50%);
+        }
+        .careers:hover {
+          background-color: #1c1aaf;
+        }
+
+        .about {
+          border-bottom: 5px solid #0066e7;
+          background-image: linear-gradient(to top, #0066e7 50%, black 50%);
+        }
+        .about:hover {
+          background-color: #0066e7;
+        }
+        .contact {
+          border-bottom: 5px solid #0a8062;
+          background-image: linear-gradient(to top, #0a8062 50%, black 50%);
+        }
+        .contact:hover {
+          background-color: #0a8062;
+        }
+
+        .content {
+          display: flex;
+          justify-content: center;
+          flex-direction: column;
+          margin: 0 auto;
+          width: 880px;
+          height: 685px;
+          margin-top: 50px;
+        }
+        h1 {
+          background-image: linear-gradient(
+            to right,
+            orange,
+            #fe3e00,
+            #922b3e,
+            purple,
+            #1c1aaf,
+            #0066e7,
+            #0a8062
+          );
+          color: white;
+          text-align: center;
+          font-size: 3.8em;
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        }
+
+        p {
+          text-align: center;
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: #fff;
+          margin-top: 30px;
+          font-size: 2em;
+        }
+      </style>
+    </head>
+    <body>
+      <header>
+        <nav>
+          <ul>
+            <li class="home"><a href="">Home</a></li>
+            <li class="services"><a href="">Services</a></li>
+            <li class="products"><a href="">Products</a></li>
+            <li class="pricing"><a href="">Pricing</a></li>
+            <li class="team"><a href="">Our Team</a></li>
+            <li class="careers"><a href="">Careers</a></li>
+            <li class="about"><a href="">About Us</a></li>
+            <li class="contact"><a href="">Contact Us</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <div class="content">
+        <h1>Colorfull Navigation bar</h1>
+        <p>
+          this is a cool and colorful navigation bar with a little bit of css
+          animation
+        </p>
+      </div>
+    </body>
   </body>
 </html>

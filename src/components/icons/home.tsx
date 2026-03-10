@@ -1,6 +1,6 @@
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
-export default function FaHome(props: SvgIconProps) {
+export default function RazHome(props: SvgIconProps) {
   return (
     <SvgIcon inheritViewBox {...props}>
       <svg

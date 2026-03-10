@@ -23,7 +23,7 @@ export async function getGoogleSheetsData(range: string) {
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
 
-  console.info(auth);
+  // console.info(auth);
   // Explicitly get the authenticated client
   const authClient = await auth.getClient();
   // const sheets = google.sheets({ version: "v4", auth: authClient as any });
@@ -113,6 +113,6 @@ export async function runSample(
       params: {},
     },
   );
-  console.info(res);
+  // console.info(res);
   return res.data;
 }
