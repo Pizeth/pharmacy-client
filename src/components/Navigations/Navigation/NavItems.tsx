@@ -24,8 +24,9 @@ const NavList = styled("ul", {
     overridesResolver: (_props, styles) => styles.list,
 })(() => ({
     position: "relative",
-    display: "inline-flex",
-    // width: "350px",
+    // display: "inline-flex",
+    display: "flex",
+    height: "100%",
     padding: 0,
     margin: 0,
     listStyle: "none",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, createContext, useContext } from "react";
+import { useState, useEffect, useMemo, createContext } from "react";
 import { ThemeProvider, ThemeProviderProps } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { DefaultTheme } from "@mui/system";
@@ -10,11 +10,10 @@ import BackToTopFab from "@/components/Navigations/BackToTop";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
 import PersistentDrawerLeft from "@/components/fts/menu";
 
-const ThemeContext = createContext({
-  toggleTheme: () => {},
+export const ThemeContext = createContext({
+  toggleTheme: () => { },
   mode: "light" as "light" | "dark",
 });
-export const useThemeControl = () => useContext(ThemeContext);
 
 export default function ThemeProviderWrapper<Theme = DefaultTheme>({
   theme,

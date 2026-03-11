@@ -40,6 +40,9 @@ import { makePulseKeyframes } from "@/utils/themeUtils";
 import NavigationMenu from "./Navigation/NavigationMenu";
 import RazPeople from "../icons/people";
 import RazContact from "../icons/contact";
+import DrawerToggle from "./Navigation/DrawerToggle";
+import MiniImg from "./Navigation/MiniImg";
+import RazMenu from "../icons/menu";
 
 // const drawerWidth = 250;
 // 1. Define the responsive width once
@@ -409,6 +412,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
           </ListItem>
         ))}
       </List>
+      {/* <NavigationMenu /> */}
     </Fragment>
   );
 
@@ -429,7 +433,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
               ]}
             >
               {/* <MenuIcon /> */}
-              <Box
+              {/* <Box
                 sx={{
                   flexGrow: 1,
                   display: { xs: "flex", sm: "block" },
@@ -451,7 +455,12 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   style={{ objectFit: "contain" }}
                   unoptimized
                 />
-              </Box>
+              </Box> */}
+              <DrawerToggle>
+                {/* <img src="/static/images/logo.svg" alt="Logo" /> */}
+                <MiniImg />
+              </DrawerToggle>
+
               {/* <Avatar src="/static/images/logo.svg" /> */}
             </IconButton>
             {/* <Typography

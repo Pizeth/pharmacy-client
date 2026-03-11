@@ -21,6 +21,7 @@ const NavRoot = styled("nav", {
     display: "flex",
     justifyContent: "left",
     alignItems: "center",
+    alignSelf: "stretch",
     // background: "#333",
     // borderRadius: "10px",
     [theme.breakpoints.up("xs")]: {

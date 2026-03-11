@@ -389,16 +389,23 @@ export const fadeOut = keyframes`
 `;
 
 export const bAnimation = keyframes`
-  100% {
-    background-position: 50% 0, 60% 50%;
-  }
+  100% { background-position: 50% 0, 60% 50%; }
 `;
 
 export const indicatorSpin = keyframes`
   0%, 100% { transform: rotate(35deg); }
-  50%       { transform: rotate(55deg); }
+  50% { transform: rotate(55deg); }
 `;
 
+// export const borderAnimation = keyframes`
+//   0% { transform: rotate(0deg); }
+//   100% { transform: rotate(360deg); }
+// `;
+
+export const borderAnimation = keyframes`
+  0% { transform: rotateZ(0deg); }
+  100% { transform: rotateZ(360deg); }
+`;
 // export const fadeOut = keyframes`
 //   from { opacity: 1; transform: scale(1) translateY(100%); }
 //   to { opacity: 0; transform: scale(0); }

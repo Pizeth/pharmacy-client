@@ -1,7 +1,11 @@
+// import { ThemeContext } from "@emotion/react";
 import IconButton from "@mui/material/IconButton";
-import { useThemeControl } from "./theme-wrapper";
+// import { useThemeControl } from "./theme-wrapper";
 import { Moon, Sun } from "lucide-react";
+import { useContext } from "react";
+import { ThemeContext } from "./theme-wrapper";
 
+export const useThemeControl = () => useContext(ThemeContext);
 const ThemeToggle = () => {
   const { toggleTheme, mode } = useThemeControl();
   return (
@@ -12,17 +16,17 @@ const ThemeToggle = () => {
       aria-label="Theme toggle"
       aria-haspopup="true"
       onClick={toggleTheme}
-      // sx={{
-      //   position: "fixed",
-      //   top: "2.5vmin",
-      //   right: "2.5vmin",
-      //   border: "1px solid",
-      //   borderColor: "divider",
-      //   mt: 0.5,
-      //   // borderRadius: 2,
-      //   opacity: 0.5,
-      //   "&:hover": { opacity: 1 },
-      // }}
+    // sx={{
+    //   position: "fixed",
+    //   top: "2.5vmin",
+    //   right: "2.5vmin",
+    //   border: "1px solid",
+    //   borderColor: "divider",
+    //   mt: 0.5,
+    //   // borderRadius: 2,
+    //   opacity: 0.5,
+    //   "&:hover": { opacity: 1 },
+    // }}
     >
       {mode === "dark" ? <Sun size={17} /> : <Moon size={17} />}
     </IconButton>
