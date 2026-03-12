@@ -758,6 +758,16 @@ export function resolveColor(color: string, theme: Theme): string {
   return color;
 }
 
+// shared mixin — returns the gradient styles given a resolved color
+export function colorItemMixin(color: string, theme: Theme) {
+  const resolved = resolveColor(color, theme);
+  return {
+    resolved, // expose it so each slot can use it their own way
+    gradient: `linear-gradient(to top, ${resolved} 50%, transparent 50%)`,
+    border: `5px solid ${resolved}`,
+  };
+}
+
 // function getContrastColor(hex) {
 //   const r = parseInt(hex.substr(1, 2), 16);
 //   const g = parseInt(hex.substr(3, 2), 16);

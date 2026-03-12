@@ -4,7 +4,6 @@ import {
   Avatar,
   Container,
   InputBase,
-  Link,
   ListItemIcon,
   Menu,
   MenuItem,
@@ -24,16 +23,13 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import Image from "next/image";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
 import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
-import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import ThemeToggle from "../effect/themes/themeToggle";
 import RielIcon from "../icons/riel";
-import { navigate } from "next/dist/client/components/segment-cache/navigation";
 import RazHome from "../icons/home";
 import { filt, hi, hii, wee } from "@/theme/keyframes";
 import { makePulseKeyframes } from "@/utils/themeUtils";
@@ -42,7 +38,7 @@ import RazPeople from "../icons/people";
 import RazContact from "../icons/contact";
 import DrawerToggle from "./Navigation/DrawerToggle";
 import MiniImg from "./Navigation/MiniImg";
-import RazMenu from "../icons/menu";
+import { NavItems } from "./Navigation/NavItems";
 
 // const drawerWidth = 250;
 // 1. Define the responsive width once
@@ -125,11 +121,16 @@ const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  padding: theme.spacing(0, 1),
+  alignSelf: "stretch",
+  // padding: theme.spacing(0, 1),
+  padding: 0,
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
   // justifyContent: "flex-end",
   justifyContent: "center",
+  button: {
+    padding: 0,
+  },
 }));
 
 const Search = styled("div")(({ theme }) => ({
@@ -208,7 +209,7 @@ const HamBurgerNav = styled(Box)(({ theme }) => ({
               `,
     animation: `${wee} 40s linear infinite, ${filt} 6s linear infinite`,
     zIndex: 0,
-  }
+  },
 }));
 
 const Logo = styled(Box)(({ theme }) => ({
@@ -268,18 +269,15 @@ const Logo = styled(Box)(({ theme }) => ({
     // )`,
     animation: `${makePulseKeyframes(
       theme.custom.sideImage.circlePulseSequence,
-    )} ${theme.custom.sideImage.circlePulseDuration
-      } ease-in-out infinite`,
+    )} ${theme.custom.sideImage.circlePulseDuration} ease-in-out infinite`,
     // backgroundSize: "100% 100%",
   },
 
   /*** Animation ***/
   // "--c": "#09f",
   backgroundColor: "#000",
-  backgroundImage:
-    theme.custom.sideImage.animationBackground.backgroundImage,
-  backgroundSize:
-    theme.custom.sideImage.animationBackground.backgroundSize,
+  backgroundImage: theme.custom.sideImage.animationBackground.backgroundImage,
+  backgroundSize: theme.custom.sideImage.animationBackground.backgroundSize,
 
   animation: `${hi} 150s linear infinite`,
   "&::after": {
@@ -313,11 +311,31 @@ const Logo = styled(Box)(({ theme }) => ({
 // ];
 
 const navItems = [
-  { title: "ទំព័រដើម", icon: <RazHome color="error" fontSize="medium" />, href: "/" },
-  { title: "ប្រព័ន្ធចរន្តឯកសារ", icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />, href: "/fts" },
-  { title: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស", icon: <RielIcon color="success" fontSize="medium" />, href: "/payrolls" },
-  { title: "ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក", icon: <RazPeople color="primary" fontSize="medium" />, href: "/photos" },
-  { title: "អំពីក្រសួង", icon: <RazContact color="warning" fontSize="medium" />, href: "/about" },
+  {
+    title: "ទំព័រដើម",
+    icon: <RazHome color="error" fontSize="medium" />,
+    href: "/",
+  },
+  {
+    title: "ប្រព័ន្ធចរន្តឯកសារ",
+    icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />,
+    href: "/fts",
+  },
+  {
+    title: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស",
+    icon: <RielIcon color="success" fontSize="medium" />,
+    href: "/payrolls",
+  },
+  {
+    title: "ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក",
+    icon: <RazPeople color="primary" fontSize="medium" />,
+    href: "/photos",
+  },
+  {
+    title: "អំពីក្រសួង",
+    icon: <RazContact color="warning" fontSize="medium" />,
+    href: "/about",
+  },
 ];
 
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -350,10 +368,8 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
 
     setOpen(open);
   };
-
-  const drawer = (
-    <Fragment>
-      {/* <Box
+  {
+    /* <Box
         sx={{
           display: { xs: "flex", md: "flex" },
           //   alignItems: "center",
@@ -373,9 +389,12 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
           style={{ objectFit: "contain" }}
           unoptimized
         />
-      </Box> */}
+      </Box> */
+  }
+  const drawer = (
+    <Fragment>
       <DrawerHeader>
-        <IconButton onClick={handleDrawerToggle} sx={{ height: "100%", p: 0 }}>
+        <IconButton onClick={handleDrawerToggle}>
           <HamBurgerNav
             sx={{
               // display: { xs: "flex", md: "flex" },
@@ -402,7 +421,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         </IconButton>
       </DrawerHeader>
       <Divider />
-      <List>
+      {/* <List>
         {navItems.map((item) => (
           <ListItem key={item.title} disablePadding>
             <ListItemButton>
@@ -411,8 +430,8 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
             </ListItemButton>
           </ListItem>
         ))}
-      </List>
-      {/* <NavigationMenu /> */}
+      </List> */}
+      <NavItems variant="horizontal" />
     </Fragment>
   );
 
@@ -509,7 +528,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 </Typography>
               </Link>
             </Box> */}
-            <NavigationMenu />
+            <NavItems />
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -561,10 +580,10 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         anchor="left"
         open={open}
         onClose={handleDrawerToggle}
-      // onOpen={toggleDrawer}
-      // ModalProps={{
-      //   keepMounted: true, // Better open performance on mobile.
-      // }}
+        // onOpen={toggleDrawer}
+        // ModalProps={{
+        //   keepMounted: true, // Better open performance on mobile.
+        // }}
       >
         {drawer}
       </Drawer>

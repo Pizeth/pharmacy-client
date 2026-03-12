@@ -37,7 +37,7 @@ const NavRoot = styled("nav", {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const Navigation = () => {
+const Navigation = ({ variant = "vertical" }: { variant?: "vertical" | "horizontal" }) => {
     return (
         <NavRoot>
             {/* <NavList>
@@ -58,7 +58,7 @@ const Navigation = () => {
 
                 <Indicator activeIndex={activeIndex} />
             </NavList> */}
-            <NavItems />  {/* client boundary is here, not at the layout level */}
+            <NavItems variant={variant} />  {/* client boundary is here, not at the layout level */}
         </NavRoot>
     );
 };
