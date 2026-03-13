@@ -144,7 +144,7 @@ const NavItem = styled(ListItem, {
       //   width: variant == "vertical" ? 0 : "2.5px",
       //   height: variant == "vertical" ? "2.5px" : 0,
       background: resolved,
-      transition: " width .3s",
+      transition: "width .3s",
     },
 
     "&:hover::after": {
@@ -152,7 +152,9 @@ const NavItem = styled(ListItem, {
       //   borderRight: "2.5px solid white",
       width: variant == "vertical" ? "100%" : "2.5px",
       background: active ? "white" : resolved,
-      backgroundPosition: "100% 0",
+      backgroundPosition: "right",
+      /* Size the width to 2.5px and height to fill the element */
+      backgroundSize: "2.5px 100%",
     },
     svg: {
       // color: active ? `oklch(from ${resolved} calc(l - 0.6) c h)` : resolved,
@@ -326,6 +328,15 @@ const NavIcon = styled(ListItemIcon, {
         ? `0 ${theme.spacing(1)} 0 ${theme.spacing(-0.5)}`
         : "0",
     minWidth: variant === "vertical" ? "fit-content" : theme.spacing(7),
+    textShadow: `
+            -0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            -0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0    0   7px ${theme.custom.sideImage.captionGlowColor}
+          `,
+    // "-webkit-text-stroke": `0.125px ${props.theme.custom.sideImage.captionOutlineColor}`,
+    WebkitTextStroke: `0.125px ${theme.custom.sideImage.captionOutlineColor}`,
   }),
 );
 

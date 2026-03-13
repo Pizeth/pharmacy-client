@@ -177,6 +177,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const NavMenuButton = styled(IconButton)(({ theme }) => ({
+  alignSelf: "stretch",
+  minHeight: "61.55px",
+  height: "fill-available",
+}));
+
 const HamBurgerNav = styled(Box)(({ theme }) => ({
   "&::before": {
     content: "''",
@@ -228,7 +234,8 @@ const Logo = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   borderRadius: "50%",
-  width: "7.5%", // one-third of parent width
+  // width: "7.5%", // one-third of parent width
+  height: "97.5%",
   aspectRatio: "1 / 1", // keep height equal to width
   // paddingTop: "var(--app-sideImage-circleSize)", // makes height equal to width
   // backgroundImage:
@@ -394,14 +401,15 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   const drawer = (
     <Fragment>
       <DrawerHeader>
-        <IconButton onClick={handleDrawerToggle}>
+        <NavMenuButton onClick={handleDrawerToggle}>
           <HamBurgerNav
             sx={{
               // display: { xs: "flex", md: "flex" },
               // mr: 1,
               position: "relative",
               width: "100vmin",
-              height: `max(40px, 7vmin)`,
+              // height: `max(40px, 7vmin)`,
+              height: "fill-available",
               img: {
                 p: 0.5,
               },
@@ -418,7 +426,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
               unoptimized
             />
           </HamBurgerNav>
-        </IconButton>
+        </NavMenuButton>
       </DrawerHeader>
       <Divider />
       {/* <List>

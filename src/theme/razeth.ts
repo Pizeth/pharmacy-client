@@ -562,7 +562,9 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
       MuiAppBar: {
         styleOverrides: {
           root: (props: { theme: Theme }) => ({
-            backgroundColor: "#c40316", // Customize the AppBar background color
+            // backgroundColor: "#c40316", // Customize the AppBar background color
+            // backgroundColor: "#e1232e", // Customize the AppBar background color
+            backgroundImage: "linear-gradient(45deg, #190a05 0%, #870000 100%)",
             color: props.theme.palette.text.primary, // Customize font color
           }),
         },
