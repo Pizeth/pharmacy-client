@@ -546,6 +546,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
             <Toolbar
               disableGutters
               sx={{ py: 2, display: "flex", justifyContent: "space-between" }}
+              variant="dense"
             >
               <Box
                 sx={{
@@ -555,34 +556,115 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 }}
               >
                 {/* Logo Image */}
-                <Box
+                {/* <Box
                   component="img"
                   src="/static/images/logo.svg" // Replace with your actual logo path
                   alt="Logo"
                   sx={{ height: 70, width: "auto", mr: 2 }}
+                /> */}
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={[
+                    { mr: 2, p: 0.5 },
+                    open && { display: { xs: "none", sm: "block" } },
+                  ]}
+                >
+                  {/* <MenuIcon /> */}
+                  {/* <Box
+                sx={{
+                  flexGrow: 1,
+                  display: { xs: "flex", sm: "block" },
+                  // mr: 1,
+                  position: "relative",
+                  width: `max(40px, 7vmin)`,
+                  height: `max(40px, 7vmin)`,
+                  img: {
+                    p: 0.5,
+                  },
+                }}
+              >
+                <Image
+                  src="/static/images/logo.svg"
+                  alt="Logo"
+                  preload={false}
+                  loading="eager"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  unoptimized
                 />
+              </Box> */}
+                  <DrawerToggle>
+                    {/* <img src="/static/images/logo.svg" alt="Logo" /> */}
+                    <MiniImg />
+                  </DrawerToggle>
+
+                  {/* <Avatar src="/static/images/logo.svg" /> */}
+                </IconButton>
                 {/* Logo Title */}
                 <Box sx={{ textAlign: "center", h6: { py: 0.5 } }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      // fontWeight: 700,
-                      lineHeight: 1.2,
-                      fontSize: { xs: "1rem", md: "1.25rem" },
-                    }}
-                  >
-                    អគ្គលេខាធិការដ្ឋានក្រសួងមុខងារសាធារណៈ
-                  </Typography>
+                  <Box sx={{ position: "relative", display: "inline-block" }}>
+                    {/* <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#fff",
+                        pb: "6px", // Space for the swoosh
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      Ministry of Post and Telecommunications
+                    </Typography> */}
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        // fontWeight: 700,
+                        lineHeight: 2.5,
+                        fontSize: { xs: "0.75rem", md: "1rem" },
+                        // pb: "12px", // Space for the swoosh
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      អគ្គលេខាធិការដ្ឋាន
+                    </Typography>
+
+                    {/* The Orange Tapered Underline (Swoosh) */}
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "4px", // The maximum thickness in the middle
+                        backgroundColor: "#fdb913", // The official MPTC gold/orange
+
+                        /* This Clip-Path creates the "tapered" look:
+         Starts thin at the left, gets thick in the middle, 
+         and ends thin at the right.
+      */
+                        clipPath:
+                          "polygon(0% 80%, 15% 40%, 50% 10%, 85% 40%, 100% 80%, 85% 100%, 50% 100%, 15% 100%)",
+
+                        // Adds a very slight "glow" to mimic the site's look
+                        filter:
+                          "drop-shadow(0px 0px 2px rgba(253, 185, 19, 0.5))",
+                      }}
+                    />
+                  </Box>
                   <Typography
                     variant="h6"
                     sx={{
                       // fontWeight: 400,
                       // lineHeight: 5,
-                      fontSize: { xs: "0.975rem", md: "1rem" },
+                      fontSize: { xs: "0.75rem", md: "1rem" },
                       textTransform: "uppercase",
                     }}
                   >
-                    Ministry of Civil Service
+                    General Secretariat
                   </Typography>
                 </Box>
               </Box>
@@ -660,48 +742,12 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
               </Stack>
             </Toolbar>
           </AppBarContainer>
-          <Toolbar disableGutters variant="dense">
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={[
-                { mr: 2, p: 0.5 },
-                open && { display: { xs: "none", sm: "block" } },
-              ]}
-            >
-              {/* <MenuIcon /> */}
-              {/* <Box
-                sx={{
-                  flexGrow: 1,
-                  display: { xs: "flex", sm: "block" },
-                  // mr: 1,
-                  position: "relative",
-                  width: `max(40px, 7vmin)`,
-                  height: `max(40px, 7vmin)`,
-                  img: {
-                    p: 0.5,
-                  },
-                }}
-              >
-                <Image
-                  src="/static/images/logo.svg"
-                  alt="Logo"
-                  preload={false}
-                  loading="eager"
-                  fill
-                  style={{ objectFit: "contain" }}
-                  unoptimized
-                />
-              </Box> */}
-              <DrawerToggle>
-                {/* <img src="/static/images/logo.svg" alt="Logo" /> */}
-                <MiniImg />
-              </DrawerToggle>
-
-              {/* <Avatar src="/static/images/logo.svg" /> */}
-            </IconButton>
+          <Toolbar
+            disableGutters
+            variant="dense"
+            sx={{ display: { xs: "none", md: "flex" } }}
+          >
+            {/* Pass The Drawer Button back here to revert back */}
             {/* <Typography
               variant="h6"
               component="div"
