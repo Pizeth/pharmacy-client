@@ -1,12 +1,14 @@
 // import AppBar from "@mui/material/AppBar";
-import { Fragment, ReactNode, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 import {
   Avatar,
+  Button,
   Container,
   InputBase,
   ListItemIcon,
   Menu,
   MenuItem,
+  Stack,
   // SwipeableDrawer,
   Tooltip,
 } from "@mui/material";
@@ -39,7 +41,10 @@ import RazContact from "../icons/contact";
 import DrawerToggle from "./Navigation/DrawerToggle";
 import MiniImg from "./Navigation/MiniImg";
 import { NavItems } from "./Navigation/NavItems";
-
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { loadSlim } from "@tsparticles/slim";
+import { Facebook } from "lucide-react";
+import { Language, Telegram, YouTube } from "@mui/icons-material";
 // const drawerWidth = 250;
 // 1. Define the responsive width once
 const drawerWidth = "clamp(250px, 30vmin, 300px)";
@@ -80,6 +85,14 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
+  /* Addition Style for particles */
+  // height: "100px",
+  justifyContent: "center",
+  // Your Red Gradient
+  // background: "linear-gradient(45deg, rgb(187, 17, 17) 0%, #820000 100%)",
+  // position: "relative",
+  overflow: "hidden", // Keeps particles inside the bar
+  boxShadow: "none",
   variants: [
     {
       props: ({ open }) => open,
@@ -99,6 +112,31 @@ const AppBar = styled(MuiAppBar, {
       },
     },
   ],
+}));
+
+const AppBarContainer = styled(Container)(({ theme }) => ({
+  // display: "flex",
+  // flexDirection: "column",
+  // height: "100%",
+  // overflow: "hidden",
+  position: "relative",
+  zIndex: 10,
+  padding: 0,
+  [theme.breakpoints.up("xs")]: {
+    padding: 0,
+  },
+  // [theme.breakpoints.up("sm")]: {
+  //   padding: 0,
+  // },
+  // [theme.breakpoints.up("md")]: {
+  //   padding: 0,
+  // },
+  // [theme.breakpoints.up("lg")]: {
+  //   padding: 0,
+  // },
+  // [theme.breakpoints.up("xl")]: {
+  //   padding: 0,
+  // },
 }));
 
 const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
@@ -349,6 +387,7 @@ const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
+  const [init, setInit] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const handleDrawerToggle = () => {
@@ -443,11 +482,184 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
     </Fragment>
   );
 
+  // 1. Initialize the engine once
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine);
+    }).then(() => {
+      setInit(true);
+    });
+  }, []);
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="fixed" color="primary" component="nav">
         <Container maxWidth="xl">
+          {/* 2. The Particles Canvas */}
+          {init && (
+            <Particles
+              id="tsparticles"
+              options={{
+                fullScreen: { enable: false }, // Crucial: prevents it from covering the whole page
+                style: {
+                  position: "absolute",
+                  top: "0",
+                  left: "0",
+                  width: "100%",
+                  height: "100%",
+                },
+                fpsLimit: 60,
+                interactivity: {
+                  events: {
+                    onHover: { enable: true, mode: "grab" },
+                  },
+                  modes: {
+                    grab: { distance: 150, links: { opacity: 0.5 } },
+                  },
+                },
+                particles: {
+                  color: { value: "#ffffff" },
+                  links: {
+                    color: "#ffffff",
+                    distance: 150,
+                    enable: true,
+                    opacity: 0.3,
+                    width: 1,
+                  },
+                  move: {
+                    enable: true,
+                    speed: 1,
+                  },
+                  number: {
+                    value: 50,
+                  },
+                  opacity: { value: 0.5 },
+                  size: { value: { min: 1, max: 3 } },
+                },
+              }}
+            />
+          )}
+          {/* Content Container (Above Canvas) */}
+          <AppBarContainer maxWidth="xl">
+            {/* --- SECTION 2: LOGO & TITLE --- */}
+            <Toolbar
+              disableGutters
+              sx={{ py: 2, display: "flex", justifyContent: "space-between" }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  alignContent: "middle",
+                }}
+              >
+                {/* Logo Image */}
+                <Box
+                  component="img"
+                  src="/static/images/logo.svg" // Replace with your actual logo path
+                  alt="Logo"
+                  sx={{ height: 70, width: "auto", mr: 2 }}
+                />
+                {/* Logo Title */}
+                <Box sx={{ textAlign: "center", h6: { py: 0.5 } }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      // fontWeight: 700,
+                      lineHeight: 1.2,
+                      fontSize: { xs: "1rem", md: "1.25rem" },
+                    }}
+                  >
+                    អគ្គលេខាធិការដ្ឋានក្រសួងមុខងារសាធារណៈ
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      // fontWeight: 400,
+                      // lineHeight: 5,
+                      fontSize: { xs: "0.975rem", md: "1rem" },
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Ministry of Civil Service
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* --- SECTION 3: NAVIGATION MENU --- */}
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ display: { xs: "none", md: "flex" } }}
+              >
+                {/* <Button color="inherit" sx={{ fontWeight: 600 }}>
+                  Home
+                </Button>
+                <Button color="inherit" sx={{ fontWeight: 600 }}>
+                  About Us
+                </Button>
+                <Button color="inherit" sx={{ fontWeight: 600 }}>
+                  News
+                </Button>
+                <Button color="inherit" sx={{ fontWeight: 600 }}>
+                  Contact
+                </Button> */}
+                <IconButton size="small" sx={{ color: "white" }}>
+                  <Facebook fontSize="small" />
+                </IconButton>
+                <IconButton size="small" sx={{ color: "white" }}>
+                  <Telegram fontSize="small" />
+                </IconButton>
+                <IconButton size="small" sx={{ color: "white" }}>
+                  <YouTube fontSize="small" />
+                </IconButton>
+                <Search>
+                  <SearchIconWrapper>
+                    <SearchIcon />
+                  </SearchIconWrapper>
+                  <StyledInputBase
+                    placeholder="Search…"
+                    inputProps={{ "aria-label": "search" }}
+                  />
+                </Search>
+                <Box sx={{ display: { xs: "none", md: "flex" } }}>
+                  <ThemeToggle />
+                </Box>
+                <Box sx={{ flexGrow: 0 }}>
+                  <Tooltip title="Open settings">
+                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                      <Avatar alt="MCS" src="/static/images/otto.webp" />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    sx={{ mt: "45px" }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                  >
+                    {settings.map((setting) => (
+                      <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                        <Typography sx={{ textAlign: "center" }}>
+                          {setting}
+                        </Typography>
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Box>
+              </Stack>
+            </Toolbar>
+          </AppBarContainer>
           <Toolbar disableGutters variant="dense">
             <IconButton
               color="inherit"
@@ -537,7 +749,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
               </Link>
             </Box> */}
             <NavItems />
-            <Search>
+            {/* <Search>
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
@@ -579,7 +791,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   </MenuItem>
                 ))}
               </Menu>
-            </Box>
+            </Box> */}
           </Toolbar>
         </Container>
       </AppBar>
