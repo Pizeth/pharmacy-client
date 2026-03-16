@@ -45,7 +45,15 @@ import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import { Facebook } from "lucide-react";
 import { Language, Telegram, YouTube } from "@mui/icons-material";
+import RazFacebook from "../icons/socials/facebook";
+import RazTelegram from "../icons/socials/telegram";
+import RazYoutube from "../icons/socials/youtube";
+import YouTubeIcon from "@mui/icons-material/YouTube";
+import RazInstagram from "../icons/socials/instagram";
+import RazWebsite from "../icons/socials/website";
 // const drawerWidth = 250;
+
+const PREFIX = "RazethDrawer";
 // 1. Define the responsive width once
 const drawerWidth = "clamp(250px, 30vmin, 300px)";
 
@@ -166,9 +174,9 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
   // justifyContent: "flex-end",
   justifyContent: "center",
-  button: {
-    padding: 0,
-  },
+  // button: {
+  //   padding: 0,
+  // },
 }));
 
 const Search = styled("div")(({ theme }) => ({
@@ -215,13 +223,45 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const NavMenuButton = styled(IconButton)(({ theme }) => ({
+const NavMenuButton = styled(IconButton, {
+  name: PREFIX,
+  slot: "Content",
+  overridesResolver: (_props, styles) => styles.content,
+})<{ variant?: "main" | "side" }>(({ theme, variant = "main" }) => ({
   alignSelf: "stretch",
-  minHeight: "61.55px",
+  // minHeight: "61.55px",
   height: "fill-available",
+  width: variant === "main" ? "fit-content" : "stretch",
+  // padding: `${theme.spacing(1)}`,
+  padding: 0,
+  // margin: `${theme.spacing(1)}`,
+  // "&:hover": {
+  //   svg: {
+  //     opacity: 1,
+  //   },
+  // },
 }));
 
 const HamBurgerNav = styled(Box)(({ theme }) => ({
+  // display: { xs: "flex", md: "flex" },
+  mr: 1,
+  position: "relative",
+  width: "100%",
+  // height: `max(40px, 7vmin)`,
+  height: "fill-available",
+  justifyContent: "center",
+  justifyItems: "center",
+  alignContent: "center",
+  alignItems: "center",
+  // img: {
+  //   p: 0.5,
+  // },
+  [theme.breakpoints.up("xs")]: {
+    display: "flex",
+  },
+  [theme.breakpoints.up("md")]: {
+    display: "flex",
+  },
   "&::before": {
     content: "''",
     position: "absolute",
@@ -343,6 +383,12 @@ const Logo = styled(Box)(({ theme }) => ({
   },
 }));
 
+const DrawerDivider = styled(Divider)(({ theme }) => ({
+  // margin: theme.spacing(1, 0),
+  height: theme.spacing(1),
+  backgroundColor: "#000",
+}));
+
 // const navItems = [
 //   { title: "ទំព័រដើម", icon: <RazHome color="error" fontSize="medium" /> },
 //   {
@@ -440,21 +486,21 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   const drawer = (
     <Fragment>
       <DrawerHeader>
-        <NavMenuButton onClick={handleDrawerToggle}>
+        <NavMenuButton onClick={handleDrawerToggle} variant="side">
           <HamBurgerNav
-            sx={{
-              // display: { xs: "flex", md: "flex" },
-              // mr: 1,
-              position: "relative",
-              width: "100vmin",
-              // height: `max(40px, 7vmin)`,
-              height: "fill-available",
-              img: {
-                p: 0.5,
-              },
-            }}
+          // sx={{
+          //   // display: { xs: "flex", md: "flex" },
+          //   // mr: 1,
+          //   position: "relative",
+          //   width: "100vmin",
+          //   // height: `max(40px, 7vmin)`,
+          //   height: "fill-available",
+          //   img: {
+          //     p: 0.5,
+          //   },
+          // }}
           >
-            <Logo />
+            {/* <Logo />
             <Image
               src="/static/images/logo.svg"
               alt="Logo"
@@ -463,11 +509,17 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
               fill
               style={{ objectFit: "contain" }}
               unoptimized
-            />
+            /> */}
+            <DrawerToggle>
+              <MiniImg />
+            </DrawerToggle>
           </HamBurgerNav>
+          {/* <DrawerToggle>
+            <MiniImg />
+          </DrawerToggle> */}
         </NavMenuButton>
       </DrawerHeader>
-      <Divider />
+      <DrawerDivider />
       {/* <List>
         {navItems.map((item) => (
           <ListItem key={item.title} disablePadding>
@@ -545,7 +597,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
             {/* --- SECTION 2: LOGO & TITLE --- */}
             <Toolbar
               disableGutters
-              sx={{ py: 2, display: "flex", justifyContent: "space-between" }}
+              sx={{ py: 0.5, display: "flex", justifyContent: "space-between" }}
               variant="dense"
             >
               <Box
@@ -562,15 +614,16 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   alt="Logo"
                   sx={{ height: 70, width: "auto", mr: 2 }}
                 /> */}
-                <IconButton
+                <NavMenuButton
                   color="inherit"
                   aria-label="open drawer"
                   edge="start"
                   onClick={handleDrawerToggle}
-                  sx={[
-                    { mr: 2, p: 0.5 },
-                    open && { display: { xs: "none", sm: "block" } },
-                  ]}
+                  sx={{ p: 0 }}
+                  // sx={[
+                  //   { mr: 2, p: 0.5 },
+                  //   open && { display: { xs: "none", sm: "block" } },
+                  // ]}
                 >
                   {/* <MenuIcon /> */}
                   {/* <Box
@@ -602,7 +655,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   </DrawerToggle>
 
                   {/* <Avatar src="/static/images/logo.svg" /> */}
-                </IconButton>
+                </NavMenuButton>
                 {/* Logo Title */}
                 <Box sx={{ textAlign: "center", h6: { py: 0.5 } }}>
                   <Box sx={{ position: "relative", display: "inline-block" }}>
@@ -688,13 +741,24 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   Contact
                 </Button> */}
                 <IconButton size="small" sx={{ color: "white" }}>
-                  <Facebook fontSize="small" />
+                  {/* <Facebook fontSize="small" /> */}
+                  <RazWebsite />
                 </IconButton>
                 <IconButton size="small" sx={{ color: "white" }}>
-                  <Telegram fontSize="small" />
+                  {/* <Facebook fontSize="small" /> */}
+                  <RazFacebook />
                 </IconButton>
                 <IconButton size="small" sx={{ color: "white" }}>
-                  <YouTube fontSize="small" />
+                  {/* <YouTube fontSize="small" /> */}
+                  <RazInstagram />
+                </IconButton>
+                <IconButton size="small" sx={{ color: "white" }}>
+                  {/* <Telegram fontSize="small" /> */}
+                  <RazTelegram />
+                </IconButton>
+                <IconButton size="small" sx={{ color: "white" }}>
+                  {/* <YouTube fontSize="small" /> */}
+                  <RazYoutube />
                 </IconButton>
                 <Search>
                   <SearchIconWrapper>

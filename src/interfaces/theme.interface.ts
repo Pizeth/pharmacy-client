@@ -1,3 +1,4 @@
+import { HtmlHTMLAttributes } from "react";
 import {
   AvatarProps,
   DividerProps,
@@ -23,6 +24,7 @@ export interface RazethComponentsPropsList {
   RazethAuthNavigation: Partial<AuthNavigationProps>;
   RazethFooter: Partial<FooterProps>;
   RazethTV: Partial<TVProps>;
+  RazethNavToggle: Partial<HtmlHTMLAttributes<HTMLDivElement>>;
 }
 
 export interface SideImage {

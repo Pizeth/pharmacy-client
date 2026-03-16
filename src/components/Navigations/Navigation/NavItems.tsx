@@ -43,15 +43,15 @@ const Root = styled(Box, {
   alignSelf: "stretch",
   // background: "#333",
   // borderRadius: "10px",
-  [theme.breakpoints.up("xs")]: {
-    display: "none",
-  },
-  [theme.breakpoints.up("sm")]: {
-    display: "block",
-  },
-  [theme.breakpoints.up("md")]: {
-    display: "flex",
-  },
+  // [theme.breakpoints.up("xs")]: {
+  //   display: "none",
+  // },
+  // [theme.breakpoints.up("sm")]: {
+  //   display: "block",
+  // },
+  // [theme.breakpoints.up("md")]: {
+  //   display: "flex",
+  // },
 }));
 
 const NavList = styled(List, {
