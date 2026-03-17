@@ -57,7 +57,7 @@ const CustomLoginPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     login({ username: email, password }).catch(() =>
-      notify("Invalid email or password")
+      notify("Invalid email or password"),
     );
   };
 

@@ -563,9 +563,34 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
         styleOverrides: {
           root: (props: { theme: Theme }) => ({
             // backgroundColor: "#c40316", // Customize the AppBar background color
-            // backgroundColor: "#e1232e", // Customize the AppBar background color
-            backgroundImage: "linear-gradient(45deg, #190a05 0%, #870000 100%)",
-            color: props.theme.palette.text.primary, // Customize font color
+            backgroundColor: "#e1232e", // Customize the AppBar background color
+            // backgroundImage: "linear-gradient(45deg, #190a05 0%, #870000 100%)",
+            // color: props.theme.palette.text.primary, // Customize font color
+            // Optional: apply a different background image/color for light mode
+            // ...(props.theme.palette.mode === "light" && {
+            //   // Shorthand prevents the dark-mode elevation overlay bleeding in
+            // background: `linear-gradient(45deg, rgb(187, 17, 17) 0%, #820000 100%)`,
+            //   backgroundColor: `blue`,
+            //   backgroundImage: "none",
+            //   color: props.theme.palette.text.primary,
+            // }),
+            // // Apply the background image specifically for dark mode
+            // ...(props.theme.palette.mode === "dark" && {
+            //   // Shorthand resets backgroundColor + backgroundImage together
+            //   backgroundImage: `linear-gradient(45deg, #190a05 0%, #870000 100%)`,
+            //   backgroundColor: "red",
+            //   color: props.theme.palette.text.primary,
+            // }),
+          }),
+          colorPrimary: ({ theme }: { theme: Theme }) => ({
+            ...(theme.palette.mode === "light" && {
+              backgroundColor: theme.palette.primary.main,
+              backgroundImage: "none",
+            }),
+            ...(theme.palette.mode === "dark" && {
+              backgroundColor: "#481dac",
+              // background: `linear-gradient(45deg, #190a05 0%, #870000 100%)`,
+            }),
           }),
         },
       },

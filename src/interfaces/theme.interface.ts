@@ -9,7 +9,11 @@ import {
   SocialLoginProps,
   SocialButtonProps,
 } from "./auth.interface";
-import { LoginFormProps, TVProps } from "./component-props.interface";
+import {
+  DrawerToggleProps,
+  LoginFormProps,
+  TVProps,
+} from "./component-props.interface";
 
 // This interface maps each component's name to its specific props interface.
 // To add a new component, you only need to add a new line here.
@@ -24,7 +28,7 @@ export interface RazethComponentsPropsList {
   RazethAuthNavigation: Partial<AuthNavigationProps>;
   RazethFooter: Partial<FooterProps>;
   RazethTV: Partial<TVProps>;
-  RazethNavToggle: Partial<HtmlHTMLAttributes<HTMLDivElement>>;
+  RazethNavToggle: Partial<DrawerToggleProps>;
 }
 
 export interface SideImage {

@@ -43,14 +43,13 @@ import MiniImg from "./Navigation/MiniImg";
 import { NavItems } from "./Navigation/NavItems";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
-import { Facebook } from "lucide-react";
-import { Language, Telegram, YouTube } from "@mui/icons-material";
 import RazFacebook from "../icons/socials/facebook";
 import RazTelegram from "../icons/socials/telegram";
 import RazYoutube from "../icons/socials/youtube";
-import YouTubeIcon from "@mui/icons-material/YouTube";
 import RazInstagram from "../icons/socials/instagram";
 import RazWebsite from "../icons/socials/website";
+import RazTiktok from "../icons/socials/tiktok";
+import RazX from "../icons/socials/x";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
@@ -61,7 +60,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme }) => ({
   flexGrow: 1,
-  paddingTop: theme.spacing(8),
+  paddingTop: theme.spacing(10),
   // // padding: `0 ${theme.spacing(3)}`,
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
@@ -100,7 +99,8 @@ const AppBar = styled(MuiAppBar, {
   // Your Red Gradient
   // background: "linear-gradient(45deg, rgb(187, 17, 17) 0%, #820000 100%)",
   // position: "relative",
-  overflow: "hidden", // Keeps particles inside the bar
+  // ❌ Remove this — it corrupts Menu positioning
+  // overflow: "hidden", // Keeps particles inside the bar
   boxShadow: "none",
   variants: [
     {
@@ -442,6 +442,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   };
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    console.log(event.currentTarget);
     setAnchorElUser(event.currentTarget);
   };
 
@@ -547,51 +548,65 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" color="primary" component="nav">
+      <AppBar
+        position="fixed"
+        // color="primary"
+        component="nav"
+        // enableColorOnDark
+      >
         <Container maxWidth="xl">
           {/* 2. The Particles Canvas */}
           {init && (
-            <Particles
-              id="tsparticles"
-              options={{
-                fullScreen: { enable: false }, // Crucial: prevents it from covering the whole page
-                style: {
-                  position: "absolute",
-                  top: "0",
-                  left: "0",
-                  width: "100%",
-                  height: "100%",
-                },
-                fpsLimit: 60,
-                interactivity: {
-                  events: {
-                    onHover: { enable: true, mode: "grab" },
-                  },
-                  modes: {
-                    grab: { distance: 150, links: { opacity: 0.5 } },
-                  },
-                },
-                particles: {
-                  color: { value: "#ffffff" },
-                  links: {
-                    color: "#ffffff",
-                    distance: 150,
-                    enable: true,
-                    opacity: 0.3,
-                    width: 1,
-                  },
-                  move: {
-                    enable: true,
-                    speed: 1,
-                  },
-                  number: {
-                    value: 50,
-                  },
-                  opacity: { value: 0.5 },
-                  size: { value: { min: 1, max: 3 } },
-                },
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                overflow: "hidden",
+                zIndex: 0,
               }}
-            />
+            >
+              <Particles
+                id="tsparticles"
+                options={{
+                  fullScreen: { enable: false }, // Crucial: prevents it from covering the whole page
+                  style: {
+                    position: "absolute",
+                    top: "0",
+                    left: "0",
+                    width: "100%",
+                    height: "100%",
+                  },
+                  fpsLimit: 120,
+                  interactivity: {
+                    events: {
+                      onHover: { enable: true, mode: "grab" },
+                    },
+                    modes: {
+                      grab: { distance: 125, links: { opacity: 0.5 } },
+                    },
+                  },
+                  particles: {
+                    color: { value: "#ffffff" },
+                    links: {
+                      color: "#ffffff",
+                      distance: 125,
+                      enable: true,
+                      opacity: 0.3,
+                      width: 1,
+                    },
+                    move: {
+                      enable: true,
+                      speed: 1,
+                    },
+                    number: {
+                      value: 30,
+                    },
+                    opacity: { value: 0.5 },
+                    size: { value: { min: 1, max: 3 } },
+                  },
+                }}
+              />
+            </Box>
           )}
           {/* Content Container (Above Canvas) */}
           <AppBarContainer maxWidth="xl">
@@ -758,6 +773,14 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   <RazTelegram />
                 </IconButton>
                 <IconButton size="small" sx={{ color: "white" }}>
+                  {/* <Telegram fontSize="small" /> */}
+                  <RazTiktok />
+                </IconButton>
+                <IconButton size="small" sx={{ color: "white" }}>
+                  {/* <Telegram fontSize="small" /> */}
+                  <RazX />
+                </IconButton>
+                <IconButton size="small" sx={{ color: "white" }}>
                   {/* <YouTube fontSize="small" /> */}
                   <RazYoutube />
                 </IconButton>
@@ -780,11 +803,11 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                     </IconButton>
                   </Tooltip>
                   <Menu
-                    sx={{ mt: "45px" }}
+                    // sx={{ mt: "45px" }}
                     id="menu-appbar"
                     anchorEl={anchorElUser}
                     anchorOrigin={{
-                      vertical: "top",
+                      vertical: "bottom",
                       horizontal: "right",
                     }}
                     keepMounted
@@ -794,6 +817,10 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                     }}
                     open={Boolean(anchorElUser)}
                     onClose={handleCloseUserMenu}
+                    // PopperProps={{
+                    //   // ← THIS IS THE KEY FIX
+                    //   strategy: "fixed",
+                    // }}
                   >
                     {settings.map((setting) => (
                       <MenuItem key={setting} onClick={handleCloseUserMenu}>

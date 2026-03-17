@@ -7,7 +7,7 @@ import { SaveHandler } from "ra-core";
 import { SaveButtonProps } from "react-admin";
 import { AuthAction } from "@/types/theme";
 import { Circle } from "lucide-react";
-import { HtmlHTMLAttributes } from "react";
+import { HtmlHTMLAttributes, ReactNode } from "react";
 
 export interface LoginFormProps {
   content?: StyleComponent;
@@ -17,7 +17,7 @@ export interface LoginFormProps {
   redirectTo?: string;
   className?: string;
   sx?: SxProps<Theme>;
-  children?: React.ReactNode;
+  children?: ReactNode;
   forgotPassword?: string;
   forgotPasswordUrl?: string;
 }
@@ -31,6 +31,18 @@ export interface SignUpFormProps extends LoginFormProps {
   // children?: React.ReactNode;
   termsUrl?: string;
   privacyUrl?: string;
+}
+
+export interface DrawerToggleProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  wrapper?: ReactNode;
+  children?: ReactNode;
+  icon?: ReactNode;
+  src?: string;
+  circleSize?: string; // e.g. "33%", "200px"
+  circleColor?: string; // e.g. "#1e40af", "red", "var(--mui-palette-primary-main)"
+  logoOffset?: string; // e.g. "2%", "8px"
+  className?: string;
+  sx?: SxProps<Theme>;
 }
 
 export interface ValidatedButtonProps extends SaveButtonProps {
