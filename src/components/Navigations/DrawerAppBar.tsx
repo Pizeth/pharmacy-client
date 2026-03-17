@@ -61,6 +61,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme }) => ({
   flexGrow: 1,
+  paddingTop: theme.spacing(8),
   // // padding: `0 ${theme.spacing(3)}`,
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
@@ -711,9 +712,9 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   <Typography
                     variant="h6"
                     sx={{
-                      // fontWeight: 400,
+                      fontWeight: 700,
                       // lineHeight: 5,
-                      fontSize: { xs: "0.75rem", md: "1rem" },
+                      fontSize: { xs: "0.75rem", md: "0.925rem" },
                       textTransform: "uppercase",
                     }}
                   >
