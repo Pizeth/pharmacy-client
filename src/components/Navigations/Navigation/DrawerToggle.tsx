@@ -12,6 +12,7 @@ const Root = styled(Box, {
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
 })<DrawerToggleProps>(({ theme }) => ({
+  // flexGrow: 1,
   position: "relative",
   width: `max(50px, 10vmin)`,
   height: `max(50px, 10vmin)`,
@@ -20,6 +21,12 @@ const Root = styled(Box, {
   overflow: "hidden",
   margin: `${theme.spacing(1)}`,
   boxShadow: `0 0 20px 10px ${theme.palette.primary.main}50`,
+  [theme.breakpoints.up("xs")]: {
+    display: "flex",
+  },
+  [theme.breakpoints.up("sm")]: {
+    display: "block",
+  },
   "&::before": {
     content: '""',
     position: "absolute",
@@ -179,7 +186,7 @@ const DrawerToggle = (inProps: DrawerToggleProps) => {
   // const theme = useTheme();
   // const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   return (
-    <Root>
+    <Root {...rest}>
       {/* <Logo /> */}
       <DrawerToggle.wrapper children={children} icon={icon} />
     </Root>

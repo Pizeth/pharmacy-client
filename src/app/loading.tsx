@@ -2,7 +2,8 @@
 // import Box from "@mui/material/Box";
 // import CircularProgress from "@mui/material/CircularProgress";
 "use client";
-import PulseLoader from "@/theme/loaders/loader";
+
+import PulseLoader from "@/components/effect/loaders/loader";
 
 // export default function Loading() {
 //   return (

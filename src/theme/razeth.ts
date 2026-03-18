@@ -577,21 +577,22 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
             // // Apply the background image specifically for dark mode
             // ...(props.theme.palette.mode === "dark" && {
             //   // Shorthand resets backgroundColor + backgroundImage together
-            //   backgroundImage: `linear-gradient(45deg, #190a05 0%, #870000 100%)`,
+            backgroundImage: `linear-gradient(45deg, #1e1e1e 0%, #870000 100%)`,
+            // backgroundImage: `linear-gradient(45deg, #190a05 0%, #870000 100%)`,
             //   backgroundColor: "red",
             //   color: props.theme.palette.text.primary,
             // }),
           }),
-          colorPrimary: ({ theme }: { theme: Theme }) => ({
-            ...(theme.palette.mode === "light" && {
-              backgroundColor: theme.palette.primary.main,
-              backgroundImage: "none",
-            }),
-            ...(theme.palette.mode === "dark" && {
-              backgroundColor: "#481dac",
-              // background: `linear-gradient(45deg, #190a05 0%, #870000 100%)`,
-            }),
-          }),
+          // colorPrimary: ({ theme }: { theme: Theme }) => ({
+          //   ...(theme.palette.mode === "light" && {
+          //     backgroundColor: theme.palette.primary.main,
+          //     backgroundImage: "none",
+          //   }),
+          //   ...(theme.palette.mode === "dark" && {
+          //     backgroundColor: "#481dac",
+          //     // background: `linear-gradient(45deg, #190a05 0%, #870000 100%)`,
+          //   }),
+          // }),
         },
       },
       MuiInputLabel: {

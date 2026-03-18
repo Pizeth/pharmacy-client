@@ -3,9 +3,10 @@ import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { styled, useTheme } from "@mui/material/styles";
 import { makePulseKeyframes } from "@/utils/themeUtils"; // Assuming these exist in your utilities
-import { borderAnimation, hi, hii, shimmer } from "../keyframes";
+// import { borderAnimation, hi, hii, shimmer } from "../keyframes";
 import Fade from "@mui/material/Fade";
 import Typography from "@mui/material/Typography";
+import { borderAnimation, hi, hii, shimmer } from "@/theme/keyframes";
 
 // 1. Replicate the DrawerNavToggle styling logic
 const PREFIX = "RazethLoader";

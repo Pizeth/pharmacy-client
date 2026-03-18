@@ -50,11 +50,118 @@ import RazInstagram from "../icons/socials/instagram";
 import RazWebsite from "../icons/socials/website";
 import RazTiktok from "../icons/socials/tiktok";
 import RazX from "../icons/socials/x";
+import options from "@/configs/particleConfig";
+import { Padding } from "@mui/icons-material";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
 // 1. Define the responsive width once
 const drawerWidth = "clamp(250px, 30vmin, 300px)";
+
+const Root = styled(Box, {
+  name: PREFIX,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})(({ theme }) => ({
+  display: "flex",
+  // width: drawerWidth,
+  // [theme.breakpoints.up("sm")]: {
+  //   width: drawerWidth,
+  //   flexShrink: 0,
+  // },
+}));
+
+const ParticleContainer = styled(Box, {
+  name: PREFIX,
+  slot: "effect",
+  overridesResolver: (_props, styles) => styles.effect,
+})(({ theme }) => ({
+  position: "absolute",
+  inset: 0,
+  overflow: "hidden",
+  zIndex: 0,
+}));
+
+const ProfileToolBar = styled(Toolbar, {
+  name: PREFIX,
+  slot: "Toolbar",
+  overridesResolver: (_props, styles) => styles.toolbar,
+})(({ theme }) => ({
+  padding: `${theme.spacing(0.5)} 0`,
+  alignItems: "center",
+  display: "flex",
+  justifyContent: "space-between",
+}));
+
+const LogoSection = styled(Box, {
+  name: PREFIX,
+  slot: "LogoSection",
+  overridesResolver: (_props, styles) => styles.logoSection,
+})(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  alignContent: "middle",
+}));
+
+const LogoCaption = styled(Box, {
+  name: PREFIX,
+  slot: "Caption",
+  overridesResolver: (_props, styles) => styles.caption,
+})(({ theme }) => ({
+  textAlign: "center",
+  h6: {
+    Padding: `${theme.spacing(0.5)} 0`,
+    lineHeight: 2.5,
+    fontSize: { xs: "0.75rem", md: "0.925rem" },
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+    [theme.breakpoints.up("xs")]: {
+      fontSize: "0.75rem",
+    },
+    [theme.breakpoints.up("md")]: {
+      fontSize: "0.925rem",
+    },
+  },
+}));
+
+const CaptionWrapper = styled(Stack, {
+  name: PREFIX,
+  slot: "CaptionWrapper",
+  overridesResolver: (_props, styles) => styles.captionWrapper,
+})(({ theme }) => ({
+  display: "inline-block",
+  position: "relative",
+  h6: {
+    [theme.breakpoints.up("md")]: {
+      fontSize: "1rem",
+    },
+    fontWeight: 500,
+  },
+}));
+
+const Underline = styled(Box, {
+  name: PREFIX,
+  slot: "Underline",
+  overridesResolver: (_props, styles) => styles.underline,
+})(({ theme }) => ({
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  width: "100%",
+  height: "4px", // The maximum thickness in the middle
+  backgroundColor: "#fdb913", // The official MPTC gold/orange
+
+  /* This Clip-Path creates the "tapered" look:
+         Starts thin at the left, gets thick in the middle,
+         and ends thin at the right.
+      */
+  clipPath:
+    "polygon(0% 80%, 15% 40%, 50% 10%, 85% 40%, 100% 80%, 85% 100%, 50% 100%, 15% 100%)",
+
+  // Adds a very slight "glow" to mimic the site's look
+  filter: "drop-shadow(0px 0px 2px rgba(253, 185, 19, 0.5))",
+}));
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
@@ -546,197 +653,54 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Root>
       <CssBaseline />
       <AppBar
         position="fixed"
-        // color="primary"
+        color="primary"
         component="nav"
-        // enableColorOnDark
+        enableColorOnDark
       >
         <Container maxWidth="xl">
           {/* 2. The Particles Canvas */}
           {init && (
-            <Box
-              sx={{
-                position: "absolute",
-                inset: 0,
-                overflow: "hidden",
-                zIndex: 0,
-              }}
-            >
-              <Particles
-                id="tsparticles"
-                options={{
-                  fullScreen: { enable: false }, // Crucial: prevents it from covering the whole page
-                  style: {
-                    position: "absolute",
-                    top: "0",
-                    left: "0",
-                    width: "100%",
-                    height: "100%",
-                  },
-                  fpsLimit: 120,
-                  interactivity: {
-                    events: {
-                      onHover: { enable: true, mode: "grab" },
-                    },
-                    modes: {
-                      grab: { distance: 125, links: { opacity: 0.5 } },
-                    },
-                  },
-                  particles: {
-                    color: { value: "#ffffff" },
-                    links: {
-                      color: "#ffffff",
-                      distance: 125,
-                      enable: true,
-                      opacity: 0.3,
-                      width: 1,
-                    },
-                    move: {
-                      enable: true,
-                      speed: 1,
-                    },
-                    number: {
-                      value: 30,
-                    },
-                    opacity: { value: 0.5 },
-                    size: { value: { min: 1, max: 3 } },
-                  },
-                }}
-              />
-            </Box>
+            <ParticleContainer>
+              <Particles id="tsparticles" options={options} />
+            </ParticleContainer>
           )}
           {/* Content Container (Above Canvas) */}
           <AppBarContainer maxWidth="xl">
             {/* --- SECTION 2: LOGO & TITLE --- */}
-            <Toolbar
-              disableGutters
-              sx={{ py: 0.5, display: "flex", justifyContent: "space-between" }}
-              variant="dense"
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  alignContent: "middle",
-                }}
-              >
+            <ProfileToolBar disableGutters variant="dense">
+              <LogoSection>
                 {/* Logo Image */}
-                {/* <Box
-                  component="img"
-                  src="/static/images/logo.svg" // Replace with your actual logo path
-                  alt="Logo"
-                  sx={{ height: 70, width: "auto", mr: 2 }}
-                /> */}
                 <NavMenuButton
                   color="inherit"
                   aria-label="open drawer"
                   edge="start"
                   onClick={handleDrawerToggle}
-                  sx={{ p: 0 }}
                   // sx={[
                   //   { mr: 2, p: 0.5 },
                   //   open && { display: { xs: "none", sm: "block" } },
                   // ]}
                 >
                   {/* <MenuIcon /> */}
-                  {/* <Box
-                sx={{
-                  flexGrow: 1,
-                  display: { xs: "flex", sm: "block" },
-                  // mr: 1,
-                  position: "relative",
-                  width: `max(40px, 7vmin)`,
-                  height: `max(40px, 7vmin)`,
-                  img: {
-                    p: 0.5,
-                  },
-                }}
-              >
-                <Image
-                  src="/static/images/logo.svg"
-                  alt="Logo"
-                  preload={false}
-                  loading="eager"
-                  fill
-                  style={{ objectFit: "contain" }}
-                  unoptimized
-                />
-              </Box> */}
                   <DrawerToggle>
-                    {/* <img src="/static/images/logo.svg" alt="Logo" /> */}
                     <MiniImg />
                   </DrawerToggle>
-
-                  {/* <Avatar src="/static/images/logo.svg" /> */}
                 </NavMenuButton>
+
                 {/* Logo Title */}
-                <Box sx={{ textAlign: "center", h6: { py: 0.5 } }}>
-                  <Box sx={{ position: "relative", display: "inline-block" }}>
-                    {/* <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: "bold",
-                        color: "#fff",
-                        pb: "6px", // Space for the swoosh
-                        textTransform: "uppercase",
-                        letterSpacing: "1px",
-                      }}
-                    >
-                      Ministry of Post and Telecommunications
-                    </Typography> */}
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        // fontWeight: 700,
-                        lineHeight: 2.5,
-                        fontSize: { xs: "0.75rem", md: "1rem" },
-                        // pb: "12px", // Space for the swoosh
-                        textTransform: "uppercase",
-                        letterSpacing: "1px",
-                      }}
-                    >
-                      អគ្គលេខាធិការដ្ឋាន
-                    </Typography>
+                <LogoCaption>
+                  <CaptionWrapper>
+                    <Typography variant="h6">អគ្គលេខាធិការដ្ឋាន</Typography>
 
                     {/* The Orange Tapered Underline (Swoosh) */}
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "4px", // The maximum thickness in the middle
-                        backgroundColor: "#fdb913", // The official MPTC gold/orange
-
-                        /* This Clip-Path creates the "tapered" look:
-         Starts thin at the left, gets thick in the middle, 
-         and ends thin at the right.
-      */
-                        clipPath:
-                          "polygon(0% 80%, 15% 40%, 50% 10%, 85% 40%, 100% 80%, 85% 100%, 50% 100%, 15% 100%)",
-
-                        // Adds a very slight "glow" to mimic the site's look
-                        filter:
-                          "drop-shadow(0px 0px 2px rgba(253, 185, 19, 0.5))",
-                      }}
-                    />
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 700,
-                      // lineHeight: 5,
-                      fontSize: { xs: "0.75rem", md: "0.925rem" },
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    General Secretariat
-                  </Typography>
-                </Box>
-              </Box>
+                    <Underline />
+                  </CaptionWrapper>
+                  <Typography variant="h6">General Secretariat</Typography>
+                </LogoCaption>
+              </LogoSection>
 
               {/* --- SECTION 3: NAVIGATION MENU --- */}
               <Stack
@@ -832,7 +796,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   </Menu>
                 </Box>
               </Stack>
-            </Toolbar>
+            </ProfileToolBar>
           </AppBarContainer>
           <Toolbar
             disableGutters
@@ -949,7 +913,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         {/* <DrawerHeader /> */}
         {children}
       </Main>
-    </Box>
+    </Root>
   );
 };
 
