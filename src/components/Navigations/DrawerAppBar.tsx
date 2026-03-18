@@ -71,6 +71,68 @@ const Root = styled(Box, {
   // },
 }));
 
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<AppBarProps>(({ theme }) => ({
+  transition: theme.transitions.create(["margin", "width"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  /* Addition Style for particles */
+  // height: "100px",
+  justifyContent: "center",
+  // Your Red Gradient
+  // background: "linear-gradient(45deg, rgb(187, 17, 17) 0%, #820000 100%)",
+  // position: "relative",
+  // ❌ Remove this — it corrupts Menu positioning
+  // overflow: "hidden", // Keeps particles inside the bar
+  boxShadow: "none",
+  variants: [
+    {
+      props: ({ open }) => open,
+      style: {
+        // width: `calc(100% - ${drawerWidth}px)`,
+        // marginLeft: `${drawerWidth}px`,
+
+        // 2. Use it directly for margin (negative values work too!)
+        marginLeft: `${drawerWidth}`,
+
+        // 3. Subtract it from 100% for the main content width
+        width: `calc(100% - ${drawerWidth})`,
+        transition: theme.transitions.create(["margin", "width"], {
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+      },
+    },
+  ],
+}));
+
+const AppBarContainer = styled(Container)(({ theme }) => ({
+  // display: "flex",
+  // flexDirection: "column",
+  // height: "100%",
+  // overflow: "hidden",
+  position: "relative",
+  zIndex: 10,
+  padding: 0,
+  [theme.breakpoints.up("xs")]: {
+    padding: 0,
+  },
+  // [theme.breakpoints.up("sm")]: {
+  //   padding: 0,
+  // },
+  // [theme.breakpoints.up("md")]: {
+  //   padding: 0,
+  // },
+  // [theme.breakpoints.up("lg")]: {
+  //   padding: 0,
+  // },
+  // [theme.breakpoints.up("xl")]: {
+  //   padding: 0,
+  // },
+}));
+
 const ParticleContainer = styled(Box, {
   name: PREFIX,
   slot: "effect",
@@ -163,11 +225,42 @@ const Underline = styled(Box, {
   filter: "drop-shadow(0px 0px 2px rgba(253, 185, 19, 0.5))",
 }));
 
+const StackWrapper = styled(Stack, {
+  name: PREFIX,
+  slot: "StackWrapper",
+  overridesResolver: (_props, styles) => styles.stackWrapper,
+})(({ theme }) => ({
+  [theme.breakpoints.up("xs")]: {
+    display: "none",
+  },
+  [theme.breakpoints.up("md")]: {
+    display: "flex",
+  },
+  button: {
+    color: "inherit",
+  },
+}));
+
+const DesktopToolbar = styled(Toolbar, {
+  name: PREFIX,
+  slot: "DesktopToolbar",
+  overridesResolver: (_props, styles) => styles.desktopToolbar,
+})(({ theme }) => ({
+  [theme.breakpoints.up("xs")]: {
+    display: "none",
+  },
+  [theme.breakpoints.up("md")]: {
+    display: "flex",
+  },
+}));
+
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme }) => ({
   flexGrow: 1,
-  paddingTop: theme.spacing(10),
+  [theme.breakpoints.up("md")]: {
+    paddingTop: theme.spacing(10),
+  },
   // // padding: `0 ${theme.spacing(3)}`,
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
@@ -192,68 +285,6 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
-
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme }) => ({
-  transition: theme.transitions.create(["margin", "width"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  /* Addition Style for particles */
-  // height: "100px",
-  justifyContent: "center",
-  // Your Red Gradient
-  // background: "linear-gradient(45deg, rgb(187, 17, 17) 0%, #820000 100%)",
-  // position: "relative",
-  // ❌ Remove this — it corrupts Menu positioning
-  // overflow: "hidden", // Keeps particles inside the bar
-  boxShadow: "none",
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        // width: `calc(100% - ${drawerWidth}px)`,
-        // marginLeft: `${drawerWidth}px`,
-
-        // 2. Use it directly for margin (negative values work too!)
-        marginLeft: `${drawerWidth}`,
-
-        // 3. Subtract it from 100% for the main content width
-        width: `calc(100% - ${drawerWidth})`,
-        transition: theme.transitions.create(["margin", "width"], {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      },
-    },
-  ],
-}));
-
-const AppBarContainer = styled(Container)(({ theme }) => ({
-  // display: "flex",
-  // flexDirection: "column",
-  // height: "100%",
-  // overflow: "hidden",
-  position: "relative",
-  zIndex: 10,
-  padding: 0,
-  [theme.breakpoints.up("xs")]: {
-    padding: 0,
-  },
-  // [theme.breakpoints.up("sm")]: {
-  //   padding: 0,
-  // },
-  // [theme.breakpoints.up("md")]: {
-  //   padding: 0,
-  // },
-  // [theme.breakpoints.up("lg")]: {
-  //   padding: 0,
-  // },
-  // [theme.breakpoints.up("xl")]: {
-  //   padding: 0,
-  // },
-}));
 
 const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
   width: drawerWidth,
@@ -496,48 +527,51 @@ const DrawerDivider = styled(Divider)(({ theme }) => ({
   height: theme.spacing(1),
   backgroundColor: "#000",
 }));
-
-// const navItems = [
-//   { title: "ទំព័រដើម", icon: <RazHome color="error" fontSize="medium" /> },
-//   {
-//     title: "ប្រព័ន្ធចរន្តឯកសារ",
-//     icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />,
-//   },
-//   {
-//     title: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស",
-//     icon: <RielIcon color="success" fontSize="medium" />,
-//   },
-// ];
-
-const navItems = [
+const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const SOCIAL_ITEMS = [
   {
-    title: "ទំព័រដើម",
-    icon: <RazHome color="error" fontSize="medium" />,
-    href: "/",
+    label: "គេហទំព័រ",
+    Icon: <RazWebsite color="inherit" fontSize="medium" />,
+    color: "error",
+    href: "https://www.mcs.gov.kh/",
   },
   {
-    title: "ប្រព័ន្ធចរន្តឯកសារ",
-    icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />,
-    href: "/fts",
+    label: "Facebook",
+    Icon: <RazFacebook color="inherit" fontSize="medium" />,
+    color: "secondary",
+    href: "https://www.facebook.com/CivilServiceCambodia",
   },
   {
-    title: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស",
-    icon: <RielIcon color="success" fontSize="medium" />,
-    href: "/payrolls",
+    label: "Instagram",
+    Icon: <RazInstagram color="inherit" fontSize="medium" />,
+    color: "primary",
+    href: "https://www.instagram.com/civilservice_cambodia",
   },
   {
-    title: "ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក",
-    icon: <RazPeople color="primary" fontSize="medium" />,
-    href: "/photos",
+    label: "Telegram",
+    Icon: <RazTelegram color="inherit" fontSize="medium" />,
+    color: "success",
+    href: "https://t.me/mcsgovkh",
   },
   {
-    title: "អំពីក្រសួង",
-    icon: <RazContact color="warning" fontSize="medium" />,
+    label: "Tiktok",
+    Icon: <RazTiktok color="inherit" fontSize="medium" />,
+    color: "warning",
+    href: "https://www.tiktok.com/@mcsgovernment",
+  },
+  {
+    label: "X",
+    Icon: <RazX color="inherit" fontSize="medium" />,
+    color: "warning",
     href: "/about",
   },
+  {
+    label: "YouTube",
+    Icon: <RazYoutube color="inherit" fontSize="medium" />,
+    color: "warning",
+    href: "https://youtube.com/@MinistryofCivilService",
+  },
 ];
-
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
@@ -569,29 +603,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
 
     setOpen(open);
   };
-  {
-    /* <Box
-        sx={{
-          display: { xs: "flex", md: "flex" },
-          //   alignItems: "center",
-          //   justifyContent: "center",
-          mr: 1,
-          position: "relative",
-          //   width: "7vmin",
-          height: "7vmin",
-        }}
-      >
-        <Image
-          src="/static/images/logo.svg"
-          alt="Logo"
-          preload={false}
-          loading="eager"
-          fill
-          style={{ objectFit: "contain" }}
-          unoptimized
-        />
-      </Box> */
-  }
+
   const drawer = (
     <Fragment>
       <DrawerHeader>
@@ -609,36 +621,13 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
           //   },
           // }}
           >
-            {/* <Logo />
-            <Image
-              src="/static/images/logo.svg"
-              alt="Logo"
-              preload={false}
-              loading="eager"
-              fill
-              style={{ objectFit: "contain" }}
-              unoptimized
-            /> */}
             <DrawerToggle>
               <MiniImg />
             </DrawerToggle>
           </HamBurgerNav>
-          {/* <DrawerToggle>
-            <MiniImg />
-          </DrawerToggle> */}
         </NavMenuButton>
       </DrawerHeader>
       <DrawerDivider />
-      {/* <List>
-        {navItems.map((item) => (
-          <ListItem key={item.title} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.title} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List> */}
       <NavItems variant="horizontal" />
     </Fragment>
   );
@@ -703,11 +692,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
               </LogoSection>
 
               {/* --- SECTION 3: NAVIGATION MENU --- */}
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{ display: { xs: "none", md: "flex" } }}
-              >
+              <StackWrapper direction="row" spacing={1}>
                 {/* <Button color="inherit" sx={{ fontWeight: 600 }}>
                   Home
                 </Button>
@@ -720,34 +705,39 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 <Button color="inherit" sx={{ fontWeight: 600 }}>
                   Contact
                 </Button> */}
-                <IconButton size="small" sx={{ color: "white" }}>
-                  {/* <Facebook fontSize="small" /> */}
+                {SOCIAL_ITEMS.map(({ label, Icon, color, href }, i) => (
+                  <Tooltip title={label} key={label}>
+                    <IconButton
+                      href={href}
+                      target="_blank"
+                      size="small"
+                      color="inherit"
+                    >
+                      {Icon}
+                    </IconButton>
+                  </Tooltip>
+                ))}
+                {/* <IconButton size="small">
                   <RazWebsite />
                 </IconButton>
-                <IconButton size="small" sx={{ color: "white" }}>
-                  {/* <Facebook fontSize="small" /> */}
+                <IconButton size="small">
                   <RazFacebook />
                 </IconButton>
-                <IconButton size="small" sx={{ color: "white" }}>
-                  {/* <YouTube fontSize="small" /> */}
+                <IconButton size="small">
                   <RazInstagram />
                 </IconButton>
-                <IconButton size="small" sx={{ color: "white" }}>
-                  {/* <Telegram fontSize="small" /> */}
+                <IconButton size="small">
                   <RazTelegram />
                 </IconButton>
-                <IconButton size="small" sx={{ color: "white" }}>
-                  {/* <Telegram fontSize="small" /> */}
+                <IconButton size="small">
                   <RazTiktok />
                 </IconButton>
-                <IconButton size="small" sx={{ color: "white" }}>
-                  {/* <Telegram fontSize="small" /> */}
+                <IconButton size="small">
                   <RazX />
                 </IconButton>
-                <IconButton size="small" sx={{ color: "white" }}>
-                  {/* <YouTube fontSize="small" /> */}
+                <IconButton size="small">
                   <RazYoutube />
-                </IconButton>
+                </IconButton> */}
                 <Search>
                   <SearchIconWrapper>
                     <SearchIcon />
@@ -761,8 +751,12 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   <ThemeToggle />
                 </Box>
                 <Box sx={{ flexGrow: 0 }}>
-                  <Tooltip title="Open settings">
-                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Tooltip title="Open User's settings">
+                    <IconButton
+                      size="small"
+                      onClick={handleOpenUserMenu}
+                      sx={{ p: 0 }}
+                    >
                       <Avatar alt="MCS" src="/static/images/otto.webp" />
                     </IconButton>
                   </Tooltip>
@@ -788,68 +782,16 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   >
                     {settings.map((setting) => (
                       <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                        <Typography sx={{ textAlign: "center" }}>
-                          {setting}
-                        </Typography>
+                        <Typography align="center">{setting}</Typography>
                       </MenuItem>
                     ))}
                   </Menu>
                 </Box>
-              </Stack>
+              </StackWrapper>
             </ProfileToolBar>
           </AppBarContainer>
-          <Toolbar
-            disableGutters
-            variant="dense"
-            sx={{ display: { xs: "none", md: "flex" } }}
-          >
+          <DesktopToolbar disableGutters variant="dense">
             {/* Pass The Drawer Button back here to revert back */}
-            {/* <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-            >
-              MUI
-            </Typography> */}
-            {/* <Box
-              sx={{
-                flexGrow: 1,
-                display: {
-                  xs: "none",
-                  sm: "block",
-                  md: "flex",
-                  // height: "100%",
-                },
-              }}
-            >
-              {navItems.map((item) => (
-                <Button
-                  key={item.title}
-                  sx={{
-                    my: "-webkit-fill-available",
-                    py: "-webkit-fill-available",
-                    height: "100%",
-                  }}
-                  startIcon={item.icon}
-                  size="large"
-                >
-                  <Typography variant="h4" align="center">
-                    {item.title}
-                  </Typography>
-                </Button>
-              ))}
-              <Link
-                component="button"
-                variant="body2"
-                onClick={() => {
-                  window.location.href = "/staff";
-                }}
-              >
-                <Typography variant="h4" align="center">
-                  ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក
-                </Typography>
-              </Link>
-            </Box> */}
             <NavItems />
             {/* <Search>
               <SearchIconWrapper>
@@ -894,7 +836,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 ))}
               </Menu>
             </Box> */}
-          </Toolbar>
+          </DesktopToolbar>
         </Container>
       </AppBar>
       <Drawer

@@ -14,8 +14,8 @@ const Root = styled(Box, {
 })<DrawerToggleProps>(({ theme }) => ({
   // flexGrow: 1,
   position: "relative",
-  width: `max(50px, 10vmin)`,
-  height: `max(50px, 10vmin)`,
+  width: `max(50px, 5rem)`,
+  height: `max(50px, 5rem)`,
   background: "rgba(0, 0, 0, 0.5)",
   borderRadius: "50%",
   overflow: "hidden",
