@@ -23,7 +23,8 @@ export default function AdministrativeForm() {
       {/* --- HEADER --- */}
       <Box
         sx={{
-          display: { xs: "none", md: "inherit" },
+          // display: { xs: "none", md: "inherit" },
+          display: "none",
           justifyContent: "space-between",
           mb: 7,
         }}

@@ -488,7 +488,7 @@ export default function DocumentTable() {
     // positionGlobalFilter: "left",
     positionToolbarAlertBanner: "bottom", //show selected rows count on bottom toolbar
     muiTableContainerProps: {
-      sx: { maxHeight: "calc(100vh - 200px)" },
+      sx: { maxHeight: "calc(100vh - 370px)" },
     },
     // enableColumnResizing: true,
     muiTableHeadCellProps: {
