@@ -327,7 +327,7 @@ const NavIcon = styled(ListItemIcon, {
       variant === "vertical"
         ? `0 ${theme.spacing(1)} 0 ${theme.spacing(-0.5)}`
         : "0",
-    minWidth: variant === "vertical" ? "fit-content" : theme.spacing(7),
+    minWidth: variant === "vertical" ? "fit-content" : theme.spacing(5),
     textShadow: `
             -0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
             0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},

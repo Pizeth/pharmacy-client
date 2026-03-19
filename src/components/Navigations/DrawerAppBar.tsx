@@ -51,7 +51,9 @@ import RazWebsite from "../icons/socials/website";
 import RazTiktok from "../icons/socials/tiktok";
 import RazX from "../icons/socials/x";
 import options from "@/configs/particleConfig";
-import { Padding } from "@mui/icons-material";
+import { Height, Padding } from "@mui/icons-material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import SettingsIcon from "@mui/icons-material/Settings";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
@@ -258,6 +260,9 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme }) => ({
   flexGrow: 1,
+  [theme.breakpoints.up("xs")]: {
+    paddingTop: theme.spacing(5),
+  },
   [theme.breakpoints.up("md")]: {
     paddingTop: theme.spacing(10),
   },
@@ -294,6 +299,9 @@ const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
     boxSizing: "border-box",
     // minWidth: 230,
     // maxWidth: 300,
+    display: "flex",
+    flexDirection: "column",
+    Height: "100%",
   },
   [theme.breakpoints.up("sm")]: {
     display: "none",
@@ -326,17 +334,18 @@ const Search = styled("div")(({ theme }) => ({
   "&:hover": {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
+  // marginRight: theme.spacing(2),
+  // marginLeft: "auto",
+  margin: theme.spacing(0.75, 1),
   width: "100%",
   [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
+    // marginLeft: theme.spacing(3),
     width: "auto",
   },
 }));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
+  padding: theme.spacing(0, 1),
   height: "100%",
   position: "absolute",
   pointerEvents: "none",
@@ -356,7 +365,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     [theme.breakpoints.up("sm")]: {
       width: "10ch",
       "&:focus": {
-        width: "25ch",
+        width: "100%",
       },
     },
   },
@@ -366,20 +375,23 @@ const NavMenuButton = styled(IconButton, {
   name: PREFIX,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
-})<{ variant?: "main" | "side" }>(({ theme, variant = "main" }) => ({
-  alignSelf: "stretch",
-  // minHeight: "61.55px",
-  height: "fill-available",
-  width: variant === "main" ? "fit-content" : "stretch",
-  // padding: `${theme.spacing(1)}`,
-  padding: 0,
-  // margin: `${theme.spacing(1)}`,
-  // "&:hover": {
-  //   svg: {
-  //     opacity: 1,
-  //   },
-  // },
-}));
+})<{ variant?: "main" | "side"; visible?: boolean }>(
+  ({ theme, variant = "main", visible = true }) => ({
+    alignSelf: "stretch",
+    // minHeight: "61.55px",
+    height: "fill-available",
+    width: variant === "main" ? "fit-content" : "stretch",
+    // padding: `${theme.spacing(1)}`,
+    padding: 0,
+    opacity: visible === true ? 1 : 0,
+    // margin: `${theme.spacing(1)}`,
+    // "&:hover": {
+    //   svg: {
+    //     opacity: 1,
+    //   },
+    // },
+  }),
+);
 
 const HamBurgerNav = styled(Box)(({ theme }) => ({
   // display: { xs: "flex", md: "flex" },
@@ -527,7 +539,9 @@ const DrawerDivider = styled(Divider)(({ theme }) => ({
   height: theme.spacing(1),
   backgroundColor: "#000",
 }));
+
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
+
 const SOCIAL_ITEMS = [
   {
     label: "គេហទំព័រ",
@@ -628,7 +642,158 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         </NavMenuButton>
       </DrawerHeader>
       <DrawerDivider />
+      <Search>
+        <SearchIconWrapper>
+          <SearchIcon />
+        </SearchIconWrapper>
+        <StyledInputBase
+          placeholder="Search…"
+          inputProps={{ "aria-label": "search" }}
+        />
+      </Search>
+      <Divider />
       <NavItems variant="horizontal" />
+
+      {/* Bottom items container - automatically pushed to the bottom */}
+      <Box
+        sx={{
+          marginTop: "auto",
+          p: 1.5,
+          borderTop: "1px solid #404040", // Optional divider
+        }}
+      >
+        {/* The "New Version" Update Card (optional) */}
+        <Box
+          sx={{
+            bgcolor: "#272935",
+            p: 2,
+            borderRadius: 2,
+            mb: 2,
+            border: "1px solid rgba(255,255,255,0.05)",
+          }}
+        >
+          <Typography variant="caption" sx={{ color: "#fff", fontWeight: 600 }}>
+            Legacy version available
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "rgba(255,255,255,0.5)",
+              fontSize: "0.75rem",
+              mt: 0.5,
+            }}
+          >
+            The legacy version of the App is available.
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "#6366f1",
+              mt: 1,
+              display: "block",
+              cursor: "pointer",
+            }}
+          >
+            Switch now →
+          </Typography>
+        </Box>
+
+        {/* The Profile Section */}
+        <ListItemButton
+          sx={{
+            borderRadius: 2,
+            px: 0,
+            "&:hover": { bgcolor: "rgba(255,255,255,0.05)" },
+          }}
+          onClick={handleOpenUserMenu}
+        >
+          <Avatar
+            src="/static/images/otto.webp"
+            alt="User"
+            sx={{
+              width: 50,
+              height: 50,
+              mr: 1,
+              p: 0.125,
+              // borderRadius: "12px",
+              border: "1px solid rgba(197, 190, 190, 0.73)",
+            }} // Squircle avatar
+          />
+          <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+            <Typography
+              variant="body2"
+              sx={{ color: "#fff", fontWeight: 500, lineHeight: 1.2 }}
+            >
+              Liam Smith
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "rgba(255,255,255,0.5)",
+                display: "block",
+                // noWrap: true,
+              }}
+              noWrap
+            >
+              smith@example.com
+            </Typography>
+          </Box>
+          <SettingsIcon
+            fontSize="medium"
+            sx={{ color: "rgba(255,255,255,0.4)", mr: 0.5 }}
+          />
+        </ListItemButton>
+
+        {/* The Popup Menu */}
+        <Menu
+          // sx={{ mt: "45px" }}
+          id="menu-appbar"
+          anchorEl={anchorElUser}
+          // anchorOrigin={{
+          //   vertical: "bottom",
+          //   horizontal: "right",
+          // }}
+          // transformOrigin={{
+          //   vertical: "top",
+          //   horizontal: "right",
+          // }}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+          keepMounted
+          open={Boolean(anchorElUser)}
+          onClose={handleCloseUserMenu}
+          slotProps={{
+            paper: {
+              sx: {
+                bgcolor: "#1c1e26", // Match drawer background
+                // color: "#fff",
+                borderRadius: "15px",
+                border: "1px solid rgba(255,255,255,0.1)",
+                // mt: -1, // Adjust vertical offset
+                width: "clamp(150px, 80%, 250px)",
+                "& .MuiMenuItem-root": {
+                  fontSize: "0.875rem",
+                  borderRadius: "6px",
+                  mx: 1,
+                  my: 0.5,
+                },
+              },
+            },
+          }}
+        >
+          {settings.map((setting) => (
+            <MenuItem key={setting} onClick={handleCloseUserMenu}>
+              <Typography align="center">{setting}</Typography>
+            </MenuItem>
+          ))}
+        </Menu>
+      </Box>
     </Fragment>
   );
 
@@ -668,6 +833,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                   aria-label="open drawer"
                   edge="start"
                   onClick={handleDrawerToggle}
+                  visible={!open}
                   // sx={[
                   //   { mr: 2, p: 0.5 },
                   //   open && { display: { xs: "none", sm: "block" } },
@@ -738,7 +904,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 <IconButton size="small">
                   <RazYoutube />
                 </IconButton> */}
-                <Search>
+                {/* <Search>
                   <SearchIconWrapper>
                     <SearchIcon />
                   </SearchIconWrapper>
@@ -786,7 +952,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                       </MenuItem>
                     ))}
                   </Menu>
-                </Box>
+                </Box> */}
               </StackWrapper>
             </ProfileToolBar>
           </AppBarContainer>
