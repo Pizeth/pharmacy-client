@@ -54,6 +54,7 @@ import options from "@/configs/particleConfig";
 import { Height, Padding } from "@mui/icons-material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SettingsIcon from "@mui/icons-material/Settings";
+import GlobalSearch from "./Search/search";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
@@ -302,6 +303,11 @@ const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
     display: "flex",
     flexDirection: "column",
     Height: "100%",
+    background: `
+      linear-gradient(135deg, 
+      ${alpha(theme.palette.primary.main, 0.1)}, 
+      ${alpha(theme.palette.secondary.main, 0.1)})
+    `,
   },
   [theme.breakpoints.up("sm")]: {
     display: "none",
@@ -333,6 +339,9 @@ const Search = styled("div")(({ theme }) => ({
   backgroundColor: alpha(theme.palette.common.white, 0.15),
   "&:hover": {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
+    svg: {
+      fill: theme.palette.error.main,
+    },
   },
   // marginRight: theme.spacing(2),
   // marginLeft: "auto",
@@ -642,7 +651,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         </NavMenuButton>
       </DrawerHeader>
       <DrawerDivider />
-      <Search>
+      {/* <Search>
         <SearchIconWrapper>
           <SearchIcon />
         </SearchIconWrapper>
@@ -650,8 +659,9 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
           placeholder="Search…"
           inputProps={{ "aria-label": "search" }}
         />
-      </Search>
-      <Divider />
+      </Search> */}
+      <GlobalSearch />
+      {/* <Divider /> */}
       <NavItems variant="horizontal" />
 
       {/* Bottom items container - automatically pushed to the bottom */}
