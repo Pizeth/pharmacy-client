@@ -600,6 +600,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
   const [init, setInit] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  // const [results, setResults] = useState<any[]>([]);
 
   const handleDrawerToggle = () => {
     setOpen((prevState) => !prevState);

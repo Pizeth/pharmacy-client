@@ -1,5 +1,10 @@
 import { StyleComponent } from "@/types/classKey";
-import { AvatarOwnProps, SxProps, Theme } from "@mui/material";
+import {
+  AvatarOwnProps,
+  PopperPlacementType,
+  SxProps,
+  Theme,
+} from "@mui/material";
 import { Property } from "csstype";
 import { SignUpParams } from "./auth.interface";
 import { FieldValues, SubmitHandler } from "react-hook-form";
@@ -7,7 +12,8 @@ import { SaveHandler } from "ra-core";
 import { SaveButtonProps } from "react-admin";
 import { AuthAction } from "@/types/theme";
 import { Circle } from "lucide-react";
-import { HtmlHTMLAttributes, ReactNode } from "react";
+import { HtmlHTMLAttributes, ReactNode, RefObject } from "react";
+import { VirtualElement } from "@popperjs/core/lib/types";
 
 export interface LoginFormProps {
   content?: StyleComponent;
@@ -175,4 +181,23 @@ export interface ColumnAvatarProps extends Omit<AvatarOwnProps, "children"> {
 export interface TVProps extends HtmlHTMLAttributes<HTMLDivElement> {
   className?: string;
   sx?: SxProps<Theme>;
+}
+
+export interface PoperResultProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  open: boolean;
+  // reference: RefObject<HTMLDivElement | null>;
+  placement?: PopperPlacementType;
+  anchorEl:
+    | null
+    | VirtualElement
+    | HTMLElement
+    | (() => HTMLElement)
+    | (() => VirtualElement);
+  width?: number | string | undefined;
+  results: any;
+  error: string | null;
+  // onClose: () => void;
+  onSelect?: (product: any) => void;
+  setValue: (value: string) => void;
+  setOpen: (open: boolean) => void;
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FormControl,
   InputLabel,
@@ -10,9 +10,32 @@ import {
   Box,
   Fade,
   useTheme,
+  CircularProgress,
+  ClickAwayListener,
+  Popper,
+  Paper,
+  Typography,
+  List,
+  ListItemButton,
+  ListItemText,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import axios from "axios";
+import PoperResult from "./popperResult";
+import { set } from "lodash";
+
+interface SmartSearchProps {
+  onSelect?: (product: any) => void;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+}
 
 const PREFIX = "RazethSearch";
 const Root = styled(Box, {
@@ -44,6 +67,7 @@ const FormInput = styled(FormControl, {
   "&:focus-within": { transform: "scale(1.025)" },
   margin: theme.spacing(0),
   width: "fill-available",
+  maxWidth: "50ch",
   // [theme.breakpoints.up("sm")]: {
   //   // marginLeft: theme.spacing(3),
   //   width: "auto",
@@ -123,10 +147,10 @@ const Input = styled(OutlinedInput, {
       color: theme.palette.error.main,
     },
   },
-  svg: {
-    transform: "scaleX(-1)",
-    marginLeft: theme.spacing(0),
-  },
+  // svg: {
+  //   transform: "scaleX(-1)",
+  //   marginLeft: theme.spacing(0),
+  // },
   // 1. Remove the default border
   "& .MuiOutlinedInput-notchedOutline": {
     border: "none",
@@ -134,12 +158,13 @@ const Input = styled(OutlinedInput, {
   "&:hover": {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
     svg: {
-      fill: theme.palette.error.main,
-      transition: "fill 0.25s ease-in-out",
+      // fill: theme.palette.error.main,
+      color: theme.palette.error.main,
+      transition: "color 0.25s ease-in-out",
     },
     // 2. Ensure the border doesn't reappear on hover
     "& .MuiOutlinedInput-notchedOutline": {
-      // border: "none",
+      border: "none",
     },
   },
   // 3. Ensure the border doesn't reappear when focused
@@ -154,6 +179,26 @@ const Input = styled(OutlinedInput, {
     backgroundColor: alpha(theme.palette.common.white, 0.07),
     boxShadow: `0 8px 32px 0 ${alpha(theme.palette.common.black, 0.25)}`,
     border: `1px solid ${alpha(theme.palette.error.main, 0.5)}`,
+  },
+  "& .MuiInputAdornment-root": {
+    "&.MuiInputAdornment-positionStart": {
+      opacity: 0.5,
+      transform: "scaleX(-1)",
+      // marginLeft: theme.spacing(0),
+    },
+    "&.MuiInputAdornment-positionEnd": {
+      // opacity: 0.5,
+      // transform: "scaleX(-1)",
+      margin: theme.spacing(1),
+      svg: {
+        color: theme.palette.text.primary,
+      },
+    },
+    // svg: {
+    //   opacity: 0.5,
+    //   transform: "scaleX(-1)",
+    //   marginLeft: theme.spacing(0),
+    // },
   },
   //   // 5. Keep your original input width transition
   // "& .MuiOutlinedInput-input": {
@@ -173,58 +218,219 @@ const ActionButton = styled(IconButton, {
   slot: "ActionButton",
   overridesResolver: (_props, styles) => styles.actionButton,
 })(({ theme }) => ({
-  color: theme.palette.text.secondary,
-  marginLeft: theme.spacing(1),
+  // color: theme.palette.text.secondary,
+  // marginLeft: theme.spacing(1),
+  padding: theme.spacing(0),
   "&:hover": {
     color: theme.palette.primary.main,
   },
 }));
 
 const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }) => {
+  // Refs & Anchors
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [value, setValue] = useState(""); // Immediate UI state
+  const [loading, setLoading] = useState(false);
   // 1. Manually track focus and value to control the shrink state
   const [focused, setFocused] = useState(false);
-  const [value, setValue] = useState("");
+  const [results, setResults] = useState<any>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
-  // The label should shrink if the input is focused OR has text
-  const shouldShrink = focused || value.length > 0;
+  // 1. The Search Logic (Connect this to your API)
+  const performSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      // onSearchResults?.([]); // Clear results if query is empty
+      setResults([]);
+      setOpen(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Replace this with your actual API call:
+      const response = await axios.get(
+        `https://jsonplaceholder.typicode.com/posts/${query}`,
+      );
+      // console.log(response.data);
+      setResults(response.data);
+      console.log(results);
+      setOpen(response.data.length > 0 || query.length > 0);
+
+      // console.log(`API Call: Fetching results for "${query}"...`);
+
+      // Simulating a 1-second network delay
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Mock result
+      // const mockData = [{ id: 1, name: `Result for ${query}` }];
+      // onSearchResults?.(mockData);
+    } catch (err) {
+      console.error("Search failed", error);
+      setError(err instanceof Error ? err.message : "An error occurred");
+      setOpen(true); // Open to show the error message
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 2. Debounce
+  useEffect(() => {
+    const timer = setTimeout(() => performSearch(value), 500);
+    return () => clearTimeout(timer);
+  }, [value, performSearch]);
 
   const handleClear = () => {
     setValue("");
+    setResults([]);
+    setOpen(false);
+    setError(null);
   };
 
+  // The label should shrink if the input is focused OR has text
+  const shouldShrink = open || focused || value.length > 0;
+
   return (
-    <Root>
-      <FormInput variant="outlined">
-        <Label shrink={shouldShrink} htmlFor="outlined-adornment-password">
-          {label}
-        </Label>
-        <Input
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          notched={shouldShrink}
-          label={label} // Required for the outline to calculate the cutout width
-          startAdornment={
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          }
-          // 2. The Clear Button logic
-          endAdornment={
-            value.length > 0 ? (
-              <InputAdornment position="start">
-                <Fade in={value.length > 0}>
-                  <ActionButton onClick={handleClear} size="small">
-                    <ClearIcon fontSize="small" />
-                  </ActionButton>
-                </Fade>
+    <ClickAwayListener onClickAway={() => setOpen(false)}>
+      <Root>
+        <FormInput variant="outlined" ref={containerRef}>
+          <Label shrink={shouldShrink} htmlFor="outlined-adornment-password">
+            {label}
+          </Label>
+          <Input
+            value={value}
+            label={label} // Required for the outline to calculate the cutout width
+            onChange={(e) => setValue(e.target.value)}
+            // onChange={(e) => {
+            //   setValue(e.target.value);
+            //   if (e.target.value.length > 0)
+            //     setLoading(true); // Simulate start loading
+            //   else setLoading(false);
+            // }}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            notched={shouldShrink}
+            onKeyDown={(e) => e.key === "Escape" && handleClear()}
+            startAdornment={
+              <InputAdornment position="start" className="reverse">
+                <SearchIcon />
               </InputAdornment>
-            ) : null // 3. Returns null so the input takes up the full space
-          }
-        />
-      </FormInput>
-    </Root>
+            }
+            // 2. The Clear Button logic
+            // endAdornment={
+            //   value.length > 0 ? (
+            //     <InputAdornment position="start">
+            //       <Fade in={value.length > 0}>
+            //         <ActionButton onClick={handleClear} size="small">
+            //           <ClearIcon fontSize="small" />
+            //         </ActionButton>
+            //       </Fade>
+            //     </InputAdornment>
+            //   ) : null // 3. Returns null so the input takes up the full space
+            // }
+            // 1. DYNAMIC END ADORNMENT
+            endAdornment={
+              loading || value.length > 0 ? (
+                <InputAdornment position="end">
+                  {loading ? (
+                    <CircularProgress
+                      size="1rem"
+                      thickness={5}
+                      // sx={{ color: theme.palette.primary.main }}
+                    />
+                  ) : (
+                    <ActionButton onClick={handleClear} size="small">
+                      <ClearIcon fontSize="small" />
+                    </ActionButton>
+                  )}
+                </InputAdornment>
+              ) : null
+            }
+          />
+          {/* 3. The Results Dropdown (Popper) */}
+          {/* <Popper
+            open={open}
+            anchorEl={containerRef.current}
+            placement="bottom"
+            transition
+            // width={containerRef.current?.clientWidth}
+            style={{
+              width: containerRef.current?.clientWidth,
+              zIndex: 1300,
+              // marginTop: 8,
+            }}
+          >
+            {({ TransitionProps }) => (
+              <Fade {...TransitionProps} timeout={250}>
+                <Paper
+                  elevation={7}
+                  sx={{
+                    mt: 1,
+                    borderRadius: "50px",
+                    overflow: "hidden",
+                    backgroundColor: (theme) =>
+                      alpha(theme.palette.background.paper, 0.75),
+                    backdropFilter: "blur(0.125rem)",
+                  }}
+                >
+                  {error ? (
+                    <Box
+                      sx={{
+                        p: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        color: "error.main",
+                      }}
+                    >
+                      <ErrorOutlineIcon sx={{ mr: 1 }} />
+                      <Typography variant="body2">{error}</Typography>
+                    </Box>
+                  ) : results.length > 0 ? (
+                    <List sx={{ py: 0 }}>
+                      {results.map((product: Product) => (
+                        <ListItemButton
+                          key={product.id}
+                          onClick={() => {
+                            onSelect?.(product);
+                            setValue(product.name);
+                            setOpen(false);
+                          }}
+                        >
+                          <ListItemText
+                            primary={product.name}
+                            secondary={`${product.category} • $${product.price}`}
+                          />
+                        </ListItemButton>
+                      ))}
+                    </List>
+                  ) : (
+                    <Typography
+                      sx={{
+                        p: 2,
+                        textAlign: "center",
+                        color: "text.secondary",
+                      }}
+                    >
+                      No products found
+                    </Typography>
+                  )}
+                </Paper>
+              </Fade>
+            )}
+          </Popper> */}
+          <PoperResult
+            open={open}
+            anchorEl={containerRef.current}
+            width={containerRef.current?.clientWidth}
+            results={results}
+            error={error}
+            setValue={setValue}
+            setOpen={setOpen}
+            onSelect={(p) => console.log("Selected:", p)}
+          />
+        </FormInput>
+      </Root>
+    </ClickAwayListener>
   );
 
   //   return (
