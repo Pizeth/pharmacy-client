@@ -35,7 +35,7 @@ const Paper = styled(MuiPaper, {
   overridesResolver: (_props, styles) => styles.paper,
 })(({ theme }) => ({
   marginTop: theme.spacing(1),
-  borderRadius: "50px",
+  borderRadius: "5px",
   overflow: "hidden",
   backgroundColor: alpha(theme.palette.background.paper, 0.75),
   backdropFilter: "blur(0.125rem)",
@@ -67,6 +67,8 @@ const PoperResult = (inProps: PoperResultProps) => {
     setOpen,
     ...rest
   } = props;
+
+  console.log("results", results);
 
   return (
     <Root

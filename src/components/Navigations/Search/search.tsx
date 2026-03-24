@@ -223,7 +223,7 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
   const [loading, setLoading] = useState(false);
   // 1. Manually track focus and value to control the shrink state
   const [focused, setFocused] = useState(false);
-  const [results, setResults] = useState<any>([]);
+  const [results, setResults] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1); // -1 means nothing is highlighted
@@ -242,10 +242,12 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
       // Replace this with your actual API call:
       const response = await axios.get(
         `https://jsonplaceholder.typicode.com/posts/${query}`,
+        // `https://jsonplaceholder.typicode.com/posts`,
       );
       // console.log(response.data);
-      setResults(response.data);
-      console.log(results);
+      setResults([response.data]);
+      setError(null);
+      console.log("results in search: ", results);
       setOpen(response.data.length > 0 || query.length > 0);
 
       // console.log(`API Call: Fetching results for "${query}"...`);
