@@ -13,10 +13,10 @@ import { alpha, styled, useThemeProps } from "@mui/material/styles";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
+  id: number;
+  userId: number;
+  title: string;
+  body: string;
 }
 
 const PREFIX = "RazethSearchPoppers";
@@ -61,6 +61,7 @@ const PoperResult = (inProps: PoperResultProps) => {
     placement,
     results,
     error,
+    activeIndex,
     onSelect,
     setValue,
     setOpen,
@@ -86,18 +87,30 @@ const PoperResult = (inProps: PoperResultProps) => {
               </ErrorBox>
             ) : results.length > 0 ? (
               <List sx={{ py: 0 }}>
-                {results.map((product: Product) => (
+                {results.map((product: Product, index: number) => (
                   <ListItemButton
                     key={product.id}
+                    selected={index === activeIndex}
                     onClick={() => {
                       onSelect?.(product);
-                      setValue(product.name);
+                      setValue(product.title);
                       setOpen(false);
+                    }}
+                    sx={{
+                      // Custom highlight color to match your glassmorphism theme
+                      "&.Mui-selected": {
+                        backgroundColor: (theme) =>
+                          alpha(theme.palette.primary.main, 0.15),
+                        "&:hover": {
+                          backgroundColor: (theme) =>
+                            alpha(theme.palette.primary.main, 0.25),
+                        },
+                      },
                     }}
                   >
                     <ListItemText
-                      primary={product.name}
-                      secondary={`${product.category} • $${product.price}`}
+                      primary={product.title}
+                      secondary={`${product.title} • $${product.body}`}
                     />
                   </ListItemButton>
                 ))}

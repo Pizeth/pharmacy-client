@@ -8,23 +8,13 @@ import {
   styled,
   IconButton,
   Box,
-  Fade,
-  useTheme,
   CircularProgress,
   ClickAwayListener,
-  Popper,
-  Paper,
-  Typography,
-  List,
-  ListItemButton,
-  ListItemText,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import axios from "axios";
 import PoperResult from "./popperResult";
-import { set } from "lodash";
 
 interface SmartSearchProps {
   onSelect?: (product: any) => void;
@@ -236,6 +226,7 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
   const [results, setResults] = useState<any>([]);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1); // -1 means nothing is highlighted
 
   // 1. The Search Logic (Connect this to your API)
   const performSearch = useCallback(async (query: string) => {
@@ -280,6 +271,39 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
     return () => clearTimeout(timer);
   }, [value, performSearch]);
 
+  const handleSelect = (product: Product) => {
+    setValue(product.name);
+    setOpen(false);
+    setActiveIndex(-1);
+    console.log("Selected:", product);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!open || results.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setActiveIndex((prev) => (prev < results.length - 1 ? prev + 1 : 0));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : results.length - 1));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (activeIndex >= 0) {
+          handleSelect(results[activeIndex]);
+        }
+        break;
+      case "Escape":
+        setOpen(false);
+        setActiveIndex(-1);
+        handleClear();
+        break;
+    }
+  };
+
   const handleClear = () => {
     setValue("");
     setResults([]);
@@ -300,17 +324,25 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
           <Input
             value={value}
             label={label} // Required for the outline to calculate the cutout width
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => {
+              setValue(e.target.value);
+              setActiveIndex(-1); // Reset highlight when typing
+            }}
+            // onKeyDown={handleKeyDown}
             // onChange={(e) => {
             //   setValue(e.target.value);
             //   if (e.target.value.length > 0)
             //     setLoading(true); // Simulate start loading
             //   else setLoading(false);
             // }}
-            onFocus={() => setFocused(true)}
+            onFocus={() => {
+              setFocused(true);
+              setOpen(true);
+            }}
             onBlur={() => setFocused(false)}
             notched={shouldShrink}
-            onKeyDown={(e) => e.key === "Escape" && handleClear()}
+            // onKeyDown={(e) => e.key === "Escape" && handleClear()}
+            onKeyDown={handleKeyDown}
             startAdornment={
               <InputAdornment position="start" className="reverse">
                 <SearchIcon />
@@ -424,6 +456,7 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
             width={containerRef.current?.clientWidth}
             results={results}
             error={error}
+            activeIndex={activeIndex}
             setValue={setValue}
             setOpen={setOpen}
             onSelect={(p) => console.log("Selected:", p)}

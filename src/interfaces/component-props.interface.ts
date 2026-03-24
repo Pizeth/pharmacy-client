@@ -196,6 +196,7 @@ export interface PoperResultProps extends HtmlHTMLAttributes<HTMLDivElement> {
   width?: number | string | undefined;
   results: any;
   error: string | null;
+  activeIndex: number;
   // onClose: () => void;
   onSelect?: (product: any) => void;
   setValue: (value: string) => void;

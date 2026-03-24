@@ -17,7 +17,7 @@ function BackToTopFab() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     // Reset icon after reaching the top (roughly after animation ends)
-    setTimeout(() => setIsScrolling(false), 1000);
+    setTimeout(() => setIsScrolling(false), 1500);
   };
 
   return (
