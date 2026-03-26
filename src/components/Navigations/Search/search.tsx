@@ -245,7 +245,10 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
         // `https://jsonplaceholder.typicode.com/posts`,
       );
       // console.log(response.data);
-      setResults([response.data]);
+      // setResults([response.data]);
+      Array.isArray(response.data)
+        ? setResults(response.data)
+        : setResults([response.data]);
       setError(null);
       console.log("results in search: ", results);
       setOpen(response.data.length > 0 || query.length > 0);
@@ -259,7 +262,7 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
       // const mockData = [{ id: 1, name: `Result for ${query}` }];
       // onSearchResults?.(mockData);
     } catch (err) {
-      console.error("Search failed", error);
+      console.error("Search failed", err);
       setError(err instanceof Error ? err.message : "An error occurred");
       setOpen(true); // Open to show the error message
     } finally {
@@ -270,6 +273,16 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
   // 2. Debounce
   useEffect(() => {
     const timer = setTimeout(() => performSearch(value), 500);
+    // If the dropdown is open and has results, lock the body scroll
+    if (open && results.length > 0) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = "hidden";
+
+      // Cleanup function: Restore the scroll when the dropdown closes
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
     return () => clearTimeout(timer);
   }, [value, performSearch]);
 
@@ -339,7 +352,7 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
             // }}
             onFocus={() => {
               setFocused(true);
-              setOpen(true);
+              // setOpen(error !== null);
             }}
             onBlur={() => setFocused(false)}
             notched={shouldShrink}

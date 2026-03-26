@@ -11,6 +11,7 @@ import {
 import Box from "@mui/material/Box";
 import { alpha, styled, useThemeProps } from "@mui/material/styles";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { useEffect, useRef } from "react";
 
 interface Product {
   id: number;
@@ -69,7 +70,20 @@ const PoperResult = (inProps: PoperResultProps) => {
   } = props;
 
   console.log("results", results);
-
+  const listRef = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    if (activeIndex !== -1 && listRef.current) {
+      const activeElement = listRef.current.children[
+        activeIndex
+      ] as HTMLElement;
+      if (activeElement) {
+        activeElement.scrollIntoView({
+          block: "nearest", // Only scrolls if the item is out of view
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [activeIndex]);
   return (
     <Root
       open={open}
@@ -81,38 +95,70 @@ const PoperResult = (inProps: PoperResultProps) => {
     >
       {({ TransitionProps }) => (
         <Fade {...TransitionProps} timeout={250}>
-          <Paper elevation={7}>
+          <Paper
+            elevation={7}
+            sx={{
+              mt: 1,
+              borderRadius: "12px",
+              overflow: "hidden", // Clips the ripple effects to the border radius
+              backgroundColor: (theme) =>
+                alpha(theme.palette.background.paper, 0.95),
+              backdropFilter: "blur(10px)",
+              border: (theme) =>
+                `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
+            }}
+          >
             {error ? (
               <ErrorBox>
                 <ErrorOutlineIcon sx={{ mr: 1 }} />
                 <Typography variant="body2">{error}</Typography>
               </ErrorBox>
             ) : results.length > 0 ? (
-              <List sx={{ py: 0 }}>
+              <List
+                ref={listRef}
+                sx={{
+                  py: 0,
+                  maxHeight: "300px", // 1. Limit the height
+                  overflowY: "auto", // 2. Enable internal scrolling
+                  // 3. Smooth scrollbar styling (optional but looks great)
+                  "&::-webkit-scrollbar": { width: "6px" },
+                  "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: (theme) =>
+                      alpha(theme.palette.text.primary, 0.1),
+                    borderRadius: "10px",
+                  },
+                }}
+                dense
+              >
                 {results.map((product: Product, index: number) => (
                   <ListItemButton
                     key={product.id}
                     selected={index === activeIndex}
+                    dense
+                    // disableGutters
+                    divider
                     onClick={() => {
                       onSelect?.(product);
                       setValue(product.title);
                       setOpen(false);
                     }}
-                    sx={{
-                      // Custom highlight color to match your glassmorphism theme
-                      "&.Mui-selected": {
-                        backgroundColor: (theme) =>
-                          alpha(theme.palette.primary.main, 0.15),
-                        "&:hover": {
-                          backgroundColor: (theme) =>
-                            alpha(theme.palette.primary.main, 0.25),
-                        },
-                      },
-                    }}
+                    component="a"
+                    href="/fts"
+                    // sx={{
+                    //   // Custom highlight color to match your glassmorphism theme
+                    //   "&.Mui-selected": {
+                    //     backgroundColor: (theme) =>
+                    //       alpha(theme.palette.primary.main, 0.15),
+                    //     "&:hover": {
+                    //       backgroundColor: (theme) =>
+                    //         alpha(theme.palette.primary.main, 0.25),
+                    //     },
+                    //   },
+                    // }}
                   >
                     <ListItemText
                       primary={product.title}
-                      secondary={`${product.title} • $${product.body}`}
+                      secondary={product.body}
                     />
                   </ListItemButton>
                 ))}
