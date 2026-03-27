@@ -15,6 +15,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import axios from "axios";
 import PoperResult from "./popperResult";
+import { fill } from "lodash";
+import { se } from "date-fns/locale";
 
 interface SmartSearchProps {
   onSelect?: (product: any) => void;
@@ -148,7 +150,7 @@ const Input = styled(OutlinedInput, {
   "&:hover": {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
     svg: {
-      // fill: theme.palette.error.main,
+      fill: theme.palette.error.main,
       color: theme.palette.error.main,
       transition: "color 0.25s ease-in-out",
     },
@@ -182,6 +184,12 @@ const Input = styled(OutlinedInput, {
       margin: theme.spacing(1),
       svg: {
         color: theme.palette.text.primary,
+      },
+    },
+    "&:hover": {
+      svg: {
+        fill: theme.palette.primary.main,
+        // color: theme.palette.primary.main,
       },
     },
     // svg: {
@@ -241,8 +249,8 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
     try {
       // Replace this with your actual API call:
       const response = await axios.get(
-        `https://jsonplaceholder.typicode.com/posts/${query}`,
-        // `https://jsonplaceholder.typicode.com/posts`,
+        // `https://jsonplaceholder.typicode.com/posts/${query}`,
+        `https://jsonplaceholder.typicode.com/posts`,
       );
       // console.log(response.data);
       // setResults([response.data]);
@@ -352,9 +360,14 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
             // }}
             onFocus={() => {
               setFocused(true);
+              console.log("open: ", open);
+              setOpen(error === null && value.length > 0);
               // setOpen(error !== null);
             }}
-            onBlur={() => setFocused(false)}
+            onBlur={() => {
+              setFocused(false);
+              setOpen(false);
+            }}
             notched={shouldShrink}
             // onKeyDown={(e) => e.key === "Escape" && handleClear()}
             onKeyDown={handleKeyDown}

@@ -212,7 +212,7 @@ const VerticalNavItem = styled(ListItem, {
       width: 0,
       height: "2px",
       background: resolved,
-      transition: " width .3s",
+      transition: "width .3s",
     },
 
     "&:hover::after": {

@@ -37,9 +37,10 @@ const Paper = styled(MuiPaper, {
 })(({ theme }) => ({
   marginTop: theme.spacing(1),
   borderRadius: "5px",
-  overflow: "hidden",
+  overflow: "hidden", // Clips the ripple effects to the border radius
   backgroundColor: alpha(theme.palette.background.paper, 0.75),
   backdropFilter: "blur(0.125rem)",
+  border: `1px solid ${alpha(theme.palette.common.white, 0.125)}`,
 }));
 
 const ErrorBox = styled(Box, {
@@ -47,10 +48,35 @@ const ErrorBox = styled(Box, {
   slot: "ErrorBox",
   overridesResolver: (_props, styles) => styles.errorBox,
 })(({ theme }) => ({
-  padding: 2,
+  padding: theme.spacing(0.5),
   display: "flex",
   alignItems: "center",
   color: theme.palette.error.main,
+  svg: {
+    marginRight: theme.spacing(0.5),
+  },
+}));
+
+const ScrollableList = styled(List, {
+  name: PREFIX,
+  slot: "ScrollableList",
+  overridesResolver: (_props, styles) => styles.scrollableList,
+})(({ theme }) => ({
+  padding: theme.spacing(0),
+  maxHeight: "50vmin", // 1. Limit the height
+  overflowY: "auto", // 2. Enable internal scrolling
+  // 3. Smooth scrollbar styling (optional but looks great)
+  "&::-webkit-scrollbar": { width: "6px" },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: alpha(theme.palette.text.primary, 0.1),
+    borderRadius: "10px",
+  },
+  "& .MuiButtonBase-root": {
+    padding: theme.spacing(0),
+    "& .MuiListItemText-root": {
+      margin: theme.spacing(0.5, 1, 1, 1),
+    },
+  },
 }));
 
 const PoperResult = (inProps: PoperResultProps) => {
@@ -95,47 +121,22 @@ const PoperResult = (inProps: PoperResultProps) => {
     >
       {({ TransitionProps }) => (
         <Fade {...TransitionProps} timeout={250}>
-          <Paper
-            elevation={7}
-            sx={{
-              mt: 1,
-              borderRadius: "12px",
-              overflow: "hidden", // Clips the ripple effects to the border radius
-              backgroundColor: (theme) =>
-                alpha(theme.palette.background.paper, 0.95),
-              backdropFilter: "blur(10px)",
-              border: (theme) =>
-                `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-            }}
-          >
+          <Paper elevation={7}>
             {error ? (
               <ErrorBox>
-                <ErrorOutlineIcon sx={{ mr: 1 }} />
-                <Typography variant="body2">{error}</Typography>
+                <ErrorOutlineIcon fontSize="small" />
+                <Typography variant="caption" align="center">
+                  {error}
+                </Typography>
               </ErrorBox>
             ) : results.length > 0 ? (
-              <List
-                ref={listRef}
-                sx={{
-                  py: 0,
-                  maxHeight: "300px", // 1. Limit the height
-                  overflowY: "auto", // 2. Enable internal scrolling
-                  // 3. Smooth scrollbar styling (optional but looks great)
-                  "&::-webkit-scrollbar": { width: "6px" },
-                  "&::-webkit-scrollbar-thumb": {
-                    backgroundColor: (theme) =>
-                      alpha(theme.palette.text.primary, 0.1),
-                    borderRadius: "10px",
-                  },
-                }}
-                dense
-              >
+              <ScrollableList ref={listRef} dense>
                 {results.map((product: Product, index: number) => (
                   <ListItemButton
                     key={product.id}
                     selected={index === activeIndex}
                     dense
-                    // disableGutters
+                    disableGutters
                     divider
                     onClick={() => {
                       onSelect?.(product);
@@ -144,17 +145,6 @@ const PoperResult = (inProps: PoperResultProps) => {
                     }}
                     component="a"
                     href="/fts"
-                    // sx={{
-                    //   // Custom highlight color to match your glassmorphism theme
-                    //   "&.Mui-selected": {
-                    //     backgroundColor: (theme) =>
-                    //       alpha(theme.palette.primary.main, 0.15),
-                    //     "&:hover": {
-                    //       backgroundColor: (theme) =>
-                    //         alpha(theme.palette.primary.main, 0.25),
-                    //     },
-                    //   },
-                    // }}
                   >
                     <ListItemText
                       primary={product.title}
@@ -162,7 +152,7 @@ const PoperResult = (inProps: PoperResultProps) => {
                     />
                   </ListItemButton>
                 ))}
-              </List>
+              </ScrollableList>
             ) : (
               <Typography
                 align="center"
@@ -173,8 +163,6 @@ const PoperResult = (inProps: PoperResultProps) => {
 
                 sx={{
                   p: 1.25,
-                  // textAlign: "center",
-                  // color: "text.secondary",
                 }}
               >
                 No products found

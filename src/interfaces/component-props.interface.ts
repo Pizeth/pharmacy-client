@@ -1,6 +1,7 @@
 import { StyleComponent } from "@/types/classKey";
 import {
   AvatarOwnProps,
+  PopoverVirtualElement,
   PopperPlacementType,
   SxProps,
   Theme,
@@ -201,4 +202,23 @@ export interface PoperResultProps extends HtmlHTMLAttributes<HTMLDivElement> {
   onSelect?: (product: any) => void;
   setValue: (value: string) => void;
   setOpen: (open: boolean) => void;
+}
+
+export interface UserMenuProps {
+  anchorEl:
+    | null
+    | Element
+    | PopoverVirtualElement
+    | (() => Element | PopoverVirtualElement | null)
+    | undefined;
+  open: boolean;
+  placement?: PopperPlacementType;
+  onClose: () => void;
+  data: {
+    name: string;
+    email: string;
+    role: string;
+    storageUsed: number;
+    storageTotal: number;
+  };
 }

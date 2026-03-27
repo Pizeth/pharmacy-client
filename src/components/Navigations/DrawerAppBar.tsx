@@ -55,6 +55,7 @@ import { Height, Padding } from "@mui/icons-material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GlobalSearch from "./Search/search";
+import { UserMenu } from "./UserSetting/settings";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
@@ -756,7 +757,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         </ListItemButton>
 
         {/* The Popup Menu */}
-        <Menu
+        {/* <Menu
           // sx={{ mt: "45px" }}
           id="menu-appbar"
           anchorEl={anchorElUser}
@@ -803,7 +804,19 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
               <Typography align="center">{setting}</Typography>
             </MenuItem>
           ))}
-        </Menu>
+        </Menu> */}
+        <UserMenu
+          anchorEl={anchorElUser}
+          open={Boolean(anchorElUser)}
+          onClose={handleCloseUserMenu}
+          data={{
+            name: "Piseth Chesda",
+            email: "piseth@example.com",
+            role: "Admin",
+            storageUsed: 150,
+            storageTotal: 200,
+          }}
+        />
       </Box>
     </Fragment>
   );
