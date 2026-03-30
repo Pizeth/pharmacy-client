@@ -30,6 +30,8 @@ import { useEffect } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import { UserMenuProps } from "@/interfaces/component-props.interface";
+import ParticleContainer from "@/theme/effects/particle";
+import options from "@/configs/particleConfig";
 
 // interface UserMenuProps {
 //   anchorEl: HTMLElement | null;
@@ -66,7 +68,7 @@ const particleOptions = (theme: Theme) => ({
         links: { opacity: 0.5, color: theme.palette.primary.main },
       },
       repulse: {
-        distance: 75,
+        distance: 50,
         duration: 0.75,
       },
     },
@@ -86,7 +88,7 @@ const particleOptions = (theme: Theme) => ({
       // density: { enable: true, area: 800 }
     },
     opacity: { value: 0.5 },
-    shape: { type: "circle" },
+    shape: { type: "star" },
     size: { value: { min: 1, max: 3 } },
   },
   detectRetina: true,
@@ -96,8 +98,8 @@ const particleOptions = (theme: Theme) => ({
 const containerVariants = {
   open: {
     transition: {
-      staggerChildren: 0.06, // Delay between each item
-      delayChildren: 0.1, // Wait for the main menu bounce to finish
+      staggerChildren: 0.075, // Delay between each item
+      delayChildren: 0.125, // Wait for the main menu bounce to finish
     },
   },
   closed: {
@@ -112,7 +114,7 @@ const itemVariants = {
   open: {
     opacity: 1,
     x: 0,
-    transition: { type: "spring" as const, stiffness: 300, damping: 24 },
+    transition: { type: "spring" as const, stiffness: 300, damping: 25 },
   },
   closed: {
     opacity: 0,
@@ -127,11 +129,11 @@ export const UserMenu = (inProps: UserMenuProps) => {
   const { anchorEl, open, onClose, data } = props;
 
   // Initialize particles once
-  // useEffect(() => {
-  //   initParticlesEngine(async (engine) => {
-  //     await loadSlim(engine);
-  //   });
-  // }, []);
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine);
+    });
+  }, []);
 
   const storagePercent = (data.storageUsed / data.storageTotal) * 100;
 
@@ -170,6 +172,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
       // TransitionComponent={BounceTransition}
       slotProps={{
         paper: {
+          elevation: 3,
           sx: {
             mt: 1.5,
             width: "clamp(150px, 80%, 250px)",
@@ -220,19 +223,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
         }}
       >
         {/* 3. Particle Background Layer */}
-        <Box
-          sx={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 0,
-            pointerEvents: "none",
-          }}
-        >
-          <Particles
-            id="menu-particles"
-            options={particleOptions(theme) as any}
-          />
-        </Box>
+        <ParticleContainer id="menu-particles" options={options({})} />
         {/* 4. Content Layer (zIndex ensures text is above particles) */}
         <Box sx={{ position: "relative", zIndex: 1 }}>
           {/* 1. Profile Header */}

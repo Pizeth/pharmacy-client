@@ -56,6 +56,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GlobalSearch from "./Search/search";
 import { UserMenu } from "./UserSetting/settings";
+import ParticleContainer from "@/theme/effects/particle";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
@@ -137,16 +138,16 @@ const AppBarContainer = styled(Container)(({ theme }) => ({
   // },
 }));
 
-const ParticleContainer = styled(Box, {
-  name: PREFIX,
-  slot: "effect",
-  overridesResolver: (_props, styles) => styles.effect,
-})(({ theme }) => ({
-  position: "absolute",
-  inset: 0,
-  overflow: "hidden",
-  zIndex: 0,
-}));
+// const ParticleContainer = styled(Box, {
+//   name: PREFIX,
+//   slot: "effect",
+//   overridesResolver: (_props, styles) => styles.effect,
+// })(({ theme }) => ({
+//   position: "absolute",
+//   inset: 0,
+//   overflow: "hidden",
+//   zIndex: 0,
+// }));
 
 const ProfileToolBar = styled(Toolbar, {
   name: PREFIX,
@@ -385,6 +386,7 @@ const NavMenuButton = styled(IconButton, {
   name: PREFIX,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
+  shouldForwardProp: (prop) => prop !== "visible",
 })<{ variant?: "main" | "side"; visible?: boolean }>(
   ({ theme, variant = "main", visible = true }) => ({
     alignSelf: "stretch",
@@ -841,11 +843,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
       >
         <Container maxWidth="xl">
           {/* 2. The Particles Canvas */}
-          {init && (
-            <ParticleContainer>
-              <Particles id="tsparticles" options={options} />
-            </ParticleContainer>
-          )}
+          {init && <ParticleContainer id="tsparticles" options={options({})} />}
           {/* Content Container (Above Canvas) */}
           <AppBarContainer maxWidth="xl">
             {/* --- SECTION 2: LOGO & TITLE --- */}

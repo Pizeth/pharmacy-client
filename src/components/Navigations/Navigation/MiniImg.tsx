@@ -18,6 +18,7 @@ const Root = styled(Box, {
   left: 0,
   // width: "100%",
   // height: "100%",
+  // inset: 0,
   [theme.breakpoints.up("xs")]: {
     display: "flex",
   },
@@ -50,7 +51,14 @@ const MiniImg = ({ src = "/static/images/logo.svg" }) => {
         style={{ objectFit: "contain" }}
         unoptimized
       />
-      {/* <Box
+    </Root>
+  );
+};
+
+export default MiniImg;
+
+{
+  /* <Box
         sx={{
           position: "relative",
           zIndex: 2,
@@ -101,12 +109,8 @@ const MiniImg = ({ src = "/static/images/logo.svg" }) => {
         >
           <Typography variant="h6">ក្រសួងមុខងារសាធារណៈ</Typography>
         </Box>
-      </Box> */}
-    </Root>
-  );
-};
-
-export default MiniImg;
+      </Box> */
+}
 
 {
   /* <Box

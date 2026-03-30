@@ -15,6 +15,7 @@ import { AuthAction } from "@/types/theme";
 import { Circle } from "lucide-react";
 import { HtmlHTMLAttributes, ReactNode, RefObject } from "react";
 import { VirtualElement } from "@popperjs/core/lib/types";
+import { IParticlesProps } from "@tsparticles/react/dist/IParticlesProps";
 
 export interface LoginFormProps {
   content?: StyleComponent;
@@ -221,4 +222,8 @@ export interface UserMenuProps {
     storageUsed: number;
     storageTotal: number;
   };
+}
+
+export interface ParticleProps extends IParticlesProps {
+  children?: React.ReactNode;
 }
