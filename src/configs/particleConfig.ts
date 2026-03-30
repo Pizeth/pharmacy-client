@@ -1,27 +1,50 @@
 import { Theme } from "@mui/material/styles";
 import { IEvents, IModes, ISourceOptions } from "@tsparticles/engine";
 
-interface ParticleOptions {
-  theme?: Theme;
-  modes?: IModes;
-  events?: IEvents;
-}
-const options = (options: ParticleOptions): ISourceOptions => {
-  const {
-    theme,
-    modes = {
-      grab: {
-        distance: 125,
-        links: {
-          opacity: 0.5,
-          color: theme ? theme.palette.primary.main : "#FFF",
-        },
+// interface ParticleOptions {
+//   theme?: Theme;
+//   modes?: IModes;
+//   events?: IEvents;
+// }
+const options = ({
+  theme,
+  modes = {
+    grab: {
+      distance: 125,
+      links: {
+        opacity: 0.5,
+        color: "#FFF",
       },
     },
-    events = {
-      onHover: { enable: true, modes: "grab" },
+  },
+  events = {
+    onHover: {
+      enable: true,
+      mode: "grab",
+      parallax: { enable: false, force: 60, smooth: 10 },
     },
-  } = options;
+  },
+}: {
+  theme?: Theme;
+  modes?: Partial<IModes>;
+  events?: Partial<IEvents>;
+}): ISourceOptions => {
+  // const {
+  //   theme,
+  //   modes = {
+  //     grab: {
+  //       distance: 125,
+  //       links: {
+  //         opacity: 0.5,
+  //         color: theme ? theme.palette.primary.main : "#FFF",
+  //       },
+  //     },
+  //   },
+  //   events = {
+  //     onHover: { enable: true, modes: "grab" },
+  //   },
+  // } = options;
+  console.log("Particle options generated with theme:", theme);
 
   return {
     fullScreen: { enable: false }, // Crucial: prevents it from covering the whole page
