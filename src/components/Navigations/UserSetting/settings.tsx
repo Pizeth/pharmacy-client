@@ -12,6 +12,8 @@ import {
   alpha,
   useTheme,
   LinearProgress,
+  CircularProgressProps,
+  CircularProgress,
 } from "@mui/material";
 import {
   SettingsOutlined,
@@ -22,7 +24,7 @@ import {
   VerifiedUserOutlined,
 } from "@mui/icons-material";
 import BounceTransition from "@/theme/effects/animation";
-import { motion } from "framer-motion";
+import { color, motion } from "framer-motion";
 import { Theme, useThemeProps } from "@mui/material/styles";
 import { useEffect } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
@@ -46,12 +48,44 @@ const PREFIX = "RazethUserSetting";
 
 // 1. Particle Configuration (Subtle & Slow)
 const particleOptions = (theme: Theme) => ({
-  fpsLimit: 60,
+  style: {
+    position: "absolute",
+    top: "0",
+    left: "0",
+    width: "100%",
+    height: "100%",
+  },
+  fpsLimit: 120,
+  interactivity: {
+    events: {
+      onHover: { enable: true, mode: "repulse" },
+    },
+    modes: {
+      grab: {
+        distance: 125,
+        links: { opacity: 0.5, color: theme.palette.primary.main },
+      },
+      repulse: {
+        distance: 75,
+        duration: 0.75,
+      },
+    },
+  },
   particles: {
     color: { value: theme.palette.primary.main },
-    move: { enable: true, speed: 0.4, direction: "none", outModes: "out" },
-    number: { value: 15, density: { enable: true, area: 800 } },
-    opacity: { value: 0.2 },
+    links: {
+      color: theme.palette.primary.main,
+      distance: 125,
+      enable: true,
+      opacity: 0.25,
+      width: 1,
+    },
+    move: { enable: true, speed: 1, direction: "none", outModes: "out" },
+    number: {
+      value: 25,
+      // density: { enable: true, area: 800 }
+    },
+    opacity: { value: 0.5 },
     shape: { type: "circle" },
     size: { value: { min: 1, max: 3 } },
   },
@@ -93,11 +127,11 @@ export const UserMenu = (inProps: UserMenuProps) => {
   const { anchorEl, open, onClose, data } = props;
 
   // Initialize particles once
-  useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      await loadSlim(engine);
-    });
-  }, []);
+  // useEffect(() => {
+  //   initParticlesEngine(async (engine) => {
+  //     await loadSlim(engine);
+  //   });
+  // }, []);
 
   const storagePercent = (data.storageUsed / data.storageTotal) * 100;
 
@@ -117,22 +151,23 @@ export const UserMenu = (inProps: UserMenuProps) => {
       onTransitionEnter={playOpenSound} // Trigger sound on open
       // anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       // transformOrigin={{ vertical: "top", horizontal: "right" }}
-      // anchorOrigin={{
-      //   vertical: "bottom",
-      //   horizontal: "right",
-      // }}
-      // transformOrigin={{
-      //   vertical: "bottom",
-      //   horizontal: "left",
-      // }}
       anchorOrigin={{
-        vertical: "top",
-        horizontal: "left",
+        vertical: "bottom",
+        horizontal: "right",
       }}
       transformOrigin={{
         vertical: "bottom",
         horizontal: "left",
       }}
+      // anchorOrigin={{
+      //   vertical: "top",
+      //   horizontal: "left",
+      // }}
+      // transformOrigin={{
+      //   vertical: "bottom",
+      //   horizontal: "left",
+      // }}
+      // TransitionComponent={BounceTransition}
       slotProps={{
         paper: {
           sx: {
@@ -152,8 +187,11 @@ export const UserMenu = (inProps: UserMenuProps) => {
           },
         },
         // 2. Attach the Bouncy Transition
-        transition: BounceTransition,
+        // transition: BounceTransition,
       }}
+      // slots={{
+      //   transition: BounceTransition,
+      // }}
       //   PaperProps={{
       //     sx: {
       //       mt: 1.5,
@@ -168,16 +206,16 @@ export const UserMenu = (inProps: UserMenuProps) => {
     >
       {/* 3. Wrap content in a Paper inside the motion div */}
       <Paper
-        elevation={0}
+        elevation={3}
         sx={{
           borderRadius: "25px",
           overflow: "hidden",
-          // border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
           position: "relative",
           // 2. Glassmorphism Secret Sauce
           backgroundColor: alpha(theme.palette.background.paper, 0.7),
           backdropFilter: "blur(20px) saturate(180%)",
-          border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`,
+          // border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`,
           boxShadow: `0 8px 32px 0 ${alpha(theme.palette.common.black, 0.2)}`,
         }}
       >
@@ -317,7 +355,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
                   backgroundColor: theme.palette.primary.main, // The ripple 'wave' color
                 },
                 "& .MuiTouchRipple-rippleVisible": {
-                  opacity: 0.2, // Adjust intensity of the ripple
+                  opacity: 0.3, // Adjust intensity of the ripple
                 },
               }}
             >
@@ -483,7 +521,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
 
 // 1. Updated Menu Item Styles with Animation
 const menuItemStyle = (theme: Theme) => ({
-  borderRadius: "12px",
+  borderRadius: "15px",
   mb: 0.5,
   py: 1,
   px: 1.5,
@@ -512,11 +550,38 @@ const menuItemStyle = (theme: Theme) => ({
   },
 });
 
-const CircularProgressStatic = ({ value }: { value: number }) => {
+const CircularProgressStatic = (inProps: CircularProgressProps) => {
+  const props = useThemeProps({ props: inProps, name: PREFIX });
+  const { value = 0, ...rest } = props;
   const theme = useTheme();
   return (
     <Box sx={{ position: "relative", display: "inline-flex" }}>
-      <svg width="32" height="32" viewBox="0 0 32 32">
+      <CircularProgress
+        color="primary"
+        enableTrackSlot
+        size="2.5rem"
+        variant="determinate"
+        {...props}
+      />
+      <Box
+        sx={{
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          position: "absolute",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Typography
+          variant="caption"
+          component="div"
+          color={value <= 50 ? "textSecondary" : "primary"}
+        >{`${Math.round(value)}%`}</Typography>
+      </Box>
+      {/* <svg width="32" height="32" viewBox="0 0 32 32">
         <circle
           cx="16"
           cy="16"
@@ -537,7 +602,7 @@ const CircularProgressStatic = ({ value }: { value: number }) => {
           strokeLinecap="round"
           style={{ transition: "stroke-dashoffset 0.5s ease" }}
         />
-      </svg>
+      </svg> */}
     </Box>
   );
 };

@@ -1,5 +1,3 @@
-import { de } from "date-fns/locale";
-
 const options = {
   fullScreen: { enable: false }, // Crucial: prevents it from covering the whole page
   style: {
@@ -33,6 +31,7 @@ const options = {
     },
     number: {
       value: 30,
+      // density: { enable: true, area: 1000 },
     },
     opacity: { value: 0.5 },
     size: { value: { min: 1, max: 3 } },
