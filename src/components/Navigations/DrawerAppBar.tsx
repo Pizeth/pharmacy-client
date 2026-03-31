@@ -815,6 +815,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
             name: "Piseth Chesda",
             email: "piseth@example.com",
             role: "Admin",
+            avatar: "/static/images/otto.webp",
             storageUsed: 150,
             storageTotal: 200,
           }}
@@ -843,7 +844,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
       >
         <Container maxWidth="xl">
           {/* 2. The Particles Canvas */}
-          {init && <ParticleContainer id="tsparticles" options={options({})} />}
+          {init && <ParticleContainer id="tsparticles" options={options()} />}
           {/* Content Container (Above Canvas) */}
           <AppBarContainer maxWidth="xl">
             {/* --- SECTION 2: LOGO & TITLE --- */}

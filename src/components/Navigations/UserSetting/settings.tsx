@@ -1,98 +1,68 @@
 "use client";
 import {
   Box,
-  Avatar,
   Typography,
   Divider,
   MenuItem,
   ListItemIcon,
-  Chip,
+  Chip as MuiChip,
   Paper,
   Popover,
   alpha,
   useTheme,
-  LinearProgress,
   CircularProgressProps,
   CircularProgress,
 } from "@mui/material";
 import {
   SettingsOutlined,
   ContactSupportOutlined,
-  GitHub,
   PaletteOutlined,
   LogoutOutlined,
   VerifiedUserOutlined,
+  AccountCircle,
+  Dashboard,
+  AssignmentTurnedIn,
+  EventAvailable,
+  Assessment,
+  Verified,
+  GppGood,
+  GppGoodOutlined,
+  LocalPolice,
+  AccountCircleOutlined,
+  DashboardOutlined,
+  AssignmentTurnedInOutlined,
+  AssessmentOutlined,
+  EventAvailableOutlined,
 } from "@mui/icons-material";
 import BounceTransition from "@/theme/effects/animation";
-import { color, motion } from "framer-motion";
-import { Theme, useThemeProps } from "@mui/material/styles";
-import { useEffect } from "react";
-import Particles, { initParticlesEngine } from "@tsparticles/react";
-import { loadSlim } from "@tsparticles/slim";
+import { motion } from "framer-motion";
+import { styled, Theme, useThemeProps } from "@mui/material/styles";
 import { UserMenuProps } from "@/interfaces/component-props.interface";
 import ParticleContainer from "@/theme/effects/particle";
 import options from "@/configs/particleConfig";
-
-// interface UserMenuProps {
-//   anchorEl: HTMLElement | null;
-//   open: boolean;
-//   onClose: () => void;
-//   user: {
-//     name: string;
-//     email: string;
-//     role: string;
-//     storageUsed: number;
-//     storageTotal: number;
-//   };
-// }
+import Image from "next/image";
+import MiniImg from "../Navigation/MiniImg";
 
 const PREFIX = "RazethUserSetting";
 
-// 1. Particle Configuration (Subtle & Slow)
-const particleOptions = (theme: Theme) => ({
-  style: {
-    position: "absolute",
-    top: "0",
-    left: "0",
-    width: "100%",
-    height: "100%",
-  },
-  fpsLimit: 120,
-  interactivity: {
-    events: {
-      onHover: { enable: true, mode: "repulse" },
-    },
-    modes: {
-      grab: {
-        distance: 125,
-        links: { opacity: 0.5, color: theme.palette.primary.main },
-      },
-      repulse: {
-        distance: 50,
-        duration: 0.75,
-      },
-    },
-  },
-  particles: {
-    color: { value: theme.palette.primary.main },
-    links: {
-      color: theme.palette.primary.main,
-      distance: 125,
-      enable: true,
-      opacity: 0.25,
-      width: 1,
-    },
-    move: { enable: true, speed: 1, direction: "none", outModes: "out" },
-    number: {
-      value: 25,
-      // density: { enable: true, area: 800 }
-    },
-    opacity: { value: 0.5 },
-    shape: { type: "star" },
-    size: { value: { min: 1, max: 3 } },
-  },
-  detectRetina: true,
-});
+const Chip = styled(MuiChip, {
+  name: PREFIX,
+  slot: "Chip",
+  overridesResolver: (_props, styles) => styles.chip,
+})(({ theme }) => ({
+  // width: "fit-content",
+  // display: "flex-content",
+  marginTop: theme.spacing(5),
+  height: "1.25rem",
+  fontSize: "0.65rem",
+  fontWeight: 900,
+  textTransform: "uppercase",
+  borderRadius: "50px",
+  backgroundColor: alpha(theme.palette.primary.main, 0.175),
+  color: theme.palette.primary.main,
+  border: "none",
+  zIndex: 99,
+}));
 
 // 1. Define the Animation Variants
 const containerVariants = {
@@ -127,13 +97,6 @@ export const UserMenu = (inProps: UserMenuProps) => {
 
   const props = useThemeProps({ props: inProps, name: PREFIX });
   const { anchorEl, open, onClose, data } = props;
-
-  // Initialize particles once
-  useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      await loadSlim(engine);
-    });
-  }, []);
 
   const storagePercent = (data.storageUsed / data.storageTotal) * 100;
 
@@ -172,7 +135,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
       // TransitionComponent={BounceTransition}
       slotProps={{
         paper: {
-          elevation: 3,
+          // elevation: 3,
           sx: {
             mt: 1.5,
             width: "clamp(150px, 80%, 250px)",
@@ -209,7 +172,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
     >
       {/* 3. Wrap content in a Paper inside the motion div */}
       <Paper
-        elevation={3}
+        elevation={0}
         sx={{
           borderRadius: "25px",
           overflow: "hidden",
@@ -218,23 +181,108 @@ export const UserMenu = (inProps: UserMenuProps) => {
           // 2. Glassmorphism Secret Sauce
           backgroundColor: alpha(theme.palette.background.paper, 0.7),
           backdropFilter: "blur(20px) saturate(180%)",
-          // border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`,
+          // border: `1px solid ${alpha(theme.palette.common.white, 0.25)}`,
           boxShadow: `0 8px 32px 0 ${alpha(theme.palette.common.black, 0.2)}`,
         }}
       >
         {/* 3. Particle Background Layer */}
-        <ParticleContainer id="menu-particles" options={options({})} />
+        <ParticleContainer
+          id="menu-particles"
+          options={options(
+            theme,
+            {
+              repulse: {
+                distance: 50,
+                duration: 0.75,
+              },
+            },
+            {
+              onHover: {
+                enable: true,
+                mode: "repulse",
+                parallax: { enable: true, force: 60, smooth: 10 },
+              },
+            },
+            20,
+            "triangle",
+          )}
+        />
         {/* 4. Content Layer (zIndex ensures text is above particles) */}
         <Box sx={{ position: "relative", zIndex: 1 }}>
           {/* 1. Profile Header */}
-          <Box sx={{ p: 2.5, pb: 2 }}>
-            <Typography
-              variant="subtitle1"
-              fontWeight={700}
-              sx={{ lineHeight: 1.2 }}
+          <Box
+            sx={{
+              p: 2.5,
+              pb: 2,
+              // display: "flex",
+              // flexDirection: "column",
+              // alignItems: "center",
+            }}
+          >
+            <Box
+              sx={{
+                position: "relative",
+                display: "flex",
+                margin: "auto",
+                // width: "75px",
+                // height: "75px",
+                border: "1px solid #f0f0f0",
+                borderRadius: "50%",
+                // fontSize: "11px",
+                justifyContent: "center",
+                alignItems: "center",
+                justifyItems: "center",
+                padding: "0.75rem",
+                width: `max(50px, 4.5rem)`,
+                height: `max(50px, 4.5rem)`,
+                marginBottom: 1.5,
+                transition: "all 0.5s",
+                // zIndex: 99,
+                // backgroundColor: "#152f50",
+              }}
             >
-              {data.name}
-            </Typography>
+              <MiniImg src={data.avatar} />
+              {/* <Image
+                src={data.avatar}
+                alt="User Avatar"
+                fill
+                style={{ objectFit: "contain" }}
+                preload={false}
+                loading="eager"
+                // width={100}
+                // height={100}
+              /> */}
+              <Chip
+                icon={<LocalPolice fontSize="inherit" color="primary" />}
+                label={data.role}
+                size="small"
+              />
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+                alignItems: "center",
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                fontWeight={700}
+                sx={{ lineHeight: 1.25 }}
+              >
+                {data.name}
+                {/* <VerifiedUserOutlined fontSize="small" /> */}
+                <Verified fontSize="small" color="primary" sx={{ ml: 0.25 }} />
+              </Typography>
+
+              {/* <Chip
+                icon={<LocalPolice fontSize="inherit" color="primary" />}
+                label={data.role}
+                size="small"
+              /> */}
+            </Box>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               {data.email}
             </Typography>
@@ -280,14 +328,33 @@ export const UserMenu = (inProps: UserMenuProps) => {
             {/* 3. Wrap each MenuItem in a motion.div with item variants */}
             {[
               {
-                label: "Settings",
-                icon: <SettingsOutlined fontSize="small" />,
+                label: "Profile",
+                icon: <AccountCircleOutlined fontSize="small" />,
+              },
+              {
+                label: "Dashboard",
+                icon: <DashboardOutlined fontSize="small" />,
+              },
+              {
+                label: "Tasks",
+                icon: <AssignmentTurnedInOutlined fontSize="small" />,
+              },
+              {
+                label: "Reports",
+                icon: <AssessmentOutlined fontSize="small" />,
+              },
+              {
+                label: "Calendar",
+                icon: <EventAvailableOutlined fontSize="small" />,
               },
               {
                 label: "Support",
                 icon: <ContactSupportOutlined fontSize="small" />,
               },
-              { label: "Github", icon: <GitHub fontSize="small" /> },
+              {
+                label: "Settings",
+                icon: <SettingsOutlined fontSize="small" />,
+              },
             ].map((item) => (
               <motion.div key={item.label} variants={itemVariants}>
                 <MenuItem onClick={onClose} sx={menuItemStyle(theme)}>
@@ -300,7 +367,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
             ))}
 
             {/* Specialized Role Item */}
-            <motion.div variants={itemVariants}>
+            {/* <motion.div variants={itemVariants}>
               <MenuItem onClick={onClose} sx={menuItemStyle(theme)}>
                 <ListItemIcon>
                   <VerifiedUserOutlined fontSize="small" />
@@ -332,16 +399,15 @@ export const UserMenu = (inProps: UserMenuProps) => {
                   />
                 </Box>
               </MenuItem>
-            </motion.div>
+            </motion.div> */}
           </motion.div>
 
           {/* 2. Menu Items */}
-          <Box sx={{ p: 1 }}>
+          {/* <Box sx={{ p: 1 }}>
             <MenuItem
               onClick={onClose}
               sx={{
                 ...menuItemStyle(theme),
-                // 2. Custom Ripple Color
                 "& .MuiTouchRipple-child": {
                   backgroundColor: theme.palette.primary.main, // The ripple 'wave' color
                 },
@@ -358,7 +424,6 @@ export const UserMenu = (inProps: UserMenuProps) => {
               </Typography>
             </MenuItem>
 
-            {/* ROLE ITEM WITH CHIP (Your Specific Request) */}
             <MenuItem onClick={onClose} sx={menuItemStyle(theme)}>
               <ListItemIcon>
                 <VerifiedUserOutlined fontSize="small" />
@@ -408,7 +473,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
                 Github
               </Typography>
             </MenuItem>
-          </Box>
+          </Box> */}
 
           <Divider sx={{ borderStyle: "dashed" }} />
 
@@ -454,7 +519,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
             </Box>
           </Box>
           {/* Logout Section (Staggered separately) */}
-          <Box sx={{ p: 1 }}>
+          <Box sx={{ p: 1, pb: 1.5 }}>
             <motion.div
               variants={itemVariants}
               initial="closed"
@@ -464,10 +529,11 @@ export const UserMenu = (inProps: UserMenuProps) => {
                 onClick={onClose}
                 sx={{
                   ...menuItemStyle,
-                  bgcolor: alpha(theme.palette.error.main, 0.08),
-                  color: theme.palette.error.main,
+                  borderRadius: "50px",
+                  bgcolor: alpha(theme.palette.primary.main, 0.075),
+                  color: theme.palette.primary.main,
                   "&:hover": {
-                    bgcolor: alpha(theme.palette.error.main, 0.12),
+                    bgcolor: alpha(theme.palette.primary.main, 0.125),
                   },
                 }}
               >
@@ -482,7 +548,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
           </Box>
 
           {/* 4. Logout Section (Ref Image 1 Styling) */}
-          <Box sx={{ p: 1, pb: 1.5 }}>
+          {/* <Box sx={{ p: 1, pb: 1.5 }}>
             <MenuItem
               onClick={onClose}
               sx={{
@@ -501,7 +567,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
                 Logout
               </Typography>
             </MenuItem>
-          </Box>
+          </Box> */}
         </Box>
       </Paper>
     </Popover>
@@ -538,6 +604,14 @@ const menuItemStyle = (theme: Theme) => ({
     "& .MuiTypography-root": {
       color: theme.palette.primary.main, // Text pops color too
     },
+  },
+
+  // 2. Custom Ripple Color
+  "& .MuiTouchRipple-child": {
+    backgroundColor: theme.palette.primary.main, // The ripple 'wave' color
+  },
+  "& .MuiTouchRipple-rippleVisible": {
+    opacity: 0.3, // Adjust intensity of the ripple
   },
 });
 

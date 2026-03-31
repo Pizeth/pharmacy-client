@@ -219,6 +219,7 @@ export interface UserMenuProps {
     name: string;
     email: string;
     role: string;
+    avatar: string;
     storageUsed: number;
     storageTotal: number;
   };

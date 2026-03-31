@@ -6,9 +6,9 @@ import { IEvents, IModes, ISourceOptions } from "@tsparticles/engine";
 //   modes?: IModes;
 //   events?: IEvents;
 // }
-const options = ({
-  theme,
-  modes = {
+const options = (
+  theme?: Theme,
+  modes: Partial<IModes> = {
     grab: {
       distance: 125,
       links: {
@@ -17,18 +17,16 @@ const options = ({
       },
     },
   },
-  events = {
+  events: Partial<IEvents> = {
     onHover: {
       enable: true,
       mode: "grab",
       parallax: { enable: false, force: 60, smooth: 10 },
     },
   },
-}: {
-  theme?: Theme;
-  modes?: Partial<IModes>;
-  events?: Partial<IEvents>;
-}): ISourceOptions => {
+  number = 30,
+  shape = "circle",
+): ISourceOptions => {
   // const {
   //   theme,
   //   modes = {
@@ -44,7 +42,7 @@ const options = ({
   //     onHover: { enable: true, modes: "grab" },
   //   },
   // } = options;
-  console.log("Particle options generated with theme:", theme);
+  // console.log("Particle options generated with theme:", theme);
 
   return {
     fullScreen: { enable: false }, // Crucial: prevents it from covering the whole page
@@ -76,11 +74,13 @@ const options = ({
         outModes: "out",
       },
       number: {
-        value: 30,
+        value: number,
       },
       opacity: { value: 0.5 },
+      shape: { type: shape },
       size: { value: { min: 1, max: 3 } },
     },
+    detectRetina: true,
   };
 };
 
