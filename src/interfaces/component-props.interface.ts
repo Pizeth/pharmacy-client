@@ -1,8 +1,12 @@
 import { StyleComponent } from "@/types/classKey";
 import {
   AvatarOwnProps,
+  ChipPropsColorOverrides,
+  ChipPropsSizeOverrides,
+  ChipPropsVariantOverrides,
   PopoverVirtualElement,
   PopperPlacementType,
+  SvgIconPropsSizeOverrides,
   SxProps,
   Theme,
 } from "@mui/material";
@@ -16,6 +20,7 @@ import { Circle } from "lucide-react";
 import { HtmlHTMLAttributes, ReactNode, RefObject } from "react";
 import { VirtualElement } from "@popperjs/core/lib/types";
 import { IParticlesProps } from "@tsparticles/react/dist/IParticlesProps";
+import { OverridableStringUnion } from "@mui/types";
 
 export interface LoginFormProps {
   content?: StyleComponent;
@@ -225,6 +230,45 @@ export interface UserMenuProps {
   };
 }
 
+export interface RazethAvatarContainerProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  src?: string;
+  icon?: React.ReactElement<unknown> | undefined;
+  alt?: string;
+  role?: string;
+  color?:
+    | OverridableStringUnion<
+        | "default"
+        | "primary"
+        | "secondary"
+        | "error"
+        | "info"
+        | "success"
+        | "warning",
+        ChipPropsColorOverrides
+      >
+    | undefined;
+  fontSize?:
+    | OverridableStringUnion<
+        "inherit" | "large" | "medium" | "small",
+        SvgIconPropsSizeOverrides
+      >
+    | undefined;
+  size?:
+    | OverridableStringUnion<"small" | "medium", ChipPropsSizeOverrides>
+    | undefined;
+  variant?:
+    | OverridableStringUnion<"filled" | "outlined", ChipPropsVariantOverrides>
+    | undefined;
+  className?: string;
+  sx?: SxProps<Theme>;
+}
+
+export interface MiniDashboardProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode;
+  mainCaption?: string;
+  subCaption?: string;
+  link?: string;
+}
 export interface ParticleProps extends IParticlesProps {
   children?: React.ReactNode;
 }

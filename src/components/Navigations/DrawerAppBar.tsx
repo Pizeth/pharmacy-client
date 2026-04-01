@@ -41,7 +41,7 @@ import RazContact from "../icons/contact";
 import DrawerToggle from "./Navigation/DrawerToggle";
 import MiniImg from "./Navigation/MiniImg";
 import { NavItems } from "./Navigation/NavItems";
-import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import RazFacebook from "../icons/socials/facebook";
 import RazTelegram from "../icons/socials/telegram";
@@ -51,11 +51,10 @@ import RazWebsite from "../icons/socials/website";
 import RazTiktok from "../icons/socials/tiktok";
 import RazX from "../icons/socials/x";
 import options from "@/configs/particleConfig";
-import { Height, Padding } from "@mui/icons-material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GlobalSearch from "./Search/search";
-import { UserMenu } from "./UserSetting/settings";
+import { UserMenu } from "./UserSetting/Settings";
 import ParticleContainer from "@/theme/effects/particle";
 // const drawerWidth = 250;
 
@@ -812,8 +811,8 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
           open={Boolean(anchorElUser)}
           onClose={handleCloseUserMenu}
           data={{
-            name: "Piseth Chesda",
-            email: "piseth@example.com",
+            name: "ម៉ម ពិសិដ្ឋ",
+            email: "admin@razeth.com",
             role: "Admin",
             avatar: "/static/images/otto.webp",
             storageUsed: 150,
@@ -828,6 +827,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     initParticlesEngine(async (engine) => {
       await loadSlim(engine);
+      // await loadTrianglesPreset(engine);
     }).then(() => {
       setInit(true);
     });

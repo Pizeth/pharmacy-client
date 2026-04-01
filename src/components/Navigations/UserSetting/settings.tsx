@@ -5,13 +5,10 @@ import {
   Divider,
   MenuItem,
   ListItemIcon,
-  Chip as MuiChip,
   Paper,
   Popover,
   alpha,
   useTheme,
-  CircularProgressProps,
-  CircularProgress,
 } from "@mui/material";
 import {
   SettingsOutlined,
@@ -33,6 +30,8 @@ import {
   AssignmentTurnedInOutlined,
   AssessmentOutlined,
   EventAvailableOutlined,
+  LocalPoliceOutlined,
+  VerifiedOutlined,
 } from "@mui/icons-material";
 import BounceTransition from "@/theme/effects/animation";
 import { motion } from "framer-motion";
@@ -40,29 +39,58 @@ import { styled, Theme, useThemeProps } from "@mui/material/styles";
 import { UserMenuProps } from "@/interfaces/component-props.interface";
 import ParticleContainer from "@/theme/effects/particle";
 import options from "@/configs/particleConfig";
-import Image from "next/image";
 import MiniImg from "../Navigation/MiniImg";
+import AvatarContainer from "./AvatarContainer";
+import CircularProgressStatic from "@/components/CustomComponents/CircularProgressStatic";
+import MiniDashboard from "./MiniDashboard";
+import AvatarWrapper from "@/components/CustomComponents/AvatarWrapper";
+import AvatarFrame from "@/components/CustomComponents/AvatarFrame";
 
 const PREFIX = "RazethUserSetting";
 
-const Chip = styled(MuiChip, {
+const Header = styled(Box, {
   name: PREFIX,
-  slot: "Chip",
-  overridesResolver: (_props, styles) => styles.chip,
+  slot: "Header",
+  overridesResolver: (_props, styles) => styles.header,
+})(({ theme }) => ({ padding: theme.spacing(2.5, 2.5, 2) }));
+
+const Wrapper = styled(Box, {
+  name: PREFIX,
+  slot: "Wrapper",
+  overridesResolver: (_props, styles) => styles.wrapper,
 })(({ theme }) => ({
-  // width: "fit-content",
-  // display: "flex-content",
-  marginTop: theme.spacing(5),
-  height: "1.25rem",
-  fontSize: "0.65rem",
-  fontWeight: 900,
-  textTransform: "uppercase",
-  borderRadius: "50px",
-  backgroundColor: alpha(theme.palette.primary.main, 0.175),
-  color: theme.palette.primary.main,
-  border: "none",
-  zIndex: 99,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  marginBottom: theme.spacing(1),
+  "& .MuiTypography-root": {
+    // lineHeight: 1.5,
+    svg: {
+      marginLeft: theme.spacing(0.25),
+    },
+  },
 }));
+
+// const Chip = styled(MuiChip, {
+//   name: PREFIX,
+//   slot: "Chip",
+//   overridesResolver: (_props, styles) => styles.chip,
+// })(({ theme }) => ({
+//   // width: "fit-content",
+//   // display: "flex-content",
+//   // padding: theme.spacing(0),
+//   marginTop: theme.spacing(5),
+//   height: "1.25rem",
+//   fontSize: "0.725rem",
+//   fontWeight: 900,
+//   textTransform: "uppercase",
+//   borderRadius: "50px",
+//   backgroundColor: alpha(theme.palette.primary.main, 0.925),
+//   // color: theme.palette.primary.main,
+//   color: theme.palette.text.primary,
+//   border: "none",
+//   zIndex: 99,
+// }));
 
 // 1. Define the Animation Variants
 const containerVariants = {
@@ -209,107 +237,50 @@ export const UserMenu = (inProps: UserMenuProps) => {
         />
         {/* 4. Content Layer (zIndex ensures text is above particles) */}
         <Box sx={{ position: "relative", zIndex: 1 }}>
-          {/* 1. Profile Header */}
           <Box
             sx={{
-              p: 2.5,
-              pb: 2,
-              // display: "flex",
-              // flexDirection: "column",
-              // alignItems: "center",
+              width: "75%",
+              height: "0.35rem",
+              // background: "#6b64f3",
+              background: (theme) =>
+                `linear-gradient(315deg, ${theme.palette.primary.main}, ${theme.palette.error.main})`,
+              margin: "auto",
+              borderRadius: "0 0 25px 25px",
             }}
-          >
-            <Box
-              sx={{
-                position: "relative",
-                display: "flex",
-                margin: "auto",
-                // width: "75px",
-                // height: "75px",
-                border: "1px solid #f0f0f0",
-                borderRadius: "50%",
-                // fontSize: "11px",
-                justifyContent: "center",
-                alignItems: "center",
-                justifyItems: "center",
-                padding: "0.75rem",
-                width: `max(50px, 4.5rem)`,
-                height: `max(50px, 4.5rem)`,
-                marginBottom: 1.5,
-                transition: "all 0.5s",
-                // zIndex: 99,
-                // backgroundColor: "#152f50",
-              }}
-            >
-              <MiniImg src={data.avatar} />
-              {/* <Image
-                src={data.avatar}
-                alt="User Avatar"
-                fill
-                style={{ objectFit: "contain" }}
-                preload={false}
-                loading="eager"
-                // width={100}
-                // height={100}
-              /> */}
-              <Chip
-                icon={<LocalPolice fontSize="inherit" color="primary" />}
-                label={data.role}
-                size="small"
-              />
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-                alignItems: "center",
-              }}
-            >
-              <Typography
-                variant="subtitle2"
-                fontWeight={700}
-                sx={{ lineHeight: 1.25 }}
-              >
+          />
+          {/* 1. Profile Header */}
+          <Header>
+            <Wrapper>
+              <AvatarContainer role={data.role} size="small">
+                <AvatarFrame>
+                  <AvatarWrapper>
+                    <MiniImg src={data.avatar} />
+                  </AvatarWrapper>
+                </AvatarFrame>
+              </AvatarContainer>
+              <Typography variant="subtitle2" fontWeight={700}>
                 {data.name}
                 {/* <VerifiedUserOutlined fontSize="small" /> */}
-                <Verified fontSize="small" color="primary" sx={{ ml: 0.25 }} />
+                <VerifiedOutlined
+                  fontSize="small"
+                  // color="primary"
+                  // sx={{ ml: 0.25 }}
+                />
               </Typography>
-
-              {/* <Chip
-                icon={<LocalPolice fontSize="inherit" color="primary" />}
-                label={data.role}
-                size="small"
-              /> */}
-            </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {data.email}
-            </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {data.email}
+              </Typography>
+            </Wrapper>
 
             {/* Storage Bar (Ref Image 1) */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              <Box sx={{ position: "relative", display: "inline-flex" }}>
-                <CircularProgressStatic value={storagePercent} />
-              </Box>
-              <Box>
-                <Typography variant="caption" fontWeight={700} display="block">
-                  {data.storageUsed} used of {data.storageTotal}GB
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="primary"
-                  fontWeight={700}
-                  sx={{
-                    cursor: "pointer",
-                    "&:hover": { textDecoration: "underline" },
-                  }}
-                >
-                  Try pro plan
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
+            <MiniDashboard
+              mainCaption={`${data.storageUsed} used of ${data.storageTotal}GB`}
+              subCaption="Try pro plan"
+              link="#"
+            >
+              <CircularProgressStatic value={storagePercent} />
+            </MiniDashboard>
+          </Header>
 
           <Divider
             sx={{
@@ -614,60 +585,3 @@ const menuItemStyle = (theme: Theme) => ({
     opacity: 0.3, // Adjust intensity of the ripple
   },
 });
-
-const CircularProgressStatic = (inProps: CircularProgressProps) => {
-  const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { value = 0, ...rest } = props;
-  const theme = useTheme();
-  return (
-    <Box sx={{ position: "relative", display: "inline-flex" }}>
-      <CircularProgress
-        color="primary"
-        enableTrackSlot
-        size="2.5rem"
-        variant="determinate"
-        {...props}
-      />
-      <Box
-        sx={{
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          position: "absolute",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography
-          variant="caption"
-          component="div"
-          color={value <= 50 ? "textSecondary" : "primary"}
-        >{`${Math.round(value)}%`}</Typography>
-      </Box>
-      {/* <svg width="32" height="32" viewBox="0 0 32 32">
-        <circle
-          cx="16"
-          cy="16"
-          r="14"
-          fill="none"
-          stroke={alpha(theme.palette.divider, 0.1)}
-          strokeWidth="3"
-        />
-        <circle
-          cx="16"
-          cy="16"
-          r="14"
-          fill="none"
-          stroke={theme.palette.primary.main}
-          strokeWidth="3"
-          strokeDasharray={88}
-          strokeDashoffset={88 - (88 * value) / 100}
-          strokeLinecap="round"
-          style={{ transition: "stroke-dashoffset 0.5s ease" }}
-        />
-      </svg> */}
-    </Box>
-  );
-};
