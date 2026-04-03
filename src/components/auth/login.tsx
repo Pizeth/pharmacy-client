@@ -24,7 +24,7 @@ import ShootingStars from "./effects/shootingStars";
 import TwinkleStars from "./effects/twinkleStars";
 import RocketAnimation from "./effects/rocket";
 import SignUpForm from "./signUpForm";
-import { AuthAction } from "@/types/theme";
+import { AuthAction } from "@/theme";
 import {
   cloudMove,
   fadeIn,

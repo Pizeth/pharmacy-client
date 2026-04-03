@@ -422,6 +422,39 @@ export const shimmer = keyframes`
   100% { opacity: 0.3; transform: translateY(0px); }
 `;
 
+// ─── Theme Toggle Animation ─── //
+
+export const sunPulse = keyframes`
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(255, 215, 0, 0.7),
+      0 0 0 0 rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 20px 10px rgba(255, 215, 0, 0.7),
+      0 0 40px 20px rgba(255, 215, 0, 0.4);
+  }
+`;
+
+export const moonPhase = keyframes`
+  0%, 100% {
+    box-shadow:
+      inset -10px -5px 0 0 #ddd,
+      0 0 20px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 0 0 #ddd,
+      0 0 20px rgba(255, 255, 255, 0.5);
+  }
+`;
+
+export const twinkleStar = keyframes`
+  0%, 100% { opacity: 0.2; }
+  50%       { opacity: 1; }
+`;
+
 // ============================================
 // REMOVE THESE - Not used anymore
 // ============================================

@@ -3,7 +3,7 @@ import { Theme } from "@emotion/react";
 import { ButtonProps, SxProps } from "@mui/material";
 import { CSSProperties, HtmlHTMLAttributes, ReactNode } from "react";
 import { Meteor, MeteorConfig, MeteorState } from "./theme.interface";
-import { AuthAction } from "@/types/theme";
+import { AuthAction } from "@/theme";
 
 export interface LoginParams {
   // For form login
@@ -99,16 +99,14 @@ export interface SocialLoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
   sx?: SxProps<Theme>;
 }
 
-export interface SocialButtonProps
-  extends ButtonProps /*ExtendButtonBase<ButtonTypeMap> & ButtonOwnProps */ {
+export interface SocialButtonProps extends ButtonProps /*ExtendButtonBase<ButtonTypeMap> & ButtonOwnProps */ {
   className?: string;
   icon?: ReactNode;
   children?: ReactNode;
   // onClick?: MouseEventHandler<T> | undefined;
 }
 
-export interface AuthNavigationProps
-  extends HtmlHTMLAttributes<HTMLDivElement> {
+export interface AuthNavigationProps extends HtmlHTMLAttributes<HTMLDivElement> {
   mode?: AuthAction; // Receives state from parent
   onToggle?: () => void; // Toggle handler from parent
   className?: string;

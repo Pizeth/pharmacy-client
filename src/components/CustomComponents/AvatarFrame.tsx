@@ -11,12 +11,14 @@ const Root = styled(Box, {
   overridesResolver: (_props, styles) => styles.root,
 })(({ theme }) => ({
   position: "relative",
-  overflow: "visible",
+  overflow: "hidden",
   width: `max(50px, 5rem)`,
   height: `max(50px, 5rem)`,
   background: "rgba(0, 0, 0, 0.5)",
   borderRadius: "50%",
-  boxShadow: `0 0 20px 10px ${theme.palette.primary.main}50`,
+  // boxShadow: `0 0 20px 10px ${theme.palette.primary.main}50`,
+  // boxShadow: "0px 0px 10px 1px #000000ee",
+  boxShadow: "3px 3px 15px rgb(0, 0, 0), -3px -3px 15px rgb(58, 58, 58)",
   // overflow: "hidden",
   // margin: `${theme.spacing(1)}`,
   // width: `fill-available`,
@@ -51,8 +53,7 @@ const Content = styled(Box, {
   width: "100%",
   height: "100%",
 
-  // backfaceVisibility: "hidden",
-  // borderRadius: "5px",
+  backfaceVisibility: "hidden",
   overflow: "hidden",
   justifyContent: "center",
   display: "flex",
@@ -62,21 +63,17 @@ const Content = styled(Box, {
     content: '""',
     position: "absolute",
     // display: "block",
-    width: "50%",
+    width: "75%",
     height: "150%",
     borderRadius: "50%",
-    //       width: `max(50px, 5rem)`,
-    // height: `max(50px, 5rem)`,
-    // background: `linear-gradient(
-    //       90deg,
-    //       transparent,
-    //       #ff9966,
-    //       #ff9966,
-    //       #ff9966,
-    //       #ff9966,
-    //       transparent
-    //     )`,
-    background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, ${theme.palette.error.main}, transparent)`,
+    background: `linear-gradient(
+      90deg, 
+      transparent,
+      ${theme.palette.error.main},
+      ${theme.palette.primary.main},
+      transparent
+    )`,
+    transition: "0.5s",
     animation: `${borderAnimation} 3s linear infinite`,
   },
 }));
@@ -84,9 +81,9 @@ const Content = styled(Box, {
 const AvatarFrame = ({ children }: { children?: ReactNode }) => {
   return (
     <Root>
-      <Container>
-        <Content>{children}</Content>
-      </Container>
+      {/* <Container> */}
+      <Content>{children}</Content>
+      {/* </Container> */}
     </Root>
   );
 };

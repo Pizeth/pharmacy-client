@@ -249,7 +249,9 @@ const NavLink = styled(Link, {
 
     /* new style */
     // display: "inline-block",
-    color: theme.palette.text.primary,
+    // color: theme.vars.palette.text.primary,
+    color: theme.vars?.palette?.text?.primary ?? theme.palette.text.primary,
+    // color: theme.palette.text.primary,
     fontSize: "1rem",
     // padding: "12.7px 12.7px",
     // boxSizing: "border-box",

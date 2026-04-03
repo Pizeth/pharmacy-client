@@ -3,14 +3,15 @@
 import { deepmerge } from "@mui/utils";
 import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
 import { red, blue } from "@mui/material/colors";
-import { createTheme, PaletteMode, Theme } from "@mui/material/styles";
-import { ClassKey, CustomComponents } from "@/types/classKey";
 import {
-  Line,
-  Meteor,
-  RazethComponentsPropsList,
-  SideImage,
-} from "@/interfaces/theme.interface";
+  createTheme,
+  // CssVarsTheme,
+  // PaletteMode,
+  Theme,
+  // ThemeOptions,
+  // CssVarsThemeOptions,
+} from "@mui/material/styles";
+
 // import { makePulseVars } from "@/utils/themeUtils";
 import { getMeteorConfig, getSideImageConfig } from "@/configs/themeConfig";
 import { shake } from "./keyframes";
@@ -22,49 +23,6 @@ import {
   RazethSideImageOptimized,
   RazethTwinkleStarOptimized,
 } from "@/theme/components";
-
-declare module "@mui/material/styles" {
-  interface Palette {
-    passwordStrength: string[] | ((theme: Theme) => string[]);
-  }
-  interface PaletteOptions {
-    passwordStrength?: string[] | ((theme: Theme) => string[]);
-  }
-
-  interface ThemeVars {
-    sideImage?: SideImage;
-  }
-  interface Theme {
-    custom: {
-      sideImage: SideImage;
-      lines: Line[];
-      meteor: Meteor;
-    };
-  }
-  interface ThemeOptions {
-    custom?: {
-      sideImage?: SideImage;
-      lines?: Line[];
-      meteor?: Meteor;
-    };
-  }
-
-  // ComponentNameToClassKey can derive its keys from our map.
-  // Note: If each component has different keys (e.g., 'root', 'card'),
-  // this interface should be defined manually for full accuracy.
-  interface ComponentNameToClassKey extends Record<
-    keyof RazethComponentsPropsList,
-    ClassKey
-  > {}
-
-  // ComponentsPropsList directly extends our map.
-  interface ComponentsPropsList extends RazethComponentsPropsList {}
-
-  interface Components extends CustomComponents {
-    // Your custom components are now automatically included
-    // You can still add standard MUI component overrides here if needed
-  }
-}
 
 const globalStyles = (theme: Theme) => ({
   "html, body, #__next": {
@@ -213,12 +171,14 @@ const defaultThemeInvariants = {
   },
 };
 
-export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
+export const RazethBaseTheme = (): RaThemeOptions =>
   createTheme({
     cssVariables: {
       cssVarPrefix: "app",
+      // nativeColor: true, // Uses CSS color-mix()
       colorSchemeSelector: "class",
     },
+    // cssVariables: true,
     // cssVarPrefix: "app", // all vars will start with --app-
     custom: {
       sideImage: getSideImageConfig(),
@@ -243,19 +203,85 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
       warning: { main: "#FFD22B" },
       info: { main: "#f89696" },
       success: { main: "#2ece71", contrastText: "#fff" },
+      // common: {
+      //   white: "#ffffff",
+      //   whiteChannel: "255 255 255", // Add this
+      //   black: "#000000",
+      //   blackChannel: "0 0 0", // Add this
+      // },
 
-      mode,
-      // background: { default: "#121212", paper: "#1d1d1dbf" },
-      background: {
-        default: mode === "dark" ? "#121212" : "#f4f6f8",
-        paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
-      },
-      text: { primary: "#ffffff", secondary: "#aaaaaa" },
+      mode: "dark",
+      // // background: { default: "#121212", paper: "#1d1d1dbf" },
+      // background: {
+      //   default: mode === "dark" ? "#121212" : "#f4f6f8",
+      //   paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
+      // },
+      // text: { primary: "#ffffff", secondary: "#aaaaaa" },
       passwordStrength: ["#aaaaaa", "#e76f51", "#f58700", "#0668d1", "#4caf50"],
     },
+    // colorSchemes: {
+    //   light: true, // MUI's default mode
+    //   dark: true,
+    // },
+    // Move ALL mode-specific colors here
+    // colorSchemes: {
+    //   light: {
+    //     palette: {
+    //       background: {
+    //         default: "#f4f6f8",
+    //         paper: "#ffffff",
+    //       },
+    //       text: {
+    //         primary: "#1A2027", // Dark text for light mode
+    //         secondary: "#3E5060",
+    //       },
+    //     },
+    //   },
+    //   dark: {
+    //     palette: {
+    //       background: {
+    //         default: "#121212",
+    //         paper: "#1e1e1e",
+    //       },
+    //       text: {
+    //         primary: "#ffffff",
+    //         secondary: "#aaaaaa",
+    //       },
+    //     },
+    //   },
+    // },
+    // ── per-scheme overrides ─────────────────────────────────────────────────
     colorSchemes: {
-      light: true, // MUI's default mode
-      dark: true,
+      dark: {
+        palette: {
+          background: {
+            default: "#121212",
+            paper: "#1e1e1e",
+          },
+          text: {
+            primary: "#ffffff",
+            secondary: "#aaaaaa",
+          },
+        },
+      },
+      light: {
+        palette: {
+          background: {
+            default: "#f4f6f8",
+            paper: "#ffffff",
+          },
+          text: {
+            primary: "#111111", // ← was hardcoded #ffffff, this is why it never changed
+            secondary: "#555555",
+          },
+          common: {
+            white: "#ffffff",
+            // whiteChannel: "255 255 255", // Add this
+            black: "#000000",
+            // blackChannel: "0 0 0", // Add this
+          },
+        },
+      },
     },
     shape: {
       // borderRadius: 50,
@@ -565,7 +591,9 @@ export const RazethBaseTheme = (mode: PaletteMode = "dark"): RaThemeOptions =>
             // backgroundColor: "#c40316", // Customize the AppBar background color
             backgroundColor: "#e1232e", // Customize the AppBar background color
             // backgroundImage: "linear-gradient(45deg, #190a05 0%, #870000 100%)",
-            // color: props.theme.palette.text.primary, // Customize font color
+            color:
+              props.theme.vars?.palette?.text?.primary ??
+              props.theme.palette.text.primary,
             // Optional: apply a different background image/color for light mode
             // ...(props.theme.palette.mode === "light" && {
             //   // Shorthand prevents the dark-mode elevation overlay bleeding in

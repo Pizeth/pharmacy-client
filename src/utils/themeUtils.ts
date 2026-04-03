@@ -5,7 +5,7 @@ import {
 } from "@/interfaces/component-props.interface";
 import { StarfieldOptions } from "@/interfaces/css.interface";
 import { MeteorConfig } from "@/interfaces/theme.interface";
-import { GradientOptions, GradientPoint } from "@/types/theme";
+import { GradientOptions, GradientPoint } from "@/theme";
 import { alpha, keyframes, Theme } from "@mui/material/styles";
 
 // export function makeSoftStops(color: string) {

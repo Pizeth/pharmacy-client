@@ -15,7 +15,7 @@ import { SignUpParams } from "./auth.interface";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { SaveHandler } from "ra-core";
 import { SaveButtonProps } from "react-admin";
-import { AuthAction } from "@/types/theme";
+import { AuthAction } from "@/theme";
 import { Circle } from "lucide-react";
 import { HtmlHTMLAttributes, ReactNode, RefObject } from "react";
 import { VirtualElement } from "@popperjs/core/lib/types";
@@ -269,6 +269,16 @@ export interface MiniDashboardProps extends HtmlHTMLAttributes<HTMLDivElement> {
   subCaption?: string;
   link?: string;
 }
+
+export interface ThemeToggleProps {
+  /** Mirrors MUI icon size convention. Default 24 = MUI default icon size. */
+  size?: number;
+  checked?: boolean;
+  // onChange?: (checked: boolean) => void;
+  onChange?: (checked?: boolean) => void; // make arg optional
+  ariaLabel?: string;
+}
+
 export interface ParticleProps extends IParticlesProps {
   children?: React.ReactNode;
 }

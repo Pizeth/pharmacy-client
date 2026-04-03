@@ -45,6 +45,8 @@ import CircularProgressStatic from "@/components/CustomComponents/CircularProgre
 import MiniDashboard from "./MiniDashboard";
 import AvatarWrapper from "@/components/CustomComponents/AvatarWrapper";
 import AvatarFrame from "@/components/CustomComponents/AvatarFrame";
+// import ThemeToggle from "@/components/CustomComponents/DaynightSwitch";
+import ThemeToggle from "@/components/effect/themes/themeToggle";
 
 const PREFIX = "RazethUserSetting";
 
@@ -52,7 +54,7 @@ const Header = styled(Box, {
   name: PREFIX,
   slot: "Header",
   overridesResolver: (_props, styles) => styles.header,
-})(({ theme }) => ({ padding: theme.spacing(2.5, 2.5, 2) }));
+})(({ theme }) => ({ padding: theme.spacing(2.5, 0) }));
 
 const Wrapper = styled(Box, {
   name: PREFIX,
@@ -263,7 +265,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
                 {/* <VerifiedUserOutlined fontSize="small" /> */}
                 <VerifiedOutlined
                   fontSize="small"
-                  // color="primary"
+                  color="primary"
                   // sx={{ ml: 0.25 }}
                 />
               </Typography>
@@ -451,7 +453,8 @@ export const UserMenu = (inProps: UserMenuProps) => {
           {/* 3. Theme Toggle Section */}
           <Box
             sx={{
-              p: 2,
+              px: 2.5,
+              py: 1.5,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
@@ -465,15 +468,15 @@ export const UserMenu = (inProps: UserMenuProps) => {
             </Box>
             {/* Simple custom toggle UI placeholder */}
             <Box
-              sx={{
-                bgcolor: alpha(theme.palette.action.focus, 0.5),
-                p: 0.5,
-                borderRadius: "10px",
-                display: "flex",
-                gap: 0.5,
-              }}
+            // sx={{
+            //   bgcolor: alpha(theme.palette.action.focus, 0.5),
+            //   p: 0.5,
+            //   borderRadius: "10px",
+            //   display: "flex",
+            //   gap: 0.5,
+            // }}
             >
-              <Box
+              {/* <Box
                 sx={{
                   p: 0.5,
                   bgcolor: theme.palette.background.paper,
@@ -486,7 +489,8 @@ export const UserMenu = (inProps: UserMenuProps) => {
               </Box>
               <Box sx={{ p: 0.5, display: "flex", opacity: 0.5 }}>
                 <SettingsOutlined sx={{ fontSize: 14 }} />
-              </Box>
+              </Box> */}
+              <ThemeToggle />
             </Box>
           </Box>
           {/* Logout Section (Staggered separately) */}

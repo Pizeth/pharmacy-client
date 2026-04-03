@@ -1,6 +1,7 @@
 import { Meteor, MeteorConfig } from "@/interfaces/theme.interface";
+import { GradientPoint, GradientRow } from "@/theme";
 import { shootingStar } from "@/theme/keyframes";
-import { GradientPoint, GradientRow } from "@/types/theme";
+// import { GradientPoint, GradientRow } from "@/theme";
 import { buildGradients, makePulseSequence } from "@/utils/themeUtils";
 
 /**

@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo, createContext, useContext } from "react";
-import { ThemeProvider, ThemeProviderProps } from "@mui/material/styles";
+import {
+  ThemeProvider,
+  ThemeProviderProps,
+  useColorScheme,
+} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { DefaultTheme } from "@mui/system";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
@@ -9,10 +13,12 @@ import ResponsiveAppBar from "@/components/Navigations/AppBar"; // PrimarySearch
 import BackToTopFab from "@/components/Navigations/BackToTop";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
 import PersistentDrawerLeft from "@/components/fts/menu";
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 
 export const ThemeContext = createContext({
   toggleTheme: () => {},
   mode: "light" as "light" | "dark",
+  // mode: "light" as "light" | "dark" | "system" | undefined,
 });
 
 export const useThemeControl = () => useContext(ThemeContext);
@@ -23,6 +29,7 @@ export default function ThemeProviderWrapper<Theme = DefaultTheme>({
   // ...props
 }: ThemeProviderProps<Theme>) {
   const [mode, setMode] = useState<"light" | "dark">("light");
+  // const { mode, setMode } = useColorScheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -42,7 +49,10 @@ export default function ThemeProviderWrapper<Theme = DefaultTheme>({
     const newMode = mode === "light" ? "dark" : "light";
     setMode(newMode);
     localStorage.setItem("theme", newMode);
-    document.documentElement.classList.toggle("dark", newMode === "dark");
+    // document.documentElement.classList.toggle("dark", newMode === "dark");
+    // Clean up and set the correct class for MUI CSS Variables
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(newMode);
   };
 
   //   const theme = useMemo(() => getCustomTheme(mode), [mode]);
@@ -51,7 +61,8 @@ export default function ThemeProviderWrapper<Theme = DefaultTheme>({
     <ThemeContext.Provider value={{ toggleTheme, mode }}>
       <AppRouterCacheProvider options={{ enableCssLayer: true }}>
         <ThemeProvider theme={theme}>
-          {/* <CssBaseline /> */}
+          <CssBaseline />
+          <InitColorSchemeScript attribute="class" />
           {/* <ResponsiveAppBar /> */}
           {/* <PrimarySearchAppBar /> */}
           {/* <PersistentDrawerLeft /> */}

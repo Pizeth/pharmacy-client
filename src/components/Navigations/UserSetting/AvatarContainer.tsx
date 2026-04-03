@@ -14,14 +14,14 @@ const Root = styled(Box, {
   position: "relative",
   display: "inline-grid",
   margin: "auto",
-  border: "1px solid #f0f0f0",
+  // border: "1px solid #f0f0f0",
   borderRadius: "50%",
   justifyContent: "center",
   alignItems: "center",
   justifyItems: "center",
   // padding: "0.75rem",
-  width: `max(50px, 4.5rem)`,
-  height: `max(50px, 4.5rem)`,
+  // width: `max(50px, 5rem)`,
+  // height: `max(50px, 5rem)`,
   marginBottom: theme.spacing(1.5),
   transition: "all 0.5s",
 }));
@@ -35,7 +35,7 @@ const Chip = styled(MuiChip, {
   // display: "flex-content",
   // padding: theme.spacing(0),
   marginTop: theme.spacing(-3),
-  height: "1.25rem",
+  height: "1.35rem",
   fontSize: "0.725rem",
   fontWeight: 900,
   textTransform: "uppercase",
@@ -44,7 +44,7 @@ const Chip = styled(MuiChip, {
   // color: theme.palette.primary.main,
   color: alpha(theme.palette.text.primary, 0.925),
   border: "none",
-  zIndex: 99,
+  zIndex: 999,
 }));
 
 const AvatarContainer = (inProps: RazethAvatarContainerProps) => {
