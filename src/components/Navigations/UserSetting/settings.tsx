@@ -209,10 +209,13 @@ export const UserMenu = (inProps: UserMenuProps) => {
           border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
           position: "relative",
           // 2. Glassmorphism Secret Sauce
-          backgroundColor: alpha(theme.palette.background.paper, 0.7),
+          backgroundColor: theme.alpha(
+            theme.vars.palette.background.paper,
+            0.7,
+          ),
           backdropFilter: "blur(20px) saturate(180%)",
           // border: `1px solid ${alpha(theme.palette.common.white, 0.25)}`,
-          boxShadow: `0 8px 32px 0 ${alpha(theme.palette.common.black, 0.2)}`,
+          boxShadow: `0 8px 32px 0 ${alpha(theme.palette.common.black, 0.25)}`,
         }}
       >
         {/* 3. Particle Background Layer */}
@@ -458,25 +461,31 @@ export const UserMenu = (inProps: UserMenuProps) => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              justifyItems: "center",
+              // alignContent: "center",
+              transition: "color 0.25s ease",
+              svg: {
+                transition: "fill 0.25s ease",
+              },
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <PaletteOutlined fontSize="small" color="action" />
               <Typography variant="body2" fontWeight={500}>
                 Theme
               </Typography>
             </Box>
             {/* Simple custom toggle UI placeholder */}
-            <Box
-            // sx={{
-            //   bgcolor: alpha(theme.palette.action.focus, 0.5),
-            //   p: 0.5,
-            //   borderRadius: "10px",
-            //   display: "flex",
-            //   gap: 0.5,
-            // }}
-            >
-              {/* <Box
+            {/* <Box
+              sx={{
+                bgcolor: alpha(theme.palette.action.focus, 0.5),
+                p: 0.5,
+                borderRadius: "10px",
+                display: "flex",
+                gap: 0.5,
+              }}
+            > */}
+            {/* <Box
                 sx={{
                   p: 0.5,
                   bgcolor: theme.palette.background.paper,
@@ -490,8 +499,8 @@ export const UserMenu = (inProps: UserMenuProps) => {
               <Box sx={{ p: 0.5, display: "flex", opacity: 0.5 }}>
                 <SettingsOutlined sx={{ fontSize: 14 }} />
               </Box> */}
-              <ThemeToggle />
-            </Box>
+            {/* </Box> */}
+            <ThemeToggle />
           </Box>
           {/* Logout Section (Staggered separately) */}
           <Box sx={{ p: 1, pb: 1.5 }}>
@@ -515,7 +524,11 @@ export const UserMenu = (inProps: UserMenuProps) => {
                 <ListItemIcon>
                   <LogoutOutlined fontSize="small" sx={{ color: "inherit" }} />
                 </ListItemIcon>
-                <Typography variant="body2" fontWeight={700}>
+                <Typography
+                  variant="body2"
+                  fontWeight={700}
+                  color="textPrimary"
+                >
                   Logout
                 </Typography>
               </MenuItem>
@@ -566,7 +579,7 @@ const menuItemStyle = (theme: Theme) => ({
   "&:last-child": { mb: 0 },
   "& .MuiListItemIcon-root": {
     minWidth: "38px !important",
-    transition: "color 0.2s ease",
+    transition: "color 0.25s ease",
   },
 
   // THE HOVER MAGIC

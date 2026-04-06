@@ -13,9 +13,9 @@ const Root = styled(Box, {
   gap: theme.spacing(1.5),
   margin: theme.spacing(0, 1.25),
   padding: theme.spacing(0.5, 1.25, 0),
-  boxShadow: "3px 3px 15px rgb(0, 0, 0), -3px -3px 15px rgb(58, 58, 58)",
+  boxShadow: `3px 3px 15px ${theme.vars.palette.background.default}, -3px -3px 15px rgb(58, 58, 58)`,
   borderRadius: "3rem",
-  backgroundColor: alpha(theme.palette.background.paper, 0.75),
+  backgroundColor: theme.alpha(theme.vars.palette.background.paper, 0.75),
   "& .MuiBox-root": {
     a: {
       color: alpha(theme.palette.primary.main, 0.75),
@@ -36,7 +36,7 @@ const Content = styled(Box, {
   display: "inline-flex",
   fontSize: "0.875rem",
   fontWeight: 500,
-  color: theme.palette.text.primary,
+  color: theme.vars.palette.text.primary,
 }));
 
 const MiniDashboard = (inProps: MiniDashboardProps) => {

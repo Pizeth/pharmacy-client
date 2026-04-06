@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { styled, keyframes } from "@mui/material/styles";
 
 // ─── Keyframes ────────────────────────────────────────────────────────────────
@@ -49,7 +48,7 @@ const SwitchRoot = styled("label", {
   shouldForwardProp: (prop) => prop !== "size",
 })<{ size?: number }>(({ size = 24 }) => ({
   fontSize: `${size / 3}px`,
-  display: "inline-block",
+  display: "flex",
   width: "6em",
   height: "3em",
   position: "relative",

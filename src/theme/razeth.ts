@@ -197,21 +197,26 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       ],
     },
     palette: {
-      primary: { main: "#e1232e", contrastText: "#fff" },
+      primary: {
+        main: "#e1232e",
+        dark: "#e1232e",
+        light: "#DC143C",
+        contrastText: "#fff",
+      },
       secondary: { main: "#007bff" },
       error: { main: "#f58700" },
       warning: { main: "#FFD22B" },
       info: { main: "#f89696" },
       success: { main: "#2ece71", contrastText: "#fff" },
-      // common: {
-      //   white: "#ffffff",
-      //   whiteChannel: "255 255 255", // Add this
-      //   black: "#000000",
-      //   blackChannel: "0 0 0", // Add this
-      // },
+      common: {
+        white: "#ffffff",
+        // whiteChannel: "255 255 255", // Add this
+        black: "#000000",
+        // blackChannel: "0 0 0", // Add this
+      },
 
-      mode: "dark",
-      // // background: { default: "#121212", paper: "#1d1d1dbf" },
+      // mode: "dark",
+      background: { default: "#f4f6f8", paper: "#ffffff" },
       // background: {
       //   default: mode === "dark" ? "#121212" : "#f4f6f8",
       //   paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
@@ -250,10 +255,23 @@ export const RazethBaseTheme = (): RaThemeOptions =>
     //     },
     //   },
     // },
-    // ── per-scheme overrides ─────────────────────────────────────────────────
+    // ── colorSchemes: ALL color values go here so MUI generates
+    //    the channel variables ──────────────────────────────────────────────────
     colorSchemes: {
       dark: {
         palette: {
+          primary: {
+            main: "#e1232e",
+            // dark: "#e1232e",
+            // light: "#007bff",
+            // contrastText: "#fff",
+          },
+          // common: {
+          //   white: "#ffffff",
+          //   whiteChannel: "255 255 255",
+          //   black: "#000000",
+          //   blackChannel: "0 0 0",
+          // },
           background: {
             default: "#121212",
             paper: "#1e1e1e",
@@ -262,30 +280,35 @@ export const RazethBaseTheme = (): RaThemeOptions =>
             primary: "#ffffff",
             secondary: "#aaaaaa",
           },
+          card: "#272935", // Black for Dark mode
         },
       },
       light: {
         palette: {
+          // common: {
+          //   white: "#ffffff",
+          //   whiteChannel: "255 255 255",
+          //   black: "#000000",
+          //   blackChannel: "0 0 0",
+          // },
           background: {
             default: "#f4f6f8",
             paper: "#ffffff",
           },
           text: {
-            primary: "#111111", // ← was hardcoded #ffffff, this is why it never changed
+            primary: "#111111",
             secondary: "#555555",
           },
-          common: {
-            white: "#ffffff",
-            // whiteChannel: "255 255 255", // Add this
-            black: "#000000",
-            // blackChannel: "0 0 0", // Add this
-          },
+          card: "#3a3e53", // White for dark mode
         },
       },
     },
     shape: {
       // borderRadius: 50,
     },
+    // mixins: {
+    //   toolbar: { marginTop: "65px" },
+    // },
     breakpoints: {
       values: {
         xs: 0,
@@ -591,9 +614,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
             // backgroundColor: "#c40316", // Customize the AppBar background color
             backgroundColor: "#e1232e", // Customize the AppBar background color
             // backgroundImage: "linear-gradient(45deg, #190a05 0%, #870000 100%)",
-            color:
-              props.theme.vars?.palette?.text?.primary ??
-              props.theme.palette.text.primary,
+            color: props.theme.vars.palette.text.primary,
             // Optional: apply a different background image/color for light mode
             // ...(props.theme.palette.mode === "light" && {
             //   // Shorthand prevents the dark-mode elevation overlay bleeding in
@@ -823,7 +844,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         styleOverrides: {
           root: (props: { theme: Theme }) => ({
             "&.MuiButton-root": {
-              color: props.theme.palette.text.primary,
+              color: props.theme.vars.palette.text.primary,
             },
           }),
         },

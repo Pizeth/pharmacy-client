@@ -16,10 +16,12 @@ import {
 
 declare module "@mui/material/styles" {
   interface Palette {
-    passwordStrength: string[] | ((theme: Theme) => string[]);
+    passwordStrength: string[] | ((theme: MuiTheme) => string[]);
+    card: string;
   }
   interface PaletteOptions {
-    passwordStrength?: string[] | ((theme: Theme) => string[]);
+    passwordStrength?: string[] | ((theme: MuiTheme) => string[]);
+    card?: string;
   }
 
   // 1. Extend ThemeVars to include your custom keys for CSS Variables
@@ -28,8 +30,15 @@ declare module "@mui/material/styles" {
     // You can add other custom variable paths here
   }
 
+  interface CommonColors {
+    whiteChannel: string;
+    blackChannel: string;
+  }
+
   // 2. Merge MuiTheme with CssVarsTheme and your custom properties
-  interface Theme extends MuiTheme, CssVarsTheme {
+  interface Theme extends CssVarsTheme {
+    // explicitly non-optional — this is the missing piece
+    vars: CssVarsTheme["vars"];
     custom: {
       sideImage: SideImage;
       lines: Line[];
@@ -38,7 +47,7 @@ declare module "@mui/material/styles" {
   }
 
   // 3. Do the same for ThemeOptions
-  interface ThemeOptions extends MuiThemeOptions, CssVarsThemeOptions {
+  interface ThemeOptions extends CssVarsThemeOptions {
     custom?: {
       sideImage?: SideImage;
       lines?: Line[];

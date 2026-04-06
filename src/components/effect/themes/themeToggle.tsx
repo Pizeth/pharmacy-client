@@ -35,7 +35,7 @@ const Root = styled("label", {
   // height = 3em → fontSize = size / 3
   fontSize: `${size / 3}px`,
 
-  display: "inline-block",
+  display: "inline-flex",
   width: "6em",
   height: "3em",
   position: "relative",
@@ -254,33 +254,33 @@ const DayNightSwitch1 = (
 
 const ThemeToggle = () => {
   const { toggleTheme, mode } = useThemeControl();
-  console.log(mode);
+  console.log("mode: ", mode);
 
   return <DayNightSwitch checked={mode === "dark"} onChange={toggleTheme} />;
-
-  // return (
-  //   <IconButton
-  //     color="inherit"
-  //     size="large"
-  //     // edge="end"
-  //     aria-label="Theme toggle"
-  //     aria-haspopup="true"
-  //     onClick={toggleTheme}
-  //     // sx={{
-  //     //   position: "fixed",
-  //     //   top: "2.5vmin",
-  //     //   right: "2.5vmin",
-  //     //   border: "1px solid",
-  //     //   borderColor: "divider",
-  //     //   mt: 0.5,
-  //     //   // borderRadius: 2,
-  //     //   opacity: 0.5,
-  //     //   "&:hover": { opacity: 1 },
-  //     // }}
-  //   >
-  //     {mode === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-  //   </IconButton>
-  // );
 };
 
 export default ThemeToggle;
+
+// return (
+//   <IconButton
+//     color="inherit"
+//     size="large"
+//     // edge="end"
+//     aria-label="Theme toggle"
+//     aria-haspopup="true"
+//     onClick={toggleTheme}
+//     // sx={{
+//     //   position: "fixed",
+//     //   top: "2.5vmin",
+//     //   right: "2.5vmin",
+//     //   border: "1px solid",
+//     //   borderColor: "divider",
+//     //   mt: 0.5,
+//     //   // borderRadius: 2,
+//     //   opacity: 0.5,
+//     //   "&:hover": { opacity: 1 },
+//     // }}
+//   >
+//     {mode === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+//   </IconButton>
+// );

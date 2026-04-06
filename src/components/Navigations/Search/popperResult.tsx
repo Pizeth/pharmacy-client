@@ -38,9 +38,10 @@ const Paper = styled(MuiPaper, {
   marginTop: theme.spacing(1),
   borderRadius: "5px",
   overflow: "hidden", // Clips the ripple effects to the border radius
-  backgroundColor: alpha(theme.palette.background.paper, 0.75),
+  // backgroundColor: alpha(theme.palette.background.paper, 0.75),
+  backgroundColor: theme.alpha(theme.vars.palette.background.paper, 0.75),
   backdropFilter: "blur(0.125rem)",
-  border: `1px solid ${alpha(theme.palette.common.white, 0.125)}`,
+  border: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.125)}`,
 }));
 
 const ErrorBox = styled(Box, {
@@ -68,7 +69,7 @@ const ScrollableList = styled(List, {
   // 3. Smooth scrollbar styling (optional but looks great)
   "&::-webkit-scrollbar": { width: "6px" },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: alpha(theme.palette.text.primary, 0.1),
+    backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.1),
     borderRadius: "10px",
   },
   "& .MuiButtonBase-root": {
@@ -95,7 +96,6 @@ const PoperResult = (inProps: PoperResultProps) => {
     ...rest
   } = props;
 
-  console.log("results", results);
   const listRef = useRef<HTMLUListElement>(null);
   useEffect(() => {
     if (activeIndex !== -1 && listRef.current) {

@@ -249,9 +249,8 @@ const NavLink = styled(Link, {
 
     /* new style */
     // display: "inline-block",
-    // color: theme.vars.palette.text.primary,
-    color: theme.vars?.palette?.text?.primary ?? theme.palette.text.primary,
-    // color: theme.palette.text.primary,
+    color: theme.vars.palette.text.primary,
+    // color: theme.vars?.palette?.text?.primary ?? theme.palette.text.primary,
     fontSize: "1rem",
     // padding: "12.7px 12.7px",
     // boxSizing: "border-box",
@@ -353,7 +352,7 @@ const NavText = styled(ListItemText, {
     // fontWeight: 600,
     // fontSize: "0.5em",
     // color: "#222327",
-    transition: "0.25s",
+    // transition: "0.00125s",
     letterSpacing: "0.05em",
     textTransform: "uppercase",
     transform: "translateY(0px)",

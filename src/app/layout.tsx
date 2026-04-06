@@ -5,6 +5,7 @@ import "./globals.css";
 import { Siemreap, Moul } from "next/font/google";
 import { darkTheme } from "@/theme/razeth";
 import ThemeProviderWrapper from "@/components/effect/themes/theme-wrapper";
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 // import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 // import { useEffect, useState } from "react";
 
@@ -99,7 +100,7 @@ const kantumruy = localFont({
     },
   ],
   variable: "--font-kantumruy",
-})
+});
 
 const googleSans = localFont({
   src: [
@@ -118,7 +119,7 @@ const googleSans = localFont({
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
-})
+});
 
 export default function RootLayout({
   children,
@@ -150,6 +151,7 @@ export default function RootLayout({
         {/* {children} */}
         {/* <ThemeProvider theme={darkTheme}>{children}</ThemeProvider> */}
         {/* <AppRouterCacheProvider>{children}+ </AppRouterCacheProvider> */}
+        <InitColorSchemeScript attribute="class" /> {/* ← before everything */}
         <ThemeProviderWrapper theme={darkTheme}>
           {children}
         </ThemeProviderWrapper>

@@ -54,8 +54,8 @@ import options from "@/configs/particleConfig";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GlobalSearch from "./Search/search";
-import { UserMenu } from "./UserSetting/Settings";
 import ParticleContainer from "@/theme/effects/particle";
+import { UserMenu } from "./UserSetting/Settings";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
@@ -678,20 +678,28 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         {/* The "New Version" Update Card (optional) */}
         <Box
           sx={{
-            bgcolor: "#272935",
+            // bgcolor: "#272935",
+            bgcolor: (theme) => theme.vars.palette.card,
             p: 2,
             borderRadius: 2,
             mb: 2,
             border: "1px solid rgba(255,255,255,0.05)",
           }}
         >
-          <Typography variant="caption" sx={{ color: "#fff", fontWeight: 600 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: (theme) => theme.vars.palette.text.primary,
+              fontWeight: 600,
+            }}
+          >
             Legacy version available
           </Typography>
           <Typography
             variant="body2"
             sx={{
-              color: "rgba(255,255,255,0.5)",
+              color: (theme) =>
+                theme.alpha(theme.vars.palette.text.primary, 0.7),
               fontSize: "0.75rem",
               mt: 0.5,
             }}
@@ -735,14 +743,19 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
           <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
             <Typography
               variant="body2"
-              sx={{ color: "#fff", fontWeight: 500, lineHeight: 1.2 }}
+              sx={{
+                color: (theme) => theme.vars.palette.text.primary,
+                fontWeight: 500,
+                lineHeight: 1.2,
+              }}
             >
               Liam Smith
             </Typography>
             <Typography
               variant="caption"
               sx={{
-                color: "rgba(255,255,255,0.5)",
+                color: (theme) =>
+                  theme.alpha(theme.vars.palette.text.primary, 0.5),
                 display: "block",
                 // noWrap: true,
               }}
@@ -753,7 +766,12 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
           </Box>
           <SettingsIcon
             fontSize="medium"
-            sx={{ color: "rgba(255,255,255,0.4)", mr: 0.5 }}
+            sx={{
+              // color: (theme) => "rgba(255,255,255,0.4)",
+              color: (theme) =>
+                theme.alpha(theme.vars.palette.text.primary, 0.4),
+              mr: 0.5,
+            }}
           />
         </ListItemButton>
 

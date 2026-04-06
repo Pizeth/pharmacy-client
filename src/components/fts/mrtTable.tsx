@@ -59,10 +59,10 @@ import NAIcon from "../icons/na";
 
 const Root = styled(Box)(({ theme }) => ({
   width: "100%",
-  typography: "body1",
-  border: "1px solid rgba(255, 255, 255, 0.1)",
+  // typography: "body1",
+  border: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.125)}`,
   // borderRadius: theme.shape.borderRadius,
-  borderRadius: "5px",
+  borderRadius: "50px",
 }));
 
 const ToolBar = styled(Box)(({ theme }) => ({
@@ -78,20 +78,23 @@ const ToolBar = styled(Box)(({ theme }) => ({
   "@media max-width: 768px": {
     flexDirection: "column",
   },
-  color: theme.palette.text.primary,
+  color: theme.vars.palette.text.primary,
   // box-shadow: var(--Paper-shadow);
   // background-image: var(--Paper-overlay);
-  backgroundColor: "rgb(29, 29, 29)",
+  // backgroundColor: "rgb(29, 29, 29)",
+  backgroundColor: theme.vars.palette.background.paper,
   backgroundImage: "unset",
   overflow: "hidden",
   transition: "all 100ms ease-in-out",
   // borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-  borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+  borderBottom: ` 1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.125)}`,
+  borderRadius: "50px 50px 0 0",
 }));
 
 const BottomBar = styled(Box)(({ theme }) => ({
   alignItems: "flex-start",
-  backgroundColor: "rgb(29, 29, 29)",
+  // backgroundColor: "rgb(29, 29, 29)",
+  backgroundColor: theme.vars.palette.background.paper,
   display: "grid",
   flexWrap: "wrap-reverse",
   minHeight: "3.5rem",
@@ -100,6 +103,7 @@ const BottomBar = styled(Box)(({ theme }) => ({
   transition: "all 150ms ease-in-out",
   zIndex: 1,
   boxShadow: "0 1px 2px -1px rgba(97, 97, 97, 0.5) inset",
+  borderRadius: "0 0 50px 50px",
   left: 0,
   right: 0,
   // fontFamily: [
@@ -119,7 +123,7 @@ const BottomBar = styled(Box)(({ theme }) => ({
     ].join(","),
     button: {
       background: theme.palette.primary.main,
-      color: theme.palette.text.primary,
+      color: theme.vars.palette.text.primary,
       fontSize: "0.875rem",
       fontFamily: [
         "Roboto",
@@ -170,7 +174,7 @@ const DetailPane = styled(Box)(({ theme }) => ({
   margin: 1,
   fontFamily: "var(--font-interkhmerloopless)",
   th: {
-    background: theme.palette.background.paper,
+    background: theme.vars.palette.background.paper,
   },
   td: {
     fontFamily: "var(--font-interkhmerloopless)",
@@ -571,6 +575,7 @@ export default function DocumentTable() {
           color="secondary"
           type="button"
           onClick={handleDialogForm}
+          sx={{ borderRadius: "50px" }}
         >
           <Typography variant="body2">
             <strong>បញ្ចូលឯកសារថ្មី</strong>
@@ -894,6 +899,7 @@ export default function DocumentTable() {
             // autoFocus
             type="button"
             onClick={handleDialogForm}
+            sx={{ borderRadius: "50px" }}
           >
             <Typography variant="body2">
               <strong>បញ្ចូលឯកសារថ្មី</strong>

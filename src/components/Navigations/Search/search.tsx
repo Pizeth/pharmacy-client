@@ -38,7 +38,7 @@ const Root = styled(Box, {
   // margin: theme.spacing(0),
   display: "flex",
   justifyContent: "center",
-  background: `${theme.alpha((theme.vars ?? theme).palette.background.paper, 0.925)}`,
+  background: `${theme.alpha(theme.vars.palette.background.paper, 0.925)}`,
   // borderRadius: 50,
 }));
 
@@ -70,6 +70,7 @@ const Label = styled(InputLabel, {
   overridesResolver: (_props, styles) => styles.label,
 })<{ shrink?: boolean }>(({ theme, shrink }) => ({
   left: shrink ? 0 : theme.spacing(4),
+  padding: shrink ? theme.spacing(0, 1) : "none",
   fontFamily: "var(--font-interkhmerloopless)",
   // color: alpha(theme.palette.text.primary, 0.5),
   transform: !shrink
@@ -80,7 +81,7 @@ const Label = styled(InputLabel, {
   borderRadius: 50,
   // backgroundColor: shrink ? theme.palette.background.paper : "transparent",
   backgroundColor: shrink
-    ? theme.alpha((theme.vars ?? theme).palette.common.black, 0.05)
+    ? theme.alpha(theme.vars.palette.background.default, 0.05)
     : "transparent",
   backdropFilter: "blur(10px) saturate(150%)",
   // border: `1px solid ${alpha(theme.palette.common.white, 0.075)}`,
@@ -117,19 +118,16 @@ const Input = styled(OutlinedInput, {
   transition: theme.transitions.create(["background-color", "width"]),
 
   // 3. The Glass Effect
-  backgroundColor: theme.alpha(
-    (theme.vars ?? theme).palette.common.white,
-    0.05,
-  ),
+  backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.0775),
   backdropFilter: "blur(10px) saturate(150%)",
   // border: `1px solid ${theme.alpha((theme.vars ?? theme).palette.common.white, 0.075)}`,
-  border: `1px solid ${alpha(theme.palette.common.white, 0.075)}`,
+  border: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.0775)}`,
   input: {
     fontFamily: "'Roboto Mono', monospace, var(--font-interkhmerloopless)", // Different font for input if desired
     fontSize: "0.925rem",
     // fontWeight: 400,
     // color: theme.vars.palette.text.primary ?? theme.palette.text.primary,
-    color: (theme.vars ?? theme).palette.text.primary,
+    color: theme.vars.palette.text.primary,
     paddingLeft: theme.spacing(1),
     transition: theme.transitions.create("width"),
     // [theme.breakpoints.up("sm")]: {
@@ -151,10 +149,7 @@ const Input = styled(OutlinedInput, {
     border: "none",
   },
   "&:hover": {
-    backgroundColor: theme.alpha(
-      (theme.vars ?? theme).palette.common.white,
-      0.25,
-    ),
+    backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.25),
     svg: {
       fill: theme.palette.error.main,
       color: theme.palette.error.main,
@@ -174,11 +169,8 @@ const Input = styled(OutlinedInput, {
   "&.Mui-focused": {
     // backgroundColor: alpha(theme.palette.background.paper, 0.25),
     // boxShadow: `0 0 0 2px ${alpha(theme.palette.error.main, 0.25)}`,
-    backgroundColor: theme.alpha(
-      (theme.vars ?? theme).palette.common.white,
-      0.07,
-    ),
-    boxShadow: `0 8px 32px 0 ${theme.alpha((theme.vars ?? theme).palette.common.black, 0.25)}`,
+    backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.07),
+    boxShadow: `0 8px 32px 0 ${theme.alpha(theme.vars.palette.common.black, 0.25)}`,
     border: `1px solid ${alpha(theme.palette.error.main, 0.5)}`,
   },
   "& .MuiInputAdornment-root": {
@@ -192,7 +184,7 @@ const Input = styled(OutlinedInput, {
       // transform: "scaleX(-1)",
       margin: theme.spacing(1),
       svg: {
-        color: theme.palette.text.primary,
+        color: theme.vars.palette.text.primary,
       },
     },
     "&:hover": {

@@ -42,7 +42,7 @@ const Chip = styled(MuiChip, {
   borderRadius: "50px",
   backgroundColor: alpha(theme.palette.primary.main, 0.555),
   // color: theme.palette.primary.main,
-  color: alpha(theme.palette.text.primary, 0.925),
+  color: alpha(theme.palette.common.white, 0.925),
   border: "none",
   zIndex: 999,
 }));
