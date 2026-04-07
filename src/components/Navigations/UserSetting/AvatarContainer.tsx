@@ -22,6 +22,7 @@ const Root = styled(Box, {
   // padding: "0.75rem",
   // width: `max(50px, 5rem)`,
   // height: `max(50px, 5rem)`,
+  border: `0.5px solid ${theme.alpha(theme.vars.palette.text.primary, 0.05)}`, // Subtle edge highlight
   marginBottom: theme.spacing(1.5),
   transition: "all 0.5s",
 }));

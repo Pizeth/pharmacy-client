@@ -118,10 +118,10 @@ const Input = styled(OutlinedInput, {
   transition: theme.transitions.create(["background-color", "width"]),
 
   // 3. The Glass Effect
-  backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.0775),
+  backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.05),
   backdropFilter: "blur(10px) saturate(150%)",
   // border: `1px solid ${theme.alpha((theme.vars ?? theme).palette.common.white, 0.075)}`,
-  border: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.0775)}`,
+  border: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.075)}`,
   input: {
     fontFamily: "'Roboto Mono', monospace, var(--font-interkhmerloopless)", // Different font for input if desired
     fontSize: "0.925rem",

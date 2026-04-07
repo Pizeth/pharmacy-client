@@ -18,10 +18,20 @@ declare module "@mui/material/styles" {
   interface Palette {
     passwordStrength: string[] | ((theme: MuiTheme) => string[]);
     card: string;
+    customShadows: {
+      neumorphic: string;
+      inset: string;
+      circleWell: string;
+    };
   }
   interface PaletteOptions {
     passwordStrength?: string[] | ((theme: MuiTheme) => string[]);
     card?: string;
+    customShadows?: {
+      neumorphic: string;
+      inset: string;
+      circleWell: string;
+    };
   }
 
   // 1. Extend ThemeVars to include your custom keys for CSS Variables

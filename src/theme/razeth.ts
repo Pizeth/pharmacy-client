@@ -216,7 +216,15 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       },
 
       // mode: "dark",
-      background: { default: "#f4f6f8", paper: "#ffffff" },
+      // background: { default: "#f4f6f8", paper: "#ecf0f3" },
+      background: { default: "#d1d9e6", paper: "#dfeafd" },
+      customShadows: {
+        neumorphic: `-7px -7px 15px rgba(255, 255, 255, 1), 7px 7px 15px rgba(174, 174, 192, 0.4)`,
+        inset: `inset -5px -5px 10px rgba(255, 255, 255, 1), inset 5px 5px 10px rgba(174, 174, 192, 0.4)`,
+        circleWell:
+          // "inset 6px 6px 15px rgba(163, 177, 198, 0.5), inset -6px -6px 15px rgba(255, 255, 255, 1)",
+          "-7px -7px 15px rgba(255,255,255,1), 7px 7px 15px rgba(174, 174, 192, 0.5)",
+      },
       // background: {
       //   default: mode === "dark" ? "#121212" : "#f4f6f8",
       //   paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
@@ -266,15 +274,19 @@ export const RazethBaseTheme = (): RaThemeOptions =>
             // light: "#007bff",
             // contrastText: "#fff",
           },
-          // common: {
-          //   white: "#ffffff",
-          //   whiteChannel: "255 255 255",
-          //   black: "#000000",
-          //   blackChannel: "0 0 0",
-          // },
           background: {
             default: "#121212",
             paper: "#1e1e1e",
+          },
+          // Define custom shadow variables for dark mode
+          customShadows: {
+            neumorphic:
+              "-7px -7px 15px rgba(255, 255, 255, 0.05), 7px 7px 15px rgba(0, 0, 0, 0.5)",
+            inset:
+              "inset -5px -5px 10px rgba(255, 255, 255, 0.05), inset 5px 5px 10px rgba(0, 0, 0, 0.5)",
+            circleWell:
+              // "inset 6px 6px 15px rgba(0, 0, 0, 0.6), inset -6px -6px 15px rgba(255, 255, 255, 0.05)",
+              "-7px -7px 15px rgba(255,255,255,0.125), 7px 7px 15px rgba(0, 0, 0, 0.75)",
           },
           text: {
             primary: "#ffffff",
@@ -292,8 +304,20 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           //   blackChannel: "0 0 0",
           // },
           background: {
-            default: "#f4f6f8",
-            paper: "#ffffff",
+            // default: "#f4f6f8",
+            default: "#d1d9e6",
+            paper: "#dfeafd",
+          },
+          // Define custom shadow variables for light mode
+          customShadows: {
+            neumorphic:
+              "-7px -7px 15px rgba(255, 255, 255, 1), 7px 7px 15px rgba(174, 174, 192, 0.4)",
+            inset:
+              "inset -5px -5px 10px rgba(255, 255, 255, 1), inset 5px 5px 10px rgba(174, 174, 192, 0.4)",
+            circleWell: `
+              inset 7px 7px 15px rgba(0, 0, 0, 0.6), 
+              inset -7px -7px 15px rgba(255, 255, 255, 0.05)
+            `,
           },
           text: {
             primary: "#111111",
@@ -880,6 +904,113 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           root: ({ theme }) => ({
             height: 5,
             borderRadius: 5,
+          }),
+        },
+      },
+      MuiTable: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            backgroundColor: props.theme.vars.palette.background.default, // Set your default table background
+          }),
+        },
+      },
+      MuiTableRow: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            // Chain the class twice to increase specificity weight
+            "&.MuiTableRow-root.MuiTableRow-root": {
+              backgroundColor: props.theme.vars.palette.background.paper,
+            },
+            "&.MuiTableRow-root": {
+              '& td[data-pinned="true"]': {
+                "&:before": {
+                  backgroundColor: props.theme.vars.palette.background.paper,
+                },
+              },
+            },
+          }),
+          head: (props: { theme: Theme }) => ({
+            backgroundColor: props.theme.vars.palette.background.paper, // Set your default table row background
+          }),
+        },
+      },
+      MuiTableHead: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            // backgroundColor: props.theme.vars.palette.background.default, // Set your default table header background
+            // Targets cells specifically within the header
+            '& .MuiTableCell-root[data-pinned="true"]:before': {
+              backgroundColor: props.theme.vars.palette.background.default,
+              opacity: 1, // Ensures it's not semi-transparent
+              backdropFilter: "none",
+            },
+          }),
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: (props: { theme: Theme }) => ({
+            backgroundColor: props.theme.vars.palette.background.paper, // Set your default table header background
+            // Targets TableCell specifically when it is a 'head' cell
+            "&.MuiTableCell-head": {
+              backgroundColor: props.theme.vars.palette.background.default,
+            },
+            "&.MuiTableCell-body": {
+              backgroundColor: props.theme.vars.palette.background.paper,
+            },
+            '[data-pinned="true"]:before': {
+              backgroundColor: props.theme.vars.palette.background.paper,
+            },
+          }),
+          head: (props: { theme: Theme }) => ({
+            backgroundColor: props.theme.vars.palette.background.default, // Specific background for header cells
+            color: props.theme.vars.palette.text.primary,
+            // Targets the specific internal MRT class
+            // "& .Mui-TableHeadCell-Content": {
+            //   backgroundColor: props.theme.vars.palette.background.default, // Specific background for header cells
+            //   color: props.theme.vars.palette.text.primary,
+            // },
+            // You can also target the label and actions specifically
+            // "& .Mui-TableHeadCell-Content-Labels": {
+            //   fontWeight: "bold",
+            // },
+          }),
+        },
+      },
+      MuiTableSortLabel: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            // 1. Target the icon specifically to beat the library's !important
+            "&.MuiTableSortLabel-root .MuiTableSortLabel-icon": {
+              color: `${theme.vars.palette.text.secondary} !important`,
+              // opacity: 0.5, // Default opacity for inactive icons
+            },
+            // // 2. Target the active state icon
+            // "&.Mui-active .MuiTableSortLabel-icon": {
+            //   color: `${theme.vars.palette.primary.main} !important`,
+            //   opacity: 1,
+            // },
+            // // 3. Optional: Hover state for the icon
+            // "&:hover .MuiTableSortLabel-icon": {
+            //   opacity: 0.8,
+            // },
+          }),
+        },
+      },
+      MuiMenu: {
+        styleOverrides: {
+          // Target the 'list' slot specifically
+          // list: ({ theme }) => ({
+          //   // Double class to increase specificity without !important
+          //   "&.MuiMenu-list": {
+          //     backgroundColor: theme.vars.palette.background.paper,
+          //   },
+          // }),
+          paper: ({ theme }) => ({
+            backgroundColor: theme.vars.palette.background.paper,
+            "& .MuiMenu-list": {
+              backgroundColor: "inherit", // Force the list to follow the paper color
+            },
           }),
         },
       },

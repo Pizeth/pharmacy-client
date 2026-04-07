@@ -62,7 +62,7 @@ const Root = styled(Box)(({ theme }) => ({
   // typography: "body1",
   border: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.125)}`,
   // borderRadius: theme.shape.borderRadius,
-  borderRadius: "50px",
+  borderRadius: "25px",
 }));
 
 const ToolBar = styled(Box)(({ theme }) => ({
@@ -88,7 +88,7 @@ const ToolBar = styled(Box)(({ theme }) => ({
   transition: "all 100ms ease-in-out",
   // borderTop: "1px solid rgba(255, 255, 255, 0.1)",
   borderBottom: ` 1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.125)}`,
-  borderRadius: "50px 50px 0 0",
+  borderRadius: "25px 25px 0 0",
 }));
 
 const BottomBar = styled(Box)(({ theme }) => ({
@@ -103,7 +103,7 @@ const BottomBar = styled(Box)(({ theme }) => ({
   transition: "all 150ms ease-in-out",
   zIndex: 1,
   boxShadow: "0 1px 2px -1px rgba(97, 97, 97, 0.5) inset",
-  borderRadius: "0 0 50px 50px",
+  borderRadius: "0 0 25px 25px",
   left: 0,
   right: 0,
   // fontFamily: [
@@ -419,7 +419,7 @@ export default function DocumentTable() {
               sx={(theme) => ({
                 color:
                   value < 7
-                    ? theme.palette.text.primary
+                    ? theme.vars.palette.text.primary
                     : value >= 7 && value < 30
                       ? theme.palette.warning.dark
                       : theme.palette.error.dark,
@@ -688,12 +688,13 @@ export default function DocumentTable() {
       onClick: () => {
         // router.push(`/documents/${row.original.id}`);
       },
-      // sx: {
-      //   cursor: "pointer",
-      //   "&:hover": {
-      //     backgroundColor: "rgba(0, 0, 0, 0.04)",
-      //   },
-      // },
+      sx: {
+        cursor: "pointer",
+        backgroundColor: (theme) => theme.vars.palette.background.paper,
+        "&:hover": {
+          backgroundColor: "rgba(0, 0, 0, 0.04)",
+        },
+      },
     }),
 
     localization: mrt,

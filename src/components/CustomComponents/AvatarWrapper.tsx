@@ -15,7 +15,7 @@ const Root = styled(Box, {
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  inset: "0.25vmin",
+  inset: "0.175vmin",
   border: "3px solid #070a1c",
   borderRadius: "50%",
   overflow: "hidden",
