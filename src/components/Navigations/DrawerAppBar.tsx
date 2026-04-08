@@ -175,6 +175,15 @@ const LogoCaption = styled(Box, {
   overridesResolver: (_props, styles) => styles.caption,
 })(({ theme }) => ({
   textAlign: "center",
+  color: "#edad54",
+  textShadow: `
+    -0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+    0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+    -0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+    0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+    0    0   7px ${theme.vars.palette.text.primary}
+  `,
+  // WebkitTextStroke: `0.125px ${theme.vars.palette.text.primary}`,
   h6: {
     Padding: `${theme.spacing(0.5)} 0`,
     lineHeight: 2.5,
