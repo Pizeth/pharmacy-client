@@ -290,7 +290,8 @@ export const UserMenu = (inProps: UserMenuProps) => {
           <Divider
             sx={{
               borderStyle: "dashed",
-              borderColor: alpha(theme.palette.divider, 0.1),
+              borderColor: (theme) =>
+                theme.alpha(theme.vars.palette.text.primary, 0.255),
             }}
           />
 
@@ -451,7 +452,13 @@ export const UserMenu = (inProps: UserMenuProps) => {
             </MenuItem>
           </Box> */}
 
-          <Divider sx={{ borderStyle: "dashed" }} />
+          <Divider
+            sx={{
+              borderStyle: "dashed",
+              borderColor: (theme) =>
+                theme.alpha(theme.vars.palette.text.primary, 0.255),
+            }}
+          />
 
           {/* 3. Theme Toggle Section */}
           <Box

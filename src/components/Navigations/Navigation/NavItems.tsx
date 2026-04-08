@@ -249,7 +249,9 @@ const NavLink = styled(Link, {
 
     /* new style */
     // display: "inline-block",
-    color: theme.vars.palette.text.primary,
+    color: active
+      ? theme.vars.palette.common.white
+      : theme.vars.palette.text.primary,
     // color: theme.vars?.palette?.text?.primary ?? theme.palette.text.primary,
     fontSize: "1rem",
     // padding: "12.7px 12.7px",
@@ -271,7 +273,8 @@ const NavLink = styled(Link, {
       // backgroundPosition: "0 100%",
       // transition: "all 0.25s ease-in",
       //   color: active ? "inherit" : resolved,
-      backgroundColor: "var(--app-palette-action-hover)",
+      // backgroundColor: "var(--app-palette-action-hover)",
+      backgroundColor: theme.palette.action.hover,
     },
     // "&::after": {
     //     content: "''",

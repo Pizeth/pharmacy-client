@@ -46,7 +46,7 @@ const SwitchRoot = styled("label", {
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
   shouldForwardProp: (prop) => prop !== "size",
-})<{ size?: number }>(({ size = 24 }) => ({
+})<{ size?: number }>(({ size = 24, theme }) => ({
   fontSize: `${size / 3}px`,
   display: "flex",
   width: "6em",
@@ -54,6 +54,9 @@ const SwitchRoot = styled("label", {
   position: "relative",
   userSelect: "none",
   cursor: "pointer",
+  borderRadius: "50px",
+  border: `0.5px solid ${theme.alpha(theme.vars.palette.text.primary, 0.0925)}`,
+  boxShadow: theme.vars.palette.customShadows.neumorphic,
 }));
 
 // ─── Hidden input ─────────────────────────────────────────────────────────────

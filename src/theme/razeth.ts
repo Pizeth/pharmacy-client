@@ -214,10 +214,12 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         black: "#000000",
         // blackChannel: "0 0 0", // Add this
       },
+      // divider: "rgba(0, 0, 0, 0.12)",
 
       // mode: "dark",
       // background: { default: "#f4f6f8", paper: "#ecf0f3" },
-      background: { default: "#d1d9e6", paper: "#dfeafd" },
+      // background: { default: "#d1d9e6", paper: "#dfeafd" },
+      background: { default: "#d3e1f7", paper: "#e0eafd" },
       customShadows: {
         neumorphic: `-7px -7px 15px rgba(255, 255, 255, 1), 7px 7px 15px rgba(174, 174, 192, 0.4)`,
         inset: `inset -5px -5px 10px rgba(255, 255, 255, 1), inset 5px 5px 10px rgba(174, 174, 192, 0.4)`,
@@ -225,6 +227,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           // "inset 6px 6px 15px rgba(163, 177, 198, 0.5), inset -6px -6px 15px rgba(255, 255, 255, 1)",
           "-7px -7px 15px rgba(255,255,255,1), 7px 7px 15px rgba(174, 174, 192, 0.5)",
       },
+      card: "#adc4eb", // White for dark mode
       // background: {
       //   default: mode === "dark" ? "#121212" : "#f4f6f8",
       //   paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
@@ -268,15 +271,28 @@ export const RazethBaseTheme = (): RaThemeOptions =>
     colorSchemes: {
       dark: {
         palette: {
+          // primary: {
+          //   main: "#e1232e",
+          //   // dark: "#e1232e",
+          //   // light: "#007bff",
+          //   // contrastText: "#fff",
+          // },
           primary: {
             main: "#e1232e",
-            // dark: "#e1232e",
-            // light: "#007bff",
-            // contrastText: "#fff",
+            dark: "#e1232e",
+            light: "#DC143C",
+            contrastText: "#fff",
           },
+          secondary: { main: "#007bff" },
+          error: { main: "#f58700" },
+          warning: { main: "#FFD22B" },
+          info: { main: "#f89696" },
+          success: { main: "#2ece71", contrastText: "#fff" },
           background: {
-            default: "#121212",
-            paper: "#1e1e1e",
+            // default: "#121212",
+            // paper: "#1e1e1e",
+            default: "#26282b",
+            paper: "#31363b",
           },
           // Define custom shadow variables for dark mode
           customShadows: {
@@ -292,6 +308,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
             primary: "#ffffff",
             secondary: "#aaaaaa",
           },
+          // divider: "rgba(255, 255, 255, 0.12)",
           card: "#272935", // Black for Dark mode
         },
       },
@@ -634,11 +651,11 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       /***** MUI's COMPONENTs *****/
       MuiAppBar: {
         styleOverrides: {
-          root: (props: { theme: Theme }) => ({
+          root: ({ theme }) => ({
             // backgroundColor: "#c40316", // Customize the AppBar background color
             backgroundColor: "#e1232e", // Customize the AppBar background color
             // backgroundImage: "linear-gradient(45deg, #190a05 0%, #870000 100%)",
-            color: props.theme.vars.palette.text.primary,
+            color: theme.vars.palette.common.white,
             // Optional: apply a different background image/color for light mode
             // ...(props.theme.palette.mode === "light" && {
             //   // Shorthand prevents the dark-mode elevation overlay bleeding in
@@ -650,11 +667,17 @@ export const RazethBaseTheme = (): RaThemeOptions =>
             // // Apply the background image specifically for dark mode
             // ...(props.theme.palette.mode === "dark" && {
             //   // Shorthand resets backgroundColor + backgroundImage together
-            backgroundImage: `linear-gradient(45deg, #1e1e1e 0%, #870000 100%)`,
+            backgroundImage: `linear-gradient(45deg, ${theme.vars.palette.background.paper} 0%, ${theme.vars.palette.error.main} 50%, #870000 100%)`,
+            borderBottom: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.125)}`,
             // backgroundImage: `linear-gradient(45deg, #190a05 0%, #870000 100%)`,
             //   backgroundColor: "red",
             //   color: props.theme.palette.text.primary,
             // }),
+            ...theme.applyStyles("dark", {
+              color: theme.vars.palette.text.primary,
+              // backgroundImage: `linear-gradient(45deg, #1e1e1e 0%, #870000 100%)`,
+              backgroundImage: `linear-gradient(45deg, ${theme.vars.palette.background.paper} 0%, ${theme.vars.palette.error.main} 50%, #870000 100%)`,
+            }),
           }),
           // colorPrimary: ({ theme }: { theme: Theme }) => ({
           //   ...(theme.palette.mode === "light" && {
@@ -951,6 +974,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         styleOverrides: {
           root: (props: { theme: Theme }) => ({
             backgroundColor: props.theme.vars.palette.background.paper, // Set your default table header background
+            borderBottom: `1px solid ${props.theme.alpha(props.theme.vars.palette.text.primary, 0.125)}`,
             // Targets TableCell specifically when it is a 'head' cell
             "&.MuiTableCell-head": {
               backgroundColor: props.theme.vars.palette.background.default,
