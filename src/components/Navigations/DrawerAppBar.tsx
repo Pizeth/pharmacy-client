@@ -269,7 +269,7 @@ const DesktopToolbar = styled(Toolbar, {
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
-}>(({ theme }) => ({
+}>(({ theme, open }) => ({
   flexGrow: 1,
   [theme.breakpoints.up("xs")]: {
     paddingTop: theme.spacing(5),
@@ -283,26 +283,38 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
     duration: theme.transitions.duration.leavingScreen,
   }),
   // marginLeft: `-${drawerWidth}px`,
-  marginLeft: `calc(-1 * ${drawerWidth})`,
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        transition: theme.transitions.create("margin", {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-        marginLeft: 0,
-      },
-    },
-  ],
+  // marginLeft: `calc(-1 * ${drawerWidth})`,
+  // variants: [
+  //   {
+  //     props: ({ open }) => open,
+  //     style: {
+  //       transition: theme.transitions.create("margin", {
+  //         easing: theme.transitions.easing.easeOut,
+  //         duration: theme.transitions.duration.enteringScreen,
+  //       }),
+  //       marginLeft: 0,
+  //     },
+  //   },
+  // ],
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth})`,
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
 }));
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
 
-const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
+const Drawer = styled(MuiDrawer, {
+  name: PREFIX,
+  slot: "Drawer",
+  overridesResolver: (_props, styles) => styles.drawer,
+})<DrawerProps>(({ theme }) => ({
   width: drawerWidth,
   flexShrink: 0,
   "& .MuiDrawer-paper": {
@@ -312,13 +324,15 @@ const Drawer = styled(MuiDrawer)<DrawerProps>(({ theme }) => ({
     // maxWidth: 300,
     display: "flex",
     flexDirection: "column",
-    Height: "100%",
+    height: "100%",
     background: `
       linear-gradient(135deg, 
       ${alpha(theme.palette.primary.main, 0.1)}, 
       ${alpha(theme.palette.secondary.main, 0.1)})
     `,
   },
+  backdropFilter: "blur(10px)", // Optional: makes the transparent drawer look premium
+  borderRight: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
   [theme.breakpoints.up("sm")]: {
     display: "none",
   },
@@ -1056,14 +1070,20 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         </Container>
       </AppBar>
       <Drawer
-        variant="persistent"
+        // variant="persistent"
+        variant="temporary"
         anchor="left"
         open={open}
         onClose={handleDrawerToggle}
         // onOpen={toggleDrawer}
-        // ModalProps={{
-        //   keepMounted: true, // Better open performance on mobile.
-        // }}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        slotProps={{
+          backdrop: {
+            sx: { backgroundColor: "transparent" },
+          },
+        }}
       >
         {drawer}
       </Drawer>
