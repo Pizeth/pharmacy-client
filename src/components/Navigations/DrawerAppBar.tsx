@@ -2,6 +2,8 @@
 import { Fragment, ReactNode, useEffect, useState } from "react";
 import {
   Avatar,
+  Backdrop,
+  BackdropProps,
   Button,
   Container,
   InputBase,
@@ -221,21 +223,102 @@ const Underline = styled(Box, {
   overridesResolver: (_props, styles) => styles.underline,
 })(({ theme }) => ({
   position: "absolute",
-  bottom: 0,
+  // bottom: 0,
+  // left: 0,
+  // width: "100%",
+  // height: "4px", // The maximum thickness in the middle
+  bottom: "-10px",
+  left: "0",
+  width: "100%",
+  height: "2px", // Thin like a PCB trace
+  background: `linear-gradient(90deg, 
+    #edad54 0%, 
+    #edad54 70%, 
+    transparent 100%)`,
+
+  // The "Node" or "Pad" at the start of the circuit
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    left: "-4px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    width: "8px",
+    height: "8px",
+    backgroundColor: "#edad54",
+    borderRadius: "50%",
+    boxShadow: `0 0 10px #edad54`, // Glow for the node
+  },
+
+  // The angled "tail" at the end
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    right: "10%",
+    top: "-4px",
+    width: "20%",
+    height: "2px",
+    backgroundColor: "#edad54",
+    // This creates the 45-degree circuit bend
+    transform: "rotate(45deg)",
+    transformOrigin: "left center",
+    opacity: 0.6,
+  },
+
+  // Optional: Add a subtle pulse to the "trace"
+  // animation: `${makePulseKeyframes([
+  //   { offset: 0, opacity: 0.8 },
+  //   { offset: 0.5, opacity: 1 },
+  //   { offset: 1, opacity: 0.8 },
+  // ])} 3s infinite`,
+  // filter: `drop-shadow(${theme.vars.palette.customShadows.neumorphic})`,
+}));
+
+const CircuitTrace = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  bottom: "-12px",
+  left: "0",
+  width: "100%",
+  height: "15px",
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0 10 L70 10 L80 18 L100 18' stroke='%23edad54' stroke-width='2' fill='none'/%3E%3Ccircle cx='2' cy='10' r='2' fill='%23edad54'/%3E%3C/svg%3E")`,
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "100% 100%",
+  filter: "drop-shadow(0px 0px 3px rgba(237, 173, 84, 0.6))",
+}));
+
+const MPTCCircuitLine = styled(Box, {
+  name: PREFIX,
+  slot: "Underline",
+})(({ theme }) => ({
+  position: "absolute",
+  // bottom: "-16px",
   left: 0,
   width: "100%",
-  height: "4px", // The maximum thickness in the middle
-  backgroundColor: "#fdb913", // The official MPTC gold/orange
+  height: "10px",
+  margin: theme.spacing(2, 0),
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 20' preserveAspectRatio='none'%3E%3C!-- Main horizontal line --%3E%3Cline x1='14' y1='14' x2='360' y2='14' stroke='%23F07820' stroke-width='2'/%3E%3C!-- Diagonal step UP --%3E%3Cline x1='360' y1='14' x2='382' y2='4' stroke='%23F07820' stroke-width='2'/%3E%3C!-- Short top-level line to end circle --%3E%3Cline x1='382' y1='4' x2='492' y2='4' stroke='%23F07820' stroke-width='2'/%3E%3C!-- Left filled circle (start) --%3E%3Ccircle cx='8' cy='14' r='5' fill='%23F07820'/%3E%3C!-- First hollow node --%3E%3Ccircle cx='140' cy='14' r='4.5' fill='black' stroke='%23F07820' stroke-width='2'/%3E%3C!-- Second hollow node --%3E%3Ccircle cx='270' cy='14' r='4.5' fill='black' stroke='%23F07820' stroke-width='2'/%3E%3C!-- Right end hollow circle --%3E%3Ccircle cx='494' cy='4' r='5' fill='black' stroke='%23F07820' stroke-width='2'/%3E%3C/svg%3E")`,
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "100% 100%",
 
-  /* This Clip-Path creates the "tapered" look:
-         Starts thin at the left, gets thick in the middle,
-         and ends thin at the right.
-      */
-  clipPath:
-    "polygon(0% 80%, 15% 40%, 50% 10%, 85% 40%, 100% 80%, 85% 100%, 50% 100%, 15% 100%)",
+  filter: "drop-shadow(0px 0px 3px rgba(240, 120, 32, 0.6))",
 
-  // Adds a very slight "glow" to mimic the site's look
-  filter: "drop-shadow(0px 0px 2px rgba(253, 185, 19, 0.5))",
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    inset: 0,
+    background:
+      "linear-gradient(90deg, transparent 20%, rgba(255,255,255,0.35) 50%, transparent 80%)",
+    backgroundSize: "200% 100%",
+    animation: "shimmer 3s linear infinite",
+    maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 20' preserveAspectRatio='none'%3E%3Cline x1='14' y1='14' x2='360' y2='14' stroke='black' stroke-width='2'/%3E%3Cline x1='360' y1='14' x2='382' y2='4' stroke='black' stroke-width='2'/%3E%3Cline x1='382' y1='4' x2='492' y2='4' stroke='black' stroke-width='2'/%3E%3Ccircle cx='8' cy='14' r='5' fill='black'/%3E%3Ccircle cx='140' cy='14' r='4.5' fill='black'/%3E%3Ccircle cx='270' cy='14' r='4.5' fill='black'/%3E%3Ccircle cx='494' cy='4' r='5' fill='black'/%3E%3C/svg%3E")`,
+    maskRepeat: "no-repeat",
+    maskSize: "100% 100%",
+  },
+
+  "@keyframes shimmer": {
+    "0%": { backgroundPosition: "200% 0" },
+    "100%": { backgroundPosition: "-200% 0" },
+  },
 }));
 
 const StackWrapper = styled(Stack, {
@@ -327,12 +410,17 @@ const Drawer = styled(MuiDrawer, {
     height: "100%",
     background: `
       linear-gradient(135deg, 
-      ${alpha(theme.palette.primary.main, 0.1)}, 
-      ${alpha(theme.palette.secondary.main, 0.1)})
+      ${theme.alpha(theme.vars.palette.primary.main, 0.1)}, 
+      ${theme.alpha(theme.vars.palette.secondary.main, 0.1)})
     `,
   },
-  backdropFilter: "blur(10px)", // Optional: makes the transparent drawer look premium
-  borderRight: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+  // backdropFilter: "blur(10px)", // Optional: makes the transparent drawer look premium
+  // borderRight: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.25)}`,
+  // pointerEvents: "auto",
+  // Ensure the Modal container doesn't interfere
+  "& .MuiModal-root": {
+    zIndex: theme.zIndex.drawer,
+  },
   [theme.breakpoints.up("sm")]: {
     display: "none",
   },
@@ -354,6 +442,19 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   // button: {
   //   padding: 0,
   // },
+}));
+
+const TransparentBackdrop = styled(Backdrop)<BackdropProps>(({ theme }) => ({
+  // Make it invisible
+  backgroundColor: "rgba(0, 0, 0, 0)",
+  // Ensure it doesn't have a flash of gray on entry
+  transition: theme.transitions.create("opacity", {
+    duration: theme.transitions.duration.standard,
+  }),
+  // This ensures it doesn't block the "blur" layer of the paper
+  zIndex: -1,
+  // Disable the default "dim" look
+  WebkitTapHighlightColor: "transparent",
 }));
 
 const Search = styled("div")(({ theme }) => ({
@@ -915,7 +1016,8 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                     <Typography variant="h6">អគ្គលេខាធិការដ្ឋាន</Typography>
 
                     {/* The Orange Tapered Underline (Swoosh) */}
-                    <Underline />
+                    {/* <Underline /> */}
+                    <MPTCCircuitLine />
                   </CaptionWrapper>
                   <Typography variant="h6">General Secretariat</Typography>
                 </LogoCaption>
@@ -1079,11 +1181,13 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         ModalProps={{
           keepMounted: true, // Better open performance on mobile.
         }}
-        slotProps={{
-          backdrop: {
-            sx: { backgroundColor: "transparent" },
-          },
+        slots={{
+          backdrop: TransparentBackdrop,
         }}
+        // This is CRUCIAL for backdropFilter to work correctly in Modals
+        // Prevents focus trapping from interfering with the transparent click layer
+        disableEnforceFocus
+        disableScrollLock={false}
       >
         {drawer}
       </Drawer>
