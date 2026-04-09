@@ -197,22 +197,34 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       ],
     },
     palette: {
+      // primary: {
+      //   main: "#e1232e",
+      //   dark: "#e1232e",
+      //   light: "#DC143C",
+      //   contrastText: "#fff",
+      // },
+      // secondary: { main: "#007bff" },
+      // error: { main: "#f58700" },
+      // warning: { main: "#FFD22B" },
+      // info: { main: "#f89696" },
+      // success: { main: "#2ece71", contrastText: "#fff" },
       primary: {
-        main: "#e1232e",
-        dark: "#e1232e",
+        dark: "#ef4444",
+        main: "#dc2626",
         light: "#DC143C",
         contrastText: "#fff",
       },
-      secondary: { main: "#007bff" },
-      error: { main: "#f58700" },
-      warning: { main: "#FFD22B" },
-      info: { main: "#f89696" },
-      success: { main: "#2ece71", contrastText: "#fff" },
+      secondary: { dark: "#2563eb", main: "#3b82f6", contrastText: "#fff" },
+      error: { dark: "#f58700", main: "#c26a00", contrastText: "#fff" },
+      warning: { dark: "#eab308", main: "#ca8a04", contrastText: "#fff" },
+      // info: { dark: "#9333ea", main: "#7e22ce", contrastText: "#fff" },
+      info: { dark: "#6366f1", main: "#4338ca", contrastText: "#fff" },
+      success: { dark: "#22c55e", main: "#16a34a", contrastText: "#fff" },
       common: {
         white: "#ffffff",
-        // whiteChannel: "255 255 255", // Add this
+        whiteChannel: "255 255 255", // Add this
         black: "#000000",
-        // blackChannel: "0 0 0", // Add this
+        blackChannel: "0 0 0", // Add this
       },
       // divider: "rgba(0, 0, 0, 0.12)",
 
@@ -220,12 +232,14 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       // background: { default: "#f4f6f8", paper: "#ecf0f3" },
       // background: { default: "#d1d9e6", paper: "#dfeafd" },
       background: { default: "#d3e1f7", paper: "#e0eafd" },
+      // background: { default: "#d3e1f7", paper: "#e6e9ef" },
       customShadows: {
         neumorphic: `-7px -7px 15px rgba(255, 255, 255, 1), 7px 7px 15px rgba(174, 174, 192, 0.4)`,
         inset: `inset -5px -5px 10px rgba(255, 255, 255, 1), inset 5px 5px 10px rgba(174, 174, 192, 0.4)`,
         circleWell:
           // "inset 6px 6px 15px rgba(163, 177, 198, 0.5), inset -6px -6px 15px rgba(255, 255, 255, 1)",
-          "-7px -7px 15px rgba(255,255,255,1), 7px 7px 15px rgba(174, 174, 192, 0.5)",
+          "-7px -7px 15px rgba(255,255,255,1), 7px 7px 15px rgba(174, 174, 192, 0.75)",
+        // "-8px -8px 16px #ffffff, 8px 8px 16px #b8bcc2",
       },
       card: "#adc4eb", // White for dark mode
       // background: {
@@ -273,21 +287,33 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         palette: {
           // primary: {
           //   main: "#e1232e",
-          //   // dark: "#e1232e",
-          //   // light: "#007bff",
-          //   // contrastText: "#fff",
+          //   dark: "#e1232e",
+          //   light: "#DC143C",
+          //   contrastText: "#fff",
           // },
+          // secondary: { main: "#007bff" },
+          // error: { main: "#f58700" },
+          // warning: { main: "#FFD22B" },
+          // info: { main: "#f89696" },
+          // success: { main: "#2ece71", contrastText: "#fff" },
           primary: {
-            main: "#e1232e",
-            dark: "#e1232e",
+            main: "#ef4444",
+            dark: "#dc2626",
             light: "#DC143C",
             contrastText: "#fff",
           },
-          secondary: { main: "#007bff" },
-          error: { main: "#f58700" },
-          warning: { main: "#FFD22B" },
-          info: { main: "#f89696" },
-          success: { main: "#2ece71", contrastText: "#fff" },
+          secondary: { main: "#2563eb", dark: "#3b82f6", contrastText: "#fff" },
+          error: { main: "#f58700", dark: "#c26a00", contrastText: "#fff" },
+          warning: { main: "#eab308", dark: "#ca8a04", contrastText: "#fff" },
+          // info: { main: "#9333ea", dark: "#7e22ce", contrastText: "#fff" },
+          info: { main: "#6366f1", dark: "#4338ca", contrastText: "#fff" },
+          success: { main: "#22c55e", dark: "#16a34a", contrastText: "#fff" },
+          common: {
+            white: "#ffffff",
+            whiteChannel: "255 255 255", // Add this
+            black: "#000000",
+            blackChannel: "0 0 0", // Add this
+          },
           background: {
             // default: "#121212",
             // paper: "#1e1e1e",
@@ -303,6 +329,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
             circleWell:
               // "inset 6px 6px 15px rgba(0, 0, 0, 0.6), inset -6px -6px 15px rgba(255, 255, 255, 0.05)",
               "-7px -7px 15px rgba(255,255,255,0.125), 7px 7px 15px rgba(0, 0, 0, 0.75)",
+            // "-8px -8px 16px #4b5563, 8px 8px 16px #111827",
           },
           text: {
             primary: "#ffffff",
@@ -789,10 +816,11 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           },
           h6: {
             fontFamily: [
-              "Roboto",
-              "Helvetica",
-              "sans-serif",
+              // "Roboto",
+              // "Helvetica",
+              // "sans-serif",
               "var(--font-moul)",
+              "var(--font-google)",
             ].join(","),
           },
           h5: {

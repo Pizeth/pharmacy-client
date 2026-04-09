@@ -431,8 +431,8 @@ const NAV_ITEMS = [
   },
   {
     label: "អំពីក្រសួង",
-    Icon: <RazContact color="warning" fontSize="medium" />,
-    color: "warning",
+    Icon: <RazContact color="info" fontSize="medium" />,
+    color: "info",
     href: "/about",
   },
 ];

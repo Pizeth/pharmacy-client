@@ -64,6 +64,16 @@ const mef2 = localFont({
   variable: "--font-mef2",
 });
 
+const tactieng = localFont({
+  src: [
+    {
+      path: "../../public/fonts/Tacteing.ttf",
+      style: "normal",
+    },
+  ],
+  variable: "--font-tactieng",
+});
+
 const interKhmerLooped = localFont({
   src: [
     {
@@ -146,7 +156,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} ${kantumruy.variable} ${montserrat.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} ${kantumruy.variable} ${montserrat.variable} ${tactieng.variable} antialiased`}
       >
         {/* {children} */}
         {/* <ThemeProvider theme={darkTheme}>{children}</ThemeProvider> */}

@@ -35,7 +35,7 @@ import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
 import ThemeToggle from "../effect/themes/themeToggle";
 import RielIcon from "../icons/riel";
 import RazHome from "../icons/home";
-import { filt, hi, hii, wee } from "@/theme/keyframes";
+import { filt, hi, hii, shimmerText, wee } from "@/theme/keyframes";
 import { makePulseKeyframes } from "@/utils/themeUtils";
 import NavigationMenu from "./Navigation/NavigationMenu";
 import RazPeople from "../icons/people";
@@ -58,6 +58,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import GlobalSearch from "./Search/search";
 import ParticleContainer from "@/theme/effects/particle";
 import { UserMenu } from "./UserSetting/Settings";
+import { th } from "date-fns/locale";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
@@ -177,43 +178,86 @@ const LogoCaption = styled(Box, {
   overridesResolver: (_props, styles) => styles.caption,
 })(({ theme }) => ({
   textAlign: "center",
-  color: "#edad54",
-  textShadow: `
-    -0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
-    0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
-    -0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
-    0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
-    0    0   7px ${theme.vars.palette.text.primary}
-  `,
+  position: "relative",
+  display: "inline-block",
+  zIndex: 1,
+  // color: "#edad54",
+  // textShadow: `
+  //   -0.5px -0.5px 0 ${theme.vars.palette.common.black},
+  //   0.5px -0.5px 0 ${theme.vars.palette.common.black},
+  //   -0.5px  0.5px 0 ${theme.vars.palette.common.black},
+  //   0.5px  0.5px 0 ${theme.vars.palette.common.black},
+  //   0    0   7px ${theme.alpha(theme.vars.palette.text.primary, 0.75)}
+  // `,
   // WebkitTextStroke: `0.125px ${theme.vars.palette.text.primary}`,
+  // h6: {
+  //   Padding: `${theme.spacing(0.5)} 0`,
+  //   lineHeight: 2.5,
+  //   fontSize: { xs: "0.75rem", md: "0.925rem" },
+  //   fontWeight: 700,
+  //   textTransform: "uppercase",
+  //   letterSpacing: "0.5px",
+
+  //   [theme.breakpoints.up("xs")]: {
+  //     fontSize: "0.75rem",
+  //   },
+  //   [theme.breakpoints.up("md")]: {
+  //     fontSize: "0.925rem",
+  //   },
+  // },
+
+  // 1. SHIMMER EFFECT
+  background: "linear-gradient(90deg, #edad54 45%, #ffffff 55%, #edad54 60%)",
+  backgroundSize: "200% auto",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  animation: `${shimmerText} 10s linear infinite`,
+
+  // 2. THE FIX: Use filter instead of text-shadow
+  // This applies a shadow to the "cut out" text shape
+  filter: `
+    drop-shadow(-0.125px -0.125px 0 ${theme.alpha(theme.vars.palette.common.black, 0.375)})
+    drop-shadow(0.125px -0.125px 0 ${theme.alpha(theme.vars.palette.common.black, 0.375)})
+    drop-shadow(-0.125px 0.125px 0 ${theme.alpha(theme.vars.palette.common.black, 0.375)})
+    drop-shadow(0.125px 0.125px 0 ${theme.alpha(theme.vars.palette.common.black, 0.375)})
+    drop-shadow(0 0 5px ${theme.alpha(theme.vars.palette.text.primary, 0.5)})
+  `,
+
   h6: {
     Padding: `${theme.spacing(0.5)} 0`,
     lineHeight: 2.5,
     fontSize: { xs: "0.75rem", md: "0.925rem" },
-    fontWeight: 700,
+    // fontFamily: "var(--font-google)",
+    // fontWeight: 700,
     textTransform: "uppercase",
     letterSpacing: "0.5px",
-    [theme.breakpoints.up("xs")]: {
-      fontSize: "0.75rem",
-    },
-    [theme.breakpoints.up("md")]: {
-      fontSize: "0.925rem",
-    },
-  },
-}));
 
-const CaptionWrapper = styled(Stack, {
-  name: PREFIX,
-  slot: "CaptionWrapper",
-  overridesResolver: (_props, styles) => styles.captionWrapper,
-})(({ theme }) => ({
-  display: "inline-block",
-  position: "relative",
-  h6: {
-    [theme.breakpoints.up("md")]: {
-      fontSize: "1rem",
-    },
-    fontWeight: 500,
+    // [theme.breakpoints.up("xs")]: {
+    //   fontSize: "0.75rem",
+    // },
+    // [theme.breakpoints.up("md")]: {
+    //   fontSize: "0.925rem",
+    // },
+    // [theme.breakpoints.up("md")]: {
+    //   fontSize: "1rem",
+    // },
+    // fontWeight: 500,
+  },
+  h5: {
+    fontFamily: "var(--font-tactieng)",
+    fontWeight: "500",
+    fontSize: "2.5rem",
+    lineHeight: 0.125,
+  },
+  "& .MuiTypography-subtitle1": {
+    fontFamily: "var(--font-google)",
+  },
+
+  // Ensure children inherit the background-clip
+  "& *": {
+    background: "inherit",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
   },
 }));
 
@@ -807,7 +851,9 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
             p: 2,
             borderRadius: 2,
             mb: 2,
-            border: "1px solid rgba(255,255,255,0.05)",
+            border: (theme) =>
+              `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.05)}`,
+            boxShadow: (theme) => theme.vars.palette.customShadows.neumorphic,
           }}
         >
           <Typography
@@ -833,7 +879,10 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
           <Typography
             variant="caption"
             sx={{
-              color: "#6366f1",
+              // color: "#4338ca",
+              // color: "#818cf8",
+              // color: "#6366f1",
+              color: (theme) => theme.vars.palette.info.main,
               mt: 1,
               display: "block",
               cursor: "pointer",
@@ -1011,15 +1060,12 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 </NavMenuButton>
 
                 {/* Logo Title */}
-                <LogoCaption>
-                  <CaptionWrapper>
-                    <Typography variant="h6">អគ្គលេខាធិការដ្ឋាន</Typography>
-
-                    {/* The Orange Tapered Underline (Swoosh) */}
-                    {/* <Underline /> */}
-                    <MPTCCircuitLine />
-                  </CaptionWrapper>
-                  <Typography variant="h6">General Secretariat</Typography>
+                <LogoCaption data-text="General Secretariat">
+                  <Typography variant="h6">អគ្គលេខាធិការដ្ឋាន</Typography>
+                  <Typography variant="h5">3</Typography>
+                  <Typography variant="subtitle1">
+                    General Secretariat
+                  </Typography>
                 </LogoCaption>
               </LogoSection>
 

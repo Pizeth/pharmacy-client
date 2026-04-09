@@ -12,13 +12,13 @@ const Root = styled(Box, {
   alignItems: "center",
   gap: theme.spacing(1.5),
   margin: theme.spacing(0, 1.25),
-  padding: theme.spacing(0.5, 1.25, 0),
+  padding: theme.spacing(0.25, 0.75),
   // boxShadow: `3px 3px 15px ${theme.vars.palette.background.default}, -3px -3px 15px rgb(58, 58, 58)`,
   // Formula: [Top-Left Highlight], [Bottom-Right Shadow]
   // Use the CSS variable created by colorSchemes
   boxShadow: theme.vars.palette.customShadows.neumorphic,
   border: `0.5px solid ${theme.alpha(theme.vars.palette.text.primary, 0.05)}`, // Subtle edge highlight
-  borderRadius: "3rem",
+  borderRadius: "50px",
   backgroundColor: theme.alpha(theme.vars.palette.background.paper, 0.775),
   // transition: "box-shadow 0.00125s ease-in-out",
   "& .MuiBox-root": {

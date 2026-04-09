@@ -422,6 +422,11 @@ export const shimmer = keyframes`
   100% { opacity: 0.3; transform: translateY(0px); }
 `;
 
+export const shimmerText = keyframes`
+  0% { background-position: 200% 0; }
+  100%" { background-position: -200% 0; }
+`;
+
 // ─── Theme Toggle Animation ─── //
 
 export const sunPulse = keyframes`
