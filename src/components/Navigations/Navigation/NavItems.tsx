@@ -58,15 +58,26 @@ const NavList = styled(List, {
   name: PREFIX,
   slot: "List",
   overridesResolver: (_props, styles) => styles.list,
-})<{ variant?: "vertical" | "horizontal" }>(({ variant = "vertical" }) => ({
-  position: "relative",
-  // display: "inline-flex",
-  display: variant === "vertical" ? "flex" : "block",
-  height: "100%",
-  padding: 0,
-  margin: 0,
-  listStyle: "none",
-}));
+})<{ variant?: "vertical" | "horizontal" }>(
+  ({ theme, variant = "vertical" }) => ({
+    position: "relative",
+    // display: "inline-flex",
+    display: variant === "vertical" ? "flex" : "block",
+    // backgroundImage:
+    //   variant === "vertical"
+    //     ? theme.alpha(theme.vars.palette.background.paper, 0.15)
+    //     : "transparent",
+    // backgroundImage:
+    //   variant === "vertical"
+    //     ? `linear-gradient(180deg, transparent 0%, ${theme.alpha(theme.vars.palette.background.paper, 0.75)} 100%)`
+    //     : "transparent",
+
+    height: "100%",
+    padding: 0,
+    margin: 0,
+    listStyle: "none",
+  }),
+);
 
 const NavItem = styled(ListItem, {
   name: PREFIX,
@@ -133,6 +144,10 @@ const NavItem = styled(ListItem, {
       // backgroundPosition: "0 100%",
       transition: "all 0.25s ease-in",
       a: { color: active ? "inherit" : resolved },
+      // backgroundImage:
+      //   variant === "vertical"
+      //     ? `linear-gradient(180deg, transparent 0%, ${theme.alpha(theme.vars.palette.background.paper, 0.75)} 100%)`
+      //     : "transparent",
     },
 
     "&::after": {

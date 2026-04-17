@@ -33,8 +33,8 @@ export const RazethLoginOptimized = {
       // padding: props.theme.spacing(2),
       backgroundColor:
         props.theme.palette.mode === "dark"
-          ? props.theme.palette.grey[900]
-          : props.theme.palette.grey[100],
+          ? props.theme.vars.palette.grey[900]
+          : props.theme.vars.palette.grey[100],
       // // backgroundImage: `
       // //   repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
       // //   repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
@@ -856,7 +856,7 @@ export const RazethLoginOptimized = {
           backgroundColor:
             theme.palette.mode === "dark"
               ? theme.palette.grey[800]
-              : theme.palette.background.paper,
+              : theme.vars.palette.background.paper,
         },
       }),
     },
@@ -876,7 +876,7 @@ export const RazethLoginOptimized = {
           backgroundColor:
             theme.palette.mode === "dark"
               ? theme.palette.grey[900]
-              : theme.palette.background.paper,
+              : theme.vars.palette.background.paper,
         },
       }),
     },

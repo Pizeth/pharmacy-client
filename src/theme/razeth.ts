@@ -695,6 +695,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
             // ...(props.theme.palette.mode === "dark" && {
             //   // Shorthand resets backgroundColor + backgroundImage together
             backgroundImage: `linear-gradient(45deg, ${theme.vars.palette.background.paper} 0%, ${theme.vars.palette.error.main} 50%, #870000 100%)`,
+            // backgroundImage: `linear-gradient(45deg, #870000 0%, ${theme.vars.palette.error.main} 50%, ${theme.vars.palette.background.paper} 100%)`,
             borderBottom: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.125)}`,
             // backgroundImage: `linear-gradient(45deg, #190a05 0%, #870000 100%)`,
             //   backgroundColor: "red",
