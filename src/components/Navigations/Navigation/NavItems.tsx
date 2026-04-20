@@ -247,8 +247,13 @@ const NavLink = styled(Link, {
   slot: "Link",
   overridesResolver: (_props, styles) => styles.link,
   shouldForwardProp: (prop) => prop !== "active" && prop !== "color",
-})<{ color: string; active?: boolean }>(({ theme, color, active }) => {
+})<{
+  color: string;
+  active?: boolean;
+  variant?: "vertical" | "horizontal";
+}>(({ theme, color, active, variant = "vertical" }) => {
   const resolved = resolveColor(color, theme); // 👈 resolve here
+  console.log("Resolved alignment for", variant);
   return {
     position: "relative",
     display: "inline-flex",
@@ -264,9 +269,13 @@ const NavLink = styled(Link, {
 
     /* new style */
     // display: "inline-block",
-    color: active
-      ? theme.vars.palette.common.white
-      : theme.vars.palette.text.primary,
+    // color: active
+    //   ? theme.vars.palette.common.white
+    //   : theme.vars.palette.text.primary,
+    color:
+      variant === "vertical"
+        ? theme.vars.palette.common.white
+        : theme.vars.palette.text.primary,
     // color: theme.vars?.palette?.text?.primary ?? theme.palette.text.primary,
     fontSize: "1rem",
     // padding: "12.7px 12.7px",
@@ -472,7 +481,12 @@ export const NavItems = ({
             active={resolvedIndex === i}
             variant={variant}
           >
-            <NavLink href={href} color={color} active={resolvedIndex === i}>
+            <NavLink
+              href={href}
+              color={color}
+              variant={variant}
+              active={resolvedIndex === i}
+            >
               <NavIcon variant={variant}>{Icon}</NavIcon>
               {/* {Icon} */}
               <NavText

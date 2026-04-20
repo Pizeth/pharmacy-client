@@ -57,6 +57,8 @@ import MsgUtils from "@/utils/msgUtils";
 import formatLocaleDate, { formatLocalTime } from "@/utils/dateUtils";
 import NAIcon from "../icons/na";
 
+const PREFIX = "RazethTable";
+
 const Root = styled(Box)(({ theme }) => ({
   width: "100%",
   // typography: "body1",
@@ -179,6 +181,34 @@ const DetailPane = styled(Box)(({ theme }) => ({
   td: {
     fontFamily: "var(--font-interkhmerloopless)",
   },
+}));
+
+const AddButton = styled(Button, {
+  name: PREFIX,
+  slot: "button",
+  overridesResolver: (_props, styles) => styles.button,
+})(({ theme }) => ({
+  borderRadius: "50px",
+  "&.MuiButton-contained": {
+    color: theme.palette.common.white,
+  },
+}));
+
+const DateBox = styled("span", {
+  name: PREFIX,
+  slot: "caption",
+  shouldForwardProp: (prop: string) => prop !== "value",
+  overridesResolver: (_props, styles) => styles.caption,
+})<{ value: number }>(({ theme, value }) => ({
+  color:
+    value < 7
+      ? theme.vars.palette.text.primary
+      : value >= 7 && value < 30
+        ? theme.palette.warning.main
+        : theme.palette.error.dark,
+  borderRadius: "0.25rem",
+  maxWidth: "5ch",
+  p: "0.25rem",
 }));
 
 const MenuBox = styled(Box)(({ theme }) => ({}));
@@ -407,8 +437,9 @@ export default function DocumentTable() {
         Cell: ({ cell }) => {
           const value = cell.getValue<number>();
           return (
-            <Box
-              component="span"
+            <DateBox
+              // component="span"
+              value={value}
               // color={
               //   value < 7
               //     ? "success"
@@ -416,21 +447,21 @@ export default function DocumentTable() {
               //       ? "warning"
               //       : "primary"
               // }
-              sx={(theme) => ({
-                color:
-                  value < 7
-                    ? theme.vars.palette.text.primary
-                    : value >= 7 && value < 30
-                      ? theme.palette.warning.dark
-                      : theme.palette.error.dark,
-                borderRadius: "0.25rem",
-                // color: "#fff",
-                maxWidth: "5ch",
-                p: "0.25rem",
-              })}
+              // sx={(theme) => ({
+              //   color:
+              //     value < 7
+              //       ? theme.vars.palette.text.primary
+              //       : value >= 7 && value < 30
+              //         ? theme.palette.warning.main
+              //         : theme.palette.error.dark,
+              //   borderRadius: "0.25rem",
+              //   // color: "#fff",
+              //   maxWidth: "5ch",
+              //   p: "0.25rem",
+              // })}
             >
               {MsgUtils.toLocaleNumerals(value, "km-KH")}ថ្ងៃ
-            </Box>
+            </DateBox>
           );
         },
       },
@@ -567,40 +598,40 @@ export default function DocumentTable() {
     },
 
     //add custom action buttons to top-left of top toolbar
-    renderTopToolbarCustomActions: ({ table }) => (
-      <Box>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          color="secondary"
-          type="button"
-          onClick={handleDialogForm}
-          sx={{ borderRadius: "50px" }}
-        >
-          <Typography variant="body2">
-            <strong>បញ្ចូលឯកសារថ្មី</strong>
-          </Typography>
-        </Button>
-        <Tooltip title="Delete">
-          <span>
-            <IconButton
-              color="primary"
-              onClick={(e) => {
-                e.stopPropagation();
-                const selectedIds = Object.keys(
-                  table.getState().rowSelection,
-                ).map((id) => parseInt(id, 10));
-                console.log(selectedIds);
-                handleDelete(selectedIds);
-              }}
-              disabled={!table.getIsSomeRowsSelected()}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-      </Box>
-    ),
+    // renderTopToolbarCustomActions: ({ table }) => (
+    //   <Box>
+    //     <Button
+    //       variant="contained"
+    //       startIcon={<Add />}
+    //       color="secondary"
+    //       type="button"
+    //       onClick={handleDialogForm}
+    //       sx={{ borderRadius: "50px" }}
+    //     >
+    //       <Typography variant="body2">
+    //         <strong>បញ្ចូលឯកសារថ្មី</strong>
+    //       </Typography>
+    //     </Button>
+    //     <Tooltip title="Delete">
+    //       <span>
+    //         <IconButton
+    //           color="primary"
+    //           onClick={(e) => {
+    //             e.stopPropagation();
+    //             const selectedIds = Object.keys(
+    //               table.getState().rowSelection,
+    //             ).map((id) => parseInt(id, 10));
+    //             console.log(selectedIds);
+    //             handleDelete(selectedIds);
+    //           }}
+    //           disabled={!table.getIsSomeRowsSelected()}
+    //         >
+    //           <DeleteIcon />
+    //         </IconButton>
+    //       </span>
+    //     </Tooltip>
+    //   </Box>
+    // ),
 
     // renderToolbarInternalActions: ({ table }) => (
     //   <Box>
@@ -891,7 +922,7 @@ export default function DocumentTable() {
             p: (theme) => theme.spacing(1),
           }}
         >
-          <Button
+          <AddButton
             variant="contained"
             startIcon={<Add />}
             // fullWidth
@@ -900,12 +931,11 @@ export default function DocumentTable() {
             // autoFocus
             type="button"
             onClick={handleDialogForm}
-            sx={{ borderRadius: "50px" }}
           >
             <Typography variant="body2">
               <strong>បញ្ចូលឯកសារថ្មី</strong>
             </Typography>
-          </Button>
+          </AddButton>
         </Box>
         <MRT_GlobalFilterTextField table={table} />
         <Box>
