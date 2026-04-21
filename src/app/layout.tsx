@@ -6,6 +6,7 @@ import { Siemreap, Moul } from "next/font/google";
 import { darkTheme } from "@/theme/razeth";
 import ThemeProviderWrapper from "@/components/effect/themes/theme-wrapper";
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
+import RefineContext from "./refineContext";
 // import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 // import { useEffect, useState } from "react";
 
@@ -163,7 +164,7 @@ export default function RootLayout({
         {/* <AppRouterCacheProvider>{children}+ </AppRouterCacheProvider> */}
         <InitColorSchemeScript attribute="class" /> {/* ← before everything */}
         <ThemeProviderWrapper theme={darkTheme}>
-          {children}
+          <RefineContext>{children}</RefineContext>
         </ThemeProviderWrapper>
       </body>
     </html>

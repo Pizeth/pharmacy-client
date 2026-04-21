@@ -10,13 +10,23 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  // 1. Global Ignores (Must be the first object and only contain 'ignores')
   {
+    ignores: [".next/*", "node_modules/*", "dist/*"],
+  },
+
+  // 2. Base Next.js & TS Configs
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+
+  // 3. Custom Rule Overrides
+  {
+    name: "pharmacy-client-overrides",
     rules: {
       "@typescript-eslint/no-unused-vars": [
         "warn",
         { argsIgnorePattern: "^_" },
       ],
+      // During migration, you might want to keep these off to avoid noise
       // "@typescript-eslint/no-explicit-any": "off",
       // "react/display-name": "off",
     },

@@ -253,7 +253,6 @@ const NavLink = styled(Link, {
   variant?: "vertical" | "horizontal";
 }>(({ theme, color, active, variant = "vertical" }) => {
   const resolved = resolveColor(color, theme); // 👈 resolve here
-  console.log("Resolved alignment for", variant);
   return {
     position: "relative",
     display: "inline-flex",

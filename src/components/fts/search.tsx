@@ -15,10 +15,12 @@ import { FormProvider, useForm } from "react-hook-form";
 import EnhancedTable from "./table";
 import StickyFAB from "../CustomComponents/StickyFab";
 import DocumentTable from "./mrtTable";
+import { Authenticated } from "@refinedev/core";
 
 export default function AdministrativeForm() {
   const methods = useForm();
   return (
+    // <Authenticated key="fts" appendCurrentPathToQuery={false}>
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* --- HEADER --- */}
       <Box
