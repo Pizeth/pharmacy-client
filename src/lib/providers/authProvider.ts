@@ -25,10 +25,10 @@ export const authProvider: AuthProvider = {
     try {
       const { data: session } = await authClient.getSession();
       if (session) return { authenticated: true };
-      return { authenticated: false, redirectTo: "/login" };
+      return { authenticated: false };
     } catch (error) {
-      //   console.error("Error checking authentication: ", error);
-      return { authenticated: false, redirectTo: "/login" };
+      // console.error("Error checking authentication: ", error);
+      return { authenticated: false };
     }
     // const { data: session } = await authClient.useSession();
     // const { data: session } = await authClient.getSession();

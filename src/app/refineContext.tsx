@@ -21,7 +21,7 @@ export const RefineContext = ({ children }: { children: React.ReactNode }) => {
       resources={[
         {
           name: "dashboard",
-          list: "/",
+          list: "/dashboard",
           meta: { label: "ផ្ទាំងសូចនាករ" }, // Example Khmer label
         },
         {

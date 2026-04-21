@@ -13,15 +13,23 @@ import { getSessionCookie } from "better-auth/cookies";
 // };
 
 // Add any route that should be visible without logging in
-const PUBLIC_ROUTES = ["/", "/login", "/register", "/public-stats"];
+const PUBLIC_ROUTES = ["/", "/fts", "/login", "/register", "/public-stats"];
 
-export default async function middleware(request: NextRequest) {
-  const sessionCookie = getSessionCookie(request);
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  console.log("Middleware: Incoming request for path:", request.nextUrl);
+  console.log("Middleware: Checking authentication for path:", pathname);
+  // console.log("Middleware:  path:", request.url);
 
-  const isPublicRoute = PUBLIC_ROUTES.some((route) =>
-    pathname.startsWith(route),
+  const isPublicRoute = PUBLIC_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
+
+  console.log("Middleware: Is public route?", isPublicRoute);
+
+  if (isPublicRoute) return NextResponse.next();
+
+  const sessionCookie = getSessionCookie(request);
 
   // Redirect to login if not authenticated and trying to access a private route
   if (!sessionCookie && !isPublicRoute) {
@@ -37,5 +45,6 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  // Update matcher to exclude internal Next.js and Chrome paths
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.well-known).*)"],
 };
