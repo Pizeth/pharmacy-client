@@ -1,6 +1,6 @@
 "use client";
 
-import { useLogin } from "@refinedev/core";
+import { AuthPage, useLogin } from "@refinedev/core";
 import {
   Box,
   Button,
@@ -10,10 +10,48 @@ import {
   Paper,
   Alert,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { AuthForm } from "@/components/auth/authForm";
 
-export default function LoginPage() {
+export function useAuthRedirect() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const check = async () => {
+      const res = await fetch("/api/auth/me");
+
+      if (res.ok) {
+        router.push("/");
+      }
+    };
+
+    check();
+  }, [router]);
+}
+
+type LoginForm = {
+  email: string;
+  password: string;
+};
+
+export function LoginPage() {
   const { mutate: login, isPending, error } = useLogin();
+  // const {
+  //   control,
+  //   handleSubmit,
+  //   formState: { errors },
+  // } = useForm<LoginForm>({
+  //   defaultValues: {
+  //     email: "",
+  //     password: "",
+  //   },
+  // });
+
+  // const onSubmit = (values: LoginForm) => {
+  //   login(values);
+  // };
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -23,6 +61,7 @@ export default function LoginPage() {
   };
 
   return (
+    // <AuthPage type="login" formProps={{ onSubmit: handleSubmit }}>
     <Container component="main" maxWidth="xs">
       <Box
         sx={{
@@ -85,5 +124,18 @@ export default function LoginPage() {
         </Paper>
       </Box>
     </Container>
+  );
+}
+
+// login.tsx
+// import { AuthPage } from "@refinedev/mui";
+// import AvatarHeader from "@/components/auth/AvatarHeader";
+// import SideImage from "@/components/auth/SideImage";
+// import Footer from "@/components/auth/Footer";
+// import { AuthForm } from "@/components/auth/AuthForm";
+
+export default function LoginPageNew() {
+  return (
+    <AuthPage type="login" renderContent={() => <AuthForm mode="login" />} />
   );
 }

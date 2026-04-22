@@ -16,6 +16,8 @@ export const RefineContext = ({ children }: { children: React.ReactNode }) => {
       options={{
         syncWithLocation: true,
         warnWhenUnsavedChanges: true,
+        // Tell Refine where your auth pages live
+        disableTelemetry: true,
       }}
       /* Define your resources here */
       resources={[

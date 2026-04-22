@@ -7,8 +7,6 @@ import { darkTheme } from "@/theme/razeth";
 import ThemeProviderWrapper from "@/components/effect/themes/theme-wrapper";
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import RefineContext from "./refineContext";
-// import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-// import { useEffect, useState } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -137,30 +135,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const [mode, setMode] = useState("light");
-  // // Logic to toggle dark mode automatically based on official Tailwind guide
-  // useEffect(() => {
-  //   const isDark =
-  //     localStorage.theme === "dark" ||
-  //     (!("theme" in localStorage) &&
-  //       window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-  //   setMode(isDark ? "dark" : "light");
-
-  //   if (isDark) {
-  //     document.documentElement.classList.add("dark");
-  //   } else {
-  //     document.documentElement.classList.remove("dark");
-  //   }
-  // }, []);
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} ${kantumruy.variable} ${montserrat.variable} ${tactieng.variable} antialiased`}
       >
-        {/* {children} */}
-        {/* <ThemeProvider theme={darkTheme}>{children}</ThemeProvider> */}
         {/* <AppRouterCacheProvider>{children}+ </AppRouterCacheProvider> */}
         <InitColorSchemeScript attribute="class" /> {/* ← before everything */}
         <ThemeProviderWrapper theme={darkTheme}>
@@ -170,3 +149,20 @@ export default function RootLayout({
     </html>
   );
 }
+
+// const [mode, setMode] = useState("light");
+// // Logic to toggle dark mode automatically based on official Tailwind guide
+// useEffect(() => {
+//   const isDark =
+//     localStorage.theme === "dark" ||
+//     (!("theme" in localStorage) &&
+//       window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+//   setMode(isDark ? "dark" : "light");
+
+//   if (isDark) {
+//     document.documentElement.classList.add("dark");
+//   } else {
+//     document.documentElement.classList.remove("dark");
+//   }
+// }, []);

@@ -69,7 +69,14 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
     // console.log("Setting up validators", passwordValue);
     const normalizedValidate = Array.isArray(validate) ? validate : [validate];
     const baseValidators = [...normalizedValidate];
-    baseValidators.push(strengthMeter ? passwordValidator() : matchPassword());
+    // baseValidators.push(strengthMeter ? passwordValidator() : matchPassword());
+    if (strengthMeter) {
+      baseValidators.push(passwordValidator());
+    }
+
+    if (passwordValue) {
+      baseValidators.push(matchPassword());
+    }
     return baseValidators;
   }, [validate, strengthMeter, passwordValidator, matchPassword]);
 
@@ -84,7 +91,8 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
     parse,
     resource,
     source,
-    type: "text",
+    // type: "text",
+    type: visible ? "text" : "password",
     validate: validators,
     onBlur,
     onChange,
@@ -305,7 +313,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
     // Query the label element inside the container
     if (inputRef.current) {
       shakeRef.current = inputRef.current.querySelector(
-        ".MuiInputLabel-root"
+        ".MuiInputLabel-root",
       ) as HTMLLabelElement | null;
     }
   }, []);
@@ -355,7 +363,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
           EventHandlers.handleKeyboardEvent(
             EventHandlers.toKeyboardEvent(event),
             true,
-            setVisible
+            setVisible,
           );
           break;
         // Handle key release
@@ -363,7 +371,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
           EventHandlers.handleKeyboardEvent(
             EventHandlers.toKeyboardEvent(event),
             false,
-            setVisible
+            setVisible,
           );
           break;
         default:
@@ -371,7 +379,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
           break;
       }
     },
-    [handleMouseUp, handleTouchEnd]
+    [handleMouseUp, handleTouchEnd],
   );
 
   // Cleanup global event listeners on unmount
@@ -396,17 +404,21 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
   };
   const handleBlur = () => {
     setFocused(false);
+
+    const changed = field.value !== initialValueRef.current;
+    const emptyRequired = isRequired && isEmpty(field.value);
+    field.onBlur(); // ALWAYS call this
+    if (changed || emptyRequired) {
+      // your custom logic here
+    }
     // This check now correctly compares the value on blur
     // to the value as it was on focus.
-    if (
-      field.value !== initialValueRef.current ||
-      (isRequired && isEmpty(field.value)) /*&& isEmpty(passwordValue)*/
-    ) {
-      // console.log("Field value ", field.value, source);
-      // console.log("initialValueRef ", initialValueRef.current, source);
-      // console.log("Field value changed", source);
-      field.onBlur(); // Ensure React Admin's onBlur is called
-    }
+    // if (
+    //   field.value !== initialValueRef.current ||
+    //   (isRequired && isEmpty(field.value)) /*&& isEmpty(passwordValue)*/
+    // ) {
+    //   field.onBlur(); // Ensure React Admin's onBlur is called
+    // }
     // Animations.shake(isValidating, invalid, shakeRef, clearErrors, source);
   };
 
@@ -432,7 +444,7 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
       <ResettableIconInputField
         id={id}
         {...field}
-        type={visible ? "text" : "password"}
+        // type={visible ? "text" : "password"}
         size="small"
         ref={inputRef}
         onChange={handlePasswordChange}

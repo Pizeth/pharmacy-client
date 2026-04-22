@@ -30,6 +30,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  transpilePackages: [
+    "@refinedev/core",
+    "@refinedev/nextjs-router",
+    "@refinedev/nestjsx-crud",
+  ],
   async rewrites() {
     return [
       // Proxy API calls to your NestJS backend during development
