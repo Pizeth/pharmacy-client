@@ -3,9 +3,28 @@ import authService from "@/services/auth.service";
 import { username } from "better-auth/plugins/username";
 import { z } from "zod";
 
+const refinedIdentifier = z.string().superRefine((val, ctx) => {
+  if (val.includes("@")) {
+    const emailResult = z.email().safeParse(val);
+    if (!emailResult.success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid email format",
+      });
+    }
+  } else {
+    if (val.length < 3) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Username must be at least 3 characters",
+      });
+    }
+  }
+});
+
 export const loginSchema = z.object({
-  email: z.email(),
-  password: z.string().min(6),
+  indentifier: refinedIdentifier,
+  password: z.string().min(10),
 });
 
 export const registerSchema = z

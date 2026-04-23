@@ -22,6 +22,49 @@ import { VirtualElement } from "@popperjs/core/lib/types";
 import { IParticlesProps } from "@tsparticles/react/dist/IParticlesProps";
 import { OverridableStringUnion } from "@mui/types";
 
+export interface AuthProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  // content?: ReactNode;
+  card?: ReactNode;
+  // Avatar: MUIStyledCommonProps<Theme>;
+  effect?: ReactNode;
+  avatarIcon?: ReactNode;
+  backgroundImage?: string;
+  image?: ReactNode;
+  sideImage?: ReactNode;
+  children?: ReactNode;
+  divider?: ReactNode;
+  social?: ReactNode;
+  authNavigationLinks?: ReactNode;
+  // enableTabs?: boolean; // New prop to enable tab mode
+  // defaultTab?: "login" | "signup"; // New prop to set default tab
+  enableToggle?: boolean; // Enable link-based toggle
+  defaultMode?: AuthAction;
+  // onSignUp?: (data: any) => void | Promise<void>;
+  footer?: ReactNode;
+  className?: string;
+  sx?: SxProps<Theme>;
+  variant?: "compact" | "full";
+  src?: string;
+  alt?: string;
+  heading?: string;
+}
+
+export interface AuthFormProps extends HtmlHTMLAttributes<HTMLFormElement> {
+  mode?: AuthAction;
+  content?: StyleComponent;
+  password?: StyleComponent;
+  footer?: StyleComponent;
+  formButton?: StyleComponent;
+  redirectTo?: string;
+  className?: string;
+  sx?: SxProps<Theme>;
+  children?: ReactNode;
+  forgotPassword?: string;
+  forgotPasswordUrl?: string;
+  termsUrl?: string;
+  privacyUrl?: string;
+}
+
 export interface LoginFormProps {
   content?: StyleComponent;
   password?: StyleComponent;
@@ -59,7 +102,7 @@ export interface DrawerToggleProps extends HtmlHTMLAttributes<HTMLDivElement> {
 }
 
 export interface ValidatedButtonProps extends SaveButtonProps {
-  loading: boolean;
+  loading?: boolean;
   authType?: AuthAction;
   className?: string;
   sx?: any;

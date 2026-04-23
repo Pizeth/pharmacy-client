@@ -6,8 +6,11 @@ import { authClient } from "@/lib/auth-client";
 import { clearAxiosAuth, setupAxiosAuth } from "./dataProvider";
 
 export const authProvider: AuthProvider = {
-  login: async ({ email, password }) => {
-    const { data, error } = await authClient.signIn.email({ email, password });
+  login: async ({ identifier, password }) => {
+    const { data, error } = await authClient.signIn.username({
+      username: identifier,
+      password,
+    });
     if (error)
       return {
         success: false,
@@ -42,17 +45,55 @@ export const authProvider: AuthProvider = {
       if (!session.data)
         return {
           authenticated: false,
-          redirectTo: "/login",
+          // redirectTo: "/login",
           error: {
             statusCode: 401,
             message: "Check failed",
             name: "Unauthorized",
           },
         };
+      console.log("Session data:", session.data);
       return { authenticated: true };
     } catch (error) {
-      return { authenticated: false, redirectTo: "/login" };
+      console.error("Error occurred while checking authentication:", error);
+      return {
+        authenticated: false,
+        // redirectTo: "/login",
+        error: error as Error,
+      };
     }
+  },
+
+  register: async (
+    payload: {
+      email: string;
+      username: string;
+      password: string;
+      name: string;
+    },
+    redirectPath?: string,
+  ) => {
+    const { data, error } = await authClient.signUp.email(payload);
+
+    if (error)
+      return {
+        success: false,
+        error: {
+          message: error.message || error.statusText || "Login failed",
+          statusCode: error.status,
+          name: "Invalid Credentials",
+        },
+      };
+    // return data;
+    return {
+      success: true,
+      redirectTo: redirectPath || "/login",
+      // error,
+      successNotification: {
+        message: "Registration Successful",
+        description: `User ${data.user.name} have successfully registered.`,
+      },
+    };
   },
 
   getPermissions: async () => null,

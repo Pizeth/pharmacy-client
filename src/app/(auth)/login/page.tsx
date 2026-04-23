@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AuthForm } from "@/components/auth/authForm";
+import { Auth } from "@/components/auth/auth";
 
 export function useAuthRedirect() {
   const router = useRouter();
@@ -135,7 +135,5 @@ export function LoginPage() {
 // import { AuthForm } from "@/components/auth/AuthForm";
 
 export default function LoginPageNew() {
-  return (
-    <AuthPage type="login" renderContent={() => <AuthForm mode="login" />} />
-  );
+  return <AuthPage type="login" renderContent={() => <Auth />} />;
 }

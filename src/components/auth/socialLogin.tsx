@@ -112,7 +112,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
   });
 
   const notify = useNotify();
-  const [searchParams] = useSearchParams();
+  // const [searchParams] = useSearchParams();
 
   // State management with standard useState
   // const [loading, setLoading] = useState(false);
