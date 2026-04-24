@@ -110,10 +110,9 @@ export interface AuthNavigationProps extends HtmlHTMLAttributes<HTMLDivElement> 
   mode?: AuthAction; // Receives state from parent
   onToggle?: () => void; // Toggle handler from parent
   className?: string;
-  // message?: string;
-  // title?: string;
-  // link?: string;
-  // icon?: ReactNode;
+  message?: string;
+  title?: string;
+  icon?: ReactNode;
   sx?: SxProps<Theme>;
 }
 

@@ -24,7 +24,7 @@ const StyledSideImage = styled(Grid, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<SideImageProps>((props: { theme: Theme }) => ({
+})<SideImageProps>(({ theme }) => ({
   position: "relative",
   /*** New CSS ***/
   overflow: "hidden", // prevents scrollbars
@@ -96,13 +96,13 @@ const Circle = styled("div", {
   name: PREFIX,
   slot: "Card",
   overridesResolver: (_props, styles) => styles.card,
-})((props: { theme: Theme }) => ({
+})(({ theme }) => ({
   position: "absolute",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   borderRadius: "50%",
-  width: props.theme.custom.sideImage.circleSize || "35%", // one-third of parent width
+  width: theme.custom.sideImage.circleSize || "35%", // one-third of parent width
   aspectRatio: "1 / 1", // keep height equal to width
   // paddingTop: "var(--app-sideImage-circleSize)", // makes height equal to width
   // backgroundImage:
@@ -113,7 +113,7 @@ const Circle = styled("div", {
   left: "50%",
   transform: "translate(-50%, -50%)", // center it
   // boxShadow: "0 0 20px 10px rgba(30, 64, 175, 0.5)",
-  boxShadow: `0 0 20px 10px ${props.theme.palette.primary.main}50`,
+  boxShadow: `0 0 20px 10px ${theme.alpha(theme.vars.palette.primary.main, 0.25)}`,
   "&::before": {
     content: "''",
     position: "absolute",
@@ -142,20 +142,16 @@ const Circle = styled("div", {
     //   )}
     // )`,
     animation: `${makePulseKeyframes(
-      props.theme.custom.sideImage.circlePulseSequence,
-    )} ${
-      props.theme.custom.sideImage.circlePulseDuration
-    } ease-in-out infinite`,
+      theme.custom.sideImage.circlePulseSequence,
+    )} ${theme.custom.sideImage.circlePulseDuration} ease-in-out infinite`,
     // backgroundSize: "100% 100%",
   },
 
   /*** Animation ***/
   // "--c": "#09f",
   backgroundColor: "#000",
-  backgroundImage:
-    props.theme.custom.sideImage.animationBackground.backgroundImage,
-  backgroundSize:
-    props.theme.custom.sideImage.animationBackground.backgroundSize,
+  backgroundImage: theme.custom.sideImage.animationBackground.backgroundImage,
+  backgroundSize: theme.custom.sideImage.animationBackground.backgroundSize,
 
   animation: `${hi} 150s linear infinite`,
   "&::after": {
@@ -180,17 +176,17 @@ const LogoWrapper = styled(Box, {
   name: PREFIX,
   slot: "Image",
   overridesResolver: (_props, styles) => styles.image,
-})((props: { theme: Theme }) => ({
+})(({ theme }) => ({
   position: "relative",
   zIndex: 2,
 
   aspectRatio: "1 / 1",
 
-  width: props.theme.custom.sideImage.logoSize,
+  width: theme.custom.sideImage.logoSize,
   overflow: "visible",
   inset: 0,
   objectFit: "cover",
-  ...(props.theme.palette.mode === "dark" &&
+  ...(theme.palette.mode === "dark" &&
     {
       // filter: "brightness(0.25) grayscale(1)",
       // filter:
@@ -202,9 +198,9 @@ const Caption = styled(Box, {
   name: PREFIX,
   slot: "Caption",
   overridesResolver: (_props, styles) => styles.caption,
-})((props: { theme: Theme }) => ({
+})(({ theme }) => ({
   position: "absolute",
-  top: `calc(100% + ${props.theme.custom.sideImage.captionOffset.xs})`,
+  top: `calc(100% + ${theme.custom.sideImage.captionOffset.xs})`,
   left: "50%",
   transform: "translateX(-50%)",
   zIndex: 2,
@@ -214,24 +210,24 @@ const Caption = styled(Box, {
   maxWidth: "none", // remove inherited width limit
   color: "#edad54",
   textAlign: "center",
-  fontSize: props.theme.custom.sideImage.captionFontSize.xs,
+  fontSize: theme.custom.sideImage.captionFontSize.xs,
   textShadow: `
-            -0.5px -0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
-            0.5px -0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
-            -0.5px  0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
-            0.5px  0.5px 0 ${props.theme.custom.sideImage.captionOutlineColor},
-            0    0   7px ${props.theme.custom.sideImage.captionGlowColor}
+            -0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            -0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0    0   7px ${theme.custom.sideImage.captionGlowColor}
           `,
-  // "-webkit-text-stroke": `0.125px ${props.theme.custom.sideImage.captionOutlineColor}`,
-  WebkitTextStroke: `0.125px ${props.theme.custom.sideImage.captionOutlineColor}`,
+  // "-webkit-text-stroke": `0.125px ${theme.custom.sideImage.captionOutlineColor}`,
+  WebkitTextStroke: `0.125px ${theme.custom.sideImage.captionOutlineColor}`,
 
-  [props.theme.breakpoints.up("sm")]: {
-    top: `calc(100% + ${props.theme.custom.sideImage.captionOffset.sm})`,
-    fontSize: props.theme.custom.sideImage.captionFontSize.sm,
+  [theme.breakpoints.up("sm")]: {
+    top: `calc(100% + ${theme.custom.sideImage.captionOffset.sm})`,
+    fontSize: theme.custom.sideImage.captionFontSize.sm,
   },
-  [props.theme.breakpoints.up("md")]: {
-    top: `calc(100% + ${props.theme.custom.sideImage.captionOffset.md})`,
-    fontSize: props.theme.custom.sideImage.captionFontSize.md,
+  [theme.breakpoints.up("md")]: {
+    top: `calc(100% + ${theme.custom.sideImage.captionOffset.md})`,
+    fontSize: theme.custom.sideImage.captionFontSize.md,
   },
 }));
 

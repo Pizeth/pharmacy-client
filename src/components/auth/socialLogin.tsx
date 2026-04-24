@@ -1,10 +1,4 @@
-import {
-  CircularProgress,
-  Grid,
-  styled,
-  Theme,
-  useThemeProps,
-} from "@mui/material";
+import { CircularProgress, Grid, styled, useThemeProps } from "@mui/material";
 import {
   Apple,
   Discord,
@@ -18,49 +12,47 @@ import {
 } from "../icons/socialIcons";
 import { SocialLoginProps } from "@/interfaces/auth.interface";
 import { useCallback, useState } from "react";
-import { useNotify } from "ra-core";
+// import { useNotify } from "ra-core";
 import SocialButton from "./ui/socialButton";
-// import { useSearchParams } from "next/navigation";
-import { useSearchParams } from "react-router-dom";
 
 const PREFIX = "RazethSocialLogin";
 
-const SocialLoginRoot = styled(Grid, {
+const Root = styled(Grid, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<SocialLoginProps>(() => ({}));
+})<SocialLoginProps>(() => ({
+  // border: "0.5px solid red",
+}));
 
 const SocialLoginContent = styled(Grid, {
   name: PREFIX,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
-})((props: { theme: Theme }) => ({
+})(({ theme }) => ({
   button: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: props.theme.spacing(1),
+    gap: theme.spacing(1),
     width: "100%",
-    padding: props.theme.spacing(1),
+    padding: theme.spacing(1),
     textTransform: "none",
-    border: `1px solid ${props.theme.palette.divider}`,
-    transition: props.theme.transitions.create(
-      ["transform", "background-color"],
-      {
-        duration: props.theme.transitions.duration.standard,
-        easing: props.theme.transitions.easing.easeInOut,
-      },
-    ),
+    border: `1px solid ${theme.palette.divider}`,
+    boxShadow: theme.vars.palette.customShadows.neumorphic,
+    transition: theme.transitions.create(["transform", "background-color"], {
+      duration: theme.transitions.duration.standard,
+      easing: theme.transitions.easing.easeInOut,
+    }),
     "&:hover": {
-      border: `1px solid ${props.theme.palette.divider}`,
-      backgroundColor: props.theme.palette.action.hover,
+      border: `1px solid ${theme.vars.palette.divider}`,
+      backgroundColor: theme.palette.action.hover,
       transform: "scale(1.05)", // enlarge smoothly
-      boxShadow: props.theme.shadows[3],
+      boxShadow: theme.shadows[3],
     },
     "& svg": {
-      width: props.theme.spacing(2),
-      height: props.theme.spacing(2),
+      width: theme.spacing(2),
+      height: theme.spacing(2),
     },
   },
 }));
@@ -111,60 +103,60 @@ const SocialLogin = (inProps: SocialLoginProps) => {
     name: PREFIX,
   });
 
-  const notify = useNotify();
-  // const [searchParams] = useSearchParams();
+  const { children, className, sx, ...rest } = props;
+
+  // const notify = useNotify();
 
   // State management with standard useState
   // const [loading, setLoading] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
 
-  const handleProviderLogin = useCallback(
-    async (provider: string) => {
-      try {
-        setLoading(provider);
-        // setLoading(true);
+  const handleProviderLogin = useCallback(async (provider: string) => {
+    try {
+      setLoading(provider);
+      // setLoading(true);
 
-        const backendUrl =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
-        const loginUrl = `${backendUrl}/auth/${provider}/login`;
+      const backendUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
+      const loginUrl = `${backendUrl}/auth/${provider}/login`;
 
-        // Redirect to OIDC provider
-        window.location.href = loginUrl;
-      } catch (err) {
-        console.error("Login error:", err);
-        notify("razeth.auth.oidc_error", {
-          type: "error",
-        });
-        // Only reset loading if component is still mounted
-        // if (isMounted.current) {
-        //   setLoading(null);
-        // }
-      }
-    },
-    [notify],
-  );
+      // Redirect to OIDC provider
+      window.location.href = loginUrl;
+    } catch (err) {
+      console.error("Login error:", err);
+      // notify("razeth.auth.oidc_error", {
+      //   type: "error",
+      // });
+      // Only reset loading if component is still mounted
+      // if (isMounted.current) {
+      //   setLoading(null);
+      // }
+    }
+  }, []);
 
   const isLoading = useCallback((type: string) => loading === type, [loading]);
 
   return (
-    <SocialLoginRoot container spacing={2}>
+    <Root container spacing={2} className={className} sx={sx} {...rest}>
       {Object.entries(PROVIDERS).map(([key, provider]) => (
         <SocialLogin.children key={key} size={{ xs: 6, sm: 4 }}>
-          <SocialButton
-            variant="outlined"
-            icon={provider.icon}
-            onClick={() => handleProviderLogin(key)}
-            disabled={loading != null}
-          >
-            {isLoading(key) ? (
-              <CircularProgress color="inherit" size={"1rem"} thickness={3} />
-            ) : (
-              provider.name
-            )}
-          </SocialButton>
+          {children || (
+            <SocialButton
+              variant="outlined"
+              icon={provider.icon}
+              onClick={() => handleProviderLogin(key)}
+              disabled={loading != null}
+            >
+              {isLoading(key) ? (
+                <CircularProgress color="inherit" size={"1rem"} thickness={3} />
+              ) : (
+                provider.name
+              )}
+            </SocialButton>
+          )}
         </SocialLogin.children>
       ))}
-    </SocialLoginRoot>
+    </Root>
   );
 };
 

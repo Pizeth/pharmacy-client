@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FieldValues, FormProvider } from "react-hook-form";
 import {
   Typography,
   Link,
@@ -27,8 +27,7 @@ import {
   LoginFormProps,
 } from "@/interfaces/component-props.interface";
 // import ValidatedButton from "./ui/validatedButton";
-import { useIsAuthenticated, useLogin, useRegister } from "@refinedev/core";
-import { AuthAction } from "@/theme";
+import { useLogin, useRegister } from "@refinedev/core";
 import {
   loginSchema,
   registerSchema,
@@ -84,7 +83,7 @@ const PasswordArea = styled(Box, {
   name: PREFIX,
   slot: "Password",
   overridesResolver: (_props, styles) => styles.password,
-})<LoginFormProps>(({ theme }) => ({
+})<AuthFormProps>(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   width: "100%",
@@ -95,7 +94,7 @@ const Footer = styled(Box, {
   name: PREFIX,
   slot: "Footer",
   overridesResolver: (_props, styles) => styles.footer,
-})<LoginFormProps>(({ theme }) => ({
+})<AuthFormProps>(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -106,12 +105,6 @@ const Footer = styled(Box, {
   gap: theme.spacing(0),
 }));
 
-const FormButton = styled(ValidatedButton, {
-  name: PREFIX,
-  slot: "Button",
-  overridesResolver: (_props, styles) => styles.button,
-})(() => ({}));
-
 const AuthForm = (inProps: AuthFormProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
   const {
@@ -119,7 +112,7 @@ const AuthForm = (inProps: AuthFormProps) => {
     redirectTo,
     className,
     sx,
-    forgotPassword,
+    forgotPassword = "Forgot your password?",
     forgotPasswordUrl = "/forgot-password",
     termsUrl = "/terms",
     privacyUrl = "/privacy",
@@ -128,8 +121,7 @@ const AuthForm = (inProps: AuthFormProps) => {
   } = props;
 
   // const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const { isFetching, data } = useIsAuthenticated();
+
   // State to track current mode (login or signup)
   // const [currentMode, setCurrentMode] = useState<AuthAction>(mode);
   const isLogin = mode === "signin";
@@ -156,29 +148,15 @@ const AuthForm = (inProps: AuthFormProps) => {
   //   // not authenticated, stay on the login page
   // }, [data, isFetching, router, redirectTo]); // ✅ Added necessary dependencies
 
-  // 1. Wait for loading to finish
-  if (isFetching) return null;
-
-  // 2. If already logged in, redirect away from login page
-  if (data?.authenticated) {
-    router.push("/admin"); // or your dashboard
-    return null;
-  }
-
   const { mutate: login, isPending } = useLogin();
   const { mutate: register, isPending: isRegisterPending } =
     useRegister<RegisterValues>();
 
   const form = useForm<LoginValues | RegisterValues>({
-    resolver: zodResolver(
-      schema,
-      // {
-      //   async: true, // 🔥 enable async validation
-      // }
-    ),
+    resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: isLogin
-      ? { indentifier: "", password: "" }
+      ? { identifier: "", password: "" }
       : { username: "", email: "", password: "", confirmPassword: "" },
   });
 
@@ -214,30 +192,21 @@ const AuthForm = (inProps: AuthFormProps) => {
     window.location.href = forgotPasswordUrl;
   }, [forgotPasswordUrl]);
 
-  const handleTerms = useCallback(() => {
-    // Navigate to terms of service page
-    window.location.href = termsUrl;
-  }, [termsUrl]);
-
-  const handlePrivacy = useCallback(() => {
-    // Navigate to privacy policy page
-    window.location.href = privacyUrl;
-  }, [privacyUrl]);
-
   return (
-    <Root
-      // component="form"
-      onSubmit={handleSubmit(onSubmit)}
-      // mode="onChange"
-      // noValidate
-      className={className}
-      sx={sx}
-      {...rest}
-    >
-      <CardContent>
-        {children || (
-          <AuthForm.content>
-            {/* <IconInput
+    <FormProvider {...form}>
+      <Root
+        // component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        // mode="onChange"
+        // noValidate
+        className={className}
+        sx={sx}
+        {...rest}
+      >
+        <CardContent>
+          {children || (
+            <AuthForm.content>
+              {/* <IconInput
               source="credential"
               className="icon-input"
               iconStart={<Person />}
@@ -248,46 +217,46 @@ const AuthForm = (inProps: AuthFormProps) => {
               validate={required()}
               resettable
             /> */}
-            {isLogin ? (
-              <TextField
-                name="identifier"
-                control={control}
-                label="Username or Email"
-                iconStart={<Person />}
-                rules={{ required: "Username or Email is required" }}
-                fullWidth
-              />
-            ) : (
-              <>
+              {isLogin ? (
                 <TextField
-                  name="name"
-                  control={control}
-                  label="Full Name"
-                  iconStart={<Badge />}
-                  rules={{ required: "Name is required" }}
-                  fullWidth
-                />
-                <TextField
-                  name="email"
-                  control={control}
-                  label="Email Address"
-                  type="email"
-                  iconStart={<Email />}
-                  rules={{ required: "Email is required" }}
-                  fullWidth
-                />
-                <TextField
-                  name="username"
-                  control={control}
-                  label="Username"
+                  name="identifier"
+                  // control={control}
+                  label="Username or Email"
                   iconStart={<Person />}
-                  rules={{ required: "Username is required" }}
+                  rules={{ required: "Username or Email is required" }}
                   fullWidth
                 />
-              </>
-            )}
-            <AuthForm.password>
-              {/* <PasswordValidationInput
+              ) : (
+                <>
+                  <TextField
+                    name="name"
+                    // control={control}
+                    label="Full Name"
+                    iconStart={<Badge />}
+                    rules={{ required: "Name is required" }}
+                    fullWidth
+                  />
+                  <TextField
+                    name="email"
+                    // control={control}
+                    label="Email Address"
+                    type="email"
+                    iconStart={<Email />}
+                    rules={{ required: "Email is required" }}
+                    fullWidth
+                  />
+                  <TextField
+                    name="username"
+                    // control={control}
+                    label="Username"
+                    iconStart={<Person />}
+                    rules={{ required: "Username is required" }}
+                    fullWidth
+                  />
+                </>
+              )}
+              <AuthForm.password>
+                {/* <PasswordValidationInput
                 source="password"
                 iconStart={<Password />}
                 className="icon-input"
@@ -299,57 +268,64 @@ const AuthForm = (inProps: AuthFormProps) => {
                 fullWidth
                 // strengthMeter
               /> */}
-              <PasswordField
-                name="password"
-                control={control}
-                label="Password"
-                type="password"
-              />
-
-              {!isLogin && (
                 <PasswordField
-                  name="confirmPassword"
+                  name="password"
                   control={control}
-                  label="Confirm Password"
+                  label="Password"
                   type="password"
                 />
+
+                {!isLogin && (
+                  <PasswordField
+                    name="confirmPassword"
+                    control={control}
+                    label="Confirm Password"
+                    type="password"
+                  />
+                )}
+              </AuthForm.password>
+              {isLogin && (
+                <AuthForm.footer>
+                  <Typography
+                    variant="body2"
+                    component="span"
+                    color="textSecondary"
+                  >
+                    <FormControlLabel
+                      control={<Checkbox defaultChecked />}
+                      // label={translate("razeth.auth.remember_me")}
+                      label={"Remember Me"}
+                    />
+                  </Typography>
+                  <Link
+                    // href={forgotPasswordUrl}
+                    component="button"
+                    type="button"
+                    variant="body2"
+                    onClick={handleForgotPassword}
+                  >
+                    {/* {forgotPassword || translate("razeth.auth.forgot_password")} */}
+                    {forgotPassword}
+                    {/* {forgotPasswordIcon} */}
+                  </Link>
+                </AuthForm.footer>
               )}
-            </AuthForm.password>
-            <AuthForm.footer>
-              <Typography variant="body2">
-                <FormControlLabel
-                  control={<Checkbox defaultChecked />}
-                  // label={translate("razeth.auth.remember_me")}
-                  label={"Remember Me"}
-                />
-              </Typography>
-              <Link
-                // href={forgotPasswordUrl}
-                component="button"
-                type="button"
-                variant="body2"
-                onClick={handleForgotPassword}
-              >
-                {/* {forgotPassword || translate("razeth.auth.forgot_password")} */}
-                {forgotPassword}
-                {/* {forgotPasswordIcon} */}
-              </Link>
-            </AuthForm.footer>
-            <AuthForm.button
-              loading={isPending || isRegisterPending}
-              authType="signin"
-            />
-          </AuthForm.content>
-        )}
-      </CardContent>
-    </Root>
+              <ValidatedButton
+                loading={isPending || isRegisterPending}
+                authType="signin"
+              />
+            </AuthForm.content>
+          )}
+        </CardContent>
+      </Root>
+    </FormProvider>
   );
 };
 
 AuthForm.content = Content;
 AuthForm.password = PasswordArea;
 AuthForm.footer = Footer;
-AuthForm.button = FormButton;
+// AuthForm.button = FormButton;
 
 export default AuthForm;
 

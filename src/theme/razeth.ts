@@ -195,6 +195,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         { color: "#FF1493", delay: "4.5s" },
         { color: "#00BFFF", delay: "5s" },
       ],
+      paper: "#aaaaaa",
     },
     palette: {
       // primary: {

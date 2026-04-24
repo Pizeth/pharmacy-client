@@ -12,36 +12,39 @@ import { useTranslate } from "ra-core";
 export const RazethDivider = (inProps: DividerProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
   const { className, title, sx, ...rest } = props;
-  const translate = useTranslate();
+  // const translate = useTranslate();
   return (
-    <StyledDivider className={className} sx={sx} {...rest}>
+    <Root className={className} sx={sx} {...rest}>
       <Divider />
       <Typography variant="body2">
-        {title || translate("razeth.auth.social_login")}
+        {/* {title || translate("razeth.auth.social_login")} */}
+        {title || "Or continue with"}
       </Typography>
       <Divider />
-    </StyledDivider>
+    </Root>
   );
 };
 
 const PREFIX = "RazethDivider";
 
-const StyledDivider = styled(Box, {
+const Root = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<DividerProps>((props: { theme: Theme }) => ({
+})<DividerProps>(({ theme }) => ({
   position: "relative",
   display: "flex",
   alignItems: "center",
-  marginTop: props.theme.spacing(2),
-  marginBottom: props.theme.spacing(2),
+  marginTop: theme.spacing(2),
+  marginBottom: theme.spacing(2),
   ["& .MuiDivider-root"]: { flex: 1 },
   ["& .MuiTypography-root"]: {
-    paddingLeft: props.theme.spacing(2),
-    paddingRight: props.theme.spacing(2),
-    backgroundColor: props.theme.palette.background.paper,
-    color: props.theme.palette.text.secondary,
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    backgroundColor: theme.vars.palette.background.paper,
+    boxShadow: theme.vars.palette.customShadows.neumorphic,
+    color: theme.vars.palette.text.secondary,
+    borderRadius: "50px",
   },
 }));
 

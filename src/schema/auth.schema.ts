@@ -23,7 +23,7 @@ const refinedIdentifier = z.string().superRefine((val, ctx) => {
 });
 
 export const loginSchema = z.object({
-  indentifier: refinedIdentifier,
+  identifier: refinedIdentifier,
   password: z.string().min(10),
 });
 

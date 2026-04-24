@@ -53,6 +53,7 @@ declare module "@mui/material/styles" {
       sideImage: SideImage;
       lines: Line[];
       meteor: Meteor;
+      paper: string;
     };
   }
 
@@ -62,6 +63,7 @@ declare module "@mui/material/styles" {
       sideImage?: SideImage;
       lines?: Line[];
       meteor?: Meteor;
+      paper?: string;
     };
   }
 

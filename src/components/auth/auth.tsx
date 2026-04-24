@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   CardContent,
-  Divider,
   Grid,
   Stack,
   styled,
@@ -49,6 +48,7 @@ import RocketAnimation from "./effects/rocket";
 import TwinkleStars from "./effects/twinkleStars";
 import SocialLogin from "./socialLogin";
 import Footer from "./ui/footer";
+import Divider from "./divider";
 
 const PREFIX = "RazethAuth";
 
@@ -773,128 +773,132 @@ const LoginCard = styled(Card, {
   name: PREFIX,
   slot: "Card",
   overridesResolver: (_props, styles) => styles.card,
-})(({ theme }) => ({
-  position: "relative",
-  // zIndex: 2,
-  overflow: "visible",
-  borderRadius: theme.spacing(2),
-  boxShadow: theme.shadows[3],
-  /*** Paper Texture ***/
-  backgroundImage: `
-            radial-gradient(circle at 1px 1px, rgba(0,0,0,0.08) 1px, transparent 0),
-            repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px),
-            repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px)
-          `,
-  backgroundSize: "8px 8px, 32px 32px, 32px 32px",
-  backgroundColor: theme.palette.background.paper,
-
-  /*** Gradient Glow Effect ***/
-  // display: "flex",
-  // alignItems: "center",
-  // justifyContent: "center",
-  // userSelect: "none",
-  // animation: `${gradientShift} 10s ease-in-out infinite` /* Faster animation */,
-
-  // "&::before, &::after": {
-  //   content: '""',
-  //   position: "absolute",
-  //   top: "calc(var(--size) / -2)",
-  //   left: "calc(var(--size) / -2)",
-  //   width: "calc(100% + var(--size))",
-  //   height: "calc(100% + var(--size))",
-  //   background: `
-  //   radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
-  //   radial-gradient(circle at 100% 0, #00a6ff, transparent),
-  //   radial-gradient(circle at 0 100%, #ff0056, transparent),
-  //   radial-gradient(circle at 100% 100%, #6500ff, transparent)
-  // `,
-  // },
-  // "&::after": {
-  //   "--size": "2px",
-  //   // zIndex: "-1",
-  // },
-  // "&::before": {
-  //   "--size": "5px",
-  //   // zIndex: "-2",
-  //   filter: "blur(0.25vmin)",
-  //   animation: `${blurAnimation} 3s ease-in-out alternate infinite`,
-  // },
-
-  // "&::before, &::after": {
-  //   content: '""',
-  //   position: "absolute",
-  //   left: "-1px",
-  //   top: "-1px",
-  //   // borderRadius: "5%",
-  //   background: `
-  //   linear-gradient(
-  //     45deg,
-  //     hsl(27deg 93% 60%),
-  //   #00a6ff,
-  //   #ff0056,
-  //   #6500ff
-  //   )
-  // `,
-
-  //   //   // #fb0094,
-  //   //   // #0000ff,
-  //   //   // #00ff00,
-  //   //   // #ffff00,
-  //   //   // #ff0000,
-  //   //   // #fb0094,
-  //   //   // #0000ff,
-  //   //   // #00ff00,
-  //   //   // #ffff00,
-  //   //   // #ff0000
-
-  //   backgroundSize: "250%",
-  //   width: "calc(100% + 2px)",
-  //   height: "calc(100% + 2px)",
-  //   // zIndex: -99,
-  //   animation: `${steam} 60s linear infinite`,
-  // },
-  // "&::after": {
-  //   filter: "blur(1vmin)",
-  // },
-  "& .MuiGrid-container": {
+})(({ theme }) => {
+  const alpha8 = theme.alpha(theme.vars.palette.background.default, 0.08);
+  const alpha2 = theme.alpha(theme.vars.palette.background.default, 0.02);
+  return {
     position: "relative",
-    zIndex: 1,
-    // background: "linear-gradient(0deg, #000, #272727)",
-    // backgroundImage: `
-    //   repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
-    //   repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
-    //   repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
-    // `,
-    // backgroundSize: "24px 24px, 24px 24px, 8px 8px",
-
+    // zIndex: 2,
+    overflow: "visible",
+    borderRadius: theme.spacing(2),
+    boxShadow: theme.shadows[3],
+    /*** Paper Texture ***/
     backgroundImage: `
+            radial-gradient(circle at 1px 1px, ${alpha8} 1px, transparent 0),
+            repeating-linear-gradient(0deg, transparent, transparent 2px, ${alpha2} 2px, ${alpha2} 4px),
+            repeating-linear-gradient(90deg, transparent, transparent 2px, ${alpha2}2px, ${alpha2} 4px)
+          `,
+    backgroundSize: "8px 8px, 32px 32px, 32px 32px",
+    backgroundColor: theme.vars.palette.background.paper,
+
+    /*** Gradient Glow Effect ***/
+    // display: "flex",
+    // alignItems: "center",
+    // justifyContent: "center",
+    // userSelect: "none",
+    // animation: `${gradientShift} 10s ease-in-out infinite` /* Faster animation */,
+
+    // "&::before, &::after": {
+    //   content: '""',
+    //   position: "absolute",
+    //   top: "calc(var(--size) / -2)",
+    //   left: "calc(var(--size) / -2)",
+    //   width: "calc(100% + var(--size))",
+    //   height: "calc(100% + var(--size))",
+    //   background: `
+    //   radial-gradient(circle at 0 0, hsl(27deg 93% 60%), transparent),
+    //   radial-gradient(circle at 100% 0, #00a6ff, transparent),
+    //   radial-gradient(circle at 0 100%, #ff0056, transparent),
+    //   radial-gradient(circle at 100% 100%, #6500ff, transparent)
+    // `,
+    // },
+    // "&::after": {
+    //   "--size": "2px",
+    //   // zIndex: "-1",
+    // },
+    // "&::before": {
+    //   "--size": "5px",
+    //   // zIndex: "-2",
+    //   filter: "blur(0.25vmin)",
+    //   animation: `${blurAnimation} 3s ease-in-out alternate infinite`,
+    // },
+
+    // "&::before, &::after": {
+    //   content: '""',
+    //   position: "absolute",
+    //   left: "-1px",
+    //   top: "-1px",
+    //   // borderRadius: "5%",
+    //   background: `
+    //   linear-gradient(
+    //     45deg,
+    //     hsl(27deg 93% 60%),
+    //   #00a6ff,
+    //   #ff0056,
+    //   #6500ff
+    //   )
+    // `,
+
+    //   //   // #fb0094,
+    //   //   // #0000ff,
+    //   //   // #00ff00,
+    //   //   // #ffff00,
+    //   //   // #ff0000,
+    //   //   // #fb0094,
+    //   //   // #0000ff,
+    //   //   // #00ff00,
+    //   //   // #ffff00,
+    //   //   // #ff0000
+
+    //   backgroundSize: "250%",
+    //   width: "calc(100% + 2px)",
+    //   height: "calc(100% + 2px)",
+    //   // zIndex: -99,
+    //   animation: `${steam} 60s linear infinite`,
+    // },
+    // "&::after": {
+    //   filter: "blur(1vmin)",
+    // },
+    "& .MuiGrid-container": {
+      position: "relative",
+      zIndex: 1,
+      // background: "linear-gradient(0deg, #000, #272727)",
+      // backgroundImage: `
+      //   repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+      //   repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+      //   repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
+      // `,
+      // backgroundSize: "24px 24px, 24px 24px, 8px 8px",
+
+      backgroundImage: `
             repeating-linear-gradient(45deg, rgba(255, 140, 0, 0.12) 0, rgba(255, 140, 0, 0.12) 1px, transparent 1px, transparent 22px),
             repeating-linear-gradient(-45deg, rgba(255, 69, 0, 0.08) 0, rgba(255, 69, 0, 0.08) 1px, transparent 1px, transparent 22px)
             `,
-    backgroundSize: "44px 44px",
-  },
-  // "& .card-content": {
-  "& .MuiCardContent-root": {
-    backgroundImage: `
+      backgroundSize: "44px 44px",
+    },
+    // "& .card-content": {
+    "& .MuiCardContent-root": {
+      backgroundImage: `
               repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(75, 85, 99, 0.06) 2px, rgba(75, 85, 99, 0.06) 3px, transparent 3px, transparent 8px),
               repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(107, 114, 128, 0.05) 2px, rgba(107, 114, 128, 0.05) 3px, transparent 3px, transparent 8px),
               repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(55, 65, 81, 0.04) 2px, rgba(55, 65, 81, 0.04) 3px, transparent 3px, transparent 8px),
               repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(31, 41, 55, 0.03) 2px, rgba(31, 41, 55, 0.03) 3px, transparent 3px, transparent 8px)
             `,
-    // backgroundImage: `
-    //   repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(16, 185, 129, 0.18) 2px, rgba(16, 185, 129, 0.18) 3px, transparent 3px, transparent 8px),
-    //   repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(245, 101, 101, 0.10) 2px, rgba(245, 101, 101, 0.10) 3px, transparent 3px, transparent 8px),
-    //   repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(234, 179, 8, 0.08) 2px, rgba(234, 179, 8, 0.08) 3px, transparent 3px, transparent 8px),
-    //   repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(249, 115, 22, 0.06) 2px, rgba(249, 115, 22, 0.06) 3px, transparent 3px, transparent 8px)
-    // `,
-    // padding: props.theme.spacing(3),
-    // "& .card-box": {
-    //   display: "flex",
-    //   flexDirection: "column",
-    //   gap: 0,
-    // },
-  },
-}));
+      // backgroundImage: `
+      //   repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(16, 185, 129, 0.18) 2px, rgba(16, 185, 129, 0.18) 3px, transparent 3px, transparent 8px),
+      //   repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(245, 101, 101, 0.10) 2px, rgba(245, 101, 101, 0.10) 3px, transparent 3px, transparent 8px),
+      //   repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(234, 179, 8, 0.08) 2px, rgba(234, 179, 8, 0.08) 3px, transparent 3px, transparent 8px),
+      //   repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(249, 115, 22, 0.06) 2px, rgba(249, 115, 22, 0.06) 3px, transparent 3px, transparent 8px)
+      // `,
+      // padding: props.theme.spacing(3),
+      // "& .card-box": {
+      //   display: "flex",
+      //   flexDirection: "column",
+      //   gap: 0,
+      // },
+    },
+  };
+});
 
 // Provider configuration
 const PROVIDERS = {
@@ -971,12 +975,13 @@ export const Auth = (inProps: AuthProps) => {
   useEffect(() => {
     // already authenticated, redirect to the home page
     if (data) {
-      router.push("/");
+      // router.push("/");
+      router.push(data.authenticated ? data.redirectTo || "/fts" : "/login");
     }
     // not authenticated, stay on the login page
   }, [router, data]);
 
-  const { mutate: login, isPending } = useLogin();
+  // const { mutate: login, isPending } = useLogin();
 
   const form = useForm<LoginValues | RegisterValues>({
     resolver: zodResolver(
@@ -996,18 +1001,18 @@ export const Auth = (inProps: AuthProps) => {
     setCurrentMode((prev) => (prev === "signin" ? "signup" : "signin"));
   };
 
-  const { control, handleSubmit } = form;
+  // const { control, handleSubmit } = form;
 
-  const onSubmit = async (values: any) => {
-    if (isLogin) {
-      login(values); // 🔥 uses your authProvider automatically
-    } else {
-      console.log("register", values);
-      // call your signup API here
-      await authService.register(values);
-      login(values); //
-    }
-  };
+  // const onSubmit = async (values: any) => {
+  //   if (isLogin) {
+  //     login(values); // 🔥 uses your authProvider automatically
+  //   } else {
+  //     console.log("register", values);
+  //     // call your signup API here
+  //     await authService.register(values);
+  //     login(values); //
+  //   }
+  // };
 
   // return (
   //   <form onSubmit={handleSubmit(onSubmit)}>

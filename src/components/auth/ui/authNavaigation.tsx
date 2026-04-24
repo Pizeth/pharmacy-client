@@ -1,11 +1,4 @@
-import {
-  Box,
-  Link,
-  styled,
-  Theme,
-  Typography,
-  useThemeProps,
-} from "@mui/material";
+import { Box, Link, styled, Typography, useThemeProps } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { AuthNavigationProps } from "@/interfaces/auth.interface";
 import { useTranslate } from "ra-core";
@@ -13,59 +6,65 @@ import { Login } from "@mui/icons-material";
 
 const AuthNavigationLink = (inProps: AuthNavigationProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { mode = "signin", onToggle, sx, className, ...rest } = props;
+  const {
+    mode = "signin",
+    message,
+    title,
+    icon,
+    onToggle,
+    sx,
+    className,
+    ...rest
+  } = props;
 
-  // const [isSignUpMode, setIsSignUpMode] = useState(false);
-  // const handleToggle = () => setIsSignUpMode(!isSignUpMode);
-
-  const translate = useTranslate();
+  // const translate = useTranslate();
 
   // Determine the text and icon based on current mode
   const isLoginMode = mode === "signin";
-  const message = isLoginMode
-    ? translate("razeth.auth.no_account") || "Don't have an account?"
-    : translate("razeth.auth.have_account") || "Already have an account?";
+  // const message = isLoginMode
+  //  ? translate("razeth.auth.no_account") || "Don't have an account?"
+  //  : translate("razeth.auth.have_account") || "Already have an account?";
 
-  const linkText = isLoginMode
-    ? translate("razeth.auth.sign_up") || "Sign Up"
-    : translate("razeth.auth.sign_in") || "Sign In";
+  // const linkText = isLoginMode
+  //   ? translate("razeth.auth.sign_up") || "Sign Up"
+  //   : translate("razeth.auth.sign_in") || "Sign In";
 
-  // const icon = isLoginMode ? <Login /> : <PersonAddIcon />;
-  const icon = isLoginMode ? <PersonAddIcon /> : <Login />;
-  // const icon = isLoginMode ? <PersonAddIcon /> : <Login />;
   return (
-    <StyledAuthNavigation className={className} sx={sx} {...rest}>
+    <Root className={className} sx={sx} {...rest}>
       {/* We wrap the message in a Typography component for consistency */}
       <Typography variant="body2" component="span">
-        {message}
+        {isLoginMode
+          ? message || "Don't have an account?"
+          : message || "Already have an account?"}
       </Typography>
       <Link component="button" type="button" variant="body2" onClick={onToggle}>
-        {linkText} {icon}
+        {isLoginMode ? title || "Sign Up" : title || "Sign In"}{" "}
+        {isLoginMode ? icon || <PersonAddIcon /> : icon || <Login />}
       </Link>
-    </StyledAuthNavigation>
+    </Root>
   );
 };
 
 const PREFIX = "RazethAuthNavigation";
 
-const StyledAuthNavigation = styled(Box, {
+const Root = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})((props: { theme: Theme }) => ({
+})(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  gap: props.theme.spacing(0.5), // The space is now handled by the gap property
+  gap: theme.spacing(0.5), // The space is now handled by the gap property
   textAlign: "center",
-  marginTop: props.theme.spacing(2),
-  color: props.theme.palette.text.secondary,
+  marginTop: theme.spacing(2),
+  color: theme.vars.palette.text.secondary,
   button: {
     textTransform: "uppercase",
     display: "inline-flex",
     alignItems: "center",
     svg: {
-      marginLeft: props.theme.spacing(0.5),
+      marginLeft: theme.spacing(0.5),
       fontSize: "1rem",
     },
   },

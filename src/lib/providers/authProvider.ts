@@ -45,7 +45,7 @@ export const authProvider: AuthProvider = {
       if (!session.data)
         return {
           authenticated: false,
-          // redirectTo: "/login",
+          redirectTo: "/login",
           error: {
             statusCode: 401,
             message: "Check failed",

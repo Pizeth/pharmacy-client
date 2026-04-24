@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Auth } from "@/components/auth/auth";
+import AuthForm from "@/components/auth/ui/authForm";
 
 export function useAuthRedirect() {
   const router = useRouter();

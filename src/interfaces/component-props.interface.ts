@@ -8,11 +8,17 @@ import {
   PopperPlacementType,
   SvgIconPropsSizeOverrides,
   SxProps,
+  TextFieldProps,
   Theme,
 } from "@mui/material";
 import { Property } from "csstype";
 import { SignUpParams } from "./auth.interface";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import {
+  FieldValues,
+  SubmitHandler,
+  UseControllerProps,
+  UseControllerReturn,
+} from "react-hook-form";
 import { SaveHandler } from "ra-core";
 import { SaveButtonProps } from "react-admin";
 import { AuthAction } from "@/theme";
@@ -324,4 +330,42 @@ export interface ThemeToggleProps {
 
 export interface ParticleProps extends IParticlesProps {
   children?: React.ReactNode;
+}
+
+export interface BaseInputProps extends Omit<TextFieldProps, "variant"> {
+  field: UseControllerReturn["field"];
+  fieldState: UseControllerReturn["fieldState"];
+  iconStart?: ReactNode;
+  iconEnd?: ReactNode;
+  isPassword?: boolean;
+  resettable?: boolean;
+  clearAlwaysVisible?: boolean;
+  isValidating?: boolean;
+  isFocused?: boolean;
+  helper?: ReactNode;
+}
+
+export interface InputAdornmentProps {
+  value: string;
+  type?: string;
+  isPassword?: boolean;
+  resettable?: boolean;
+  clearAlwaysVisible?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
+  isValidating?: boolean;
+  iconEnd: React.ReactNode;
+  onClear: () => void;
+}
+
+export interface IconInputProps<TFieldValues extends FieldValues = FieldValues>
+  extends
+    UseControllerProps<TFieldValues>,
+    Omit<TextFieldProps, "name" | "defaultValue"> {
+  // Add any other custom props from BaseInput here if they aren't in TextFieldProps
+  isPassword?: boolean;
+  resettable?: boolean;
+  clearAlwaysVisible?: boolean;
+  iconStart?: React.ReactNode;
+  iconEnd?: React.ReactNode;
 }

@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { FooterProps } from "@/interfaces/auth.interface";
 import { useTranslate } from "ra-core";
+import { useCallback } from "react";
 
 const Footer = (inProps: FooterProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
@@ -24,53 +25,64 @@ const Footer = (inProps: FooterProps) => {
     ...rest
   } = props;
 
-  const translate = useTranslate();
+  const handleTerms = useCallback(() => {
+    // Navigate to terms of service page
+    window.location.href = termsOfServiceUrl;
+  }, [termsOfServiceUrl]);
+
+  const handlePrivacy = useCallback(() => {
+    // Navigate to privacy policy page
+    window.location.href = privacyPolicyUrl;
+  }, [privacyPolicyUrl]);
+
+  // const translate = useTranslate();
   return (
-    <StyledFooter className={className} sx={sx} {...rest}>
+    <Root className={className} sx={sx} {...rest}>
       <Typography variant="body2" component="div">
-        {description || translate("razeth.title.description")}
-        <Link href={termsOfServiceUrl}>
-          {termsOfService || translate("razeth.title.terms_of_service")}
+        {description || "By clicking continue, you agree to our"}
+        <Link component="button" type="button" onClick={handleTerms}>
+          {termsOfService || "Terms of Service"}
         </Link>
-        {ampersand || translate("razeth.title.ampersand")}
-        <Link href={privacyPolicyUrl}>
-          {privacyPolicy || translate("razeth.title.privacy_policy")}
+        {ampersand || "and"}
+        <Link component="button" type="button" onClick={handlePrivacy}>
+          {privacyPolicy || "Privacy Policy"}
         </Link>
       </Typography>
       <Typography variant="body2" component="span">
-        {copyright || translate("razeth.title.copyright")}
+        {copyright || "Copyright © 2025 Razeth Inc. All rights reserved."}
       </Typography>
-    </StyledFooter>
+    </Root>
   );
 };
 
 const PREFIX = "RazethFooter";
 
-const StyledFooter = styled(Box, {
+const Root = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<FooterProps>((props: { theme: Theme }) => ({
+})<FooterProps>(({ theme }) => ({
   textAlign: "center",
-  marginTop: props.theme.spacing(1),
-  color: props.theme.palette.text.secondary,
+  marginTop: theme.spacing(1),
+  color: theme.custom.paper,
   position: "relative",
   ["& .MuiTypography-root"]: {
-    marginTop: props.theme.spacing(0.5),
+    marginTop: theme.spacing(0.5),
     fontSize: "0.75rem",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: props.theme.spacing(0.5), // The space is now handled by the gap property
-    a: {
-      margin: props.theme.spacing(0),
+    gap: theme.spacing(0.5), // The space is now handled by the gap property
+    // a,
+    button: {
+      margin: theme.spacing(0),
       display: "inline-flex",
       alignItems: "center",
     },
     "& > :last-child::after": {
-      color: props.theme.palette.text.secondary,
+      color: theme.custom.paper,
       textDecoration: "none",
-      marginLeft: props.theme.spacing(-0.5),
+      marginLeft: theme.spacing(-0.5),
       content: '"."',
     },
     "& > :last-child:hover::after": {

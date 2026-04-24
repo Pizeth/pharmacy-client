@@ -1,11 +1,4 @@
-import {
-  Avatar,
-  Box,
-  styled,
-  Theme,
-  Typography,
-  useThemeProps,
-} from "@mui/material";
+import { Avatar, Box, styled, Typography, useThemeProps } from "@mui/material";
 
 import PersonIcon from "@mui/icons-material/Person";
 import { AvatarProps } from "@/interfaces/auth.interface";
@@ -27,18 +20,25 @@ const AvatarHeader = (inProps: AvatarProps) => {
     title,
     ...rest
   } = props;
-  const translate = useTranslate();
+  // const translate = useTranslate();
 
   return (
-    <BoxAvatar className={className} sx={sx} {...rest}>
+    <Root className={className} sx={sx} {...rest}>
       {/* <Box sx={{ display: "flex", position: "relative" }}>
         <RocketAnimation />
         <Avatar alt="Razeth">{avatarIcon}</Avatar>
       </Box> */}
 
       <Avatar alt="Razeth">{avatarIcon}</Avatar>
-      <Typography align="center" variant="h6" fontWeight="bold" gutterBottom>
-        {translate("razeth.title.welcome") || title}
+      <Typography
+        align="center"
+        variant="h6"
+        fontWeight="bold"
+        gutterBottom
+        color="textPrimary"
+      >
+        {/* {translate("razeth.title.welcome") || title} */}
+        {title || "Welcome"}
       </Typography>
       {/* <Typography
         variant="body2"
@@ -51,19 +51,19 @@ const AvatarHeader = (inProps: AvatarProps) => {
       >
         Login to your MCS account
       </Typography> */}
-    </BoxAvatar>
+    </Root>
   );
 };
 
 const defaultAvatarIcon = <PersonIcon />;
 const PREFIX = "RazethAvatar";
 
-const BoxAvatar = styled(Box, {
+const Root = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<AvatarProps>((props: { theme: Theme }) => ({
-  margin: props.theme.spacing(0, 0, 0, 0),
+})<AvatarProps>(({ theme }) => ({
+  margin: theme.spacing(0, 0, 0, 0),
   // display: "flex",
   // justifyContent: "center",
   display: "flex", // Use flexbox for alignment
@@ -78,7 +78,7 @@ const BoxAvatar = styled(Box, {
     backgroundImage: `url('https://pub-ce3376330760464f8be1e4a3b46318c0.r2.dev/sea-planet-water-Earth-map-Arctic-193611-wallhere.com.jpg')`,
     // backgroundColor: "#e72d32",
     // background: "linear-gradient(135deg, #1e1e24 10%, #050505 60%)",
-    color: props.theme.palette.primary.main,
+    color: theme.palette.primary.main,
     position: "relative",
 
     /*** Globe Animation ***/
@@ -122,9 +122,10 @@ const BoxAvatar = styled(Box, {
   },
   "& svg": { fill: "#fff" },
   "& .MuiTypography-root": {
-    marginBottom: props.theme.spacing(0),
+    marginBottom: theme.spacing(0),
+    fontFamily: ["var(--font-moul)", "var(--font-monserrat)"], // Using your Khmer font
     // fontWeight: 900,
-    color: props.theme.palette.text.primary,
+    color: theme.vars.palette.text.primary,
   },
 }));
 
