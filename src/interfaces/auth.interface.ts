@@ -4,6 +4,7 @@ import { ButtonProps, SxProps } from "@mui/material";
 import { CSSProperties, HtmlHTMLAttributes, ReactNode } from "react";
 import { Meteor, MeteorConfig, MeteorState } from "./theme.interface";
 import { AuthAction } from "@/theme";
+import { extend } from "lodash";
 
 export interface LoginParams {
   // For form login
@@ -163,4 +164,15 @@ export interface MeteorVariables extends CSSProperties {
   "--m-z"?: number;
   "--m-transform"?: string;
   "--m-duration"?: string;
+}
+
+export interface ValidationState {
+  message: string;
+  status: "error" | "success" | "loading" | "idle" | "required";
+}
+
+export interface PasswordResult extends ValidationState {
+  score: number;
+  warning?: string; // For the "required" or "regex" sync errors
+  isPwned: boolean; // Specific flag for pwned check
 }

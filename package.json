@@ -52,6 +52,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "diacritic": "^0.0.2",
+    "es-toolkit": "^1.46.0",
     "framer-motion": "^12.38.0",
     "googleapis": "^171.4.0",
     "http-status-codes": "^2.3.0",

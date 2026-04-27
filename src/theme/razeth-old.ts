@@ -57,6 +57,7 @@ declare module "@mui/material/styles" {
       sideImage: SideImage;
       lines: Line[];
       meteor: Meteor;
+      paper: string;
     };
   }
   interface ThemeOptions {
@@ -64,6 +65,7 @@ declare module "@mui/material/styles" {
       sideImage?: SideImage;
       lines?: Line[];
       meteor?: Meteor;
+      paper?: string;
     };
   }
 

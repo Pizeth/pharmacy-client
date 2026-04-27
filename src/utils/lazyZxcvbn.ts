@@ -5,7 +5,7 @@ export const loadDebounce = async () => {
   return debounce;
 };
 
-export const loadZxcvbn = async () => {
+export const loadZxcvbn = async (signal?: AbortSignal) => {
   const [
     { zxcvbnOptions, zxcvbnAsync },
     // types,
@@ -20,8 +20,12 @@ export const loadZxcvbn = async () => {
     import("@zxcvbn-ts/language-common"),
   ]);
 
+  // Create a wrapper that passes the signal to every fetch call
+  const fetchWithSignal = (url: string, opts?: RequestInit) =>
+    fetch(url, { ...opts, signal });
+
   //   const { Match, Matcher, MatchEstimated, MatchExtended } = types as any;
-  const matcherPwned = PwnedMatcher(fetch, zxcvbnOptions);
+  const matcherPwned = PwnedMatcher(fetchWithSignal, zxcvbnOptions);
 
   // Initialize options and matcher once at the top level
   // const regexMatcher = {

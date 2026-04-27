@@ -39,11 +39,11 @@ export type FieldError = {
 
 export type Memoize = <T extends (...args: any[]) => any>(
   func: T,
-  resolver?: (...args: any[]) => any
+  resolver?: (...args: any[]) => any,
 ) => T;
 
 export type MessageFunc = (
-  params: MessageFuncParams
+  params: MessageFuncParams,
 ) => AsyncValidationErrorMessage;
 interface MessageFuncParams {
   args: any;
@@ -86,7 +86,7 @@ export type AsyncValidationErrorMessage = ValidationErrorMessage & {
 export type zxcvbnFeedBack = {
   score: number;
   feedbackMsg: string;
-  warning?: string;
+  warning?: string; // For the "required" or "regex" sync errors
 };
 
 export type PasswordFieldProps = {

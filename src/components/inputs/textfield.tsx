@@ -15,6 +15,7 @@ import useInputAdornment from "./useInputAdornment ";
 import { IconInputProps } from "@/interfaces/component-props.interface";
 import { useEffect, useRef, useState } from "react";
 import BaseInput from "./baseInput";
+import ControlledInput from "./controlledInput";
 
 // export const TextField = ({
 //   name,
@@ -86,38 +87,50 @@ export const TextField = (inProps: IconInputProps) => {
       control={control}
       defaultValue={defaultValue}
       rules={rules}
-      render={({ field, fieldState }) => {
-        // 🔥 SHAKE EFFECT (same behavior as your Animations.shake)
-        useEffect(() => {
-          if (fieldState.invalid && labelRef.current) {
-            labelRef.current.classList.add("shake");
-            setTimeout(() => {
-              labelRef.current?.classList.remove("shake");
-            }, 500);
-          } else {
-            clearErrors(name);
-          }
-        }, [fieldState.invalid]);
+      // render={({ field, fieldState }) => {
+      //   // 🔥 SHAKE EFFECT (same behavior as your Animations.shake)
+      //   useEffect(() => {
+      //     if (fieldState.invalid && labelRef.current) {
+      //       labelRef.current.classList.add("shake");
+      //       setTimeout(() => {
+      //         labelRef.current?.classList.remove("shake");
+      //       }, 500);
+      //     } else {
+      //       clearErrors(name);
+      //     }
+      //   }, [fieldState.invalid]);
 
-        return (
-          <BaseInput
-            field={field}
-            fieldState={fieldState}
-            label={label}
-            isFocused={focused}
-            isValidating={fieldState.isValidating}
-            onFocus={(e) => {
-              setFocused(true);
-              props.onFocus?.(e);
-            }}
-            onBlur={(e) => {
-              field.onBlur(); // Important for RHF touch state
-              props.onBlur?.(e);
-            }}
-            {...rest}
-          />
-        );
-      }}
+      //   return (
+      //     <BaseInput
+      //       field={field}
+      //       fieldState={fieldState}
+      //       label={label}
+      //       isFocused={focused}
+      //       isValidating={fieldState.isValidating}
+      //       onFocus={(e) => {
+      //         setFocused(true);
+      //         props.onFocus?.(e);
+      //       }}
+      //       onBlur={(e) => {
+      //         field.onBlur(); // Important for RHF touch state
+      //         props.onBlur?.(e);
+      //       }}
+      //       {...rest}
+      //     />
+      //   );
+      // }}
+      render={({ field, fieldState }) => (
+        // ✅ No hooks here — render prop is a plain JSX expression
+        <ControlledInput
+          field={field}
+          fieldState={fieldState}
+          name={name}
+          clearErrors={clearErrors}
+          isFocused={focused}
+          onFocusChange={setFocused}
+          {...rest}
+        />
+      )}
     />
   );
 };

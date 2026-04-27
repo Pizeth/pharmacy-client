@@ -1,39 +1,88 @@
-// import { useRef, useState } from "react";
 // import axios from "axios";
+// import statusCode from "http-status-codes";
+// // import lazyZxcvbn from "./lazyZxcvbn";
 // // import debounce from "lodash.debounce";
-// import asyncDebounce from "@refinedev/core";
-// import zxcvbn from "@zxcvbn-ts/core";
+// import { debounce } from "es-toolkit/function";
+// // import zxcvbn from "@zxcvbn-ts/core";
+// import { ValidationState } from "@/interfaces/auth.interface";
+// import zxcvbn from "@/utils/lazyZxcvbn";
 
-// export const useAsyncFieldValidator = () => {
-//   const controllerRef = useRef<AbortController | null>(null);
+// const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-//   const validate = asyncDebounce(
-//     async (url: string, value: string): Promise<string | true> => {
-//       if (!value) return true;
+// const zxcvbnAsync = await zxcvbn.loadZxcvbn();
 
-//       if (controllerRef.current) {
-//         controllerRef.current.abort();
+// let validationController: AbortController | null = null;
+// export const asyncFieldValidator = debounce(
+//   async (
+//     source: string,
+//     value: string,
+//     onResult: (res: ValidationState) => void,
+//   ) => {
+//     // 1. Setup AbortController
+//     if (validationController) validationController.abort();
+//     validationController = new AbortController();
+
+//     onResult({ message: "Checking...", status: "loading" });
+
+//     if (!value) return true;
+
+//     try {
+//       const response = await axios.get(
+//         `${API_URL}/validate/${source}/${value}`,
+//         {
+//           signal: validationController.signal,
+//         },
+//       );
+
+//       const { status, message } = response.data;
+
+//       if (status === statusCode.OK) {
+//         onResult({ message: message || "Available", status: "success" });
+//       } else {
+//         onResult({ message: message || "Invalid", status: "error" });
 //       }
+//     } catch (error) {
+//       if (axios.isCancel(error)) return;
+//       onResult({
+//         message: "Validation service unavailable",
+//         status: "error",
+//       });
+//     }
+//   },
+//   500,
+// );
 
-//       controllerRef.current = new AbortController();
+// export const usePasswordStrength = () => {
+//   const [strength, setStrength] = useState({
+//     score: 0,
+//     feedback: "",
+//   });
 
-//       try {
-//         const res = await axios.get(url, {
-//           signal: controllerRef.current.signal,
-//         });
+//   const validate = async (value: string) => {
+//     if (!value) {
+//       setStrength({ score: 0, feedback: "" });
+//       return "Password is required";
+//     }
 
-//         if (res.data.status === "OK") {
-//           return true;
-//         }
+//     const result = await zxcvbn(value);
 
-//         return res.data.message || "Invalid";
-//       } catch (e: any) {
-//         if (e.name === "CanceledError") return true;
-//         return "Validation failed";
-//       }
-//     },
-//     500,
-//   );
+//     setStrength({
+//       score: result.score,
+//       feedback: result.feedback.suggestions.join(" "),
+//     });
 
-//   return validate;
+//     if (result.score < 3) {
+//       return result.feedback.warning || "Weak password";
+//     }
+
+//     return true;
+//   };
+
+//   return { validate, strength };
+// };
+
+// // Helper to kill everything
+// export const resetValidation = () => {
+//   asyncFieldValidator.cancel();
+//   if (validationController) validationController.abort();
 // };
