@@ -1,21 +1,42 @@
 // RHFTextField.tsx
-import {
-  Controller,
-  FieldValues,
-  UseControllerProps,
-  useFormContext,
-} from "react-hook-form";
-import {
-  TextField as MuiTextField,
-  InputAdornment,
-  CircularProgress,
-  useThemeProps,
-} from "@mui/material";
-import useInputAdornment from "./useInputAdornment ";
+import { Controller, useFormContext } from "react-hook-form";
+import { useThemeProps } from "@mui/material";
 import { IconInputProps } from "@/interfaces/component-props.interface";
-import { useEffect, useRef, useState } from "react";
-import BaseInput from "./baseInput";
+import { useState } from "react";
 import ControlledInput from "./controlledInput";
+
+const PREFIX = "RazethTextField";
+export const TextField = (inProps: IconInputProps) => {
+  const props = useThemeProps({ props: inProps, name: PREFIX });
+  const { name, label, rules, defaultValue, ...rest } = props;
+  const { control, clearErrors } = useFormContext();
+
+  const [focused, setFocused] = useState(false);
+
+  return (
+    <Controller
+      name={name}
+      control={control}
+      defaultValue={defaultValue}
+      rules={rules}
+      render={({ field, fieldState }) => (
+        // ✅ No hooks here — render prop is a plain JSX expression
+        <ControlledInput
+          field={field}
+          fieldState={fieldState}
+          label={label}
+          name={name}
+          clearErrors={clearErrors}
+          isFocused={focused}
+          onFocusChange={setFocused}
+          {...rest}
+        />
+      )}
+    />
+  );
+};
+
+export default TextField;
 
 // export const TextField = ({
 //   name,
@@ -72,67 +93,35 @@ import ControlledInput from "./controlledInput";
 //   );
 // };
 
-const PREFIX = "RazethTextField";
-export const TextField = (inProps: IconInputProps) => {
-  const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { name, label, rules, defaultValue, ...rest } = props;
-  const { control, clearErrors } = useFormContext();
+// render={({ field, fieldState }) => {
+//   // 🔥 SHAKE EFFECT (same behavior as your Animations.shake)
+//   useEffect(() => {
+//     if (fieldState.invalid && labelRef.current) {
+//       labelRef.current.classList.add("shake");
+//       setTimeout(() => {
+//         labelRef.current?.classList.remove("shake");
+//       }, 500);
+//     } else {
+//       clearErrors(name);
+//     }
+//   }, [fieldState.invalid]);
 
-  const [focused, setFocused] = useState(false);
-  const labelRef = useRef<HTMLLabelElement | null>(null);
-
-  return (
-    <Controller
-      name={name}
-      control={control}
-      defaultValue={defaultValue}
-      rules={rules}
-      // render={({ field, fieldState }) => {
-      //   // 🔥 SHAKE EFFECT (same behavior as your Animations.shake)
-      //   useEffect(() => {
-      //     if (fieldState.invalid && labelRef.current) {
-      //       labelRef.current.classList.add("shake");
-      //       setTimeout(() => {
-      //         labelRef.current?.classList.remove("shake");
-      //       }, 500);
-      //     } else {
-      //       clearErrors(name);
-      //     }
-      //   }, [fieldState.invalid]);
-
-      //   return (
-      //     <BaseInput
-      //       field={field}
-      //       fieldState={fieldState}
-      //       label={label}
-      //       isFocused={focused}
-      //       isValidating={fieldState.isValidating}
-      //       onFocus={(e) => {
-      //         setFocused(true);
-      //         props.onFocus?.(e);
-      //       }}
-      //       onBlur={(e) => {
-      //         field.onBlur(); // Important for RHF touch state
-      //         props.onBlur?.(e);
-      //       }}
-      //       {...rest}
-      //     />
-      //   );
-      // }}
-      render={({ field, fieldState }) => (
-        // ✅ No hooks here — render prop is a plain JSX expression
-        <ControlledInput
-          field={field}
-          fieldState={fieldState}
-          name={name}
-          clearErrors={clearErrors}
-          isFocused={focused}
-          onFocusChange={setFocused}
-          {...rest}
-        />
-      )}
-    />
-  );
-};
-
-export default TextField;
+//   return (
+//     <BaseInput
+//       field={field}
+//       fieldState={fieldState}
+//       label={label}
+//       isFocused={focused}
+//       isValidating={fieldState.isValidating}
+//       onFocus={(e) => {
+//         setFocused(true);
+//         props.onFocus?.(e);
+//       }}
+//       onBlur={(e) => {
+//         field.onBlur(); // Important for RHF touch state
+//         props.onBlur?.(e);
+//       }}
+//       {...rest}
+//     />
+//   );
+// }}

@@ -28,6 +28,7 @@ const ControlledInput = ({
   field,
   fieldState,
   name,
+  label,
   clearErrors,
   isFocused,
   onFocusChange,
@@ -36,29 +37,35 @@ const ControlledInput = ({
   ...rest
 }: ControlledInputProps) => {
   // ref for the shake animation target
-  const containerRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   // Shake the label whenever validation fails, clear RHF errors on recovery.
   // This effect is now at the top level of a real component — no hook violation.
   useEffect(() => {
+    const label = rootRef.current?.querySelector(".MuiInputLabel-root");
+
+    if (!label) return;
     if (fieldState.invalid && !fieldState.isValidating) {
-      const label = containerRef.current?.querySelector<HTMLLabelElement>(
-        ".MuiInputLabel-root",
-      );
-      if (!label) return;
+      // const label = containerRef.current?.querySelector<HTMLLabelElement>(
+      //   ".MuiInputLabel-root",
+      // );
+      // if (!label) return;
       label.classList.add("shake");
       const timer = setTimeout(() => label.classList.remove("shake"), 500);
       return () => clearTimeout(timer);
-    } else if (!fieldState.invalid) {
+    }
+
+    if (!fieldState.invalid) {
       clearErrors(name);
     }
   }, [fieldState.invalid, fieldState.isValidating, name, clearErrors]);
 
   return (
     <BaseInput
-      ref={containerRef}
+      rootRef={rootRef}
       field={field}
       fieldState={fieldState}
+      label={label}
       isFocused={isFocused}
       isValidating={fieldState.isValidating}
       onFocus={(e) => {

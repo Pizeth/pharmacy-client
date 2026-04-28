@@ -408,8 +408,31 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
               ) : null
             }
           />
-          {/* 3. The Results Dropdown (Popper) */}
-          {/* <Popper
+
+          <PoperResult
+            open={open}
+            anchorEl={containerRef.current}
+            width={containerRef.current?.clientWidth}
+            results={results}
+            error={error}
+            activeIndex={activeIndex}
+            setValue={setValue}
+            setOpen={setOpen}
+            onSelect={(p) => console.log("Selected:", p)}
+          />
+        </FormInput>
+      </Root>
+    </ClickAwayListener>
+  );
+};
+
+export default GlobalSearch;
+
+{
+  /* 3. The Results Dropdown (Popper) */
+}
+{
+  /* <Popper
             open={open}
             anchorEl={containerRef.current}
             placement="bottom"
@@ -478,75 +501,58 @@ const GlobalSearch = ({ label = "ស្វែងរក..." }: { label?: string }
                 </Paper>
               </Fade>
             )}
-          </Popper> */}
-          <PoperResult
-            open={open}
-            anchorEl={containerRef.current}
-            width={containerRef.current?.clientWidth}
-            results={results}
-            error={error}
-            activeIndex={activeIndex}
-            setValue={setValue}
-            setOpen={setOpen}
-            onSelect={(p) => console.log("Selected:", p)}
-          />
-        </FormInput>
-      </Root>
-    </ClickAwayListener>
-  );
+          </Popper> */
+}
 
-  //   return (
-  //     <Root>
-  //       <Label
-  //         // shrink={shouldShrink} // 2. Override default behavior
-  //         sx={
-  //           {
-  //             // 3. When NOT shrunk, shift the label to the right to avoid the Search icon
-  //             //   ...(!shouldShrink && {
-  //             //     transform: "translate(44px, 16px) scale(1)",
-  //             //   }),
-  //           }
-  //         }
-  //       >
-  //         ស្វែងរក...
-  //       </Label>
+//   return (
+//     <Root>
+//       <Label
+//         // shrink={shouldShrink} // 2. Override default behavior
+//         sx={
+//           {
+//             // 3. When NOT shrunk, shift the label to the right to avoid the Search icon
+//             //   ...(!shouldShrink && {
+//             //     transform: "translate(44px, 16px) scale(1)",
+//             //   }),
+//           }
+//         }
+//       >
+//         ស្វែងរក...
+//       </Label>
 
-  //       <Input
-  //         value={value}
-  //         onChange={(e) => setValue(e.target.value)}
-  //         onFocus={() => setFocused(true)}
-  //         onBlur={() => setFocused(false)}
-  //         // label="ស្វែងរក" // Required for the outline to calculate the cutout width
-  //         notched={shouldShrink} // 4. Tell the outline when to cut the notch
-  //         // startAdornment={
-  //         //   <InputAdornment position="start">
-  //         //     <SearchIcon />
-  //         //   </InputAdornment>
-  //         // }
-  //         // sx={{
-  //         //   borderRadius: 50,
-  //         //   backgroundColor: alpha(theme.palette.common.white, 0.15),
-  //         //   transition: theme.transitions.create(["background-color", "width"]),
-  //         //   "&:hover": {
-  //         //     backgroundColor: alpha(theme.palette.common.white, 0.25),
-  //         //     "& svg": {
-  //         //       fill: theme.palette.error.main,
-  //         //     },
-  //         //   },
-  //         //   // 5. Keep your original input width transition
-  //         //   "& .MuiOutlinedInput-input": {
-  //         //     transition: theme.transitions.create("width"),
-  //         //     [theme.breakpoints.up("sm")]: {
-  //         //       width: "12ch",
-  //         //       "&:focus": {
-  //         //         width: "20ch",
-  //         //       },
-  //         //     },
-  //         //   },
-  //         // }}
-  //       />
-  //     </Root>
-  //   );
-};
-
-export default GlobalSearch;
+//       <Input
+//         value={value}
+//         onChange={(e) => setValue(e.target.value)}
+//         onFocus={() => setFocused(true)}
+//         onBlur={() => setFocused(false)}
+//         // label="ស្វែងរក" // Required for the outline to calculate the cutout width
+//         notched={shouldShrink} // 4. Tell the outline when to cut the notch
+//         // startAdornment={
+//         //   <InputAdornment position="start">
+//         //     <SearchIcon />
+//         //   </InputAdornment>
+//         // }
+//         // sx={{
+//         //   borderRadius: 50,
+//         //   backgroundColor: alpha(theme.palette.common.white, 0.15),
+//         //   transition: theme.transitions.create(["background-color", "width"]),
+//         //   "&:hover": {
+//         //     backgroundColor: alpha(theme.palette.common.white, 0.25),
+//         //     "& svg": {
+//         //       fill: theme.palette.error.main,
+//         //     },
+//         //   },
+//         //   // 5. Keep your original input width transition
+//         //   "& .MuiOutlinedInput-input": {
+//         //     transition: theme.transitions.create("width"),
+//         //     [theme.breakpoints.up("sm")]: {
+//         //       width: "12ch",
+//         //       "&:focus": {
+//         //         width: "20ch",
+//         //       },
+//         //     },
+//         //   },
+//         // }}
+//       />
+//     </Root>
+//   );

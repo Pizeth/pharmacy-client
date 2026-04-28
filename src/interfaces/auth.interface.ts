@@ -168,7 +168,7 @@ export interface MeteorVariables extends CSSProperties {
 
 export interface ValidationState {
   message: string;
-  status: "error" | "success" | "loading" | "idle" | "required";
+  status: "error" | "success" | "loading" | "idle" | "required" | "cancelled";
 }
 
 export interface PasswordResult extends ValidationState {

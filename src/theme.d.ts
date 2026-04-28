@@ -103,3 +103,4 @@ export type GradientOptions = {
 };
 
 export type AuthAction = "signin" | "signup";
+export type AsyncRuleType = "email" | "username" | "none";

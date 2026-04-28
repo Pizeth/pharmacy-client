@@ -1,6 +1,7 @@
 import { StyleComponent } from "@/types/classKey";
 import {
   AvatarOwnProps,
+  ButtonProps,
   ChipPropsColorOverrides,
   ChipPropsSizeOverrides,
   ChipPropsVariantOverrides,
@@ -21,9 +22,9 @@ import {
 } from "react-hook-form";
 import { SaveHandler } from "ra-core";
 import { SaveButtonProps } from "react-admin";
-import { AuthAction } from "@/theme";
+import { AsyncRuleType, AuthAction } from "@/theme";
 import { Circle } from "lucide-react";
-import { HtmlHTMLAttributes, ReactNode, RefObject } from "react";
+import { HtmlHTMLAttributes, ReactNode, Ref, RefObject } from "react";
 import { VirtualElement } from "@popperjs/core/lib/types";
 import { IParticlesProps } from "@tsparticles/react/dist/IParticlesProps";
 import { OverridableStringUnion } from "@mui/types";
@@ -107,11 +108,18 @@ export interface DrawerToggleProps extends HtmlHTMLAttributes<HTMLDivElement> {
   sx?: SxProps<Theme>;
 }
 
-export interface ValidatedButtonProps extends SaveButtonProps {
+// export interface ValidatedButtonProps extends SaveButtonProps {
+//   loading?: boolean;
+//   authType?: AuthAction;
+//   className?: string;
+//   sx?: any;
+// }
+
+export interface ValidatedButtonProps extends Omit<ButtonProps, "loading"> {
+  /** Whether the form submission is in-flight */
   loading?: boolean;
+  /** Controls label and icon: "signin" → Sign In, "signup" → Sign Up */
   authType?: AuthAction;
-  className?: string;
-  sx?: any;
 }
 
 export interface ShootingStarData {
@@ -332,29 +340,42 @@ export interface ParticleProps extends IParticlesProps {
   children?: React.ReactNode;
 }
 
-export interface BaseInputProps extends Omit<TextFieldProps, "variant"> {
-  field: UseControllerReturn["field"];
-  fieldState: UseControllerReturn["fieldState"];
+export interface BaseInputProps<
+  TFieldValues extends FieldValues = FieldValues,
+> extends Omit<TextFieldProps, "variant"> {
+  field: UseControllerReturn<TFieldValues>["field"];
+  fieldState: UseControllerReturn<TFieldValues>["fieldState"];
+  /** Pass "password" to activate the built-in show/hide toggle */
+  type?: string;
   iconStart?: ReactNode;
   iconEnd?: ReactNode;
-  isPassword?: boolean;
+  /**
+   * Show a clear button when the field has a value.
+   * Defaults to `true` so text fields always get a clear button unless
+   * explicitly opted out with `resettable={false}`.
+   */
   resettable?: boolean;
   clearAlwaysVisible?: boolean;
   isValidating?: boolean;
   isFocused?: boolean;
-  helper?: ReactNode;
+  // Explicitly add this to resolve the destructuring conflict
+  readOnly?: boolean;
+  helperText?: ReactNode;
+  ref?: Ref<HTMLDivElement>; // Standard prop in React 19
+  rootRef?: React.RefObject<HTMLDivElement | null>;
+  inputRef?: React.Ref<HTMLInputElement>;
 }
 
 export interface InputAdornmentProps {
   value: string;
+  /** Pass "password" to activate the show/hide toggle internally */
   type?: string;
-  isPassword?: boolean;
   resettable?: boolean;
   clearAlwaysVisible?: boolean;
   disabled?: boolean;
   readOnly?: boolean;
   isValidating?: boolean;
-  iconEnd: React.ReactNode;
+  iconEnd: ReactNode;
   onClear: () => void;
 }
 
@@ -368,4 +389,29 @@ export interface IconInputProps<TFieldValues extends FieldValues = FieldValues>
   clearAlwaysVisible?: boolean;
   iconStart?: React.ReactNode;
   iconEnd?: React.ReactNode;
+  behavior?: FieldBehavior;
+}
+
+export interface PasswordFieldProps<
+  TFieldValues extends FieldValues = FieldValues,
+> extends IconInputProps<TFieldValues> {
+  /**
+   * Show the zxcvbn strength meter below the field.
+   * When true, also wires up `strengthRule` as the async RHF validator so the
+   * field stays invalid until the password is strong enough.
+   */
+  strengthMeter?: boolean;
+  /**
+   * Value of the password field this one must match (confirm-password use case).
+   * When provided, wires up `matchRule` automatically.
+   */
+  matchPassword?: string;
+}
+
+export interface FieldBehavior {
+  clearable?: boolean;
+  passwordToggle?: boolean;
+  asyncValidate?: AsyncRuleType;
+  showSpinner?: boolean;
+  shakeOnError?: boolean;
 }

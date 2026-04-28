@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { useForm, FieldValues, FormProvider } from "react-hook-form";
+import {
+  useForm,
+  SubmitHandler,
+  FormProvider,
+  useFormContext,
+} from "react-hook-form";
 import {
   Typography,
   Link,
@@ -8,9 +13,7 @@ import {
   CardContent,
   Box,
 } from "@mui/material";
-// import PersonIcon from "@mui/icons-material/Person";
 import { styled, useThemeProps } from "@mui/material/styles";
-// import IconInput from "../CustomInputs/IconInput";
 import {
   PermIdentity,
   Person,
@@ -19,14 +22,10 @@ import {
   Badge,
   Email,
 } from "@mui/icons-material";
-import { useRequired } from "@/utils/validator";
-// import PasswordValidationInput from "../CustomInputs/PasswordValidationInput";
-import { LoginParams } from "@/interfaces/auth.interface";
 import {
   AuthFormProps,
   LoginFormProps,
 } from "@/interfaces/component-props.interface";
-// import ValidatedButton from "./ui/validatedButton";
 import { useLogin, useRegister } from "@refinedev/core";
 import {
   loginSchema,
@@ -39,6 +38,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import TextField from "@/components/inputs/textfield";
 import PasswordField from "@/components/inputs/passwordfield";
 import ValidatedButton from "@/components/inputs/validatedButton";
+// ✅ Real-time async email uniqueness check — debounced, cancellable
+import {
+  useAsyncFieldRule,
+  usePasswordValidation,
+} from "@/lib/hooks/useFieldValidation";
+
+// ─── Styled slots ─────────────────────────────────────────────────────────────
 
 const PREFIX = "RazethAuthForm";
 
@@ -67,7 +73,6 @@ const Content = styled(Box, {
       duration: theme.transitions.duration.short,
     }),
     "&:focus": {
-      // color: "#e1232e", // focused
       color: theme.palette.primary.main, // focused
     },
   },
@@ -105,6 +110,79 @@ const Footer = styled(Box, {
   gap: theme.spacing(0),
 }));
 
+// ─── Confirm password — needs watch("password") from FormProvider context ─────
+const ConfirmPasswordField = () => {
+  const { watch } = useFormContext();
+  const passwordValue: string = watch("password") ?? "";
+  return (
+    <PasswordField
+      name="confirmPassword"
+      label="Confirm Password"
+      matchPassword={passwordValue}
+    />
+  );
+};
+
+// ─── Register fields — extracted so hooks run inside FormProvider ─────────────
+const RegisterFields = () => {
+  const asyncEmailRule = useAsyncFieldRule("email");
+  const asyncUsernameRule = useAsyncFieldRule("username");
+  console.log("RegisterFields rendered, async rules created", {
+    asyncEmailRule,
+    asyncUsernameRule,
+  });
+  return (
+    <>
+      <TextField
+        name="name"
+        label="Full Name"
+        iconStart={<Badge />}
+        rules={{ required: "Name is required" }}
+        fullWidth
+      />
+      <TextField
+        name="email"
+        label="Email Address"
+        type="email"
+        iconStart={<Email />}
+        rules={{
+          required: "Email is required",
+          validate: asyncEmailRule,
+        }}
+        fullWidth
+      />
+      <TextField
+        name="username"
+        label="Username"
+        iconStart={<Person />}
+        rules={{
+          required: "Username is required",
+          validate: asyncUsernameRule,
+        }}
+        fullWidth
+      />
+      <AuthForm.password>
+        <PasswordField name="password" label="Password" strengthMeter />
+        <ConfirmPasswordField />
+      </AuthForm.password>
+    </>
+  );
+};
+
+// Mini Helpers
+const getDefaults = (mode: string) =>
+  mode === "signin"
+    ? { identifier: "", password: "" }
+    : {
+        name: "",
+        email: "",
+        username: "",
+        password: "",
+        confirmPassword: "",
+      };
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 const AuthForm = (inProps: AuthFormProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
   const {
@@ -120,12 +198,7 @@ const AuthForm = (inProps: AuthFormProps) => {
     ...rest
   } = props;
 
-  // const [loading, setLoading] = useState(false);
-
-  // State to track current mode (login or signup)
-  // const [currentMode, setCurrentMode] = useState<AuthAction>(mode);
   const isLogin = mode === "signin";
-
   const schema = isLogin ? loginSchema : registerSchema;
 
   // useEffect(() => {
@@ -152,138 +225,140 @@ const AuthForm = (inProps: AuthFormProps) => {
   const { mutate: register, isPending: isRegisterPending } =
     useRegister<RegisterValues>();
 
+  // ── Async email uniqueness rule ────────────────────────────────────────────
+  // The hook debounces calls and cancels in-flight requests on unmount/change,
+  // so we never hammer the API. It returns a Promise<string | boolean> that RHF
+  // accepts directly in `rules.validate`.
+  // const asyncEmailRule = useAsyncFieldRule("email");
+  // const asyncUsernameRule = useAsyncFieldRule("username");
+  // const { strengthRule, matchRule } = usePasswordValidation("password");
+
+  // Two separate form instances with their own default values and schemas.
+  // Keeping them separate avoids cross-contamination of validation state
+  // when the user switches between signin and signup modes.
   const form = useForm<LoginValues | RegisterValues>({
     resolver: zodResolver(schema),
     mode: "onChange",
-    defaultValues: isLogin
-      ? { identifier: "", password: "" }
-      : { username: "", email: "", password: "", confirmPassword: "" },
+    defaultValues: getDefaults(mode),
   });
 
-  const {
-    control,
-    register: registerField,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = form;
+  // ✅ CRITICAL: reset when mode changes
+  useEffect(() => {
+    form.reset(getDefaults(mode));
+  }, [mode, form]);
 
-  const onSubmit = async (values: any) => {
+  const { handleSubmit } = form;
+
+  const onSubmit = async (values: LoginValues | RegisterValues) => {
     if (isLogin) {
-      // Sends { identifier, password } to authProvider.login
-      login(values); // 🔥 uses your authProvider automatically
+      login(values as LoginValues); // 🔥 uses authProvider automatically
     } else {
       // Sends { email, username, password, name } to authProvider.register
-      register(values, {
+      register(values as RegisterValues, {
         onSuccess: (data) => {
           if (!data.success) {
             // handle error
             console.error("Registration failed:", data.error);
             return;
           }
-          login(values);
+          // Auto-login after successful registration
+          login({
+            identifier: (values as RegisterValues).email, // or values.username, depending on the backend
+            password: (values as RegisterValues).password,
+          });
         },
       });
     }
   };
 
   const handleForgotPassword = useCallback(() => {
-    // Navigate to forgot password page
     window.location.href = forgotPasswordUrl;
   }, [forgotPasswordUrl]);
 
+  const isSubmitting = isPending || isRegisterPending;
+
+  // FormProvider exposes the RHF context to every TextField/PasswordField
+  // via useFormContext() — no need to thread `control` down manually.
   return (
     <FormProvider {...form}>
       <Root
-        // component="form"
         onSubmit={handleSubmit(onSubmit)}
-        // mode="onChange"
-        // noValidate
         className={className}
         sx={sx}
         {...rest}
       >
         <CardContent>
+          {/* Allow full slot override via children */}
           {children || (
             <AuthForm.content>
-              {/* <IconInput
-              source="credential"
-              className="icon-input"
-              iconStart={<Person />}
-              fullWidth
-              // helper={true}
-              label={translate("razeth.auth.credentail")}
-              autoComplete="username"
-              validate={required()}
-              resettable
-            /> */}
               {isLogin ? (
-                <TextField
-                  name="identifier"
-                  // control={control}
-                  label="Username or Email"
-                  iconStart={<Person />}
-                  rules={{ required: "Username or Email is required" }}
-                  fullWidth
-                />
-              ) : (
+                // ── Sign-in fields ─────────────────────────────────────────
                 <>
                   <TextField
-                    name="name"
-                    // control={control}
-                    label="Full Name"
-                    iconStart={<Badge />}
-                    rules={{ required: "Name is required" }}
-                    fullWidth
-                  />
-                  <TextField
-                    name="email"
-                    // control={control}
-                    label="Email Address"
-                    type="email"
-                    iconStart={<Email />}
-                    rules={{ required: "Email is required" }}
-                    fullWidth
-                  />
-                  <TextField
-                    name="username"
-                    // control={control}
-                    label="Username"
+                    name="identifier"
+                    label="Username or Email"
                     iconStart={<Person />}
-                    rules={{ required: "Username is required" }}
+                    rules={{ required: "Username or Email is required" }}
                     fullWidth
                   />
+                  <AuthForm.password>
+                    <PasswordField name="password" label="Password" />
+                  </AuthForm.password>
                 </>
+              ) : (
+                // ── Registration fields ────────────────────────────────────
+                // <>
+                //   <TextField
+                //     name="name"
+                //     label="Full Name"
+                //     iconStart={<Badge />}
+                //     rules={{ required: "Name is required" }}
+                //     fullWidth
+                //   />
+                //   <TextField
+                //     name="email"
+                //     label="Email Address"
+                //     type="email"
+                //     iconStart={<Email />}
+                //     rules={{
+                //       required: "Email is required",
+                //       // ✅ Real-time uniqueness check — debounced, no schema duplication
+                //       validate: asyncEmailRule,
+                //     }}
+                //     fullWidth
+                //   />
+                //   <TextField
+                //     name="username"
+                //     label="Username"
+                //     iconStart={<Person />}
+                //     rules={{
+                //       required: "Username is required",
+                //       // ✅ Real-time uniqueness check — debounced, no schema duplication
+                //       validate: asyncUsernameRule,
+                //     }}
+                //     fullWidth
+                //   />
+                // </>
+                <RegisterFields />
               )}
-              <AuthForm.password>
-                {/* <PasswordValidationInput
-                source="password"
-                iconStart={<Password />}
-                className="icon-input"
-                // helper={true}
-                label={translate("razeth.auth.password")}
-                autoComplete="current-password"
-                validate={required()}
-                resettable
-                fullWidth
-                // strengthMeter
-              /> */}
+
+              {/* ── Password fields ────────────────────────────────────── */}
+              {/* <AuthForm.password>
                 <PasswordField
                   name="password"
-                  control={control}
                   label="Password"
-                  type="password"
+                  rules={{ validate: strengthRule }}
                 />
-
                 {!isLogin && (
                   <PasswordField
                     name="confirmPassword"
-                    control={control}
                     label="Confirm Password"
-                    type="password"
+                    rules={{ validate: (v) => matchRule(v, watch("password")) }}
                   />
                 )}
-              </AuthForm.password>
+              </AuthForm.password> */}
+
+              {/* ── Remember me / forgot password (sign-in only) ────────── */}
               {isLogin && (
                 <AuthForm.footer>
                   <Typography
@@ -293,26 +368,24 @@ const AuthForm = (inProps: AuthFormProps) => {
                   >
                     <FormControlLabel
                       control={<Checkbox defaultChecked />}
-                      // label={translate("razeth.auth.remember_me")}
                       label={"Remember Me"}
                     />
                   </Typography>
                   <Link
-                    // href={forgotPasswordUrl}
                     component="button"
                     type="button"
                     variant="body2"
                     onClick={handleForgotPassword}
                   >
-                    {/* {forgotPassword || translate("razeth.auth.forgot_password")} */}
                     {forgotPassword}
-                    {/* {forgotPasswordIcon} */}
                   </Link>
                 </AuthForm.footer>
               )}
+
+              {/* ── Submit button — authType drives label + icon ─────────── */}
               <ValidatedButton
-                loading={isPending || isRegisterPending}
-                authType="signin"
+                loading={isSubmitting}
+                authType={isLogin ? "signin" : "signup"}
               />
             </AuthForm.content>
           )}
