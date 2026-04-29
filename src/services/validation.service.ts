@@ -13,6 +13,7 @@ const PASSWORD_REGEX =
 // Sentinel status used internally when a request is superseded by a newer one.
 // Hooks treat this as "no error yet" and wait for the next resolve.
 const CANCELLED = "cancelled" as const;
+const cache = new Map<string, string | true>();
 
 // ─── Async field validator (username / email uniqueness etc.) ─────────────────
 
@@ -25,9 +26,15 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
 
   const validator = debounce(
     async (value: string, onResult: (res: ValidationState) => void) => {
-      console.log(`Validating ${source}:`, value); // Debug log
-      console.log("Current controller before validation:", controller); // Debug log
-      console.log("Debounced validator called for", source); // Debug log
+      // 🔥 CACHE HIT
+      if (cache.has(value)) {
+        const cached = cache.get(value);
+        onResult({
+          message: cached === true ? "Available" : (cached as string),
+          status: cached === true ? "success" : "error",
+        });
+        return;
+      }
 
       // 1. Setup AbortController
       // Cancel the previous in-flight request (only for THIS validator instance)
@@ -51,6 +58,12 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
 
         console.log("Validation response:", data); // Debug log
         const { status, message } = data;
+
+        // Cache the result for future calls with the same value
+        cache.set(
+          value,
+          status === statusCode.OK ? true : message || "Invalid",
+        );
 
         onResult(
           status === statusCode.OK

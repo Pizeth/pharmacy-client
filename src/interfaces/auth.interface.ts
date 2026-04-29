@@ -3,8 +3,9 @@ import { Theme } from "@emotion/react";
 import { ButtonProps, SxProps } from "@mui/material";
 import { CSSProperties, HtmlHTMLAttributes, ReactNode } from "react";
 import { Meteor, MeteorConfig, MeteorState } from "./theme.interface";
-import { AuthAction } from "@/theme";
 import { extend } from "lodash";
+import { Field } from "react-hook-form";
+import { AuthAction, FieldStatus } from "@/types/auth";
 
 export interface LoginParams {
   // For form login
@@ -169,6 +170,7 @@ export interface MeteorVariables extends CSSProperties {
 export interface ValidationState {
   message: string;
   status: "error" | "success" | "loading" | "idle" | "required" | "cancelled";
+  // status: FieldStatus;
 }
 
 export interface PasswordResult extends ValidationState {

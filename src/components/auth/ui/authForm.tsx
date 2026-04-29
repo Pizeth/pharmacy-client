@@ -43,6 +43,7 @@ import {
   useAsyncFieldRule,
   usePasswordValidation,
 } from "@/lib/hooks/useFieldValidation";
+import hybridResolver from "@/lib/validations/hybridResolver";
 
 // ─── Styled slots ─────────────────────────────────────────────────────────────
 
@@ -111,7 +112,7 @@ const Footer = styled(Box, {
 }));
 
 // ─── Confirm password — needs watch("password") from FormProvider context ─────
-const ConfirmPasswordField = () => {
+const ConfirmPasswordFieldOld = () => {
   const { watch } = useFormContext();
   const passwordValue: string = watch("password") ?? "";
   return (
@@ -124,20 +125,20 @@ const ConfirmPasswordField = () => {
 };
 
 // ─── Register fields — extracted so hooks run inside FormProvider ─────────────
-const RegisterFields = () => {
-  const asyncEmailRule = useAsyncFieldRule("email");
-  const asyncUsernameRule = useAsyncFieldRule("username");
-  console.log("RegisterFields rendered, async rules created", {
-    asyncEmailRule,
-    asyncUsernameRule,
-  });
+const RegisterFieldsOld = () => {
+  // const asyncEmailRule = useAsyncFieldRule("email");
+  // const asyncUsernameRule = useAsyncFieldRule("username");
+  // console.log("RegisterFields rendered, async rules created", {
+  //   asyncEmailRule,
+  //   asyncUsernameRule,
+  // });
   return (
     <>
       <TextField
         name="name"
         label="Full Name"
         iconStart={<Badge />}
-        rules={{ required: "Name is required" }}
+        // rules={{ required: "Name is required" }}
         fullWidth
       />
       <TextField
@@ -145,20 +146,20 @@ const RegisterFields = () => {
         label="Email Address"
         type="email"
         iconStart={<Email />}
-        rules={{
-          required: "Email is required",
-          validate: asyncEmailRule,
-        }}
+        // rules={{
+        //   required: "Email is required",
+        //   validate: asyncEmailRule.validate,
+        // }}
         fullWidth
       />
       <TextField
         name="username"
         label="Username"
         iconStart={<Person />}
-        rules={{
-          required: "Username is required",
-          validate: asyncUsernameRule,
-        }}
+        // rules={{
+        //   required: "Username is required",
+        //   validate: asyncUsernameRule.validate,
+        // }}
         fullWidth
       />
       <AuthForm.password>
@@ -169,8 +170,60 @@ const RegisterFields = () => {
   );
 };
 
+// ─── Confirm password — needs watch("password") from context ──────────────────
+const ConfirmPasswordField = () => {
+  const { watch } = useFormContext();
+  const passwordValue: string = watch("password") ?? "";
+  return (
+    <PasswordField
+      name="confirmPassword"
+      label="Confirm Password"
+      matchPassword={passwordValue} // wires match validation via useEffect
+    />
+  );
+};
+
+// ─── Register fields ──────────────────────────────────────────────────────────
+const RegisterFields = () => (
+  <>
+    <TextField
+      name="name"
+      label="Full Name"
+      iconStart={<Badge />}
+      rules={{ required: "Name is required" }}
+      fullWidth
+    />
+    <TextField
+      name="email"
+      label="Email Address"
+      type="email"
+      iconStart={<Email />}
+      rules={{ required: "Email is required" }}
+      // asyncValidate triggers the side-effect channel (useEffect → setError)
+      // which works even though useForm has a zodResolver.
+      asyncValidate
+      fullWidth
+    />
+    <TextField
+      name="username"
+      label="Username"
+      iconStart={<Person />}
+      rules={{ required: "Username is required" }}
+      asyncValidate // checks username availability against the API
+      fullWidth
+    />
+    <AuthForm.password>
+      {/* strengthMeter wires zxcvbn strength check via useEffect → setError */}
+      <PasswordField name="password" label="Password" strengthMeter />
+      <ConfirmPasswordField />
+    </AuthForm.password>
+  </>
+);
+
 // Mini Helpers
-const getDefaults = (mode: string) =>
+const getDefaults = (
+  mode: "signin" | "signup",
+): LoginValues | RegisterValues =>
   mode === "signin"
     ? { identifier: "", password: "" }
     : {
@@ -199,6 +252,22 @@ const AuthForm = (inProps: AuthFormProps) => {
   } = props;
 
   const isLogin = mode === "signin";
+
+  // 🔥 async validators
+  const emailAsync = useAsyncFieldRule("email");
+  const usernameAsync = useAsyncFieldRule("username");
+  const { strengthRule } = usePasswordValidation("password");
+  const { matchRule } = usePasswordValidation("confirmPassword");
+
+  const asyncMap = isLogin
+    ? undefined
+    : {
+        email: emailAsync.validate,
+        username: usernameAsync.validate,
+        password: strengthRule,
+        // confirmPassword: matchRule,
+      };
+
   const schema = isLogin ? loginSchema : registerSchema;
 
   // useEffect(() => {
@@ -236,8 +305,14 @@ const AuthForm = (inProps: AuthFormProps) => {
   // Two separate form instances with their own default values and schemas.
   // Keeping them separate avoids cross-contamination of validation state
   // when the user switches between signin and signup modes.
-  const form = useForm<LoginValues | RegisterValues>({
-    resolver: zodResolver(schema),
+  // const form = useForm<LoginValues | RegisterValues>({
+  //   resolver: zodResolver(schema),
+  //   mode: "onChange",
+  //   defaultValues: getDefaults(mode),
+  // });
+
+  const form = useForm({
+    resolver: hybridResolver(schema, asyncMap),
     mode: "onChange",
     defaultValues: getDefaults(mode),
   });
@@ -276,6 +351,8 @@ const AuthForm = (inProps: AuthFormProps) => {
   }, [forgotPasswordUrl]);
 
   const isSubmitting = isPending || isRegisterPending;
+  const isFormReady =
+    form.formState.isValid && !form.formState.isValidating && !isSubmitting;
 
   // FormProvider exposes the RHF context to every TextField/PasswordField
   // via useFormContext() — no need to thread `control` down manually.
@@ -386,6 +463,7 @@ const AuthForm = (inProps: AuthFormProps) => {
               <ValidatedButton
                 loading={isSubmitting}
                 authType={isLogin ? "signin" : "signup"}
+                disabled={!isFormReady}
               />
             </AuthForm.content>
           )}

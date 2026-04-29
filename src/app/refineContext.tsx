@@ -4,6 +4,7 @@ import authProvider from "@/lib/providers/authProvider";
 import { Refine } from "@refinedev/core";
 import dataProvider from "@refinedev/nestjsx-crud";
 import routerProvider from "@refinedev/nextjs-router";
+import { Suspense } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 export const RefineContext = ({ children }: { children: React.ReactNode }) => {
@@ -34,7 +35,7 @@ export const RefineContext = ({ children }: { children: React.ReactNode }) => {
         },
       ]}
     >
-      {children}
+      <Suspense fallback={null}>{children}</Suspense>
     </Refine>
   );
 };

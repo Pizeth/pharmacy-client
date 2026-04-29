@@ -7,6 +7,7 @@ import { darkTheme } from "@/theme/razeth";
 import ThemeProviderWrapper from "@/components/effect/themes/theme-wrapper";
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import RefineContext from "./refineContext";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -137,6 +138,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* React Scan monitoring script */}
+        <Script
+          src="https://unpkg.com/react-scan/dist/auto.global.js"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} ${kantumruy.variable} ${montserrat.variable} ${tactieng.variable} antialiased`}
       >

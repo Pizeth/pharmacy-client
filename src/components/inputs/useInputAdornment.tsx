@@ -107,8 +107,8 @@ export const useInputAdornment = (
                 sx={{
                   opacity: hasClearableValue || clearAlwaysVisible ? 1 : 0,
                   transition: "opacity 0.2s",
-                  width: 16,
-                  height: 16,
+                  width: "1rem",
+                  height: "1rem",
                 }}
               />
             </IconButton>

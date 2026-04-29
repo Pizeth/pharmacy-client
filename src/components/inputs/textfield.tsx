@@ -2,23 +2,37 @@
 import { Controller, useFormContext } from "react-hook-form";
 import { useThemeProps } from "@mui/material";
 import { IconInputProps } from "@/interfaces/component-props.interface";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ControlledInput from "./controlledInput";
+import { useAsyncFieldRule } from "@/lib/hooks/useFieldValidation";
 
 const PREFIX = "RazethTextField";
 export const TextField = (inProps: IconInputProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { name, label, rules, defaultValue, ...rest } = props;
-  const { control, clearErrors } = useFormContext();
-
+  const { name, type, label, rules, defaultValue, behavior, ...rest } = props;
+  const { control, clearErrors, setError } = useFormContext();
   const [focused, setFocused] = useState(false);
+
+  // 🔥 Async rule (safe hook usage)
+  const async = behavior?.asyncValidate
+    ? useAsyncFieldRule(behavior.asyncValidate)
+    : null;
+
+  const mergedRules = useMemo(() => {
+    if (!async) return rules;
+
+    return {
+      ...rules,
+      validate: async.validate,
+    };
+  }, [rules, behavior]);
 
   return (
     <Controller
       name={name}
       control={control}
       defaultValue={defaultValue}
-      rules={rules}
+      rules={mergedRules}
       render={({ field, fieldState }) => (
         // ✅ No hooks here — render prop is a plain JSX expression
         <ControlledInput
@@ -27,8 +41,12 @@ export const TextField = (inProps: IconInputProps) => {
           label={label}
           name={name}
           clearErrors={clearErrors}
+          setError={setError}
           isFocused={focused}
           onFocusChange={setFocused}
+          isValidating={async?.status === "validating"}
+          resettable={behavior?.clearable}
+          type={behavior?.passwordToggle ? "password" : type}
           {...rest}
         />
       )}

@@ -15,19 +15,26 @@ import {
 import { Property } from "csstype";
 import { SignUpParams } from "./auth.interface";
 import {
+  ControllerFieldState,
+  ControllerRenderProps,
+  ErrorOption,
   FieldValues,
   SubmitHandler,
   UseControllerProps,
   UseControllerReturn,
+  UseFormClearErrors,
+  UseFormSetError,
 } from "react-hook-form";
 import { SaveHandler } from "ra-core";
 import { SaveButtonProps } from "react-admin";
-import { AsyncRuleType, AuthAction } from "@/theme";
+// import { AsyncRuleType, AuthAction } from "@/types";
 import { Circle } from "lucide-react";
 import { HtmlHTMLAttributes, ReactNode, Ref, RefObject } from "react";
 import { VirtualElement } from "@popperjs/core/lib/types";
 import { IParticlesProps } from "@tsparticles/react/dist/IParticlesProps";
 import { OverridableStringUnion } from "@mui/types";
+import { AsyncRuleType, AuthAction } from "@/types/auth";
+import { extend } from "lodash";
 
 export interface AuthProps extends HtmlHTMLAttributes<HTMLDivElement> {
   // content?: ReactNode;
@@ -340,6 +347,37 @@ export interface ParticleProps extends IParticlesProps {
   children?: React.ReactNode;
 }
 
+// export interface IconInputProps<TFieldValues extends FieldValues = FieldValues>
+//   extends
+//     UseControllerProps<TFieldValues>,
+//     Omit<TextFieldProps, "name" | "defaultValue"> {
+//   // Add any other custom props from BaseInput here if they aren't in TextFieldProps
+//   isPassword?: boolean;
+//   resettable?: boolean;
+//   clearAlwaysVisible?: boolean;
+//   iconStart?: React.ReactNode;
+//   iconEnd?: React.ReactNode;
+//   behavior?: FieldBehavior;
+// }
+
+export interface IconInputProps<
+  TFieldValues extends FieldValues = FieldValues,
+> extends Omit<BaseInputProps<TFieldValues>, "field" | "fieldState"> {
+  name: string;
+  rules?: UseControllerProps["rules"];
+  defaultValue?: unknown;
+  behavior?: FieldBehavior;
+  /**
+   * Set true to run async uniqueness validation for this field.
+   *
+   * Why a separate prop and not rules.validate:
+   * RHF silently skips rules.validate on all fields when useForm has a resolver.
+   * This prop instead uses a useEffect side-effect channel (setError/clearErrors)
+   * which works regardless of whether a resolver is present.
+   */
+  asyncValidate?: boolean;
+}
+
 export interface BaseInputProps<
   TFieldValues extends FieldValues = FieldValues,
 > extends Omit<TextFieldProps, "variant"> {
@@ -366,6 +404,20 @@ export interface BaseInputProps<
   inputRef?: React.Ref<HTMLInputElement>;
 }
 
+export interface ControlledInputProps extends Omit<
+  BaseInputProps,
+  "field" | "fieldState"
+> {
+  field: ControllerRenderProps<FieldValues, string>;
+  fieldState: ControllerFieldState;
+  name: string;
+  asyncValidate?: boolean;
+  clearErrors: (name: string) => void;
+  setError: (name: string, error: ErrorOption) => void;
+  isFocused: boolean;
+  onFocusChange: (v: boolean) => void;
+}
+
 export interface InputAdornmentProps {
   value: string;
   /** Pass "password" to activate the show/hide toggle internally */
@@ -379,32 +431,40 @@ export interface InputAdornmentProps {
   onClear: () => void;
 }
 
-export interface IconInputProps<TFieldValues extends FieldValues = FieldValues>
-  extends
-    UseControllerProps<TFieldValues>,
-    Omit<TextFieldProps, "name" | "defaultValue"> {
-  // Add any other custom props from BaseInput here if they aren't in TextFieldProps
-  isPassword?: boolean;
-  resettable?: boolean;
-  clearAlwaysVisible?: boolean;
-  iconStart?: React.ReactNode;
-  iconEnd?: React.ReactNode;
-  behavior?: FieldBehavior;
-}
+// export interface PasswordFieldProps<
+//   TFieldValues extends FieldValues = FieldValues,
+// > extends IconInputProps<TFieldValues> {
+//   /**
+//    * Show the zxcvbn strength meter below the field.
+//    * When true, also wires up `strengthRule` as the async RHF validator so the
+//    * field stays invalid until the password is strong enough.
+//    */
+//   strengthMeter?: boolean;
+//   /**
+//    * Value of the password field this one must match (confirm-password use case).
+//    * When provided, wires up `matchRule` automatically.
+//    */
+//   matchPassword?: string;
+// }
 
-export interface PasswordFieldProps<
-  TFieldValues extends FieldValues = FieldValues,
-> extends IconInputProps<TFieldValues> {
-  /**
-   * Show the zxcvbn strength meter below the field.
-   * When true, also wires up `strengthRule` as the async RHF validator so the
-   * field stays invalid until the password is strong enough.
-   */
+export interface PasswordFieldProps extends Omit<
+  IconInputProps,
+  "asyncValidate" | "type"
+> {
+  /** Show the zxcvbn strength meter and wire up strength validation */
   strengthMeter?: boolean;
   /**
-   * Value of the password field this one must match (confirm-password use case).
-   * When provided, wires up `matchRule` automatically.
+   * Value of the password field to match against (confirm-password case).
+   * When provided, wires up match validation automatically.
    */
+  matchPassword?: string;
+}
+
+export interface ControlledPasswordInputProps extends Omit<
+  ControlledInputProps,
+  "type" | "asyncValidate"
+> {
+  strengthMeter: boolean;
   matchPassword?: string;
 }
 
@@ -414,4 +474,28 @@ export interface FieldBehavior {
   asyncValidate?: AsyncRuleType;
   showSpinner?: boolean;
   shakeOnError?: boolean;
+}
+
+export interface UseAsyncFieldValidationOptions {
+  /** RHF field name — also used as the API source path segment */
+  name: string;
+  /** Current field value, obtained from watch(name) */
+  value: string;
+  setError: UseFormSetError<FieldValues>;
+  clearErrors: UseFormClearErrors<FieldValues>;
+  /** Debounce delay in ms (default 500) */
+  debounceDelay?: number;
+  /** Skip validation entirely (e.g. field not yet dirty, or signin mode) */
+  enabled?: boolean;
+}
+
+export interface UsePasswordValidationOptions extends UseAsyncFieldValidationOptions {
+  threshold?: number;
+}
+
+export interface UseMatchPasswordOptions extends Omit<
+  UseAsyncFieldValidationOptions,
+  "debounceDelay"
+> {
+  matchValue: string;
 }
