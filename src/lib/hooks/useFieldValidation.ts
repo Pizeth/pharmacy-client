@@ -162,6 +162,8 @@ export const useAsyncFieldValidation = ({
   useEffect(() => {
     if (!enabled) return;
 
+    // 1. Check if we already have an error for this field to avoid redundant sets
+    // You might need to pass fieldState.error into this hook
     if (isEmpty(value?.trim() ?? "")) {
       validatorRef.current.cancel();
       clearErrors(name);
@@ -175,9 +177,11 @@ export const useAsyncFieldValidation = ({
     const cached = getCached(name, value);
     if (cached) {
       if (cached.status === "success") {
+        // ✅ Only clear if there is currently an error
         clearErrors(name);
         machine.setValid();
       } else {
+        // ✅ Only set if the message is different from the current one
         setError(name, { type: "async", message: cached.message });
         machine.setError();
       }
@@ -204,7 +208,7 @@ export const useAsyncFieldValidation = ({
         machine.setError();
       }
     });
-  }, [value, enabled, name, setError, clearErrors]);
+  }, [value, enabled, name]);
 };
 
 // ─── Password validation ──────────────────────────────────────────────────────

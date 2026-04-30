@@ -85,7 +85,6 @@ export function BaseInput<TFieldValues extends FieldValues>(
 
   return (
     <Box ref={rootRef}>
-      {" "}
       <TextField
         // ref={ref}
         inputRef={inputRef} // Forwarding to internal input

@@ -32,9 +32,8 @@ import {
 } from "@/theme/keyframes";
 import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
 import PersonIcon from "@mui/icons-material/Person";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthAction } from "@/theme";
 import { AuthProps } from "@/interfaces/component-props.interface";
 import AuthForm from "./ui/authForm";
 import { EffectProps } from "@/interfaces/auth.interface";
@@ -49,6 +48,7 @@ import TwinkleStars from "./effects/twinkleStars";
 import SocialLogin from "./socialLogin";
 import Footer from "./ui/footer";
 import Divider from "./divider";
+import { AuthAction } from "@/types/auth";
 
 const PREFIX = "RazethAuth";
 
@@ -1186,9 +1186,26 @@ Auth.image = ({ src, alt }: { src: string; alt: string }) => (
 );
 Auth.effect = ({ shootingStarCount, twinkleStarCount }: EffectProps) => {
   const theme = useTheme();
+
+  // 1. Memoize the config objects/arrays from the theme
+  const sideImageConfig = useMemo(
+    () => theme.custom?.sideImage || {},
+    [theme.custom?.sideImage],
+  );
+  const meteorConfig = useMemo(
+    () => theme.custom?.meteor || {},
+    [theme.custom?.meteor],
+  );
+
+  // 2. Specifically memoize the colors array since it's used in dependencies
+  const starColors = useMemo(
+    () => sideImageConfig?.starColors || ["#fff"],
+    [sideImageConfig?.starColors],
+  );
+
   // Get configurations from theme
-  const meteorConfig = theme.custom?.meteor;
-  const sideImageConfig = theme.custom?.sideImage;
+  // const meteorConfig = theme.custom?.meteor;
+  // const sideImageConfig = theme.custom?.sideImage;
 
   return (
     <Effect>
@@ -1238,7 +1255,7 @@ Auth.effect = ({ shootingStarCount, twinkleStarCount }: EffectProps) => {
         spawnInterval={sideImageConfig?.twinkleStarSpawnInterval || 3000}
         minLifetime={sideImageConfig?.twinkleStarMinLifetime || 10000}
         maxLifetime={sideImageConfig?.twinkleStarMaxLifetime || 25000}
-        colors={sideImageConfig?.starColors}
+        colors={starColors}
         baseSize={sideImageConfig?.starSize || 0.5}
         enabled={true}
       />

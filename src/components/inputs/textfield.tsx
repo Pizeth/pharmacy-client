@@ -14,25 +14,25 @@ export const TextField = (inProps: IconInputProps) => {
   const [focused, setFocused] = useState(false);
 
   // 🔥 Async rule (safe hook usage)
-  const async = behavior?.asyncValidate
-    ? useAsyncFieldRule(behavior.asyncValidate)
-    : null;
+  // const async = behavior?.asyncValidate
+  //   ? useAsyncFieldRule(behavior.asyncValidate)
+  //   : null;
 
-  const mergedRules = useMemo(() => {
-    if (!async) return rules;
+  // const mergedRules = useMemo(() => {
+  //   if (!async) return rules;
 
-    return {
-      ...rules,
-      validate: async.validate,
-    };
-  }, [rules, behavior]);
+  //   return {
+  //     ...rules,
+  //     validate: async.validate,
+  //   };
+  // }, [rules, behavior]);
 
   return (
     <Controller
       name={name}
       control={control}
       defaultValue={defaultValue}
-      rules={mergedRules}
+      // rules={mergedRules}
       render={({ field, fieldState }) => (
         // ✅ No hooks here — render prop is a plain JSX expression
         <ControlledInput
@@ -44,7 +44,7 @@ export const TextField = (inProps: IconInputProps) => {
           setError={setError}
           isFocused={focused}
           onFocusChange={setFocused}
-          isValidating={async?.status === "validating"}
+          // isValidating={async?.status === "validating"}
           resettable={behavior?.clearable}
           type={behavior?.passwordToggle ? "password" : type}
           {...rest}

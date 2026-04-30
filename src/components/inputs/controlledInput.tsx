@@ -17,18 +17,6 @@ import {
 import BaseInput from "./baseInput";
 import { useAsyncFieldValidation } from "@/lib/hooks/useFieldValidation";
 
-// interface ControlledInputProps extends Omit<
-//   BaseInputProps,
-//   "field" | "fieldState"
-// > {
-//   field: ControllerRenderProps<FieldValues, string>;
-//   fieldState: ControllerFieldState;
-//   name: string;
-//   clearErrors: (name: string) => void;
-//   isFocused: boolean;
-//   onFocusChange: (focused: boolean) => void;
-// }
-
 const ControlledInput = ({
   field,
   fieldState,
@@ -82,10 +70,10 @@ const ControlledInput = ({
 
     // ✅ Fix: Only clear errors if there actually IS an error to clear.
     // This prevents the infinite loop/render-update error.
-    if (!fieldState.invalid && fieldState.error) {
-      clearErrors(name);
-    }
-  }, [fieldState.invalid, fieldState.isValidating, name, clearErrors]);
+    // if (!fieldState.invalid && fieldState.error) {
+    //   clearErrors(name);
+    // }
+  }, [fieldState.invalid, fieldState.isValidating]);
 
   return (
     <BaseInput
@@ -110,3 +98,15 @@ const ControlledInput = ({
 };
 
 export default ControlledInput;
+
+// interface ControlledInputProps extends Omit<
+//   BaseInputProps,
+//   "field" | "fieldState"
+// > {
+//   field: ControllerRenderProps<FieldValues, string>;
+//   fieldState: ControllerFieldState;
+//   name: string;
+//   clearErrors: (name: string) => void;
+//   isFocused: boolean;
+//   onFocusChange: (focused: boolean) => void;
+// }
