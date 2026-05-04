@@ -56,7 +56,8 @@ function BackButton() {
   );
 }
 
-export default function NotFound() {
+// 1. Create a "UI Only" component
+export function NotFoundUI() {
   const [stars, setStars] = useState<Star[]>([]);
 
   // useEffect(() => {
@@ -68,34 +69,33 @@ export default function NotFound() {
   // }, []);
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-black" />}>
-      <div className="relative min-h-screen w-full bg-black text-white overflow-hidden font-sans">
-        {/* Background Image: using 'bg-space' from tailwind.config */}
-        <div className="absolute inset-0 bg-space bg-cover bg-center opacity-80" />
-        {/* Stars Layer */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {stars.map((star) => (
-            <div
-              key={star.id}
-              // Using the custom animations defined in tailwind.config.ts
-              className={`absolute rounded-full bg-white opacity-80 ${
-                star.direction === "topLeft"
-                  ? "animate-fall-topLeft"
-                  : "animate-fall-topRight"
-              }`}
-              style={{
-                top: star.top,
-                left: star.left,
-                width: `${star.size}px`,
-                height: `${star.size}px`,
-                animationDuration: `${star.duration}s`,
-                animationDelay: `${star.delay}s`,
-              }}
-            />
-          ))}
-        </div>
-        {/* UFO Container: Outer Float, Inner Tilt */}
-        {/* <div className="absolute top-1/3 right-1 -translate-x-1/2 -translate-y-1/2 animate-float z-10">
+    <div className="relative min-h-screen w-full bg-black text-white overflow-hidden font-sans">
+      {/* Background Image: using 'bg-space' from tailwind.config */}
+      <div className="absolute inset-0 bg-space bg-cover bg-center opacity-80" />
+      {/* Stars Layer */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {stars.map((star) => (
+          <div
+            key={star.id}
+            // Using the custom animations defined in tailwind.config.ts
+            className={`absolute rounded-full bg-white opacity-80 ${
+              star.direction === "topLeft"
+                ? "animate-fall-topLeft"
+                : "animate-fall-topRight"
+            }`}
+            style={{
+              top: star.top,
+              left: star.left,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              animationDuration: `${star.duration}s`,
+              animationDelay: `${star.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+      {/* UFO Container: Outer Float, Inner Tilt */}
+      {/* <div className="absolute top-1/3 right-1 -translate-x-1/2 -translate-y-1/2 animate-float z-10">
         <div className="animate-tilt">
           <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/8794272-p5k6GdbD8O2RIat5GWtUGJGkDgXoxf.png"
@@ -108,8 +108,8 @@ export default function NotFound() {
         </div>
       </div> */}
 
-        {/* UFO Container: Outer Float, Inner Tilt */}
-        {/* <div className="absolute top-1/2 left-1/6 -translate-x-1/2 -translate-y-1/2  z-10">
+      {/* UFO Container: Outer Float, Inner Tilt */}
+      {/* <div className="absolute top-1/2 left-1/6 -translate-x-1/2 -translate-y-1/2  z-10">
         <div>
           <Image
             src="/static/images/blue_marble.png"
@@ -122,19 +122,19 @@ export default function NotFound() {
         </div>
       </div> */}
 
-        <div className="absolute top-1/7 right-1 -translate-x-1/2 -translate-y-1/2 z-10">
-          <Saturn />
-        </div>
+      <div className="absolute top-1/7 right-1 -translate-x-1/2 -translate-y-1/2 z-10">
+        <Saturn />
+      </div>
 
-        <div>
-          {/* <TV /> */}
-          {/* <Mars /> */}
-          {/* <Jupyter /> */}
-          {/* <TestPlanet /> */}
-          {/* <Sun /> */}
-          {/* <Moon /> */}
-          {/* <Earth size={100} /> */}
-          {/* <div
+      <div>
+        {/* <TV /> */}
+        {/* <Mars /> */}
+        {/* <Jupyter /> */}
+        {/* <TestPlanet /> */}
+        {/* <Sun /> */}
+        {/* <Moon /> */}
+        {/* <Earth size={100} /> */}
+        {/* <div
           style={{
             position: "absolute",
             width: "35vmin",
@@ -144,60 +144,60 @@ export default function NotFound() {
             transform: "translate(-50%,-50%)",
           }}
         ></div> */}
-        </div>
-        {/* <div>
+      </div>
+      {/* <div>
         <Earth />
       </div> */}
-        {/* Text Content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pt-60 px-4 text-center z-20">
-          {/* <h1 className="mb-2 text-7xl font-bold text-white tracking-tighter drop-shadow-lg">
+      {/* Text Content */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pt-60 px-4 text-center z-20">
+        {/* <h1 className="mb-2 text-7xl font-bold text-white tracking-tighter drop-shadow-lg">
           404
         </h1> */}
-          {/* <p className="mb-8 text-xl text-gray-200 drop-shadow-md">
+        {/* <p className="mb-8 text-xl text-gray-200 drop-shadow-md">
           Oops! Looks like this page got lost in space
         </p>
         <BackButton /> */}
-          {/* <Link
+        {/* <Link
           href="/admin"
           className="px-6 py-3 text-white bg-purple-600/90 hover:bg-purple-600 rounded-lg transition-all shadow-lg shadow-purple-500/30 backdrop-blur-sm border border-purple-400/30"
         >
           Back to previous page
         </Link> */}
-        </div>
+      </div>
 
-        {/* Additional Decorative Stars */}
-        <div className="mars"></div>
-        {/* <img
+      {/* Additional Decorative Stars */}
+      <div className="mars"></div>
+      {/* <img
         src="https://assets.codepen.io/1538474/404.svg"
         className="logo-404"
       /> */}
-        {/* <img
+      {/* <img
         src="https://assets.codepen.io/1538474/meteor.svg"
         className="meteor"
       /> */}
-        <p className="title">Oh no!!</p>
-        <p className="subtitle">
-          You’re either misspelling the URL <br />
-          or requesting a page that's no longer here.
-        </p>
-        {/* <div className="flex justify-center">
+      <p className="title">Oh no!!</p>
+      <p className="subtitle">
+        You’re either misspelling the URL <br />
+        or requesting a page that's no longer here.
+      </p>
+      {/* <div className="flex justify-center">
         <a className="btn-back" href="#">
           Back to previous page
         </a>
       </div> */}
-        {/* <BackButton /> */}
-        <img
-          src="https://assets.codepen.io/1538474/astronaut.svg"
-          className="astronaut"
-        />
-        <img
-          src="https://assets.codepen.io/1538474/spaceship.svg"
-          className="spaceship"
-        />
+      {/* <BackButton /> */}
+      <img
+        src="https://assets.codepen.io/1538474/astronaut.svg"
+        className="astronaut"
+      />
+      <img
+        src="https://assets.codepen.io/1538474/spaceship.svg"
+        className="spaceship"
+      />
 
-        {/* Another 404 Page Styles */}
-        <div className="stars">
-          {/* <div className="custom-navbar">
+      {/* Another 404 Page Styles */}
+      <div className="stars">
+        {/* <div className="custom-navbar">
           <div class="brand-logo">
             <img src="http://salehriaz.com/404Page/img/logo.svg" width="80px" />
           </div>
@@ -230,23 +230,23 @@ export default function NotFound() {
             </ul>
           </div>
         </div> */}
-          <div className="central-body">
-            {/* <img
+        <div className="central-body">
+          {/* <img
             className="image-404"
             src="http://salehriaz.com/404Page/img/404.svg"
             width="300px"
           /> */}
-            <Link href="/admin" className="btn-go-home">
-              GO BACK HOME
-            </Link>
-          </div>
-          <div className="objects">
-            <img
-              className="object_rocket"
-              src="http://salehriaz.com/404Page/img/rocket.svg"
-              width="40px"
-            />
-            {/* <div className="earth-moon">
+          <Link href="/admin" className="btn-go-home">
+            GO BACK HOME
+          </Link>
+        </div>
+        <div className="objects">
+          <img
+            className="object_rocket"
+            src="http://salehriaz.com/404Page/img/rocket.svg"
+            width="40px"
+          />
+          {/* <div className="earth-moon">
             <img
               className="object_earth"
               src="http://salehriaz.com/404Page/img/earth.svg"
@@ -258,23 +258,31 @@ export default function NotFound() {
               width="80px"
             />
           </div> */}
-            <div className="box_astronaut">
-              <img
-                className="object_astronaut"
-                src="http://salehriaz.com/404Page/img/astronaut.svg"
-                width="140px"
-              />
-            </div>
-          </div>
-          <div className="glowing_stars">
-            <div className="star"></div>
-            <div className="star"></div>
-            <div className="star"></div>
-            <div className="star"></div>
-            <div className="star"></div>
+          <div className="box_astronaut">
+            <img
+              className="object_astronaut"
+              src="http://salehriaz.com/404Page/img/astronaut.svg"
+              width="140px"
+            />
           </div>
         </div>
+        <div className="glowing_stars">
+          <div className="star"></div>
+          <div className="star"></div>
+          <div className="star"></div>
+          <div className="star"></div>
+          <div className="star"></div>
+        </div>
       </div>
+    </div>
+  );
+}
+
+// 2. The default export MUST be the wrapper
+export default function NotFound() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <NotFoundUI />
     </Suspense>
   );
 }
