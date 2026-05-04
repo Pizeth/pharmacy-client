@@ -44,6 +44,7 @@ import {
   usePasswordValidation,
 } from "@/lib/hooks/useFieldValidation";
 import hybridResolver from "@/lib/validations/hybridResolver";
+import { useFormOrchestrator } from "@/lib/hooks/useFormOrchestrator";
 
 // ─── Styled slots ─────────────────────────────────────────────────────────────
 
@@ -178,6 +179,7 @@ const ConfirmPasswordField = () => {
     <PasswordField
       name="confirmPassword"
       label="Confirm Password"
+      required
       matchPassword={passwordValue} // wires match validation via useEffect
     />
   );
@@ -189,6 +191,7 @@ const RegisterFields = () => (
     <TextField
       name="name"
       label="Full Name"
+      required
       iconStart={<Badge />}
       rules={{ required: "Name is required" }}
       fullWidth
@@ -197,6 +200,7 @@ const RegisterFields = () => (
       name="email"
       label="Email Address"
       type="email"
+      required
       iconStart={<Email />}
       rules={{ required: "Email is required" }}
       // asyncValidate triggers the side-effect channel (useEffect → setError)
@@ -207,6 +211,7 @@ const RegisterFields = () => (
     <TextField
       name="username"
       label="Username"
+      required
       iconStart={<Person />}
       rules={{ required: "Username is required" }}
       asyncValidate // checks username availability against the API
@@ -214,7 +219,7 @@ const RegisterFields = () => (
     />
     <AuthForm.password>
       {/* strengthMeter wires zxcvbn strength check via useEffect → setError */}
-      <PasswordField name="password" label="Password" strengthMeter />
+      <PasswordField name="password" label="Password" required strengthMeter />
       <ConfirmPasswordField />
     </AuthForm.password>
   </>
@@ -305,17 +310,17 @@ const AuthForm = (inProps: AuthFormProps) => {
   // Two separate form instances with their own default values and schemas.
   // Keeping them separate avoids cross-contamination of validation state
   // when the user switches between signin and signup modes.
-  // const form = useForm<LoginValues | RegisterValues>({
-  //   resolver: zodResolver(schema),
-  //   mode: "onChange",
-  //   defaultValues: getDefaults(mode),
-  // });
-
-  const form = useForm({
-    resolver: hybridResolver(schema, asyncMap),
+  const form = useForm<LoginValues | RegisterValues>({
+    resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: getDefaults(mode),
   });
+
+  // const form = useForm({
+  //   resolver: hybridResolver(schema, asyncMap),
+  //   mode: "onChange",
+  //   defaultValues: getDefaults(mode),
+  // });
 
   // ✅ CRITICAL: reset when mode changes
   useEffect(() => {
@@ -351,8 +356,10 @@ const AuthForm = (inProps: AuthFormProps) => {
   }, [forgotPasswordUrl]);
 
   const isSubmitting = isPending || isRegisterPending;
-  const isFormReady =
+  const isReady =
     form.formState.isValid && !form.formState.isValidating && !isSubmitting;
+
+  // const { isReady, isSubmitting } = useFormOrchestrator(form);
 
   // FormProvider exposes the RHF context to every TextField/PasswordField
   // via useFormContext() — no need to thread `control` down manually.
@@ -374,12 +381,13 @@ const AuthForm = (inProps: AuthFormProps) => {
                   <TextField
                     name="identifier"
                     label="Username or Email"
+                    required
                     iconStart={<Person />}
                     rules={{ required: "Username or Email is required" }}
                     fullWidth
                   />
                   <AuthForm.password>
-                    <PasswordField name="password" label="Password" />
+                    <PasswordField name="password" label="Password" required />
                   </AuthForm.password>
                 </>
               ) : (
@@ -463,7 +471,7 @@ const AuthForm = (inProps: AuthFormProps) => {
               <ValidatedButton
                 loading={isSubmitting}
                 authType={isLogin ? "signin" : "signup"}
-                disabled={!isFormReady}
+                disabled={!isReady}
               />
             </AuthForm.content>
           )}

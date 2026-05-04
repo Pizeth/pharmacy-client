@@ -7,7 +7,7 @@ import {
   BaseInputProps,
   ControlledInputProps,
 } from "@/interfaces/component-props.interface";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
   ControllerFieldState,
   ControllerRenderProps,
@@ -34,13 +34,20 @@ const ControlledInput = ({
   // ref for the shake animation target
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const clearFieldErrors: UseFormClearErrors<FieldValues> = (fieldName) => {
-    if (typeof fieldName === "string") {
-      clearErrors(fieldName);
-    } else if (Array.isArray(fieldName)) {
-      fieldName.forEach((nameItem) => clearErrors(nameItem));
-    }
-  };
+  // ✅ CRITICAL: memoize this wrapper so it doesn't change identity every render.
+  // Without useCallback, a new function is created each render, which lands in
+  // the useEffect deps array inside useAsyncFieldValidation and fires the effect
+  // on every single render → infinite setState loop.
+  const clearFieldErrors: UseFormClearErrors<FieldValues> = useCallback(
+    (fieldName) => {
+      if (typeof fieldName === "string") {
+        clearErrors(fieldName);
+      } else if (Array.isArray(fieldName)) {
+        fieldName.forEach((nameItem) => clearErrors(nameItem));
+      }
+    },
+    [clearErrors],
+  );
 
   // Async validation side-effect — fires on value change via useEffect inside
   // the hook. Only enabled after the field is touched to avoid firing on mount.
@@ -59,9 +66,11 @@ const ControlledInput = ({
 
     // if (!label) return;
     if (fieldState.invalid && !fieldState.isValidating) {
+      console.log("rootRef", rootRef.current);
       const label = rootRef.current?.querySelector<HTMLLabelElement>(
         ".MuiInputLabel-root",
       );
+
       if (!label) return;
       label.classList.add("shake");
       const timer = setTimeout(() => label.classList.remove("shake"), 500);
@@ -70,10 +79,16 @@ const ControlledInput = ({
 
     // ✅ Fix: Only clear errors if there actually IS an error to clear.
     // This prevents the infinite loop/render-update error.
-    // if (!fieldState.invalid && fieldState.error) {
-    //   clearErrors(name);
-    // }
-  }, [fieldState.invalid, fieldState.isValidating]);
+    if (!fieldState.invalid && fieldState.error) {
+      clearErrors(name);
+    }
+  }, [
+    fieldState.invalid,
+    fieldState.isValidating,
+    fieldState.error,
+    name,
+    clearErrors,
+  ]);
 
   return (
     <BaseInput

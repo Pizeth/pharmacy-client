@@ -367,6 +367,7 @@ export interface IconInputProps<
   rules?: UseControllerProps["rules"];
   defaultValue?: unknown;
   behavior?: FieldBehavior;
+  required?: boolean;
   /**
    * Set true to run async uniqueness validation for this field.
    *

@@ -151,7 +151,7 @@ export const useAsyncFieldValidation = ({
 }: UseAsyncFieldValidationOptions) => {
   // Stable validator instance across renders
   const validatorRef = useRef(createAsyncValidator(name, debounceDelay));
-  const machine = useFieldMachine();
+  // const machine = useFieldMachine();
 
   // Cancel + teardown on unmount
   useEffect(() => {
@@ -167,11 +167,11 @@ export const useAsyncFieldValidation = ({
     if (isEmpty(value?.trim() ?? "")) {
       validatorRef.current.cancel();
       clearErrors(name);
-      machine.reset();
+      // machine.reset();
       return;
     }
 
-    machine.setTyping();
+    // machine.setTyping();
 
     // 🔥 CACHE HIT
     const cached = getCached(name, value);
@@ -179,16 +179,16 @@ export const useAsyncFieldValidation = ({
       if (cached.status === "success") {
         // ✅ Only clear if there is currently an error
         clearErrors(name);
-        machine.setValid();
+        // machine.setValid();
       } else {
         // ✅ Only set if the message is different from the current one
         setError(name, { type: "async", message: cached.message });
-        machine.setError();
+        // machine.setError();
       }
       return;
     }
 
-    machine.setValidating();
+    // machine.setValidating();
 
     validatorRef.current.validate(value, (result) => {
       if (result.status === "loading") return; // wait for terminal state
@@ -199,16 +199,16 @@ export const useAsyncFieldValidation = ({
 
       if (result.status === "success") {
         clearErrors(name);
-        machine.setValid();
+        // machine.setValid();
       } else {
         setError(name, {
           type: "async",
           message: result.message || "Validation failed",
         });
-        machine.setError();
+        // machine.setError();
       }
     });
-  }, [value, enabled, name]);
+  }, [value, enabled, name, setError, clearErrors]);
 };
 
 // ─── Password validation ──────────────────────────────────────────────────────
@@ -352,7 +352,7 @@ export const usePasswordStrengthValidation = ({
   const validatorRef = useRef(
     createPasswordValidator(debounceDelay, threshold),
   );
-  const machine = useFieldMachine();
+  // const machine = useFieldMachine();
 
   // Cancel + teardown on unmount
   useEffect(() => {
@@ -373,16 +373,30 @@ export const usePasswordStrengthValidation = ({
         warning: "",
         status: "idle",
       });
-      machine.reset();
+      // machine.reset();
       return;
     }
 
-    machine.setTyping();
+    // machine.setTyping();
 
     validatorRef.current.validate(value, name, (result) => {
       // Always update the meter — including the loading / "Analyzing…" state
       setFeedback(result);
-      machine.setValidating();
+      // machine.setValidating();
+
+      const isWeak = result.status === "error";
+
+      // ❗ DO NOT rely on RHF for strength blocking
+      // only use it for UI unless you explicitly want blocking
+
+      // if (isWeak) {
+      //   setError(name, {
+      //     type: "strength",
+      //     message: result.warning || result.message,
+      //   });
+      // } else {
+      //   clearErrors(name);
+      // }
 
       if (result.status === "loading") return;
       if ((result.status as string) === "cancelled") return;
@@ -394,10 +408,10 @@ export const usePasswordStrengthValidation = ({
           type: "async",
           message: result.warning || result.message || "Password is too weak",
         });
-        machine.setError();
+        // machine.setError();
       }
     });
-  }, [value, enabled, name, setError, clearErrors]);
+  }, [value, enabled, setError, clearErrors]);
 
   return { feedback };
 };

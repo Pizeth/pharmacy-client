@@ -4,7 +4,7 @@ import {
   usePasswordStrengthValidation,
 } from "@/lib/hooks/useFieldValidation";
 import Box from "@mui/material/Box";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import BaseInput from "./baseInput";
 import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
 import { FieldValues, UseFormClearErrors } from "react-hook-form";
@@ -26,13 +26,19 @@ const ControlledPasswordInput = ({
 }: ControlledPasswordInputProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const clearFieldErrors: UseFormClearErrors<FieldValues> = (fieldName) => {
-    if (typeof fieldName === "string") {
-      clearErrors(fieldName);
-    } else if (Array.isArray(fieldName)) {
-      fieldName.forEach((nameItem) => clearErrors(nameItem));
-    }
-  };
+  // ✅ CRITICAL: memoize — recreating this on every render puts a new function
+  // reference in the useEffect deps inside the validation hooks, which fires
+  // the effect every render and produces the infinite setState loop.
+  const clearFieldErrors: UseFormClearErrors<FieldValues> = useCallback(
+    (fieldName) => {
+      if (typeof fieldName === "string") {
+        clearErrors(fieldName);
+      } else if (Array.isArray(fieldName)) {
+        fieldName.forEach((nameItem) => clearErrors(nameItem));
+      }
+    },
+    [clearErrors],
+  );
 
   // ── Password strength side-effect ─────────────────────────────────────────
   // Enabled only when strengthMeter is requested AND the field has been touched.
@@ -41,8 +47,11 @@ const ControlledPasswordInput = ({
     value: field.value ?? "",
     setError,
     clearErrors: clearFieldErrors,
-    enabled: strengthMeter && fieldState.isTouched,
+    // Only run after the user has actually touched the field
+    enabled: !!strengthMeter && fieldState.isTouched,
   });
+
+  // console.log("feedback: ", feedback);
 
   // ── Match validation side-effect ──────────────────────────────────────────
   // Runs synchronously inside useEffect whenever either password changes.

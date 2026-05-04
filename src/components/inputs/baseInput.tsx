@@ -8,7 +8,7 @@ const PREFIX = "RazethBaseInput";
 
 // Pixels occupied by the start InputAdornment (icon button / icon wrapper).
 // MUI uses ~40px for "medium" and ~36px for "small" — 40 covers both safely.
-const START_ADORNMENT_WIDTH = 40;
+const START_ADORNMENT_WIDTH = 45;
 
 /**
  * Thin wrapper around MUI TextField that wires up:
@@ -70,7 +70,8 @@ export function BaseInput<TFieldValues extends FieldValues>(
 
   // Vertical translate differs between TextField sizes:
   //   medium → translate(14px, 16px)   small → translate(14px, 9px)
-  const yOffset = size === "small" ? 9 : 16;
+  // const yOffset = size === "small" ? 9 : 16;
+  const yOffset = 9;
 
   // When NOT shrunk and a start icon is present, slide the placeholder text
   // to the right so it starts after the icon — same technique as GlobalSearch.
@@ -79,7 +80,7 @@ export function BaseInput<TFieldValues extends FieldValues>(
     iconStart && !shouldShrink
       ? {
           // Override the default transform to push the label right of the icon
-          transform: `translate(${14 + START_ADORNMENT_WIDTH}px, ${yOffset}px) scale(1)`,
+          transform: `translate(${START_ADORNMENT_WIDTH}px, ${yOffset}px) scale(1)`,
         }
       : {};
 

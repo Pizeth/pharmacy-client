@@ -5,11 +5,22 @@ import { IconInputProps } from "@/interfaces/component-props.interface";
 import { useMemo, useState } from "react";
 import ControlledInput from "./controlledInput";
 import { useAsyncFieldRule } from "@/lib/hooks/useFieldValidation";
+import FieldTitle from "./fieldTitle";
 
 const PREFIX = "RazethTextField";
 export const TextField = (inProps: IconInputProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { name, type, label, rules, defaultValue, behavior, ...rest } = props;
+  const {
+    name,
+    type,
+    label,
+    rules,
+    defaultValue,
+    asyncValidate,
+    required,
+    behavior,
+    ...rest
+  } = props;
   const { control, clearErrors, setError } = useFormContext();
   const [focused, setFocused] = useState(false);
 
@@ -38,12 +49,22 @@ export const TextField = (inProps: IconInputProps) => {
         <ControlledInput
           field={field}
           fieldState={fieldState}
-          label={label}
+          label={
+            label !== "" && label !== false ? (
+              <FieldTitle
+                label={label}
+                // source={source}
+                isRequired={required}
+              />
+            ) : null
+          }
           name={name}
+          asyncValidate={asyncValidate}
           clearErrors={clearErrors}
           setError={setError}
           isFocused={focused}
           onFocusChange={setFocused}
+          // isValidating={fieldState.isValidating}
           // isValidating={async?.status === "validating"}
           resettable={behavior?.clearable}
           type={behavior?.passwordToggle ? "password" : type}

@@ -94,6 +94,12 @@ const globalStyles = (theme: Theme) => ({
     padding: `${theme.spacing(0)}`,
     // background-color: ${theme.palette.grey[100]};
   },
+
+  // ".shake": {
+  //   animation: `${shake} 0.5s ease-in-out`,
+  //   display: "inline-block",
+  //   position: "relative",
+  // },
 });
 
 const defaultThemeInvariants = {
