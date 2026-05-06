@@ -8,6 +8,8 @@ import ThemeProviderWrapper from "@/components/effect/themes/theme-wrapper";
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import RefineContext from "./refineContext";
 import Script from "next/script";
+import { Suspense } from "react";
+import PulseLoader from "@/components/effect/loaders/loader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -151,7 +153,9 @@ export default function RootLayout({
         {/* <AppRouterCacheProvider>{children}+ </AppRouterCacheProvider> */}
         <InitColorSchemeScript attribute="class" /> {/* ← before everything */}
         <ThemeProviderWrapper theme={darkTheme}>
-          <RefineContext>{children}</RefineContext>
+          <Suspense fallback={<PulseLoader />}>
+            <RefineContext>{children}</RefineContext>
+          </Suspense>
         </ThemeProviderWrapper>
       </body>
     </html>

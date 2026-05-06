@@ -4,6 +4,7 @@
 "use client";
 
 import PulseLoader from "@/components/effect/loaders/loader";
+import { Suspense } from "react";
 
 // export default function Loading() {
 //   return (
@@ -22,5 +23,9 @@ import PulseLoader from "@/components/effect/loaders/loader";
 // }
 
 export default function Loading() {
-  return <PulseLoader />;
+  return (
+    <Suspense>
+      <PulseLoader />
+    </Suspense>
+  );
 }

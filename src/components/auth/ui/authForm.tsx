@@ -193,7 +193,7 @@ const RegisterFields = () => (
       label="Full Name"
       required
       iconStart={<Badge />}
-      rules={{ required: "Name is required" }}
+      // rules={{ required: "Name is required" }}
       fullWidth
     />
     <TextField
@@ -202,7 +202,7 @@ const RegisterFields = () => (
       type="email"
       required
       iconStart={<Email />}
-      rules={{ required: "Email is required" }}
+      // rules={{ required: "Email is required" }}
       // asyncValidate triggers the side-effect channel (useEffect → setError)
       // which works even though useForm has a zodResolver.
       asyncValidate
@@ -213,7 +213,7 @@ const RegisterFields = () => (
       label="Username"
       required
       iconStart={<Person />}
-      rules={{ required: "Username is required" }}
+      // rules={{ required: "Username is required" }}
       asyncValidate // checks username availability against the API
       fullWidth
     />
@@ -310,17 +310,17 @@ const AuthForm = (inProps: AuthFormProps) => {
   // Two separate form instances with their own default values and schemas.
   // Keeping them separate avoids cross-contamination of validation state
   // when the user switches between signin and signup modes.
-  const form = useForm<LoginValues | RegisterValues>({
-    resolver: zodResolver(schema),
-    mode: "onChange",
-    defaultValues: getDefaults(mode),
-  });
-
-  // const form = useForm({
-  //   resolver: hybridResolver(schema, asyncMap),
+  // const form = useForm<LoginValues | RegisterValues>({
+  //   resolver: zodResolver(schema),
   //   mode: "onChange",
   //   defaultValues: getDefaults(mode),
   // });
+
+  const form = useForm({
+    resolver: hybridResolver(schema, asyncMap),
+    mode: "onChange",
+    defaultValues: getDefaults(mode),
+  });
 
   // ✅ CRITICAL: reset when mode changes
   useEffect(() => {

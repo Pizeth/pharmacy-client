@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { styled, useTheme } from "@mui/material/styles";
@@ -183,42 +183,40 @@ const PulseLoader = () => {
   //   );
 
   return (
-    <Suspense fallback={null}>
-      <Fade in={open} timeout={800}>
-        <Box
-          sx={{
-            position: "fixed",
-            inset: 0,
-            display: "flex",
-            flexDirection: "column", // Stack spinner and text
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: theme.zIndex.modal + 1,
-            backgroundColor: "rgba(0,0,0,0.95)",
-            backdropFilter: "blur(12px)",
-          }}
-        >
-          <Box sx={{ position: "relative" }}>
-            <Root>
-              <ContentWrapper>
-                <CircularProgress
-                  size="70%" // Occupy most of the inner space
-                  thickness={2} // Thinner line for an elegant feel
-                  color="error" // Set color from theme
-                  sx={{
-                    position: "relative",
-                    zIndex: 5,
-                    animationDuration: "1s", // Custom speed
-                  }}
-                />
-              </ContentWrapper>
-              <PulseRing />
-            </Root>
-          </Box>
-          <LoadingText variant="caption">{displayMessage}</LoadingText>
+    <Fade in={open} timeout={800}>
+      <Box
+        sx={{
+          position: "fixed",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column", // Stack spinner and text
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: theme.zIndex.modal + 1,
+          backgroundColor: "rgba(0,0,0,0.95)",
+          backdropFilter: "blur(12px)",
+        }}
+      >
+        <Box sx={{ position: "relative" }}>
+          <Root>
+            <ContentWrapper>
+              <CircularProgress
+                size="70%" // Occupy most of the inner space
+                thickness={2} // Thinner line for an elegant feel
+                color="error" // Set color from theme
+                sx={{
+                  position: "relative",
+                  zIndex: 5,
+                  animationDuration: "1s", // Custom speed
+                }}
+              />
+            </ContentWrapper>
+            <PulseRing />
+          </Root>
         </Box>
-      </Fade>
-    </Suspense>
+        <LoadingText variant="caption">{displayMessage}</LoadingText>
+      </Box>
+    </Fade>
   );
 };
 
