@@ -15,6 +15,8 @@ import {
 } from "@/interfaces/component-props.interface";
 import { useFieldMachine } from "./useFieldMachine";
 import { getCached, setCached } from "@/caches/validationCache";
+import useRefinement from "./useRefinement";
+import get from "lodash/get";
 
 // ─── Async field validation (username / email uniqueness etc.) ────────────────
 
@@ -234,18 +236,52 @@ export const usePasswordValidation = (
     status: "idle",
   });
 
+  // Create validator instance
   const validator = useMemo(
     () => createPasswordValidator(debounceDelay, threshold),
     [debounceDelay, threshold],
   );
 
   // Clean up on unmount
-  useEffect(() => () => validator.cancel(), [validator]);
+  useEffect(() => () => validator.cancel?.(), [validator]);
+
+  // Advanced refinement with caching + abort
+  const passwordRefinement = useRefinement<string>(
+    async (value, { signal }) => {
+      return new Promise<boolean>((resolve) => {
+        validator.validate(value, source, (result) => {
+          // ✅ Always update the meter, including during the loading phase
+          setFeedback(result);
+
+          if (result.status === "loading") return; // don't resolve yet
+
+          if (result.status === "cancelled") {
+            resolve(true); // let next validation take over
+            return;
+          }
+
+          resolve(result.status === "success");
+        });
+      });
+    },
+    {
+      debounce: 400,
+      cacheKey: (value) => value, // cache per password string
+    },
+  );
 
   /** Call in onChange to update the strength meter independently of RHF */
   const checkStrength = useCallback(
     (value: string) => validator.validate(value, source, setFeedback),
     [validator, source],
+  );
+
+  // Pure strength getter (no validation side effects)
+  const getPasswordStrength = useCallback(
+    async (value: string) => {
+      return validator.strength(value, source);
+    },
+    [validator],
   );
 
   /** Synchronous match check — use directly in `rules.validate` */
@@ -265,37 +301,39 @@ export const usePasswordValidation = (
    *    when a request is superseded by a newer keystroke.
    */
   const strengthRule = useCallback(
-    (value: string): Promise<string | boolean> => {
-      return new Promise<string | boolean>((resolve) => {
-        validator.validate(value, source, (result) => {
-          // if (result.status !== "loading") {
-          //   setFeedback(result);
-          //   resolve(
-          //     result.status === "success"
-          //       ? true
-          //       : result.warning || result.message || "Password is too weak",
-          //   );
-          // }
+    // (value: string): Promise<string | boolean> => {
+    //   return new Promise<string | boolean>((resolve) => {
+    //     validator.validate(value, source, (result) => {
+    //       // if (result.status !== "loading") {
+    //       //   setFeedback(result);
+    //       //   resolve(
+    //       //     result.status === "success"
+    //       //       ? true
+    //       //       : result.warning || result.message || "Password is too weak",
+    //       //   );
+    //       // }
 
-          // ✅ Always update the meter, including during the loading phase
-          setFeedback(result);
+    //       // ✅ Always update the meter, including during the loading phase
+    //       setFeedback(result);
 
-          if (result.status === "loading") return; // still in-flight
+    //       if (result.status === "loading") return; // still in-flight
 
-          if (result.status === "cancelled") {
-            resolve(true); // superseded — next call will validate properly
-            return;
-          }
+    //       if (result.status === "cancelled") {
+    //         resolve(true); // superseded — next call will validate properly
+    //         return;
+    //       }
 
-          resolve(
-            result.status === "success"
-              ? true
-              : result.warning || result.message || "Password is too weak",
-          );
-        });
-      });
-    },
-    [validator, source],
+    //       resolve(
+    //         result.status === "success"
+    //           ? true
+    //           : result.warning || result.message || "Password is too weak",
+    //       );
+    //     });
+    //   });
+    // },
+    // [validator, source],
+    (value: string) => passwordRefinement(value),
+    [passwordRefinement],
   );
 
   /**
@@ -316,7 +354,16 @@ export const usePasswordValidation = (
     [],
   );
 
-  return { feedback, checkStrength, checkMatch, strengthRule, matchRule };
+  // return { feedback, checkStrength, checkMatch, strengthRule, matchRule };
+  return {
+    feedback, // ← Use this in your UI (strength meter)
+    checkStrength, // Call on onChange for live feedback
+    checkMatch,
+    strengthRule, // Pass to Zod or RHF rules
+    matchRule,
+    getPasswordStrength,
+    invalidate: passwordRefinement.invalidate,
+  };
 
   // return {
   //   feedback,

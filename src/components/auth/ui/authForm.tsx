@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   useForm,
   SubmitHandler,
@@ -264,6 +264,23 @@ const AuthForm = (inProps: AuthFormProps) => {
   const { strengthRule } = usePasswordValidation("password");
   const { matchRule } = usePasswordValidation("confirmPassword");
 
+  // New unified hooks
+  // const { strengthRule, checkStrength, feedback, invalidate } =
+  //   usePasswordValidation("password", 3);
+
+  // const resolver = useMemo(() => {
+  //   let schema = isLogin ? loginSchema : registerSchema;
+
+  //   if (!isLogin) {
+  //     schema = schema.refine(strengthRule, {
+  //       message: "Password is too weak",
+  //       path: ["password"],
+  //     });
+  //   }
+
+  //   return zodResolver(schema);
+  // }, [isLogin, strengthRule]);
+
   const asyncMap = isLogin
     ? undefined
     : {
@@ -321,6 +338,12 @@ const AuthForm = (inProps: AuthFormProps) => {
     mode: "onChange",
     defaultValues: getDefaults(mode),
   });
+
+  // const form = useForm({
+  //   resolver,
+  //   mode: "onChange",
+  //   defaultValues: getDefaults(mode),
+  // });
 
   // ✅ CRITICAL: reset when mode changes
   useEffect(() => {

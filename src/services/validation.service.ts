@@ -13,6 +13,13 @@ const PASSWORD_REGEX =
 // Sentinel status used internally when a request is superseded by a newer one.
 // Hooks treat this as "no error yet" and wait for the next resolve.
 const CANCELLED = "cancelled" as const;
+const DEFAULT_RESULT: PasswordResult = {
+  score: 0,
+  isPwned: false,
+  message: "",
+  warning: "",
+  status: "idle",
+};
 const cache = new Map<string, string | true>();
 
 // ─── Async field validator (username / email uniqueness etc.) ─────────────────
@@ -132,16 +139,12 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
 
         if (signal.aborted) {
           onResult({
-            score: 0,
-            isPwned: false,
-            message: "",
+            ...DEFAULT_RESULT,
             status: CANCELLED,
           });
           return;
         }
 
-        const warningMsg = result.feedback.warning;
-        const suggestMsg = result.feedback.suggestions.join(" ");
         const score = result.score;
 
         // Check if any match came from the 'pwned' matcher
@@ -150,12 +153,16 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
         const isPwned = !!result.sequence.find((m) => m.pattern === "pwned");
         const isWeak = score < threshold || isPwned; // Adjust threshold (e.g., require score >= 3)
 
+        const warningMsg = result.feedback.warning;
+        const suggestMsg = result.feedback.suggestions.join(" ");
+        const message = isWeak
+          ? suggestMsg.trim()
+          : (warningMsg ?? "").concat(` ${suggestMsg}`).trim();
+
         onResult({
           score,
           isPwned,
-          message: isWeak
-            ? suggestMsg
-            : (warningMsg ?? "").concat(` ${suggestMsg}`).trim(),
+          message,
           status: isWeak ? "error" : "success",
         });
       } catch (e) {
@@ -168,16 +175,13 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
         // });
         if ((e as Error)?.name === "AbortError") {
           onResult({
-            score: 0,
-            isPwned: false,
-            message: "",
+            ...DEFAULT_RESULT,
             status: CANCELLED,
           });
           return;
         }
         onResult({
-          score: 0,
-          isPwned: false,
+          ...DEFAULT_RESULT,
           message: "Strength check failed",
           status: "error",
         });
@@ -197,9 +201,7 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
     if (isEmpty(value.trim())) {
       checkStrength.cancel();
       onResult({
-        score: 0,
-        isPwned: false,
-        message: "",
+        ...DEFAULT_RESULT,
         warning: `${source} is required`,
         status: "error",
       });
@@ -210,8 +212,7 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
     if (!PASSWORD_REGEX.test(value)) {
       checkStrength.cancel();
       onResult({
-        score: 0,
-        isPwned: false,
+        ...DEFAULT_RESULT,
         message: `${source} must be at least 10 characters, include uppercase, lowercase, number, and special character!`,
         warning: `${source} has invalid format`,
         status: "error",
@@ -221,17 +222,52 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
 
     // 3. --- ASYNCHRONOUS CHECK 3: Strength (zxcvbn) ---
     onResult({
-      score: 0,
-      isPwned: false,
+      ...DEFAULT_RESULT,
       message: `Analyzing ${source}...`,
       status: "loading",
     });
     checkStrength(value, onResult);
   };
 
+  const getPasswordStrength = async (
+    value: string,
+    source: string,
+  ): Promise<PasswordResult> => {
+    if (isEmpty(value?.trim()) || !PASSWORD_REGEX.test(value)) {
+      return {
+        ...DEFAULT_RESULT,
+        status: "error",
+      };
+    }
+
+    if (!zxcvbnAsyncFn) {
+      zxcvbnAsyncFn = await lazyZxcvbn.loadZxcvbn();
+    }
+
+    const result = await zxcvbnAsyncFn(value);
+    const score = result.score;
+    const isPwned = result.sequence.some((m) => m.pattern === "pwned");
+    const isWeak = score < threshold || isPwned;
+
+    const warningMsg = result.feedback.warning;
+    const suggestMsg = result.feedback.suggestions.join(" ");
+    const message = isWeak
+      ? suggestMsg.trim()
+      : (warningMsg ?? "").concat(` ${suggestMsg}`).trim();
+
+    return {
+      score,
+      isPwned,
+      message,
+      warning: result.feedback.warning || "",
+      status: isWeak ? "error" : "success",
+    };
+  };
+
   return {
     validate: validator,
     match: matchValidator,
+    strength: getPasswordStrength, // ← New: Pure strength check (no side effects)
     cancel: () => {
       checkStrength.cancel();
       if (controller) {

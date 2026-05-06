@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useMemo, useState } from "react";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
