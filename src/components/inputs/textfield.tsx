@@ -21,8 +21,8 @@ export const TextField = (inProps: IconInputProps) => {
     behavior,
     ...rest
   } = props;
-  const { control, clearErrors, setError } = useFormContext();
-  const [focused, setFocused] = useState(false);
+  const { control } = useFormContext();
+  // const [focused, setFocused] = useState(false);
 
   // 🔥 Async rule (safe hook usage)
   // const async = behavior?.asyncValidate
@@ -43,7 +43,7 @@ export const TextField = (inProps: IconInputProps) => {
       name={name}
       control={control}
       defaultValue={defaultValue}
-      // rules={mergedRules}
+      rules={rules}
       render={({ field, fieldState }) => (
         // ✅ No hooks here — render prop is a plain JSX expression
         <ControlledInput
@@ -60,10 +60,10 @@ export const TextField = (inProps: IconInputProps) => {
           }
           name={name}
           asyncValidate={asyncValidate}
-          clearErrors={clearErrors}
-          setError={setError}
-          isFocused={focused}
-          onFocusChange={setFocused}
+          // clearErrors={clearErrors}
+          // setError={setError}
+          // isFocused={focused}
+          // onFocusChange={setFocused}
           // isValidating={fieldState.isValidating}
           // isValidating={async?.status === "validating"}
           resettable={behavior?.clearable}

@@ -53,6 +53,7 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
 
       onResult({ message: "Checking...", status: "loading" });
 
+      console.log("we reached here");
       try {
         const { data } = await axios.get(
           `${API_URL}/validate/${source}/${value}`,
@@ -72,25 +73,47 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
           status === statusCode.OK ? true : message || "Invalid",
         );
 
-        onResult(
-          status === statusCode.OK
-            ? { message: message || "Available", status: "success" }
-            : { message: message || "Invalid", status: "error" },
-        );
+        // onResult(
+        //   status === statusCode.OK
+        //     ? { message: message || "Available", status: "success" }
+        //     : { message: message || "Invalid", status: "error" },
+        // );
+
+        // ✅ DEFER onResult to microtask - prevents setState during render
+        queueMicrotask(() => {
+          onResult(
+            status === statusCode.OK
+              ? { message: message || "Available", status: "success" }
+              : { message: message || "Invalid", status: "error" },
+          );
+        });
       } catch (e) {
         // ✅ Always call onResult on abort so the Promise in useAsyncFieldRule
         //    can resolve and RHF's isValidating flag clears.
-        if (axios.isCancel(e) || (e as Error)?.name === "AbortError") {
-          onResult({ message: "", status: CANCELLED });
-          return;
-        }
-        onResult({
-          message:
-            statusCode.getStatusText(statusCode.SERVICE_UNAVAILABLE) ||
-            "Validation service unavailable",
-          status: "error",
+        // if (axios.isCancel(e) || (e as Error)?.name === "AbortError") {
+        //   onResult({ message: "", status: CANCELLED });
+        //   // return;
+        // }
+        // onResult({
+        //   message:
+        //     statusCode.getStatusText(statusCode.SERVICE_UNAVAILABLE) ||
+        //     "Validation service unavailable",
+        //   status: "error",
+        // });
+        queueMicrotask(() => {
+          if (axios.isCancel(e) || (e as Error)?.name === "AbortError") {
+            onResult({ message: "", status: CANCELLED });
+          } else {
+            onResult({
+              message:
+                statusCode.getStatusText(statusCode.SERVICE_UNAVAILABLE) ||
+                "Validation service unavailable",
+              status: "error",
+            });
+          }
         });
       } finally {
+        console.log("Validation finally");
         // Only clear our controller, not someone else's.
         // Check signal identity to avoid clearing a newer controller.
         if (controller?.signal === signal) controller = null;

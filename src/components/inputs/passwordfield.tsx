@@ -1,15 +1,15 @@
 // RHFPasswordField.tsx
-import { Box, useThemeProps } from "@mui/material";
-import TextField from "./textfield";
+import { useThemeProps } from "@mui/material";
+// import TextField from "./textfield";
 import { PasswordFieldProps } from "@/interfaces/component-props.interface";
 import {
   Controller,
-  UseControllerProps,
+  // UseControllerProps,
   useFormContext,
 } from "react-hook-form";
-import { usePasswordValidation } from "@/lib/hooks/useFieldValidation";
-import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
-import { useState } from "react";
+// import { usePasswordValidation } from "@/lib/hooks/useFieldValidation";
+// import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
+// import { useState } from "react";
 import ControlledPasswordInput from "./controlledPasswordInput";
 
 const PREFIX = "RazethPasswordField";
@@ -24,8 +24,8 @@ export const PasswordField = (inProps: PasswordFieldProps) => {
     ...rest
   } = props;
 
-  const { control, clearErrors, setError } = useFormContext();
-  const [focused, setFocused] = useState(false);
+  const { control } = useFormContext();
+  // const [focused, setFocused] = useState(false);
 
   return (
     <Controller
@@ -40,10 +40,10 @@ export const PasswordField = (inProps: PasswordFieldProps) => {
           name={name}
           strengthMeter={strengthMeter}
           matchPassword={matchPassword}
-          clearErrors={clearErrors}
-          setError={setError}
-          isFocused={focused}
-          onFocusChange={setFocused}
+          // clearErrors={clearErrors}
+          // setError={setError}
+          // isFocused={focused}
+          // onFocusChange={setFocused}
           {...rest}
         />
       )}

@@ -45,6 +45,8 @@ import {
 } from "@/lib/hooks/useFieldValidation";
 import hybridResolver from "@/lib/validations/hybridResolver";
 import { useFormOrchestrator } from "@/lib/hooks/useFormOrchestrator";
+import { asZodRefine, createZodRefine } from "@/lib/hooks/useRefinement";
+import { z } from "zod";
 
 // ─── Styled slots ─────────────────────────────────────────────────────────────
 
@@ -186,14 +188,19 @@ const ConfirmPasswordField = () => {
 };
 
 // ─── Register fields ──────────────────────────────────────────────────────────
-const RegisterFields = () => (
+const RegisterFields = ({
+  checkStrength,
+  invalidate,
+}: {
+  checkStrength: (password: string) => void;
+  invalidate: () => void;
+}) => (
   <>
     <TextField
       name="name"
       label="Full Name"
       required
       iconStart={<Badge />}
-      // rules={{ required: "Name is required" }}
       fullWidth
     />
     <TextField
@@ -202,10 +209,9 @@ const RegisterFields = () => (
       type="email"
       required
       iconStart={<Email />}
-      // rules={{ required: "Email is required" }}
       // asyncValidate triggers the side-effect channel (useEffect → setError)
       // which works even though useForm has a zodResolver.
-      asyncValidate
+      // asyncValidate
       fullWidth
     />
     <TextField
@@ -213,13 +219,21 @@ const RegisterFields = () => (
       label="Username"
       required
       iconStart={<Person />}
-      // rules={{ required: "Username is required" }}
-      asyncValidate // checks username availability against the API
+      // asyncValidate // checks username availability against the API
       fullWidth
     />
     <AuthForm.password>
       {/* strengthMeter wires zxcvbn strength check via useEffect → setError */}
-      <PasswordField name="password" label="Password" required strengthMeter />
+      <PasswordField
+        name="password"
+        label="Password"
+        required
+        strengthMeter
+        // onChange={(e) => {
+        //   checkStrength(e.target.value);
+        //   invalidate(); // Clear old cache
+        // }}
+      />
       <ConfirmPasswordField />
     </AuthForm.password>
   </>
@@ -259,38 +273,72 @@ const AuthForm = (inProps: AuthFormProps) => {
   const isLogin = mode === "signin";
 
   // 🔥 async validators
-  const emailAsync = useAsyncFieldRule("email");
-  const usernameAsync = useAsyncFieldRule("username");
-  const { strengthRule } = usePasswordValidation("password");
-  const { matchRule } = usePasswordValidation("confirmPassword");
+  // const emailRule = useAsyncFieldRule("email");
+  // const usernameRule = useAsyncFieldRule("username");
+  // const { strengthRule } = usePasswordValidation("password");
+  // const { matchRule } = usePasswordValidation("confirmPassword");
 
   // New unified hooks
   // const { strengthRule, checkStrength, feedback, invalidate } =
   //   usePasswordValidation("password", 3);
 
-  // const resolver = useMemo(() => {
-  //   let schema = isLogin ? loginSchema : registerSchema;
+  // ── Async Rules ─────────────────────────────────────────────────────
+  const emailRule = useAsyncFieldRule("email");
+  const usernameRule = useAsyncFieldRule("username");
+  const { strengthRule, strengthZodRefine, checkStrength, invalidate } =
+    usePasswordValidation("password");
 
-  //   if (!isLogin) {
-  //     schema = schema.refine(strengthRule, {
-  //       message: "Password is too weak",
-  //       path: ["password"],
-  //     });
-  //   }
+  // ✅ Memoize if passing to children that aren't memoized
+  // const handlePasswordChange = useCallback(
+  //   (value: string) => {
+  //     checkStrength(value);
+  //     invalidate();
+  //   },
+  //   [checkStrength, invalidate],
+  // );
 
-  //   return zodResolver(schema);
-  // }, [isLogin, strengthRule]);
+  // ── Schema with proper field-level refinements ─────────────────────
+  const resolver = useMemo(() => {
+    let schema = isLogin ? loginSchema : registerSchema;
 
-  const asyncMap = isLogin
-    ? undefined
-    : {
-        email: emailAsync.validate,
-        username: usernameAsync.validate,
-        password: strengthRule,
-        // confirmPassword: matchRule,
-      };
+    // if (!isLogin) {
+    //   schema = schema.safeExtend({
+    //     // Re-apply field-level refinements
+    //     email: z.email().refine(emailRule.validate, {
+    //       message: "Email already in use",
+    //     }),
+    //     username: z.string().min(5).refine(usernameRule.validate, {
+    //       message: "Username already taken",
+    //     }),
+    //     password: z.string().min(10).refine(strengthRule, {
+    //       message: "Password is too weak",
+    //     }),
+    //   });
+    //   // .superRefine((data, ctx) => {
+    //   //   // 🔥 async email check
+    //   //   if (data.password !== data.confirmPassword) {
+    //   //     ctx.addIssue({
+    //   //       code: "custom",
+    //   //       path: ["confirmPassword"],
+    //   //       message: "Passwords do not match",
+    //   //     });
+    //   //   }
+    //   // });
+    // }
 
-  const schema = isLogin ? loginSchema : registerSchema;
+    return zodResolver(schema);
+  }, [isLogin, emailRule, usernameRule, strengthRule, strengthZodRefine]);
+
+  // const asyncMap = isLogin
+  //   ? undefined
+  //   : {
+  //       email: emailRule.validate,
+  //       username: usernameRule.validate,
+  //       password: strengthRule,
+  //       // confirmPassword: matchRule,
+  //     };
+
+  // const schema = isLogin ? loginSchema : registerSchema;
 
   // useEffect(() => {
   //   // already authenticated, redirect to the home page
@@ -312,10 +360,6 @@ const AuthForm = (inProps: AuthFormProps) => {
   //   // not authenticated, stay on the login page
   // }, [data, isFetching, router, redirectTo]); // ✅ Added necessary dependencies
 
-  const { mutate: login, isPending } = useLogin();
-  const { mutate: register, isPending: isRegisterPending } =
-    useRegister<RegisterValues>();
-
   // ── Async email uniqueness rule ────────────────────────────────────────────
   // The hook debounces calls and cancels in-flight requests on unmount/change,
   // so we never hammer the API. It returns a Promise<string | boolean> that RHF
@@ -333,22 +377,26 @@ const AuthForm = (inProps: AuthFormProps) => {
   //   defaultValues: getDefaults(mode),
   // });
 
-  const form = useForm({
-    resolver: hybridResolver(schema, asyncMap),
-    mode: "onChange",
-    defaultValues: getDefaults(mode),
-  });
-
   // const form = useForm({
-  //   resolver,
+  //   resolver: hybridResolver(schema, asyncMap),
   //   mode: "onChange",
   //   defaultValues: getDefaults(mode),
   // });
+
+  const form = useForm({
+    resolver,
+    mode: "onChange",
+    defaultValues: getDefaults(mode),
+  });
 
   // ✅ CRITICAL: reset when mode changes
   useEffect(() => {
     form.reset(getDefaults(mode));
   }, [mode, form]);
+
+  const { mutate: login, isPending } = useLogin();
+  const { mutate: register, isPending: isRegisterPending } =
+    useRegister<RegisterValues>();
 
   const { handleSubmit } = form;
 
@@ -447,7 +495,10 @@ const AuthForm = (inProps: AuthFormProps) => {
                 //     fullWidth
                 //   />
                 // </>
-                <RegisterFields />
+                <RegisterFields
+                  checkStrength={checkStrength}
+                  invalidate={invalidate}
+                />
               )}
 
               {/* ── Password fields ────────────────────────────────────── */}

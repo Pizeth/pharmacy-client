@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import { useCallback, useEffect, useRef } from "react";
 import BaseInput from "./baseInput";
 import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
-import { FieldValues, UseFormClearErrors } from "react-hook-form";
+// import { FieldValues, UseFormClearErrors } from "react-hook-form";
 
 const ControlledPasswordInput = ({
   field,
@@ -16,12 +16,12 @@ const ControlledPasswordInput = ({
   label,
   strengthMeter,
   matchPassword,
-  clearErrors,
-  setError,
-  isFocused,
-  onFocusChange,
-  onFocus,
-  onBlur,
+  // clearErrors,
+  // setError,
+  // isFocused,
+  // onFocusChange,
+  // onFocus,
+  // onBlur,
   ...rest
 }: ControlledPasswordInputProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,40 +29,40 @@ const ControlledPasswordInput = ({
   // ✅ CRITICAL: memoize — recreating this on every render puts a new function
   // reference in the useEffect deps inside the validation hooks, which fires
   // the effect every render and produces the infinite setState loop.
-  const clearFieldErrors: UseFormClearErrors<FieldValues> = useCallback(
-    (fieldName) => {
-      if (typeof fieldName === "string") {
-        clearErrors(fieldName);
-      } else if (Array.isArray(fieldName)) {
-        fieldName.forEach((nameItem) => clearErrors(nameItem));
-      }
-    },
-    [clearErrors],
-  );
+  // const clearFieldErrors: UseFormClearErrors<FieldValues> = useCallback(
+  //   (fieldName) => {
+  //     if (typeof fieldName === "string") {
+  //       clearErrors(fieldName);
+  //     } else if (Array.isArray(fieldName)) {
+  //       fieldName.forEach((nameItem) => clearErrors(nameItem));
+  //     }
+  //   },
+  //   [clearErrors],
+  // );
 
   // ── Password strength side-effect ─────────────────────────────────────────
   // Enabled only when strengthMeter is requested AND the field has been touched.
-  const { feedback } = usePasswordStrengthValidation({
-    name,
-    value: field.value ?? "",
-    setError,
-    clearErrors: clearFieldErrors,
-    // Only run after the user has actually touched the field
-    enabled: !!strengthMeter && fieldState.isTouched,
-  });
+  // const { feedback } = usePasswordStrengthValidation({
+  //   name,
+  //   value: field.value ?? "",
+  //   // setError,
+  //   // clearErrors: clearFieldErrors,
+  //   // Only run after the user has actually touched the field
+  //   enabled: !!strengthMeter && fieldState.isTouched,
+  // });
 
   // console.log("feedback: ", feedback);
 
   // ── Match validation side-effect ──────────────────────────────────────────
   // Runs synchronously inside useEffect whenever either password changes.
-  useMatchPasswordValidation({
-    name,
-    value: field.value ?? "",
-    matchValue: matchPassword ?? "",
-    setError: setError,
-    clearErrors: clearFieldErrors,
-    enabled: matchPassword !== undefined && fieldState.isTouched,
-  });
+  // useMatchPasswordValidation({
+  //   name,
+  //   value: field.value ?? "",
+  //   matchValue: matchPassword ?? "",
+  //   // setError: setError,
+  //   // clearErrors: clearFieldErrors,
+  //   enabled: matchPassword !== undefined && fieldState.isTouched,
+  // });
 
   // ── Shake label on invalid ────────────────────────────────────────────────
   useEffect(() => {
@@ -87,23 +87,25 @@ const ControlledPasswordInput = ({
         fieldState={fieldState}
         label={label}
         type="password"
-        isFocused={isFocused}
+        // isFocused={isFocused}
         isValidating={fieldState.isValidating}
-        onFocus={(e) => {
-          onFocusChange(true);
-          onFocus?.(e as React.FocusEvent<HTMLInputElement>);
-        }}
-        onBlur={(e) => {
-          onFocusChange(false);
-          field.onBlur();
-          onBlur?.(e as React.FocusEvent<HTMLInputElement>);
-        }}
+        // onFocus={(e) => {
+        //   onFocusChange(true);
+        //   onFocus?.(e as React.FocusEvent<HTMLInputElement>);
+        // }}
+        // onBlur={(e) => {
+        //   onFocusChange(false);
+        //   field.onBlur();
+        //   onBlur?.(e as React.FocusEvent<HTMLInputElement>);
+        // }}
         {...rest}
       />
-      {showMeter && (
+      {showMeter && (field.value?.length ?? 0) > 5 && (
         <PasswordStrengthMeter
-          passwordStrength={feedback.score}
-          passwordFeedback={feedback.message}
+          // passwordStrength={feedback.score}
+          // passwordFeedback={feedback.message}
+          passwordStrength={0}
+          passwordFeedback=""
         />
       )}
     </Box>

@@ -7,6 +7,9 @@ export interface Refinement<T> {
   getCached?(data: T): Promise<boolean> | null;
 }
 
+/** Type that Zod .refine() accepts */
+export type ZodRefineFn<T = any> = (value: T) => Promise<boolean> | boolean;
+
 export interface RefinementCallback<T> {
   (data: T, ctx: { signal: AbortSignal }): boolean | Promise<boolean>;
 }
@@ -65,7 +68,6 @@ export default function useRefinement<T>(
 
   const refinement = useMemo(() => {
     const cache = new Map<string, Promise<boolean>>();
-
     let abortController: AbortController | null = null;
     // let cachedResult: Promise<boolean> | null = null;
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -89,14 +91,11 @@ export default function useRefinement<T>(
       // Cancel any previous ongoing refinement (Best Practice for forms)
       // Automatically abort any pending or running process before starting a new one
       abort();
-
       abortController = new AbortController();
       const signal = abortController.signal;
 
       const key = getCacheKey(data);
-      if (key && cache.has(key)) {
-        return cache.get(key)!;
-      }
+      if (key && cache.has(key)) return cache.get(key)!;
 
       try {
         // Debounce if configured
@@ -113,7 +112,12 @@ export default function useRefinement<T>(
           if (signal.aborted) throw new DOMException("Aborted", "AbortError");
         }
 
-        const result = await ctxRef.current.callback(data, { signal });
+        // const result = await ctxRef.current.callback(data, { signal });
+
+        // ✅ KEY FIX: Wrap callback execution to defer any setState calls
+        const result = await Promise.resolve().then(() =>
+          ctxRef.current.callback(data, { signal }),
+        );
 
         if (key) cache.set(key, Promise.resolve(result));
         return result;
@@ -142,9 +146,7 @@ export default function useRefinement<T>(
       //   cachedResult = start(data);
       //   return cachedResult;
       const key = getCacheKey(data);
-      if (key && cache.has(key)) {
-        return cache.get(key)!;
-      }
+      if (key && cache.has(key)) return cache.get(key)!;
 
       const promise = start(data);
       if (key) cache.set(key, promise);
@@ -167,12 +169,19 @@ export default function useRefinement<T>(
   }, []); // Empty deps is fine because we use ctxRef
 
   // Cleanup on unmount
-  useEffect(
-    () => () => {
-      refinement.abort();
-    },
-    [refinement],
-  );
+  useEffect(() => () => refinement.abort(), [refinement]);
 
   return refinement.refine;
 }
+
+// Helper to convert our Refinement into something Zod loves
+export const asZodRefine = <T>(refinement: Refinement<T>): ZodRefineFn<T> => {
+  return (value: T) => refinement(value);
+};
+
+// Add this helper
+export const createZodRefine = <T>(fn: Refinement<T>) => {
+  const refineFn = (value: T) => fn(value);
+  refineFn.invalidate = fn.invalidate; // optional
+  return refineFn;
+};

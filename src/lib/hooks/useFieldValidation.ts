@@ -15,8 +15,7 @@ import {
 } from "@/interfaces/component-props.interface";
 import { useFieldMachine } from "./useFieldMachine";
 import { getCached, setCached } from "@/caches/validationCache";
-import useRefinement from "./useRefinement";
-import get from "lodash/get";
+import useRefinement, { asZodRefine } from "./useRefinement";
 
 // ─── Async field validation (username / email uniqueness etc.) ────────────────
 
@@ -68,7 +67,7 @@ export const useFieldValidation = (source: string, debounceDelay = 500) => {
  *   <TextField name="username" rules={{ validate: asyncRule }} />
  */
 export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
-  const [status, setStatus] = useState<FieldStatus>("idle");
+  // const [status, setStatus] = useState<FieldStatus>("idle");
 
   const validator = useMemo(
     () => createAsyncValidator(source, debounceDelay),
@@ -77,63 +76,117 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
 
   useEffect(() => () => validator.cancel(), [validator]);
 
-  const validate = useCallback(
-    (value: string): Promise<string | boolean> => {
-      if (isEmpty(value?.trim() ?? "")) {
-        setStatus("idle");
-        validator.cancel();
-        return Promise.resolve(`${StringUtils.capitalize(source)} is required`);
-      }
+  // const validate = useCallback(
+  //   (value: string): Promise<string | boolean> => {
+  //     if (isEmpty(value?.trim() ?? "")) {
+  //       setStatus("idle");
+  //       validator.cancel();
+  //       return Promise.resolve(`${StringUtils.capitalize(source)} is required`);
+  //     }
 
-      setStatus("typing");
-      // Wrap the callback-based validator in a Promise.
-      // We only resolve once we receive a terminal (non-loading) status so
-      // RHF's isValidating flag stays true for the full async duration.
-      return new Promise<string | boolean>((resolve) => {
-        // validator.validate(value, (result) => {
-        //   if (result.status !== "loading") {
-        //     resolve(
-        //       result.status === "success"
-        //         ? true
-        //         : result.message || "Validation failed",
-        //     );
-        //   }
-        // });
+  //     setStatus("typing");
+  //     // Wrap the callback-based validator in a Promise.
+  //     // We only resolve once we receive a terminal (non-loading) status so
+  //     // RHF's isValidating flag stays true for the full async duration.
+  //     return new Promise<string | boolean>((resolve) => {
+  //       // validator.validate(value, (result) => {
+  //       //   if (result.status !== "loading") {
+  //       //     resolve(
+  //       //       result.status === "success"
+  //       //         ? true
+  //       //         : result.message || "Validation failed",
+  //       //     );
+  //       //   }
+  //       // });
 
-        validator.validate(value, (result) => {
+  //       validator.validate(value, (result) => {
+  //         // "loading" → still in-flight, do not resolve yet
+  //         // "cancelled" → superseded by a newer keystroke, resolve clean so
+  //         //               RHF's isValidating clears; the next call will validate
+  //         if (result.status === "loading") {
+  //           setStatus("validating");
+  //           return;
+  //         }
+
+  //         if (result.status === "cancelled") {
+  //           resolve(true);
+  //           return;
+  //         }
+
+  //         if (result.status === "success") {
+  //           setStatus("valid");
+  //           resolve(true);
+  //         } else {
+  //           setStatus("error");
+  //           resolve(result.message);
+  //         }
+
+  //         // resolve(
+  //         //   result.status === "success"
+  //         //     ? true
+  //         //     : result.message || "Validation failed",
+  //         // );
+  //       });
+  //     });
+  //   },
+  //   [validator, source],
+  // );
+
+  // return { validate, status };
+
+  const validate = useRefinement<string>(
+    (value) =>
+      new Promise<boolean>((resolve) => {
+        validator.validate(value, (result: ValidationState) => {
           // "loading" → still in-flight, do not resolve yet
           // "cancelled" → superseded by a newer keystroke, resolve clean so
           //               RHF's isValidating clears; the next call will validate
           if (result.status === "loading") {
-            setStatus("validating");
-            return;
+            // setStatus("validating");
+            return; // still validating
           }
-
           if (result.status === "cancelled") {
             resolve(true);
             return;
           }
 
-          if (result.status === "success") {
-            setStatus("valid");
-            resolve(true);
-          } else {
-            setStatus("error");
-            resolve(result.message);
-          }
-
+          // Return boolean only!
+          resolve(result.status === "success");
+          // if (result.status === "success") {
+          //   setStatus("valid");
+          //   resolve(true);
+          // } else {
+          //   setStatus("error");
+          //   // throw new DOMException(result.message || "Invalid", "AbortError");
+          //   resolve(result.message || false);
+          //   // resolve(result.message || "Invalid");
+          // }
           // resolve(
-          //   result.status === "success"
-          //     ? true
-          //     : result.message || "Validation failed",
+          //   result.status === "success" ? true : (result.message ?? false),
+          // );
+
+          // if (result.status === "loading") return; // still validating
+          // if (result.status === "cancelled") {
+          //   resolve(true);
+          //   return;
+          // }
+          // resolve(
+          //   result.status === "success" ? true : result.message || "Invalid",
           // );
         });
-      });
+      }),
+    {
+      debounce: debounceDelay,
+      cacheKey: (value) => `${source}:${value}`,
     },
-    [validator, source],
   );
-
-  return { validate, status };
+  // return { validate, status };
+  return {
+    validate: validate, // for manual use
+    zodRefine: asZodRefine(validate), // ← Best for Zod
+    invalidate: validate.invalidate,
+  };
+  // return validate;
 };
 
 /**
@@ -146,71 +199,135 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
 export const useAsyncFieldValidation = ({
   name,
   value,
-  setError,
-  clearErrors,
+  // setError,
+  // clearErrors,
   debounceDelay = 500,
   enabled = true,
 }: UseAsyncFieldValidationOptions) => {
-  // Stable validator instance across renders
-  const validatorRef = useRef(createAsyncValidator(name, debounceDelay));
-  // const machine = useFieldMachine();
+  // // Stable validator instance across renders
+  // const validatorRef = useRef(createAsyncValidator(name, debounceDelay));
+  // // const machine = useFieldMachine();
 
-  // Cancel + teardown on unmount
+  // // Cancel + teardown on unmount
+  // useEffect(() => {
+  //   const v = validatorRef.current;
+  //   return () => v.cancel();
+  // }, []);
+
+  // useEffect(() => {
+  //   if (!enabled) return;
+
+  //   // 1. Check if we already have an error for this field to avoid redundant sets
+  //   // You might need to pass fieldState.error into this hook
+  //   if (isEmpty(value?.trim() ?? "")) {
+  //     validatorRef.current.cancel();
+  //     clearErrors(name);
+  //     // machine.reset();
+  //     return;
+  //   }
+
+  //   // machine.setTyping();
+
+  //   // 🔥 CACHE HIT
+  //   const cached = getCached(name, value);
+  //   if (cached) {
+  //     if (cached.status === "success") {
+  //       // ✅ Only clear if there is currently an error
+  //       clearErrors(name);
+  //       // machine.setValid();
+  //     } else {
+  //       // ✅ Only set if the message is different from the current one
+  //       setError(name, { type: "async", message: cached.message });
+  //       // machine.setError();
+  //     }
+  //     return;
+  //   }
+
+  //   // machine.setValidating();
+
+  //   validatorRef.current.validate(value, (result) => {
+  //     if (result.status === "loading") return; // wait for terminal state
+  //     if ((result.status as string) === "cancelled") return; // superseded
+
+  //     // 🔥 STORE CACHE
+  //     setCached(name, value, result);
+
+  //     if (result.status === "success") {
+  //       clearErrors(name);
+  //       // machine.setValid();
+  //     } else {
+  //       setError(name, {
+  //         type: "async",
+  //         message: result.message || "Validation failed",
+  //       });
+  //       // machine.setError();
+  //     }
+  //   });
+  // }, [value, enabled, name, setError, clearErrors]);
+
+  // ✅ 1. Create the validator instance using useMemo.
+  // It will only re-create if the 'name' changes.
+  const validator = useMemo(
+    () => createAsyncValidator(name, debounceDelay),
+    [name],
+  );
+
+  // ✅ 2. Cleanup: cancel pending validations if the validator instance changes
+  useEffect(() => () => validator.cancel(), [validator]);
+
   useEffect(() => {
-    const v = validatorRef.current;
-    return () => v.cancel();
-  }, []);
-
-  useEffect(() => {
-    if (!enabled) return;
-
-    // 1. Check if we already have an error for this field to avoid redundant sets
-    // You might need to pass fieldState.error into this hook
-    if (isEmpty(value?.trim() ?? "")) {
-      validatorRef.current.cancel();
-      clearErrors(name);
-      // machine.reset();
+    if (!enabled || isEmpty(value?.trim() ?? "")) {
+      // clearErrors(name);
       return;
     }
 
-    // machine.setTyping();
+    // ✅ 3. Cache Hit Logic
+    // const cached = getCached(name, value);
+    // if (cached) {
+    //   if (cached.status === "success") {
+    //     // clearErrors(name);
+    //   } else {
+    //     // setError(name, { type: "async", message: cached.message });
+    //   }
+    //   return;
+    // }
 
-    // 🔥 CACHE HIT
-    const cached = getCached(name, value);
-    if (cached) {
-      if (cached.status === "success") {
-        // ✅ Only clear if there is currently an error
-        clearErrors(name);
-        // machine.setValid();
-      } else {
-        // ✅ Only set if the message is different from the current one
-        setError(name, { type: "async", message: cached.message });
-        // machine.setError();
-      }
-      return;
-    }
+    // ✅ 4. Trigger Validation
+    // validator.validate(value, (result) => {
+    //   // Ignore intermediate or cancelled states
+    //   if (result.status === "loading" || result.status === "cancelled") return;
 
-    // machine.setValidating();
+    //   // Store result in cache for future hits
+    //   setCached(name, value, result);
 
-    validatorRef.current.validate(value, (result) => {
-      if (result.status === "loading") return; // wait for terminal state
-      if ((result.status as string) === "cancelled") return; // superseded
+    //   if (result.status === "success") {
+    //     // clearErrors(name);
+    //   } else {
+    //     // setError(name, {
+    //     //   type: "async",
+    //     //   message: result.message || "Validation failed",
+    //     // });
+    //   }
+    // });
 
-      // 🔥 STORE CACHE
-      setCached(name, value, result);
+    // Small delay to break out of render cycle
+    const timer = setTimeout(() => {
+      validator.validate(value, (result: ValidationState) => {
+        // We no longer call setError/clearErrors here
+        // This hook is now ONLY for side effects like live feedback if needed
+        console.log(`Async validation result for ${name}:`, result);
+      });
+    }, 50);
 
-      if (result.status === "success") {
-        clearErrors(name);
-        // machine.setValid();
-      } else {
-        setError(name, {
-          type: "async",
-          message: result.message || "Validation failed",
-        });
-        // machine.setError();
-      }
-    });
-  }, [value, enabled, name, setError, clearErrors]);
+    return () => clearTimeout(timer);
+  }, [
+    value,
+    enabled,
+    name,
+    // setError,
+    // clearErrors,
+    validator,
+  ]);
 };
 
 // ─── Password validation ──────────────────────────────────────────────────────
@@ -225,7 +342,7 @@ export const useAsyncFieldValidation = ({
  */
 export const usePasswordValidation = (
   source: string,
-  debounceDelay = 500,
+  debounce = 500,
   threshold = 3,
 ) => {
   const [feedback, setFeedback] = useState<PasswordResult>({
@@ -238,8 +355,8 @@ export const usePasswordValidation = (
 
   // Create validator instance
   const validator = useMemo(
-    () => createPasswordValidator(debounceDelay, threshold),
-    [debounceDelay, threshold],
+    () => createPasswordValidator(debounce, threshold),
+    [debounce, threshold],
   );
 
   // Clean up on unmount
@@ -247,25 +364,20 @@ export const usePasswordValidation = (
 
   // Advanced refinement with caching + abort
   const passwordRefinement = useRefinement<string>(
-    async (value, { signal }) => {
-      return new Promise<boolean>((resolve) => {
+    (value) =>
+      new Promise((resolve) => {
         validator.validate(value, source, (result) => {
           // ✅ Always update the meter, including during the loading phase
           setFeedback(result);
 
           if (result.status === "loading") return; // don't resolve yet
-
-          if (result.status === "cancelled") {
-            resolve(true); // let next validation take over
-            return;
-          }
+          if (result.status === "cancelled") resolve(true); // let next validation take over
 
           resolve(result.status === "success");
         });
-      });
-    },
+      }),
     {
-      debounce: 400,
+      debounce,
       cacheKey: (value) => value, // cache per password string
     },
   );
@@ -360,6 +472,7 @@ export const usePasswordValidation = (
     checkStrength, // Call on onChange for live feedback
     checkMatch,
     strengthRule, // Pass to Zod or RHF rules
+    strengthZodRefine: asZodRefine(passwordRefinement), // ← Best for Zod
     matchRule,
     getPasswordStrength,
     invalidate: passwordRefinement.invalidate,
@@ -381,8 +494,8 @@ export const usePasswordValidation = (
 export const usePasswordStrengthValidation = ({
   name,
   value,
-  setError,
-  clearErrors,
+  // setError,
+  // clearErrors,
   debounceDelay = 500,
   threshold = 3,
   enabled = true,
@@ -395,24 +508,82 @@ export const usePasswordStrengthValidation = ({
     status: "idle",
   });
 
-  // Stable validator instance across renders
-  const validatorRef = useRef(
-    createPasswordValidator(debounceDelay, threshold),
+  // // Stable validator instance across renders
+  // const validatorRef = useRef(
+  //   createPasswordValidator(debounceDelay, threshold),
+  // );
+  // // const machine = useFieldMachine();
+
+  // // Cancel + teardown on unmount
+  // useEffect(() => {
+  //   const v = validatorRef.current;
+  //   return () => v.cancel();
+  // }, []);
+
+  // useEffect(() => {
+  //   if (!enabled) return;
+
+  //   if (isEmpty(value?.trim() ?? "")) {
+  //     validatorRef.current.cancel();
+  //     clearErrors(name);
+  //     setFeedback({
+  //       score: 0,
+  //       isPwned: false,
+  //       message: "",
+  //       warning: "",
+  //       status: "idle",
+  //     });
+  //     // machine.reset();
+  //     return;
+  //   }
+
+  //   // machine.setTyping();
+
+  //   validatorRef.current.validate(value, name, (result) => {
+  //     // Always update the meter — including the loading / "Analyzing…" state
+  //     setFeedback(result);
+  //     // machine.setValidating();
+
+  //     const isWeak = result.status === "error";
+
+  //     // ❗ DO NOT rely on RHF for strength blocking
+  //     // only use it for UI unless you explicitly want blocking
+
+  //     // if (isWeak) {
+  //     //   setError(name, {
+  //     //     type: "strength",
+  //     //     message: result.warning || result.message,
+  //     //   });
+  //     // } else {
+  //     //   clearErrors(name);
+  //     // }
+
+  //     if (result.status === "loading") return;
+  //     if ((result.status as string) === "cancelled") return;
+
+  //     if (result.status === "success") {
+  //       clearErrors(name);
+  //     } else {
+  //       setError(name, {
+  //         type: "async",
+  //         message: result.warning || result.message || "Password is too weak",
+  //       });
+  //       // machine.setError();
+  //     }
+  //   });
+  // }, [value, enabled, setError, clearErrors]);
+
+  // return { feedback };
+  const validator = useMemo(
+    () => createPasswordValidator(debounceDelay, threshold),
+    [threshold],
   );
-  // const machine = useFieldMachine();
 
-  // Cancel + teardown on unmount
-  useEffect(() => {
-    const v = validatorRef.current;
-    return () => v.cancel();
-  }, []);
+  useEffect(() => () => validator.cancel?.(), [validator]);
 
   useEffect(() => {
-    if (!enabled) return;
-
-    if (isEmpty(value?.trim() ?? "")) {
-      validatorRef.current.cancel();
-      clearErrors(name);
+    if (!enabled || isEmpty(value?.trim())) {
+      // clearErrors(name);
       setFeedback({
         score: 0,
         isPwned: false,
@@ -420,45 +591,30 @@ export const usePasswordStrengthValidation = ({
         warning: "",
         status: "idle",
       });
-      // machine.reset();
       return;
     }
 
-    // machine.setTyping();
-
-    validatorRef.current.validate(value, name, (result) => {
-      // Always update the meter — including the loading / "Analyzing…" state
+    validator.validate(value, "password", (result) => {
       setFeedback(result);
-      // machine.setValidating();
 
-      const isWeak = result.status === "error";
-
-      // ❗ DO NOT rely on RHF for strength blocking
-      // only use it for UI unless you explicitly want blocking
-
-      // if (isWeak) {
-      //   setError(name, {
-      //     type: "strength",
-      //     message: result.warning || result.message,
-      //   });
-      // } else {
-      //   clearErrors(name);
-      // }
-
-      if (result.status === "loading") return;
-      if ((result.status as string) === "cancelled") return;
+      if (result.status === "loading" || result.status === "cancelled") return;
 
       if (result.status === "success") {
-        clearErrors(name);
+        // clearErrors(name);
       } else {
-        setError(name, {
-          type: "async",
-          message: result.warning || result.message || "Password is too weak",
-        });
-        // machine.setError();
+        // setError(name, {
+        //   type: "strength",
+        //   message: result.message || result.warning || "Password is too weak",
+        // });
       }
     });
-  }, [value, enabled, setError, clearErrors]);
+  }, [
+    value,
+    enabled,
+    name,
+    // setError, clearErrors,
+    validator,
+  ]);
 
   return { feedback };
 };
@@ -481,11 +637,12 @@ export const useMatchPasswordValidation = ({
     if (!enabled) return;
 
     const result = matchValidator(value, matchValue);
+
     if (result.status === "error") {
-      setError(name, { type: "match", message: result.message });
+      // setError(name, { type: "match", message: result.message });
       machine.setError();
     } else {
-      clearErrors(name);
+      // clearErrors(name);
     }
   }, [value, matchValue, enabled, name, setError, clearErrors]);
 };

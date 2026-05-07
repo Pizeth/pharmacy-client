@@ -23,41 +23,50 @@ const ControlledInput = ({
   name,
   label,
   asyncValidate,
-  clearErrors,
-  setError,
-  isFocused,
-  onFocusChange,
-  onFocus,
-  onBlur,
+  // clearErrors,
+  // setError,
+  // isFocused,
+  // onFocusChange,
+  // onFocus,
+  // onBlur,
   ...rest
 }: ControlledInputProps) => {
   // ref for the shake animation target
   const rootRef = useRef<HTMLDivElement>(null);
+  const isMounted = useRef(false);
 
   // ✅ CRITICAL: memoize this wrapper so it doesn't change identity every render.
   // Without useCallback, a new function is created each render, which lands in
   // the useEffect deps array inside useAsyncFieldValidation and fires the effect
   // on every single render → infinite setState loop.
-  const clearFieldErrors: UseFormClearErrors<FieldValues> = useCallback(
-    (fieldName) => {
-      if (typeof fieldName === "string") {
-        clearErrors(fieldName);
-      } else if (Array.isArray(fieldName)) {
-        fieldName.forEach((nameItem) => clearErrors(nameItem));
-      }
-    },
-    [clearErrors],
-  );
+  // const clearFieldErrors: UseFormClearErrors<FieldValues> = useCallback(
+  //   (fieldName) => {
+  //     if (typeof fieldName === "string") {
+  //       clearErrors(fieldName);
+  //     } else if (Array.isArray(fieldName)) {
+  //       fieldName.forEach((nameItem) => clearErrors(nameItem));
+  //     }
+  //   },
+  //   [clearErrors],
+  // );
 
-  // Async validation side-effect — fires on value change via useEffect inside
+  // Prevent running validation on first render
+  // useEffect(() => {
+  //   isMounted.current = true;
+  //   return () => {
+  //     isMounted.current = false;
+  //   };
+  // }, []);
+
+  // Async validation side-effect - only after mount + touched
   // the hook. Only enabled after the field is touched to avoid firing on mount.
-  useAsyncFieldValidation({
-    name,
-    value: field.value ?? "",
-    setError,
-    clearErrors: clearFieldErrors,
-    enabled: !!asyncValidate && fieldState.isTouched,
-  });
+  // useAsyncFieldValidation({
+  //   name,
+  //   value: field.value ?? "",
+  //   // setError,
+  //   // clearErrors: clearFieldErrors,
+  //   enabled: !!asyncValidate && fieldState.isTouched && isMounted.current,
+  // });
 
   // Shake the label whenever validation fails, clear RHF errors on recovery.
   // This effect is now at the top level of a real component — no hook violation.
@@ -66,7 +75,6 @@ const ControlledInput = ({
 
     // if (!label) return;
     if (fieldState.invalid && !fieldState.isValidating) {
-      console.log("rootRef", rootRef.current);
       const label = rootRef.current?.querySelector<HTMLLabelElement>(
         ".MuiInputLabel-root",
       );
@@ -79,15 +87,15 @@ const ControlledInput = ({
 
     // ✅ Fix: Only clear errors if there actually IS an error to clear.
     // This prevents the infinite loop/render-update error.
-    if (!fieldState.invalid && fieldState.error) {
-      clearErrors(name);
-    }
+    // if (!fieldState.invalid && fieldState.error) {
+    //   clearErrors(name);
+    // }
   }, [
     fieldState.invalid,
     fieldState.isValidating,
-    fieldState.error,
-    name,
-    clearErrors,
+    // fieldState.error,
+    // name,
+    // clearErrors,
   ]);
 
   return (
@@ -96,17 +104,17 @@ const ControlledInput = ({
       field={field}
       fieldState={fieldState}
       label={label}
-      isFocused={isFocused}
+      // isFocused={isFocused}
       isValidating={fieldState.isValidating}
-      onFocus={(e) => {
-        onFocusChange(true);
-        onFocus?.(e as React.FocusEvent<HTMLInputElement>);
-      }}
-      onBlur={(e) => {
-        onFocusChange(false);
-        field.onBlur(); // always notify RHF
-        onBlur?.(e as React.FocusEvent<HTMLInputElement>);
-      }}
+      // onFocus={(e) => {
+      //   onFocusChange(true);
+      //   onFocus?.(e as React.FocusEvent<HTMLInputElement>);
+      // }}
+      // onBlur={(e) => {
+      //   onFocusChange(false);
+      //   field.onBlur(); // always notify RHF
+      //   onBlur?.(e as React.FocusEvent<HTMLInputElement>);
+      // }}
       {...rest}
     />
   );

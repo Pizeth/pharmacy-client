@@ -413,10 +413,10 @@ export interface ControlledInputProps extends Omit<
   fieldState: ControllerFieldState;
   name: string;
   asyncValidate?: boolean;
-  clearErrors: (name: string) => void;
-  setError: (name: string, error: ErrorOption) => void;
-  isFocused: boolean;
-  onFocusChange: (v: boolean) => void;
+  clearErrors?: (name: string) => void;
+  setError?: (name: string, error: ErrorOption) => void;
+  isFocused?: boolean;
+  onFocusChange?: (v: boolean) => void;
 }
 
 export interface InputAdornmentProps {
@@ -482,8 +482,8 @@ export interface UseAsyncFieldValidationOptions {
   name: string;
   /** Current field value, obtained from watch(name) */
   value: string;
-  setError: UseFormSetError<FieldValues>;
-  clearErrors: UseFormClearErrors<FieldValues>;
+  setError?: UseFormSetError<FieldValues>;
+  clearErrors?: UseFormClearErrors<FieldValues>;
   /** Debounce delay in ms (default 500) */
   debounceDelay?: number;
   /** Skip validation entirely (e.g. field not yet dirty, or signin mode) */
