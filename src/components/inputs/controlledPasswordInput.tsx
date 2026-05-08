@@ -15,6 +15,8 @@ const ControlledPasswordInput = ({
   name,
   label,
   strengthMeter,
+  score = 0,
+  message = "",
   matchPassword,
   // clearErrors,
   // setError,
@@ -102,10 +104,10 @@ const ControlledPasswordInput = ({
       />
       {showMeter && (field.value?.length ?? 0) > 5 && (
         <PasswordStrengthMeter
-          // passwordStrength={feedback.score}
-          // passwordFeedback={feedback.message}
-          passwordStrength={0}
-          passwordFeedback=""
+          passwordStrength={score}
+          passwordFeedback={message}
+          // passwordStrength={0}
+          // passwordFeedback=""
         />
       )}
     </Box>

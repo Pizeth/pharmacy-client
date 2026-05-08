@@ -15,7 +15,8 @@ import {
 } from "@/interfaces/component-props.interface";
 import { useFieldMachine } from "./useFieldMachine";
 import { getCached, setCached } from "@/caches/validationCache";
-import useRefinement, { asZodRefine } from "./useRefinement";
+import useRefinement from "./useRefinement";
+import { Score } from "@mui/icons-material";
 
 // ─── Async field validation (username / email uniqueness etc.) ────────────────
 
@@ -136,7 +137,7 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
 
   const validate = useRefinement<string>(
     (value) =>
-      new Promise<boolean>((resolve) => {
+      new Promise((resolve) => {
         validator.validate(value, (result: ValidationState) => {
           // "loading" → still in-flight, do not resolve yet
           // "cancelled" → superseded by a newer keystroke, resolve clean so
@@ -150,8 +151,11 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
             return;
           }
 
-          // Return boolean only!
-          resolve(result.status === "success");
+          // ✅ Return the message string so hybridResolver can surface it
+          resolve(
+            result.status === "success" ? true : result.message || "Invalid",
+          );
+          // resolve(result.status === "success");
           // if (result.status === "success") {
           //   setStatus("valid");
           //   resolve(true);
@@ -180,10 +184,12 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
       cacheKey: (value) => `${source}:${value}`,
     },
   );
+  // ✅ FIX: memoize zodRefine so it has a stable reference across renders
+  // const zodRefine = useMemo(() => asZodRefine(validate), [validate]);
   // return { validate, status };
   return {
-    validate: validate, // for manual use
-    zodRefine: asZodRefine(validate), // ← Best for Zod
+    validate, // for manual use
+    // zodRefine, // ← Best for Zod
     invalidate: validate.invalidate,
   };
   // return validate;
@@ -345,13 +351,14 @@ export const usePasswordValidation = (
   debounce = 500,
   threshold = 3,
 ) => {
-  const [feedback, setFeedback] = useState<PasswordResult>({
-    score: 0,
-    isPwned: false,
-    message: "",
-    warning: "",
-    status: "idle",
-  });
+  // const [feedback, setFeedback] = useState<PasswordResult>({
+  //   score: 0,
+  //   isPwned: false,
+  //   message: "",
+  //   // warning: "",
+  //   status: "idle",
+  // });
+  const [score, setScore] = useState(0);
 
   // Create validator instance
   const validator = useMemo(
@@ -363,17 +370,17 @@ export const usePasswordValidation = (
   useEffect(() => () => validator.cancel?.(), [validator]);
 
   // Advanced refinement with caching + abort
-  const passwordRefinement = useRefinement<string>(
+  const validate = useRefinement<string>(
     (value) =>
       new Promise((resolve) => {
         validator.validate(value, source, (result) => {
           // ✅ Always update the meter, including during the loading phase
-          setFeedback(result);
+          // setFeedback(result);
 
           if (result.status === "loading") return; // don't resolve yet
           if (result.status === "cancelled") resolve(true); // let next validation take over
-
-          resolve(result.status === "success");
+          setScore(result.score);
+          resolve(result.status === "success" ? true : result.message);
         });
       }),
     {
@@ -383,18 +390,18 @@ export const usePasswordValidation = (
   );
 
   /** Call in onChange to update the strength meter independently of RHF */
-  const checkStrength = useCallback(
-    (value: string) => validator.validate(value, source, setFeedback),
-    [validator, source],
-  );
+  // const checkStrength = useCallback(
+  //   (value: string) => validator.validate(value, source, setFeedback),
+  //   [validator, source],
+  // );
 
   // Pure strength getter (no validation side effects)
-  const getPasswordStrength = useCallback(
-    async (value: string) => {
-      return validator.strength(value, source);
-    },
-    [validator],
-  );
+  // const checkStrength = useCallback(
+  //   async (value: string) => {
+  //     return validator.validate(value, source, (result) => {});
+  //   },
+  //   [validator],
+  // );
 
   /** Synchronous match check — use directly in `rules.validate` */
   const checkMatch = useCallback(
@@ -444,8 +451,8 @@ export const usePasswordValidation = (
     //   });
     // },
     // [validator, source],
-    (value: string) => passwordRefinement(value),
-    [passwordRefinement],
+    (value: string) => validate(value),
+    [validate],
   );
 
   /**
@@ -466,16 +473,23 @@ export const usePasswordValidation = (
     [],
   );
 
+  // ✅ FIX: memoize instead of inline asZodRefine(passwordRefinement)
+  // const strengthZodRefine = useMemo(
+  //   () => asZodRefine(passwordRefinement),
+  //   [passwordRefinement],
+  // );
+
   // return { feedback, checkStrength, checkMatch, strengthRule, matchRule };
   return {
-    feedback, // ← Use this in your UI (strength meter)
-    checkStrength, // Call on onChange for live feedback
+    // feedback, // ← Use this in your UI (strength meter)
+    validate,
+    checkStrength: score, // Call on onChange for live feedback
     checkMatch,
     strengthRule, // Pass to Zod or RHF rules
-    strengthZodRefine: asZodRefine(passwordRefinement), // ← Best for Zod
+    // strengthZodRefine, // ← Best for Zod
     matchRule,
-    getPasswordStrength,
-    invalidate: passwordRefinement.invalidate,
+    // getPasswordStrength,
+    invalidate: validate.invalidate,
   };
 
   // return {
@@ -504,7 +518,7 @@ export const usePasswordStrengthValidation = ({
     score: 0,
     isPwned: false,
     message: "",
-    warning: "",
+    // warning: "",
     status: "idle",
   });
 
@@ -588,7 +602,7 @@ export const usePasswordStrengthValidation = ({
         score: 0,
         isPwned: false,
         message: "",
-        warning: "",
+        // warning: "",
         status: "idle",
       });
       return;

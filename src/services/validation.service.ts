@@ -17,7 +17,7 @@ const DEFAULT_RESULT: PasswordResult = {
   score: 0,
   isPwned: false,
   message: "",
-  warning: "",
+  // warning: "",
   status: "idle",
 };
 const cache = new Map<string, string | true>();
@@ -52,8 +52,6 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
       const { signal } = controller;
 
       onResult({ message: "Checking...", status: "loading" });
-
-      console.log("we reached here");
       try {
         const { data } = await axios.get(
           `${API_URL}/validate/${source}/${value}`,
@@ -103,6 +101,7 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
         queueMicrotask(() => {
           if (axios.isCancel(e) || (e as Error)?.name === "AbortError") {
             onResult({ message: "", status: CANCELLED });
+            return;
           } else {
             onResult({
               message:
@@ -113,7 +112,6 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
           }
         });
       } finally {
-        console.log("Validation finally");
         // Only clear our controller, not someone else's.
         // Check signal identity to avoid clearing a newer controller.
         if (controller?.signal === signal) controller = null;
@@ -189,13 +187,6 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
           status: isWeak ? "error" : "success",
         });
       } catch (e) {
-        // if ((e as Error)?.name === "AbortError") return;
-        // onResult({
-        //   score: 0,
-        //   isPwned: false,
-        //   message: "Strength check failed",
-        //   status: "error",
-        // });
         if ((e as Error)?.name === "AbortError") {
           onResult({
             ...DEFAULT_RESULT,
@@ -225,7 +216,7 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
       checkStrength.cancel();
       onResult({
         ...DEFAULT_RESULT,
-        warning: `${source} is required`,
+        message: `${source} is required`,
         status: "error",
       });
       return;
@@ -237,7 +228,7 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
       onResult({
         ...DEFAULT_RESULT,
         message: `${source} must be at least 10 characters, include uppercase, lowercase, number, and special character!`,
-        warning: `${source} has invalid format`,
+        // warning: `${source} has invalid format`,
         status: "error",
       });
       return;
@@ -252,45 +243,45 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
     checkStrength(value, onResult);
   };
 
-  const getPasswordStrength = async (
-    value: string,
-    source: string,
-  ): Promise<PasswordResult> => {
-    if (isEmpty(value?.trim()) || !PASSWORD_REGEX.test(value)) {
-      return {
-        ...DEFAULT_RESULT,
-        status: "error",
-      };
-    }
+  // const getPasswordStrength = async (
+  //   value: string,
+  //   source: string,
+  // ): Promise<PasswordResult> => {
+  //   if (isEmpty(value?.trim()) || !PASSWORD_REGEX.test(value)) {
+  //     return {
+  //       ...DEFAULT_RESULT,
+  //       status: "error",
+  //     };
+  //   }
 
-    if (!zxcvbnAsyncFn) {
-      zxcvbnAsyncFn = await lazyZxcvbn.loadZxcvbn();
-    }
+  //   if (!zxcvbnAsyncFn) {
+  //     zxcvbnAsyncFn = await lazyZxcvbn.loadZxcvbn();
+  //   }
 
-    const result = await zxcvbnAsyncFn(value);
-    const score = result.score;
-    const isPwned = result.sequence.some((m) => m.pattern === "pwned");
-    const isWeak = score < threshold || isPwned;
+  //   const result = await zxcvbnAsyncFn(value);
+  //   const score = result.score;
+  //   const isPwned = result.sequence.some((m) => m.pattern === "pwned");
+  //   const isWeak = score < threshold || isPwned;
 
-    const warningMsg = result.feedback.warning;
-    const suggestMsg = result.feedback.suggestions.join(" ");
-    const message = isWeak
-      ? suggestMsg.trim()
-      : (warningMsg ?? "").concat(` ${suggestMsg}`).trim();
+  //   const warningMsg = result.feedback.warning;
+  //   const suggestMsg = result.feedback.suggestions.join(" ");
+  //   const message = isWeak
+  //     ? suggestMsg.trim()
+  //     : (warningMsg ?? "").concat(` ${suggestMsg}`).trim();
 
-    return {
-      score,
-      isPwned,
-      message,
-      warning: result.feedback.warning || "",
-      status: isWeak ? "error" : "success",
-    };
-  };
+  //   return {
+  //     score,
+  //     isPwned,
+  //     message,
+  //     // warning: result.feedback.warning || "",
+  //     status: isWeak ? "error" : "success",
+  //   };
+  // };
 
   return {
     validate: validator,
-    match: matchValidator,
-    strength: getPasswordStrength, // ← New: Pure strength check (no side effects)
+    // match: matchValidator,
+    // strength: getPasswordStrength, // ← New: Pure strength check (no side effects)
     cancel: () => {
       checkStrength.cancel();
       if (controller) {

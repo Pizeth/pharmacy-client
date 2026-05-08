@@ -31,7 +31,7 @@ export const hybridResolver =
           errors[name] = {
             type: "async",
             message: typeof result === "string" ? result : "Invalid value",
-          } as FieldError;
+          };
         }
       }),
     );

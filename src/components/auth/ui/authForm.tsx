@@ -1,19 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  useForm,
-  SubmitHandler,
-  FormProvider,
-  useFormContext,
-} from "react-hook-form";
+import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import {
   Typography,
   Link,
   FormControlLabel,
   Checkbox,
   CardContent,
-  Box,
 } from "@mui/material";
-import { styled, useThemeProps } from "@mui/material/styles";
+import { useThemeProps } from "@mui/material/styles";
 import {
   PermIdentity,
   Person,
@@ -22,10 +16,7 @@ import {
   Badge,
   Email,
 } from "@mui/icons-material";
-import {
-  AuthFormProps,
-  LoginFormProps,
-} from "@/interfaces/component-props.interface";
+import { AuthFormProps } from "@/interfaces/component-props.interface";
 import { useLogin, useRegister } from "@refinedev/core";
 import {
   loginSchema,
@@ -33,8 +24,6 @@ import {
   LoginValues,
   RegisterValues,
 } from "@/schema/auth.schema";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import TextField from "@/components/inputs/textfield";
 import PasswordField from "@/components/inputs/passwordfield";
 import ValidatedButton from "@/components/inputs/validatedButton";
@@ -44,75 +33,13 @@ import {
   usePasswordValidation,
 } from "@/lib/hooks/useFieldValidation";
 import hybridResolver from "@/lib/validations/hybridResolver";
-import { useFormOrchestrator } from "@/lib/hooks/useFormOrchestrator";
-import { asZodRefine, createZodRefine } from "@/lib/hooks/useRefinement";
-import { z } from "zod";
+// import { useFormOrchestrator } from "@/lib/hooks/useFormOrchestrator";
+import { AsyncMap } from "@/types/auth";
+import { Root, Content, PasswordArea, Footer } from "../styles/authForm.style";
 
 // ─── Styled slots ─────────────────────────────────────────────────────────────
 
 const PREFIX = "RazethAuthForm";
-
-const Root = styled("form", {
-  name: PREFIX,
-  slot: "Root",
-  overridesResolver: (_props, styles) => styles.root,
-})<AuthFormProps>(({ theme }) => ({
-  ["& .MuiCardContent-root"]: {
-    minWidth: 300,
-    padding: `${theme.spacing(0)}`,
-  },
-}));
-
-const Content = styled(Box, {
-  name: PREFIX,
-  slot: "Content",
-  overridesResolver: (_props, styles) => styles.content,
-})(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  gap: theme.spacing(0),
-  input: {
-    transition: theme.transitions.create("color", {
-      easing: theme.transitions.easing.easeInOut,
-      duration: theme.transitions.duration.short,
-    }),
-    "&:focus": {
-      color: theme.palette.primary.main, // focused
-    },
-  },
-  // Apply custom styles to the last child element inside this container
-  "& > :last-child": {
-    // For example, you could add extra margin to the button
-    // if it's the last item. Let's override its default top margin.
-    marginTop: theme.spacing(1),
-  },
-}));
-
-const PasswordArea = styled(Box, {
-  name: PREFIX,
-  slot: "Password",
-  overridesResolver: (_props, styles) => styles.password,
-})<AuthFormProps>(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  width: "100%",
-  gap: theme.spacing(0),
-}));
-
-const Footer = styled(Box, {
-  name: PREFIX,
-  slot: "Footer",
-  overridesResolver: (_props, styles) => styles.footer,
-})<AuthFormProps>(({ theme }) => ({
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  fontWeight: 500,
-  marginTop: "-0.5rem",
-  marginBottom: "-0.5rem",
-  width: "100%",
-  gap: theme.spacing(0),
-}));
 
 // ─── Confirm password — needs watch("password") from FormProvider context ─────
 const ConfirmPasswordFieldOld = () => {
@@ -188,13 +115,7 @@ const ConfirmPasswordField = () => {
 };
 
 // ─── Register fields ──────────────────────────────────────────────────────────
-const RegisterFields = ({
-  checkStrength,
-  invalidate,
-}: {
-  checkStrength: (password: string) => void;
-  invalidate: () => void;
-}) => (
+const RegisterFields = ({ score }: { score: number }) => (
   <>
     <TextField
       name="name"
@@ -283,51 +204,55 @@ const AuthForm = (inProps: AuthFormProps) => {
   //   usePasswordValidation("password", 3);
 
   // ── Async Rules ─────────────────────────────────────────────────────
-  const emailRule = useAsyncFieldRule("email");
-  const usernameRule = useAsyncFieldRule("username");
-  const { strengthRule, strengthZodRefine, checkStrength, invalidate } =
-    usePasswordValidation("password");
+  // const emailRule = useAsyncFieldRule("email");
+  // const usernameRule = useAsyncFieldRule("username");
+  // const { strengthRule, strengthZodRefine, checkStrength, invalidate } =
+  //   usePasswordValidation("password");
 
-  // ✅ Memoize if passing to children that aren't memoized
-  // const handlePasswordChange = useCallback(
-  //   (value: string) => {
-  //     checkStrength(value);
-  //     invalidate();
-  //   },
-  //   [checkStrength, invalidate],
-  // );
+  // // ✅ Memoize if passing to children that aren't memoized
+  // // const handlePasswordChange = useCallback(
+  // //   (value: string) => {
+  // //     checkStrength(value);
+  // //     invalidate();
+  // //   },
+  // //   [checkStrength, invalidate],
+  // // );
 
-  // ── Schema with proper field-level refinements ─────────────────────
-  const resolver = useMemo(() => {
-    let schema = isLogin ? loginSchema : registerSchema;
+  // // Destructure stable primitives BEFORE the memo
+  // const { zodRefine: emailZodRefine } = emailRule;
+  // const { zodRefine: usernameZodRefine } = usernameRule;
 
-    // if (!isLogin) {
-    //   schema = schema.safeExtend({
-    //     // Re-apply field-level refinements
-    //     email: z.email().refine(emailRule.validate, {
-    //       message: "Email already in use",
-    //     }),
-    //     username: z.string().min(5).refine(usernameRule.validate, {
-    //       message: "Username already taken",
-    //     }),
-    //     password: z.string().min(10).refine(strengthRule, {
-    //       message: "Password is too weak",
-    //     }),
-    //   });
-    //   // .superRefine((data, ctx) => {
-    //   //   // 🔥 async email check
-    //   //   if (data.password !== data.confirmPassword) {
-    //   //     ctx.addIssue({
-    //   //       code: "custom",
-    //   //       path: ["confirmPassword"],
-    //   //       message: "Passwords do not match",
-    //   //     });
-    //   //   }
-    //   // });
-    // }
+  // // ── Schema with proper field-level refinements ─────────────────────
+  // const resolver = useMemo(() => {
+  //   let schema = isLogin ? loginSchema : registerSchema;
 
-    return zodResolver(schema);
-  }, [isLogin, emailRule, usernameRule, strengthRule, strengthZodRefine]);
+  //   if (!isLogin) {
+  //     schema = schema.safeExtend({
+  //       // Re-apply field-level refinements
+  //       email: z.email().refine(emailZodRefine, {
+  //         message: "Email already in use",
+  //       }),
+  //       username: z.string().min(5).refine(usernameZodRefine, {
+  //         message: "Username already taken",
+  //       }),
+  //       password: z.string().min(10).refine(strengthZodRefine, {
+  //         message: "Password is too weak",
+  //       }),
+  //     });
+  //     // .superRefine((data, ctx) => {
+  //     //   // 🔥 async email check
+  //     //   if (data.password !== data.confirmPassword) {
+  //     //     ctx.addIssue({
+  //     //       code: "custom",
+  //     //       path: ["confirmPassword"],
+  //     //       message: "Passwords do not match",
+  //     //     });
+  //     //   }
+  //     // });
+  //   }
+
+  //   return zodResolver(schema);
+  // }, [isLogin, emailZodRefine, usernameZodRefine, strengthZodRefine]);
 
   // const asyncMap = isLogin
   //   ? undefined
@@ -338,7 +263,40 @@ const AuthForm = (inProps: AuthFormProps) => {
   //       // confirmPassword: matchRule,
   //     };
 
-  // const schema = isLogin ? loginSchema : registerSchema;
+  const { validate: emailValidate } = useAsyncFieldRule("email");
+  const { validate: usernameValidate } = useAsyncFieldRule("username");
+  const {
+    validate: strengthRule,
+    checkStrength: score,
+    checkMatch: matchRule,
+  } = usePasswordValidation("password");
+
+  // asyncMap values are stable function refs — memo hits cache every render
+  const asyncMap = useMemo(
+    () =>
+      isLogin
+        ? ({} as AsyncMap)
+        : {
+            email: emailValidate,
+            username: usernameValidate,
+            password: strengthRule,
+            // confirmPassword: matchRule,
+          },
+    [isLogin, emailValidate, usernameValidate, strengthRule],
+  );
+
+  // const asyncMap = isLogin
+  //   ? undefined
+  //   : {
+  //       // email: emailRule.validate,
+  //       // username: usernameRule.validate,
+  //       email: emailValidate,
+  //       username: usernameValidate,
+  //       password: strengthRule,
+  //       // confirmPassword: matchRule,
+  //     };
+
+  const schema = isLogin ? loginSchema : registerSchema;
 
   // useEffect(() => {
   //   // already authenticated, redirect to the home page
@@ -377,17 +335,17 @@ const AuthForm = (inProps: AuthFormProps) => {
   //   defaultValues: getDefaults(mode),
   // });
 
-  // const form = useForm({
-  //   resolver: hybridResolver(schema, asyncMap),
-  //   mode: "onChange",
-  //   defaultValues: getDefaults(mode),
-  // });
-
   const form = useForm({
-    resolver,
+    resolver: hybridResolver(schema, asyncMap),
     mode: "onChange",
     defaultValues: getDefaults(mode),
   });
+
+  // const form = useForm({
+  //   resolver,
+  //   mode: "onChange",
+  //   defaultValues: getDefaults(mode),
+  // });
 
   // ✅ CRITICAL: reset when mode changes
   useEffect(() => {
@@ -496,8 +454,9 @@ const AuthForm = (inProps: AuthFormProps) => {
                 //   />
                 // </>
                 <RegisterFields
-                  checkStrength={checkStrength}
-                  invalidate={invalidate}
+                  score={score}
+                  // checkStrength={checkStrength}
+                  // invalidate={invalidate}
                 />
               )}
 

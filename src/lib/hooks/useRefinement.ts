@@ -1,17 +1,20 @@
 import { useEffect, useRef, useMemo } from "react";
 
 export interface Refinement<T> {
-  (data: T): Promise<boolean>;
+  (data: T): Promise<boolean | string>;
   invalidate(): void;
   /** Get cached result without re-running (useful for UI) */
-  getCached?(data: T): Promise<boolean> | null;
+  getCached?(data: T): Promise<boolean | string> | null;
 }
 
 /** Type that Zod .refine() accepts */
-export type ZodRefineFn<T = any> = (value: T) => Promise<boolean> | boolean;
+// export type ZodRefineFn<T = any> = (value: T) => Promise<boolean> | boolean;
 
 export interface RefinementCallback<T> {
-  (data: T, ctx: { signal: AbortSignal }): boolean | Promise<boolean>;
+  (
+    data: T,
+    ctx: { signal: AbortSignal },
+  ): boolean | string | Promise<boolean | string>;
 }
 
 export interface UseRefinementOptions<T> {
@@ -67,7 +70,7 @@ export default function useRefinement<T>(
   }, [callback, debounce, cacheKey]);
 
   const refinement = useMemo(() => {
-    const cache = new Map<string, Promise<boolean>>();
+    const cache = new Map<string, Promise<boolean | string>>();
     let abortController: AbortController | null = null;
     // let cachedResult: Promise<boolean> | null = null;
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -87,7 +90,7 @@ export default function useRefinement<T>(
       return typeof data === "string" ? data : JSON.stringify(data);
     };
 
-    const start = async (data: T): Promise<boolean> => {
+    const start = async (data: T): Promise<boolean | string> => {
       // Cancel any previous ongoing refinement (Best Practice for forms)
       // Automatically abort any pending or running process before starting a new one
       abort();
@@ -137,7 +140,7 @@ export default function useRefinement<T>(
       }
     };
 
-    const refine = async (data: T): Promise<boolean> => {
+    const refine = async (data: T): Promise<boolean | string> => {
       // Return cached result if available
       //   if (cachedResult) {
       //     return cachedResult;
@@ -175,9 +178,9 @@ export default function useRefinement<T>(
 }
 
 // Helper to convert our Refinement into something Zod loves
-export const asZodRefine = <T>(refinement: Refinement<T>): ZodRefineFn<T> => {
-  return (value: T) => refinement(value);
-};
+// export const asZodRefine = <T>(refinement: Refinement<T>): ZodRefineFn<T> => {
+//   return (value: T) => refinement(value);
+// };
 
 // Add this helper
 export const createZodRefine = <T>(fn: Refinement<T>) => {
