@@ -11,6 +11,9 @@ import { useAtomValue, useSetAtom } from "jotai";
 import {
   clearValidationScoreAtom,
   validationScoreAtom,
+  validationMessagesAtom,
+  validationLoadingAtom,
+  setValidationLoadingAtom,
 } from "@/Stores/validationStore";
 // import { FieldValues, UseFormClearErrors } from "react-hook-form";
 
@@ -34,10 +37,16 @@ const ControlledPasswordInput = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const scores = useAtomValue(validationScoreAtom);
+  const messages = useAtomValue(validationMessagesAtom);
+  const loadings = useAtomValue(validationLoadingAtom);
+  const setLoading = useSetAtom(setValidationLoadingAtom);
+
   // const clearScore = useSetAtom(clearValidationScoreAtom);
   // const score = scores[name] ?? 0;
   // If field is empty, show 0 — no atom write needed
   const score = field.value ? (scores[name] ?? 0) : 0;
+  const message = messages[name] ?? "";
+  const isPasswordValidating = loadings[name] ?? false;
 
   // Clean up when field unmounts
   // useEffect(() => () => clearScore(name), [name, clearScore]);
@@ -101,6 +110,9 @@ const ControlledPasswordInput = ({
 
   const showMeter = strengthMeter && (field.value?.length ?? 0) > 0;
 
+  useEffect(() => {
+    return () => setLoading({ source: name, loading: false });
+  }, [name, setLoading]);
   return (
     <Box width="100%">
       <BaseInput
@@ -111,6 +123,7 @@ const ControlledPasswordInput = ({
         type="password"
         // isFocused={isFocused}
         isValidating={fieldState.isValidating}
+        // isValidating={isPasswordValidating} // ← replaces fieldState.isValidating
         // onFocus={(e) => {
         //   onFocusChange(true);
         //   onFocus?.(e as React.FocusEvent<HTMLInputElement>);
@@ -122,10 +135,10 @@ const ControlledPasswordInput = ({
         // }}
         {...rest}
       />
-      {showMeter && (field.value?.length ?? 0) > 5 && (
+      {showMeter && (field.value?.length ?? 0) >= 10 && (
         <PasswordStrengthMeter
           passwordStrength={score}
-          passwordFeedback={"message"}
+          passwordFeedback={message}
           // passwordStrength={0}
           // passwordFeedback=""
         />

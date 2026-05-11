@@ -183,6 +183,18 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
         console.log("warningMsg", warningMsg);
         console.log("suggestMsg", suggestMsg);
         console.log("message", message);
+        console.log("score", score);
+        if (isWeak) {
+          onResult({
+            score,
+            isPwned,
+            message: warningMsg || "Password is too weak!",
+            warning: suggestMsg,
+            status: "error",
+          });
+          return;
+        }
+
         onResult({
           score,
           isPwned,

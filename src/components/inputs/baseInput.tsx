@@ -94,7 +94,12 @@ export function BaseInput<TFieldValues extends FieldValues>(
         label={label}
         disabled={disabled}
         error={!!fieldState.error}
-        helperText={fieldState.error?.message ?? helperText}
+        // helperText={fieldState.error?.message ?? helperText}
+        helperText={
+          fieldState.error?.message ??
+          (isValidating ? "Validating..." : isValidating) ??
+          helperText
+        }
         slotProps={{
           input: {
             readOnly,

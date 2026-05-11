@@ -3,6 +3,7 @@ import { atom } from "jotai";
 
 export const validationMessagesAtom = atom<Record<string, string>>({});
 export const validationScoreAtom = atom<Record<string, number>>({});
+export const validationLoadingAtom = atom<Record<string, boolean>>({});
 
 export const setValidationMessageAtom = atom(
   null,
@@ -43,5 +44,15 @@ export const clearValidationScoreAtom = atom(
       delete newScores[source];
       return newScores;
     });
+  },
+);
+
+export const setValidationLoadingAtom = atom(
+  null,
+  (_get, set, update: { source: string; loading: boolean }) => {
+    set(validationLoadingAtom, (prev) => ({
+      ...prev,
+      [update.source]: update.loading,
+    }));
   },
 );

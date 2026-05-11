@@ -21,6 +21,7 @@ import { useSetAtom } from "jotai";
 import {
   clearValidationMessageAtom,
   clearValidationScoreAtom,
+  setValidationLoadingAtom,
   setValidationMessageAtom,
   setValidationScoreAtom,
 } from "@/Stores/validationStore";
@@ -76,6 +77,7 @@ export const useFieldValidation = (source: string, debounceDelay = 500) => {
  */
 export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
   // const [status, setStatus] = useState<FieldStatus>("idle");
+  const setLoading = useSetAtom(setValidationLoadingAtom);
 
   const validator = useMemo(
     () => createAsyncValidator(source, debounceDelay),
@@ -151,8 +153,10 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
           //               RHF's isValidating clears; the next call will validate
           if (result.status === "loading") {
             // setStatus("validating");
+            setLoading({ source, loading: true }); // ← API request started
             return; // still validating
           }
+          setLoading({ source, loading: false }); // ← terminal state
           if (result.status === "cancelled") {
             resolve(true);
             return;
@@ -367,7 +371,8 @@ export const usePasswordValidation = (
   // });
   const setScore = useSetAtom(setValidationScoreAtom);
   const setMessage = useSetAtom(setValidationMessageAtom);
-  const clearMessage = useSetAtom(clearValidationMessageAtom);
+  const setLoading = useSetAtom(setValidationLoadingAtom);
+  // const clearMessage = useSetAtom(clearValidationMessageAtom);
   // const [score, setScore] = useState(0);
 
   // Create validator instance
@@ -386,16 +391,25 @@ export const usePasswordValidation = (
         validator.validate(value, source, (result) => {
           // ✅ Always update the meter, including during the loading phase
           // setFeedback(result);
-
-          if (result.status === "loading") return; // don't resolve yet
-          if (result.status === "cancelled") resolve(true); // let next validation take over
+          // if (result.status === "loading") return; // don't resolve yet
+          if (result.status === "loading") {
+            setLoading({ source, loading: true }); // ← zxcvbn started
+            setMessage({ source, message: `Analyzing ${source}...` });
+            // resolve("Validating...");
+            return;
+          }
+          setLoading({ source, loading: false }); // ← terminal state
+          if (result.status === "cancelled") {
+            resolve(true);
+            return;
+          } // let next validation take over
           // ✅ Write to your existing store
           // if (result.status === "success") {
           //   setScore({ source, score: result.score });
           // } else {
           //   clearScore(source);
           // }
-          // setMessage({ source, message: result.warning });
+          setMessage({ source, message: result.warning || "" });
           setScore({ source, score: result.score });
           resolve(result.status === "success" ? true : result.message);
         });

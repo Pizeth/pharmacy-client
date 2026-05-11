@@ -16,6 +16,11 @@ import {
 } from "react-hook-form";
 import BaseInput from "./baseInput";
 import { useAsyncFieldValidation } from "@/lib/hooks/useFieldValidation";
+import {
+  setValidationLoadingAtom,
+  validationLoadingAtom,
+} from "@/Stores/validationStore";
+import { useAtomValue, useSetAtom } from "jotai";
 
 const ControlledInput = ({
   field,
@@ -34,6 +39,9 @@ const ControlledInput = ({
   // ref for the shake animation target
   const rootRef = useRef<HTMLDivElement>(null);
   const isMounted = useRef(false);
+  const loadings = useAtomValue(validationLoadingAtom);
+  const setLoading = useSetAtom(setValidationLoadingAtom);
+  const isFieldValidating = loadings[name] ?? false;
 
   // ✅ CRITICAL: memoize this wrapper so it doesn't change identity every render.
   // Without useCallback, a new function is created each render, which lands in
@@ -98,6 +106,10 @@ const ControlledInput = ({
     // clearErrors,
   ]);
 
+  useEffect(() => {
+    return () => setLoading({ source: name, loading: false });
+  }, [name, setLoading]);
+
   return (
     <BaseInput
       rootRef={rootRef}
@@ -105,7 +117,8 @@ const ControlledInput = ({
       fieldState={fieldState}
       label={label}
       // isFocused={isFocused}
-      isValidating={fieldState.isValidating}
+      // isValidating={fieldState.isValidating}
+      isValidating={isFieldValidating} // ← replaces fieldState.isValidating
       // onFocus={(e) => {
       //   onFocusChange(true);
       //   onFocus?.(e as React.FocusEvent<HTMLInputElement>);

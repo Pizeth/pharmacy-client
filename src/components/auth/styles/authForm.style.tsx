@@ -56,7 +56,7 @@ export const PasswordArea = styled(Box, {
 })(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  gap: theme.spacing(2),
+  // gap: theme.spacing(2),
 }));
 
 export const Footer = styled("div", {

@@ -1,6 +1,7 @@
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, styled } from "@mui/material";
 import { PasswordStrengthMeterProps } from "@/types/Types";
 import LinearProgressWithLabel from "./LinearProgressWithLabel";
+import { padding } from "@mui/system";
 
 // const MESSAGE = import.meta.env.VITE_PASSWORD_HINT;
 
@@ -48,23 +49,35 @@ import LinearProgressWithLabel from "./LinearProgressWithLabel";
 //     </Typography>
 //   </Box>
 // );
+const Root = styled(Box)(({ theme }) => ({
+  p: {
+    "&.MuiTypography-caption": {
+      paddingLeft: theme.spacing(1.5),
+    },
+  },
+}));
 
 export const PasswordStrengthMeter = ({
   passwordStrength,
   passwordFeedback,
 }: // value,
 PasswordStrengthMeterProps) => (
-  <Box mt={1}>
+  <Root>
     <LinearProgressWithLabel
       variant="determinate"
       value={(passwordStrength / 4) * 100}
       strength={passwordStrength} // Pass strength to LinearProgressWithLabel
     />
-    <Typography className={"passHint"} variant="caption" color="textSecondary">
+    <Typography
+      className={"passHint"}
+      component={"p"}
+      variant="caption"
+      color="textSecondary"
+    >
       {passwordFeedback}
       {/* {value ? passwordFeedback : MESSAGE} */}
     </Typography>
-  </Box>
+  </Root>
 );
 
 export default PasswordStrengthMeter;
