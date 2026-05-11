@@ -109,10 +109,21 @@ export default function useRefinement<T>(
         // }
 
         if (ctxRef.current.debounce > 0) {
-          await new Promise<void>((resolve) => {
+          await new Promise<void>((resolve, reject) => {
             timeoutId = setTimeout(resolve, ctxRef.current.debounce);
+            // ✅ When abort() fires, reject immediately so start() throws AbortError
+            // and the cached promise settles (then gets deleted by our .catch in refine)
+            signal.addEventListener(
+              "abort",
+              () => {
+                clearTimeout(timeoutId!);
+                timeoutId = null;
+                reject(new DOMException("Aborted", "AbortError"));
+              },
+              { once: true },
+            );
           });
-          if (signal.aborted) throw new DOMException("Aborted", "AbortError");
+          // if (signal.aborted) throw new DOMException("Aborted", "AbortError");
         }
 
         // const result = await ctxRef.current.callback(data, { signal });
@@ -151,7 +162,13 @@ export default function useRefinement<T>(
       const key = getCacheKey(data);
       if (key && cache.has(key)) return cache.get(key)!;
 
-      const promise = start(data);
+      // const promise = start(data);
+      // Store pending promise so concurrent calls for same key share it
+      const promise = start(data).catch((err) => {
+        // ✅ Remove from cache so the next attempt re-runs cleanly
+        if (key) cache.delete(key);
+        throw err;
+      });
       if (key) cache.set(key, promise);
       return promise;
     };

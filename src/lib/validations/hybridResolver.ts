@@ -26,13 +26,25 @@ export const hybridResolver =
         // Only run async validation if Zod hasn't already found an error for this field
         if (!value || errors[name]) return;
 
-        const result = await validate(value);
-        if (result !== true) {
-          errors[name] = {
-            type: "async",
-            message: typeof result === "string" ? result : "Invalid value",
-          };
+        try {
+          const result = await validate(value);
+          if (result !== true) {
+            errors[name] = { type: "async", message: String(result) };
+          }
+        } catch (err) {
+          // ✅ Aborted means superseded by a newer keystroke — not an error,
+          // the next resolver invocation will validate the new value
+          if (err instanceof Error && err.name === "AbortError") return;
+          throw err;
         }
+
+        // const result = await validate(value);
+        // if (result !== true) {
+        //   errors[name] = {
+        //     type: "async",
+        //     message: typeof result === "string" ? result : "Invalid value",
+        //   };
+        // }
       }),
     );
 

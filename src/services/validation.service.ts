@@ -17,7 +17,7 @@ const DEFAULT_RESULT: PasswordResult = {
   score: 0,
   isPwned: false,
   message: "",
-  // warning: "",
+  warning: "",
   status: "idle",
 };
 const cache = new Map<string, string | true>();
@@ -62,7 +62,7 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
         // The newer request's callback is responsible for resolving.
         if (signal.aborted) return;
 
-        console.log("Validation response:", data); // Debug log
+        // console.log("Validation response:", data); // Debug log
         const { status, message } = data;
 
         // Cache the result for future calls with the same value
@@ -71,46 +71,46 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
           status === statusCode.OK ? true : message || "Invalid",
         );
 
-        // onResult(
-        //   status === statusCode.OK
-        //     ? { message: message || "Available", status: "success" }
-        //     : { message: message || "Invalid", status: "error" },
-        // );
+        onResult(
+          status === statusCode.OK
+            ? { message: message || "Available", status: "success" }
+            : { message: message || "Invalid", status: "error" },
+        );
 
         // ✅ DEFER onResult to microtask - prevents setState during render
-        queueMicrotask(() => {
-          onResult(
-            status === statusCode.OK
-              ? { message: message || "Available", status: "success" }
-              : { message: message || "Invalid", status: "error" },
-          );
-        });
+        // queueMicrotask(() => {
+        //   onResult(
+        //     status === statusCode.OK
+        //       ? { message: message || "Available", status: "success" }
+        //       : { message: message || "Invalid", status: "error" },
+        //   );
+        // });
       } catch (e) {
         // ✅ Always call onResult on abort so the Promise in useAsyncFieldRule
         //    can resolve and RHF's isValidating flag clears.
-        // if (axios.isCancel(e) || (e as Error)?.name === "AbortError") {
-        //   onResult({ message: "", status: CANCELLED });
-        //   // return;
-        // }
-        // onResult({
-        //   message:
-        //     statusCode.getStatusText(statusCode.SERVICE_UNAVAILABLE) ||
-        //     "Validation service unavailable",
-        //   status: "error",
-        // });
-        queueMicrotask(() => {
-          if (axios.isCancel(e) || (e as Error)?.name === "AbortError") {
-            onResult({ message: "", status: CANCELLED });
-            return;
-          } else {
-            onResult({
-              message:
-                statusCode.getStatusText(statusCode.SERVICE_UNAVAILABLE) ||
-                "Validation service unavailable",
-              status: "error",
-            });
-          }
+        if (axios.isCancel(e) || (e as Error)?.name === "AbortError") {
+          onResult({ message: "", status: CANCELLED });
+          // return;
+        }
+        onResult({
+          message:
+            statusCode.getStatusText(statusCode.SERVICE_UNAVAILABLE) ||
+            "Validation service unavailable",
+          status: "error",
         });
+        // queueMicrotask(() => {
+        //   if (axios.isCancel(e) || (e as Error)?.name === "AbortError") {
+        //     onResult({ message: "", status: CANCELLED });
+        //     return;
+        //   } else {
+        //     onResult({
+        //       message:
+        //         statusCode.getStatusText(statusCode.SERVICE_UNAVAILABLE) ||
+        //         "Validation service unavailable",
+        //       status: "error",
+        //     });
+        //   }
+        // });
       } finally {
         // Only clear our controller, not someone else's.
         // Check signal identity to avoid clearing a newer controller.
@@ -180,6 +180,9 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
           ? suggestMsg.trim()
           : (warningMsg ?? "").concat(` ${suggestMsg}`).trim();
 
+        console.log("warningMsg", warningMsg);
+        console.log("suggestMsg", suggestMsg);
+        console.log("message", message);
         onResult({
           score,
           isPwned,
@@ -217,6 +220,7 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
       onResult({
         ...DEFAULT_RESULT,
         message: `${source} is required`,
+        // warning: `${source} is required`,
         status: "error",
       });
       return;
@@ -227,8 +231,8 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
       checkStrength.cancel();
       onResult({
         ...DEFAULT_RESULT,
-        message: `${source} must be at least 10 characters, include uppercase, lowercase, number, and special character!`,
-        // warning: `${source} has invalid format`,
+        warning: `${source} must be at least 10 characters, include uppercase, lowercase, number, and special character!`,
+        message: `${source} has invalid format`,
         status: "error",
       });
       return;

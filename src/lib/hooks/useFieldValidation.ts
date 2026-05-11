@@ -17,6 +17,13 @@ import { useFieldMachine } from "./useFieldMachine";
 import { getCached, setCached } from "@/caches/validationCache";
 import useRefinement from "./useRefinement";
 import { Score } from "@mui/icons-material";
+import { useSetAtom } from "jotai";
+import {
+  clearValidationMessageAtom,
+  clearValidationScoreAtom,
+  setValidationMessageAtom,
+  setValidationScoreAtom,
+} from "@/Stores/validationStore";
 
 // ─── Async field validation (username / email uniqueness etc.) ────────────────
 
@@ -358,7 +365,10 @@ export const usePasswordValidation = (
   //   // warning: "",
   //   status: "idle",
   // });
-  const [score, setScore] = useState(0);
+  const setScore = useSetAtom(setValidationScoreAtom);
+  const setMessage = useSetAtom(setValidationMessageAtom);
+  const clearMessage = useSetAtom(clearValidationMessageAtom);
+  // const [score, setScore] = useState(0);
 
   // Create validator instance
   const validator = useMemo(
@@ -379,13 +389,21 @@ export const usePasswordValidation = (
 
           if (result.status === "loading") return; // don't resolve yet
           if (result.status === "cancelled") resolve(true); // let next validation take over
-          setScore(result.score);
+          // ✅ Write to your existing store
+          // if (result.status === "success") {
+          //   setScore({ source, score: result.score });
+          // } else {
+          //   clearScore(source);
+          // }
+          // setMessage({ source, message: result.warning });
+          setScore({ source, score: result.score });
           resolve(result.status === "success" ? true : result.message);
         });
       }),
     {
       debounce,
-      cacheKey: (value) => value, // cache per password string
+      // cacheKey: (value) => value, // cache per password string
+      cacheKey: () => null, // ✅ disable cache — score must always recompute
     },
   );
 
@@ -483,7 +501,7 @@ export const usePasswordValidation = (
   return {
     // feedback, // ← Use this in your UI (strength meter)
     validate,
-    checkStrength: score, // Call on onChange for live feedback
+    // checkStrength: score, // Call on onChange for live feedback
     checkMatch,
     strengthRule, // Pass to Zod or RHF rules
     // strengthZodRefine, // ← Best for Zod

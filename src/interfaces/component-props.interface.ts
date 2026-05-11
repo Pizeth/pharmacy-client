@@ -465,8 +465,8 @@ export interface ControlledPasswordInputProps extends Omit<
   ControlledInputProps,
   "type" | "asyncValidate"
 > {
-  score?: number;
-  message?: string;
+  // score?: number;
+  // message?: string;
   strengthMeter: boolean;
   matchPassword?: string;
 }

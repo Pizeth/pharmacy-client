@@ -175,6 +175,6 @@ export interface ValidationState {
 
 export interface PasswordResult extends ValidationState {
   score: number;
-  // warning?: string; // For the "required" or "regex" sync errors
+  warning?: string; // For the "required" or "regex" sync errors
   isPwned: boolean; // Specific flag for pwned check
 }

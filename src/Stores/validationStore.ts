@@ -2,6 +2,7 @@
 import { atom } from "jotai";
 
 export const validationMessagesAtom = atom<Record<string, string>>({});
+export const validationScoreAtom = atom<Record<string, number>>({});
 
 export const setValidationMessageAtom = atom(
   null,
@@ -20,6 +21,27 @@ export const clearValidationMessageAtom = atom(
       const newMessages = { ...prev };
       delete newMessages[source];
       return newMessages;
+    });
+  },
+);
+
+export const setValidationScoreAtom = atom(
+  null,
+  (get, set, update: { source: string; score: number }) => {
+    set(validationScoreAtom, (prev) => ({
+      ...prev,
+      [update.source]: update.score,
+    }));
+  },
+);
+
+export const clearValidationScoreAtom = atom(
+  null,
+  (get, set, source: string) => {
+    set(validationScoreAtom, (prev) => {
+      const newScores = { ...prev };
+      delete newScores[source];
+      return newScores;
     });
   },
 );

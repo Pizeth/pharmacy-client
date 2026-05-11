@@ -115,7 +115,7 @@ const ConfirmPasswordField = () => {
 };
 
 // ─── Register fields ──────────────────────────────────────────────────────────
-const RegisterFields = ({ score }: { score: number }) => (
+const RegisterFields = ({ invalidate }: { invalidate: () => void }) => (
   <>
     <TextField
       name="name"
@@ -151,9 +151,10 @@ const RegisterFields = ({ score }: { score: number }) => (
         required
         strengthMeter
         // onChange={(e) => {
-        //   checkStrength(e.target.value);
-        //   invalidate(); // Clear old cache
+        //   // checkStrength(e.target.value);
+        //   if (!e.target.value) invalidate(); // ✅ bust cache when cleared
         // }}
+        // onChange={() => invalidate()}
       />
       <ConfirmPasswordField />
     </AuthForm.password>
@@ -267,8 +268,9 @@ const AuthForm = (inProps: AuthFormProps) => {
   const { validate: usernameValidate } = useAsyncFieldRule("username");
   const {
     validate: strengthRule,
-    checkStrength: score,
+    // checkStrength: score,
     checkMatch: matchRule,
+    invalidate,
   } = usePasswordValidation("password");
 
   // asyncMap values are stable function refs — memo hits cache every render
@@ -454,9 +456,9 @@ const AuthForm = (inProps: AuthFormProps) => {
                 //   />
                 // </>
                 <RegisterFields
-                  score={score}
+                  // score={score}
                   // checkStrength={checkStrength}
-                  // invalidate={invalidate}
+                  invalidate={invalidate}
                 />
               )}
 

@@ -7,6 +7,11 @@ import Box from "@mui/material/Box";
 import { useCallback, useEffect, useRef } from "react";
 import BaseInput from "./baseInput";
 import PasswordStrengthMeter from "../CustomComponents/PasswordStrengthMeter";
+import { useAtomValue, useSetAtom } from "jotai";
+import {
+  clearValidationScoreAtom,
+  validationScoreAtom,
+} from "@/Stores/validationStore";
 // import { FieldValues, UseFormClearErrors } from "react-hook-form";
 
 const ControlledPasswordInput = ({
@@ -15,8 +20,8 @@ const ControlledPasswordInput = ({
   name,
   label,
   strengthMeter,
-  score = 0,
-  message = "",
+  // score = 0,
+  // message = "",
   matchPassword,
   // clearErrors,
   // setError,
@@ -27,6 +32,21 @@ const ControlledPasswordInput = ({
   ...rest
 }: ControlledPasswordInputProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const scores = useAtomValue(validationScoreAtom);
+  // const clearScore = useSetAtom(clearValidationScoreAtom);
+  // const score = scores[name] ?? 0;
+  // If field is empty, show 0 — no atom write needed
+  const score = field.value ? (scores[name] ?? 0) : 0;
+
+  // Clean up when field unmounts
+  // useEffect(() => () => clearScore(name), [name, clearScore]);
+
+  // useEffect(() => {
+  //   if (!field.value) {
+  //     clearScore(name);
+  //   }
+  // }, [field.value, name, clearScore]);
 
   // ✅ CRITICAL: memoize — recreating this on every render puts a new function
   // reference in the useEffect deps inside the validation hooks, which fires
@@ -105,7 +125,7 @@ const ControlledPasswordInput = ({
       {showMeter && (field.value?.length ?? 0) > 5 && (
         <PasswordStrengthMeter
           passwordStrength={score}
-          passwordFeedback={message}
+          passwordFeedback={"message"}
           // passwordStrength={0}
           // passwordFeedback=""
         />
