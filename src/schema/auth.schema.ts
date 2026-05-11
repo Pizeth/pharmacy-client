@@ -41,10 +41,16 @@ export const registerSchema = z
     name: z.string().min(2, "Name must be at least 2 characters").max(100),
     username: z
       .string()
+      .trim()
+      .min(1, "Username is required!") // Catches empty strings first
       .min(5, "Username must be at least 5 characters")
       .max(100),
     email: z.email("Invalid email address"),
-    password: z.string().min(10, "Password must be at least 10 characters"),
+    password: z
+      .string()
+      .trim()
+      .min(1, "Password is required!") // Catches empty strings first
+      .min(10, "Password must be at least 10 characters"),
     confirmPassword: z.string(),
   })
   .superRefine((data, ctx) => {
