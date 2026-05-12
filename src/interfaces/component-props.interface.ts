@@ -479,6 +479,20 @@ export interface FieldBehavior {
   shakeOnError?: boolean;
 }
 
+export interface InputHelperTextProps {
+  helperText?: React.ReactNode;
+  error?: ValidationErrorMessage | string;
+}
+
+export interface ValidationErrorMessageWithArgs {
+  message: string;
+  args: {
+    [key: string]: ValidationErrorMessageWithArgs | any;
+  };
+}
+
+export type ValidationErrorMessage = string | ValidationErrorMessageWithArgs;
+
 export interface UseAsyncFieldValidationOptions {
   /** RHF field name — also used as the API source path segment */
   name: string;

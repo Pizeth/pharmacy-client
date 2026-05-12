@@ -140,18 +140,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* React Scan monitoring script */}
+      {/* React Scan monitoring script */}
+      {/* <head>
         <Script
           src="https://unpkg.com/react-scan/dist/auto.global.js"
           strategy="beforeInteractive"
         />
-      </head>
+      </head> */}
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} ${kantumruy.variable} ${montserrat.variable} ${tactieng.variable} antialiased`}
       >
         {/* <AppRouterCacheProvider>{children}+ </AppRouterCacheProvider> */}
-        <InitColorSchemeScript attribute="class" /> {/* ← before everything */}
+        {/* <InitColorSchemeScript attribute="class" /> ← before everything */}
         <ThemeProviderWrapper theme={darkTheme}>
           <Suspense fallback={<PulseLoader />}>
             <RefineContext>{children}</RefineContext>

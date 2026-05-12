@@ -151,12 +151,8 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
           // "loading" → still in-flight, do not resolve yet
           // "cancelled" → superseded by a newer keystroke, resolve clean so
           //               RHF's isValidating clears; the next call will validate
-          if (result.status === "loading") {
-            // setStatus("validating");
-            setLoading({ source, loading: true }); // ← API request started
-            return; // still validating
-          }
-          setLoading({ source, loading: false }); // ← terminal state
+          if (result.status === "loading") return; // API in-flight, wait
+          setLoading({ source, loading: false }); // ← terminal: clear loading
           if (result.status === "cancelled") {
             resolve(true);
             return;
@@ -193,6 +189,7 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
     {
       debounce: debounceDelay,
       cacheKey: (value) => `${source}:${value}`,
+      onStart: () => setLoading({ source, loading: true }), // ← immediate
     },
   );
   // ✅ FIX: memoize zodRefine so it has a stable reference across renders
@@ -391,14 +388,9 @@ export const usePasswordValidation = (
         validator.validate(value, source, (result) => {
           // ✅ Always update the meter, including during the loading phase
           // setFeedback(result);
-          // if (result.status === "loading") return; // don't resolve yet
-          if (result.status === "loading") {
-            setLoading({ source, loading: true }); // ← zxcvbn started
-            setMessage({ source, message: `Analyzing ${source}...` });
-            // resolve("Validating...");
-            return;
-          }
-          setLoading({ source, loading: false }); // ← terminal state
+          if (result.status === "loading") return; // API in-flight, wait
+
+          setLoading({ source, loading: false }); // ← terminal: clear loading
           if (result.status === "cancelled") {
             resolve(true);
             return;
@@ -418,6 +410,7 @@ export const usePasswordValidation = (
       debounce,
       // cacheKey: (value) => value, // cache per password string
       cacheKey: () => null, // ✅ disable cache — score must always recompute
+      onStart: () => setLoading({ source, loading: true }), // ← immediate
     },
   );
 

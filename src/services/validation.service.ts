@@ -180,10 +180,10 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
           ? suggestMsg.trim()
           : (warningMsg ?? "").concat(` ${suggestMsg}`).trim();
 
-        console.log("warningMsg", warningMsg);
-        console.log("suggestMsg", suggestMsg);
-        console.log("message", message);
-        console.log("score", score);
+        // console.log("warningMsg", warningMsg);
+        // console.log("suggestMsg", suggestMsg);
+        // console.log("message", message);
+        // console.log("score", score);
         if (isWeak) {
           onResult({
             score,

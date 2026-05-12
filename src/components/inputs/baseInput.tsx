@@ -96,9 +96,8 @@ export function BaseInput<TFieldValues extends FieldValues>(
         error={!!fieldState.error}
         // helperText={fieldState.error?.message ?? helperText}
         helperText={
-          fieldState.error?.message ??
-          (isValidating ? "Validating..." : isValidating) ??
-          helperText
+          // fieldState.error?.message ??
+          (isValidating ? "Validating..." : helperText) ?? helperText
         }
         slotProps={{
           input: {
@@ -117,6 +116,12 @@ export function BaseInput<TFieldValues extends FieldValues>(
             sx: {
               fontWeight:
                 !fieldState.error && !isValidating ? "bold" : undefined,
+              color: (theme) =>
+                isValidating
+                  ? theme.palette.primary.main
+                  : fieldState.error
+                    ? theme.palette.error.main
+                    : theme.palette.success.main,
             },
           },
         }}

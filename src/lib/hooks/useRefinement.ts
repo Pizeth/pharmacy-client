@@ -22,6 +22,7 @@ export interface UseRefinementOptions<T> {
   debounce?: number;
   /** Enable caching based on input value (recommended for password/username checks) */
   cacheKey?: (data: T) => string | null;
+  onStart?: () => void; // ← fires immediately on every call, before debounce
 }
 
 /**
@@ -59,15 +60,15 @@ export default function useRefinement<T>(
   callback: RefinementCallback<T>,
   options: UseRefinementOptions<T> = {},
 ): Refinement<T> {
-  const { debounce = 0, cacheKey } = options;
+  const { debounce = 0, cacheKey, onStart } = options;
 
   // Keep latest callback and options
-  const ctxRef = useRef({ callback, debounce, cacheKey });
+  const ctxRef = useRef({ callback, debounce, cacheKey, onStart });
 
   // Update context when callback or debounce changes
   useEffect(() => {
-    ctxRef.current = { callback, debounce, cacheKey };
-  }, [callback, debounce, cacheKey]);
+    ctxRef.current = { callback, debounce, cacheKey, onStart };
+  }, [callback, debounce, cacheKey, onStart]);
 
   const refinement = useMemo(() => {
     const cache = new Map<string, Promise<boolean | string>>();
@@ -94,6 +95,7 @@ export default function useRefinement<T>(
       // Cancel any previous ongoing refinement (Best Practice for forms)
       // Automatically abort any pending or running process before starting a new one
       abort();
+      ctxRef.current.onStart?.(); // ← fires on every keystroke immediately
       abortController = new AbortController();
       const signal = abortController.signal;
 

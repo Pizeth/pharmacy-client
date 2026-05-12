@@ -21,12 +21,14 @@ import {
   validationLoadingAtom,
 } from "@/Stores/validationStore";
 import { useAtomValue, useSetAtom } from "jotai";
+import { InputHelper } from "../CustomComponents/InputHelper";
 
 const ControlledInput = ({
   field,
   fieldState,
   name,
   label,
+  helperText,
   asyncValidate,
   // clearErrors,
   // setError,
@@ -110,6 +112,14 @@ const ControlledInput = ({
     return () => setLoading({ source: name, loading: false });
   }, [name, setLoading]);
 
+  const errMsg = fieldState.error?.message;
+  const renderHelperText = !!(
+    helperText ||
+    errMsg ||
+    // successMessage ||
+    fieldState.invalid
+  );
+
   return (
     <BaseInput
       rootRef={rootRef}
@@ -119,6 +129,25 @@ const ControlledInput = ({
       // isFocused={isFocused}
       // isValidating={fieldState.isValidating}
       isValidating={isFieldValidating} // ← replaces fieldState.isValidating
+      helperText={
+        // fieldState.error?.message ??
+        // (fieldState.isValidating
+        //   ? "Validating..."
+        //   : fieldState.isValidating) ??
+        // helperText
+        renderHelperText && (
+          <InputHelper
+            error={
+              // Show validation message only when NOT in validating state
+              fieldState.isValidating ? undefined : errMsg
+            }
+            // helperText={
+            //   // Show "Validating..." text during async validation
+            //   fieldState.isValidating ? "Validating..." : helperText
+            // }
+          />
+        )
+      }
       // onFocus={(e) => {
       //   onFocusChange(true);
       //   onFocus?.(e as React.FocusEvent<HTMLInputElement>);

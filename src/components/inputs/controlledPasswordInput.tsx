@@ -15,6 +15,7 @@ import {
   validationLoadingAtom,
   setValidationLoadingAtom,
 } from "@/Stores/validationStore";
+import { InputHelper } from "../CustomComponents/InputHelper";
 // import { FieldValues, UseFormClearErrors } from "react-hook-form";
 
 const ControlledPasswordInput = ({
@@ -22,6 +23,7 @@ const ControlledPasswordInput = ({
   fieldState,
   name,
   label,
+  helperText,
   strengthMeter,
   // score = 0,
   // message = "",
@@ -110,9 +112,17 @@ const ControlledPasswordInput = ({
 
   const showMeter = strengthMeter && (field.value?.length ?? 0) > 0;
 
-  useEffect(() => {
-    return () => setLoading({ source: name, loading: false });
-  }, [name, setLoading]);
+  const errMsg = fieldState.error?.message || message;
+  const renderHelperText = !!(
+    helperText ||
+    errMsg ||
+    // successMessage ||
+    fieldState.invalid
+  );
+
+  // useEffect(() => {
+  //   return () => setLoading({ source: name, loading: false });
+  // }, [name, setLoading]);
   return (
     <Box width="100%">
       <BaseInput
@@ -123,6 +133,25 @@ const ControlledPasswordInput = ({
         type="password"
         // isFocused={isFocused}
         isValidating={fieldState.isValidating}
+        helperText={
+          // fieldState.error?.message ??
+          // (fieldState.isValidating
+          //   ? "Validating..."
+          //   : fieldState.isValidating) ??
+          // helperText
+          renderHelperText && (
+            <InputHelper
+              error={
+                // Show validation message only when NOT in validating state
+                fieldState.isValidating ? undefined : errMsg
+              }
+              // helperText={
+              //   // Show "Validating..." text during async validation
+              //   fieldState.isValidating ? "Validating..." : helperText
+              // }
+            />
+          )
+        }
         // isValidating={isPasswordValidating} // ← replaces fieldState.isValidating
         // onFocus={(e) => {
         //   onFocusChange(true);
