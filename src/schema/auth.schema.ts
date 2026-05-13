@@ -1,5 +1,6 @@
 // auth.schema.ts
 import authService from "@/services/auth.service";
+import { PASSWORD_REGEX } from "@/types/constants";
 import { z } from "zod";
 
 // ── Identifier: accepts either an email or a username ────────────────────────
@@ -50,7 +51,11 @@ export const registerSchema = z
       .string()
       .trim()
       .min(1, "Password is required!") // Catches empty strings first
-      .min(10, "Password must be at least 10 characters"),
+      .min(10, "Password must be at least 10 characters")
+      .regex(
+        PASSWORD_REGEX,
+        "Password must include uppercase, lowercase, number, and special character",
+      ),
     confirmPassword: z.string(),
   })
   .superRefine((data, ctx) => {

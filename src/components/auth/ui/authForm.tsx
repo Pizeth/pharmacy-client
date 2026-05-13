@@ -268,6 +268,7 @@ const AuthForm = (inProps: AuthFormProps) => {
   const { validate: usernameValidate } = useAsyncFieldRule("username");
   const {
     validate: strengthRule,
+    // strengthRule: strengthRule,
     // checkStrength: score,
     checkMatch: matchRule,
     invalidate,

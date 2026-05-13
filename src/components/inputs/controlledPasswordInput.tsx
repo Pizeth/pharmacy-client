@@ -112,12 +112,15 @@ const ControlledPasswordInput = ({
 
   const showMeter = strengthMeter && (field.value?.length ?? 0) > 0;
 
-  const errMsg = fieldState.error?.message || message;
+  const errMsg = isPasswordValidating
+    ? undefined
+    : fieldState.error?.message || message;
   const renderHelperText = !!(
     helperText ||
     errMsg ||
     // successMessage ||
-    fieldState.invalid
+    fieldState.invalid ||
+    isPasswordValidating
   );
 
   // useEffect(() => {
@@ -132,7 +135,8 @@ const ControlledPasswordInput = ({
         label={label}
         type="password"
         // isFocused={isFocused}
-        isValidating={fieldState.isValidating}
+        // isValidating={fieldState.isValidating}
+        isValidating={isPasswordValidating} // ← replaces fieldState.isValidating
         helperText={
           // fieldState.error?.message ??
           // (fieldState.isValidating
@@ -152,7 +156,6 @@ const ControlledPasswordInput = ({
             />
           )
         }
-        // isValidating={isPasswordValidating} // ← replaces fieldState.isValidating
         // onFocus={(e) => {
         //   onFocusChange(true);
         //   onFocus?.(e as React.FocusEvent<HTMLInputElement>);
@@ -164,7 +167,7 @@ const ControlledPasswordInput = ({
         // }}
         {...rest}
       />
-      {showMeter && (field.value?.length ?? 0) >= 10 && (
+      {showMeter && (field.value?.length ?? 0) >= 10 && message && (
         <PasswordStrengthMeter
           passwordStrength={score}
           passwordFeedback={message}

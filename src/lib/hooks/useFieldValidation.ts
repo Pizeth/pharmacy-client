@@ -25,6 +25,7 @@ import {
   setValidationMessageAtom,
   setValidationScoreAtom,
 } from "@/Stores/validationStore";
+import { PASSWORD_REGEX } from "@/types/constants";
 
 // ─── Async field validation (username / email uniqueness etc.) ────────────────
 
@@ -446,36 +447,21 @@ export const usePasswordValidation = (
    */
   const strengthRule = useCallback(
     // (value: string): Promise<string | boolean> => {
-    //   return new Promise<string | boolean>((resolve) => {
-    //     validator.validate(value, source, (result) => {
-    //       // if (result.status !== "loading") {
-    //       //   setFeedback(result);
-    //       //   resolve(
-    //       //     result.status === "success"
-    //       //       ? true
-    //       //       : result.warning || result.message || "Password is too weak",
-    //       //   );
-    //       // }
+    //   // ✅ Sync — resolve immediately, no debounce, no zxcvbn
+    //   if (isEmpty(value?.trim())) {
+    //     setScore({ source, score: 0 });
+    //     return Promise.resolve(`${source} is required`);
+    //   }
 
-    //       // ✅ Always update the meter, including during the loading phase
-    //       setFeedback(result);
+    //   if (!PASSWORD_REGEX.test(value)) {
+    //     setScore({ source, score: 0 });
+    //     return Promise.resolve("Invalid Format!");
+    //   }
 
-    //       if (result.status === "loading") return; // still in-flight
-
-    //       if (result.status === "cancelled") {
-    //         resolve(true); // superseded — next call will validate properly
-    //         return;
-    //       }
-
-    //       resolve(
-    //         result.status === "success"
-    //           ? true
-    //           : result.warning || result.message || "Password is too weak",
-    //       );
-    //     });
-    //   });
+    //   // ✅ Only reaches here if format is valid — now debounce + zxcvbn
+    //   return validate(value);
     // },
-    // [validator, source],
+    // [validate, source],
     (value: string) => validate(value),
     [validate],
   );

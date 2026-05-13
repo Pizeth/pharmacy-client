@@ -3,6 +3,7 @@ import { FieldValues } from "react-hook-form";
 import { BaseInputProps } from "@/interfaces/component-props.interface";
 import { TextField, InputAdornment, useThemeProps, Box } from "@mui/material";
 import useInputAdornment from "./useInputAdornment";
+import { useState } from "react";
 
 const PREFIX = "RazethBaseInput";
 
@@ -60,13 +61,15 @@ export function BaseInput<TFieldValues extends FieldValues>(
     onClear: () => field.onChange(""),
   });
 
+  const [focused, setFocused] = useState(false);
+
   // ── Label shrink & offset ────────────────────────────────────────────────
   // The label must shrink (float above) when focused or when the field has a
   // value. If there is a start adornment we ALSO always shrink so the label
   // never overlaps the icon — this mirrors MUI's own behaviour for
   // `startAdornment` in uncontrolled inputs.
   // const shouldShrink = isFocused || !!field.value || !!iconStart;
-  const shouldShrink = isFocused || !!field.value;
+  const shouldShrink = focused || !!field.value;
 
   // Vertical translate differs between TextField sizes:
   //   medium → translate(14px, 16px)   small → translate(14px, 9px)
@@ -124,6 +127,15 @@ export function BaseInput<TFieldValues extends FieldValues>(
                     : theme.palette.success.main,
             },
           },
+        }}
+        onFocus={(e) => {
+          setFocused(true);
+          rest.onFocus?.(e); // forward if caller passed one
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          field.onBlur();
+          rest.onBlur?.(e);
         }}
         {...rest}
       />
