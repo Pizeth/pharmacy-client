@@ -37,6 +37,7 @@ import hybridResolver from "@/lib/validations/hybridResolver";
 // import { useFormOrchestrator } from "@/lib/hooks/useFormOrchestrator";
 import { AsyncMap } from "@/types/auth";
 import { Root, Content, PasswordArea, Footer } from "../styles/authForm.style";
+import FullName from "@/components/icons/fullName";
 
 // ─── Styled slots ─────────────────────────────────────────────────────────────
 
@@ -68,7 +69,7 @@ const RegisterFieldsOld = () => {
       <TextField
         name="name"
         label="Full Name"
-        iconStart={<Badge />}
+        iconStart={<FullName />}
         // rules={{ required: "Name is required" }}
         fullWidth
       />
@@ -123,7 +124,7 @@ const RegisterFields = () => (
       name="name"
       label="Full Name"
       required
-      iconStart={<Badge />}
+      iconStart={<FullName />}
       fullWidth
     />
     <TextField
