@@ -12,10 +12,11 @@ const Root = styled(Button, {
   overridesResolver: (_props, styles) => styles.root,
 })<ValidatedButtonProps>(({ theme }) => ({
   "&.MuiButton-root": {
+    color: theme.vars.palette.common.white,
     borderRadius: "50px",
     fontWeight: 700,
     fontSize: "0.9375rem",
-    color: theme.vars.palette.common.white,
+    "&.Mui-disabled": { color: theme.vars.palette.action.disabled },
   },
 
   // fontSize: "2.5rem",

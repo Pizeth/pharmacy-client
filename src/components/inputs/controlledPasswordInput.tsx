@@ -16,6 +16,7 @@ import {
   setValidationLoadingAtom,
 } from "@/Stores/validationStore";
 import { InputHelper } from "../CustomComponents/InputHelper";
+import { useFormContext } from "react-hook-form";
 // import { FieldValues, UseFormClearErrors } from "react-hook-form";
 
 const ControlledPasswordInput = ({
@@ -96,6 +97,14 @@ const ControlledPasswordInput = ({
   //   // clearErrors: clearFieldErrors,
   //   enabled: matchPassword !== undefined && fieldState.isTouched,
   // });
+  const { trigger } = useFormContext();
+
+  // ✅ When password changes, re-validate confirmPassword (and vice versa)
+  useEffect(() => {
+    if (matchPassword === undefined) return; // not a confirm field
+    if (!fieldState.isTouched) return; // don't show before interaction
+    trigger(name);
+  }, [matchPassword]); // ← matchPassword changes when password field changes
 
   // ── Shake label on invalid ────────────────────────────────────────────────
   useEffect(() => {
@@ -110,11 +119,10 @@ const ControlledPasswordInput = ({
     }
   }, [fieldState.invalid, fieldState.isValidating]);
 
-  const showMeter = strengthMeter && (field.value?.length ?? 0) > 0;
-
   const errMsg = isPasswordValidating
     ? undefined
     : fieldState.error?.message || message;
+
   const renderHelperText = !!(
     helperText ||
     errMsg ||
@@ -122,6 +130,11 @@ const ControlledPasswordInput = ({
     fieldState.invalid ||
     isPasswordValidating
   );
+
+  const zodFailed = !!fieldState.error && fieldState.error.type !== "async";
+  // const showMeter = strengthMeter && (field.value?.length ?? 0) > 0;
+  const showMeter =
+    strengthMeter && (field.value?.length ?? 0) > 0 && !zodFailed; // ← hide while Zod sync validators are failing
 
   // useEffect(() => {
   //   return () => setLoading({ source: name, loading: false });
@@ -167,7 +180,7 @@ const ControlledPasswordInput = ({
         // }}
         {...rest}
       />
-      {showMeter && (field.value?.length ?? 0) >= 10 && message && (
+      {showMeter && (field.value?.length ?? 0) >= 10 && (
         <PasswordStrengthMeter
           passwordStrength={score}
           passwordFeedback={message}

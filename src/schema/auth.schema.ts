@@ -4,29 +4,32 @@ import { PASSWORD_REGEX } from "@/types/constants";
 import { z } from "zod";
 
 // ── Identifier: accepts either an email or a username ────────────────────────
-const refinedIdentifier = z.string().superRefine((val, ctx) => {
-  if (val.includes("@")) {
-    const result = z.email().safeParse(val);
-    if (!result.success) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Invalid email format",
-      });
+const refinedIdentifier = z
+  .string()
+  .min(1, "Username cannot be empty!")
+  .superRefine((val, ctx) => {
+    if (val.includes("@")) {
+      const result = z.email().safeParse(val);
+      if (!result.success) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Invalid email format",
+        });
+      }
+    } else {
+      if (val.length < 3) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Username must be at least 3 characters",
+        });
+      }
     }
-  } else {
-    if (val.length < 3) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Username must be at least 3 characters",
-      });
-    }
-  }
-});
+  });
 
 // ── Login ────────────────────────────────────────────────────────────────────
 export const loginSchema = z.object({
   identifier: refinedIdentifier,
-  password: z.string().min(10, "Password must be at least 10 characters"),
+  password: z.string().min(1, "Password cannot be empty!"),
 });
 
 // ── Register ─────────────────────────────────────────────────────────────────

@@ -9,13 +9,14 @@ import { Button, SaveButton } from "react-admin";
 import { useFormState } from "react-hook-form";
 import Loader from "./loading";
 import CircularProgress from "@mui/material/CircularProgress";
+import { color } from "framer-motion";
 
 const PREFIX = "RazethValidatedButton";
-const VaidatedSaveButton = styled(Box, {
+const Root = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<SignUpFormProps>(() => ({
+})<SignUpFormProps>(({ theme }) => ({
   button: {
     // borderRadius: "2.5rem",
     fontWeight: 700,
@@ -34,7 +35,7 @@ const ValidatedButton = (inProps: ValidatedButtonProps) => {
   const hasErrors = Object.values(errors).some((error) => !!error);
   const { loading, authType = "login", className, sx, ...rest } = props;
   return (
-    <VaidatedSaveButton>
+    <Root>
       {/* Conditional rendering */}
       {authType === "signin" ? (
         <Button
@@ -82,7 +83,7 @@ const ValidatedButton = (inProps: ValidatedButtonProps) => {
           {...rest}
         />
       )}
-    </VaidatedSaveButton>
+    </Root>
   );
 };
 

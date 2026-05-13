@@ -127,13 +127,13 @@ export function NotFoundUI() {
       </div>
 
       <div>
-        {/* <TV /> */}
+        <TV />
         {/* <Mars /> */}
         {/* <Jupyter /> */}
         {/* <TestPlanet /> */}
         {/* <Sun /> */}
         {/* <Moon /> */}
-        {/* <Earth size={100} /> */}
+        <Earth size={100} />
         {/* <div
           style={{
             position: "absolute",

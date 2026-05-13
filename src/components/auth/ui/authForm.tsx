@@ -15,6 +15,7 @@ import {
   Login,
   Badge,
   Email,
+  PasswordOutlined,
 } from "@mui/icons-material";
 import { AuthFormProps } from "@/interfaces/component-props.interface";
 import { useLogin, useRegister } from "@refinedev/core";
@@ -108,6 +109,7 @@ const ConfirmPasswordField = () => {
     <PasswordField
       name="confirmPassword"
       label="Confirm Password"
+      iconStart={<Password />}
       required
       matchPassword={passwordValue} // wires match validation via useEffect
     />
@@ -115,7 +117,7 @@ const ConfirmPasswordField = () => {
 };
 
 // ─── Register fields ──────────────────────────────────────────────────────────
-const RegisterFields = ({ invalidate }: { invalidate: () => void }) => (
+const RegisterFields = () => (
   <>
     <TextField
       name="name"
@@ -148,6 +150,7 @@ const RegisterFields = ({ invalidate }: { invalidate: () => void }) => (
       <PasswordField
         name="password"
         label="Password"
+        iconStart={<Password />}
         required
         strengthMeter
         // onChange={(e) => {
@@ -270,7 +273,6 @@ const AuthForm = (inProps: AuthFormProps) => {
     validate: strengthRule,
     // strengthRule: strengthRule,
     // checkStrength: score,
-    checkMatch: matchRule,
     invalidate,
   } = usePasswordValidation("password");
 
@@ -284,6 +286,12 @@ const AuthForm = (inProps: AuthFormProps) => {
             username: usernameValidate,
             password: strengthRule,
             // confirmPassword: matchRule,
+            // confirmPassword: (value) => {
+            //   const result = matchValidator(value, form.getValues("password"));
+            //   return Promise.resolve(
+            //     result.status === "error" ? result.message : true,
+            //   );
+            // },
           },
     [isLogin, emailValidate, usernameValidate, strengthRule],
   );
@@ -419,7 +427,12 @@ const AuthForm = (inProps: AuthFormProps) => {
                     fullWidth
                   />
                   <AuthForm.password>
-                    <PasswordField name="password" label="Password" required />
+                    <PasswordField
+                      name="password"
+                      label="Password"
+                      iconStart={<Password />}
+                      required
+                    />
                   </AuthForm.password>
                 </>
               ) : (
@@ -456,11 +469,7 @@ const AuthForm = (inProps: AuthFormProps) => {
                 //     fullWidth
                 //   />
                 // </>
-                <RegisterFields
-                  // score={score}
-                  // checkStrength={checkStrength}
-                  invalidate={invalidate}
-                />
+                <RegisterFields />
               )}
 
               {/* ── Password fields ────────────────────────────────────── */}

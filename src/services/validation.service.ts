@@ -5,7 +5,7 @@ import { ValidationState, PasswordResult } from "@/interfaces/auth.interface";
 import lazyZxcvbn from "@/utils/lazyZxcvbn";
 import { zxcvbnAsync } from "@zxcvbn-ts/core";
 import { isEmpty } from "es-toolkit/compat";
-import { API_URL } from "@/types/constants";
+import { API_URL, PASSWORD_REGEX } from "@/types/constants";
 
 // Sentinel status used internally when a request is superseded by a newer one.
 // Hooks treat this as "no error yet" and wait for the next resolve.
@@ -236,16 +236,16 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
     }
 
     // 2. --- SYNCHRONOUS CHECK 2: Regex Policy (If fails, STOP HERE) ---
-    // if (!PASSWORD_REGEX.test(value)) {
-    //   checkStrength.cancel();
-    //   onResult({
-    //     ...DEFAULT_RESULT,
-    //     warning: `${source} must be at least 10 characters, include uppercase, lowercase, number, and special character!`,
-    //     message: `${source} has invalid format`,
-    //     status: "error",
-    //   });
-    //   return;
-    // }
+    if (!PASSWORD_REGEX.test(value)) {
+      checkStrength.cancel();
+      onResult({
+        ...DEFAULT_RESULT,
+        warning: `${source} must be at least 10 characters, include uppercase, lowercase, number, and special character!`,
+        message: `${source} has invalid format`,
+        status: "error",
+      });
+      return;
+    }
 
     // 3. --- ASYNCHRONOUS CHECK 3: Strength (zxcvbn) ---
     onResult({

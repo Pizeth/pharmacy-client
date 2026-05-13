@@ -1,5 +1,5 @@
 // lib/validation/hybridResolver.ts
-import { FieldError, FieldValues, Resolver } from "react-hook-form";
+import { FieldError, FieldName, FieldValues, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AsyncMap } from "@/types/auth";
 
@@ -22,6 +22,14 @@ export const hybridResolver =
 
     await Promise.all(
       asyncEntries.map(async ([name, validate]) => {
+        if (!validate) return; // ← guard for undefined validators
+        // ✅ Skip validators not involved in this validation trigger
+        if (
+          options.names?.length &&
+          !options.names.includes(name as FieldName<T>)
+        )
+          return;
+
         const value = values[name];
         // Only run async validation if Zod hasn't already found an error for this field
         if (!value || errors[name]) return;

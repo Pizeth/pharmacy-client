@@ -411,7 +411,10 @@ export const usePasswordValidation = (
       debounce,
       // cacheKey: (value) => value, // cache per password string
       cacheKey: () => null, // ✅ disable cache — score must always recompute
-      onStart: () => setLoading({ source, loading: true }), // ← immediate
+      onStart: () => {
+        setLoading({ source, loading: true }); // ← immediate
+        setMessage({ source, message: "" }); // ← clear stale warning immediately
+      },
     },
   );
 

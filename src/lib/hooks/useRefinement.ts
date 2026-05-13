@@ -95,7 +95,12 @@ export default function useRefinement<T>(
       // Cancel any previous ongoing refinement (Best Practice for forms)
       // Automatically abort any pending or running process before starting a new one
       abort();
-      ctxRef.current.onStart?.(); // ← fires on every keystroke immediately
+      // ctxRef.current.onStart?.(); // ← fires on every keystroke immediately
+      // ✅ Defer onStart to microtask — same reason as the callback defer below
+      // Prevents setState (Jotai atom) from firing during RHF's render-phase resolver call
+      Promise.resolve().then(() => ctxRef.current.onStart?.());
+      // ✅ macrotask — guaranteed outside render cycle
+      // setTimeout(() => ctxRef.current.onStart?.(), 0);
       abortController = new AbortController();
       const signal = abortController.signal;
 

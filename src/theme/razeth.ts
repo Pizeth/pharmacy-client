@@ -236,6 +236,9 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       // divider: "rgba(0, 0, 0, 0.12)",
 
       // mode: "dark",
+      action: {
+        disabled: "rgba(0, 0, 0, 0.3)",
+      },
       // background: { default: "#f4f6f8", paper: "#ecf0f3" },
       // background: { default: "#d1d9e6", paper: "#dfeafd" },
       background: { default: "#d3e1f7", paper: "#e0eafd" },
@@ -320,6 +323,9 @@ export const RazethBaseTheme = (): RaThemeOptions =>
             whiteChannel: "255 255 255", // Add this
             black: "#000000",
             blackChannel: "0 0 0", // Add this
+          },
+          action: {
+            disabled: "rgba(255, 255, 255, 0.3)",
           },
           background: {
             // default: "#121212",
