@@ -429,6 +429,7 @@ export interface InputAdornmentProps {
   readOnly?: boolean;
   isValidating?: boolean;
   iconEnd: ReactNode;
+  spinnerColor?: "primary" | "error" | "warning" | "success" | "inherit"; // ← add
   onClear: () => void;
 }
 

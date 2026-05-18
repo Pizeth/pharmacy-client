@@ -23,6 +23,9 @@ import {
   RazethSideImageOptimized,
   RazethTwinkleStarOptimized,
 } from "@/theme/components";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"; // Optional
 
 const globalStyles = (theme: Theme) => ({
   "html, body, #__next": {
@@ -891,6 +894,15 @@ export const RazethBaseTheme = (): RaThemeOptions =>
             "&.Mui-error .MuiSvgIcon-root": {
               color: props.theme.palette.error.main,
             },
+            // TARGET THE INPUT TEXT COLOR HERE
+            "&.Mui-focused.Mui-error": {
+              // Target the actual input element inside the root
+              "& .MuiOutlinedInput-input": {
+                color: props.theme.palette.error.main,
+                // Use WebkitTextFillColor to ensure compatibility with some browser defaults
+                WebkitTextFillColor: props.theme.palette.error.main,
+              },
+            },
             // Targets the root container when disabled
             "&.Mui-disabled": {
               backgroundColor: "#7974745c",
@@ -952,6 +964,23 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           }),
         },
       },
+      // MuiCheckbox: {
+      //   // defaultProps: {
+      //   //   // Swap default square icons with rounded icons theme-wide
+      //   //   icon: <RadioButtonUncheckedIcon />,
+      //   //   checkedIcon: <CheckCircleIcon />,
+      //   //   indeterminateIcon: <IndeterminateCheckBoxIcon />,
+      //   // },
+      //   styleOverrides: {
+      //     root: ({ theme }) => ({
+      //       // Add global styling like padding or base colors here
+      //       borderRadius: "50%",
+      //       // '&.Mui-checked': {
+      //       //   // Target checked state globally if needed
+      //       // },
+      //     }),
+      //   },
+      // },
       MuiCssBaseline: {
         styleOverrides: (theme) => globalStyles(theme),
       },

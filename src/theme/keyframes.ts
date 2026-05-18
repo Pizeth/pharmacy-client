@@ -200,7 +200,7 @@ export const shadowPulse = keyframes`
 
 export const cloudMove = keyframes`
   0% { background-position: 0 0; }
-  100% { background-position: 100% 0; }
+  100% { background-position: 1000px 0; }
 `;
 
 // export const moveBackground = keyframes`

@@ -40,6 +40,7 @@ export const useInputAdornment = (
     readOnly,
     isValidating,
     iconEnd,
+    spinnerColor,
     onClear,
     ...rest
   } = props;
@@ -55,7 +56,13 @@ export const useInputAdornment = (
     if (isValidating) {
       return {
         effectiveType: isPassword && !visible ? "password" : "text",
-        endAdornment: <CircularProgress size={20} />,
+        // ← use it} />
+        endAdornment: (
+          // <CircularProgress size={20} color={spinnerColor ?? "primary"} />
+          <InputAdornment position="end" disablePointerEvents>
+            <CircularProgress size={18} color={spinnerColor ?? "primary"} />
+          </InputAdornment>
+        ),
       };
     }
 

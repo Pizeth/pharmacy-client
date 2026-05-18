@@ -49,6 +49,12 @@ export function BaseInput<TFieldValues extends FieldValues>(
     ...rest // only standard MUI TextField props remain
   } = props;
 
+  // Compute spinner color from fieldState before passing to useInputAdornment
+  const spinnerColor = fieldState.error ? "error" : "primary";
+  // : fieldState.isDirty && !fieldState.invalid
+  //   ? "success"
+  //   : "primary";
+
   const { effectiveType, endAdornment } = useInputAdornment({
     value: field.value,
     type,
@@ -58,6 +64,7 @@ export function BaseInput<TFieldValues extends FieldValues>(
     readOnly,
     isValidating,
     iconEnd,
+    spinnerColor,
     onClear: () => field.onChange(""),
   });
 

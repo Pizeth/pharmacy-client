@@ -49,6 +49,7 @@ import SocialLogin from "./socialLogin";
 import Footer from "./ui/footer";
 import Divider from "./divider";
 import { AuthAction } from "@/types/auth";
+import ThemeToggle from "../effect/themes/themeToggle";
 
 const PREFIX = "RazethAuth";
 
@@ -199,8 +200,10 @@ const Ambient = styled(Box, {
   // right: 0,
   // background:
   //   "url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png) repeat",
-  background: `transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/clouds_repeat.png") repeat`,
-  backgroundSize: "contain",
+  // background: `transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/clouds_repeat.png") repeat`,
+  background: `transparent url("/static/textures/clouds_repeat.png") repeat`,
+  // backgroundSize: "contain",
+  backgroundSize: "1000px 1000px" /* Force the 1:1 image size */,
   animation: `${cloudMove} 150s linear infinite`,
   "::before": {
     content: '""',
@@ -1139,6 +1142,7 @@ export const Auth = (inProps: AuthProps) => {
           </Auth.card>
           {footer}
         </Content>
+        <ThemeToggle />
         {/* </Auth.content> */}
         {/* <Login.Heading>{heading}</Login.Heading> */}
         <Auth.icon>
