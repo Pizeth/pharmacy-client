@@ -224,7 +224,7 @@ const LogoCaption = styled(Box, {
   `,
 
   h6: {
-    Padding: `${theme.spacing(0.5)} 0`,
+    padding: `${theme.spacing(0.25)} 0`,
     lineHeight: 2.5,
     fontSize: { xs: "0.75rem", md: "0.925rem" },
     // fontFamily: "var(--font-google)",

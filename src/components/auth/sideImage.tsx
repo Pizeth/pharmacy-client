@@ -4,6 +4,7 @@ import {
   Grid,
   styled,
   Theme,
+  Typography,
   useMediaQuery,
   useTheme,
   useThemeProps,
@@ -12,15 +13,19 @@ import Image from "next/image";
 import { Moul } from "next/font/google";
 import { filt, hi, hii, wee } from "@/theme/keyframes";
 import { makePulseVars, makePulseKeyframes } from "@/utils/themeUtils";
+import Footer from "./ui/footer";
+import Icons from "../icons/components/socials";
 
 const moul = Moul({
   subsets: ["khmer", "latin"],
   weight: "400",
 });
 
+const CAPTION = process.env.NEXT_PUBLIC_LOGO_CAPTION || "ក្រសួងមុខងារសាធារណៈ";
+
 const PREFIX = "RazethSideImage";
 
-const StyledSideImage = styled(Grid, {
+const Root = styled(Grid, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
@@ -210,7 +215,9 @@ const Caption = styled(Box, {
   maxWidth: "none", // remove inherited width limit
   color: "#edad54",
   textAlign: "center",
+  fontFamily: "var(--font-moul)",
   fontSize: theme.custom.sideImage.captionFontSize.xs,
+  fontWeight: 400,
   textShadow: `
             -0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
             0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
@@ -231,6 +238,30 @@ const Caption = styled(Box, {
   },
 }));
 
+const FooterWrapper = styled(Box, {
+  name: PREFIX,
+  slot: "Footer",
+  overridesResolver: (_props, styles) => styles.footer,
+})(({ theme }) => ({
+  color: "#edad54",
+  textShadow: `
+            -0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            -0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0    0   7px ${theme.custom.sideImage.captionGlowColor}
+          `,
+  // "-webkit-text-stroke": `0.125px ${theme.custom.sideImage.captionOutlineColor}`,
+  WebkitTextStroke: `0.125px ${theme.custom.sideImage.captionOutlineColor}`,
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  right: 0,
+  zIndex: 2,
+  paddingBottom: theme.spacing(1),
+  // backgroundColor: "#00000050",
+}));
+
 /* Image section - hidden on mobile */
 const SideImage = (inProps: SideImageProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
@@ -241,7 +272,7 @@ const SideImage = (inProps: SideImageProps) => {
   if (isMobile) return null;
 
   return (
-    <StyledSideImage size={{ xs: 12, md: 6 }} {...rest}>
+    <Root size={{ xs: 12, md: 6 }} {...rest}>
       <SideImage.content>
         {/* Blue circle centered */}
 
@@ -254,15 +285,21 @@ const SideImage = (inProps: SideImageProps) => {
         </SideImage.circle>
       </SideImage.content>
       {/* Fixed-size logo in the middle */}
-      <SideImage.logo src={src} theme={theme} />
+      <SideImage.logo src={src} caption={CAPTION} />
+      <SideImage.footer>
+        <Typography variant="subtitle2" fontWeight={700} align="center">
+          បណ្ដាញសង្គមផ្លូវការ
+        </Typography>
+        <Icons />
+      </SideImage.footer>
       {/* Caption below logo */}
-    </StyledSideImage>
+    </Root>
   );
 };
 
 SideImage.content = Content;
 SideImage.circle = Circle;
-SideImage.logo = ({ src, theme }: { src: string; theme: Theme }) => (
+SideImage.logo = ({ src, caption }: { src: string; caption: string }) => (
   <LogoWrapper>
     <Image
       preload={false}
@@ -273,26 +310,26 @@ SideImage.logo = ({ src, theme }: { src: string; theme: Theme }) => (
       style={{ objectFit: "contain" }}
       unoptimized
     />
-    <SideImage.caption
-      caption={theme.custom.sideImage.logoCaption}
-      className={moul.className}
-    />
+    <Caption>{caption}</Caption>
+    {/* <SideImage.caption caption={caption} className={moul.className} /> */}
   </LogoWrapper>
 );
+
+SideImage.footer = FooterWrapper;
 
 // SideImage.caption = ({ caption }: { caption: string }) => {
 //   return <Caption>{caption}</Caption>;
 // };
 
-SideImage.caption = ({
-  caption,
-  className,
-}: {
-  caption: string;
-  className?: string;
-}) => {
-  return <Caption className={className}>{caption}</Caption>;
-};
+// SideImage.caption = ({
+//   caption,
+//   className,
+// }: {
+//   caption: string;
+//   className?: string;
+// }) => {
+//   return <Caption className={className}>{caption}</Caption>;
+// };
 
 export default SideImage;
 
