@@ -1,4 +1,5 @@
 // import AppBar from "@mui/material/AppBar";
+import type { Engine } from "@tsparticles/engine";
 import { Fragment, ReactNode, useEffect, useState } from "react";
 import {
   Avatar,
@@ -43,7 +44,8 @@ import RazContact from "../icons/contact";
 import DrawerToggle from "./Navigation/DrawerToggle";
 import MiniImg from "./Navigation/MiniImg";
 import { NavItems } from "./Navigation/NavItems";
-import { initParticlesEngine } from "@tsparticles/react";
+// import { initParticlesEngine } from "@tsparticles/react";
+import { NextParticles, NextParticlesProvider } from "@tsparticles/nextjs";
 import { loadSlim } from "@tsparticles/slim";
 import RazFacebook from "../icons/socials/facebook";
 import RazTelegram from "../icons/socials/telegram";
@@ -767,8 +769,17 @@ const SOCIAL_ITEMS = [
 ];
 
 export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
+  const init = async (engine: Engine): Promise<void> => {
+    const [{ loadSlim }, { loadThemesPlugin }] = await Promise.all([
+      import("@tsparticles/slim"),
+      import("@tsparticles/plugin-themes"),
+    ]);
+
+    await Promise.all([loadSlim(engine), loadThemesPlugin(engine)]);
+  };
+
   const [open, setOpen] = useState(false);
-  const [init, setInit] = useState(false);
+  // const [init, setInit] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   // const [results, setResults] = useState<any[]>([]);
 
@@ -1015,63 +1026,69 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   );
 
   // 1. Initialize the engine once
-  useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      await loadSlim(engine);
-      // await loadTrianglesPreset(engine);
-    }).then(() => {
-      setInit(true);
-    });
-  }, []);
+  // useEffect(() => {
+  //   initParticlesEngine(async (engine) => {
+  //     await loadSlim(engine);
+  //     // await loadTrianglesPreset(engine);
+  //   }).then(() => {
+  //     setInit(true);
+  //   });
+  // }, []);
 
   return (
     <Root>
-      {/* <CssBaseline /> */}
-      <AppBar
-        position="fixed"
-        color="primary"
-        component="nav"
-        enableColorOnDark
-      >
-        <Container maxWidth="xl">
-          {/* 2. The Particles Canvas */}
-          {init && <ParticleContainer id="tsparticles" options={options()} />}
-          {/* Content Container (Above Canvas) */}
-          <AppBarContainer maxWidth="xl">
-            {/* --- SECTION 2: LOGO & TITLE --- */}
-            <ProfileToolBar disableGutters variant="dense">
-              <LogoSection>
-                {/* Logo Image */}
-                <NavMenuButton
-                  color="inherit"
-                  aria-label="open drawer"
-                  edge="start"
-                  onClick={handleDrawerToggle}
-                  visible={!open}
-                  // sx={[
-                  //   { mr: 2, p: 0.5 },
-                  //   open && { display: { xs: "none", sm: "block" } },
-                  // ]}
-                >
-                  {/* <MenuIcon /> */}
-                  <DrawerToggle>
-                    <MiniImg />
-                  </DrawerToggle>
-                </NavMenuButton>
+      <NextParticlesProvider init={init}>
+        {" "}
+        {/* <CssBaseline /> */}
+        <AppBar
+          position="fixed"
+          color="primary"
+          component="nav"
+          enableColorOnDark
+        >
+          <Container maxWidth="xl">
+            {/* 2. The Particles Canvas */}
+            {/* {init && <ParticleContainer id="tsparticles" options={options()} />} */}
+            <ParticleContainer id="tsparticles" options={options()} />
+            {/* <NextParticlesProvider init={init}>
+            <NextParticles id="tsparticles" options={options()} />
+          </NextParticlesProvider> */}
+            {/* Content Container (Above Canvas) */}
+            <AppBarContainer maxWidth="xl">
+              {/* --- SECTION 2: LOGO & TITLE --- */}
+              <ProfileToolBar disableGutters variant="dense">
+                <LogoSection>
+                  {/* Logo Image */}
+                  <NavMenuButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    edge="start"
+                    onClick={handleDrawerToggle}
+                    visible={!open}
+                    // sx={[
+                    //   { mr: 2, p: 0.5 },
+                    //   open && { display: { xs: "none", sm: "block" } },
+                    // ]}
+                  >
+                    {/* <MenuIcon /> */}
+                    <DrawerToggle>
+                      <MiniImg />
+                    </DrawerToggle>
+                  </NavMenuButton>
 
-                {/* Logo Title */}
-                <LogoCaption data-text="General Secretariat">
-                  <Typography variant="h6">អគ្គលេខាធិការដ្ឋាន</Typography>
-                  <Typography variant="h5">3</Typography>
-                  <Typography variant="subtitle1">
-                    General Secretariat
-                  </Typography>
-                </LogoCaption>
-              </LogoSection>
+                  {/* Logo Title */}
+                  <LogoCaption data-text="General Secretariat">
+                    <Typography variant="h6">អគ្គលេខាធិការដ្ឋាន</Typography>
+                    <Typography variant="h5">3</Typography>
+                    <Typography variant="subtitle1">
+                      General Secretariat
+                    </Typography>
+                  </LogoCaption>
+                </LogoSection>
 
-              {/* --- SECTION 3: NAVIGATION MENU --- */}
-              <StackWrapper direction="row" spacing={1}>
-                {/* <Button color="inherit" sx={{ fontWeight: 600 }}>
+                {/* --- SECTION 3: NAVIGATION MENU --- */}
+                <StackWrapper direction="row" spacing={1}>
+                  {/* <Button color="inherit" sx={{ fontWeight: 600 }}>
                   Home
                 </Button>
                 <Button color="inherit" sx={{ fontWeight: 600 }}>
@@ -1083,19 +1100,19 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 <Button color="inherit" sx={{ fontWeight: 600 }}>
                   Contact
                 </Button> */}
-                {SOCIAL_ITEMS.map(({ label, Icon, color, href }, i) => (
-                  <Tooltip title={label} key={label}>
-                    <IconButton
-                      href={href}
-                      target="_blank"
-                      size="small"
-                      color="inherit"
-                    >
-                      {Icon}
-                    </IconButton>
-                  </Tooltip>
-                ))}
-                {/* <IconButton size="small">
+                  {SOCIAL_ITEMS.map(({ label, Icon, color, href }, i) => (
+                    <Tooltip title={label} key={label}>
+                      <IconButton
+                        href={href}
+                        target="_blank"
+                        size="small"
+                        color="inherit"
+                      >
+                        {Icon}
+                      </IconButton>
+                    </Tooltip>
+                  ))}
+                  {/* <IconButton size="small">
                   <RazWebsite />
                 </IconButton>
                 <IconButton size="small">
@@ -1116,7 +1133,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 <IconButton size="small">
                   <RazYoutube />
                 </IconButton> */}
-                {/* <Search>
+                  {/* <Search>
                   <SearchIconWrapper>
                     <SearchIcon />
                   </SearchIconWrapper>
@@ -1165,13 +1182,13 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                     ))}
                   </Menu>
                 </Box> */}
-              </StackWrapper>
-            </ProfileToolBar>
-          </AppBarContainer>
-          <DesktopToolbar disableGutters variant="dense">
-            {/* Pass The Drawer Button back here to revert back */}
-            <NavItems />
-            {/* <Search>
+                </StackWrapper>
+              </ProfileToolBar>
+            </AppBarContainer>
+            <DesktopToolbar disableGutters variant="dense">
+              {/* Pass The Drawer Button back here to revert back */}
+              <NavItems />
+              {/* <Search>
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
@@ -1214,33 +1231,34 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 ))}
               </Menu>
             </Box> */}
-          </DesktopToolbar>
-        </Container>
-      </AppBar>
-      <Drawer
-        // variant="persistent"
-        variant="temporary"
-        anchor="left"
-        open={open}
-        onClose={handleDrawerToggle}
-        // onOpen={toggleDrawer}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
-        slots={{
-          backdrop: TransparentBackdrop,
-        }}
-        // This is CRUCIAL for backdropFilter to work correctly in Modals
-        // Prevents focus trapping from interfering with the transparent click layer
-        disableEnforceFocus
-        disableScrollLock={false}
-      >
-        {drawer}
-      </Drawer>
-      <Main open={open}>
-        {/* <DrawerHeader /> */}
-        {children}
-      </Main>
+            </DesktopToolbar>
+          </Container>
+        </AppBar>
+        <Drawer
+          // variant="persistent"
+          variant="temporary"
+          anchor="left"
+          open={open}
+          onClose={handleDrawerToggle}
+          // onOpen={toggleDrawer}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          slots={{
+            backdrop: TransparentBackdrop,
+          }}
+          // This is CRUCIAL for backdropFilter to work correctly in Modals
+          // Prevents focus trapping from interfering with the transparent click layer
+          disableEnforceFocus
+          disableScrollLock={false}
+        >
+          {drawer}
+        </Drawer>
+        <Main open={open}>
+          {/* <DrawerHeader /> */}
+          {children}
+        </Main>
+      </NextParticlesProvider>
     </Root>
   );
 };

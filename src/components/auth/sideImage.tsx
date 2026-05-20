@@ -1,5 +1,6 @@
 import { SideImageProps } from "@/interfaces/auth.interface";
 import {
+  alpha,
   Box,
   Grid,
   styled,
@@ -258,14 +259,34 @@ const FooterWrapper = styled(Box, {
   left: 0,
   right: 0,
   zIndex: 2,
-  paddingBottom: theme.spacing(1),
+  // paddingBottom: theme.spacing(1),
   // backgroundColor: "#00000050",
+}));
+
+const IconsWrapper = styled(Box, {
+  name: PREFIX,
+  slot: "Icons",
+  overridesResolver: (_props, styles) => styles.icons,
+})(({ theme }) => ({
+  width: "100%",
+  display: "flex",
+  justifyContent: "center",
+  gap: theme.spacing(1),
+  padding: theme.spacing(0.5),
+  "& .MuiBox-root": {
+    borderRadius: "50px",
+    backgroundColor: alpha(theme.palette.common.black, 0.425),
+  },
 }));
 
 /* Image section - hidden on mobile */
 const SideImage = (inProps: SideImageProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { src = "/static/images/piseth_chesda_logo.svg", ...rest } = props;
+  const {
+    src = "/static/images/piseth_chesda_logo.svg",
+    title = "បណ្ដាញសង្គមផ្លូវការ",
+    ...rest
+  } = props;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -286,10 +307,7 @@ const SideImage = (inProps: SideImageProps) => {
       </SideImage.content>
       {/* Fixed-size logo in the middle */}
       <SideImage.logo src={src} caption={CAPTION} />
-      <SideImage.footer>
-        <Typography variant="subtitle2" fontWeight={700} align="center">
-          បណ្ដាញសង្គមផ្លូវការ
-        </Typography>
+      <SideImage.footer title={title}>
         <Icons />
       </SideImage.footer>
       {/* Caption below logo */}
@@ -315,7 +333,20 @@ SideImage.logo = ({ src, caption }: { src: string; caption: string }) => (
   </LogoWrapper>
 );
 
-SideImage.footer = FooterWrapper;
+SideImage.footer = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <FooterWrapper>
+    <Typography variant="subtitle2" fontWeight={700} align="center">
+      {title}
+    </Typography>
+    <IconsWrapper>{children}</IconsWrapper>
+  </FooterWrapper>
+);
 
 // SideImage.caption = ({ caption }: { caption: string }) => {
 //   return <Caption>{caption}</Caption>;

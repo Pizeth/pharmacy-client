@@ -1,5 +1,5 @@
 import { Theme } from "@mui/material/styles";
-import { IEvents, IModes, ISourceOptions } from "@tsparticles/engine";
+import { ISourceOptions } from "@tsparticles/engine";
 
 // interface ParticleOptions {
 //   theme?: Theme;
@@ -8,7 +8,8 @@ import { IEvents, IModes, ISourceOptions } from "@tsparticles/engine";
 // }
 const options = (
   theme?: Theme,
-  modes: Partial<IModes> = {
+  // modes: Partial<IModes> = {
+  modes: Record<string, unknown> = {
     grab: {
       distance: 125,
       links: {
@@ -17,7 +18,7 @@ const options = (
       },
     },
   },
-  events: Partial<IEvents> = {
+  events: Record<string, unknown> = {
     onHover: {
       enable: true,
       mode: "grab",
@@ -59,7 +60,19 @@ const options = (
       modes,
     },
     particles: {
-      color: { value: theme ? theme.palette.primary.main : "#FFF" },
+      // color: { value: theme ? theme.palette.primary.main : "#FFF" },
+      paint: {
+        fill: {
+          // value: theme ? theme.palette.primary.main : "#FFF",
+          color: { value: theme ? theme.palette.primary.main : "#FFF" },
+          enable: true,
+        },
+        stroke: {
+          width: 1,
+          color: { value: "#000000" },
+          opacity: 0.25,
+        },
+      },
       links: {
         color: theme ? theme.palette.primary.main : "#FFF",
         distance: 125,
@@ -72,6 +85,12 @@ const options = (
         speed: 1,
         direction: "none",
         outModes: "out",
+      },
+      repulse: {
+        value: 0,
+        enabled: false,
+        distance: 200,
+        duration: 0.25,
       },
       number: {
         value: number,

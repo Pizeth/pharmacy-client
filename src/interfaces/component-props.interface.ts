@@ -31,10 +31,11 @@ import { SaveButtonProps } from "react-admin";
 import { Circle } from "lucide-react";
 import { HtmlHTMLAttributes, ReactNode, Ref, RefObject } from "react";
 import { VirtualElement } from "@popperjs/core/lib/types";
-import { IParticlesProps } from "@tsparticles/react/dist/IParticlesProps";
+// import { IParticlesProps } from "@tsparticles/react/dist/IParticlesProps";
+import { IParticlesProps } from "@tsparticles/react";
 import { OverridableStringUnion } from "@mui/types";
 import { AsyncRuleType, AuthAction } from "@/types/auth";
-import { extend } from "lodash";
+import { Engine } from "@tsparticles/engine";
 
 export interface AuthProps extends HtmlHTMLAttributes<HTMLDivElement> {
   // content?: ReactNode;

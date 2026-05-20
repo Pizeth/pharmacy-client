@@ -1,11 +1,10 @@
 import { Avatar, Box, styled, Typography, useThemeProps } from "@mui/material";
 
-import PersonIcon from "@mui/icons-material/Person";
+// import PersonIcon from "@mui/icons-material/Person";
 import { AvatarProps } from "@/interfaces/auth.interface";
-import { useTranslate } from "ra-core";
-import RocketAnimation from "./effects/rocket";
 import { earthRotate } from "@/theme/keyframes";
 import { buildResponsiveShadow } from "@/utils/themeUtils";
+import MCS from "../icons/socials/mcs";
 
 const AvatarHeader = (inProps: AvatarProps) => {
   const props = useThemeProps({
@@ -29,7 +28,9 @@ const AvatarHeader = (inProps: AvatarProps) => {
         <Avatar alt="Razeth">{avatarIcon}</Avatar>
       </Box> */}
 
-      <Avatar alt="Razeth">{avatarIcon}</Avatar>
+      <Avatar alt="Razeth" sizes="75">
+        {avatarIcon}
+      </Avatar>
       <Typography
         align="center"
         variant="h6"
@@ -55,7 +56,7 @@ const AvatarHeader = (inProps: AvatarProps) => {
   );
 };
 
-const defaultAvatarIcon = <PersonIcon />;
+const defaultAvatarIcon = <MCS />;
 const PREFIX = "RazethAvatar";
 
 const Root = styled(Box, {

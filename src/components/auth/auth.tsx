@@ -50,7 +50,7 @@ import Footer from "./ui/footer";
 import Divider from "./divider";
 import { AuthAction } from "@/types/auth";
 import ThemeToggle from "../effect/themes/themeToggle";
-import { MCS } from "../icons/mcs";
+import { MCS } from "../icons/socials/mcs";
 import Icons from "../icons/components/socials";
 
 const PREFIX = "RazethAuth";
@@ -1164,7 +1164,7 @@ const defaultAvatar = (
       "https://assets.razeth.com/sea-planet-water-Earth-map-Arctic-193611-wallhere.com.jpg"
       // "https://api.dicebear.com/9.x/adventurer-neutral/svg?radius=50&seed=Razeth"
     }
-    avatarIcon={<PersonIcon />}
+    // avatarIcon={<PersonIcon />}
   />
 );
 const defaultDivider = <Divider />;

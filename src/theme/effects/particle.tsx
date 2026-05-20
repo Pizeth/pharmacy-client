@@ -1,7 +1,9 @@
 import { ParticleProps } from "@/interfaces/component-props.interface";
 import Box from "@mui/material/Box";
 import { styled, useThemeProps } from "@mui/material/styles";
-import Particles from "@tsparticles/react/dist/Particles";
+import { NextParticles, NextParticlesProvider } from "@tsparticles/nextjs";
+// import Particles from "@tsparticles/react/dist/Particles";
+// import Particles from "@tsparticles/react";
 
 const PREFIX = "RazethParticle";
 
@@ -22,8 +24,8 @@ const ParticleContainer = (inProps: ParticleProps) => {
   const { children, id, options, ...rest } = props;
   return (
     <Root {...rest}>
-      <Particles id={id} options={options} />
-      {children}
+      {/* <Particles id={id} options={options} /> */}
+      <NextParticles id={id} options={options} />
     </Root>
   );
 };

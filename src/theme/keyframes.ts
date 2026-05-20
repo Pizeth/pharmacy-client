@@ -388,6 +388,13 @@ export const fadeOut = keyframes`
   to { opacity: 1; transform: scale(1); }
 `;
 
+export const bounce = keyframes`
+    40% { transform: scale(1.4); }
+    60% { transform: scale(0.8); }
+    80% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+`;
+
 export const bAnimation = keyframes`
   100% { background-position: 50% 0, 60% 50%; }
 `;
