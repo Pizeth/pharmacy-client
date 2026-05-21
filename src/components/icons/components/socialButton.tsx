@@ -1,8 +1,11 @@
 import { SocialButtonProps } from "@/interfaces/auth.interface";
 import {
+  Box,
   Button,
+  IconButton,
   styled,
   Theme,
+  Tooltip,
   Typography,
   useThemeProps,
 } from "@mui/material";
@@ -10,12 +13,19 @@ import {
 const PREFIX = "RazethSocialButton";
 
 // The main button component
-const SocialButtonRoot = styled(Button, {
+const SocialButtonRoot = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<SocialButtonProps>(() => ({
+})(({ theme }) => ({
   /* base styles for the button */
+  "& .MuiIconButton-root": {
+    border: "none",
+    padding: "0.575rem",
+    margin: theme.spacing(0.25),
+    minWidth: "1rem",
+    borderRadius: "50%",
+  },
 }));
 
 // The text/label part of the button
@@ -38,16 +48,31 @@ export const SocialButton = (inProps: SocialButtonProps) => {
     props: inProps,
     name: PREFIX,
   });
-  const { className, sx, variant, icon, children, ...rest } = props;
+  const {
+    className,
+    sx,
+    variant,
+    icon,
+    label,
+    href,
+    size = "small",
+    children,
+    ...rest
+  } = props;
 
   return (
     <SocialButtonRoot
       className={className}
       sx={sx}
-      variant={variant || "outlined"}
+      // variant={variant || "outlined"}
       {...rest}
     >
-      {icon}
+      <Tooltip title={label}>
+        <IconButton href={href} target="_blank" size={size} color="inherit">
+          {icon}
+        </IconButton>
+      </Tooltip>
+      {/* {icon} */}
       <SocialButtonLabel variant="body2">{children}</SocialButtonLabel>
     </SocialButtonRoot>
   );

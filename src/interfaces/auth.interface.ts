@@ -101,9 +101,15 @@ export interface SocialLoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
   sx?: SxProps<Theme>;
 }
 
-export interface SocialButtonProps extends ButtonProps /*ExtendButtonBase<ButtonTypeMap> & ButtonOwnProps */ {
+// export interface SocialButtonProps extends ButtonProps /*ExtendButtonBase<ButtonTypeMap> & ButtonOwnProps */ {
+export interface SocialButtonProps extends HtmlHTMLAttributes<HTMLDivElement> /*ExtendButtonBase<ButtonTypeMap> & ButtonOwnProps */ {
   className?: string;
   icon?: ReactNode;
+  label?: string;
+  href: string;
+  size?: "small" | "medium" | "large";
+  variant?: "text" | "outlined" | "contained";
+  sx?: SxProps<Theme>;
   children?: ReactNode;
   // onClick?: MouseEventHandler<T> | undefined;
 }

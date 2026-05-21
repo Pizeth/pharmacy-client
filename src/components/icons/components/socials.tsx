@@ -2,10 +2,13 @@ import { styled } from "@mui/material";
 import Box from "@mui/material/Box";
 import { MCS } from "../socials/mcs";
 // import { Meta, Instagram, Telegram, YouTube } from "../socialIcons";
+// import { Meta } from "../socialIcons";
 import { SocialButton } from "./socialButton";
 import { bounce } from "@/theme/keyframes";
 import Meta from "../socials/meta";
 import Instagram from "../socials/instagram";
+import TikTok from "../socials/tiktok";
+import X from "../socials/x";
 import Telegram from "../socials/telegram";
 import YouTube from "../socials/youtube";
 
@@ -15,28 +18,45 @@ const PREFIX = "RazethSocialIcons";
 const PROVIDERS = {
   web: {
     name: "Web",
-    icon: <MCS />,
+    icon: <MCS color="action" fontSize="medium" />,
     className: "web",
+    href: "https://mcs.gov.kh",
   },
   meta: {
     name: "Meta",
-    icon: <Meta />,
+    icon: <Meta color="action" fontSize="medium" />,
     className: "meta",
+    href: "https://facebook.com/CivilServiceCambodia",
   },
   instagram: {
     name: "Instagram",
-    icon: <Instagram />,
+    icon: <Instagram color="action" fontSize="medium" />,
     className: "instagram",
+    href: "https://instagram.com/civilservice_cambodia",
+  },
+  tiktok: {
+    name: "TikTok",
+    icon: <TikTok color="action" fontSize="medium" />,
+    className: "tiktok",
+    href: "https://tiktok.com/@mcsgovernment",
+  },
+  x: {
+    name: "X",
+    icon: <X color="action" fontSize="medium" />,
+    className: "x",
+    href: "https://tiktok.com/@mcsgovernment",
   },
   telegram: {
     name: "Telegram",
-    icon: <Telegram />,
+    icon: <Telegram color="action" fontSize="medium" />,
     className: "telegram",
+    href: "https://t.me/mcsgovkh",
   },
   youtube: {
     name: "Youtube",
-    icon: <YouTube />,
+    icon: <YouTube color="action" fontSize="medium" />,
     className: "youtube",
+    href: "https://youtube.com/@MinistryofCivilService",
   },
 };
 
@@ -54,8 +74,8 @@ const Root = styled(Box, {
   zIndex: 1,
   button: {
     border: "none",
-    padding: "0.75rem",
-    margin: 0,
+    padding: "0.575rem",
+    margin: theme.spacing(0, 1),
     minWidth: "1rem",
     borderRadius: "50%",
     // "&:hover": {
@@ -67,14 +87,22 @@ const Root = styled(Box, {
     height: "1rem",
     // width: "60%",
     // height: "100%",
-    transition: "0.3s ease-in-out",
+    // transition: "0.3s ease-in-out",
+    // Smoothly transition all properties including transform and mask properties
+    transition: `transform 0.5s ease-in-out, background-color 0.5s ease-in-out, fill 0.5s ease-in-out`,
     boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+    borderRadius: "50%",
     // transform: "scale(1)",
     "&:hover": {
       transform: "scale(1.5)",
     },
-    borderRadius: "50%",
+    // 👇 ADD THIS BLOCK HERE 👇
+    // This gives a global smooth fade to ALL icon paths (Instagram, YouTube, etc.)
+    path: {
+      transition: "fill 0.5s ease-in-out",
+    },
   },
+
   // "&::before": {
   //   content: '""',
   //   position: "absolute",
@@ -112,6 +140,12 @@ const Root = styled(Box, {
     svg: {
       fill: "#ffcd34",
     },
+
+    "& .insta-lens-patch": {
+      fill: "#d28943",
+      transition: "fill 0.5s ease-in-out",
+    },
+
     background: theme.vars.palette.background.paper,
     animation: `${bounce} 0.5s linear`,
   },
@@ -136,11 +170,54 @@ const Root = styled(Box, {
     svg: {
       fill: "#0081FB",
     },
+
+    // Smoothly reveal the gradient path layer
+    "& .meta-gradient-layer": {
+      opacity: 1,
+      transition: "opacity 0.5s ease-in-out",
+    },
+
+    // Smoothly hide the default solid color layer
+    "& .meta-solid-layer": {
+      opacity: 0,
+      transition: "opacity 0.5s ease-in-out",
+    },
+
     background: theme.vars.palette.background.paper,
     animation: `${bounce} 0.5s linear`,
   },
   "& .instagram:hover": {
-    // background: "linear-gradient(45deg,#fd5,#ff543e,#c837ab,#3771c8)",
+    // svg: {
+    //   path: {
+    //     // Points directly to the gradient ID inside the SVG
+    //     fill: "url(#instagram-gradient)",
+    //   },
+    // },
+
+    // 1. Target the main path lines for the gradient
+    // "& svg path": {
+    //   fill: "url(#instagram-gradient)",
+    //   transition: "fill 0.5s ease-in-out",
+    // },
+
+    // Smoothly reveal the gradient path layer
+    "& .insta-gradient-layer": {
+      opacity: 1,
+      transition: "opacity 0.5s ease-in-out",
+    },
+
+    // Smoothly hide the default solid color layer
+    "& .insta-solid-layer": {
+      opacity: 0,
+      transition: "opacity 0.5s ease-in-out",
+    },
+
+    // 2. Target the inner lens cutout circle directly from the button hover!
+    "& .insta-lens-patch": {
+      fill: "#ffffff",
+      transition: "fill 0.5s ease-in-out",
+    },
+
     background: theme.vars.palette.background.paper,
     animation: `${bounce} 0.5s linear`,
   },
@@ -157,6 +234,12 @@ const Root = styled(Box, {
     svg: {
       fill: "#FF0000",
     },
+    // 2. Target the inner lens cutout circle directly from the button hover!
+    "& .youtube-patch": {
+      fill: "#ffffff",
+      transition: "fill 0.5s ease-in-out",
+    },
+
     background: theme.vars.palette.background.paper,
     animation: `${bounce} 0.5s linear`,
   },
@@ -183,6 +266,8 @@ const Icons = () => {
           variant="outlined"
           icon={provider.icon}
           className={provider.className}
+          label={provider.name}
+          href={provider.href}
         >
           {/* {provider.name} */}
         </SocialButton>
