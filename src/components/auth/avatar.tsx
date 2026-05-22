@@ -4,6 +4,9 @@ import { Avatar, Box, styled, Typography, useThemeProps } from "@mui/material";
 import { AvatarProps } from "@/interfaces/auth.interface";
 import { earthRotate } from "@/theme/keyframes";
 import { buildResponsiveShadow } from "@/utils/themeUtils";
+import AvatarFrame from "../CustomComponents/AvatarFrame";
+import AvatarWrapper from "../CustomComponents/AvatarWrapper";
+import MiniImg from "../Navigations/Navigation/MiniImg";
 import MCS from "../icons/socials/mcs";
 
 const AvatarHeader = (inProps: AvatarProps) => {
@@ -23,24 +26,16 @@ const AvatarHeader = (inProps: AvatarProps) => {
 
   return (
     <Root className={className} sx={sx} {...rest}>
-      {/* <Box sx={{ display: "flex", position: "relative" }}>
-        <RocketAnimation />
-        <Avatar alt="Razeth">{avatarIcon}</Avatar>
-      </Box> */}
-
-      <Avatar alt="Razeth" sizes="75">
-        {avatarIcon}
-      </Avatar>
-      <Typography
-        align="center"
-        variant="h6"
-        fontWeight="bold"
-        gutterBottom
-        color="textPrimary"
-      >
-        {/* {translate("razeth.title.welcome") || title} */}
-        {title || "Welcome"}
-      </Typography>
+      <AvatarFrame>
+        {/* <AvatarWrapper><MiniImg src={src} /></AvatarWrapper> */}
+        <Avatar alt="Razeth" sizes="75">
+          {avatarIcon}
+        </Avatar>
+        {/* <Box sx={{ display: "flex", position: "relative" }}>
+          <RocketAnimation />
+          <Avatar alt="Razeth">{avatarIcon}</Avatar>
+        </Box> */}
+      </AvatarFrame>
       {/* <Typography
         variant="body2"
         color="text.secondary"
@@ -52,6 +47,16 @@ const AvatarHeader = (inProps: AvatarProps) => {
       >
         Login to your MCS account
       </Typography> */}
+      <Typography
+        align="center"
+        variant="h6"
+        fontWeight="bold"
+        gutterBottom
+        color="textPrimary"
+      >
+        {/* {translate("razeth.title.welcome") || title} */}
+        {title || "Welcome"}
+      </Typography>
     </Root>
   );
 };

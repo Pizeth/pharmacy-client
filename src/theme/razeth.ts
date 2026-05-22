@@ -254,6 +254,9 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           "-7px -7px 15px rgba(255,255,255,1), 7px 7px 15px rgba(174, 174, 192, 0.75)",
         // "-8px -8px 16px #ffffff, 8px 8px 16px #b8bcc2",
       },
+      dynamic: {
+        background: "#211111",
+      },
       card: "#adc4eb", // White for dark mode
       // background: {
       //   default: mode === "dark" ? "#121212" : "#f4f6f8",
@@ -346,6 +349,9 @@ export const RazethBaseTheme = (): RaThemeOptions =>
               // "inset 6px 6px 15px rgba(0, 0, 0, 0.6), inset -6px -6px 15px rgba(255, 255, 255, 0.05)",
               "-7px -7px 15px rgba(255,255,255,0.125), 7px 7px 15px rgba(0, 0, 0, 0.75)",
             // "-8px -8px 16px #4b5563, 8px 8px 16px #111827",
+          },
+          dynamic: {
+            background: "#000",
           },
           text: {
             primary: "#ffffff",

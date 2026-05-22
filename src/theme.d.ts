@@ -23,6 +23,9 @@ declare module "@mui/material/styles" {
       inset: string;
       circleWell: string;
     };
+    dynamic: {
+      background: string;
+    };
   }
   interface PaletteOptions {
     passwordStrength?: string[] | ((theme: MuiTheme) => string[]);
@@ -31,6 +34,9 @@ declare module "@mui/material/styles" {
       neumorphic: string;
       inset: string;
       circleWell: string;
+    };
+    dynamic?: {
+      background: string;
     };
   }
 

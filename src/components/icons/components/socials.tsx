@@ -1,4 +1,4 @@
-import { styled } from "@mui/material";
+import { alpha, styled } from "@mui/material";
 import Box from "@mui/material/Box";
 import { MCS } from "../socials/mcs";
 // import { Meta, Instagram, Telegram, YouTube } from "../socialIcons";
@@ -72,24 +72,28 @@ const Root = styled(Box, {
   flexDirection: "row",
   // columnGap: "0.5rem",
   zIndex: 1,
-  button: {
-    border: "none",
-    padding: "0.575rem",
-    margin: theme.spacing(0, 1),
-    minWidth: "1rem",
-    borderRadius: "50%",
-    // "&:hover": {
-    //   transform: "scale(1.25)",
-    // },
-  },
+  // "& .MuiIconButton-root": {
+  //   border: "none",
+  //   padding: "0.575rem",
+  //   // margin: theme.spacing(0, 1),
+  //   minWidth: "1rem",
+  //   borderRadius: "50%",
+  //   // "&:hover": {
+  //   //   transform: "scale(1.25)",
+  //   // },
+  // },
+  borderRadius: "50px",
+  backgroundColor: theme.alpha(theme.vars.palette.background.default, 0.725),
   "& svg": {
-    width: "1rem",
-    height: "1rem",
+    minWidth: "1rem",
+    minHeight: "1rem",
+    maxWidth: "1.35rem",
+    maxHeight: "1.35rem",
     // width: "60%",
     // height: "100%",
     // transition: "0.3s ease-in-out",
     // Smoothly transition all properties including transform and mask properties
-    transition: `transform 0.5s ease-in-out, background-color 0.5s ease-in-out, fill 0.5s ease-in-out`,
+    transition: `transform 0.3s ease-in-out, background-color 0.3s ease-in-out, fill 0.3s ease-in-out`,
     boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
     borderRadius: "50%",
     // transform: "scale(1)",
@@ -99,7 +103,7 @@ const Root = styled(Box, {
     // 👇 ADD THIS BLOCK HERE 👇
     // This gives a global smooth fade to ALL icon paths (Instagram, YouTube, etc.)
     path: {
-      transition: "fill 0.5s ease-in-out",
+      transition: "fill 0.3s ease-in-out, stroke 0.3s ease-in-out",
     },
   },
 
@@ -134,6 +138,7 @@ const Root = styled(Box, {
   //   animationDelay: "0.8s",
   // },
   // Specific provider color classes
+
   "& .web:hover": {
     // backgroundColor: "#edad54",
     // backgroundColor: "#d09749",
@@ -143,11 +148,11 @@ const Root = styled(Box, {
 
     "& .insta-lens-patch": {
       fill: "#d28943",
-      transition: "fill 0.5s ease-in-out",
+      transition: "fill 0.3s ease-in-out",
     },
 
     background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.5s linear`,
+    animation: `${bounce} 0.3s linear`,
   },
   // "& .meta::before": {
   //   content: '""',
@@ -174,17 +179,17 @@ const Root = styled(Box, {
     // Smoothly reveal the gradient path layer
     "& .meta-gradient-layer": {
       opacity: 1,
-      transition: "opacity 0.5s ease-in-out",
+      transition: "opacity 0.3s ease-in-out",
     },
 
     // Smoothly hide the default solid color layer
     "& .meta-solid-layer": {
       opacity: 0,
-      transition: "opacity 0.5s ease-in-out",
+      transition: "opacity 0.3s ease-in-out",
     },
 
     background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.5s linear`,
+    animation: `${bounce} 0.3s linear`,
   },
   "& .instagram:hover": {
     // svg: {
@@ -197,29 +202,48 @@ const Root = styled(Box, {
     // 1. Target the main path lines for the gradient
     // "& svg path": {
     //   fill: "url(#instagram-gradient)",
-    //   transition: "fill 0.5s ease-in-out",
+    //   transition: "fill 0.3s ease-in-out",
     // },
 
     // Smoothly reveal the gradient path layer
     "& .insta-gradient-layer": {
       opacity: 1,
-      transition: "opacity 0.5s ease-in-out",
+      transition: "opacity 0.3s ease-in-out",
     },
 
     // Smoothly hide the default solid color layer
     "& .insta-solid-layer": {
       opacity: 0,
-      transition: "opacity 0.5s ease-in-out",
+      transition: "opacity 0.3s ease-in-out",
     },
 
     // 2. Target the inner lens cutout circle directly from the button hover!
     "& .insta-lens-patch": {
       fill: "#ffffff",
-      transition: "fill 0.5s ease-in-out",
+      transition: "fill 0.3s ease-in-out",
     },
 
     background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.5s linear`,
+    animation: `${bounce} 0.3s linear`,
+  },
+  "& .tiktok:hover": {
+    "& .tiktok-chroma-red, .tiktok-chroma-dark, .tiktok-chroma-cyan ": {
+      opacity: 1,
+      transition: "opacity 0.3s ease-in-out",
+    },
+    "& .tiktok-solid-path": {
+      opacity: 0,
+      transition: "opacity 0.3s ease-in-out",
+    },
+    background: theme.vars.palette.background.paper,
+    animation: `${bounce} 0.3s linear`,
+  },
+  "& .x:hover": {
+    svg: {
+      fill: "#000",
+    },
+    background: theme.vars.palette.background.paper,
+    animation: `${bounce} 0.3s linear`,
   },
   "& .telegram:hover": {
     // backgroundColor: "#229ed9",
@@ -227,7 +251,7 @@ const Root = styled(Box, {
       fill: "#229ed9",
     },
     background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.5s linear`,
+    animation: `${bounce} 0.3s linear`,
   },
   "& .youtube:hover": {
     // backgroundColor: "#FF0000",
@@ -237,11 +261,11 @@ const Root = styled(Box, {
     // 2. Target the inner lens cutout circle directly from the button hover!
     "& .youtube-patch": {
       fill: "#ffffff",
-      transition: "fill 0.5s ease-in-out",
+      transition: "fill 0.3s ease-in-out",
     },
 
     background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.5s linear`,
+    animation: `${bounce} 0.3s linear`,
   },
   // // Provider-specific hover strokes
   // "& .web svg path": { stroke: "#2859c5" },
@@ -264,6 +288,7 @@ const Icons = () => {
         <SocialButton
           key={key}
           variant="outlined"
+          buttonType="iconButton"
           icon={provider.icon}
           className={provider.className}
           label={provider.name}

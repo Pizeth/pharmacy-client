@@ -18,6 +18,8 @@ const SocialButtonRoot = styled(Box, {
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
 })(({ theme }) => ({
+  borderRadius: "50px",
+
   /* base styles for the button */
   "& .MuiIconButton-root": {
     border: "none",
@@ -26,6 +28,32 @@ const SocialButtonRoot = styled(Box, {
     minWidth: "1rem",
     borderRadius: "50%",
   },
+
+  // button: {
+  //   display: "flex",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   gap: theme.spacing(1),
+  //   width: "100%",
+  //   padding: theme.spacing(1),
+  //   textTransform: "none",
+  //   border: `1px solid ${theme.palette.divider}`,
+  //   boxShadow: theme.vars.palette.customShadows.neumorphic,
+  //   transition: theme.transitions.create(["transform", "background-color"], {
+  //     duration: theme.transitions.duration.standard,
+  //     easing: theme.transitions.easing.easeInOut,
+  //   }),
+  //   "&:hover": {
+  //     border: `1px solid ${theme.vars.palette.divider}`,
+  //     backgroundColor: theme.palette.action.hover,
+  //     transform: "scale(1.05)", // enlarge smoothly
+  //     boxShadow: theme.shadows[3],
+  //   },
+  //   "& svg": {
+  //     width: theme.spacing(2),
+  //     height: theme.spacing(2),
+  //   },
+  // },
 }));
 
 // The text/label part of the button
@@ -51,29 +79,37 @@ export const SocialButton = (inProps: SocialButtonProps) => {
   const {
     className,
     sx,
-    variant,
+    variant = "outlined",
+    buttonType = "button",
     icon,
     label,
-    href,
+    href = "#",
     size = "small",
+    disabled = false,
     children,
     ...rest
   } = props;
 
   return (
-    <SocialButtonRoot
-      className={className}
-      sx={sx}
-      // variant={variant || "outlined"}
-      {...rest}
-    >
-      <Tooltip title={label}>
-        <IconButton href={href} target="_blank" size={size} color="inherit">
+    <SocialButtonRoot className={className} sx={sx} {...rest}>
+      {buttonType === "iconButton" ? (
+        <Tooltip title={label}>
+          <IconButton
+            href={href}
+            target="_blank"
+            size={size}
+            color="inherit"
+            disabled={disabled}
+          >
+            {icon}
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Button variant={variant} disabled={disabled}>
           {icon}
-        </IconButton>
-      </Tooltip>
-      {/* {icon} */}
-      <SocialButtonLabel variant="body2">{children}</SocialButtonLabel>
+          <SocialButtonLabel variant="body2">{children}</SocialButtonLabel>
+        </Button>
+      )}
     </SocialButtonRoot>
   );
 };

@@ -1,10 +1,8 @@
 import { SideImageProps } from "@/interfaces/auth.interface";
 import {
-  alpha,
   Box,
   Grid,
   styled,
-  Theme,
   Typography,
   useMediaQuery,
   useTheme,
@@ -14,7 +12,6 @@ import Image from "next/image";
 import { Moul } from "next/font/google";
 import { filt, hi, hii, wee } from "@/theme/keyframes";
 import { makePulseVars, makePulseKeyframes } from "@/utils/themeUtils";
-import Footer from "./ui/footer";
 import Icons from "../icons/components/socials";
 
 const moul = Moul({
@@ -49,9 +46,17 @@ const Root = styled(Grid, {
     inset: 0,
     "--c": "7px",
     // backgroundColor: "#000",
+    // backgroundImage: `
+    //           radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+    //           radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+    //           radial-gradient(circle at 50% 50%, #f00, #f000 60%),
+    //           radial-gradient(circle at 50% 50%, #ff0, #ff00 60%),
+    //           radial-gradient(circle at 50% 50%, #0f0, #0f00 60%),
+    //           radial-gradient(ellipse at 50% 50%, #00f, #00f0 60%)
+    //         `,
     backgroundImage: `
-              radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
-              radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+              radial-gradient(circle at 50% 50%, #0000 1.5px, ${theme.vars.palette.dynamic.background} 0 var(--c), #0000 var(--c)),
+              radial-gradient(circle at 50% 50%, #0000 1.5px, ${theme.vars.palette.dynamic.background} 0 var(--c), #0000 var(--c)),
               radial-gradient(circle at 50% 50%, #f00, #f000 60%),
               radial-gradient(circle at 50% 50%, #ff0, #ff00 60%),
               radial-gradient(circle at 50% 50%, #0f0, #0f00 60%),
@@ -156,6 +161,7 @@ const Circle = styled("div", {
   /*** Animation ***/
   // "--c": "#09f",
   backgroundColor: "#000",
+  // backgroundColor: theme.vars.palette.background.default,
   backgroundImage: theme.custom.sideImage.animationBackground.backgroundImage,
   backgroundSize: theme.custom.sideImage.animationBackground.backgroundSize,
 
@@ -172,6 +178,12 @@ const Circle = styled("div", {
                 #0000 2px,
                 hsl(0 0 4%) 2px
               )`,
+    // backgroundImage: `radial-gradient(
+    //             circle at 50% 50%,
+    //             #0000 0,
+    //             #0000 2px,
+    //             ${theme.vars.palette.dynamic.background}2px
+    //           )`,
     backgroundSize: "8px 8px",
     "--f": "blur(1em) brightness(6)",
     animation: `${hii} 10s linear infinite`,
@@ -185,9 +197,7 @@ const LogoWrapper = styled(Box, {
 })(({ theme }) => ({
   position: "relative",
   zIndex: 2,
-
   aspectRatio: "1 / 1",
-
   width: theme.custom.sideImage.logoSize,
   overflow: "visible",
   inset: 0,
@@ -273,10 +283,10 @@ const IconsWrapper = styled(Box, {
   justifyContent: "center",
   gap: theme.spacing(1),
   padding: theme.spacing(0.5),
-  "& .MuiBox-root": {
-    borderRadius: "50px",
-    backgroundColor: alpha(theme.palette.common.black, 0.425),
-  },
+  // "& .MuiBox-root": {
+  //   borderRadius: "50px",
+  //   backgroundColor: alpha(theme.palette.background.default, 0.725),
+  // },
 }));
 
 /* Image section - hidden on mobile */

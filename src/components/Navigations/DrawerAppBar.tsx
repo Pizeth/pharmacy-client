@@ -61,6 +61,8 @@ import GlobalSearch from "./Search/search";
 import ParticleContainer from "@/theme/effects/particle";
 import { UserMenu } from "./UserSetting/Settings";
 import { th } from "date-fns/locale";
+import MCS from "../icons/socials/mcs";
+import Icons from "../icons/components/socials";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
@@ -726,7 +728,7 @@ const settings = ["Profile", "Account", "Dashboard", "Logout"];
 const SOCIAL_ITEMS = [
   {
     label: "គេហទំព័រ",
-    Icon: <RazWebsite color="action" fontSize="medium" />,
+    Icon: <MCS color="action" fontSize="medium" />,
     color: "error",
     href: "https://www.mcs.gov.kh/",
   },
@@ -1100,7 +1102,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 <Button color="inherit" sx={{ fontWeight: 600 }}>
                   Contact
                 </Button> */}
-                  {SOCIAL_ITEMS.map(({ label, Icon, color, href }, i) => (
+                  {/* {SOCIAL_ITEMS.map(({ label, Icon, color, href }, i) => (
                     <Tooltip title={label} key={label}>
                       <IconButton
                         href={href}
@@ -1111,7 +1113,8 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                         {Icon}
                       </IconButton>
                     </Tooltip>
-                  ))}
+                  ))} */}
+                  <Icons />
                   {/* <IconButton size="small">
                   <RazWebsite />
                 </IconButton>
