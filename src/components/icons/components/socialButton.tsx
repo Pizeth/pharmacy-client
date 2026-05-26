@@ -27,6 +27,47 @@ const SocialButtonRoot = styled(Box, {
     margin: theme.spacing(0.25),
     minWidth: "1rem",
     borderRadius: "50%",
+    backgroundColor: theme.alpha(theme.vars.palette.background.default, 0.375),
+    transition: "background 0.3s ease-in-out",
+    overflow: "hidden",
+    // maxWidth: "3rem",
+    // maxHeight: "3rem",
+    ":before": {
+      content: '""',
+      position: "absolute",
+      borderRadius: "50%",
+      top: "90%",
+      left: "-110%",
+      width: "120%",
+      height: "120%",
+      transform: "rotate(45deg)",
+      transition:
+        "top 0.3s ease-in-out, left 0.3s ease-in-out, background 0.3s ease-in-out",
+    },
+    "&:hover:before": {
+      top: "-10%",
+      left: "-10%",
+    },
+
+    svg: {
+      transition: "fill 0.3s ease-in-out, opacity 0.3s ease-in-out",
+      fill: { transition: "fill 0.3s ease-in-out, opacity 0.3s ease-in-out" },
+      path: {
+        transition: "fill 0.3s ease-in-out, opacity 0.3s ease-in-out",
+      },
+    },
+
+    "&:hover": {
+      svg: {
+        transform: "scale(1.25)",
+        // transition: "fill 0.3s ease-in-out",
+        // path: { transition: "fill 5s ease-in-out, opacity 5s ease-in-out" },
+        // outline: "none",
+        // background: "linear-gradient(#fff, #fff)",
+        // "-webkit-background-clip": "text",
+        // "-webkit-text-fill-color": "transparent",
+      },
+    },
   },
 
   // button: {

@@ -103,6 +103,14 @@ const globalStyles = (theme: Theme) => ({
   //   display: "inline-block",
   //   position: "relative",
   // },
+
+  // Set the initial brown color here globally
+  svg: {
+    ".mcs-frame": {
+      fill: "#7C3E1E",
+      transition: "fill 0.3s ease-in-out",
+    },
+  },
 });
 
 const defaultThemeInvariants = {

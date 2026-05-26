@@ -76,7 +76,7 @@ const Root = styled(Box, {
   flexDirection: "column", // Arrange items vertically
   alignItems: "center", // Center items horizontally
   "& .MuiAvatar-root": {
-    "--avatar-size": "min(12vmin, 70px)", // responsive size
+    "--avatar-size": "max(50px, 4.375rem)", // responsive size
     width: "var(--avatar-size)",
     height: "var(--avatar-size)",
 

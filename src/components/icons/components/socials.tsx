@@ -83,7 +83,7 @@ const Root = styled(Box, {
   //   // },
   // },
   borderRadius: "50px",
-  backgroundColor: theme.alpha(theme.vars.palette.background.default, 0.725),
+  // backgroundColor: theme.alpha(theme.vars.palette.background.default, 0.725),
   "& svg": {
     minWidth: "1rem",
     minHeight: "1rem",
@@ -93,18 +93,19 @@ const Root = styled(Box, {
     // height: "100%",
     // transition: "0.3s ease-in-out",
     // Smoothly transition all properties including transform and mask properties
-    transition: `transform 0.3s ease-in-out, background-color 0.3s ease-in-out, fill 0.3s ease-in-out`,
-    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+    // transition: `transform 0.3s ease-in-out, background 0.3s ease-in-out, fill 0.3s ease-in-out`,
+    // boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
     borderRadius: "50%",
     // transform: "scale(1)",
-    "&:hover": {
-      transform: "scale(1.5)",
-    },
+    // "&:hover": {
+    //   transform: "scale(1.5)",
+    // },
     // 👇 ADD THIS BLOCK HERE 👇
     // This gives a global smooth fade to ALL icon paths (Instagram, YouTube, etc.)
-    path: {
-      transition: "fill 0.3s ease-in-out, stroke 0.3s ease-in-out",
-    },
+    // path: {
+    //   transition:
+    //     "fill 0.3s ease-in-out, stroke 0.3s ease-in-out, opacity 0.3s ease-in-out",
+    // },
   },
 
   // "&::before": {
@@ -139,20 +140,33 @@ const Root = styled(Box, {
   // },
   // Specific provider color classes
 
-  "& .web:hover": {
-    // backgroundColor: "#edad54",
-    // backgroundColor: "#d09749",
-    svg: {
-      fill: "#ffcd34",
-    },
+  "& .web": {
+    "&:hover": {
+      // backgroundColor: "#edad54",
+      // backgroundColor: "#d09749",
+      svg: {
+        path: { fill: "#FFF" },
+      },
 
-    "& .insta-lens-patch": {
-      fill: "#d28943",
-      transition: "fill 0.3s ease-in-out",
-    },
+      "& .st0": {
+        fill: "#FFF",
+        // transition: "fill 0.3s ease-in-out",
+      },
 
-    background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.3s linear`,
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: `radial-gradient(
+        circle at center,
+        #D38944 25%,
+        #EA9548 40%, 
+        #EDAC4C 55%,
+        #E8B841 70%,
+        #F0C54C 85%,
+        #ffcd34 100%
+      )`,
+    },
   },
   // "& .meta::before": {
   //   content: '""',
@@ -170,102 +184,154 @@ const Root = styled(Box, {
   //   transition: "1s ease",
   //   animationDelay: "1s",
   // },
-  "& .meta:hover": {
-    // backgroundColor: "#0081FB",
-    svg: {
-      fill: "#0081FB",
-    },
+  "& .meta": {
+    "&:hover": {
+      // backgroundColor: "#0081FB",
+      svg: {
+        // fill: "#0081FB",
+        fill: "white",
+      },
 
-    // Smoothly reveal the gradient path layer
-    "& .meta-gradient-layer": {
-      opacity: 1,
-      transition: "opacity 0.3s ease-in-out",
-    },
+      "* .meta-line": {
+        fill: "#FFF",
+      },
+      // Smoothly reveal the gradient path layer
+      "& .meta-gradient-layer": {
+        opacity: 0,
+        // transition: "opacity 0.3s ease-in-out",
+      },
 
-    // Smoothly hide the default solid color layer
-    "& .meta-solid-layer": {
-      opacity: 0,
-      transition: "opacity 0.3s ease-in-out",
-    },
+      // Smoothly hide the default solid color layer
+      "& .meta-solid-layer": {
+        opacity: 1,
+        // transition: "opacity 0.3s ease-in-out",
+      },
 
-    background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.3s linear`,
+      // background: theme.vars.palette.background.paper,
+
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: `linear-gradient(
+        183deg, 
+        #0064E1 0%, 
+        #0064E1 40%, 
+        #0073EE 83%, 
+        #0082FB 100%
+      )`,
+    },
   },
-  "& .instagram:hover": {
-    // svg: {
-    //   path: {
-    //     // Points directly to the gradient ID inside the SVG
-    //     fill: "url(#instagram-gradient)",
-    //   },
-    // },
-
-    // 1. Target the main path lines for the gradient
-    // "& svg path": {
-    //   fill: "url(#instagram-gradient)",
-    //   transition: "fill 0.3s ease-in-out",
-    // },
-
-    // Smoothly reveal the gradient path layer
-    "& .insta-gradient-layer": {
-      opacity: 1,
-      transition: "opacity 0.3s ease-in-out",
-    },
-
-    // Smoothly hide the default solid color layer
-    "& .insta-solid-layer": {
-      opacity: 0,
-      transition: "opacity 0.3s ease-in-out",
-    },
-
-    // 2. Target the inner lens cutout circle directly from the button hover!
+  "& .instagram": {
     "& .insta-lens-patch": {
-      fill: "#ffffff",
-      transition: "fill 0.3s ease-in-out",
+      transition: "fill 0.3s ease-in-out, opacity 0.3s ease-in-out",
     },
+    "&:hover": {
+      // svg: {
+      //   path: {
+      //     // Points directly to the gradient ID inside the SVG
+      //     fill: "url(#instagram-gradient)",
+      //   },
+      // },
 
-    background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.3s linear`,
-  },
-  "& .tiktok:hover": {
-    "& .tiktok-chroma-red, .tiktok-chroma-dark, .tiktok-chroma-cyan ": {
-      opacity: 1,
-      transition: "opacity 0.3s ease-in-out",
-    },
-    "& .tiktok-solid-path": {
-      opacity: 0,
-      transition: "opacity 0.3s ease-in-out",
-    },
-    background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.3s linear`,
-  },
-  "& .x:hover": {
-    svg: {
-      fill: "#000",
-    },
-    background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.3s linear`,
-  },
-  "& .telegram:hover": {
-    // backgroundColor: "#229ed9",
-    svg: {
-      fill: "#229ed9",
-    },
-    background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.3s linear`,
-  },
-  "& .youtube:hover": {
-    // backgroundColor: "#FF0000",
-    svg: {
-      fill: "#FF0000",
-    },
-    // 2. Target the inner lens cutout circle directly from the button hover!
-    "& .youtube-patch": {
-      fill: "#ffffff",
-      transition: "fill 0.3s ease-in-out",
-    },
+      // 1. Target the main path lines for the gradient
+      // "& svg path": {
+      //   fill: "url(#instagram-gradient)",
+      //   transition: "fill 0.3s ease-in-out",
+      // },
 
-    background: theme.vars.palette.background.paper,
-    animation: `${bounce} 0.3s linear`,
+      // Smoothly reveal the gradient path layer
+      "& .insta-gradient-layer": {
+        opacity: 0,
+        // transition: "opacity 0.3s ease-in-out",
+      },
+
+      // Smoothly hide the default solid color layer
+      "& .insta-solid-layer": {
+        opacity: 1,
+        // transition: "opacity 0.3s ease-in-out",
+      },
+
+      // 2. Target the inner lens cutout circle directly from the button hover!
+      "& .insta-lens-patch": {
+        fill: "transparent",
+        // transition: "fill 0.3s ease-in-out",
+      },
+
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: `radial-gradient(
+        120% 120% at 30% 100%, 
+        #ffd500 0%, 
+        #ffd500 15%, 
+        #ff543e 45%, 
+        #c837ab 75%, 
+        #3771c8 100%
+      )`,
+    },
+  },
+  "& .tiktok": {
+    "&:hover": {
+      "& .tiktok-chroma-red, .tiktok-chroma-dark, .tiktok-chroma-cyan ": {
+        opacity: 0,
+        // transition: "opacity 0.3s ease-in-out",
+      },
+      "& .tiktok-solid-path": {
+        opacity: 1,
+        // transition: "opacity 0.3s ease-in-out",
+      },
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: "#000",
+    },
+  },
+  "& .x": {
+    "&:hover": {
+      svg: {
+        path: { fill: "#FFF" },
+      },
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: "#000",
+    },
+  },
+
+  "& .telegram": {
+    "&:hover": {
+      // backgroundColor: "#229ed9",
+      svg: {
+        path: { fill: "#FFF" },
+      },
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: "#229ed9",
+    },
+  },
+  "& .youtube": {
+    "&:hover": {
+      // backgroundColor: "#FF0000",
+      svg: {
+        path: { fill: "#FFF" },
+      },
+      // 2. Target the inner lens cutout circle directly from the button hover!
+      "& .youtube-patch": {
+        fill: "transparent",
+        transition: "fill 0.3s ease-in-out",
+      },
+
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+      "& .MuiIconButton-root::before": {
+        background: "#FF0000",
+      },
+    },
   },
   // // Provider-specific hover strokes
   // "& .web svg path": { stroke: "#2859c5" },

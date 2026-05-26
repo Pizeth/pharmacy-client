@@ -139,7 +139,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
   return (
     <Root container spacing={2} className={className} sx={sx} {...rest}>
       {Object.entries(PROVIDERS).map(([key, provider]) => (
-        <SocialLogin.children key={key} size={{ xs: 6, sm: 4 }}>
+        <SocialLogin.children key={key} size={{ xs: 12, sm: 4 }}>
           {children || (
             <SocialButton
               variant="outlined"

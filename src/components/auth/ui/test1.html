@@ -4,389 +4,426 @@
     <meta charset="UTF-8" />
     <title>Particle Navbar</title>
     <style>
-      /* From Uiverse.io by Mohammad-Rahme-576 */
-      /* Base Styles */
-      .switch {
+      body {
+        margin: 0;
+        padding: 0;
+        background: #303030;
+      }
+
+      .middle {
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 100%;
+        text-align: center;
+      }
+      .social-btns {
+        font-size: 0;
+        text-align: center;
+        float: right;
+        padding: 0px;
+      }
+      .social-btns .btn,
+      .social-btns .btn:before,
+      .social-btns .btn .fab,
+      .social-btns .btn .fas,
+      .social-btns .btn .far {
+        transition: all 0.35s;
+        transition-timing-function: cubic-bezier(0.31, -0.105, 0.43, 1.59);
+      }
+      .social-btns .btn:before {
+        top: 90%;
+        left: -110%;
+      }
+      .social-btns .btn:focus:before,
+      .social-btns .btn:hover:before {
+        top: -10%;
+        left: -10%;
+      }
+      .social-btns .btn {
+        padding: 0px;
+        border: none;
+        font-size: inherit;
         display: inline-block;
-        width: 6em;
-        height: 3em;
+        background-color: rgba(255, 255, 255, 0.75);
+        width: 44px;
+        height: 44px;
+        line-height: 44px;
+        margin: 10px 3px 10px 3px;
+        text-align: center;
         position: relative;
-        font-size: 18px;
-        user-select: none;
-        margin: 20px;
-      }
-
-      /* Hide default HTML checkbox */
-      .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-        position: absolute;
-      }
-
-      /* Slider */
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to right, #87ceeb, #e0f6ff);
-        border-radius: 50px;
-        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        box-shadow:
-          0 4px 8px rgba(0, 0, 0, 0.1),
-          inset 0 -5px 10px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-      }
-
-      /* Inner slider for additional styling */
-      .slider-inner {
-        position: absolute;
-        top: 0.3em;
-        left: 0.3em;
-        height: 2.4em;
-        width: 2.4em;
         border-radius: 50%;
-        background-color: #ffd700;
-        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        box-shadow:
-          0 2px 4px rgba(0, 0, 0, 0.2),
-          inset 0 -2px 5px rgba(0, 0, 0, 0.2);
+        box-shadow: 0px 3px 15px -3px rgba(255, 255, 255, 0.72);
+        opacity: 0.99;
+      }
+      .social-btns .btn:before {
+        content: "";
+        width: 120%;
+        height: 120%;
+        position: absolute;
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg);
+      }
+      .social-btns .btn .fab,
+      .social-btns .btn .fas,
+      .social-btns .btn .far {
+        font-size: 20px;
+        vertical-align: middle;
       }
 
-      /* Checked state */
-      .switch input:checked + .slider {
-        background: linear-gradient(to right, #1a237e, #3949ab);
+      /* flickr */
+      .social-btns .btn.flickr:before {
+        background-color: #ff0084;
+        background: linear-gradient(45deg, #0063dc 50%, #ff0084 50%);
+      }
+      .social-btns .btn.flickr .fab {
+        color: #ff0084;
+        background: -webkit-linear-gradient(to right, #0063dc 50%, #ff0084 50%);
+        background: linear-gradient(to right, #0063dc 50%, #ff0084 50%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
-      .switch input:checked + .slider .slider-inner {
-        transform: translateX(3em);
-        background-color: #ffffff;
+      /* instagram */
+      .social-btns .btn.instagram:before {
+        background: linear-gradient(
+          rgb(64, 93, 230) 10%,
+          rgb(88, 81, 219) 20%,
+          rgb(131, 58, 180) 30%,
+          rgb(193, 53, 132) 40%,
+          rgb(225, 48, 108) 50%,
+          rgb(253, 29, 29) 60%,
+          rgb(245, 96, 64) 70%,
+          rgb(247, 119, 55) 80%,
+          rgb(252, 175, 69) 90%,
+          rgb(255, 220, 128) 100%
+        );
+      }
+      .social-btns .btn.instagram .fab {
+        background: -webkit-linear-gradient(
+          #405de6,
+          #5851db,
+          #833ab4,
+          #c13584,
+          #e1306c,
+          #fd1d1d,
+          #f56040,
+          #f77737,
+          #fcaf45,
+          #ffdc80
+        );
+        background: linear-gradient(
+          #405de6,
+          #5851db,
+          #833ab4,
+          #c13584,
+          #e1306c,
+          #fd1d1d,
+          #f56040,
+          #f77737,
+          #fcaf45,
+          #ffdc80
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
-      /* Focus state */
-      .switch input:focus + .slider {
+      /* ebay */
+      .social-btns .btn.ebay:before {
+        background-color: #0db7ed;
+        background: linear-gradient(
+          45deg,
+          #e53238 40%,
+          #0064d2 40%,
+          #0064d2 50%,
+          #f5af02 50%,
+          #f5af02 60%,
+          #86b817 60%
+        );
+      }
+      .social-btns .btn.ebay .fab {
+        color: #e53238;
+        background: -webkit-linear-gradient(
+          to right,
+          #e53238 25%,
+          #0064d2 25%,
+          #0064d2 50%,
+          #f5af02 50%,
+          #f5af02 75%,
+          #86b817 75%
+        );
+        background: linear-gradient(
+          to right,
+          #e53238 25%,
+          #0064d2 25%,
+          #0064d2 50%,
+          #f5af02 50%,
+          #f5af02 75%,
+          #86b817 75%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* slack */
+      .social-btns .btn.slack:before {
+        background-color: #36c5f0;
+        background-image:
+          linear-gradient(
+            45deg,
+            #e01e5a 25%,
+            transparent 25%,
+            transparent 75%,
+            #2eb67d 75%,
+            #2eb67d
+          ),
+          linear-gradient(
+            45deg,
+            #2eb67d 25%,
+            transparent 25%,
+            transparent 75%,
+            #e01e5a 75%,
+            #e01e5a
+          ),
+          linear-gradient(
+            -45deg,
+            #ecb22e 25%,
+            transparent 25%,
+            transparent 75%,
+            transparent 75%,
+            transparent
+          ),
+          linear-gradient(
+            -45deg,
+            transparent 25%,
+            transparent 25%,
+            transparent 75%,
+            #ecb22e 75%,
+            #ecb22e
+          );
+        background-size: 52.8px 52.8px;
+        background-position:
+          0 0,
+          26.4px 26.4px;
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+      .social-btns .btn.slack .fab {
+        width: 20px;
+        color: #e01563;
+        background-color: #36c5f0;
+        background-image:
+          linear-gradient(
+            45deg,
+            #e01e5a 25%,
+            transparent 25%,
+            transparent 75%,
+            #2eb67d 75%,
+            #2eb67d
+          ),
+          linear-gradient(
+            45deg,
+            #2eb67d 25%,
+            transparent 25%,
+            transparent 75%,
+            #e01e5a 75%,
+            #e01e5a
+          ),
+          linear-gradient(
+            -45deg,
+            #ecb22e 25%,
+            transparent 25%,
+            transparent 75%,
+            transparent 75%,
+            transparent
+          ),
+          linear-gradient(
+            -45deg,
+            transparent 25%,
+            transparent 25%,
+            transparent 75%,
+            #ecb22e 75%,
+            #ecb22e
+          );
+        background-size: 20px 20px;
+        background-position:
+          0 0,
+          10px 10px;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .social-btns .btn:focus .fab,
+      .social-btns .btn:hover .fab,
+      .social-btns .btn:focus .fas,
+      .social-btns .btn:hover .fas,
+      .social-btns .btn:focus .far,
+      .social-btns .btn:hover .far {
+        color: #fff;
+        -webkit-transform: scale(1.25);
+        transform: scale(1.25);
         outline: none;
-        box-shadow: 0 0 0.4em rgba(25, 118, 210, 0.5);
+        background: -webkit-linear-gradient(#fff, #fff);
+        background: linear-gradient(#fff, #fff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
-      /* Hover and active states */
-      .switch:hover .slider {
-        background: linear-gradient(to right, #64b5f6, #e3f2fd);
+      /* Microsoft */
+      .social-btns .btn.microsoft:before {
+        /*   background-color: #f25022; */
+        background-image:
+          linear-gradient(
+            45deg,
+            #00a4ef 25%,
+            transparent 25%,
+            transparent 75%,
+            #7fba00 75%,
+            #7fba00
+          ),
+          linear-gradient(
+            45deg,
+            #7fba00 25%,
+            transparent 25%,
+            transparent 75%,
+            #00a4ef 75%,
+            #00a4ef
+          ),
+          linear-gradient(
+            -45deg,
+            #ffb900 25%,
+            transparent 25%,
+            transparent 75%,
+            #f25022 75%,
+            #f25022
+          ),
+          linear-gradient(
+            -45deg,
+            #f25022 25%,
+            transparent 25%,
+            transparent 75%,
+            #ffb900 75%,
+            #ffb900
+          );
+        background-size: 52.8px 52.8px;
+        background-position:
+          0 0,
+          26.4px 26.4px;
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+      .social-btns .btn.microsoft .fab {
+        width: 20px;
+        color: #e01563;
+        /*   background-color: #f25022; */
+        background-image:
+          linear-gradient(
+            45deg,
+            #00a4ef 25%,
+            transparent 25%,
+            transparent 75%,
+            #7fba00 75%,
+            #7fba00
+          ),
+          linear-gradient(
+            45deg,
+            #7fba00 25%,
+            transparent 25%,
+            transparent 75%,
+            #00a4ef 75%,
+            #00a4ef
+          ),
+          linear-gradient(
+            -45deg,
+            #ffb900 25%,
+            transparent 25%,
+            transparent 75%,
+            #f25022 75%,
+            #f25022
+          ),
+          linear-gradient(
+            -45deg,
+            #f25022 25%,
+            transparent 25%,
+            transparent 75%,
+            #ffb900 75%,
+            #ffb900
+          );
+        background-size: 20px 20px;
+        background-position:
+          0 0,
+          10px 10px;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
-      .switch input:checked:hover + .slider {
-        background: linear-gradient(to right, #283593, #5c6bc0);
-      }
-
-      /* Animation for slider inner */
-      @keyframes sunPulse {
-        0%,
-        100% {
-          box-shadow:
-            0 0 0 0 rgba(255, 215, 0, 0.7),
-            0 0 0 0 rgba(255, 215, 0, 0.4);
-        }
-        50% {
-          box-shadow:
-            0 0 20px 10px rgba(255, 215, 0, 0.7),
-            0 0 40px 20px rgba(255, 215, 0, 0.4);
-        }
-      }
-
-      @keyframes moonPhase {
-        0%,
-        100% {
-          box-shadow:
-            inset -10px -5px 0 0 #ddd,
-            0 0 20px rgba(255, 255, 255, 0.5);
-        }
-        50% {
-          box-shadow:
-            inset 0 0 0 0 #ddd,
-            0 0 20px rgba(255, 255, 255, 0.5);
-        }
-      }
-
-      .switch input:not(:checked) + .slider .slider-inner {
-        animation: sunPulse 3s infinite;
-      }
-
-      .switch input:checked + .slider .slider-inner {
-        animation: moonPhase 5s infinite;
-      }
-
-      /* Stars effect */
-      @keyframes twinkle {
-        0%,
-        100% {
-          opacity: 0.2;
-        }
-        50% {
-          opacity: 1;
-        }
-      }
-
-      .slider::before,
-      .slider::after {
-        content: "";
-        position: absolute;
-        width: 4px;
-        height: 4px;
-        background-color: #ffffff;
-        border-radius: 50%;
-        transition: all 0.6s ease;
-        opacity: 0;
-      }
-
-      .slider::before {
-        top: 20%;
-        left: 30%;
-      }
-
-      .slider::after {
-        bottom: 25%;
-        right: 25%;
-      }
-
-      .switch input:checked + .slider::before,
-      .switch input:checked + .slider::after {
-        opacity: 1;
-        animation: twinkle 2s infinite;
-      }
-
-      .switch input:checked + .slider::before {
-        animation-delay: 0.5s;
-      }
-
-      /* 3D effect */
-      .slider {
-        transform-style: preserve-3d;
-        perspective: 500px;
-      }
-
-      .slider-inner {
-        transform: translateZ(5px);
-      }
-
-      .switch input:checked + .slider .slider-inner {
-        transform: translateX(3em) translateZ(5px) rotateY(180deg);
-      }
-
-      /* Cloud effect for day mode */
-      .slider-inner::before,
-      .slider-inner::after {
-        content: "";
-        position: absolute;
-        background-color: rgba(255, 255, 255, 0.8);
-        border-radius: 50%;
-        transition: all 0.6s ease;
-      }
-
-      .slider-inner::before {
-        width: 1em;
-        height: 1em;
-        top: -0.5em;
-        left: -0.2em;
-      }
-
-      .slider-inner::after {
-        width: 1.2em;
-        height: 1.2em;
-        bottom: -0.6em;
-        right: -0.3em;
-      }
-
-      .switch input:checked + .slider .slider-inner::before,
-      .switch input:checked + .slider .slider-inner::after {
-        opacity: 0;
-      }
-
-      /* Crater effect for night mode */
-      .switch input:checked + .slider .slider-inner::before {
-        width: 0.6em;
-        height: 0.6em;
-        background-color: rgba(0, 0, 0, 0.2);
-        top: 0.3em;
-        left: 0.3em;
-        opacity: 1;
-      }
-
-      .switch input:checked + .slider .slider-inner::after {
-        width: 0.4em;
-        height: 0.4em;
-        background-color: rgba(0, 0, 0, 0.15);
-        bottom: 0.5em;
-        right: 0.5em;
-        opacity: 1;
-      }
-
-      /* Accessibility improvements */
-      .switch input:focus + .slider {
-        outline: 2px solid #4a90e2;
-        outline-offset: 2px;
-      }
-
-      /* Responsive adjustments */
-      @media (max-width: 768px) {
-        .switch {
-          width: 5em;
-          height: 2.5em;
-        }
-
-        .slider-inner {
-          height: 2em;
-          width: 2em;
-        }
-
-        .switch input:checked + .slider .slider-inner {
-          transform: translateX(2.5em) translateZ(5px) rotateY(180deg);
-        }
-      }
-
-      @media (max-width: 480px) {
-        .switch {
-          width: 4em;
-          height: 2em;
-        }
-
-        .slider-inner {
-          height: 1.6em;
-          width: 1.6em;
-        }
-
-        .switch input:checked + .slider .slider-inner {
-          transform: translateX(2em) translateZ(5px) rotateY(180deg);
-        }
-      }
-
-      /* High contrast mode */
-      @media (forced-colors: active) {
-        .slider {
-          background: Canvas;
-          border: 2px solid ButtonText;
-        }
-
-        .switch input:checked + .slider {
-          background: Highlight;
-        }
-
-        .slider-inner {
-          background-color: ButtonFace;
-        }
-
-        .switch::before,
-        .switch::after {
-          color: ButtonText;
-        }
-      }
-
-      /* Reduced motion preference */
-      @media (prefers-reduced-motion: reduce) {
-        .switch,
-        .slider,
-        .slider-inner {
-          transition: none;
-        }
-
-        .switch input:checked + .slider .slider-inner,
-        .switch input:not(:checked) + .slider .slider-inner,
-        .switch input:checked + .slider::before,
-        .switch input:checked + .slider::after {
-          animation: none;
-        }
+      .social-btns .btn:focus .fab,
+      .social-btns .btn:hover .fab,
+      .social-btns .btn:focus .fas,
+      .social-btns .btn:hover .fas,
+      .social-btns .btn:focus .far,
+      .social-btns .btn:hover .far {
+        color: #fff;
+        -webkit-transform: scale(1.25);
+        transform: scale(1.25);
+        outline: none;
+        background: -webkit-linear-gradient(#fff, #fff);
+        background: linear-gradient(#fff, #fff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
     </style>
   </head>
   <body>
-    <!-- From Uiverse.io by 00Kubi -->
-    <!-- From Uiverse.io by Mohammad-Rahme-576 -->
-    <label aria-checked="false" role="switch" class="switch">
-      <input type="checkbox" />
-      <span class="slider">
-        <span class="slider-inner"></span>
-      </span>
-    </label>
+    <div class="social-btns col-12 middle">
+      <a
+        href="https://www.flickr.com/photos/razeth"
+        target="_blank"
+        rel="nofollow"
+        title="Flickr"
+        class="btn flickr"
+      >
+        <i class="fab fa-flickr" aria-hidden="true"></i>
+      </a>
+      <a
+        href="https://www.instagram.com/razeth.boss/"
+        target="_blank"
+        rel="nofollow"
+        title="Instagram"
+        class="btn instagram"
+      >
+        <i class="fab fa-instagram" aria-hidden="true"></i>
+      </a>
+      <a
+        href="https://www.ebay.com/usr/razeth"
+        target="_blank"
+        rel="nofollow"
+        title="ebay"
+        class="btn ebay"
+      >
+        <i class="fab fa-ebay" aria-hidden="true"></i>
+      </a>
+      <a
+        href="https://join.slack.com/t/razeth/shared_invite/enQtNzI5Mjg0MjQ3NDk0LTI0ODcyYjA0ZjU4ZjI5NmY0MWIyOWY4ZGYzZjJhMzE0ODFjZDk2NWQyNGVjN2M2YjhmNTg5NTA5NDE5NzU2ZWQ"
+        target="_blank"
+        rel="nofollow"
+        title="Slack"
+        class="btn slack"
+      >
+        <i class="fab fa-slack" aria-hidden="true"></i>
+      </a>
+      <a
+        href="#ejuy"
+        target="_blank"
+        rel="nofollow"
+        title="microsoft"
+        class="btn microsoft"
+      >
+        <i class="fab fa-microsoft" aria-hidden="true"></i>
+      </a>
+    </div>
   </body>
 </html>
-
-<div class="MuiBox-root mui-0">
-  <div
-    class="MuiFormControl-root MuiFormControl-marginDense MuiFormControl-fullWidth MuiTextField-root mui-bkeaeu-MuiFormControl-root-MuiTextField-root"
-  >
-    <label
-      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-error MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined mui-5azuzj-MuiFormLabel-root-MuiInputLabel-root"
-      data-shrink="true"
-      for="_r_k_"
-      id="_r_k_-label"
-      >Full Name</label
-    >
-    <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary Mui-error MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedStart MuiInputBase-adornedEnd mui-9kdf1t-MuiInputBase-root-MuiOutlinedInput-root"
-    >
-      <div
-        class="MuiInputAdornment-root MuiInputAdornment-positionStart MuiInputAdornment-outlined MuiInputAdornment-sizeSmall mui-tyncx3-MuiInputAdornment-root"
-      >
-        <span class="notranslate" aria-hidden="true">​</span
-        ><svg
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-4uxqju-MuiSvgIcon-root"
-          focusable="false"
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          data-testid="BadgeIcon"
-        >
-          <path
-            d="M20 7h-5V4c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2M9 12c.83 0 1.5.67 1.5 1.5S9.83 15 9 15s-1.5-.67-1.5-1.5S8.17 12 9 12m3 6H6v-.75c0-1 2-1.5 3-1.5s3 .5 3 1.5zm1-9h-2V4h2zm5 7.5h-4V15h4zm0-3h-4V12h4z"
-          ></path>
-        </svg>
-      </div>
-      <input
-        aria-invalid="true"
-        id="_r_k_"
-        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall MuiInputBase-inputAdornedStart MuiInputBase-inputAdornedEnd mui-1gci8vu-MuiInputBase-input-MuiOutlinedInput-input"
-        type="text"
-        value="t"
-        name="name"
-        aria-describedby="_r_k_-helper-text"
-      />
-      <div
-        class="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeSmall mui-2d0b4g-MuiInputAdornment-root"
-      >
-        <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-edgeEnd MuiIconButton-sizeSmall mui-11yujn1-MuiButtonBase-root-MuiIconButton-root"
-          tabindex="0"
-          type="button"
-          aria-label="Clear input"
-        >
-          <svg
-            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-yoriwg-MuiSvgIcon-root"
-            focusable="false"
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            data-testid="ClearIcon"
-          >
-            <path
-              d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-            ></path>
-          </svg>
-        </button>
-      </div>
-      <fieldset
-        aria-hidden="true"
-        class="MuiOutlinedInput-notchedOutline mui-zg5sxk-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
-      >
-        <legend class="mui-ex8a5f-MuiNotchedOutlined-root">
-          <span>Full Name</span>
-        </legend>
-      </fieldset>
-    </div>
-    <p
-      class="MuiFormHelperText-root Mui-error MuiFormHelperText-sizeSmall MuiFormHelperText-contained MuiFormHelperText-filled mui-15nr9wl-MuiFormHelperText-root"
-      id="_r_k_-helper-text"
-    >
-      Name must be at least 2 characters
-    </p>
-  </div>
-</div>

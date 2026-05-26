@@ -942,6 +942,16 @@ export const Auth = (inProps: AuthProps) => {
               {/* Form section */}
               <Grid size={{ xs: 12, md: 6 }}>
                 <CardContent>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      mb: "-3em",
+                    }}
+                  >
+                    <ThemeToggle />
+                  </Box>
+
                   <Box>
                     {avatarIcon}
                     {/* {children}
@@ -1007,7 +1017,7 @@ export const Auth = (inProps: AuthProps) => {
           </Auth.card>
           {footer}
         </Content>
-        <ThemeToggle />
+        {/* <ThemeToggle /> */}
         {/* </Auth.content> */}
         {/* <Login.Heading>{heading}</Login.Heading> */}
         {/* <Auth.icon>
