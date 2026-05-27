@@ -946,7 +946,8 @@ export const Auth = (inProps: AuthProps) => {
                     sx={{
                       display: "flex",
                       justifyContent: "flex-end",
-                      mb: "-3em",
+                      padding: "1em",
+                      m: "-1em -1em -2.5em 0",
                     }}
                   >
                     <ThemeToggle />
