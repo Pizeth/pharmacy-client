@@ -253,7 +253,7 @@ const SwitchThumb = styled("span", {
   transform: checked
     ? "translateX(3em) translateZ(5px) rotateY(180deg)"
     : "translateZ(5px)",
-  animation: checked ? `${moonPhase} 5s infinite` : `${sunPulse} 3s infinite`,
+  animation: checked ? `${moonPhase} 5s infinite` : `${sunPulse} 2.5s infinite`,
 
   "&::before": {
     content: '""',
@@ -315,10 +315,14 @@ const SwitchThumb = styled("span", {
       0 4px 12px rgba(0, 0, 0, 0.5)
     `
     : `
-      inset -3px -3px 6px rgba(0, 0, 0, 0.15),
-      inset 3px 3px 6px rgba(255, 255, 255, 0.6),
-      0 6px 16px rgba(255, 140, 0, 0.35)
+      0 0 30px rgba(255, 165, 0, 0.8),
+      0 0 60px rgba(255, 165, 0, 0.4)
     `,
+  // : `
+  //   inset -3px -3px 6px rgba(0, 0, 0, 0.15),
+  //   inset 3px 3px 6px rgba(255, 255, 255, 0.6),
+  //   0 6px 16px rgba(255, 140, 0, 0.35)
+  // `,
 
   // High-end Lunar surface topography craters via procedural shadow-mapping
   // "&::before": {
