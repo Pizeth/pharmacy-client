@@ -21,12 +21,12 @@ export const MCS = (props: SvgIconProps) => {
             fx="50%"
             fy="50%"
           >
-            <stop offset="0%" stop-color="#D38944" />
-            <stop offset="20%" stop-color="#EA9548" />
-            <stop offset="40%" stop-color="#EDAC4C" />
-            <stop offset="60%" stop-color="#E8B841" />
-            <stop offset="80%" stop-color="#F0C54C" />
-            <stop offset="100%" stop-color="#ffcd34" />
+            <stop offset="0%" stopColor="#D38944" />
+            <stop offset="20%" stopColor="#EA9548" />
+            <stop offset="40%" stopColor="#EDAC4C" />
+            <stop offset="60%" stopColor="#E8B841" />
+            <stop offset="80%" stopColor="#F0C54C" />
+            <stop offset="100%" stopColor="#ffcd34" />
           </radialGradient>
         </defs>
         <path

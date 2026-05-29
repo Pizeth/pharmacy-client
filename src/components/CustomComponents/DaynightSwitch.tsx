@@ -91,6 +91,7 @@ const SwitchRoot = styled("label", {
   position: "relative",
   userSelect: "none",
   cursor: "pointer",
+  overflow: "hidden",
   borderRadius: "50px",
   border: `0.5px solid ${theme.alpha(theme.vars.palette.text.primary, 0.0925)}`,
   boxShadow: theme.vars.palette.customShadows.neumorphic,
@@ -136,8 +137,11 @@ const SwitchTrack = styled("span", {
   // boxShadow: "0 4px 8px rgba(0,0,0,0.1), inset 0 -5px 10px rgba(0,0,0,0.1)",
   // Ultra premium spring physics transition curve (removes backward-jerk overshoot)
   transition: "all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)",
-  boxShadow:
-    "inset 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(255, 255, 255, 0.05)",
+  // boxShadow:
+  //   "inset 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(255, 255, 255, 0.05)",
+  boxShadow: checked
+    ? "1px 1px 5px 0 #3949ab inset"
+    : "1px 1px 5px 0 #e0f6ff inset",
   overflow: "hidden",
   transformStyle: "preserve-3d",
   perspective: "500px",
@@ -380,6 +384,41 @@ const SwitchThumb = styled("span", {
   },
 }));
 
+const SwitchDecoration = styled("span", {
+  name: PREFIX,
+  slot: "Decoration",
+  overridesResolver: (_props, styles) => styles.decoration,
+  shouldForwardProp: (prop) => prop !== "checked",
+})<{ checked?: boolean }>(({ checked }) => ({
+  position: "absolute",
+  content: '""',
+  transform: checked ? "translateX(-10px)" : "none",
+  height: checked ? "1px" : "10px",
+  width: checked ? "1px" : "10px",
+  borderRadius: "50%",
+  left: "45%",
+  top: "15%",
+  background: "#FFF",
+  backdropFilter: "blur(10px)",
+  transition: "all 0.5s",
+  boxShadow: checked
+    ? `
+      -7px 10px 0 #e5f041e6,
+      8px 15px 0 #e5f041e6,
+      -17px 1px 0 #e5f041e6,
+      -20px 10px 0 #e5f041e6,
+      -7px 23px 0 #e5f041e6,
+      -15px 25px 0 #e5f041e6
+    `
+    : `
+      -12px 0 0 #FFF,
+      -6px 0 0 1.6px #FFF,
+      5px 15px 0 1px #FFF,
+      1px 17px 0 #FFF,
+      10px 17px 0 #FFF
+    `,
+}));
+
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 export interface DayNightSwitchProps {
@@ -402,6 +441,7 @@ const DayNightSwitch = ({
     <SwitchTrack checked={checked}>
       <SwitchThumb checked={checked} />
     </SwitchTrack>
+    <SwitchDecoration checked={checked} />
   </SwitchRoot>
 );
 
