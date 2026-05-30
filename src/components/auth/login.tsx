@@ -15,7 +15,7 @@ import AuthNavigationLink from "./ui/authNavaigation";
 import Footer from "./ui/footer";
 import Image from "next/image";
 import { StyleComponent } from "@/types/classKey";
-import SocialButton from "./ui/socialButton";
+import SocialButton from "../icons/components/socialButton";
 import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
 // import MCS from "../icons/mcs";
 // import { v7 } from "uuid";

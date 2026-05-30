@@ -3,7 +3,7 @@ import {
   Box,
   Grid,
   styled,
-  Theme,
+  Typography,
   useMediaQuery,
   useTheme,
   useThemeProps,
@@ -12,15 +12,18 @@ import Image from "next/image";
 import { Moul } from "next/font/google";
 import { filt, hi, hii, wee } from "@/theme/keyframes";
 import { makePulseVars, makePulseKeyframes } from "@/utils/themeUtils";
+import Icons from "../icons/components/socials";
 
 const moul = Moul({
   subsets: ["khmer", "latin"],
   weight: "400",
 });
 
+const CAPTION = process.env.NEXT_PUBLIC_LOGO_CAPTION || "ក្រសួងមុខងារសាធារណៈ";
+
 const PREFIX = "RazethSideImage";
 
-const StyledSideImage = styled(Grid, {
+const Root = styled(Grid, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
@@ -43,9 +46,17 @@ const StyledSideImage = styled(Grid, {
     inset: 0,
     "--c": "7px",
     // backgroundColor: "#000",
+    // backgroundImage: `
+    //           radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+    //           radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+    //           radial-gradient(circle at 50% 50%, #f00, #f000 60%),
+    //           radial-gradient(circle at 50% 50%, #ff0, #ff00 60%),
+    //           radial-gradient(circle at 50% 50%, #0f0, #0f00 60%),
+    //           radial-gradient(ellipse at 50% 50%, #00f, #00f0 60%)
+    //         `,
     backgroundImage: `
-              radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
-              radial-gradient(circle at 50% 50%, #0000 1.5px, #000 0 var(--c), #0000 var(--c)),
+              radial-gradient(circle at 50% 50%, #0000 1.5px, ${theme.vars.palette.dynamic.background} 0 var(--c), #0000 var(--c)),
+              radial-gradient(circle at 50% 50%, #0000 1.5px, ${theme.vars.palette.dynamic.background} 0 var(--c), #0000 var(--c)),
               radial-gradient(circle at 50% 50%, #f00, #f000 60%),
               radial-gradient(circle at 50% 50%, #ff0, #ff00 60%),
               radial-gradient(circle at 50% 50%, #0f0, #0f00 60%),
@@ -150,6 +161,7 @@ const Circle = styled("div", {
   /*** Animation ***/
   // "--c": "#09f",
   backgroundColor: "#000",
+  // backgroundColor: theme.vars.palette.background.default,
   backgroundImage: theme.custom.sideImage.animationBackground.backgroundImage,
   backgroundSize: theme.custom.sideImage.animationBackground.backgroundSize,
 
@@ -166,6 +178,12 @@ const Circle = styled("div", {
                 #0000 2px,
                 hsl(0 0 4%) 2px
               )`,
+    // backgroundImage: `radial-gradient(
+    //             circle at 50% 50%,
+    //             #0000 0,
+    //             #0000 2px,
+    //             ${theme.vars.palette.dynamic.background}2px
+    //           )`,
     backgroundSize: "8px 8px",
     "--f": "blur(1em) brightness(6)",
     animation: `${hii} 10s linear infinite`,
@@ -179,9 +197,7 @@ const LogoWrapper = styled(Box, {
 })(({ theme }) => ({
   position: "relative",
   zIndex: 2,
-
   aspectRatio: "1 / 1",
-
   width: theme.custom.sideImage.logoSize,
   overflow: "visible",
   inset: 0,
@@ -210,7 +226,9 @@ const Caption = styled(Box, {
   maxWidth: "none", // remove inherited width limit
   color: "#edad54",
   textAlign: "center",
+  fontFamily: "var(--font-moul)",
   fontSize: theme.custom.sideImage.captionFontSize.xs,
+  fontWeight: 400,
   textShadow: `
             -0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
             0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
@@ -231,17 +249,61 @@ const Caption = styled(Box, {
   },
 }));
 
+const FooterWrapper = styled(Box, {
+  name: PREFIX,
+  slot: "Footer",
+  overridesResolver: (_props, styles) => styles.footer,
+})(({ theme }) => ({
+  color: "#edad54",
+  textShadow: `
+            -0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0.5px -0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            -0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0.5px  0.5px 0 ${theme.custom.sideImage.captionOutlineColor},
+            0    0   7px ${theme.custom.sideImage.captionGlowColor}
+          `,
+  // "-webkit-text-stroke": `0.125px ${theme.custom.sideImage.captionOutlineColor}`,
+  WebkitTextStroke: `0.125px ${theme.custom.sideImage.captionOutlineColor}`,
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  right: 0,
+  zIndex: 2,
+  // paddingBottom: theme.spacing(1),
+  // backgroundColor: "#00000050",
+}));
+
+const IconsWrapper = styled(Box, {
+  name: PREFIX,
+  slot: "Icons",
+  overridesResolver: (_props, styles) => styles.icons,
+})(({ theme }) => ({
+  width: "100%",
+  display: "flex",
+  justifyContent: "center",
+  gap: theme.spacing(1),
+  padding: theme.spacing(0.5),
+  // "& .MuiBox-root": {
+  //   borderRadius: "50px",
+  //   backgroundColor: alpha(theme.palette.background.default, 0.725),
+  // },
+}));
+
 /* Image section - hidden on mobile */
 const SideImage = (inProps: SideImageProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { src = "/static/images/piseth_chesda_logo.svg", ...rest } = props;
+  const {
+    src = "/static/images/piseth_chesda_logo.svg",
+    title = "បណ្ដាញសង្គមផ្លូវការ",
+    ...rest
+  } = props;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   if (isMobile) return null;
 
   return (
-    <StyledSideImage size={{ xs: 12, md: 6 }} {...rest}>
+    <Root size={{ xs: 12, md: 6 }} {...rest}>
       <SideImage.content>
         {/* Blue circle centered */}
 
@@ -254,15 +316,18 @@ const SideImage = (inProps: SideImageProps) => {
         </SideImage.circle>
       </SideImage.content>
       {/* Fixed-size logo in the middle */}
-      <SideImage.logo src={src} theme={theme} />
+      <SideImage.logo src={src} caption={CAPTION} />
+      <SideImage.footer title={title}>
+        <Icons />
+      </SideImage.footer>
       {/* Caption below logo */}
-    </StyledSideImage>
+    </Root>
   );
 };
 
 SideImage.content = Content;
 SideImage.circle = Circle;
-SideImage.logo = ({ src, theme }: { src: string; theme: Theme }) => (
+SideImage.logo = ({ src, caption }: { src: string; caption: string }) => (
   <LogoWrapper>
     <Image
       preload={false}
@@ -273,26 +338,39 @@ SideImage.logo = ({ src, theme }: { src: string; theme: Theme }) => (
       style={{ objectFit: "contain" }}
       unoptimized
     />
-    <SideImage.caption
-      caption={theme.custom.sideImage.logoCaption}
-      className={moul.className}
-    />
+    <Caption>{caption}</Caption>
+    {/* <SideImage.caption caption={caption} className={moul.className} /> */}
   </LogoWrapper>
+);
+
+SideImage.footer = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <FooterWrapper>
+    <Typography variant="subtitle2" fontWeight={700} align="center">
+      {title}
+    </Typography>
+    <IconsWrapper>{children}</IconsWrapper>
+  </FooterWrapper>
 );
 
 // SideImage.caption = ({ caption }: { caption: string }) => {
 //   return <Caption>{caption}</Caption>;
 // };
 
-SideImage.caption = ({
-  caption,
-  className,
-}: {
-  caption: string;
-  className?: string;
-}) => {
-  return <Caption className={className}>{caption}</Caption>;
-};
+// SideImage.caption = ({
+//   caption,
+//   className,
+// }: {
+//   caption: string;
+//   className?: string;
+// }) => {
+//   return <Caption className={className}>{caption}</Caption>;
+// };
 
 export default SideImage;
 

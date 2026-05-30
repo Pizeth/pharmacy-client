@@ -13,7 +13,7 @@ import {
 import { SocialLoginProps } from "@/interfaces/auth.interface";
 import { useCallback, useState } from "react";
 // import { useNotify } from "ra-core";
-import SocialButton from "./ui/socialButton";
+import SocialButton from "../icons/components/socialButton";
 
 const PREFIX = "RazethSocialLogin";
 
@@ -67,34 +67,34 @@ const PROVIDERS = {
     name: "Apple",
     icon: <Apple />,
   },
-  microsoft: {
-    name: "Microsoft",
-    icon: <Microsoft />,
-  },
+  // microsoft: {
+  //   name: "Microsoft",
+  //   icon: <Microsoft />,
+  // },
   meta: {
     name: "Meta",
     icon: <Meta />,
   },
-  x: {
-    name: "X",
-    icon: <X />,
-  },
-  linkedin: {
-    name: "Linkedin",
-    icon: <Linkedin />,
-  },
-  discord: {
-    name: "Discord",
-    icon: <Discord />,
-  },
-  github: {
-    name: "GitHub",
-    icon: <Github />,
-  },
-  gitlab: {
-    name: "GitLab",
-    icon: <Gitlab />,
-  },
+  // x: {
+  //   name: "X",
+  //   icon: <X />,
+  // },
+  // linkedin: {
+  //   name: "Linkedin",
+  //   icon: <Linkedin />,
+  // },
+  // discord: {
+  //   name: "Discord",
+  //   icon: <Discord />,
+  // },
+  // github: {
+  //   name: "GitHub",
+  //   icon: <Github />,
+  // },
+  // gitlab: {
+  //   name: "GitLab",
+  //   icon: <Gitlab />,
+  // },
 };
 
 const SocialLogin = (inProps: SocialLoginProps) => {
@@ -139,7 +139,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
   return (
     <Root container spacing={2} className={className} sx={sx} {...rest}>
       {Object.entries(PROVIDERS).map(([key, provider]) => (
-        <SocialLogin.children key={key} size={{ xs: 6, sm: 4 }}>
+        <SocialLogin.children key={key} size={{ xs: 12, sm: 4 }}>
           {children || (
             <SocialButton
               variant="outlined"

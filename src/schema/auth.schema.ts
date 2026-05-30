@@ -77,7 +77,7 @@ export const registerSchema = z
       ctx.addIssue({
         code: "custom",
         path: ["confirmPassword"],
-        message: "Passwords do not match",
+        message: "Confirm Passwords do not match",
       });
     }
   });

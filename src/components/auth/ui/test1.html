@@ -4,16 +4,19 @@
     <meta charset="UTF-8" />
     <title>Particle Navbar</title>
     <style>
-      /* From Uiverse.io by Mohammad-Rahme-576 */
-      /* Base Styles */
+      /* From Uiverse.io by MijailVillegas */
+      body {
+        background: #000;
+      }
+      /* From Uiverse.io by juanpabl0svn */
+      /* The switch - the box around the slider */
       .switch {
-        display: inline-block;
-        width: 6em;
-        height: 3em;
+        font-size: 17px;
         position: relative;
-        font-size: 18px;
-        user-select: none;
-        margin: 20px;
+        display: inline-block;
+        width: 3.5em;
+        height: 2em;
+        cursor: pointer;
       }
 
       /* Hide default HTML checkbox */
@@ -21,372 +24,88 @@
         opacity: 0;
         width: 0;
         height: 0;
-        position: absolute;
       }
 
-      /* Slider */
+      /* The slider */
       .slider {
+        --background: #20262c;
         position: absolute;
         cursor: pointer;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(to right, #87ceeb, #e0f6ff);
-        border-radius: 50px;
-        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        box-shadow:
-          0 4px 8px rgba(0, 0, 0, 0.1),
-          inset 0 -5px 10px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
+        background-color: var(--background);
+        transition: 0.5s;
+        border-radius: 30px;
       }
 
-      /* Inner slider for additional styling */
-      .slider-inner {
+      .slider:before {
         position: absolute;
-        top: 0.3em;
-        left: 0.3em;
-        height: 2.4em;
-        width: 2.4em;
-        border-radius: 50%;
-        background-color: #ffd700;
-        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        box-shadow:
-          0 2px 4px rgba(0, 0, 0, 0.2),
-          inset 0 -2px 5px rgba(0, 0, 0, 0.2);
-      }
-
-      /* Checked state */
-      .switch input:checked + .slider {
-        background: linear-gradient(to right, #1a237e, #3949ab);
-      }
-
-      .switch input:checked + .slider .slider-inner {
-        transform: translateX(3em);
-        background-color: #ffffff;
-      }
-
-      /* Focus state */
-      .switch input:focus + .slider {
-        outline: none;
-        box-shadow: 0 0 0.4em rgba(25, 118, 210, 0.5);
-      }
-
-      /* Hover and active states */
-      .switch:hover .slider {
-        background: linear-gradient(to right, #64b5f6, #e3f2fd);
-      }
-
-      .switch input:checked:hover + .slider {
-        background: linear-gradient(to right, #283593, #5c6bc0);
-      }
-
-      /* Animation for slider inner */
-      @keyframes sunPulse {
-        0%,
-        100% {
-          box-shadow:
-            0 0 0 0 rgba(255, 215, 0, 0.7),
-            0 0 0 0 rgba(255, 215, 0, 0.4);
-        }
-        50% {
-          box-shadow:
-            0 0 20px 10px rgba(255, 215, 0, 0.7),
-            0 0 40px 20px rgba(255, 215, 0, 0.4);
-        }
-      }
-
-      @keyframes moonPhase {
-        0%,
-        100% {
-          box-shadow:
-            inset -10px -5px 0 0 #ddd,
-            0 0 20px rgba(255, 255, 255, 0.5);
-        }
-        50% {
-          box-shadow:
-            inset 0 0 0 0 #ddd,
-            0 0 20px rgba(255, 255, 255, 0.5);
-        }
-      }
-
-      .switch input:not(:checked) + .slider .slider-inner {
-        animation: sunPulse 3s infinite;
-      }
-
-      .switch input:checked + .slider .slider-inner {
-        animation: moonPhase 5s infinite;
-      }
-
-      /* Stars effect */
-      @keyframes twinkle {
-        0%,
-        100% {
-          opacity: 0.2;
-        }
-        50% {
-          opacity: 1;
-        }
-      }
-
-      .slider::before,
-      .slider::after {
         content: "";
-        position: absolute;
-        width: 4px;
-        height: 4px;
-        background-color: #ffffff;
+        height: 1.4em;
+        width: 1.4em;
         border-radius: 50%;
-        transition: all 0.6s ease;
-        opacity: 0;
+        left: 10%;
+        bottom: 15%;
+        box-shadow:
+          inset 8px -4px 0px 0px #ececd9,
+          -4px 1px 4px 0px #dadada;
+        background: var(--background);
+        transition: 0.5s;
       }
 
-      .slider::before {
-        top: 20%;
-        left: 30%;
-      }
-
-      .slider::after {
-        bottom: 25%;
-        right: 25%;
-      }
-
-      .switch input:checked + .slider::before,
-      .switch input:checked + .slider::after {
-        opacity: 1;
-        animation: twinkle 2s infinite;
-      }
-
-      .switch input:checked + .slider::before {
-        animation-delay: 0.5s;
-      }
-
-      /* 3D effect */
-      .slider {
-        transform-style: preserve-3d;
-        perspective: 500px;
-      }
-
-      .slider-inner {
-        transform: translateZ(5px);
-      }
-
-      .switch input:checked + .slider .slider-inner {
-        transform: translateX(3em) translateZ(5px) rotateY(180deg);
-      }
-
-      /* Cloud effect for day mode */
-      .slider-inner::before,
-      .slider-inner::after {
+      .decoration {
+        position: absolute;
         content: "";
-        position: absolute;
-        background-color: rgba(255, 255, 255, 0.8);
+        height: 2px;
+        width: 2px;
         border-radius: 50%;
-        transition: all 0.6s ease;
+        right: 20%;
+        top: 15%;
+        background: #e5f041e6;
+        backdrop-filter: blur(10px);
+        transition: all 0.5s;
+        box-shadow:
+          -7px 10px 0 #e5f041e6,
+          8px 15px 0 #e5f041e6,
+          -17px 1px 0 #e5f041e6,
+          -20px 10px 0 #e5f041e6,
+          -7px 23px 0 #e5f041e6,
+          -15px 25px 0 #e5f041e6;
       }
 
-      .slider-inner::before {
-        width: 1em;
-        height: 1em;
-        top: -0.5em;
-        left: -0.2em;
+      input:checked ~ .decoration {
+        transform: translateX(-20px);
+        width: 10px;
+        height: 10px;
+        background: white;
+        box-shadow:
+          -12px 0 0 white,
+          -6px 0 0 1.6px white,
+          5px 15px 0 1px white,
+          1px 17px 0 white,
+          10px 17px 0 white;
       }
 
-      .slider-inner::after {
-        width: 1.2em;
-        height: 1.2em;
-        bottom: -0.6em;
-        right: -0.3em;
+      input:checked + .slider {
+        background-color: #5494de;
       }
 
-      .switch input:checked + .slider .slider-inner::before,
-      .switch input:checked + .slider .slider-inner::after {
-        opacity: 0;
-      }
-
-      /* Crater effect for night mode */
-      .switch input:checked + .slider .slider-inner::before {
-        width: 0.6em;
-        height: 0.6em;
-        background-color: rgba(0, 0, 0, 0.2);
-        top: 0.3em;
-        left: 0.3em;
-        opacity: 1;
-      }
-
-      .switch input:checked + .slider .slider-inner::after {
-        width: 0.4em;
-        height: 0.4em;
-        background-color: rgba(0, 0, 0, 0.15);
-        bottom: 0.5em;
-        right: 0.5em;
-        opacity: 1;
-      }
-
-      /* Accessibility improvements */
-      .switch input:focus + .slider {
-        outline: 2px solid #4a90e2;
-        outline-offset: 2px;
-      }
-
-      /* Responsive adjustments */
-      @media (max-width: 768px) {
-        .switch {
-          width: 5em;
-          height: 2.5em;
-        }
-
-        .slider-inner {
-          height: 2em;
-          width: 2em;
-        }
-
-        .switch input:checked + .slider .slider-inner {
-          transform: translateX(2.5em) translateZ(5px) rotateY(180deg);
-        }
-      }
-
-      @media (max-width: 480px) {
-        .switch {
-          width: 4em;
-          height: 2em;
-        }
-
-        .slider-inner {
-          height: 1.6em;
-          width: 1.6em;
-        }
-
-        .switch input:checked + .slider .slider-inner {
-          transform: translateX(2em) translateZ(5px) rotateY(180deg);
-        }
-      }
-
-      /* High contrast mode */
-      @media (forced-colors: active) {
-        .slider {
-          background: Canvas;
-          border: 2px solid ButtonText;
-        }
-
-        .switch input:checked + .slider {
-          background: Highlight;
-        }
-
-        .slider-inner {
-          background-color: ButtonFace;
-        }
-
-        .switch::before,
-        .switch::after {
-          color: ButtonText;
-        }
-      }
-
-      /* Reduced motion preference */
-      @media (prefers-reduced-motion: reduce) {
-        .switch,
-        .slider,
-        .slider-inner {
-          transition: none;
-        }
-
-        .switch input:checked + .slider .slider-inner,
-        .switch input:not(:checked) + .slider .slider-inner,
-        .switch input:checked + .slider::before,
-        .switch input:checked + .slider::after {
-          animation: none;
-        }
+      input:checked + .slider:before {
+        transform: translateX(100%);
+        box-shadow:
+          inset 15px -4px 0px 15px #efdf2b,
+          0 0 10px 0px #efdf2b;
       }
     </style>
   </head>
   <body>
-    <!-- From Uiverse.io by 00Kubi -->
-    <!-- From Uiverse.io by Mohammad-Rahme-576 -->
-    <label aria-checked="false" role="switch" class="switch">
-      <input type="checkbox" />
-      <span class="slider">
-        <span class="slider-inner"></span>
-      </span>
+    <!-- From Uiverse.io by juanpabl0svn -->
+    <label for="switch" class="switch">
+      <input id="switch" type="checkbox" />
+      <span class="slider"></span>
+      <span class="decoration"></span>
     </label>
   </body>
 </html>
-
-<div class="MuiBox-root mui-0">
-  <div
-    class="MuiFormControl-root MuiFormControl-marginDense MuiFormControl-fullWidth MuiTextField-root mui-bkeaeu-MuiFormControl-root-MuiTextField-root"
-  >
-    <label
-      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-error MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined mui-5azuzj-MuiFormLabel-root-MuiInputLabel-root"
-      data-shrink="true"
-      for="_r_k_"
-      id="_r_k_-label"
-      >Full Name</label
-    >
-    <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary Mui-error MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedStart MuiInputBase-adornedEnd mui-9kdf1t-MuiInputBase-root-MuiOutlinedInput-root"
-    >
-      <div
-        class="MuiInputAdornment-root MuiInputAdornment-positionStart MuiInputAdornment-outlined MuiInputAdornment-sizeSmall mui-tyncx3-MuiInputAdornment-root"
-      >
-        <span class="notranslate" aria-hidden="true">​</span
-        ><svg
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-4uxqju-MuiSvgIcon-root"
-          focusable="false"
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          data-testid="BadgeIcon"
-        >
-          <path
-            d="M20 7h-5V4c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2M9 12c.83 0 1.5.67 1.5 1.5S9.83 15 9 15s-1.5-.67-1.5-1.5S8.17 12 9 12m3 6H6v-.75c0-1 2-1.5 3-1.5s3 .5 3 1.5zm1-9h-2V4h2zm5 7.5h-4V15h4zm0-3h-4V12h4z"
-          ></path>
-        </svg>
-      </div>
-      <input
-        aria-invalid="true"
-        id="_r_k_"
-        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall MuiInputBase-inputAdornedStart MuiInputBase-inputAdornedEnd mui-1gci8vu-MuiInputBase-input-MuiOutlinedInput-input"
-        type="text"
-        value="t"
-        name="name"
-        aria-describedby="_r_k_-helper-text"
-      />
-      <div
-        class="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeSmall mui-2d0b4g-MuiInputAdornment-root"
-      >
-        <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-edgeEnd MuiIconButton-sizeSmall mui-11yujn1-MuiButtonBase-root-MuiIconButton-root"
-          tabindex="0"
-          type="button"
-          aria-label="Clear input"
-        >
-          <svg
-            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-yoriwg-MuiSvgIcon-root"
-            focusable="false"
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            data-testid="ClearIcon"
-          >
-            <path
-              d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-            ></path>
-          </svg>
-        </button>
-      </div>
-      <fieldset
-        aria-hidden="true"
-        class="MuiOutlinedInput-notchedOutline mui-zg5sxk-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
-      >
-        <legend class="mui-ex8a5f-MuiNotchedOutlined-root">
-          <span>Full Name</span>
-        </legend>
-      </fieldset>
-    </div>
-    <p
-      class="MuiFormHelperText-root Mui-error MuiFormHelperText-sizeSmall MuiFormHelperText-contained MuiFormHelperText-filled mui-15nr9wl-MuiFormHelperText-root"
-      id="_r_k_-helper-text"
-    >
-      Name must be at least 2 characters
-    </p>
-  </div>
-</div>

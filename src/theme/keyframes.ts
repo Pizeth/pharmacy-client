@@ -200,7 +200,7 @@ export const shadowPulse = keyframes`
 
 export const cloudMove = keyframes`
   0% { background-position: 0 0; }
-  100% { background-position: 100% 0; }
+  100% { background-position: 1000px 0; }
 `;
 
 // export const moveBackground = keyframes`
@@ -386,6 +386,13 @@ export const fadeIn = keyframes`
 export const fadeOut = keyframes`
   from { opacity: 0; transform: scale(0) translateY(100%); }
   to { opacity: 1; transform: scale(1); }
+`;
+
+export const bounce = keyframes`
+    40% { transform: scale(1.4); }
+    60% { transform: scale(0.8); }
+    80% { transform: scale(1.2); }
+    100% { transform: scale(1); }
 `;
 
 export const bAnimation = keyframes`

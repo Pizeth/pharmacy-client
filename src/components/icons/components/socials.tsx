@@ -1,0 +1,553 @@
+import { alpha, styled } from "@mui/material";
+import Box from "@mui/material/Box";
+import { MCS } from "../socials/mcs";
+// import { Meta, Instagram, Telegram, YouTube } from "../socialIcons";
+// import { Meta } from "../socialIcons";
+import { SocialButton } from "./socialButton";
+import { bounce } from "@/theme/keyframes";
+import Meta from "../socials/meta";
+import Instagram from "../socials/instagram";
+import TikTok from "../socials/tiktok";
+import X from "../socials/x";
+import Telegram from "../socials/telegram";
+import YouTube from "../socials/youtube";
+
+const PREFIX = "RazethSocialIcons";
+
+// Provider configuration
+const PROVIDERS = {
+  web: {
+    name: "Web",
+    icon: <MCS color="action" fontSize="medium" />,
+    className: "web",
+    href: "https://mcs.gov.kh",
+  },
+  meta: {
+    name: "Meta",
+    icon: <Meta color="action" fontSize="medium" />,
+    className: "meta",
+    href: "https://facebook.com/CivilServiceCambodia",
+  },
+  instagram: {
+    name: "Instagram",
+    icon: <Instagram color="action" fontSize="medium" />,
+    className: "instagram",
+    href: "https://instagram.com/civilservice_cambodia",
+  },
+  tiktok: {
+    name: "TikTok",
+    icon: <TikTok color="action" fontSize="medium" />,
+    className: "tiktok",
+    href: "https://tiktok.com/@mcsgovernment",
+  },
+  x: {
+    name: "X",
+    icon: <X color="action" fontSize="medium" />,
+    className: "x",
+    href: "https://tiktok.com/@mcsgovernment",
+  },
+  telegram: {
+    name: "Telegram",
+    icon: <Telegram color="action" fontSize="medium" />,
+    className: "telegram",
+    href: "https://t.me/mcsgovkh",
+  },
+  youtube: {
+    name: "Youtube",
+    icon: <YouTube color="action" fontSize="medium" />,
+    className: "youtube",
+    href: "https://youtube.com/@MinistryofCivilService",
+  },
+};
+
+const Root = styled(Box, {
+  name: PREFIX,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})(({ theme }) => ({
+  // postion: "fixed",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexDirection: "row",
+  // columnGap: "0.5rem",
+  zIndex: 1,
+  // "& .MuiIconButton-root": {
+  //   border: "none",
+  //   padding: "0.575rem",
+  //   // margin: theme.spacing(0, 1),
+  //   minWidth: "1rem",
+  //   borderRadius: "50%",
+  //   // "&:hover": {
+  //   //   transform: "scale(1.25)",
+  //   // },
+  // },
+  borderRadius: "50px",
+  // backgroundColor: theme.alpha(theme.vars.palette.background.default, 0.725),
+  "& svg": {
+    minWidth: "1rem",
+    minHeight: "1rem",
+    maxWidth: "1.35rem",
+    maxHeight: "1.35rem",
+    // width: "60%",
+    // height: "100%",
+    // transition: "0.3s ease-in-out",
+    // Smoothly transition all properties including transform and mask properties
+    // transition: `transform 0.3s ease-in-out, background 0.3s ease-in-out, fill 0.3s ease-in-out`,
+    // boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+    borderRadius: "50%",
+    // transform: "scale(1)",
+    // "&:hover": {
+    //   transform: "scale(1.5)",
+    // },
+    // 👇 ADD THIS BLOCK HERE 👇
+    // This gives a global smooth fade to ALL icon paths (Instagram, YouTube, etc.)
+    // path: {
+    //   transition:
+    //     "fill 0.3s ease-in-out, stroke 0.3s ease-in-out, opacity 0.3s ease-in-out",
+    // },
+  },
+
+  // "&::before": {
+  //   content: '""',
+  //   position: "absolute",
+  //   width: "3px",
+  //   height: "3px",
+  //   borderRadius: "50%",
+  //   opacity: 1,
+  //   // boxShadow:
+  //   //   "140px 20px #fff, 425px 20px #fff, 70px 120px #fff, 20px 130px #fff, 110px 80px #fff, 280px 80px #fff, 250px 350px #fff, 280px 230px #fff, 220px 190px #fff, 450px 100px #fff, 380px 80px #fff, 520px 50px #fff",
+  //   boxShadow: createStarfield(75), // random stars
+  //   zIndex: -1,
+  //   transition: "1.5s ease",
+  //   animation: `${glowingStars} 1s linear alternate infinite`,
+  //   animationDelay: "0.4s",
+  // },
+  // "&::after": {
+  //   content: '""',
+  //   position: "absolute",
+  //   width: "3px",
+  //   height: "3px",
+  //   borderRadius: "50%",
+  //   opacity: 1,
+  //   // boxShadow:
+  //   //   "490px 330px #fff, 420px 300px #fff, 320px 280px #fff, 380px 350px #fff, 546px 170px #fff, 420px 180px #fff, 370px 150px #fff, 200px 250px #fff, 80px 20px #fff, 190px 50px #fff, 270px 20px #fff, 120px 230px #fff, 350px -1px #fff, 150px 369px #fff",
+  //   boxShadow: createStarfield(75), // random stars
+  //   zIndex: -1,
+  //   transition: "2s ease",
+  //   animation: `${glowingStars} 1s linear alternate infinite`,
+  //   animationDelay: "0.8s",
+  // },
+  // Specific provider color classes
+
+  "& .web": {
+    "&:hover": {
+      // backgroundColor: "#edad54",
+      // backgroundColor: "#d09749",
+      svg: {
+        path: { fill: "#FFF" },
+      },
+
+      "& .st0": {
+        fill: "#FFF",
+        // transition: "fill 0.3s ease-in-out",
+      },
+
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: `radial-gradient(
+        circle at center,
+        #D38944 25%,
+        #EA9548 40%, 
+        #EDAC4C 55%,
+        #E8B841 70%,
+        #F0C54C 85%,
+        #ffcd34 100%
+      )`,
+    },
+  },
+  // "& .meta::before": {
+  //   content: '""',
+  //   position: "absolute",
+  //   zIndex: -1,
+  //   // top: "10%",
+  //   // left: "90%",
+  //   top: "10vh" /* 10% of viewport height */,
+  //   left: "100vw" /* start just outside right edge */,
+  //   rotate: "-45deg",
+  //   width: "5em",
+  //   height: "1px",
+  //   background: "linear-gradient(90deg, #fff, transparent)",
+  //   animation: `${shootingStar} 4s ease-in-out infinite`,
+  //   transition: "1s ease",
+  //   animationDelay: "1s",
+  // },
+  "& .meta": {
+    "&:hover": {
+      // backgroundColor: "#0081FB",
+      svg: {
+        // fill: "#0081FB",
+        fill: "white",
+      },
+
+      "* .meta-line": {
+        fill: "#FFF",
+      },
+      // Smoothly reveal the gradient path layer
+      "& .meta-gradient-layer": {
+        opacity: 0,
+        // transition: "opacity 0.3s ease-in-out",
+      },
+
+      // Smoothly hide the default solid color layer
+      "& .meta-solid-layer": {
+        opacity: 1,
+        // transition: "opacity 0.3s ease-in-out",
+      },
+
+      // background: theme.vars.palette.background.paper,
+
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: `linear-gradient(
+        183deg, 
+        #0064E1 0%, 
+        #0064E1 40%, 
+        #0073EE 83%, 
+        #0082FB 100%
+      )`,
+    },
+  },
+  "& .instagram": {
+    "& .insta-lens-patch": {
+      transition: "fill 0.3s ease-in-out, opacity 0.3s ease-in-out",
+    },
+    "&:hover": {
+      // svg: {
+      //   path: {
+      //     // Points directly to the gradient ID inside the SVG
+      //     fill: "url(#instagram-gradient)",
+      //   },
+      // },
+
+      // 1. Target the main path lines for the gradient
+      // "& svg path": {
+      //   fill: "url(#instagram-gradient)",
+      //   transition: "fill 0.3s ease-in-out",
+      // },
+
+      // Smoothly reveal the gradient path layer
+      "& .insta-gradient-layer": {
+        opacity: 0,
+        // transition: "opacity 0.3s ease-in-out",
+      },
+
+      // Smoothly hide the default solid color layer
+      "& .insta-solid-layer": {
+        opacity: 1,
+        // transition: "opacity 0.3s ease-in-out",
+      },
+
+      // 2. Target the inner lens cutout circle directly from the button hover!
+      "& .insta-lens-patch": {
+        fill: "transparent",
+        // transition: "fill 0.3s ease-in-out",
+      },
+
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: `radial-gradient(
+        120% 120% at 30% 100%, 
+        #ffd500 0%, 
+        #ffd500 15%, 
+        #ff543e 45%, 
+        #c837ab 75%, 
+        #3771c8 100%
+      )`,
+    },
+  },
+  "& .tiktok": {
+    "&:hover": {
+      "& .tiktok-chroma-red, .tiktok-chroma-dark, .tiktok-chroma-cyan ": {
+        opacity: 0,
+        // transition: "opacity 0.3s ease-in-out",
+      },
+      "& .tiktok-solid-path": {
+        opacity: 1,
+        // transition: "opacity 0.3s ease-in-out",
+      },
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: "#000",
+    },
+  },
+  "& .x": {
+    "&:hover": {
+      svg: {
+        path: { fill: "#FFF" },
+      },
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: "#000",
+    },
+  },
+
+  "& .telegram": {
+    "&:hover": {
+      // backgroundColor: "#229ed9",
+      svg: {
+        path: { fill: "#FFF" },
+      },
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+    },
+    "& .MuiIconButton-root::before": {
+      background: "#229ed9",
+    },
+  },
+  "& .youtube": {
+    "&:hover": {
+      // backgroundColor: "#FF0000",
+      svg: {
+        path: { fill: "#FFF" },
+      },
+      // 2. Target the inner lens cutout circle directly from the button hover!
+      "& .youtube-patch": {
+        fill: "transparent",
+        transition: "fill 0.3s ease-in-out",
+      },
+
+      // background: theme.vars.palette.background.paper,
+      animation: `${bounce} 0.3s linear`,
+      "& .MuiIconButton-root::before": {
+        background: "#FF0000",
+      },
+    },
+  },
+  // // Provider-specific hover strokes
+  // "& .web svg path": { stroke: "#2859c5" },
+  // "& .meta svg path": { stroke: "#0081FB" },
+  // "& .instagram svg path": { stroke: "#808080" },
+  // "& .instagram:hover svg path": { stroke: "#cc39a4" },
+  // "& .telegram svg path": { stroke: "#229ed9" },
+  // "& .youtube svg path": { stroke: "#FF0000" },
+  // // Scale effects
+  // "& .instagram:hover svg": { transform: "scale(1.4)" },
+  // "& .telegram:hover svg, & .youtube:hover svg": {
+  //   transform: "scale(1.25)",
+  // },
+}));
+
+const Icons = () => {
+  return (
+    <Root>
+      {Object.entries(PROVIDERS).map(([key, provider]) => (
+        <SocialButton
+          key={key}
+          variant="outlined"
+          buttonType="iconButton"
+          icon={provider.icon}
+          className={provider.className}
+          label={provider.name}
+          href={provider.href}
+        >
+          {/* {provider.name} */}
+        </SocialButton>
+      ))}
+    </Root>
+  );
+};
+
+export default Icons;
+
+// const Card = () => {
+//   return (
+//     <StyledWrapper>
+//       <div className="card">
+//         <a className="social-link1">
+//           <svg
+//             viewBox="0 0 16 16"
+//             className="bi bi-instagram"
+//             fill="currentColor"
+//             height={16}
+//             width={16}
+//             xmlns="http://www.w3.org/2000/svg"
+//             style={{ color: "white" }}
+//           >
+//             {" "}
+//             <path
+//               fill="white"
+//               d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"
+//             />{" "}
+//           </svg>
+//         </a>
+//         <a className="social-link2">
+//           <svg
+//             viewBox="0 0 16 16"
+//             className="bi bi-twitter"
+//             fill="currentColor"
+//             height={16}
+//             width={16}
+//             xmlns="http://www.w3.org/2000/svg"
+//             style={{ color: "white" }}
+//           >
+//             {" "}
+//             <path
+//               fill="white"
+//               d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"
+//             />{" "}
+//           </svg>{" "}
+//         </a>
+//         <a className="social-link3">
+//           <svg
+//             viewBox="0 0 16 16"
+//             className="bi bi-discord"
+//             fill="currentColor"
+//             height={16}
+//             width={16}
+//             xmlns="http://www.w3.org/2000/svg"
+//             style={{ color: "white" }}
+//           >
+//             {" "}
+//             <path
+//               fill="white"
+//               d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059.051.051 0 0 0-.018-.011 8.875 8.875 0 0 1-1.248-.595.05.05 0 0 1-.02-.066.051.051 0 0 1 .015-.019c.084-.063.168-.129.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.052.052 0 0 1 .053.007c.08.066.164.132.248.195a.051.051 0 0 1-.004.085 8.254 8.254 0 0 1-1.249.594.05.05 0 0 0-.03.03.052.052 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.034.034 0 0 0-.02-.019Zm-8.198 7.307c-.789 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612Zm5.316 0c-.788 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612Z"
+//             />{" "}
+//           </svg>
+//         </a>
+//         <a className="social-link4">
+//           <svg
+//             viewBox="0 0 16 16"
+//             className="bi bi-whatsapp"
+//             fill="currentColor"
+//             height={16}
+//             width={16}
+//             xmlns="http://www.w3.org/2000/svg"
+//             style={{ color: "white" }}
+//           >
+//             {" "}
+//             <path
+//               fill="white"
+//               d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"
+//             />{" "}
+//           </svg>
+//         </a>
+//       </div>
+//     </StyledWrapper>
+//   );
+// };
+
+// const StyledWrapper = styled.div`
+//   .card {
+//     display: flex;
+//     height: 70px;
+//     width: 270px;
+//   }
+
+//   .card svg {
+//     position: absolute;
+//     display: flex;
+//     width: 60%;
+//     height: 100%;
+//     font-size: 24px;
+//     font-weight: 700;
+//     opacity: 1;
+//     transition: opacity 0.25s;
+//     z-index: 2;
+//     cursor: pointer;
+//   }
+
+//   .card .social-link1,
+//   .card .social-link2,
+//   .card .social-link3,
+//   .card .social-link4 {
+//     position: relative;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     width: 25%;
+//     color: whitesmoke;
+//     font-size: 24px;
+//     text-decoration: none;
+//     transition: 0.25s;
+//     border-radius: 50px;
+//   }
+
+//   .card svg {
+//     transform: scale(1);
+//   }
+
+//   .card .social-link1:hover {
+//     background: #f09433;
+//     background: -moz-linear-gradient(
+//       45deg,
+//       #f09433 0%,
+//       #e6683c 25%,
+//       #dc2743 50%,
+//       #cc2366 75%,
+//       #bc1888 100%
+//     );
+//     background: -webkit-linear-gradient(
+//       45deg,
+//       #f09433 0%,
+//       #e6683c 25%,
+//       #dc2743 50%,
+//       #cc2366 75%,
+//       #bc1888 100%
+//     );
+//     background: linear-gradient(
+//       45deg,
+//       #f09433 0%,
+//       #e6683c 25%,
+//       #dc2743 50%,
+//       #cc2366 75%,
+//       #bc1888 100%
+//     );
+//     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f09433', endColorstr='#bc1888',GradientType=1 );
+//     animation: bounce_613 0.4s linear;
+//   }
+
+//   .card .social-link2:hover {
+//     background-color: #00ccff;
+//     animation: bounce_613 0.4s linear;
+//   }
+
+//   .card .social-link3:hover {
+//     background-color: #5865f2;
+//     animation: bounce_613 0.4s linear;
+//   }
+
+//   .card .social-link4:hover {
+//     background-color: #12a50b;
+//     animation: bounce_613 0.4s linear;
+//   }
+
+//   @keyframes bounce_613 {
+//     40% {
+//       transform: scale(1.4);
+//     }
+
+//     60% {
+//       transform: scale(0.8);
+//     }
+
+//     80% {
+//       transform: scale(1.2);
+//     }
+
+//     100% {
+//       transform: scale(1);
+//     }
+//   }
+// `;
+
+// export default Card;

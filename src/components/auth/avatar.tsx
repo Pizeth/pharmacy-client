@@ -1,11 +1,13 @@
 import { Avatar, Box, styled, Typography, useThemeProps } from "@mui/material";
 
-import PersonIcon from "@mui/icons-material/Person";
+// import PersonIcon from "@mui/icons-material/Person";
 import { AvatarProps } from "@/interfaces/auth.interface";
-import { useTranslate } from "ra-core";
-import RocketAnimation from "./effects/rocket";
 import { earthRotate } from "@/theme/keyframes";
 import { buildResponsiveShadow } from "@/utils/themeUtils";
+import AvatarFrame from "../CustomComponents/AvatarFrame";
+import AvatarWrapper from "../CustomComponents/AvatarWrapper";
+import MiniImg from "../Navigations/Navigation/MiniImg";
+import MCS from "../icons/socials/mcs";
 
 const AvatarHeader = (inProps: AvatarProps) => {
   const props = useThemeProps({
@@ -24,22 +26,16 @@ const AvatarHeader = (inProps: AvatarProps) => {
 
   return (
     <Root className={className} sx={sx} {...rest}>
-      {/* <Box sx={{ display: "flex", position: "relative" }}>
-        <RocketAnimation />
-        <Avatar alt="Razeth">{avatarIcon}</Avatar>
-      </Box> */}
-
-      <Avatar alt="Razeth">{avatarIcon}</Avatar>
-      <Typography
-        align="center"
-        variant="h6"
-        fontWeight="bold"
-        gutterBottom
-        color="textPrimary"
-      >
-        {/* {translate("razeth.title.welcome") || title} */}
-        {title || "Welcome"}
-      </Typography>
+      <AvatarFrame>
+        {/* <AvatarWrapper><MiniImg src={src} /></AvatarWrapper> */}
+        <Avatar alt="Razeth" sizes="75">
+          {avatarIcon}
+        </Avatar>
+        {/* <Box sx={{ display: "flex", position: "relative" }}>
+          <RocketAnimation />
+          <Avatar alt="Razeth">{avatarIcon}</Avatar>
+        </Box> */}
+      </AvatarFrame>
       {/* <Typography
         variant="body2"
         color="text.secondary"
@@ -51,11 +47,21 @@ const AvatarHeader = (inProps: AvatarProps) => {
       >
         Login to your MCS account
       </Typography> */}
+      <Typography
+        align="center"
+        variant="h6"
+        fontWeight="bold"
+        gutterBottom
+        color="textPrimary"
+      >
+        {/* {translate("razeth.title.welcome") || title} */}
+        {title || "Welcome"}
+      </Typography>
     </Root>
   );
 };
 
-const defaultAvatarIcon = <PersonIcon />;
+const defaultAvatarIcon = <MCS />;
 const PREFIX = "RazethAvatar";
 
 const Root = styled(Box, {
@@ -70,7 +76,7 @@ const Root = styled(Box, {
   flexDirection: "column", // Arrange items vertically
   alignItems: "center", // Center items horizontally
   "& .MuiAvatar-root": {
-    "--avatar-size": "min(12vmin, 70px)", // responsive size
+    "--avatar-size": "max(50px, 4.375rem)", // responsive size
     width: "var(--avatar-size)",
     height: "var(--avatar-size)",
 
