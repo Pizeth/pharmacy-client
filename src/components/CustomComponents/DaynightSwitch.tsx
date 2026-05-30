@@ -1,5 +1,6 @@
 "use client";
 
+import Box from "@mui/material/Box";
 import { styled, keyframes } from "@mui/material/styles";
 
 // ─── Keyframes ────────────────────────────────────────────────────────────────
@@ -141,7 +142,9 @@ const SwitchTrack = styled("span", {
   //   "inset 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(255, 255, 255, 0.05)",
   boxShadow: checked
     ? "1px 1px 5px 0 #3949ab inset"
-    : "1px 1px 5px 0 #e0f6ff inset",
+    : // : "inset 0 0 10px rgba(255, 140, 0, 0.3)",
+      // : "1px 1px 5px 0 #e0f6ff inset",
+      "1px 1px 5px 0 rgba(255, 140, 0, 0.3) inset",
   overflow: "hidden",
   transformStyle: "preserve-3d",
   perspective: "500px",
@@ -153,7 +156,8 @@ const SwitchTrack = styled("span", {
   // Theme-informed cinematic track environments
   background: checked
     ? "linear-gradient(135deg, #0b0f19 0%, #161f33 50%, #22304d 100%)" // Cinematic Nebula Space
-    : "linear-gradient(135deg, #7ec4fc 0%, #bce3ff 60%, #eef7ff 100%)", // Crisp Morning Sky
+    : "linear-gradient(to right, #87ceeb 0%, #e0f6ff 60%, #eef7ff 100%)",
+  // : "linear-gradient(135deg, #7ec4fc 0%, #bce3ff 60%, #eef7ff 100%)", // Crisp Morning Sky
 
   // "&::before, &::after": {
   //   content: '""',
@@ -249,16 +253,23 @@ const SwitchThumb = styled("span", {
   backgroundColor: checked ? "#ffffff" : "#ffd700",
   background: checked
     ? "#ffffff"
-    : `radial-gradient(
-          circle,
-          #ff7f00,
-          #ffa500
+    : // : `radial-gradient(
+      //       circle,
+      //       #ff7f00,
+      //       #ffa500
+      //     )`,
+      `radial-gradient(
+          circle at 30% 20%,
+          #ff4500 15%,
+          #ff7f00 35%,
+          #ff8c00 55%,
+          #ffa500 75%,
+          #ffd700 100%
         )`,
   transform: checked
     ? "translateX(3em) translateZ(5px) rotateY(180deg)"
     : "translateZ(5px)",
   animation: checked ? `${moonPhase} 5s infinite` : `${sunPulse} 2.5s infinite`,
-
   "&::before": {
     content: '""',
     position: "absolute",
@@ -392,12 +403,12 @@ const SwitchDecoration = styled("span", {
 })<{ checked?: boolean }>(({ checked }) => ({
   position: "absolute",
   content: '""',
-  transform: checked ? "translateX(-10px)" : "none",
-  height: checked ? "1px" : "10px",
-  width: checked ? "1px" : "10px",
+  transform: checked ? "translateX(-20px)" : "none",
+  height: checked ? "1px" : "7px",
+  width: checked ? "1px" : "7px",
   borderRadius: "50%",
-  left: "45%",
-  top: "15%",
+  right: "5%",
+  top: "10%",
   background: "#FFF",
   backdropFilter: "blur(10px)",
   transition: "all 0.5s",
@@ -412,13 +423,26 @@ const SwitchDecoration = styled("span", {
     `
     : `
       -12px 0 0 #FFF,
-      -6px 0 0 1.6px #FFF,
-      5px 15px 0 1px #FFF,
-      1px 17px 0 #FFF,
-      10px 17px 0 #FFF
+      -6px 0 0 1.75px #FFF,
+      -19px 12px 0 1px #FFF,
+      -23px 15px 0 #FFF,
+      -14px 15px 0 #FFF
     `,
 }));
 
+const SwitchGlow = styled(Box, {
+  name: PREFIX,
+  slot: "Glow",
+  overridesResolver: (_props, styles) => styles.glow,
+  shouldForwardProp: (prop) => prop !== "checked",
+})<{ checked?: boolean }>(({ checked }) => ({
+  width: "100%",
+  height: "100%",
+  borderRadius: "50%",
+  background: "radial-gradient(circle, rgba(255, 140, 0, 0.3), transparent)",
+  boxShadow:
+    " 5px 5px 10px rgba(0, 0, 0, 0.6), -5px -5px 10px rgba(255, 255, 255, 0.15), inset 0 -2px 5px rgba(0, 0, 0, 0.7), inset 0 2px 5px rgba(255, 255, 255, 0.3), 2px 2px 3px rgba(255, 255, 255, 0.2)",
+}));
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 export interface DayNightSwitchProps {
@@ -439,7 +463,9 @@ const DayNightSwitch = ({
   <SwitchRoot size={size} aria-label={ariaLabel}>
     <SwitchInput type="checkbox" checked={checked} onChange={onChange} />
     <SwitchTrack checked={checked}>
-      <SwitchThumb checked={checked} />
+      <SwitchThumb checked={checked}>
+        <SwitchGlow />
+      </SwitchThumb>
     </SwitchTrack>
     <SwitchDecoration checked={checked} />
   </SwitchRoot>
