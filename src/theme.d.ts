@@ -107,3 +107,5 @@ export type GradientOptions = {
   streakHeight?: number; // default 100
   color?: string; // default "var(--c)"
 };
+
+export type IconSize = "small" | "medium" | "large" | number | string;

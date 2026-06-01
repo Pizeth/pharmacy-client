@@ -5,7 +5,7 @@ import {
 } from "@/interfaces/component-props.interface";
 import { StarfieldOptions } from "@/interfaces/css.interface";
 import { MeteorConfig } from "@/interfaces/theme.interface";
-import { GradientOptions, GradientPoint } from "@/theme";
+import { GradientOptions, GradientPoint, IconSize } from "@/theme";
 import { alpha, keyframes, Theme } from "@mui/material/styles";
 
 // export function makeSoftStops(color: string) {
@@ -723,6 +723,36 @@ export const parseUnit = (
   if (value.endsWith("%")) return (parseFloat(value) / 100) * containerHeight; // <-- Needs containerHeight
   // Fallback for simple strings
   return parseFloat(value);
+};
+
+/**
+ * Normalizes custom sizes and semantic keywords into valid CSS value strings.
+ * Safe for Server-Side Rendering (SSR) environments.
+ */
+export const normalizeIconSize = (size: IconSize | undefined): string => {
+  if (size === undefined || size === null || size === "") {
+    return "20px"; // Global elegant fallback default
+  }
+
+  // 1. Handle Material UI standard semantic string variants
+  if (size === "small") return "18px";
+  if (size === "medium") return "22px";
+  if (size === "large") return "28px";
+
+  // 2. If it's a raw number, treat it implicitly as pixels
+  if (typeof size === "number") {
+    return `${size}px`;
+  }
+
+  // 3. If it's a string that already contains a standard unit suffix, pass it directly
+  const hasUnitSuffix = /[a-zA-Z%]+$/.test(size.trim());
+  if (hasUnitSuffix) {
+    return size;
+  }
+
+  // 4. Fallback for clean digit strings without explicit units (e.g., "24")
+  const parsed = parseFloat(size);
+  return isNaN(parsed) ? "20px" : `${parsed}px`;
 };
 
 /**

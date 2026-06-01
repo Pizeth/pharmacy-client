@@ -1,4 +1,5 @@
 import { SocialButtonProps } from "@/interfaces/auth.interface";
+import { IconSize } from "@/theme";
 import {
   Box,
   Button,
@@ -10,6 +11,8 @@ import {
   useThemeProps,
 } from "@mui/material";
 
+import { normalizeIconSize } from "@/utils/themeUtils";
+
 const PREFIX = "RazethSocialButton";
 
 // The main button component
@@ -18,7 +21,27 @@ const SocialButtonRoot = styled(Box, {
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
 })(({ theme }) => ({
-  borderRadius: "50px",
+  /* ─── FULL ROW BUTTON VARIANT (Desktop + Mobile) ─── */
+  "& .MuiButton-root": {
+    borderRadius: "50px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative", // Needed to anchor the absolute positioned icon
+    // width: "100%",
+    // padding: theme.spacing(1.25, 3),
+    textTransform: "none",
+    // color: theme.vars.palette.text.primary,
+    // borderColor: theme.alpha(theme.vars.palette.text.primary, 0.15),
+    // boxShadow: theme.vars.palette.customShadows?.neumorphic,
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+
+    // "&:hover": {
+    //   transform: "translateY(-1px)",
+    //   backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.04),
+    //   borderColor: theme.alpha(theme.vars.palette.text.primary, 0.3),
+    // },
+  },
 
   /* base styles for the button */
   "& .MuiIconButton-root": {
@@ -106,14 +129,61 @@ const SocialButtonLabel = styled(Typography, {
   name: PREFIX,
   slot: "Label",
   overridesResolver: (_props, styles) => styles.label,
-})((props: { theme: Theme }) => ({
+  shouldForwardProp: (prop) => prop !== "preText",
+})<{ preText?: string }>(({ theme, preText }) => ({
   /* base styles for the label, if any */
   fontWeight: "500",
-  display: "none", // Hide by default
-  [props.theme.breakpoints.up("sm")]: {
+  // display: "none", // Hide by default
+
+  // 1. Target xs screens specifically
+  [theme.breakpoints.down("sm")]: {
+    display: "block", // Ensure label is visible on xs if that is your goal
+    "&:before": {
+      content: `"${preText}"`, // Injects "Continue with " on mobile
+    },
+  },
+
+  // 2. Target sm screens and larger
+  [theme.breakpoints.up("sm")]: {
     display: "block", // This applies for 'sm' and larger breakpoints
+    "&:before": {
+      content: '""', // Removes prefix on tablet/desktop layouts
+    },
   },
 }));
+
+/* Icon placement controller inside full row button */
+const IconButtonWrapper = styled(Box, {
+  name: PREFIX,
+  slot: "IconButtonWrapper",
+  overridesResolver: (_props, styles) => styles.iconButtonWrapper,
+  shouldForwardProp: (prop) => prop !== "size",
+})<{ size?: IconSize }>(({ theme, size }) => {
+  // Compute standard CSS string smoothly
+  const finalSize = normalizeIconSize(size);
+  return {
+    display: "flex",
+    alignItems: "center",
+
+    // On small screens/mobile, pin it cleanly to the absolute left
+    [theme.breakpoints.down("sm")]: {
+      position: "absolute",
+      left: theme.spacing(2.5),
+      top: "50%",
+      transform: "translateY(-50%)",
+    },
+
+    // On bigger screens, keep it inline next to the text
+    // [theme.breakpoints.up("sm")]: {
+    //   marginRight: theme.spacing(1.5),
+    // },
+
+    svg: {
+      width: `${finalSize}`,
+      height: `${finalSize}`,
+    },
+  };
+});
 
 // Custom styled button for social login
 export const SocialButton = (inProps: SocialButtonProps) => {
@@ -128,6 +198,7 @@ export const SocialButton = (inProps: SocialButtonProps) => {
     buttonType = "button",
     icon,
     label,
+    preText = "Continue with ",
     href = "#",
     size = "small",
     disabled = false,
@@ -150,9 +221,18 @@ export const SocialButton = (inProps: SocialButtonProps) => {
           </IconButton>
         </Tooltip>
       ) : (
-        <Button variant={variant} disabled={disabled}>
-          {icon}
-          <SocialButtonLabel variant="body2">{children}</SocialButtonLabel>
+        <Button variant={variant} disabled={disabled} fullWidth>
+          {/* {icon} */}
+          {/* {icon}
+          <SocialButtonLabel variant="body2" preText={preText}>
+            {children}
+          </SocialButtonLabel> */}
+          {/* Wrap the icon in a semantic class node for targeted layout scaling */}
+          {/* <span className="social-icon-wrap">{icon}</span> */}
+          <IconButtonWrapper size={size}>{icon}</IconButtonWrapper>
+          <SocialButtonLabel variant="body2" preText={preText}>
+            {label || children}
+          </SocialButtonLabel>
         </Button>
       )}
     </SocialButtonRoot>

@@ -123,7 +123,7 @@ const Overlay = styled(Box, {
   color: "white",
   fontFamily: "Montserrat",
   fontWeight: "bold",
-  padding: "1em 2em 1em 1em",
+  padding: "1em",
   // borderRadius: "20px",
   overflow: "hidden",
   zIndex: 1,

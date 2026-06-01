@@ -106,6 +106,7 @@ export interface SocialButtonProps extends HtmlHTMLAttributes<HTMLDivElement> /*
   className?: string;
   icon?: ReactNode;
   label?: string;
+  preText?: string;
   href?: string;
   size?: "small" | "medium" | "large";
   variant?: "text" | "outlined" | "contained";

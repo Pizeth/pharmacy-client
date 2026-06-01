@@ -264,7 +264,7 @@ const SwitchThumb = styled("span", {
           #ff7f00 35%,
           #ff8c00 55%,
           #ffa500 75%,
-          #ffd700 100%
+          #ffd700 95%
         )`,
   transform: checked
     ? "translateX(3em) translateZ(5px) rotateY(180deg)"
