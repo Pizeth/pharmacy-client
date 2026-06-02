@@ -17,6 +17,9 @@ import {
 declare module "@mui/material/styles" {
   interface Palette {
     passwordStrength: string[] | ((theme: MuiTheme) => string[]);
+    link: {
+      hover: string;
+    };
     card: string;
     customShadows: {
       neumorphic: string;
@@ -29,6 +32,9 @@ declare module "@mui/material/styles" {
   }
   interface PaletteOptions {
     passwordStrength?: string[] | ((theme: MuiTheme) => string[]);
+    link?: {
+      hover?: string;
+    };
     card?: string;
     customShadows?: {
       neumorphic: string;

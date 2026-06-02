@@ -735,9 +735,9 @@ export const normalizeIconSize = (size: IconSize | undefined): string => {
   }
 
   // 1. Handle Material UI standard semantic string variants
-  if (size === "small") return "18px";
-  if (size === "medium") return "22px";
-  if (size === "large") return "28px";
+  if (size === "small") return "20px";
+  if (size === "medium") return "24px";
+  if (size === "large") return "35px";
 
   // 2. If it's a raw number, treat it implicitly as pixels
   if (typeof size === "number") {

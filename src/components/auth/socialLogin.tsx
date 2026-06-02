@@ -50,10 +50,10 @@ const SocialLoginContent = styled(Grid, {
       transform: "scale(1.05)", // enlarge smoothly
       boxShadow: theme.shadows[3],
     },
-    "& svg": {
-      width: theme.spacing(2),
-      height: theme.spacing(2),
-    },
+    // "& svg": {
+    //   width: theme.spacing(2),
+    //   height: theme.spacing(2),
+    // },
   },
 }));
 

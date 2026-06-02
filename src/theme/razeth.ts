@@ -272,6 +272,9 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       // },
       // text: { primary: "#ffffff", secondary: "#aaaaaa" },
       passwordStrength: ["#aaaaaa", "#e76f51", "#f58700", "#0668d1", "#4caf50"],
+      link: {
+        hover: "#b91c1c",
+      },
     },
     // colorSchemes: {
     //   light: true, // MUI's default mode
@@ -367,6 +370,9 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           },
           // divider: "rgba(255, 255, 255, 0.12)",
           card: "#272935", // Black for Dark mode
+          link: {
+            hover: "#f87171",
+          },
         },
       },
       light: {
@@ -966,14 +972,18 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       },
       MuiLink: {
         styleOverrides: {
-          root: (props: { theme: Theme }) => ({
-            color: props.theme.palette.primary.main,
+          root: ({ theme }) => ({
+            color: theme.vars.palette.primary.main,
             textDecoration: "none",
+            transition: theme.transitions.create(["color"], {
+              duration: theme.transitions.duration.short, // Fast, natural UI response (~250ms)
+            }),
             "&:hover": {
               cursor: "pointer",
               textDecoration: "underline",
-              textUnderlineOffset: props.theme.spacing(0.5),
-              color: "#9d1820ff",
+              textUnderlineOffset: theme.spacing(0.5),
+              // color: "#9d1820ff",
+              color: theme.vars.palette.link.hover,
             },
           }),
         },
