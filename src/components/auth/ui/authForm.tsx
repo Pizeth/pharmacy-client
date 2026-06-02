@@ -4,8 +4,8 @@ import {
   Typography,
   Link,
   FormControlLabel,
-  Checkbox,
   CardContent,
+  Checkbox,
 } from "@mui/material";
 import { useThemeProps } from "@mui/material/styles";
 import {
@@ -16,6 +16,7 @@ import {
   Badge,
   Email,
   PasswordOutlined,
+  CheckCircle,
 } from "@mui/icons-material";
 import { AuthFormProps } from "@/interfaces/component-props.interface";
 import { useLogin, useRegister } from "@refinedev/core";
@@ -38,6 +39,8 @@ import hybridResolver from "@/lib/validations/hybridResolver";
 import { AsyncMap } from "@/types/auth";
 import { Root, Content, PasswordArea, Footer } from "../styles/authForm.style";
 import FullName from "@/components/icons/fullName";
+import RadioButtonUnchecked from "@mui/icons-material/RadioButtonUnchecked";
+import { ParticleHexBackground } from "@/components/effect/backgrounds/particleHex";
 
 // ─── Styled slots ─────────────────────────────────────────────────────────────
 
@@ -412,69 +415,77 @@ const AuthForm = (inProps: AuthFormProps) => {
         sx={sx}
         {...rest}
       >
-        <CardContent>
-          {/* Allow full slot override via children */}
-          {children || (
-            <AuthForm.content>
-              {isLogin ? (
-                // ── Sign-in fields ─────────────────────────────────────────
-                <>
-                  <TextField
-                    name="identifier"
-                    label="Username or Email"
-                    required
-                    iconStart={<Person />}
-                    rules={{ required: "Username or Email is required" }}
-                    fullWidth
-                  />
-                  <AuthForm.password>
-                    <PasswordField
-                      name="password"
-                      label="Password"
-                      iconStart={<Password />}
+        <ParticleHexBackground
+          size={7} // 1rem density hex cells
+          stroke={1} // Sleek, ultra-thin grid lines
+          gap={2} // Clear padding gaps
+          speed={32} // Twice as fast color shifting (Default was 64)
+          glowRadius={50} // Extra tight mouse trailing glow bubble
+          gridStrokeColor="rgba(255, 255, 255, 0.08)" // Translucent line integration
+        >
+          <CardContent>
+            {/* Allow full slot override via children */}
+            {children || (
+              <AuthForm.content>
+                {isLogin ? (
+                  // ── Sign-in fields ─────────────────────────────────────────
+                  <>
+                    <TextField
+                      name="identifier"
+                      label="Username or Email"
                       required
+                      iconStart={<Person />}
+                      rules={{ required: "Username or Email is required" }}
+                      fullWidth
                     />
-                  </AuthForm.password>
-                </>
-              ) : (
-                // ── Registration fields ────────────────────────────────────
-                // <>
-                //   <TextField
-                //     name="name"
-                //     label="Full Name"
-                //     iconStart={<Badge />}
-                //     rules={{ required: "Name is required" }}
-                //     fullWidth
-                //   />
-                //   <TextField
-                //     name="email"
-                //     label="Email Address"
-                //     type="email"
-                //     iconStart={<Email />}
-                //     rules={{
-                //       required: "Email is required",
-                //       // ✅ Real-time uniqueness check — debounced, no schema duplication
-                //       validate: asyncEmailRule,
-                //     }}
-                //     fullWidth
-                //   />
-                //   <TextField
-                //     name="username"
-                //     label="Username"
-                //     iconStart={<Person />}
-                //     rules={{
-                //       required: "Username is required",
-                //       // ✅ Real-time uniqueness check — debounced, no schema duplication
-                //       validate: asyncUsernameRule,
-                //     }}
-                //     fullWidth
-                //   />
-                // </>
-                <RegisterFields />
-              )}
+                    <AuthForm.password>
+                      <PasswordField
+                        name="password"
+                        label="Password"
+                        iconStart={<Password />}
+                        required
+                      />
+                    </AuthForm.password>
+                  </>
+                ) : (
+                  // ── Registration fields ────────────────────────────────────
+                  // <>
+                  //   <TextField
+                  //     name="name"
+                  //     label="Full Name"
+                  //     iconStart={<Badge />}
+                  //     rules={{ required: "Name is required" }}
+                  //     fullWidth
+                  //   />
+                  //   <TextField
+                  //     name="email"
+                  //     label="Email Address"
+                  //     type="email"
+                  //     iconStart={<Email />}
+                  //     rules={{
+                  //       required: "Email is required",
+                  //       // ✅ Real-time uniqueness check — debounced, no schema duplication
+                  //       validate: asyncEmailRule,
+                  //     }}
+                  //     fullWidth
+                  //   />
+                  //   <TextField
+                  //     name="username"
+                  //     label="Username"
+                  //     iconStart={<Person />}
+                  //     rules={{
+                  //       required: "Username is required",
+                  //       // ✅ Real-time uniqueness check — debounced, no schema duplication
+                  //       validate: asyncUsernameRule,
+                  //     }}
+                  //     fullWidth
+                  //   />
+                  // </>
+                  <RegisterFields />
+                )}
 
-              {/* ── Password fields ────────────────────────────────────── */}
-              {/* <AuthForm.password>
+                {/* ── Password fields ────────────────────────────────────── */}
+                {/* <AuthForm.password>
                 <PasswordField
                   name="password"
                   label="Password"
@@ -489,39 +500,47 @@ const AuthForm = (inProps: AuthFormProps) => {
                 )}
               </AuthForm.password> */}
 
-              {/* ── Remember me / forgot password (sign-in only) ────────── */}
-              {isLogin && (
-                <AuthForm.footer>
-                  <Typography
-                    variant="body2"
-                    component="span"
-                    color="textSecondary"
-                  >
-                    <FormControlLabel
-                      control={<Checkbox defaultChecked />}
-                      label={"Remember Me"}
-                    />
-                  </Typography>
-                  <Link
-                    component="button"
-                    type="button"
-                    variant="body2"
-                    onClick={handleForgotPassword}
-                  >
-                    {forgotPassword}
-                  </Link>
-                </AuthForm.footer>
-              )}
+                {/* ── Remember me / forgot password (sign-in only) ────────── */}
+                {isLogin && (
+                  <AuthForm.footer>
+                    <Typography
+                      variant="body2"
+                      component="span"
+                      color="textSecondary"
+                    >
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            defaultChecked
+                            size="small"
+                            // icon={<RadioButtonUnchecked />}
+                            // checkedIcon={<CheckCircle />}
+                          />
+                        }
+                        label={"Remember Me"}
+                      />
+                    </Typography>
+                    <Link
+                      component="button"
+                      type="button"
+                      variant="body2"
+                      onClick={handleForgotPassword}
+                    >
+                      {forgotPassword}
+                    </Link>
+                  </AuthForm.footer>
+                )}
 
-              {/* ── Submit button — authType drives label + icon ─────────── */}
-              <ValidatedButton
-                loading={isSubmitting}
-                authType={isLogin ? "signin" : "signup"}
-                disabled={!isReady}
-              />
-            </AuthForm.content>
-          )}
-        </CardContent>
+                {/* ── Submit button — authType drives label + icon ─────────── */}
+                <ValidatedButton
+                  loading={isSubmitting}
+                  authType={isLogin ? "signin" : "signup"}
+                  disabled={!isReady}
+                />
+              </AuthForm.content>
+            )}
+          </CardContent>
+        </ParticleHexBackground>
       </Root>
     </FormProvider>
   );
