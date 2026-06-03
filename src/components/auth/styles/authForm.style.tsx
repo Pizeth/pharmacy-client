@@ -2,6 +2,7 @@
 import { styled } from "@mui/material/styles";
 import { AuthFormProps } from "@/interfaces/component-props.interface";
 import { Box } from "@mui/material";
+import { fadeIn, fadeOut } from "@/theme/keyframes";
 
 const PREFIX = "RazethAuthForm";
 
@@ -9,10 +10,11 @@ export const Root = styled("form", {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})<AuthFormProps>(({ theme }) => ({
+})<AuthFormProps>(({ theme, mode }) => ({
   //   width: "100%",
   //   maxWidth: 420,
   //   margin: "0 auto",
+  // animation: `${mode === "signin" ? fadeIn : fadeOut} 0.75s ease`,
   ["& .MuiCardContent-root"]: {
     minWidth: 300,
     padding: `${theme.spacing(0)}`,

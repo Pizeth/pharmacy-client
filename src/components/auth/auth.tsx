@@ -52,6 +52,7 @@ import { AuthAction } from "@/types/auth";
 import ThemeToggle from "../effect/themes/themeToggle";
 import { MCS } from "../icons/socials/mcs";
 import Icons from "../icons/components/socials";
+import ParticleHexBackground from "../effect/backgrounds/particleHex";
 
 const PREFIX = "RazethAuth";
 
@@ -60,6 +61,7 @@ const Root = styled(Box, {
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
 })<AuthProps>(({ theme }) => ({
+  cursor: "url(/static/cursors/yellow.svg), auto",
   // backgroundImage: `
   //   repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
   //   repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
@@ -648,6 +650,7 @@ const Content = styled(Box, {
 })(({ theme }) => ({
   width: "100%",
   maxWidth: "100%",
+  // cursor: "url(/static/cursors/yellow.png), auto",
   // [props.theme.breakpoints.up("lg")]: {
   //   // maxWidth: "750px",
   //   maxWidth: "50%",
@@ -797,6 +800,16 @@ const LoginCard = styled(Card, {
   };
 });
 
+const ThemeToggleWrapper = styled(Box, {
+  name: PREFIX,
+  slot: "ThemeToggleWrapper",
+})(({ theme }) => ({
+  display: "flex",
+  justifyContent: "flex-end",
+  padding: "1em",
+  margin: "-1em -1em -2.5em 0",
+}));
+
 export const Auth = (inProps: AuthProps) => {
   // & {
   //   Content?: StyleComponent;
@@ -941,26 +954,27 @@ export const Auth = (inProps: AuthProps) => {
 
               {/* Form section */}
               <Grid size={{ xs: 12, md: 6 }}>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      padding: "1em",
-                      m: "-1em -1em -2.5em 0",
-                    }}
-                  >
-                    <ThemeToggle />
-                  </Box>
+                <ParticleHexBackground
+                  size={7} // 1rem density hex cells
+                  stroke={0.5} // Sleek, ultra-thin grid lines
+                  gap={0} // Clear padding gaps
+                  speed={90} // Twice as fast color shifting (Default was 64)
+                  glowRadius={25} // Extra tight mouse trailing glow bubble
+                  gridStrokeColor="rgba(255, 255, 255, 0.0125)" // Translucent line integration
+                >
+                  <CardContent>
+                    <ThemeToggleWrapper>
+                      <ThemeToggle />
+                    </ThemeToggleWrapper>
 
-                  <Box>
-                    {avatarIcon}
-                    {/* {children}
+                    <Box>
+                      {avatarIcon}
+                      {/* {children}
                       {divider}
                       {social}
                       {signUp} */}
-                    {/* Conditional rendering: Tabs or Traditional */}
-                    {/* {enableTabs ? (
+                      {/* Conditional rendering: Tabs or Traditional */}
+                      {/* {enableTabs ? (
                         <AuthTabs
                           loginForm={
                             <>
@@ -979,16 +993,16 @@ export const Auth = (inProps: AuthProps) => {
                         <>{children}</>
                       )} */}
 
-                    {/* Show Login or Signup form based on currentMode */}
-                    <Box
-                      key={currentMode} // ← This is the magic line! It forces remount and retriggers animation
-                      sx={{
-                        animation: `${
-                          currentMode === "signin" ? fadeIn : fadeOut
-                        } 0.75s ease`,
-                      }}
-                    >
-                      {/* {currentMode === "signin" ? (
+                      {/* Show Login or Signup form based on currentMode */}
+                      <Box
+                        key={currentMode} // ← This is the magic line! It forces remount and retriggers animation
+                        sx={{
+                          animation: `${
+                            currentMode === "signin" ? fadeIn : fadeOut
+                          } 0.75s ease`,
+                        }}
+                      >
+                        {/* {currentMode === "signin" ? (
                         // Login Form
                         <>{children}</>
                       ) : (
@@ -997,22 +1011,23 @@ export const Auth = (inProps: AuthProps) => {
                           <SignUpForm />
                         </>
                       )} */}
-                      <AuthForm mode={currentMode} />
-                    </Box>
+                        <AuthForm mode={currentMode} />
+                      </Box>
 
-                    {/* Toggle Link - shown after form */}
-                    {enableToggle && (
-                      <AuthNavigationLink
-                        mode={currentMode}
-                        onToggle={handleToggle}
-                      />
-                    )}
-                    {/* {authNavigationLinks} */}
-                    {/* Divider and Social Login - shown for both forms */}
-                    {divider}
-                    {social}
-                  </Box>
-                </CardContent>
+                      {/* Toggle Link - shown after form */}
+                      {enableToggle && (
+                        <AuthNavigationLink
+                          mode={currentMode}
+                          onToggle={handleToggle}
+                        />
+                      )}
+                      {/* {authNavigationLinks} */}
+                      {/* Divider and Social Login - shown for both forms */}
+                      {divider}
+                      {social}
+                    </Box>
+                  </CardContent>
+                </ParticleHexBackground>
               </Grid>
             </Grid>
           </Auth.card>

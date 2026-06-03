@@ -63,6 +63,7 @@ import { UserMenu } from "./UserSetting/Settings";
 import { th } from "date-fns/locale";
 import MCS from "../icons/socials/mcs";
 import Icons from "../icons/components/socials";
+import ParticleHexBackground from "../effect/backgrounds/particleHex";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
@@ -812,6 +813,14 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   };
 
   const drawer = (
+    // <ParticleHexBackground
+    //   size={7} // 1rem density hex cells
+    //   stroke={0.5} // Sleek, ultra-thin grid lines
+    //   gap={0} // Clear padding gaps
+    //   speed={90} // Twice as fast color shifting (Default was 64)
+    //   glowRadius={25} // Extra tight mouse trailing glow bubble
+    //   gridStrokeColor="rgba(255, 255, 255, 0.0125)" // Translucent line integration
+    // >
     <Fragment>
       <DrawerHeader>
         <NavMenuButton onClick={handleDrawerToggle} variant="side">
@@ -1025,6 +1034,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         />
       </Box>
     </Fragment>
+    // </ParticleHexBackground>
   );
 
   // 1. Initialize the engine once

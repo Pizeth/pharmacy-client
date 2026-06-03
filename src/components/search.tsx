@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useMemo, ReactNode, useEffect } from "react";
+import React, { useState, useMemo, ReactNode, useEffect, useRef } from "react";
 import Image from "next/image";
+import { styled, Box } from "@mui/material";
 
 // --- Type Definitions ---
 type SortDirection = "ascending" | "descending" | "none";
@@ -866,11 +867,11 @@ export default function AdvancedSearchPage() {
 
   // Pagination calculations
   const totalPages = Math.ceil(
-    sortedAndFilteredDocuments.length / itemsPerPage
+    sortedAndFilteredDocuments.length / itemsPerPage,
   );
   const paginatedDocuments = sortedAndFilteredDocuments.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   useEffect(() => {
@@ -888,286 +889,330 @@ export default function AdvancedSearchPage() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-100 font-sans overflow-hidden">
-      <Sidebar
-        isOpen={
-          isSidebarOpen ||
-          (typeof window !== "undefined" && window.innerWidth >= 1024)
-        }
-        isCollapsed={isDesktopCollapsed}
-      />
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        ></div>
-      )}
-      <div className="flex-1 flex flex-col min-w-0">
-        <TopHeader onToggleSidebar={handleToggleSidebar} />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          <div className="bg-white rounded-lg shadow-md p-6 w-full">
-            <header className="flex justify-between items-center pb-4 border-b border-gray-200 mb-6">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800 font-khmer">
-                  ឯកសារចូល
-                </h1>
-                <p className="text-sm text-gray-500 mt-1 font-khmer">
-                  ទំព័រដើម / ឯកសារ / ស្វែងរក
-                </p>
-              </div>
-            </header>
-
-            <div className="mb-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                <div className="sm:col-span-2 lg:col-span-3 xl:col-span-1">
-                  <label
-                    htmlFor="keywords"
-                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
-                  >
-                    ពាក្យគន្លឹះ
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                      <SearchIcon className="h-5 w-5 text-gray-400" />
-                    </span>
-                    <input
-                      type="text"
-                      id="keywords"
-                      value={keywords}
-                      onChange={(e) => setKeywords(e.target.value)}
-                      placeholder="ស្វែងរក..."
-                      className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 font-khmer text-gray-900 placeholder-gray-500"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label
-                    htmlFor="category"
-                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
-                  >
-                    ប្រភេទ
-                  </label>
-                  <CustomSelect
-                    options={categories}
-                    value={category}
-                    onChange={handleCategoryChange}
-                    placeholder="ទាំងអស់"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="subcategory"
-                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
-                  >
-                    ប្រភេទរង
-                  </label>
-                  <CustomSelect
-                    options={subcategories[category] || []}
-                    value={subcategory}
-                    onChange={setSubcategory}
-                    placeholder="ជ្រើសរើសប្រភេទ"
-                    disabled={!category}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="destination"
-                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
-                  >
-                    គោលដៅ
-                  </label>
-                  <CustomSelect
-                    options={destinations}
-                    value={destination}
-                    onChange={setDestination}
-                    placeholder="ទាំងអស់"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="priority"
-                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
-                  >
-                    អាទិភាព
-                  </label>
-                  <CustomSelect
-                    options={priorities}
-                    value={priority}
-                    onChange={setPriority}
-                    placeholder="ទាំងអស់"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="status"
-                    className="block text-sm font-medium text-gray-700 mb-1 font-khmer"
-                  >
-                    ស្ថានភាព
-                  </label>
-                  <CustomSelect
-                    options={statuses}
-                    value={status}
-                    onChange={setStatus}
-                    placeholder="ទាំងអស់"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="overflow-hidden border border-gray-200 rounded-lg">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-indigo-700">
-                    <tr>
-                      <SortableHeader
-                        sortKey="orderNumber"
-                        sortConfig={sortConfig}
-                        requestSort={requestSort}
-                      >
-                        №
-                      </SortableHeader>
-                      <SortableHeader
-                        sortKey="title"
-                        sortConfig={sortConfig}
-                        requestSort={requestSort}
-                      >
-                        ចំណងជើងឯកសារ
-                      </SortableHeader>
-                      <SortableHeader
-                        sortKey="priority"
-                        sortConfig={sortConfig}
-                        requestSort={requestSort}
-                      >
-                        អាទិភាព
-                      </SortableHeader>
-                      <SortableHeader
-                        sortKey="createdAt"
-                        sortConfig={sortConfig}
-                        requestSort={requestSort}
-                      >
-                        បង្កើតនៅ
-                      </SortableHeader>
-                      <SortableHeader
-                        sortKey="updatedAt"
-                        sortConfig={sortConfig}
-                        requestSort={requestSort}
-                      >
-                        កែប្រែនៅ
-                      </SortableHeader>
-                      <SortableHeader
-                        sortKey="destination"
-                        sortConfig={sortConfig}
-                        requestSort={requestSort}
-                      >
-                        គោលដៅ
-                      </SortableHeader>
-                      <SortableHeader
-                        sortKey="status"
-                        sortConfig={sortConfig}
-                        requestSort={requestSort}
-                      >
-                        ស្ថានភាព
-                      </SortableHeader>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider font-khmer"
-                      >
-                        សកម្មភាព
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {paginatedDocuments.length > 0 ? (
-                      paginatedDocuments.map((doc) => (
-                        <tr key={doc.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {doc.orderNumber}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a
-                              href={`/docs/${doc.id}`}
-                              className="text-indigo-600 hover:text-indigo-900 hover:underline font-khmer"
-                            >
-                              {doc.title}
-                            </a>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span
-                              className={`font-khmer px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                priorityColorMap[doc.priority]
-                              }`}
-                            >
-                              {
-                                priorities.find((p) => p.value === doc.priority)
-                                  ?.label
-                              }
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {doc.createdAt}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {doc.updatedAt}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-khmer">
-                            {
-                              destinations.find(
-                                (d) => d.value === doc.destination
-                              )?.label
-                            }
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span
-                              className={`font-khmer px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                doc.status === "Completed"
-                                  ? "bg-green-100 text-green-800"
-                                  : doc.status === "Processing"
-                                  ? "bg-blue-100 text-blue-800"
-                                  : "bg-yellow-100 text-yellow-800"
-                              }`}
-                            >
-                              {
-                                statuses.find((s) => s.value === doc.status)
-                                  ?.label
-                              }
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
-                            <div className="flex items-center justify-center gap-x-4">
-                              <button className="text-indigo-600 hover:text-indigo-900">
-                                <EditIcon />
-                              </button>
-                              <button className="text-red-600 hover:text-red-900">
-                                <DeleteIcon />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={8}
-                          className="text-center py-10 text-gray-500 font-khmer"
-                        >
-                          មិនមានឯកសារដែលត្រូវនឹងលក្ខខណ្ឌស្វែងរករបស់អ្នកទេ។
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            )}
-          </div>
-        </main>
-      </div>
-    </div>
+    <ParticleHexBackground
+      size={7} // 1rem density hex cells
+      stroke={1} // Sleek, ultra-thin grid lines
+      gap={0} // Clear padding gaps
+      speed={64} // Twice as fast color shifting (Default was 64)
+      glowRadius={50} // Extra tight mouse trailing glow bubble
+      gridStrokeColor="rgba(255, 255, 255, 0.0125)" // Translucent line integration
+    >
+      Hello
+    </ParticleHexBackground>
   );
 }
+
+const PREFIX = "ParticleHexBackground";
+
+const NEON_PALETTE = [
+  "#cb3301",
+  "#ff0066",
+  "#ff6666",
+  "#feff99",
+  "#ffff67",
+  "#ccff66",
+  "#99fe00",
+  "#fe99ff",
+  "#ff99cb",
+  "#fe349a",
+  "#cc99fe",
+  "#6599ff",
+  "#00ccff",
+  "#ffffff",
+];
+
+const wp = NEON_PALETTE.map((c) => {
+  const num = parseInt(c.replace("#", ""), 16);
+  return {
+    r: (num >> 16) & 0xff,
+    g: (num >> 8) & 0xff,
+    b: num & 0xff,
+  };
+});
+const nwp = wp.length;
+
+// ─── Grid Math Objects ───────────────────────────────────────────────────────
+
+class GridItem {
+  x: number;
+  y: number;
+  radius: number;
+  points: { x: number; y: number }[];
+
+  constructor(x: number, y: number, radius: number) {
+    this.x = x || 0;
+    this.y = y || 0;
+    this.radius = radius;
+    this.points = [];
+    this.init();
+  }
+
+  init() {
+    const ba = Math.PI / 3;
+    // Pre-calculate all 6 vertices of the hexagon to guarantee a complete cell structure
+    for (let i = 0; i < 6; i++) {
+      const a = i * ba;
+      this.points.push({
+        x: this.x + this.radius * Math.cos(a),
+        y: this.y + this.radius * Math.sin(a),
+      });
+    }
+  }
+
+  // Draw FULL closed paths to bring back the solid honeycomb grid layout
+  draw(ct: CanvasRenderingContext2D) {
+    for (let i = 0; i < 6; i++) {
+      if (i === 0) {
+        ct.moveTo(this.points[i].x, this.points[i].y);
+      } else {
+        ct.lineTo(this.points[i].x, this.points[i].y);
+      }
+    }
+    // Close the loop cleanly back to vertex 0
+    ct.lineTo(this.points[0].x, this.points[0].y);
+  }
+}
+
+class Grid {
+  cols: number;
+  rows: number;
+  items: GridItem[];
+  n: number;
+
+  constructor(
+    rows: number,
+    cols: number,
+    radius: number,
+    unitX: number,
+    unitY: number,
+    offsetX: number,
+  ) {
+    this.cols = cols || 16;
+    this.rows = rows || 16;
+    this.items = [];
+    this.n = 0;
+
+    for (let row = 0; row < this.rows; row++) {
+      const y = row * unitY;
+      for (let col = 0; col < this.cols; col++) {
+        const x = (row % 2 === 0 ? 0 : offsetX) + col * unitX;
+        this.items.push(new GridItem(x, y, radius));
+      }
+    }
+    this.n = this.items.length;
+  }
+
+  draw(ct: CanvasRenderingContext2D) {
+    for (let i = 0; i < this.n; i++) {
+      this.items[i].draw(ct);
+    }
+  }
+}
+
+// ─── MUI Slots Definition ────────────────────────────────────────────────────
+
+const Root = styled(Box, {
+  name: PREFIX,
+  slot: "Root",
+})({
+  position: "relative",
+  width: "100%",
+  height: "100%",
+  overflow: "hidden",
+});
+
+const CanvasLayer = styled("canvas", {
+  name: PREFIX,
+  slot: "CanvasLayer",
+})({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  pointerEvents: "none",
+});
+
+const ContentWrap = styled(Box, {
+  name: PREFIX,
+  slot: "ContentWrap",
+})({
+  position: "relative",
+  zIndex: 2,
+  width: "100%",
+  height: "100%",
+});
+
+// ─── Component Implementation ────────────────────────────────────────────────
+
+interface ParticleHexBackgroundProps {
+  children?: React.ReactNode;
+  size?: number;
+  stroke?: number;
+  gap?: number;
+  speed?: number;
+  glowRadius?: number;
+  gridStrokeColor?: string;
+}
+
+export const ParticleHexBackground = ({
+  children,
+  size = 12, // Adjusted slightly up for standard high-density grids
+  stroke = 1, // Sleek crisp borders
+  gap = 0, // 0 gap ensures clean shared borders like your original file
+  speed = 64,
+  glowRadius = 120, // Slightly wider glow radius to match your original preview look
+  gridStrokeColor = "rgba(255, 255, 255, 0.05)", // Perfect base line contrast
+}: ParticleHexBackgroundProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const fxCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const fxCanvas = fxCanvasRef.current;
+    if (!container || !fxCanvas) return;
+
+    const fxCtx = fxCanvas.getContext("2d");
+    if (!fxCtx) return;
+
+    let w = container.clientWidth;
+    let h = container.clientHeight;
+    let source = { x: ~~(w / 2), y: ~~(h / 2) };
+
+    let t = 0;
+    let csi = 0;
+    let requestId: number | null = null;
+    let gridInstance: Grid | null = null;
+
+    // Strict math configurations from your classic honeycomb mesh equation template
+    const unit_x = 3 * size + gap * Math.sqrt(3);
+    const unit_y = size * Math.sqrt(3) * 0.5 + 0.5 * gap;
+    const off_x = 1.5 * size + gap * Math.sqrt(3) * 0.5;
+    const f = 1 / speed;
+
+    const buildGridInstance = () => {
+      const rows = ~~(h / unit_y) + 2;
+      const cols = ~~(w / unit_x) + 2;
+      gridInstance = new Grid(rows, cols, size, unit_x, unit_y, off_x);
+    };
+
+    const neonLoop = () => {
+      if (!gridInstance) return;
+
+      const k = (t % speed) * f;
+      const r = ~~(wp[csi].r * (1 - k) + wp[(csi + 1) % nwp].r * k);
+      const g = ~~(wp[csi].g * (1 - k) + wp[(csi + 1) % nwp].g * k);
+      const b = ~~(wp[csi].b * (1 - k) + wp[(csi + 1) % nwp].b * k);
+
+      // 1. Wipe the layer frame completely transparent
+      fxCtx.globalCompositeOperation = "source-over";
+      fxCtx.clearRect(0, 0, w, h);
+
+      // 2. PASS 1: Paint the raw underlying default background mesh
+      fxCtx.lineWidth = stroke;
+      fxCtx.strokeStyle = gridStrokeColor;
+      fxCtx.beginPath();
+      gridInstance.draw(fxCtx);
+      fxCtx.stroke();
+
+      // 3. PASS 2: Create full, solid color strokes under the pointer area
+      fxCtx.lineWidth = stroke + 0.2; // Tiny weight boost to give it an emissive glow look
+      fxCtx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+      fxCtx.beginPath();
+      gridInstance.draw(fxCtx);
+      fxCtx.stroke();
+
+      // 4. PASS 3: Apply the radial masking sweep
+      const light = fxCtx.createRadialGradient(
+        source.x,
+        source.y,
+        0,
+        source.x,
+        source.y,
+        glowRadius,
+      );
+
+      const stp =
+        0.5 -
+        0.5 * Math.sin(7 * t * f) * Math.cos(5 * t * f) * Math.sin(3 * t * f);
+
+      // Pure solid mask falloff to protect theme background integrations
+      light.addColorStop(0, "rgba(255, 255, 255, 1)");
+      light.addColorStop(
+        Math.max(0, Math.min(1, stp * 0.8)),
+        "rgba(255, 255, 255, 0.6)",
+      );
+      light.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+      fxCtx.globalCompositeOperation = "destination-in";
+      fxCtx.fillStyle = light;
+      fxCtx.beginPath();
+      fxCtx.rect(0, 0, w, h);
+      fxCtx.closePath();
+      fxCtx.fill();
+
+      // 5. PASS 4: Restore normal composition and overlay base mesh lines for the dark areas
+      fxCtx.globalCompositeOperation = "source-over";
+      fxCtx.lineWidth = stroke;
+      fxCtx.strokeStyle = gridStrokeColor;
+      fxCtx.beginPath();
+      gridInstance.draw(fxCtx);
+      fxCtx.stroke();
+
+      t++;
+      if (t % speed === 0) {
+        csi++;
+        if (csi === nwp) {
+          csi = 0;
+          t = 0;
+        }
+      }
+
+      requestId = requestAnimationFrame(neonLoop);
+    };
+
+    const handleResize = () => {
+      if (!containerRef.current || !fxCanvasRef.current) return;
+      w = containerRef.current.clientWidth;
+      h = containerRef.current.clientHeight;
+
+      fxCanvasRef.current.width = w;
+      fxCanvasRef.current.height = h;
+
+      buildGridInstance();
+
+      if (!source || source.x === 0) {
+        source = { x: ~~(w / 2), y: ~~(h / 2) };
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      source = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+    };
+
+    handleResize();
+    neonLoop();
+
+    window.addEventListener("resize", handleResize);
+    container.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      container.removeEventListener("mousemove", handleMouseMove);
+      if (requestId) {
+        cancelAnimationFrame(requestId);
+      }
+    };
+  }, [size, stroke, gap, speed, glowRadius, gridStrokeColor]);
+
+  return (
+    <Root ref={containerRef}>
+      <CanvasLayer ref={fxCanvasRef} />
+      <ContentWrap>{children}</ContentWrap>
+    </Root>
+  );
+};
