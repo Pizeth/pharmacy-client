@@ -679,7 +679,7 @@ const LoginCard = styled(Card, {
   return {
     position: "relative",
     // zIndex: 2,
-    overflow: "visible",
+    // overflow: "visible",
     borderRadius: theme.spacing(2),
     boxShadow: theme.shadows[3],
     /*** Paper Texture ***/
@@ -958,7 +958,7 @@ export const Auth = (inProps: AuthProps) => {
                   size={7} // 1rem density hex cells
                   stroke={0.5} // Sleek, ultra-thin grid lines
                   gap={0} // Clear padding gaps
-                  speed={90} // Twice as fast color shifting (Default was 64)
+                  speed={64} // Twice as fast color shifting (Default was 64)
                   glowRadius={25} // Extra tight mouse trailing glow bubble
                   gridStrokeColor="rgba(255, 255, 255, 0.0125)" // Translucent line integration
                 >

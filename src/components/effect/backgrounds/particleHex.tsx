@@ -306,7 +306,8 @@ export const ParticleHexBackground = ({
   stroke = 1,
   gap = 0,
   speed = 128,
-  glowRadius = 50,
+  // glowRadius = 50,
+  glowRadius,
   //   gridStrokeColor = "rgba(42, 42, 42, 0.5)",
   gridStrokeColor = "rgba(255, 255, 255, 0.12)", // Seamless transparent overlay
 }: ParticleHexBackgroundProps) => {
@@ -324,6 +325,7 @@ export const ParticleHexBackground = ({
     // const gridCtx = gridCanvas.getContext("2d");
     if (!fxCtx /*|| !gridCtx*/) return;
 
+    // Track layout parameters dynamically
     let w = container.clientWidth;
     let h = container.clientHeight;
     // let _min = 0.75 * Math.min(w, h);
@@ -331,6 +333,9 @@ export const ParticleHexBackground = ({
     let isHovered = false; // TRACKS HOVER STATE
     let glowAlpha = 0; // ANIMATES OPACITY (0 = invisible, 1 = fully bright)
     const fadeSpeed = 0.1; // Controls how fast it fades in/out (lower = smoother)
+
+    // Define a local variable to hold the active radius calculation
+    let currentGlowRadius = glowRadius || 0.125 * Math.min(w, h);
 
     let t = 0;
     let csi = 0;
@@ -429,7 +434,7 @@ export const ParticleHexBackground = ({
           0,
           source.x,
           source.y,
-          glowRadius,
+          currentGlowRadius,
         );
 
         const stp =
@@ -504,19 +509,28 @@ export const ParticleHexBackground = ({
       requestId = requestAnimationFrame(neonLoop);
     };
 
+    // Re-architect handleResize to read structural data directly on event trigger callbacks
     const handleResize = () => {
       if (
-        !containerRef.current ||
-        !fxCanvasRef.current
+        !container ||
+        !fxCanvas
         // || !gridCanvasRef.current
       )
         return;
-      w = containerRef.current.clientWidth;
-      h = containerRef.current.clientHeight;
-      //   _min = 0.75 * Math.min(w, h);
 
-      fxCanvasRef.current.width = w;
-      fxCanvasRef.current.height = h;
+      // w = containerRef.current.clientWidth;
+      // h = containerRef.current.clientHeight;
+      // //   _min = 0.75 * Math.min(w, h);
+
+      // fxCanvasRef.current.width = w;
+      // fxCanvasRef.current.height = h;
+
+      w = container.clientWidth;
+      h = container.clientHeight;
+
+      fxCanvas.width = w;
+      fxCanvas.height = h;
+
       // gridCanvasRef.current.width = w;
       // gridCanvasRef.current.height = h;
 
@@ -530,6 +544,17 @@ export const ParticleHexBackground = ({
       // gridCtx.clearRect(0, 0, w, h);
       // gridInstance = new Grid(rows, cols, size, stroke, unit_x, unit_y, off_x);
       // gridInstance.draw(gridCtx, gridStrokeColor);
+
+      // Dynamic calculation update:
+      // If a prop was passed, use it. Otherwise, fall back to 75% of the smallest screen edge.
+      currentGlowRadius =
+        glowRadius !== undefined ? glowRadius : 0.125 * Math.min(w, h);
+
+      console.log("Resize detected. Rebuilding grid with new dimensions:", {
+        width: w,
+        height: h,
+        glowRadius: currentGlowRadius,
+      });
 
       buildGridInstance();
 
@@ -555,15 +580,31 @@ export const ParticleHexBackground = ({
     handleResize();
     neonLoop();
 
+    // ───────────────────────────────────────────────────────────────────────────
+    // THE NEW LAYOUT MONITOR COUPLING ENGINE
+    // ───────────────────────────────────────────────────────────────────────────
+    // Instantiating a native ResizeObserver detects layout box model mutations
+    // even if the user viewport doesn't shift a single pixel!
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+
+    // Begin active observation on the outer bounding box component node element
+    resizeObserver.observe(container);
+
     // Event binding
-    window.addEventListener("resize", handleResize);
+    // window.addEventListener("resize", handleResize);
+    // Bind mouse interactive events
     container.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("mouseleave", handleMouseLeave); // BIND LEAVE EVENT
 
     // Dynamic clean garbage-collection teardown loop
     return () => {
-      window.removeEventListener("resize", handleResize);
+      // Teardown observers and unbind element hooks cleanly
+      resizeObserver.disconnect();
+      // window.removeEventListener("resize", handleResize);
       container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseleave", handleMouseLeave);
       if (requestId) {
         cancelAnimationFrame(requestId);
       }
