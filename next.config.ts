@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BACKEND_URL:
       process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000",
     NEXT_PUBLIC_API_URL:
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1",
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
   },
   allowedDevOrigins: [
     "local-origin.dev",
@@ -39,8 +39,8 @@ const nextConfig: NextConfig = {
     return [
       // Proxy API calls to your NestJS backend during development
       {
-        source: "/api/v1/:path*",
-        destination: `${process.env.NEXT_PUBLIC_BACKEND_URL!}/api/v1/:path*`,
+        source: "/api/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_URL!}*`,
       },
     ];
   },

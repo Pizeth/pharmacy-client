@@ -3,7 +3,7 @@ import statusCode from "http-status-codes";
 import { debounce } from "es-toolkit/function";
 import { ValidationState, PasswordResult } from "@/interfaces/auth.interface";
 import lazyZxcvbn from "@/utils/lazyZxcvbn";
-import { zxcvbnAsync } from "@zxcvbn-ts/core";
+import { ZxcvbnFactory, ZxcvbnResult } from "@zxcvbn-ts/core";
 import { isEmpty } from "es-toolkit/compat";
 import { API_URL, PASSWORD_REGEX } from "@/types/constants";
 
@@ -133,8 +133,16 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
 export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
   // ✅ Per-instance — same fix as above
   let controller: AbortController | null = null;
-  // ✅ Per-instance lazy loader so two PasswordFields don't share state
-  let zxcvbnAsyncFn: typeof zxcvbnAsync | null = null;
+  // // ✅ Per-instance lazy loader so two PasswordFields don't share state
+  // let zxcvbnAsyncFn: typeof zxcvbnAsync | null = null;
+
+  // 👇 Type matches what loadZxcvbn now returns
+  let zxcvbnAsyncFn:
+    | ((
+        password: string,
+        userInputs?: (string | number)[],
+      ) => Promise<ZxcvbnResult>)
+    | null = null;
 
   // Debounce the heavy zxcvbn calculation
   const checkStrength = debounce(
@@ -148,18 +156,19 @@ export const createPasswordValidator = (debounceDelay = 500, threshold = 3) => {
         // 2. Lazy load zxcvbn if not already loaded
         // zxcvbn-ts accepts a signal in the options or global fetch override
         // but the pwned matcher specifically uses the global fetch
+        // 👇 Pass signal to loadZxcvbn so the pwned fetch is cancellable
+        // Only load once — reuse the same instance on subsequent calls
         if (!zxcvbnAsyncFn) {
           // Pass the controller signal to the lazy loader fetch wrapper
           zxcvbnAsyncFn = await lazyZxcvbn.loadZxcvbn(signal);
         }
 
+        // 👇 Call directly — no options needed, all encapsulated in loadZxcvbn
         const result = await zxcvbnAsyncFn(value);
 
+        // Only check once — after the async work completes
         if (signal.aborted) {
-          onResult({
-            ...DEFAULT_RESULT,
-            status: CANCELLED,
-          });
+          onResult({ ...DEFAULT_RESULT, status: CANCELLED });
           return;
         }
 

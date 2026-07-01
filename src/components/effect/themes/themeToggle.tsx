@@ -254,7 +254,7 @@ const DayNightSwitch1 = (
 
 const ThemeToggle = () => {
   const { toggleTheme, mode } = useThemeControl();
-  console.log("mode: ", mode);
+  // console.log("mode: ", mode);
 
   return <DayNightSwitch checked={mode === "dark"} onChange={toggleTheme} />;
 };

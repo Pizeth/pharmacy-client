@@ -10,10 +10,19 @@ import {
   Microsoft,
   X,
 } from "../icons/socialIcons";
-import { SocialLoginProps } from "@/interfaces/auth.interface";
-import { useCallback, useState } from "react";
+import {
+  AuthProvidersConfig,
+  SocialLoginProps,
+} from "@/interfaces/auth.interface";
+import { useCallback, useEffect, useState } from "react";
 // import { useNotify } from "ra-core";
 import SocialButton from "../icons/components/socialButton";
+import { getAuthProvidersConfig } from "@/lib/auth-config";
+import { authClient } from "@/lib/auth-client";
+import {
+  PROVIDER_REGISTRY,
+  RegisteredProviderId,
+} from "@/lib/providers/socialProvider";
 
 const PREFIX = "RazethSocialLogin";
 
@@ -110,18 +119,35 @@ const SocialLogin = (inProps: SocialLoginProps) => {
   // State management with standard useState
   // const [loading, setLoading] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
+  const [providers, setProviders] = useState<AuthProvidersConfig>({
+    social: [],
+    generic: [],
+    base: [],
+  });
+
+  useEffect(() => {
+    getAuthProvidersConfig().then(setProviders).catch(console.error);
+  }, []);
 
   const handleProviderLogin = useCallback(async (provider: string) => {
     try {
       setLoading(provider);
+      // Use authClient directly — it knows the correct baseURL + /api/auth path
+      await authClient.signIn.social({
+        provider: provider as Parameters<
+          typeof authClient.signIn.social
+        >[0]["provider"],
+        // 👈 where to redirect after OAuth
+        callbackURL: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/dashboard`,
+      });
       // setLoading(true);
 
-      const backendUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
-      const loginUrl = `${backendUrl}/auth/${provider}/login`;
+      // const backendUrl =
+      //   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
+      // const loginUrl = `${backendUrl}/auth/${provider}/login`;
 
-      // Redirect to OIDC provider
-      window.location.href = loginUrl;
+      // // Redirect to OIDC provider
+      // window.location.href = loginUrl;
     } catch (err) {
       console.error("Login error:", err);
       // notify("razeth.auth.oidc_error", {
@@ -136,26 +162,39 @@ const SocialLogin = (inProps: SocialLoginProps) => {
 
   const isLoading = useCallback((type: string) => loading === type, [loading]);
 
+  // Only render providers that are both active (from backend) AND have a registry entry
+  const activeProviders = [...providers.social, ...providers.generic].filter(
+    (key) => key in PROVIDER_REGISTRY,
+  );
+
+  // console.log("All providers:", providers);
+  // console.log("Available providers:", PROVIDER_REGISTRY);
+  // console.log("Active providers:", activeProviders);
+
   return (
     <Root container spacing={2} className={className} sx={sx} {...rest}>
-      {Object.entries(PROVIDERS).map(([key, provider]) => (
-        <SocialLogin.children key={key} size={{ xs: 12, sm: 4 }}>
-          {children || (
-            <SocialButton
-              variant="outlined"
-              icon={provider.icon}
-              onClick={() => handleProviderLogin(key)}
-              disabled={loading != null}
-            >
-              {isLoading(key) ? (
-                <CircularProgress color="inherit" size={"1rem"} thickness={3} />
-              ) : (
-                provider.name
-              )}
-            </SocialButton>
-          )}
-        </SocialLogin.children>
-      ))}
+      {activeProviders.map((key) => {
+        const entry = PROVIDER_REGISTRY[key as RegisteredProviderId];
+        const Icon = entry.icon;
+        return (
+          <SocialLogin.children key={key} size={{ xs: 12, sm: 4 }}>
+            {children || (
+              <SocialButton
+                variant="outlined"
+                icon={<Icon fontSize="medium" />}
+                onClick={() => handleProviderLogin(key)}
+                disabled={loading != null}
+              >
+                {loading === key ? (
+                  <CircularProgress color="inherit" size="1rem" thickness={3} />
+                ) : (
+                  entry.name
+                )}
+              </SocialButton>
+            )}
+          </SocialLogin.children>
+        );
+      })}
     </Root>
   );
 };
@@ -163,6 +202,46 @@ const SocialLogin = (inProps: SocialLoginProps) => {
 SocialLogin.children = SocialLoginContent;
 
 export default SocialLogin;
+
+// {
+//   Object.entries(PROVIDERS).map(([key, provider]) => (
+//     <SocialLogin.children key={key} size={{ xs: 12, sm: 4 }}>
+//       {children || (
+//         <SocialButton
+//           variant="outlined"
+//           icon={provider.icon}
+//           onClick={() => handleProviderLogin(key)}
+//           disabled={loading != null}
+//         >
+//           {isLoading(key) ? (
+//             <CircularProgress color="inherit" size={"1rem"} thickness={3} />
+//           ) : (
+//             provider.name
+//           )}
+//         </SocialButton>
+//       )}
+//     </SocialLogin.children>
+//   ));
+// }
+
+//   {Object.entries(PROVIDERS).map(([key, provider]) => (
+//     <SocialLogin.children key={key} size={{ xs: 12, sm: 4 }}>
+//       {children || (
+//         <SocialButton
+//           variant="outlined"
+//           icon={provider.icon}
+//           onClick={() => handleProviderLogin(key)}
+//           disabled={loading != null}
+//         >
+//           {isLoading(key) ? (
+//             <CircularProgress color="inherit" size={"1rem"} thickness={3} />
+//           ) : (
+//             provider.name
+//           )}
+//         </SocialButton>
+//       )}
+//     </SocialLogin.children>
+//   ))}
 
 // return (
 //   <Grid container spacing={2}>

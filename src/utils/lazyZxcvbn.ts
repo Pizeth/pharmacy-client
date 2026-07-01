@@ -7,9 +7,11 @@ export const loadDebounce = async () => {
 
 export const loadZxcvbn = async (signal?: AbortSignal) => {
   const [
-    { zxcvbnOptions, zxcvbnAsync },
-    // types,
-    { matcherPwnedFactory: PwnedMatcher },
+    // { zxcvbnOptions, zxcvbnAsync },
+    // // types,
+    // { matcherPwnedFactory: PwnedMatcher },
+    { ZxcvbnFactory, Options },
+    { matcherPwnedFactory }, // Fixed: Swapped out default import for named import
     zxcvbnEnPackage,
     zxcvbnCommonPackage,
   ] = await Promise.all([
@@ -24,8 +26,28 @@ export const loadZxcvbn = async (signal?: AbortSignal) => {
   const fetchWithSignal = (url: string, opts?: RequestInit) =>
     fetch(url, { ...opts, signal });
 
-  //   const { Match, Matcher, MatchEstimated, MatchExtended } = types as any;
-  const matcherPwned = PwnedMatcher(fetchWithSignal, zxcvbnOptions);
+  // Initialize the new modular Options instance
+  const options = new Options({
+    translations: zxcvbnEnPackage.translations,
+    graphs: zxcvbnCommonPackage.adjacencyGraphs,
+    dictionary: {
+      ...zxcvbnCommonPackage.dictionary,
+      ...zxcvbnEnPackage.dictionary,
+    },
+  });
+
+  // Construct the pwned matcher using the new options instance context
+  const matcherPwned = matcherPwnedFactory(fetchWithSignal);
+
+  // Initialize the execution factory with our options and async matchers
+  const zxcvbnInstance = new ZxcvbnFactory(options, { pwned: matcherPwned });
+
+  // Return a bound function executing the instance's asynchronous checker
+  return (password: string, userInputs?: (string | number)[]) =>
+    zxcvbnInstance.checkAsync(password, userInputs);
+
+  // //   const { Match, Matcher, MatchEstimated, MatchExtended } = types as any;
+  // const matcherPwned = PwnedMatcher(fetchWithSignal, zxcvbnOptions);
 
   // Initialize options and matcher once at the top level
   // const regexMatcher = {
@@ -66,20 +88,20 @@ export const loadZxcvbn = async (signal?: AbortSignal) => {
   //   },
   // };
 
-  const options = {
-    translations: zxcvbnEnPackage.translations,
-    graphs: zxcvbnCommonPackage.adjacencyGraphs,
-    dictionary: {
-      ...zxcvbnCommonPackage.dictionary,
-      ...zxcvbnEnPackage.dictionary,
-    },
-  };
+  // const options = {
+  //   translations: zxcvbnEnPackage.translations,
+  //   graphs: zxcvbnCommonPackage.adjacencyGraphs,
+  //   dictionary: {
+  //     ...zxcvbnCommonPackage.dictionary,
+  //     ...zxcvbnEnPackage.dictionary,
+  //   },
+  // };
 
-  zxcvbnOptions.setOptions(options);
-  // zxcvbnOptions.addMatcher("passRegex", regexMatcher);
-  zxcvbnOptions.addMatcher("pwned", matcherPwned);
+  // zxcvbnOptions.setOptions(options);
+  // // zxcvbnOptions.addMatcher("passRegex", regexMatcher);
+  // zxcvbnOptions.addMatcher("pwned", matcherPwned);
 
-  return zxcvbnAsync;
+  // return zxcvbnAsync;
 };
 
 const lazyZxcvbn = { loadDebounce, loadZxcvbn };

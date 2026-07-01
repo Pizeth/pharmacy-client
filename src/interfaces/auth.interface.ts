@@ -187,3 +187,9 @@ export interface PasswordResult extends ValidationState {
   warning?: string; // For the "required" or "regex" sync errors
   isPwned: boolean; // Specific flag for pwned check
 }
+
+export interface AuthProvidersConfig {
+  base: string[];
+  social: string[];
+  generic: string[];
+}
