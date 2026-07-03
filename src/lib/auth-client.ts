@@ -5,7 +5,7 @@ import {
   twoFactorClient,
   multiSessionClient,
   oneTapClient,
-  // oneTap,
+  adminClient, // 👈 add this — it adds role to the inferred type
 } from "better-auth/client/plugins";
 
 import { passkeyClient } from "@better-auth/passkey/client";
@@ -18,6 +18,10 @@ export const authClient = createAuthClient({
     twoFactorClient(),
     passkeyClient(),
     multiSessionClient(),
+    adminClient(), // 👈 this is what adds role to the session type
     // oneTapClient(),
   ],
 });
+
+export type ClientSession = typeof authClient.$Infer.Session;
+export type ClientUser = ClientSession["user"];

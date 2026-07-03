@@ -150,6 +150,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} ${kantumruy.variable} ${montserrat.variable} ${tactieng.variable} antialiased`}
       >
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="afterInteractive" // 👈 loads right after hydration, not lazily
+        />
         {/* <AppRouterCacheProvider>{children}+ </AppRouterCacheProvider> */}
         {/* <InitColorSchemeScript attribute="class" /> ← before everything */}
         <ThemeProviderWrapper theme={darkTheme}>

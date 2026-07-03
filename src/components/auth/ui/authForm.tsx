@@ -41,6 +41,7 @@ import { Root, Content, PasswordArea, Footer } from "../styles/authForm.style";
 import FullName from "@/components/icons/fullName";
 import RadioButtonUnchecked from "@mui/icons-material/RadioButtonUnchecked";
 import { ParticleHexBackground } from "@/components/effect/backgrounds/particleHex";
+import { Turnstile } from "@/components/securities/Turnstile";
 
 // ─── Styled slots ─────────────────────────────────────────────────────────────
 
@@ -200,6 +201,11 @@ const AuthForm = (inProps: AuthFormProps) => {
   } = props;
 
   const isLogin = mode === "signin";
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const handleCaptchaExpire = useCallback(() => {
+    setCaptchaToken(null);
+  }, []);
 
   // 🔥 async validators
   // const emailRule = useAsyncFieldRule("email");
@@ -375,7 +381,7 @@ const AuthForm = (inProps: AuthFormProps) => {
 
   const onSubmit = async (values: LoginValues | RegisterValues) => {
     if (isLogin) {
-      login(values as LoginValues); // 🔥 uses authProvider automatically
+      login({ ...values, captchaToken }); // 🔥 uses authProvider automatically
     } else {
       // Sends { email, username, password, name } to authProvider.register
       register(values as RegisterValues, {
@@ -389,6 +395,7 @@ const AuthForm = (inProps: AuthFormProps) => {
           login({
             identifier: (values as RegisterValues).email, // or values.username, depending on the backend
             password: (values as RegisterValues).password,
+            captchaToken,
           });
         },
       });
@@ -524,6 +531,12 @@ const AuthForm = (inProps: AuthFormProps) => {
                   </Link>
                 </AuthForm.footer>
               )}
+
+              <Turnstile
+                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                onSuccess={setCaptchaToken}
+                onExpire={handleCaptchaExpire}
+              />
 
               {/* ── Submit button — authType drives label + icon ─────────── */}
               <ValidatedButton

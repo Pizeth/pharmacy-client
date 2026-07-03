@@ -1,3 +1,4 @@
+import { authClient } from "@/lib/auth-client";
 export type AuthAction = "signin" | "signup";
 export type AsyncRuleType = "email" | "username" | "none";
 export type AsyncValidator = (value: string) => Promise<string | boolean>;
@@ -15,3 +16,9 @@ export type FieldStatus =
   | "error"
   | "cancelled"
   | "required";
+
+export type SignInResult =
+  | Awaited<ReturnType<typeof authClient.signIn.username>>
+  | Awaited<ReturnType<typeof authClient.signIn.email>>;
+
+export type Status = "idle" | "loading" | "success" | "error";
