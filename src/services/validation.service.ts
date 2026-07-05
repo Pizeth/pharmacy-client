@@ -51,7 +51,7 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
       onResult({ message: "Checking...", status: "loading" });
       try {
         const { data } = await axios.get(
-          `${API_URL}/validate/${source}/${value}`,
+          `${API_URL}/api/validate/${source}/${value}`,
           { signal },
         );
 
