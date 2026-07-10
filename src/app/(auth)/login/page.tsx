@@ -10,9 +10,10 @@ import {
   Paper,
   Alert,
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Auth } from "@/components/auth/auth";
+import PulseLoader from "@/components/effect/loaders/loader";
 
 export function useAuthRedirect() {
   const router = useRouter();
@@ -135,5 +136,7 @@ export function LoginPage() {
 // import { AuthForm } from "@/components/auth/AuthForm";
 
 export default function LoginPageNew() {
-  return <AuthPage type="login" renderContent={() => <Auth />} />;
+  <Suspense fallback={<PulseLoader />}>
+    return <AuthPage type="login" renderContent={() => <Auth />} />;
+  </Suspense>;
 }
