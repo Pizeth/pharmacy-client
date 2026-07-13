@@ -136,7 +136,7 @@ export function LoginPage() {
 // import { AuthForm } from "@/components/auth/AuthForm";
 
 export default function LoginPageNew() {
-  <Suspense fallback={<PulseLoader />}>
-    return <AuthPage type="login" renderContent={() => <Auth />} />;
-  </Suspense>;
+  // <Suspense fallback={<PulseLoader />}>
+  return <AuthPage type="login" renderContent={() => <Auth />} />;
+  // </Suspense>;
 }

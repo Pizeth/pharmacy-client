@@ -12,7 +12,12 @@ import { passkeyClient } from "@better-auth/passkey/client";
 
 export const authClient = createAuthClient({
   // 👆 Just the origin — Better Auth appends /api/auth internally
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
+  // baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
+  baseURL:
+    typeof window !== "undefined"
+      ? window.location.origin // 👈 same origin as Next.js
+      : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:8080",
+  // 👆 Now points to Next.js itself — cookies land on localhost:8080
   plugins: [
     usernameClient(),
     twoFactorClient(),

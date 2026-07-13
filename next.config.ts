@@ -40,7 +40,25 @@ const nextConfig: NextConfig = {
       // Proxy API calls to your NestJS backend during development
       {
         source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL!}*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL!}/api/:path*`,
+        // 👆 strips /api from destination — NestJS adds it back
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/api/:path*",
+        headers: [
+          {
+            key: "x-forwarded-host",
+            value:
+              process.env.NEXT_PUBLIC_APP_URL?.replace("http://", "").replace(
+                "https://",
+                "",
+              ) || "localhost:8080",
+          },
+        ],
       },
     ];
   },

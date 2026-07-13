@@ -53,6 +53,7 @@ import ThemeToggle from "../effect/themes/themeToggle";
 import { MCS } from "../icons/socials/mcs";
 import Icons from "../icons/components/socials";
 import ParticleHexBackground from "../effect/backgrounds/particleHex";
+import { LogoutButton } from "./ui/logoutButton";
 
 const PREFIX = "RazethAuth";
 
@@ -1025,6 +1026,7 @@ export const Auth = (inProps: AuthProps) => {
                       {/* Divider and Social Login - shown for both forms */}
                       {divider}
                       {social}
+                      <LogoutButton />
                     </Box>
                   </CardContent>
                 </ParticleHexBackground>

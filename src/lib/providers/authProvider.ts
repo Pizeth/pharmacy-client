@@ -3,7 +3,11 @@
 
 import { AuthActionResponse, AuthProvider } from "@refinedev/core";
 import { authClient } from "@/lib/auth-client";
-import { clearAxiosAuth, setupAxiosAuth } from "./dataProvider";
+import {
+  clearAuthCookies,
+  clearAxiosAuth,
+  setupAxiosAuth,
+} from "./dataProvider";
 import type { ClientUser } from "@/lib/auth-client";
 import { SignInResult } from "@/types/auth";
 
@@ -29,6 +33,15 @@ export const authProvider: AuthProvider = {
       username: identifier,
       password,
       fetchOptions: { headers },
+      /**
+       * A URL to redirect to after the user verifies their email (optional)
+       */
+      callbackURL: "/dashboard",
+      /**
+       * remember the user session after the browser is closed.
+       * @default true
+       */
+      rememberMe: false,
     });
 
     if (result.error?.status === 422 || result.error?.status === 404) {
@@ -37,6 +50,15 @@ export const authProvider: AuthProvider = {
         email: identifier,
         password,
         fetchOptions: { headers },
+        /**
+         * A URL to redirect to after the user verifies their email (optional)
+         */
+        callbackURL: "/dashboard",
+        /**
+         * remember the user session after the browser is closed.
+         * @default true
+         */
+        rememberMe: false,
       });
     }
 
@@ -84,7 +106,16 @@ export const authProvider: AuthProvider = {
 
   // ── Sign out ───────────────────────────────────────────────────────────────
   logout: async (): Promise<AuthActionResponse> => {
-    const { error } = await authClient.signOut();
+    const { error } = await authClient.signOut({
+      fetchOptions: {
+        // credentials: "include",
+        // Override baseURL just for this call
+        // baseURL: process.env.NEXT_PUBLIC_API_URL,
+        onSuccess: () => {
+          // handled by Refine's redirectTo below
+        },
+      },
+    });
 
     if (error) {
       return {
@@ -97,6 +128,8 @@ export const authProvider: AuthProvider = {
       };
     }
 
+    // Clear all auth-related cookies
+    clearAuthCookies();
     clearAxiosAuth();
     return { success: true, redirectTo: "/login" };
   },

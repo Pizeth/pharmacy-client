@@ -9,6 +9,7 @@ import {
   Popover,
   alpha,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import {
   SettingsOutlined,
@@ -47,6 +48,7 @@ import AvatarWrapper from "@/components/CustomComponents/AvatarWrapper";
 import AvatarFrame from "@/components/CustomComponents/AvatarFrame";
 // import ThemeToggle from "@/components/CustomComponents/DaynightSwitch";
 import ThemeToggle from "@/components/effect/themes/themeToggle";
+import { useLogout } from "@refinedev/core";
 
 const PREFIX = "RazethUserSetting";
 
@@ -127,6 +129,13 @@ export const UserMenu = (inProps: UserMenuProps) => {
 
   const props = useThemeProps({ props: inProps, name: PREFIX });
   const { anchorEl, open, onClose, data } = props;
+
+  const { mutate: logout, isPending: isLoggingOut } = useLogout(); // 👈 add this
+
+  const handleLogout = () => {
+    onClose();
+    logout();
+  };
 
   const storagePercent = (data.storageUsed / data.storageTotal) * 100;
 
@@ -517,7 +526,9 @@ export const UserMenu = (inProps: UserMenuProps) => {
               animate={open ? "open" : "closed"}
             >
               <MenuItem
-                onClick={onClose}
+                // onClick={onClose}
+                onClick={handleLogout} // 👈 was onClick={onClose}
+                disabled={isLoggingOut} // 👈 disable while logging out
                 sx={{
                   ...menuItemStyle,
                   borderRadius: "50px",
@@ -529,14 +540,19 @@ export const UserMenu = (inProps: UserMenuProps) => {
                 }}
               >
                 <ListItemIcon>
-                  <LogoutOutlined fontSize="small" sx={{ color: "inherit" }} />
+                  {/* <LogoutOutlined fontSize="small" sx={{ color: "inherit" }} /> */}
+                  {isLoggingOut ? (
+                    <CircularProgress size={16} color="inherit" /> // 👈 spinner while logging out
+                  ) : (
+                    <LogoutOutlined fontSize="small" color="inherit" />
+                  )}
                 </ListItemIcon>
                 <Typography
                   variant="body2"
                   fontWeight={700}
                   color="textPrimary"
                 >
-                  Logout
+                  {isLoggingOut ? "Signing out..." : "Logout"}
                 </Typography>
               </MenuItem>
             </motion.div>
