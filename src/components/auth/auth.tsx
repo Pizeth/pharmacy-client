@@ -54,6 +54,7 @@ import { MCS } from "../icons/socials/mcs";
 import Icons from "../icons/components/socials";
 import ParticleHexBackground from "../effect/backgrounds/particleHex";
 import { LogoutButton } from "./ui/logoutButton";
+import { authClient } from "@/lib/auth-client";
 
 const PREFIX = "RazethAuth";
 
@@ -860,6 +861,7 @@ export const Auth = (inProps: AuthProps) => {
       // router.push("/");
       router.push(data.authenticated ? data.redirectTo || "/fts" : "/login");
     }
+    authClient.oneTap();
     // not authenticated, stay on the login page
   }, [router, data]);
 

@@ -19,7 +19,14 @@ declare global {
   }
 }
 
-const TurnstileWrapper = styled(Box)(({ theme }) => ({
+const PREFIX = "RazethTurnstile";
+
+const TurnstileWrapper = styled(Box, {
+  name: PREFIX,
+  slot: "Root",
+  shouldForwardProp: (prop) => prop !== "status",
+  overridesResolver: (_props, styles) => styles.root,
+})<{ status: Status }>(({ theme, status }) => ({
   display: "flex",
   margin: theme.spacing(1, 0),
   // padding: theme.spacing(1, 0),
@@ -27,11 +34,20 @@ const TurnstileWrapper = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
+  height: "auto",
+  // FIX: Force line-height to 0 so the container strictly collapses to the iframe
+  lineHeight: 0,
+  fontSize: 0,
   borderRadius: theme.shape.borderRadius,
   border: `0.5px solid ${theme.vars.palette.divider}`,
+  borderColor:
+    status === "error"
+      ? theme.vars.palette.error.main
+      : status === "success"
+        ? theme.vars.palette.primary.main
+        : theme.vars.palette.divider,
   background: theme.vars.palette.background.paper,
   overflow: "hidden",
-  minHeight: "65px",
   position: "relative",
   // Match the neumorphic shadow your other inputs use
   boxShadow: theme.vars.palette.customShadows?.neumorphic,
@@ -43,6 +59,8 @@ const TurnstileWrapper = styled(Box)(({ theme }) => ({
     display: "block",
     margin: "0 auto",
     borderRadius: theme.shape.borderRadius,
+    border: "none",
+    verticalAlign: "bottom", // FIX: Removes default inline baseline spacing
   },
 }));
 
@@ -67,6 +85,8 @@ export const Turnstile = ({
   const { mode, systemMode } = useColorScheme();
   const resolvedMode = mode === "system" ? systemMode : mode;
   const turnstileTheme = resolvedMode === "dark" ? "dark" : "light";
+  // Map Material-UI mode values to Cloudflare theme specs ("light", "dark", or "auto")
+  const resolvedTheme = mode === "dark" || mode === "light" ? mode : "auto";
 
   const renderWidget = useCallback(() => {
     if (!window.turnstile || !containerRef.current) return;
@@ -75,13 +95,15 @@ export const Turnstile = ({
     if (widgetIdRef.current) {
       try {
         window.turnstile.remove(widgetIdRef.current);
-      } catch {}
+      } catch (e) {
+        console.error("Failed to remove old Turnstile widget", e);
+      }
       widgetIdRef.current = null;
     }
 
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
       sitekey: siteKey,
-      theme: turnstileTheme, // 👈 dynamic theme
+      theme: resolvedTheme, // 👈 Dynamically forces dark styling to remove bright borders
       size: "flexible",
       callback: (token: string) => {
         setStatus("success");
@@ -196,20 +218,21 @@ export const Turnstile = ({
   // return <div ref={containerRef} />;
   return (
     <TurnstileWrapper
-      sx={{
-        borderColor:
-          status === "error"
-            ? "error.main"
-            : status === "success"
-              ? "success.main"
-              : "divider",
-      }}
+      // sx={{
+      //   borderColor:
+      //     status === "error"
+      //       ? "error.main"
+      //       : status === "success"
+      //         ? "success.main"
+      //         : "divider",
+      // }}
+      status={status}
     >
       {/* Actual Turnstile iframe mounts here */}
-      <Box ref={containerRef} sx={{ width: "100%" }} />
+      <Box ref={containerRef} width="100%" />
 
       {/* Subtle status label under the widget */}
-      {status === "error" && (
+      {/* {status === "error" && (
         <StatusText color="error.main" pb={0.5}>
           Verification failed — please retry
         </StatusText>
@@ -218,7 +241,7 @@ export const Turnstile = ({
         <StatusText color="success.main" pb={0.5}>
           ✓ Verified
         </StatusText>
-      )}
+      )} */}
     </TurnstileWrapper>
   );
 };

@@ -146,7 +146,8 @@ const SocialLogin = (inProps: SocialLoginProps) => {
          * A URL to redirect after the user authenticates with the provider
          * @default "/"
          */
-        callbackURL: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/dashboard`,
+        // callbackURL: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/dashboard`,
+        callbackURL: `${window.location.origin}/auth/callback`,
         /**
          * A URL to redirect if an error occurs during the sign in process
          */

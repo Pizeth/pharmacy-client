@@ -10,6 +10,7 @@ import {
 } from "./dataProvider";
 import type { ClientUser } from "@/lib/auth-client";
 import { SignInResult } from "@/types/auth";
+import { TOKEN_KEY } from "@/types/constants";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -83,26 +84,25 @@ export const authProvider: AuthProvider = {
         },
       };
 
-    // Better Auth sessions are cookie-based — no token to store.
-    // Only call setupAxiosAuth if your dataProvider uses Bearer tokens
-    // via the JWT plugin. If you're using cookie-based auth, remove this.
-    if (data.token) setupAxiosAuth(data.token);
+    // // Better Auth sessions are cookie-based — no token to store.
+    // // Only call setupAxiosAuth if your dataProvider uses Bearer tokens
+    // // via the JWT plugin. If you're using cookie-based auth, remove this.
+    // if (data.token) setupAxiosAuth(data.token);
+
+    // Token is already captured by authClient.fetchOptions.onSuccess ✅
+    // Also set it in axios for dataProvider
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    if (token) setupAxiosAuth(token);
 
     // Respect the callbackUrl if present
-    // if (typeof window !== "undefined") {
-    //   const params = new URLSearchParams(window.location.search);
-    //   const callbackUrl = params.get("callbackUrl");
-    //   if (callbackUrl) return { success: true, redirectTo: callbackUrl };
-    // }
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const callbackUrl = params.get("callbackUrl");
+      if (callbackUrl) return { success: true, redirectTo: callbackUrl };
+    }
 
     return { success: true, redirectTo: getCallbackUrl("/dashboard") };
   },
-
-  // logout: async () => {
-  //   await authClient.signOut();
-  //   clearAxiosAuth();
-  //   return { success: true, redirectTo: "/login" };
-  // },
 
   // ── Sign out ───────────────────────────────────────────────────────────────
   logout: async (): Promise<AuthActionResponse> => {
@@ -128,6 +128,7 @@ export const authProvider: AuthProvider = {
       };
     }
 
+    sessionStorage.removeItem(TOKEN_KEY);
     // Clear all auth-related cookies
     clearAuthCookies();
     clearAxiosAuth();
@@ -137,8 +138,20 @@ export const authProvider: AuthProvider = {
   // ── Session check (called on every route) ─────────────────────────────────
   check: async () => {
     try {
-      // const session = await authClient.getSession();
-      const { data: session, error } = await authClient.getSession();
+      // If no token yet (e.g. just came back from OAuth),
+      // authClient.getSession() will use the session cookie
+      // and the response will include set-auth-token via onSuccess
+      const { data: session, error } = await authClient.getSession({
+        fetchOptions: {
+          onSuccess: (ctx) => {
+            const token = ctx.response.headers.get("set-auth-token");
+            if (token) {
+              sessionStorage.setItem(TOKEN_KEY, token);
+              setupAxiosAuth(token);
+            }
+          },
+        },
+      });
       if (error || !session)
         return {
           authenticated: false,
@@ -162,8 +175,6 @@ export const authProvider: AuthProvider = {
             error instanceof Error ? error.message : "Session check failed",
           statusCode: 401,
         },
-        // redirectTo: "/login",
-        // error: error as Error,
       };
     }
   },
@@ -213,8 +224,6 @@ export const authProvider: AuthProvider = {
       success: true,
       // Stay on login so user verifies email before entering the app
       redirectTo: "/login",
-      // redirectTo: redirectPath || "/login",
-      // error,
       successNotification: {
         message: "Registration Successful",
         description: `Welcome, ${data.user.name}! Please check your email to verify your account.`,

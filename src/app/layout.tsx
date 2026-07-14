@@ -158,7 +158,8 @@ export default function RootLayout({
         {/* <InitColorSchemeScript attribute="class" /> ← before everything */}
         <ThemeProviderWrapper theme={darkTheme}>
           <Suspense fallback={<PulseLoader />}>
-            <RefineContext>{children}</RefineContext>
+            {/* <RefineContext>{children}</RefineContext> */}
+            {children}
           </Suspense>
         </ThemeProviderWrapper>
       </body>
