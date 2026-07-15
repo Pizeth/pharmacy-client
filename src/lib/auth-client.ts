@@ -10,7 +10,7 @@ import {
 } from "better-auth/client/plugins";
 
 import { passkeyClient } from "@better-auth/passkey/client";
-import { TOKEN_KEY } from "@/types/constants";
+import { COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
 
 export const authClient = createAuthClient({
   // 👆 Just the origin — Better Auth appends /api/auth internally
@@ -23,7 +23,7 @@ export const authClient = createAuthClient({
   fetchOptions: {
     // 👇 Auto-capture token from every response
     onSuccess: (ctx) => {
-      const authToken = ctx.response.headers.get("set-auth-token");
+      const authToken = ctx.response.headers.get(COOKIE_TOKEN_KEY);
       if (authToken) {
         sessionStorage.setItem(TOKEN_KEY, authToken);
       }

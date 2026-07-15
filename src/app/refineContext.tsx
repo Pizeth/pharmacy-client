@@ -1,12 +1,13 @@
 "use client";
 
 import authProvider from "@/lib/providers/authProvider";
+import { API_URL } from "@/types/constants";
 import { Refine } from "@refinedev/core";
 import dataProvider from "@refinedev/nestjsx-crud";
 import routerProvider from "@refinedev/nextjs-router";
 import { Suspense } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 export const RefineContext = ({ children }: { children: React.ReactNode }) => {
   return (
     <Refine

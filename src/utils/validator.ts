@@ -77,6 +77,7 @@ import lodashMemoize from "lodash/memoize";
 import MsgUtils from "./msgUtils";
 import { useCallback, useRef, useState } from "react";
 import { merge } from "lodash";
+import { API_URL } from "@/types/constants";
 
 // If we define validation functions directly in JSX, it will
 // result in a new function at every render, and then trigger infinite re-render.
@@ -87,12 +88,12 @@ const memoize: Memoize = (fn: any) =>
 const zxcvbnAsync = await zxcvbn.loadZxcvbn();
 
 // const API_URL = import.meta.env.VITE_API_URL;
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const useAsyncValidator = (
   setMessage: (update: { source: string; message: string }) => void,
   clearMessage: (source: string) => void,
-  options?: UseFieldOptions
+  options?: UseFieldOptions,
 ) => {
   // const resource = useResourceContext(options);
   const translateLabel = useTranslateLabel();
@@ -114,7 +115,7 @@ export const useAsyncValidator = (
           message: "razeth.validation.required",
         },
         options,
-        callTimeOptions
+        callTimeOptions,
       );
 
       return Object.assign(
@@ -134,7 +135,7 @@ export const useAsyncValidator = (
             return Object.assign(
               MsgUtils.getMessage(message, args, value, allValues),
               { isRequired: true },
-              { status: statusCode.ACCEPTED }
+              { status: statusCode.ACCEPTED },
             );
           }
 
@@ -164,7 +165,7 @@ export const useAsyncValidator = (
                     `${API_URL}/validate/${source}/${value}`,
                     {
                       cancelToken: cancelTokenRef.current.token,
-                    }
+                    },
                   );
 
                   const data = response.data;
@@ -185,21 +186,21 @@ export const useAsyncValidator = (
                       MsgUtils.setMsg(
                         "razeth.validation.async",
                         args,
-                        statusCode.INTERNAL_SERVER_ERROR
-                      )
+                        statusCode.INTERNAL_SERVER_ERROR,
+                      ),
                     );
                   } else {
                     resolve(undefined); // Canceled request, no error
                   }
                 }
               }, interval ?? DEFAULT_DEBOUNCE);
-            }
+            },
           );
         },
-        { isRequired: true }
+        { isRequired: true },
       );
     },
-    [clearMessage, options, setMessage, translateLabel]
+    [clearMessage, options, setMessage, translateLabel],
   );
 
   return validate;
@@ -209,7 +210,7 @@ export const asyncValidator = memoize(
   (resource: string, message = "razeth.validation.async") =>
     async (value: string): Promise<FieldError> => {
       const field = StringUtils.capitalize(
-        StringUtils.getLastSegment(resource)
+        StringUtils.getLastSegment(resource),
       );
       if (!value) {
         return {
@@ -224,7 +225,7 @@ export const asyncValidator = memoize(
 
       try {
         const response = await axios.get<any>(
-          `${API_URL}/${resource}/${value}`
+          `${API_URL}/${resource}/${value}`,
         );
         const data = response.data;
         const status = statusCode.getStatusCode(data.status);
@@ -243,13 +244,13 @@ export const asyncValidator = memoize(
           message: MsgUtils.setMsg("razeth.validation.async", { error, field }),
         };
       }
-    }
+    },
 );
 
 export const serverValidator = async (
   value: string | undefined,
   resource: string,
-  message = "razeth.validation.async"
+  message = "razeth.validation.async",
 ): Promise<FieldError> => {
   const field = StringUtils.capitalize(StringUtils.getLastSegment(resource));
   if (!value) {
@@ -317,7 +318,7 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
           message: "razeth.validation.required",
         },
         options,
-        callTimeOptions
+        callTimeOptions,
       );
 
       // Define the regex for policy enforcement
@@ -357,7 +358,7 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
             if (cancelTokenRef.current) {
               cancelTokenRef.current.cancel(
-                "New validation started - Sync Fail"
+                "New validation started - Sync Fail",
               );
             }
 
@@ -368,7 +369,7 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
                 translateLabel({
                   label: "razeth.feedback.password",
                   source,
-                }) ?? ""
+                }) ?? "",
               ),
             });
             // Return a synchronous error (string or error object)
@@ -426,8 +427,8 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
                     resolve(
                       MsgUtils.setMsg(
                         warningMsg || "razeth.feedback.weak",
-                        args
-                      )
+                        args,
+                      ),
                     );
                   } else {
                     resolve(undefined);
@@ -445,20 +446,20 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
                     MsgUtils.setMsg(
                       "razeth.validation.async",
                       args,
-                      statusCode.INTERNAL_SERVER_ERROR
-                    )
+                      statusCode.INTERNAL_SERVER_ERROR,
+                    ),
                   );
                   // Ensure state reflects error on failure
                   setResult({ score: 0, feedbackMsg: "Validation failed" });
                 }
               }, interval ?? DEFAULT_DEBOUNCE);
-            }
+            },
           );
         },
-        { isRequired: true }
+        { isRequired: true },
       );
     },
-    [options, translateLabel]
+    [options, translateLabel],
   );
 
   return { passwordValidator, result };
@@ -466,7 +467,7 @@ export const usePasswordValidator = (options?: UseFieldOptions) => {
 
 export const validateStrength = async (
   value: string,
-  message = "razeth.validation.notmatch"
+  message = "razeth.validation.notmatch",
 ) => {
   if (!value)
     return {
@@ -519,7 +520,7 @@ export const validateStrength = async (
 // );
 
 export const useMatchPassword = (
-  message = ["razeth.validation.notmatch", "razeth.validation.required"]
+  message = ["razeth.validation.notmatch", "razeth.validation.required"],
 ) => {
   const translateLabel = useTranslateLabel();
 
@@ -551,7 +552,7 @@ export const useMatchPassword = (
               }),
             },
             value,
-            values
+            values,
           ); // "required"
         }
 
@@ -562,7 +563,7 @@ export const useMatchPassword = (
               message[0],
               { undefined },
               value,
-              values
+              values,
             ); // "notmatch"
           }
           return undefined; // Both match → no error
@@ -571,14 +572,14 @@ export const useMatchPassword = (
         // Fallback (shouldn’t be reached due to exhaustive checks)
         return undefined;
       },
-      { isRequired: true }
+      { isRequired: true },
     );
 
   return validateField;
 };
 
 export const useMatchPassword11 = (
-  message = ["razeth.validation.notmatch", "razeth.validation.required"]
+  message = ["razeth.validation.notmatch", "razeth.validation.required"],
 ) => {
   const translateLabel = useTranslateLabel();
 
@@ -588,33 +589,33 @@ export const useMatchPassword11 = (
         isEmpty(values.password) && isEmpty(value)
           ? undefined // Both empty
           : isEmpty(values.password) && !isEmpty(value)
-          ? MsgUtils.getMessage(message[0], { undefined }, value, values) // Password empty, rePassword not empty
-          : !isEmpty(values.password) && isEmpty(value)
-          ? MsgUtils.getMessage(
-              message[1],
-              {
-                source: props.source,
-                value,
-                field: translateLabel({
-                  label: props.label,
-                  source: props.source,
-                  resource,
-                }),
-              },
-              value,
-              values
-            ) // Password not empty, rePassword empty
-          : value !== values.password
-          ? MsgUtils.getMessage(message[0], { undefined }, value, values) // Both not empty, don’t match
-          : undefined, // Both not empty, match
-      { isRequired: true }
+            ? MsgUtils.getMessage(message[0], { undefined }, value, values) // Password empty, rePassword not empty
+            : !isEmpty(values.password) && isEmpty(value)
+              ? MsgUtils.getMessage(
+                  message[1],
+                  {
+                    source: props.source,
+                    value,
+                    field: translateLabel({
+                      label: props.label,
+                      source: props.source,
+                      resource,
+                    }),
+                  },
+                  value,
+                  values,
+                ) // Password not empty, rePassword empty
+              : value !== values.password
+                ? MsgUtils.getMessage(message[0], { undefined }, value, values) // Both not empty, don’t match
+                : undefined, // Both not empty, match
+      { isRequired: true },
     );
 
   return validateField;
 };
 
 export const useMatchPassword1 = (
-  message = ["razeth.validation.notmatch", "razeth.validation.required"]
+  message = ["razeth.validation.notmatch", "razeth.validation.required"],
 ) => {
   const translateLabel = useTranslateLabel();
   const validateField = (resource?: string) =>
@@ -633,12 +634,12 @@ export const useMatchPassword1 = (
                 }),
               },
               value,
-              values
+              values,
             )
           : value !== values.password
-          ? MsgUtils.getMessage(message[0], { undefined }, value, values)
-          : undefined,
-      { isRequired: true }
+            ? MsgUtils.getMessage(message[0], { undefined }, value, values)
+            : undefined,
+      { isRequired: true },
     );
   return validateField;
 };
@@ -648,7 +649,7 @@ export const matchPassword = memoize(
     (value: string, values: any) =>
       value !== passwordValue
         ? MsgUtils.getMessage(message, { passwordValue }, value, values)
-        : undefined
+        : undefined,
 );
 
 /**
@@ -666,7 +667,7 @@ export const matchPassword = memoize(
 export const useRequired = (
   // options?: UseFieldOptions,
   // translate?: Translate,
-  message = "razeth.validation.required"
+  message = "razeth.validation.required",
 ) => {
   const translateLabel = useTranslateLabel();
   // const resource = useResourceContext(options);
@@ -707,10 +708,10 @@ export const useRequired = (
                 }),
               },
               value,
-              values
+              values,
             )
           : undefined, // Return undefined if the value is not empty
-      { isRequired: true }
+      { isRequired: true },
     );
   };
 

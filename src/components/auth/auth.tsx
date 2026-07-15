@@ -858,10 +858,17 @@ export const Auth = (inProps: AuthProps) => {
   useEffect(() => {
     // already authenticated, redirect to the home page
     if (data) {
+      console.log("data:", data);
+      console.log(
+        "Authenticated:",
+        data.authenticated,
+        "Redirecting to:",
+        data.redirectTo || "/fts",
+      );
       // router.push("/");
       router.push(data.authenticated ? data.redirectTo || "/fts" : "/login");
     }
-    authClient.oneTap();
+    // authClient.oneTap();
     // not authenticated, stay on the login page
   }, [router, data]);
 

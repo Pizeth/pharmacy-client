@@ -5,9 +5,9 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { setupAxiosAuth } from "@/lib/providers/dataProvider";
-import { TOKEN_KEY } from "@/types/constants";
+import { API_URL, COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.razeth.com";
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.razeth.com";
 
 export default function OAuthCallbackPage() {
   const router = useRouter();
@@ -53,7 +53,7 @@ export default function OAuthCallbackPage() {
         });
 
         // 👇 Capture Bearer token from response header
-        const token = res.headers.get("set-auth-token");
+        const token = res.headers.get(COOKIE_TOKEN_KEY);
         console.log("Token from header:", token);
         console.log("All response headers:");
         res.headers.forEach((value, key) => {

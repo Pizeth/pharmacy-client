@@ -10,10 +10,11 @@ import {
 import { authProvider } from "./authProvider";
 import { StatusCodes } from "http-status-codes";
 import FormSerializer from "@/utils/formData";
+import { API_URL } from "@/types/constants";
 
 // const API_URL = process.env.API_URL; // Define your API URL here
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
+// const API_URL =
+//   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
 
 interface GetListParams {
   pagination?: { page: number; perPage: number };
@@ -78,7 +79,7 @@ interface UpdateManyParams<T extends RaRecord = any> {
 // };
 
 const createPostFormData = <T extends RaRecord>(
-  params: CreateParams<T> | UpdateParams<T>
+  params: CreateParams<T> | UpdateParams<T>,
 ): FormData => {
   const formData = new FormData();
 
@@ -110,7 +111,7 @@ const httpClient = async (url: string, options: fetchUtils.Options = {}) => {
   if (tokens.accessToken) {
     (options.headers as Headers).set(
       "Authorization",
-      `Bearer ${tokens.accessToken}`
+      `Bearer ${tokens.accessToken}`,
     );
   }
 
@@ -125,12 +126,12 @@ const httpClient = async (url: string, options: fetchUtils.Options = {}) => {
 
       // Retry the request with potentially refreshed token
       const refreshedTokens = JSON.parse(
-        localStorage.getItem("oidc_tokens") || "{}"
+        localStorage.getItem("oidc_tokens") || "{}",
       );
       if (refreshedTokens.accessToken) {
         (options.headers as Headers).set(
           "Authorization",
-          `Bearer ${refreshedTokens.accessToken}`
+          `Bearer ${refreshedTokens.accessToken}`,
         );
         return fetchUtils.fetchJson(url, options);
       }
@@ -195,7 +196,7 @@ export const dataProvider: DataProvider = {
   },
   getManyReference: async (
     resource: string,
-    params: GetManyReferenceParams
+    params: GetManyReferenceParams,
   ) => {
     const { field, order } = params.sort || { field: "", order: "" };
     if (!params.pagination) {
@@ -228,13 +229,13 @@ export const dataProvider: DataProvider = {
       data: json,
       total: parseInt(
         (headers.get("content-range") || "0").split("/").pop() || "0",
-        10
+        10,
       ),
     }));
   },
   create: async <T extends RaRecord>(
     resource: string,
-    params: CreateParams
+    params: CreateParams,
   ) => {
     // return {
     //   data: { ...params.data, id: response.json.id } as T,
@@ -265,7 +266,7 @@ export const dataProvider: DataProvider = {
   },
   update: async <T extends RaRecord>(
     resource: string,
-    params: UpdateParams<T>
+    params: UpdateParams<T>,
   ) => {
     // if (
     //   resource === "user" ||
@@ -313,7 +314,7 @@ export const dataProvider: DataProvider = {
   },
   updateMany: async <T extends RaRecord>(
     resource: string,
-    params: UpdateManyParams<T>
+    params: UpdateManyParams<T>,
   ) => {
     const responses = await Promise.all(
       params.ids.map((id) =>
@@ -324,8 +325,8 @@ export const dataProvider: DataProvider = {
         httpClient(`${API_URL}/${resource}/${id}`, {
           method: "PUT",
           body: JSON.stringify(params.data),
-        })
-      )
+        }),
+      ),
     );
     return {
       data: responses.map((response) => response.json.id),
@@ -353,8 +354,8 @@ export const dataProvider: DataProvider = {
         // })
         httpClient(`${API_URL}/${resource}/${id}`, {
           method: "DELETE",
-        })
-      )
+        }),
+      ),
     );
     return {
       data: responses.map((response) => response.json.id),

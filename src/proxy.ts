@@ -15,10 +15,10 @@ const SESSION_COOKIE_NAMES = [
   "__Secure-razeth.session_token",
 ];
 
-const API_URL =
-  process.env.BACKEND_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://api.razeth.com";
+// const API_URL =
+//   process.env.BACKEND_URL ||
+//   process.env.NEXT_PUBLIC_API_URL ||
+//   "https://api.razeth.com";
 
 export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;

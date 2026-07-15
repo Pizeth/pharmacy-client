@@ -38,7 +38,7 @@ const TurnstileWrapper = styled(Box, {
   // FIX: Force line-height to 0 so the container strictly collapses to the iframe
   lineHeight: 0,
   fontSize: 0,
-  borderRadius: theme.shape.borderRadius,
+  borderRadius: "15px",
   border: `0.5px solid ${theme.vars.palette.divider}`,
   borderColor:
     status === "error"
@@ -54,14 +54,40 @@ const TurnstileWrapper = styled(Box, {
   transition: theme.transitions.create(["border-color", "box-shadow"], {
     duration: theme.transitions.duration.short,
   }),
-  // Iframe injected by Turnstile
+
+  // 1️⃣ Target the container div containing the iframe to match the sizing scale
+  "& > div": {
+    width: "100%",
+    borderRadius: "15px",
+    // padding: theme.spacing(1),
+    clipPath: `inset(1.5px round 15px)`,
+    overflow: "hidden",
+    // transform: "scale(1.01)", // Scale up slightly to force clipped edges into layout bounds
+  },
+
+  // 2️⃣ Apply the clip-path directly onto the injected iframe
   "& iframe": {
     display: "block",
     margin: "0 auto",
-    borderRadius: theme.shape.borderRadius,
-    border: "none",
-    verticalAlign: "bottom", // FIX: Removes default inline baseline spacing
+    padding: 0,
+    borderRadius: "15px",
+    border: 0,
+    verticalAlign: "bottom",
+    transform: "translateY(-1px)",
+
+    // 👇 The Fix: Trim Cloudflare's default 1px border.
+    // Uses the component's theme border radius to align edges cleanly.
+    // clipPath: `inset(5px round ${theme.shape.borderRadius}px)`,
   },
+
+  // // Iframe injected by Turnstile
+  // "& iframe": {
+  //   display: "block",
+  //   margin: "0 auto",
+  //   borderRadius: theme.shape.borderRadius,
+  //   border: "none",
+  //   verticalAlign: "bottom", // FIX: Removes default inline baseline spacing
+  // },
 }));
 
 const StatusText = styled(Typography)(({ theme }) => ({

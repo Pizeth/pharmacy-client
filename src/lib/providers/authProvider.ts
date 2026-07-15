@@ -10,7 +10,8 @@ import {
 } from "./dataProvider";
 import type { ClientUser } from "@/lib/auth-client";
 import { SignInResult } from "@/types/auth";
-import { TOKEN_KEY } from "@/types/constants";
+import { API_URL, COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
+import { fetchSessionDirect } from "../auth/sessionFetch";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -108,7 +109,7 @@ export const authProvider: AuthProvider = {
   logout: async (): Promise<AuthActionResponse> => {
     const { error } = await authClient.signOut({
       fetchOptions: {
-        // credentials: "include",
+        credentials: "include",
         // Override baseURL just for this call
         // baseURL: process.env.NEXT_PUBLIC_API_URL,
         onSuccess: () => {
@@ -128,55 +129,34 @@ export const authProvider: AuthProvider = {
       };
     }
 
+    // const token = sessionStorage.getItem(TOKEN_KEY);
+
+    // try {
+    //   await fetch(`${API_URL}/api/auth/sign-out`, {
+    //     method: "POST",
+    //     headers: {
+    //       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    //       "Content-Type": "application/json",
+    //     },
+    //     credentials: "include", // also clears the HttpOnly cookie server-side
+    //   });
+    // } catch (error) {
+    //   console.error("Sign out request failed:", error);
+    //   return {
+    //     success: false,
+    //     error: {
+    //       name: "LogoutError",
+    //       message: error instanceof Error ? error.message : "Logout failed",
+    //       statusCode: 500,
+    //     },
+    //   };
+    // }
+
     sessionStorage.removeItem(TOKEN_KEY);
     // Clear all auth-related cookies
     clearAuthCookies();
     clearAxiosAuth();
     return { success: true, redirectTo: "/login" };
-  },
-
-  // ── Session check (called on every route) ─────────────────────────────────
-  check: async () => {
-    try {
-      // If no token yet (e.g. just came back from OAuth),
-      // authClient.getSession() will use the session cookie
-      // and the response will include set-auth-token via onSuccess
-      const { data: session, error } = await authClient.getSession({
-        fetchOptions: {
-          onSuccess: (ctx) => {
-            const token = ctx.response.headers.get("set-auth-token");
-            if (token) {
-              sessionStorage.setItem(TOKEN_KEY, token);
-              setupAxiosAuth(token);
-            }
-          },
-        },
-      });
-      if (error || !session)
-        return {
-          authenticated: false,
-          redirectTo: "/login",
-          error: {
-            name: "Unauthorized",
-            message: "No active session",
-            statusCode: 401,
-          },
-        };
-      console.log("Session data:", session);
-      return { authenticated: true };
-    } catch (error) {
-      console.error("Error occurred while checking authentication:", error);
-      return {
-        authenticated: false,
-        redirectTo: "/login",
-        error: {
-          name: "SessionError",
-          message:
-            error instanceof Error ? error.message : "Session check failed",
-          statusCode: 401,
-        },
-      };
-    }
   },
 
   // ── Register ───────────────────────────────────────────────────────────────
@@ -231,24 +211,156 @@ export const authProvider: AuthProvider = {
     };
   },
 
+  // ── Session check (called on every route) ─────────────────────────────────
+  check: async () => {
+    // try {
+    //   // Try stored JWT first — fastest path
+    //   const storedToken = sessionStorage.getItem(TOKEN_KEY);
+    //   // console.log("Stored token:", storedToken);
+
+    //   // if (storedToken) {
+    //   //   // const res = await fetch(`${API_URL}/api/auth/get-session`, {
+    //   //   //   headers: { Authorization: `Bearer ${storedToken}` },
+    //   //   //   cache: "no-store",
+    //   //   // });
+    //   //   // const session = await res.json();
+    //   //   const { session, jwt } = await fetchSessionDirect(storedToken);
+    //   //   console.log("Session check result:", { session, jwt });
+    //   //   if (session?.user) return { authenticated: true };
+    //   //   // token invalid/expired — clear and fall through
+    //   //   sessionStorage.removeItem(TOKEN_KEY);
+    //   // }
+
+    //   // // No valid token — try cookie-based session directly against API
+    //   // // (bypasses the Next.js proxy which drops the Set-Auth-Jwt header)
+    //   // const res = await fetch(`${API_URL}/api/auth/get-session`, {
+    //   //   credentials: "include",
+    //   //   cache: "no-store",
+    //   // });
+
+    //   // console.log("Session check response status:", res);
+
+    //   // const token = res.headers.get(COOKIE_TOKEN_KEY);
+    //   // const session = await res.json();
+
+    //   const { session, jwt } = await fetchSessionDirect(storedToken);
+
+    //   if (session?.user) {
+    //     console.log("Session check successful:", session);
+    //     if (jwt) {
+    //       sessionStorage.setItem(TOKEN_KEY, jwt);
+    //       setupAxiosAuth(jwt);
+    //     }
+    //     return { authenticated: true };
+    //   }
+
+    //   sessionStorage.removeItem(TOKEN_KEY);
+
+    //   return {
+    //     authenticated: false,
+    //     redirectTo: "/login",
+    //     error: {
+    //       name: "Unauthorized",
+    //       message: "No active session",
+    //       statusCode: 401,
+    //     },
+    //   };
+    // } catch (error) {
+    //   return {
+    //     authenticated: false,
+    //     redirectTo: "/login",
+    //     error: {
+    //       name: "SessionError",
+    //       message:
+    //         error instanceof Error ? error.message : "Session check failed",
+    //       statusCode: 401,
+    //     },
+    //   };
+    // }
+
+    try {
+      // If no token yet (e.g. just came back from OAuth),
+      // authClient.getSession() will use the session cookie
+      // and the response will include set-auth-token via onSuccess
+      const { data: session, error } = await authClient.getSession({
+        fetchOptions: {
+          onSuccess: (ctx) => {
+            const token = ctx.response.headers.get(COOKIE_TOKEN_KEY);
+            if (token) {
+              sessionStorage.setItem(TOKEN_KEY, token);
+              setupAxiosAuth(token);
+            }
+          },
+        },
+      });
+      if (error || !session)
+        return {
+          authenticated: false,
+          redirectTo: "/login",
+          error: {
+            name: "Unauthorized",
+            message: "No active session",
+            statusCode: 401,
+          },
+        };
+      console.log("Session data:", session);
+      return { authenticated: true };
+    } catch (error) {
+      console.error("Error occurred while checking authentication:", error);
+      return {
+        authenticated: false,
+        redirectTo: "/login",
+        error: {
+          name: "SessionError",
+          message:
+            error instanceof Error ? error.message : "Session check failed",
+          statusCode: 401,
+        },
+      };
+    }
+  },
+
   // ── Identity (used by useGetIdentity / <ThemedLayoutV2>) ──────────────────
   getIdentity: async () => {
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    if (!token) return null;
+
     try {
-      const { data: session, error } = await authClient.getSession();
+      const res = await fetch(`${API_URL}/api/auth/get-session`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      const session = await res.json();
+      if (!session?.user) return null;
 
-      if (error || !session?.user) return null;
       const user = session.user as ClientUser;
-
       return {
         id: user.id,
         name: user.name,
         email: user.email,
         avatar: user.image ?? undefined,
-        role: user.role, // ✅ now typed correctly
+        role: user.role,
       };
     } catch {
       return null;
     }
+
+    // try {
+    //   const { data: session, error } = await authClient.getSession();
+
+    //   if (error || !session?.user) return null;
+    //   const user = session.user as ClientUser;
+
+    //   return {
+    //     id: user.id,
+    //     name: user.name,
+    //     email: user.email,
+    //     avatar: user.image ?? undefined,
+    //     role: user.role, // ✅ now typed correctly
+    //   };
+    // } catch {
+    //   return null;
+    // }
 
     // const session = await authClient.getSession();
     // if (!session.data?.user) return null;
@@ -261,13 +373,26 @@ export const authProvider: AuthProvider = {
 
   // ── Permissions (wire up CASL here later) ─────────────────────────────────
   getPermissions: async () => {
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    if (!token) return null;
+
     try {
-      const { data: session } = await authClient.getSession();
-      // return session?.user?.role ?? null;
+      const res = await fetch(`${API_URL}/api/auth/get-session`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      const session = await res.json();
       return (session?.user as ClientUser | undefined)?.role ?? null;
     } catch {
       return null;
     }
+    // try {
+    //   const { data: session } = await authClient.getSession();
+    //   // return session?.user?.role ?? null;
+    //   return (session?.user as ClientUser | undefined)?.role ?? null;
+    // } catch {
+    //   return null;
+    // }
   },
 
   // ── Error handler ──────────────────────────────────────────────────────────
