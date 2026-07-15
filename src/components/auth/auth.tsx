@@ -56,6 +56,7 @@ import ParticleHexBackground from "../effect/backgrounds/particleHex";
 import { LogoutButton } from "./ui/logoutButton";
 import { authClient } from "@/lib/auth-client";
 import PulseLoader from "../effect/loaders/loader";
+import { LANDING_PAGE } from "@/types/constants";
 
 const PREFIX = "RazethAuth";
 
@@ -855,16 +856,50 @@ export const Auth = (inProps: AuthProps) => {
   const isLogin = defaultMode === "signin";
 
   const schema = isLogin ? loginSchema : registerSchema;
+  const oneTapTriggered = useRef(false);
 
   useEffect(() => {
-    // already authenticated, redirect to the home page
-    if (data) {
-      // router.push("/");
-      router.replace(data.authenticated ? data.redirectTo || "/fts" : "/login");
+    // Still checking auth status — don't do anything yet
+    if (isFetching) return;
+
+    // // Already authenticated — redirect, don't prompt One Tap
+    // if (data) {
+    //   // router.push("/");
+    //   router.replace(data.authenticated ? data.redirectTo || "/fts" : "/login");
+    // }
+
+    // No data yet, or authenticated — never prompt One Tap
+    if (!data || data.authenticated) {
+      if (data?.authenticated) {
+        router.replace(data.redirectTo || "/fts");
+      }
+      return;
     }
-    // authClient.oneTap();
+
+    // Only fire once, and only once we're certain: not fetching, data resolved, unauthenticated
+    if (oneTapTriggered.current) return;
+    oneTapTriggered.current = true;
+
+    // Only reaches here once we KNOW the user is unauthenticated
+    // and the login form is about to actually render
+    authClient.oneTap({
+      // callbackURL: `${window.location.origin}/dashboard`,
+      fetchOptions: {
+        onSuccess: () => {
+          // For example, use a router to navigate without a full reload:
+          router.replace(LANDING_PAGE); // Replace with your landing page URL
+        },
+      },
+      onPromptNotification: (notification) => {
+        console.warn(
+          "Prompt was dismissed or skipped. Consider displaying an alternative sign-in option.",
+          notification,
+        );
+        // Render your alternative UI here
+      },
+    });
     // not authenticated, stay on the login page
-  }, [router, data]);
+  }, [router, data, isFetching]);
 
   // const { mutate: login, isPending } = useLogin();
 

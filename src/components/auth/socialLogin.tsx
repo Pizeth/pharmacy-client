@@ -151,11 +151,11 @@ const SocialLogin = (inProps: SocialLoginProps) => {
         /**
          * A URL to redirect if an error occurs during the sign in process
          */
-        errorCallbackURL: "/error",
+        errorCallbackURL: `${window.location.origin}/auth/signup?error=provider_error&provider=${provider}`,
         /**
          * A URL to redirect if the user is newly registered
          */
-        newUserCallbackURL: "/welcome",
+        newUserCallbackURL: `${window.location.origin}/welcome`,
         /**
          * disable the automatic redirect to the provider.
          * @default false
