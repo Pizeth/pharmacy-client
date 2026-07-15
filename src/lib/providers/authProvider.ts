@@ -10,8 +10,13 @@ import {
 } from "./dataProvider";
 import type { ClientUser } from "@/lib/auth-client";
 import { SignInResult } from "@/types/auth";
-import { API_URL, COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
-import { fetchSessionDirect } from "../auth/sessionFetch";
+import {
+  API_URL,
+  COOKIE_TOKEN_KEY,
+  LANDING_PAGE,
+  TOKEN_KEY,
+} from "@/types/constants";
+// import { fetchSessionDirect } from "../auth/sessionFetch";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -38,7 +43,7 @@ export const authProvider: AuthProvider = {
       /**
        * A URL to redirect to after the user verifies their email (optional)
        */
-      callbackURL: "/dashboard",
+      callbackURL: LANDING_PAGE,
       /**
        * remember the user session after the browser is closed.
        * @default true
@@ -55,7 +60,7 @@ export const authProvider: AuthProvider = {
         /**
          * A URL to redirect to after the user verifies their email (optional)
          */
-        callbackURL: "/dashboard",
+        callbackURL: LANDING_PAGE,
         /**
          * remember the user session after the browser is closed.
          * @default true
@@ -102,16 +107,14 @@ export const authProvider: AuthProvider = {
       if (callbackUrl) return { success: true, redirectTo: callbackUrl };
     }
 
-    return { success: true, redirectTo: getCallbackUrl("/dashboard") };
+    return { success: true, redirectTo: getCallbackUrl(LANDING_PAGE) };
   },
 
   // ── Sign out ───────────────────────────────────────────────────────────────
   logout: async (): Promise<AuthActionResponse> => {
     const { error } = await authClient.signOut({
       fetchOptions: {
-        credentials: "include",
-        // Override baseURL just for this call
-        // baseURL: process.env.NEXT_PUBLIC_API_URL,
+        // credentials: "include",
         onSuccess: () => {
           // handled by Refine's redirectTo below
         },
@@ -194,9 +197,6 @@ export const authProvider: AuthProvider = {
           name: "RegisterError",
           message: error.message || error.statusText || "Registration failed",
           statusCode: error?.status ?? 400,
-          // message: error.message || error.statusText || "Login failed",
-          // statusCode: error.status,
-          // name: "Invalid Credentials",
         },
       };
 
@@ -212,108 +212,192 @@ export const authProvider: AuthProvider = {
   },
 
   // ── Session check (called on every route) ─────────────────────────────────
+  // check: async () => {
+  //   // try {
+  //   //   // Try stored JWT first — fastest path
+  //   //   const storedToken = sessionStorage.getItem(TOKEN_KEY);
+  //   //   // console.log("Stored token:", storedToken);
+
+  //   //   // if (storedToken) {
+  //   //   //   // const res = await fetch(`${API_URL}/api/auth/get-session`, {
+  //   //   //   //   headers: { Authorization: `Bearer ${storedToken}` },
+  //   //   //   //   cache: "no-store",
+  //   //   //   // });
+  //   //   //   // const session = await res.json();
+  //   //   //   const { session, jwt } = await fetchSessionDirect(storedToken);
+  //   //   //   console.log("Session check result:", { session, jwt });
+  //   //   //   if (session?.user) return { authenticated: true };
+  //   //   //   // token invalid/expired — clear and fall through
+  //   //   //   sessionStorage.removeItem(TOKEN_KEY);
+  //   //   // }
+
+  //   //   // // No valid token — try cookie-based session directly against API
+  //   //   // // (bypasses the Next.js proxy which drops the Set-Auth-Jwt header)
+  //   //   // const res = await fetch(`${API_URL}/api/auth/get-session`, {
+  //   //   //   credentials: "include",
+  //   //   //   cache: "no-store",
+  //   //   // });
+
+  //   //   // console.log("Session check response status:", res);
+
+  //   //   // const token = res.headers.get(COOKIE_TOKEN_KEY);
+  //   //   // const session = await res.json();
+
+  //   //   const { session, jwt } = await fetchSessionDirect(storedToken);
+
+  //   //   if (session?.user) {
+  //   //     console.log("Session check successful:", session);
+  //   //     if (jwt) {
+  //   //       sessionStorage.setItem(TOKEN_KEY, jwt);
+  //   //       setupAxiosAuth(jwt);
+  //   //     }
+  //   //     return { authenticated: true };
+  //   //   }
+
+  //   //   sessionStorage.removeItem(TOKEN_KEY);
+
+  //   //   return {
+  //   //     authenticated: false,
+  //   //     redirectTo: "/login",
+  //   //     error: {
+  //   //       name: "Unauthorized",
+  //   //       message: "No active session",
+  //   //       statusCode: 401,
+  //   //     },
+  //   //   };
+  //   // } catch (error) {
+  //   //   return {
+  //   //     authenticated: false,
+  //   //     redirectTo: "/login",
+  //   //     error: {
+  //   //       name: "SessionError",
+  //   //       message:
+  //   //         error instanceof Error ? error.message : "Session check failed",
+  //   //       statusCode: 401,
+  //   //     },
+  //   //   };
+  //   // }
+
+  //   try {
+  //     // 1. Check if we already have a JWT in storage for fast path
+  //     const storedToken = sessionStorage.getItem(TOKEN_KEY);
+  //     if (storedToken) {
+  //       setupAxiosAuth(storedToken);
+  //       // Optional: you can quickly validate it or return true if you trust the lifespan
+  //     }
+
+  //     // If no token yet (e.g. just came back from OAuth),
+  //     // authClient.getSession() will use the session cookie
+  //     // and the response will include set-auth-token via onSuccess
+  //     // 2. Fetch the session, forcing credentials for cross-domain support
+  //     const { data: session, error } = await authClient.getSession({
+  //       fetchOptions: {
+  //         credentials: "include", // 👈 Crucial: Forces browser to send cross-domain cookies
+  //         // onSuccess: (ctx) => {
+  //         //   const token = ctx.response.headers.get(COOKIE_TOKEN_KEY);
+  //         //   if (token) {
+  //         //     sessionStorage.setItem(TOKEN_KEY, token);
+  //         //     setupAxiosAuth(token);
+  //         //   }
+  //         // },
+  //         onSuccess: (ctx) => {
+  //           // Better Auth's token header is usually lowercase 'set-auth-token'
+  //           const token =
+  //             ctx.response.headers.get(COOKIE_TOKEN_KEY) ||
+  //             ctx.response.headers.get("set-auth-token");
+
+  //           if (token) {
+  //             sessionStorage.setItem(TOKEN_KEY, token);
+  //             setupAxiosAuth(token);
+  //           }
+  //         },
+  //       },
+  //     });
+
+  //     if (error || !session)
+  //       return {
+  //         authenticated: false,
+  //         redirectTo: "/login",
+  //         error: {
+  //           name: "Unauthorized",
+  //           message: "Check failed: No active session found.",
+  //           statusCode: 401,
+  //         },
+  //       };
+
+  //     // // 3. Fallback: If session is valid but onSuccess didn't catch a new token,
+  //     // // check if we can generate/pull the client token directly from the client instance.
+  //     // if (!sessionStorage.getItem(TOKEN_KEY)) {
+  //     //   // Better Auth client stores the active token in memory/internal storage
+  //     //   const clientToken =
+  //     //     authClient.getActions?.().getJwt?.() || (authClient as any).token;
+  //     //   if (clientToken) {
+  //     //     sessionStorage.setItem(TOKEN_KEY, clientToken);
+  //     //     setupAxiosAuth(clientToken);
+  //     //   }
+  //     // }
+
+  //     // 3. TypeScript-Safe Runtime Token Fallback
+  //     // If the cookie validated correctly but your browser stripped the custom response headers,
+  //     // read the internal bearer state or session cache managed natively by Better Auth:
+  //     if (!sessionStorage.getItem(TOKEN_KEY)) {
+  //       // Better Auth exposes helper contexts or a secondary internal client mapping
+  //       // We cast safely via unknown to bypass compile-time restrictions for runtime evaluation
+  //       const internalClient = authClient as any;
+  //       const fallbackToken =
+  //         internalClient.$store?.get?.("token") ||
+  //         internalClient.token ||
+  //         internalClient.getJwt?.();
+
+  //       if (fallbackToken) {
+  //         sessionStorage.setItem(TOKEN_KEY, fallbackToken);
+  //         setupAxiosAuth(fallbackToken);
+  //       }
+  //     }
+
+  //     console.log("Session verified successfully:", session);
+  //     return { authenticated: true };
+  //   } catch (error) {
+  //     console.error("Error occurred while checking authentication:", error);
+  //     sessionStorage.removeItem(TOKEN_KEY);
+  //     return {
+  //       authenticated: false,
+  //       redirectTo: "/login",
+  //       error: {
+  //         name: "SessionError",
+  //         message:
+  //           error instanceof Error ? error.message : "Session check failed",
+  //         statusCode: 401,
+  //       },
+  //     };
+  //   }
+  // },
+
   check: async () => {
-    // try {
-    //   // Try stored JWT first — fastest path
-    //   const storedToken = sessionStorage.getItem(TOKEN_KEY);
-    //   // console.log("Stored token:", storedToken);
-
-    //   // if (storedToken) {
-    //   //   // const res = await fetch(`${API_URL}/api/auth/get-session`, {
-    //   //   //   headers: { Authorization: `Bearer ${storedToken}` },
-    //   //   //   cache: "no-store",
-    //   //   // });
-    //   //   // const session = await res.json();
-    //   //   const { session, jwt } = await fetchSessionDirect(storedToken);
-    //   //   console.log("Session check result:", { session, jwt });
-    //   //   if (session?.user) return { authenticated: true };
-    //   //   // token invalid/expired — clear and fall through
-    //   //   sessionStorage.removeItem(TOKEN_KEY);
-    //   // }
-
-    //   // // No valid token — try cookie-based session directly against API
-    //   // // (bypasses the Next.js proxy which drops the Set-Auth-Jwt header)
-    //   // const res = await fetch(`${API_URL}/api/auth/get-session`, {
-    //   //   credentials: "include",
-    //   //   cache: "no-store",
-    //   // });
-
-    //   // console.log("Session check response status:", res);
-
-    //   // const token = res.headers.get(COOKIE_TOKEN_KEY);
-    //   // const session = await res.json();
-
-    //   const { session, jwt } = await fetchSessionDirect(storedToken);
-
-    //   if (session?.user) {
-    //     console.log("Session check successful:", session);
-    //     if (jwt) {
-    //       sessionStorage.setItem(TOKEN_KEY, jwt);
-    //       setupAxiosAuth(jwt);
-    //     }
-    //     return { authenticated: true };
-    //   }
-
-    //   sessionStorage.removeItem(TOKEN_KEY);
-
-    //   return {
-    //     authenticated: false,
-    //     redirectTo: "/login",
-    //     error: {
-    //       name: "Unauthorized",
-    //       message: "No active session",
-    //       statusCode: 401,
-    //     },
-    //   };
-    // } catch (error) {
-    //   return {
-    //     authenticated: false,
-    //     redirectTo: "/login",
-    //     error: {
-    //       name: "SessionError",
-    //       message:
-    //         error instanceof Error ? error.message : "Session check failed",
-    //       statusCode: 401,
-    //     },
-    //   };
-    // }
-
     try {
-      // If no token yet (e.g. just came back from OAuth),
-      // authClient.getSession() will use the session cookie
-      // and the response will include set-auth-token via onSuccess
-      const { data: session, error } = await authClient.getSession({
-        fetchOptions: {
-          onSuccess: (ctx) => {
-            const token = ctx.response.headers.get(COOKIE_TOKEN_KEY);
-            if (token) {
-              sessionStorage.setItem(TOKEN_KEY, token);
-              setupAxiosAuth(token);
-            }
-          },
-        },
-      });
-      if (error || !session)
+      const { data: session, error } = await authClient.getSession();
+
+      if (error || !session) {
+        sessionStorage.removeItem(TOKEN_KEY);
         return {
           authenticated: false,
           redirectTo: "/login",
           error: {
             name: "Unauthorized",
-            message: "No active session",
+            message: "Check failed: No active session found.",
             statusCode: 401,
           },
         };
-      console.log("Session data:", session);
+      }
+
       return { authenticated: true };
     } catch (error) {
-      console.error("Error occurred while checking authentication:", error);
       return {
         authenticated: false,
         redirectTo: "/login",
         error: {
           name: "SessionError",
-          message:
-            error instanceof Error ? error.message : "Session check failed",
+          message: "Session check failed",
           statusCode: 401,
         },
       };
@@ -322,45 +406,45 @@ export const authProvider: AuthProvider = {
 
   // ── Identity (used by useGetIdentity / <ThemedLayoutV2>) ──────────────────
   getIdentity: async () => {
-    const token = sessionStorage.getItem(TOKEN_KEY);
-    if (!token) return null;
-
-    try {
-      const res = await fetch(`${API_URL}/api/auth/get-session`, {
-        headers: { Authorization: `Bearer ${token}` },
-        cache: "no-store",
-      });
-      const session = await res.json();
-      if (!session?.user) return null;
-
-      const user = session.user as ClientUser;
-      return {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        avatar: user.image ?? undefined,
-        role: user.role,
-      };
-    } catch {
-      return null;
-    }
+    // const token = sessionStorage.getItem(TOKEN_KEY);
+    // if (!token) return null;
 
     // try {
-    //   const { data: session, error } = await authClient.getSession();
+    //   const res = await fetch(`${API_URL}/api/auth/get-session`, {
+    //     headers: { Authorization: `Bearer ${token}` },
+    //     cache: "no-store",
+    //   });
+    //   const session = await res.json();
+    //   if (!session?.user) return null;
 
-    //   if (error || !session?.user) return null;
     //   const user = session.user as ClientUser;
-
     //   return {
     //     id: user.id,
     //     name: user.name,
     //     email: user.email,
     //     avatar: user.image ?? undefined,
-    //     role: user.role, // ✅ now typed correctly
+    //     role: user.role,
     //   };
     // } catch {
     //   return null;
     // }
+
+    try {
+      const { data: session, error } = await authClient.getSession();
+
+      if (error || !session?.user) return null;
+      const user = session.user as ClientUser;
+
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar: user.image ?? undefined,
+        role: user.role, // ✅ now typed correctly
+      };
+    } catch {
+      return null;
+    }
 
     // const session = await authClient.getSession();
     // if (!session.data?.user) return null;
@@ -373,26 +457,25 @@ export const authProvider: AuthProvider = {
 
   // ── Permissions (wire up CASL here later) ─────────────────────────────────
   getPermissions: async () => {
-    const token = sessionStorage.getItem(TOKEN_KEY);
-    if (!token) return null;
+    // const token = sessionStorage.getItem(TOKEN_KEY);
+    // if (!token) return null;
 
-    try {
-      const res = await fetch(`${API_URL}/api/auth/get-session`, {
-        headers: { Authorization: `Bearer ${token}` },
-        cache: "no-store",
-      });
-      const session = await res.json();
-      return (session?.user as ClientUser | undefined)?.role ?? null;
-    } catch {
-      return null;
-    }
     // try {
-    //   const { data: session } = await authClient.getSession();
-    //   // return session?.user?.role ?? null;
+    //   const res = await fetch(`${API_URL}/api/auth/get-session`, {
+    //     headers: { Authorization: `Bearer ${token}` },
+    //     cache: "no-store",
+    //   });
+    //   const session = await res.json();
     //   return (session?.user as ClientUser | undefined)?.role ?? null;
     // } catch {
     //   return null;
     // }
+    try {
+      const { data: session } = await authClient.getSession();
+      return (session?.user as ClientUser | undefined)?.role ?? null;
+    } catch {
+      return null;
+    }
   },
 
   // ── Error handler ──────────────────────────────────────────────────────────

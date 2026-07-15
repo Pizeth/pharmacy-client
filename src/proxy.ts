@@ -129,8 +129,9 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/register", "/forgot-password"],
+  // matcher: ["/login", "/register", "/forgot-password"],
   // 👆 Only run on auth pages — not everything
+  matcher: [], // disabled
 };
 
 // export const config = {

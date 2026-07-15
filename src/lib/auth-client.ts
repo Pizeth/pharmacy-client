@@ -10,20 +10,24 @@ import {
 } from "better-auth/client/plugins";
 
 import { passkeyClient } from "@better-auth/passkey/client";
-import { COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
+import { API_URL, COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
 
 export const authClient = createAuthClient({
   // 👆 Just the origin — Better Auth appends /api/auth internally
-  // baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
-  baseURL:
-    typeof window !== "undefined"
-      ? window.location.origin // 👈 same origin as Next.js
-      : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:8080",
-  // 👆 Now points to Next.js itself — cookies land on localhost:8080
+  baseURL: API_URL, // 👈 talk directly to NestJS, not through the proxy
+  // baseURL:
+  //   typeof window !== "undefined"
+  //     ? window.location.origin // 👈 same origin as Next.js
+  //     : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:8080",
+  // // 👆 Now points to Next.js itself — cookies land on localhost:8080
+  cookiePolicy: "cross-origin",
   fetchOptions: {
+    credentials: "include", // 👈 always send cookies cross-origin
     // 👇 Auto-capture token from every response
     onSuccess: (ctx) => {
-      const authToken = ctx.response.headers.get(COOKIE_TOKEN_KEY);
+      const authToken =
+        ctx.response.headers.get(COOKIE_TOKEN_KEY) ||
+        ctx.response.headers.get("set-auth-token");
       if (authToken) {
         sessionStorage.setItem(TOKEN_KEY, authToken);
       }

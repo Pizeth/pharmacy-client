@@ -1,4 +1,5 @@
 "use client";
+import PulseLoader from "@/components/effect/loaders/loader";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
 import { Authenticated } from "@refinedev/core";
 import { NavigateToResource } from "@refinedev/nextjs-router";
@@ -15,6 +16,7 @@ export default function ProtectedLayout({
   return (
     <Authenticated
       key="protected-layout"
+      loading={<PulseLoader />} // 👈 shown while authProvider.check() is pending
       // If not authenticated, redirect to /login
       fallback={<NavigateToResource resource="login" />}
     >

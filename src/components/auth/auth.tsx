@@ -55,6 +55,7 @@ import Icons from "../icons/components/socials";
 import ParticleHexBackground from "../effect/backgrounds/particleHex";
 import { LogoutButton } from "./ui/logoutButton";
 import { authClient } from "@/lib/auth-client";
+import PulseLoader from "../effect/loaders/loader";
 
 const PREFIX = "RazethAuth";
 
@@ -858,15 +859,8 @@ export const Auth = (inProps: AuthProps) => {
   useEffect(() => {
     // already authenticated, redirect to the home page
     if (data) {
-      console.log("data:", data);
-      console.log(
-        "Authenticated:",
-        data.authenticated,
-        "Redirecting to:",
-        data.redirectTo || "/fts",
-      );
       // router.push("/");
-      router.push(data.authenticated ? data.redirectTo || "/fts" : "/login");
+      router.replace(data.authenticated ? data.redirectTo || "/fts" : "/login");
     }
     // authClient.oneTap();
     // not authenticated, stay on the login page
@@ -936,6 +930,12 @@ export const Auth = (inProps: AuthProps) => {
   //     </Stack>
   //   </form>
   // );
+
+  // 👇 Don't render the full login page until we KNOW the user is unauthenticated.
+  // Covers two cases: still checking, or check succeeded (about to redirect away).
+  if (isFetching || data?.authenticated) {
+    return <PulseLoader />; // or your app's existing loading component
+  }
 
   return (
     <Root
