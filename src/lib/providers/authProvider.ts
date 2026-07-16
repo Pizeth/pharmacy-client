@@ -441,6 +441,7 @@ export const authProvider: AuthProvider = {
         email: user.email,
         avatar: user.image ?? undefined,
         role: user.role, // ✅ now typed correctly
+        // isLinked: user.isLinked, // 👈 add this
       };
     } catch {
       return null;

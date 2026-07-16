@@ -30,17 +30,26 @@ export default function VerifyIdPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        value={officialId}
-        onChange={(e) => setOfficialId(e.target.value)}
-        placeholder="Enter your 10-digit Employee ID"
-        maxLength={10}
-      />
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <button type="submit" disabled={loading}>
-        {loading ? "Verifying..." : "Verify"}
-      </button>
-    </form>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+      }}
+    >
+      <form onSubmit={handleSubmit}>
+        <input
+          value={officialId}
+          onChange={(e) => setOfficialId(e.target.value)}
+          placeholder="Enter your 10-digit Employee ID"
+          maxLength={10}
+        />
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <button type="submit" disabled={loading}>
+          {loading ? "Verifying..." : "Verify"}
+        </button>
+      </form>
+    </div>
   );
 }

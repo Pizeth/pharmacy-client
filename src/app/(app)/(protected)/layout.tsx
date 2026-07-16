@@ -12,6 +12,8 @@ function ProfileGate({ children }: { children: React.ReactNode }) {
   }>();
   const router = useRouter();
 
+  console.log("identity", identity);
+
   useEffect(() => {
     if (!isLoading && identity && identity.isLinked === false) {
       router.replace("/verify-id");
@@ -40,7 +42,9 @@ export default function ProtectedLayout({
       // If not authenticated, redirect to /login
       fallback={<NavigateToResource resource="login" />}
     >
-      <DrawerAppBar>{children}</DrawerAppBar>
+      <ProfileGate>
+        <DrawerAppBar>{children}</DrawerAppBar>
+      </ProfileGate>
     </Authenticated>
   );
 }
