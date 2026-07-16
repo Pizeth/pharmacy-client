@@ -1,8 +1,28 @@
 "use client";
 import PulseLoader from "@/components/effect/loaders/loader";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
-import { Authenticated } from "@refinedev/core";
+import { Authenticated, useGetIdentity } from "@refinedev/core";
 import { NavigateToResource } from "@refinedev/nextjs-router";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+function ProfileGate({ children }: { children: React.ReactNode }) {
+  const { data: identity, isLoading } = useGetIdentity<{
+    isLinked?: boolean;
+  }>();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && identity && identity.isLinked === false) {
+      router.replace("/verify-id");
+    }
+  }, [isLoading, identity, router]);
+
+  if (isLoading) return <PulseLoader />;
+  if (identity?.isLinked === false) return <PulseLoader />; // brief flash before redirect
+
+  return <>{children}</>;
+}
 
 /* Layout UI */
 export default function ProtectedLayout({
