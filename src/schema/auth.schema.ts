@@ -82,5 +82,13 @@ export const registerSchema = z
     }
   });
 
+export const verifySchema = z.object({
+  officialId: z
+    .string("Official ID cannot be empty!")
+    .length(10, "Official ID must be 10 digits long")
+    .regex(/^\d+$/, "Official ID must contain numbers only"), // Ensures only 0-9 characters are allowed
+});
+
 export type LoginValues = z.infer<typeof loginSchema>;
 export type RegisterValues = z.infer<typeof registerSchema>;
+export type VerifyValues = z.infer<typeof verifySchema>;

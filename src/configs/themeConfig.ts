@@ -328,11 +328,11 @@ export const getMeteorConfig = () => {
   // 2. Generate Configs
   const configs = generateProceduralConfigs(intensity);
 
-  if (process.env.NODE_ENV !== "production") {
-    console.log(
-      `[Meteor] Generated ${intensity} meteors with interval ${interval}ms`,
-    );
-  }
+  // if (process.env.NODE_ENV !== "production") {
+  //   console.log(
+  //     `[Meteor] Generated ${intensity} meteors with interval ${interval}ms`,
+  //   );
+  // }
 
   return { enabled, interval, configs };
 };
@@ -373,9 +373,9 @@ const generateProceduralConfigs = (totalMeteors: number): MeteorConfig[] => {
     // Giant meteors (size 40) -> Speed Factor 10 (Slow)
     const velocityFactor = 15 + sizeVal * 0.25;
 
-    console.log(
-      `[Meteor] Generated ${maxCount} ${bucket.label} meteors with size ${sizeVal}vh and speed ${velocityFactor}ms/pixel`,
-    );
+    // console.log(
+    //   `[Meteor] Generated ${maxCount} ${bucket.label} meteors with size ${sizeVal}vh and speed ${velocityFactor}ms/pixel`,
+    // );
     return {
       size: `${sizeVal}vh`,
       speed: velocityFactor, // Passed to component to calculate duration

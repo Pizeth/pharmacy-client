@@ -441,7 +441,14 @@ export const authProvider: AuthProvider = {
         email: user.email,
         avatar: user.image ?? undefined,
         role: user.role, // ✅ now typed correctly
-        // isLinked: user.isLinked, // 👈 add this
+        isLinked: user.isLinked, // 👈 add this
+        profileComplete: user.profileComplete,
+        isVerified: user.emailVerified,
+        roleId: user.roleId,
+        mustChangePassword: user.mustChangePassword,
+        isEnabled: user.isEnabled,
+        isLocked: user.isLocked,
+        isActivated: user.isActivated,
       };
     } catch {
       return null;

@@ -66,4 +66,12 @@ export const authClient = createAuthClient({
 });
 
 export type ClientSession = typeof authClient.$Infer.Session;
-export type ClientUser = ClientSession["user"];
+export type ClientUser = ClientSession["user"] & {
+  isLinked?: boolean;
+  profileComplete?: boolean;
+  roleId?: number;
+  mustChangePassword?: boolean;
+  isEnabled?: boolean;
+  isLocked?: boolean;
+  isActivated?: boolean;
+};
