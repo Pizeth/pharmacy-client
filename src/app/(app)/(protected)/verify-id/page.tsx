@@ -59,7 +59,7 @@ export default function VerifyIdPage() {
   // const [error, setError] = useState<string | null>(null);
   // const [loading, setLoading] = useState(false);
 
-  const { validate: officialIdValidate } = useAsyncFieldRule("officlaId");
+  const { validate: officialIdValidate } = useAsyncFieldRule("officialId");
 
   const asyncMap = useMemo(
     () => ({ officialId: officialIdValidate }) as AsyncMap,
