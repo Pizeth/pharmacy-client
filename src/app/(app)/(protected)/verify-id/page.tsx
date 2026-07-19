@@ -22,10 +22,32 @@ export const Root = styled(Box, {
   overridesResolver: (_props, styles) => styles.root,
 })(({ theme }) => ({
   display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  minHeight: "calc(100vh - 120px)", // Forces full screen space minus header
+  flexDirection: "column", // Stack the toolbar spacer and the form area vertically
+  // height: "100dvh", // Fill the entire screen height
+  // alignItems: "center",
+  // justifyContent: "center",
+  // ...theme.mixins.toolbar,
+  // minHeight: "calc(100vh - 120px)", // Forces full screen space minus header
   width: "100%",
+  boxSizing: "border-box",
+  overflow: "hidden", // Prevents accidental sub-pixel scrolling
+  // 1. Leverage the mixin as a pseudo-element before your content
+  // "&::before": {
+  //   content: '""',
+  //   display: "block",
+  //   ...theme.mixins.toolbar, // Dynamically matches the AppBar height responsively
+  // },
+  // Calculates height by subtracting BOTH dense toolbars (48px + 48px = 96px) from the viewport
+  height: "calc(100dvh - 96px)",
+
+  // Pushes the entire centered block down so it starts right below your stacked AppBar
+  marginTop: "96px",
+
+  // Adjust coordinates if MUI responsive dense layouts change on smaller breakpoints
+  [theme.breakpoints.down("sm")]: {
+    height: "calc(100dvh - 96px)",
+    marginTop: "96px",
+  },
 }));
 
 export const FormContainer = styled("form", {
@@ -42,14 +64,16 @@ export const FormContainer = styled("form", {
   // },
   display: "flex",
   flexDirection: "row", // Stack the input, error, and button vertically
-  alignItems: "flex-start", // Center items horizontally
+  alignItems: "center", // Center items horizontally
   justifyContent: "center", // Center items vertically
-  minHeight: "calc(100vh - 120px)", // Fills the remaining screen space below your navigation bar
+  flexGrow: 1, // Fills all remaining space below the toolbar offset
+  // minHeight: "calc(100vh - 120px)", // Fills the remaining screen space below your navigation bar
   width: "100%",
   maxWidth: 600, // Prevents the fullWidth input from stretching too wide
   margin: "0 auto", // Centers the entire form block container horizontally
   gap: theme.spacing(2), // Automatically creates clean spacing between elements
   padding: theme.spacing(3),
+  // boxSizing: "border-box",
 }));
 
 export default function VerifyIdPage() {
