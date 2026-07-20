@@ -2,13 +2,28 @@ import { isValidElement } from "react";
 import { useTranslate } from "ra-core";
 import { InputHelperTextProps, ValidationError } from "react-admin";
 
-export const InputHelper = (props: InputHelperTextProps) => {
-  const { helperText, error } = props;
+export interface InputHelperProps extends InputHelperTextProps {
+  // helperText?: React.ReactNode;
+  // error?: ValidationErrorMessage;
+  // error?: string;
+  success?: string;
+}
+
+export const InputHelper = (props: InputHelperProps) => {
+  const { helperText, error, success } = props;
   const translate = useTranslate();
 
   if (error) {
     return <ValidationError error={error} />;
   }
+
+  if (success) {
+    return <span>{success}</span>;
+  }
+
+  // if (error) {
+  //   return <span style={{ color: "inherit" }}>{error}</span>; // uses your existing error color via formHelperText sx
+  // }
 
   if (helperText === false) {
     return null;

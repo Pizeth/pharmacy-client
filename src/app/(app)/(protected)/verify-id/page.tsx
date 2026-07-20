@@ -1,6 +1,6 @@
 // src/app/(protected)/verify-id/page.tsx — simplified sketch
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { verifySchema, VerifyValues } from "@/schema/auth.schema";
 import { FormProvider, useForm } from "react-hook-form";
@@ -13,6 +13,7 @@ import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import Button from "@mui/material/Button";
 import { useCreate } from "@refinedev/core";
 import Box from "@mui/material/Box";
+import FormHelperText from "@mui/material/FormHelperText";
 
 const PREFIX = "RazethVerifyIdForm";
 
@@ -38,10 +39,10 @@ export const Root = styled(Box, {
   //   ...theme.mixins.toolbar, // Dynamically matches the AppBar height responsively
   // },
   // Calculates height by subtracting BOTH dense toolbars (48px + 48px = 96px) from the viewport
-  height: "calc(100dvh - 96px)",
+  height: "calc(100dvh - 155px)",
 
   // Pushes the entire centered block down so it starts right below your stacked AppBar
-  marginTop: "96px",
+  // marginTop: "96px",
 
   // Adjust coordinates if MUI responsive dense layouts change on smaller breakpoints
   [theme.breakpoints.down("sm")]: {
@@ -65,6 +66,7 @@ export const FormContainer = styled("form", {
   display: "flex",
   flexDirection: "row", // Stack the input, error, and button vertically
   alignItems: "center", // Center items horizontally
+  // alignItems: "flex-start", // 👈 Change "center" to "flex-start"
   justifyContent: "center", // Center items vertically
   flexGrow: 1, // Fills all remaining space below the toolbar offset
   // minHeight: "calc(100vh - 120px)", // Fills the remaining screen space below your navigation bar
@@ -74,6 +76,25 @@ export const FormContainer = styled("form", {
   gap: theme.spacing(2), // Automatically creates clean spacing between elements
   padding: theme.spacing(3),
   // boxSizing: "border-box",
+}));
+
+const ButtonContainer = styled(Box, {
+  name: PREFIX,
+  slot: "ButtonContainer",
+  overridesResolver: (_props, styles) => styles.buttonContainer,
+})(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column", // Stack the input, error, and button h
+}));
+
+const ButtonWrapper = styled(Box, {
+  name: PREFIX,
+  slot: "ButtonWrapper",
+  overridesResolver: (_props, styles) => styles.buttonWrapper,
+})(({ theme }) => ({
+  height: "100%",
+  display: "flex",
+  alignItems: "center",
 }));
 
 export default function VerifyIdPage() {
@@ -102,7 +123,14 @@ export default function VerifyIdPage() {
 
   // Intercept typing updates and instantly wipe out any letters
   const currentId = form.watch("officialId");
-  useMemo(() => {
+  // useMemo(() => {
+  //   if (currentId && /[^0-9]/.test(currentId)) {
+  //     form.setValue("officialId", currentId.replace(/[^0-9]/g, ""), {
+  //       shouldValidate: true,
+  //     });
+  //   }
+  // }, [currentId, form]);
+  useEffect(() => {
     if (currentId && /[^0-9]/.test(currentId)) {
       form.setValue("officialId", currentId.replace(/[^0-9]/g, ""), {
         shouldValidate: true,
@@ -114,11 +142,25 @@ export default function VerifyIdPage() {
     mutate: create,
     mutation: { isPending },
   } = useCreate();
-  // const isSubmitting = isPending || isRegisterPending;
-  const isReady =
-    form.formState.isValid && !form.formState.isValidating && !isPending;
 
-  const { handleSubmit } = form;
+  const {
+    handleSubmit,
+    formState: { errors, isValid, isValidating, isSubmitting },
+  } = form;
+
+  // const isSubmitting = isPending || isRegisterPending;
+  const isReady = isValid && !isValidating && !isPending && !isSubmitting;
+  // console.log("isSubmitting", isSubmitting);
+  // console.log("isPending", isPending);
+  // console.log("isValid", isValid);
+  // console.log("isValidating", isValidating);
+
+  // console.log("isReady", isReady);
+
+  // Check if officialId field has an error
+  const hasError = Boolean(errors.officialId);
+  // console.log("hasError", hasError);
+  console.log("errors", errors);
 
   const onSubmit = async (values: VerifyValues) => {
     // e.preventDefault();
@@ -127,7 +169,7 @@ export default function VerifyIdPage() {
 
     create(
       {
-        resource: "account/link-employee", // Target backend API resource route
+        resource: "api/account/link-employee", // Target backend API resource route
         values: values,
       },
       {
@@ -200,14 +242,24 @@ export default function VerifyIdPage() {
           {/* <button type="submit" disabled={loading}>
           {loading ? "Verifying..." : "Verify"}
         </button> */}
-          <Button
-            loading={isPending}
-            disabled={!isReady}
-            type="submit" // Crucial fix: explicitly enables form submission
-            variant="contained" // Gives the button background color
-          >
-            {isPending ? "កំពុងផ្ទៀងផ្ទាត់..." : "ផ្ទៀងផ្ទាត់"}
-          </Button>
+          <ButtonContainer>
+            <ButtonWrapper>
+              <Button
+                loading={isPending}
+                disabled={!isReady}
+                type="submit" // Crucial fix: explicitly enables form submission
+                variant="contained" // Gives the button background color
+              >
+                {isPending ? "កំពុងផ្ទៀងផ្ទាត់..." : "ផ្ទៀងផ្ទាត់"}
+              </Button>
+            </ButtonWrapper>
+            {/* Dummy spacer matches MUI's error text height perfectly */}
+            {hasError && (
+              <FormHelperText sx={{ visibility: "hidden" }}>
+                &nbsp;
+              </FormHelperText>
+            )}
+          </ButtonContainer>
         </FormContainer>
       </FormProvider>
     </Root>

@@ -79,6 +79,7 @@ export const useFieldValidation = (source: string, debounceDelay = 500) => {
 export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
   // const [status, setStatus] = useState<FieldStatus>("idle");
   const setLoading = useSetAtom(setValidationLoadingAtom);
+  const setMessage = useSetAtom(setValidationMessageAtom); // 👈 add this
 
   const validator = useMemo(
     () => createAsyncValidator(source, debounceDelay),
@@ -154,10 +155,14 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
           //               RHF's isValidating clears; the next call will validate
           if (result.status === "loading") return; // API in-flight, wait
           setLoading({ source, loading: false }); // ← terminal: clear loading
+
           if (result.status === "cancelled") {
             resolve(true);
             return;
           }
+
+          // 👇 Always store the message — success or failure — for display
+          setMessage({ source, message: result.message ?? "" });
 
           // ✅ Return the message string so hybridResolver can surface it
           resolve(
@@ -403,6 +408,13 @@ export const usePasswordValidation = (
           //   clearScore(source);
           // }
           setMessage({ source, message: result.warning || "" });
+          setMessage({
+            source,
+            message:
+              result.status === "success"
+                ? "Password strength is good"
+                : result.warning || "",
+          });
           setScore({ source, score: result.score });
           resolve(result.status === "success" ? true : result.message);
         });

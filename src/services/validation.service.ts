@@ -30,9 +30,11 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
 
   const validator = debounce(
     async (value: string, onResult: (res: ValidationState) => void) => {
+      const cacheKey = `${source}:${value}`; // 👈 namespace by source
+
       // 🔥 CACHE HIT
-      if (cache.has(value)) {
-        const cached = cache.get(value);
+      if (cache.has(cacheKey)) {
+        const cached = cache.get(cacheKey);
         onResult({
           message: cached === true ? "Available" : (cached as string),
           status: cached === true ? "success" : "error",
@@ -60,16 +62,25 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
         if (signal.aborted) return;
 
         // console.log("Validation response:", data); // Debug log
-        const { status, message } = data;
+        const { statusCode: responseStatus, message } = data;
 
         // Cache the result for future calls with the same value
         cache.set(
-          value,
-          status === statusCode.OK ? true : message || "Invalid",
+          cacheKey,
+          responseStatus === statusCode.OK ? true : message || "Invalid",
+        );
+
+        console.log("data", data);
+
+        console.log(
+          "Validation result:",
+          responseStatus,
+          message,
+          statusCode.OK,
         );
 
         onResult(
-          status === statusCode.OK
+          responseStatus === statusCode.OK
             ? { message: message || "Available", status: "success" }
             : { message: message || "Invalid", status: "error" },
         );

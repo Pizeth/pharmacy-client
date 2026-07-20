@@ -19,6 +19,7 @@ import { useAsyncFieldValidation } from "@/lib/hooks/useFieldValidation";
 import {
   setValidationLoadingAtom,
   validationLoadingAtom,
+  validationMessagesAtom,
 } from "@/Stores/validationStore";
 import { useAtomValue, useSetAtom } from "jotai";
 import { InputHelper } from "../CustomComponents/InputHelper";
@@ -42,6 +43,7 @@ const ControlledInput = ({
   const rootRef = useRef<HTMLDivElement>(null);
   const isMounted = useRef(false);
   const loadings = useAtomValue(validationLoadingAtom);
+  const messages = useAtomValue(validationMessagesAtom); // 👈 add this
   const setLoading = useSetAtom(setValidationLoadingAtom);
   const isFieldValidating = loadings[name] ?? false;
 
@@ -113,10 +115,11 @@ const ControlledInput = ({
   }, [name, setLoading]);
 
   const errMsg = fieldState.error?.message;
+  const successMsg = !fieldState.invalid ? messages[name] : undefined; // 👈 add this
   const renderHelperText = !!(
     helperText ||
     errMsg ||
-    // successMessage ||
+    successMsg || // 👈 include success in the render condition
     fieldState.invalid
   );
 
@@ -141,6 +144,7 @@ const ControlledInput = ({
               // Show validation message only when NOT in validating state
               fieldState.isValidating ? undefined : errMsg
             }
+            success={fieldState.isValidating ? undefined : successMsg} // 👈 pass success separately
             // helperText={
             //   // Show "Validating..." text during async validation
             //   fieldState.isValidating ? "Validating..." : helperText
