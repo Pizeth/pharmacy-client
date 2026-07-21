@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useForm, FormProvider, useFormContext } from "react-hook-form";
+import {
+  useForm,
+  FormProvider,
+  useFormContext,
+  useWatch,
+} from "react-hook-form";
 import {
   Typography,
   Link,
@@ -49,8 +54,8 @@ const PREFIX = "RazethAuthForm";
 
 // ─── Confirm password — needs watch("password") from FormProvider context ─────
 const ConfirmPasswordFieldOld = () => {
-  const { watch } = useFormContext();
-  const passwordValue: string = watch("password") ?? "";
+  const { control } = useFormContext();
+  const passwordValue: string = useWatch({ control, name: "password" }) ?? "";
   return (
     <PasswordField
       name="confirmPassword"
@@ -108,8 +113,11 @@ const RegisterFieldsOld = () => {
 
 // ─── Confirm password — needs watch("password") from context ──────────────────
 const ConfirmPasswordField = () => {
-  const { watch } = useFormContext();
-  const passwordValue: string = watch("password") ?? "";
+  // const { watch } = useFormContext();
+  // const passwordValue: string = watch("password") ?? "";
+  const { control } = useFormContext();
+  const passwordValue: string = useWatch({ control, name: "password" }) ?? "";
+
   return (
     <PasswordField
       name="confirmPassword"

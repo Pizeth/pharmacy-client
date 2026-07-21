@@ -96,16 +96,31 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
       } catch (e) {
         // ✅ Always call onResult on abort so the Promise in useAsyncFieldRule
         //    can resolve and RHF's isValidating flag clears.
-        if (axios.isCancel(e) || (e as Error)?.name === "AbortError") {
+        if (
+          signal.aborted ||
+          axios.isCancel(e) ||
+          (e as Error)?.name === "AbortError"
+        ) {
           onResult({ message: "", status: CANCELLED });
-          // return;
+          return;
         }
+
+        if (axios.isAxiosError(e) && e.response) {
+          // 404 / 409 etc — genuine validation failure, not a network error
+          const message = e.response.data?.message || "Invalid";
+          cache.set(cacheKey, message);
+          onResult({ message, status: "error" });
+          return;
+        }
+
+        // True network/server failure
         onResult({
           message:
             statusCode.getStatusText(statusCode.SERVICE_UNAVAILABLE) ||
             "Validation service unavailable",
           status: "error",
         });
+
         // queueMicrotask(() => {
         //   if (axios.isCancel(e) || (e as Error)?.name === "AbortError") {
         //     onResult({ message: "", status: CANCELLED });

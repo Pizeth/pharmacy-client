@@ -154,7 +154,8 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
           // "cancelled" → superseded by a newer keystroke, resolve clean so
           //               RHF's isValidating clears; the next call will validate
           if (result.status === "loading") return; // API in-flight, wait
-          setLoading({ source, loading: false }); // ← terminal: clear loading
+          // setLoading({ source, loading: false }); // ← terminal: clear loading
+          queueMicrotask(() => setLoading({ source, loading: false })); // ← terminal: clear loading
 
           if (result.status === "cancelled") {
             resolve(true);
@@ -162,7 +163,10 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
           }
 
           // 👇 Always store the message — success or failure — for display
-          setMessage({ source, message: result.message ?? "" });
+          // setMessage({ source, message: result.message ?? "" });
+          queueMicrotask(() =>
+            setMessage({ source, message: result.message ?? "" }),
+          );
 
           // ✅ Return the message string so hybridResolver can surface it
           resolve(
@@ -396,7 +400,11 @@ export const usePasswordValidation = (
           // setFeedback(result);
           if (result.status === "loading") return; // API in-flight, wait
 
-          setLoading({ source, loading: false }); // ← terminal: clear loading
+          // setLoading({ source, loading: false }); // ← terminal: clear loading
+          queueMicrotask(() => {
+            setLoading({ source, loading: false }); // ← terminal: clear loading
+          });
+
           if (result.status === "cancelled") {
             resolve(true);
             return;
@@ -407,15 +415,26 @@ export const usePasswordValidation = (
           // } else {
           //   clearScore(source);
           // }
-          setMessage({ source, message: result.warning || "" });
-          setMessage({
-            source,
-            message:
-              result.status === "success"
-                ? "Password strength is good"
-                : result.warning || "",
+
+          // setMessage({ source, message: result.warning || "" });
+          // setMessage({
+          //   source,
+          //   message:
+          //     result.status === "success"
+          //       ? "Password strength is good"
+          //       : result.warning || "",
+          // });
+          // setScore({ source, score: result.score });
+          queueMicrotask(() => {
+            setMessage({
+              source,
+              message:
+                result.status === "success"
+                  ? "Password strength is good"
+                  : result.warning || "",
+            });
+            setScore({ source, score: result.score });
           });
-          setScore({ source, score: result.score });
           resolve(result.status === "success" ? true : result.message);
         });
       }),
@@ -424,8 +443,12 @@ export const usePasswordValidation = (
       // cacheKey: (value) => value, // cache per password string
       cacheKey: () => null, // ✅ disable cache — score must always recompute
       onStart: () => {
-        setLoading({ source, loading: true }); // ← immediate
-        setMessage({ source, message: "" }); // ← clear stale warning immediately
+        // setLoading({ source, loading: true }); // ← immediate
+        // setMessage({ source, message: "" }); // ← clear stale warning immediately
+        queueMicrotask(() => {
+          setLoading({ source, loading: true });
+          setMessage({ source, message: "" });
+        });
       },
     },
   );

@@ -14,8 +14,9 @@ import SearchInputWithIcon from "./searchBox";
 import { FormProvider, useForm } from "react-hook-form";
 import EnhancedTable from "./table";
 import StickyFAB from "../CustomComponents/StickyFab";
-import DocumentTable from "./mrtTable";
+// import DocumentTable from "./mrtTable";
 import { Authenticated } from "@refinedev/core";
+import DocumentTable from "../Tables/DocumentTable";
 
 export default function AdministrativeForm() {
   const methods = useForm();

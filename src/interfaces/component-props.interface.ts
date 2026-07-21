@@ -484,6 +484,7 @@ export interface FieldBehavior {
 export interface InputHelperTextProps {
   helperText?: React.ReactNode;
   error?: ValidationErrorMessage | string;
+  success?: string;
 }
 
 export interface ValidationErrorMessageWithArgs {

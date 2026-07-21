@@ -1,12 +1,21 @@
 import { InputHelperTextProps } from "@/interfaces/component-props.interface";
+import { useTranslate } from "@refinedev/core";
 import { isValidElement } from "react";
 
 export const InputHelperText = (props: InputHelperTextProps) => {
-  const { helperText, error } = props;
-  //   const translate = useTranslate();
+  const { helperText, error, success } = props;
+  const translate = useTranslate();
 
   if (error) {
-    return <> {typeof error === "string" ? error : error.message} </>;
+    // return <> {typeof error === "string" ? error : error.message} </>;
+    const message = typeof error === "string" ? error : error.message;
+    const args = typeof error === "string" ? undefined : error.args;
+    return <>{translate(message, { ...args, _: message })}</>;
+  }
+
+  if (success) {
+    // return <span>{success}</span>;
+    return <>{translate(success, { _: success })}</>;
   }
 
   if (helperText === false) {
@@ -18,7 +27,8 @@ export const InputHelperText = (props: InputHelperTextProps) => {
   }
 
   if (typeof helperText === "string" && helperText.length > 0) {
-    return <>helperText</>;
+    // return <>{helperText}</>;
+    return <>{translate(helperText, { _: helperText })}</>;
   }
 
   // Material UI's HelperText cannot reserve space unless we pass a single

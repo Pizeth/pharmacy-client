@@ -131,7 +131,7 @@ export function BaseInput<TFieldValues extends FieldValues>(
                   ? theme.palette.primary.main
                   : fieldState.error
                     ? theme.palette.error.main
-                    : theme.palette.success.main,
+                    : theme.palette.primary.main,
             },
           },
         }}
