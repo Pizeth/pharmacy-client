@@ -24,7 +24,7 @@ import {
   CheckCircle,
 } from "@mui/icons-material";
 import { AuthFormProps } from "@/interfaces/component-props.interface";
-import { useLogin, useRegister } from "@refinedev/core";
+import { RefineError, useLogin, useRegister } from "@refinedev/core";
 import {
   loginSchema,
   registerSchema,
@@ -47,6 +47,7 @@ import FullName from "@/components/icons/fullName";
 import RadioButtonUnchecked from "@mui/icons-material/RadioButtonUnchecked";
 import { ParticleHexBackground } from "@/components/effect/backgrounds/particleHex";
 import { Turnstile } from "@/components/securities/Turnstile";
+import { useRouter } from "next/navigation";
 
 // ─── Styled slots ─────────────────────────────────────────────────────────────
 
@@ -209,6 +210,7 @@ const AuthForm = (inProps: AuthFormProps) => {
   } = props;
 
   const isLogin = mode === "signin";
+  const router = useRouter();
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const handleCaptchaExpire = useCallback(() => {
@@ -382,31 +384,58 @@ const AuthForm = (inProps: AuthFormProps) => {
   }, [mode, form]);
 
   const { mutate: login, isPending } = useLogin();
-  const { mutate: register, isPending: isRegisterPending } =
-    useRegister<RegisterValues>();
+  const { mutate: register, isPending: isRegisterPending } = useRegister<
+    RegisterValues & { captchaToken?: string | null }
+  >();
 
   const { handleSubmit } = form;
 
   const onSubmit = async (values: LoginValues | RegisterValues) => {
     if (isLogin) {
-      login({ ...values, captchaToken }); // 🔥 uses authProvider automatically
+      login(
+        { ...values, captchaToken },
+        {
+          onSuccess: (data) => {
+            if (!data.success) {
+              // const errorMessage = data.error?.message?.toLowerCase() || "";
+              const error = data.error as RefineError;
+
+              // 👇 If the server says the account is not activated, redirect to /activate
+              // if (errorMessage.includes("not activated")) {
+              if (error.statusCode === 403) {
+                const identifier = (values as LoginValues).identifier;
+                router.replace(
+                  `/activate?email=${encodeURIComponent(identifier)}`,
+                );
+                return;
+              }
+
+              // Handle other login errors normally (Refine also handles notifications)
+              console.error("Login failed:", data.error);
+            }
+          },
+        },
+      ); // 🔥 uses authProvider automatically
     } else {
       // Sends { email, username, password, name } to authProvider.register
-      register(values as RegisterValues, {
-        onSuccess: (data) => {
-          if (!data.success) {
-            // handle error
-            console.error("Registration failed:", data.error);
-            return;
-          }
-          // Auto-login after successful registration
-          login({
-            identifier: (values as RegisterValues).email, // or values.username, depending on the backend
-            password: (values as RegisterValues).password,
-            captchaToken,
-          });
+      register(
+        { ...(values as RegisterValues), captchaToken },
+        {
+          onSuccess: (data) => {
+            if (!data.success) {
+              // handle error
+              console.error("Registration failed:", data.error);
+              return;
+            }
+            // Auto-login after successful registration
+            // login({
+            //   identifier: (values as RegisterValues).email, // or values.username, depending on the backend
+            //   password: (values as RegisterValues).password,
+            //   captchaToken,
+            // });
+          },
         },
-      });
+      );
     }
   };
 
@@ -425,7 +454,7 @@ const AuthForm = (inProps: AuthFormProps) => {
   return (
     <FormProvider {...form}>
       <Root
-        // key={mode} // Force remount + reset when mode changes
+        key={mode} // Force remount + reset when mode changes
         // mode={mode}
         onSubmit={handleSubmit(onSubmit)}
         className={className}

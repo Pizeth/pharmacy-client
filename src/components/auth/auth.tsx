@@ -33,7 +33,7 @@ import {
 import { Instagram, Meta, Telegram, YouTube } from "../icons/socialIcons";
 import PersonIcon from "@mui/icons-material/Person";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AuthProps } from "@/interfaces/component-props.interface";
 import AuthForm from "./ui/authForm";
 import { EffectProps } from "@/interfaces/auth.interface";
@@ -57,6 +57,8 @@ import { LogoutButton } from "./ui/logoutButton";
 import { authClient } from "@/lib/auth-client";
 import PulseLoader from "../effect/loaders/loader";
 import { LANDING_PAGE } from "@/types/constants";
+import { useSetAtom } from "jotai";
+import { resetAllValidationsAtom } from "@/Stores/validationStore";
 
 const PREFIX = "RazethAuth";
 
@@ -851,11 +853,16 @@ export const Auth = (inProps: AuthProps) => {
   const { isFetching, data } = useIsAuthenticated();
   const theme = useTheme();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // 1. Get the correct destination path (falling back to your default)
+  const destination =
+    searchParams.get("to") ?? searchParams.get("callbackUrl") ?? "/fts"; // or LANDING_PAGE
+
   // State to track current mode (login or signup)
   const [currentMode, setCurrentMode] = useState<AuthAction>(defaultMode);
-  const isLogin = defaultMode === "signin";
+  // const isLogin = defaultMode === "signin";
 
-  const schema = isLogin ? loginSchema : registerSchema;
+  // const schema = isLogin ? loginSchema : registerSchema;
   const oneTapTriggered = useRef(false);
 
   useEffect(() => {
@@ -871,7 +878,8 @@ export const Auth = (inProps: AuthProps) => {
     // No data yet, or authenticated — never prompt One Tap
     if (!data || data.authenticated) {
       if (data?.authenticated) {
-        router.replace(data.redirectTo || "/fts");
+        // Redirect already-authenticated users to their intended destination
+        router.replace(data.redirectTo || destination);
       }
       return;
     }
@@ -886,8 +894,8 @@ export const Auth = (inProps: AuthProps) => {
       // callbackURL: `${window.location.origin}/dashboard`,
       fetchOptions: {
         onSuccess: () => {
-          // For example, use a router to navigate without a full reload:
-          router.replace(LANDING_PAGE); // Replace with your landing page URL
+          // Redirect One Tap users to their intended destination
+          router.replace(destination);
         },
       },
       onPromptNotification: (notification) => {
@@ -899,22 +907,31 @@ export const Auth = (inProps: AuthProps) => {
       },
     });
     // not authenticated, stay on the login page
-  }, [router, data, isFetching]);
+  }, [router, data, isFetching, destination]);
 
   // const { mutate: login, isPending } = useLogin();
 
-  const form = useForm<LoginValues | RegisterValues>({
-    resolver: zodResolver(
-      schema,
-      // {
-      //   async: true, // 🔥 enable async validation
-      // }
-    ),
-    mode: "onChange",
-    defaultValues: isLogin
-      ? { email: "", password: "" }
-      : { username: "", email: "", password: "", confirmPassword: "" },
-  });
+  // const form = useForm<LoginValues | RegisterValues>({
+  //   resolver: zodResolver(
+  //     schema,
+  //     // {
+  //     //   async: true, // 🔥 enable async validation
+  //     // }
+  //   ),
+  //   mode: "onChange",
+  //   defaultValues: isLogin
+  //     ? { email: "", password: "" }
+  //     : { username: "", email: "", password: "", confirmPassword: "" },
+  // });
+
+  // Jotai reset atom
+  const resetForm = useSetAtom(resetAllValidationsAtom);
+
+  // 🔥 Automatically wipe all validation errors whenever currentMode changes
+  useEffect(() => {
+    // Clear any previous error message before checking
+    resetForm();
+  }, [currentMode, resetForm]);
 
   // Toggle between login and signup
   const handleToggle = () => {
@@ -1047,15 +1064,6 @@ export const Auth = (inProps: AuthProps) => {
                           } 0.75s ease`,
                         }}
                       >
-                        {/* {currentMode === "signin" ? (
-                        // Login Form
-                        <>{children}</>
-                      ) : (
-                        // Signup Form
-                        <>
-                          <SignUpForm />
-                        </>
-                      )} */}
                         <AuthForm mode={currentMode} />
                       </Box>
 

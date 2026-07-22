@@ -23,7 +23,9 @@ import {
 const getCallbackUrl = (fallback: string): string => {
   if (typeof window === "undefined") return fallback;
   const params = new URLSearchParams(window.location.search);
-  return params.get("callbackUrl") ?? fallback;
+  // return params.get("callbackUrl") ?? fallback;
+  // Check for Refine's native "to" parameter first
+  return params.get("to") ?? params.get("callbackUrl") ?? fallback;
 };
 
 // ── Auth Provider ─────────────────────────────────────────────────────────────
@@ -43,13 +45,15 @@ export const authProvider: AuthProvider = {
       /**
        * A URL to redirect to after the user verifies their email (optional)
        */
-      callbackURL: LANDING_PAGE,
+      callbackURL: getCallbackUrl(LANDING_PAGE),
       /**
        * remember the user session after the browser is closed.
        * @default true
        */
       rememberMe: false,
     });
+
+    console.log("result", result);
 
     if (result.error?.status === 422 || result.error?.status === 404) {
       // Not a valid username — try as email
@@ -60,7 +64,7 @@ export const authProvider: AuthProvider = {
         /**
          * A URL to redirect to after the user verifies their email (optional)
          */
-        callbackURL: LANDING_PAGE,
+        callbackURL: getCallbackUrl(LANDING_PAGE),
         /**
          * remember the user session after the browser is closed.
          * @default true
@@ -101,13 +105,16 @@ export const authProvider: AuthProvider = {
     if (token) setupAxiosAuth(token);
 
     // Respect the callbackUrl if present
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const callbackUrl = params.get("callbackUrl");
-      if (callbackUrl) return { success: true, redirectTo: callbackUrl };
-    }
+    // if (typeof window !== "undefined") {
+    //   const params = new URLSearchParams(window.location.search);
+    //   const callbackUrl = params.get("callbackUrl");
+    //   if (callbackUrl) return { success: true, redirectTo: callbackUrl };
+    // }
 
-    return { success: true, redirectTo: getCallbackUrl(LANDING_PAGE) };
+    // Get the correct redirect path based on the URL query params
+    const redirectTo = getCallbackUrl(LANDING_PAGE);
+
+    return { success: true, redirectTo };
   },
 
   // ── Sign out ───────────────────────────────────────────────────────────────
@@ -132,29 +139,6 @@ export const authProvider: AuthProvider = {
       };
     }
 
-    // const token = sessionStorage.getItem(TOKEN_KEY);
-
-    // try {
-    //   await fetch(`${API_URL}/api/auth/sign-out`, {
-    //     method: "POST",
-    //     headers: {
-    //       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    //       "Content-Type": "application/json",
-    //     },
-    //     credentials: "include", // also clears the HttpOnly cookie server-side
-    //   });
-    // } catch (error) {
-    //   console.error("Sign out request failed:", error);
-    //   return {
-    //     success: false,
-    //     error: {
-    //       name: "LogoutError",
-    //       message: error instanceof Error ? error.message : "Logout failed",
-    //       statusCode: 500,
-    //     },
-    //   };
-    // }
-
     sessionStorage.removeItem(TOKEN_KEY);
     // Clear all auth-related cookies
     clearAuthCookies();
@@ -174,18 +158,25 @@ export const authProvider: AuthProvider = {
     //   redirectPath?: string,
     // ) => {
     // Refine passes whatever you call register() with — cast to your shape
-    const { email, username, password, name } = params as {
+    const { email, username, password, name, captchaToken } = params as {
       email: string;
       username: string;
       password: string;
       name: string;
+      captchaToken?: string;
     };
+
+    // Build headers if captcha token is provided (matching your login flow)
+    const headers = captchaToken
+      ? { "x-captcha-response": captchaToken }
+      : undefined;
 
     const { data, error } = await authClient.signUp.email({
       email,
       username,
       password,
       name,
+      fetchOptions: { headers }, // 👈 Attach captcha headers here
     });
 
     // const { data, error } = await authClient.signUp.email(payload);
@@ -203,175 +194,15 @@ export const authProvider: AuthProvider = {
     return {
       success: true,
       // Stay on login so user verifies email before entering the app
-      redirectTo: "/login",
+      // redirectTo: "/login",
+      // 👈 Redirect to your activation page and pass the email via query params
+      redirectTo: `/activate?email=${encodeURIComponent(email)}`,
       successNotification: {
         message: "Registration Successful",
         description: `Welcome, ${data.user.name}! Please check your email to verify your account.`,
       },
     };
   },
-
-  // ── Session check (called on every route) ─────────────────────────────────
-  // check: async () => {
-  //   // try {
-  //   //   // Try stored JWT first — fastest path
-  //   //   const storedToken = sessionStorage.getItem(TOKEN_KEY);
-  //   //   // console.log("Stored token:", storedToken);
-
-  //   //   // if (storedToken) {
-  //   //   //   // const res = await fetch(`${API_URL}/api/auth/get-session`, {
-  //   //   //   //   headers: { Authorization: `Bearer ${storedToken}` },
-  //   //   //   //   cache: "no-store",
-  //   //   //   // });
-  //   //   //   // const session = await res.json();
-  //   //   //   const { session, jwt } = await fetchSessionDirect(storedToken);
-  //   //   //   console.log("Session check result:", { session, jwt });
-  //   //   //   if (session?.user) return { authenticated: true };
-  //   //   //   // token invalid/expired — clear and fall through
-  //   //   //   sessionStorage.removeItem(TOKEN_KEY);
-  //   //   // }
-
-  //   //   // // No valid token — try cookie-based session directly against API
-  //   //   // // (bypasses the Next.js proxy which drops the Set-Auth-Jwt header)
-  //   //   // const res = await fetch(`${API_URL}/api/auth/get-session`, {
-  //   //   //   credentials: "include",
-  //   //   //   cache: "no-store",
-  //   //   // });
-
-  //   //   // console.log("Session check response status:", res);
-
-  //   //   // const token = res.headers.get(COOKIE_TOKEN_KEY);
-  //   //   // const session = await res.json();
-
-  //   //   const { session, jwt } = await fetchSessionDirect(storedToken);
-
-  //   //   if (session?.user) {
-  //   //     console.log("Session check successful:", session);
-  //   //     if (jwt) {
-  //   //       sessionStorage.setItem(TOKEN_KEY, jwt);
-  //   //       setupAxiosAuth(jwt);
-  //   //     }
-  //   //     return { authenticated: true };
-  //   //   }
-
-  //   //   sessionStorage.removeItem(TOKEN_KEY);
-
-  //   //   return {
-  //   //     authenticated: false,
-  //   //     redirectTo: "/login",
-  //   //     error: {
-  //   //       name: "Unauthorized",
-  //   //       message: "No active session",
-  //   //       statusCode: 401,
-  //   //     },
-  //   //   };
-  //   // } catch (error) {
-  //   //   return {
-  //   //     authenticated: false,
-  //   //     redirectTo: "/login",
-  //   //     error: {
-  //   //       name: "SessionError",
-  //   //       message:
-  //   //         error instanceof Error ? error.message : "Session check failed",
-  //   //       statusCode: 401,
-  //   //     },
-  //   //   };
-  //   // }
-
-  //   try {
-  //     // 1. Check if we already have a JWT in storage for fast path
-  //     const storedToken = sessionStorage.getItem(TOKEN_KEY);
-  //     if (storedToken) {
-  //       setupAxiosAuth(storedToken);
-  //       // Optional: you can quickly validate it or return true if you trust the lifespan
-  //     }
-
-  //     // If no token yet (e.g. just came back from OAuth),
-  //     // authClient.getSession() will use the session cookie
-  //     // and the response will include set-auth-token via onSuccess
-  //     // 2. Fetch the session, forcing credentials for cross-domain support
-  //     const { data: session, error } = await authClient.getSession({
-  //       fetchOptions: {
-  //         credentials: "include", // 👈 Crucial: Forces browser to send cross-domain cookies
-  //         // onSuccess: (ctx) => {
-  //         //   const token = ctx.response.headers.get(COOKIE_TOKEN_KEY);
-  //         //   if (token) {
-  //         //     sessionStorage.setItem(TOKEN_KEY, token);
-  //         //     setupAxiosAuth(token);
-  //         //   }
-  //         // },
-  //         onSuccess: (ctx) => {
-  //           // Better Auth's token header is usually lowercase 'set-auth-token'
-  //           const token =
-  //             ctx.response.headers.get(COOKIE_TOKEN_KEY) ||
-  //             ctx.response.headers.get("set-auth-token");
-
-  //           if (token) {
-  //             sessionStorage.setItem(TOKEN_KEY, token);
-  //             setupAxiosAuth(token);
-  //           }
-  //         },
-  //       },
-  //     });
-
-  //     if (error || !session)
-  //       return {
-  //         authenticated: false,
-  //         redirectTo: "/login",
-  //         error: {
-  //           name: "Unauthorized",
-  //           message: "Check failed: No active session found.",
-  //           statusCode: 401,
-  //         },
-  //       };
-
-  //     // // 3. Fallback: If session is valid but onSuccess didn't catch a new token,
-  //     // // check if we can generate/pull the client token directly from the client instance.
-  //     // if (!sessionStorage.getItem(TOKEN_KEY)) {
-  //     //   // Better Auth client stores the active token in memory/internal storage
-  //     //   const clientToken =
-  //     //     authClient.getActions?.().getJwt?.() || (authClient as any).token;
-  //     //   if (clientToken) {
-  //     //     sessionStorage.setItem(TOKEN_KEY, clientToken);
-  //     //     setupAxiosAuth(clientToken);
-  //     //   }
-  //     // }
-
-  //     // 3. TypeScript-Safe Runtime Token Fallback
-  //     // If the cookie validated correctly but your browser stripped the custom response headers,
-  //     // read the internal bearer state or session cache managed natively by Better Auth:
-  //     if (!sessionStorage.getItem(TOKEN_KEY)) {
-  //       // Better Auth exposes helper contexts or a secondary internal client mapping
-  //       // We cast safely via unknown to bypass compile-time restrictions for runtime evaluation
-  //       const internalClient = authClient as any;
-  //       const fallbackToken =
-  //         internalClient.$store?.get?.("token") ||
-  //         internalClient.token ||
-  //         internalClient.getJwt?.();
-
-  //       if (fallbackToken) {
-  //         sessionStorage.setItem(TOKEN_KEY, fallbackToken);
-  //         setupAxiosAuth(fallbackToken);
-  //       }
-  //     }
-
-  //     console.log("Session verified successfully:", session);
-  //     return { authenticated: true };
-  //   } catch (error) {
-  //     console.error("Error occurred while checking authentication:", error);
-  //     sessionStorage.removeItem(TOKEN_KEY);
-  //     return {
-  //       authenticated: false,
-  //       redirectTo: "/login",
-  //       error: {
-  //         name: "SessionError",
-  //         message:
-  //           error instanceof Error ? error.message : "Session check failed",
-  //         statusCode: 401,
-  //       },
-  //     };
-  //   }
-  // },
 
   check: async () => {
     try {
@@ -493,9 +324,170 @@ export const authProvider: AuthProvider = {
     if (statusCode === 401 || statusCode === 403) {
       return { logout: true, redirectTo: "/login" };
     }
-    // if (error?.status === 401 || error.status === 403) return { logout: true };
     return { error };
   },
 };
 
 export default authProvider;
+
+// ── Session check (called on every route) ─────────────────────────────────
+// check: async () => {
+//   // try {
+//   //   // Try stored JWT first — fastest path
+//   //   const storedToken = sessionStorage.getItem(TOKEN_KEY);
+//   //   // console.log("Stored token:", storedToken);
+
+//   //   // if (storedToken) {
+//   //   //   // const res = await fetch(`${API_URL}/api/auth/get-session`, {
+//   //   //   //   headers: { Authorization: `Bearer ${storedToken}` },
+//   //   //   //   cache: "no-store",
+//   //   //   // });
+//   //   //   // const session = await res.json();
+//   //   //   const { session, jwt } = await fetchSessionDirect(storedToken);
+//   //   //   console.log("Session check result:", { session, jwt });
+//   //   //   if (session?.user) return { authenticated: true };
+//   //   //   // token invalid/expired — clear and fall through
+//   //   //   sessionStorage.removeItem(TOKEN_KEY);
+//   //   // }
+
+//   //   // // No valid token — try cookie-based session directly against API
+//   //   // // (bypasses the Next.js proxy which drops the Set-Auth-Jwt header)
+//   //   // const res = await fetch(`${API_URL}/api/auth/get-session`, {
+//   //   //   credentials: "include",
+//   //   //   cache: "no-store",
+//   //   // });
+
+//   //   // console.log("Session check response status:", res);
+
+//   //   // const token = res.headers.get(COOKIE_TOKEN_KEY);
+//   //   // const session = await res.json();
+
+//   //   const { session, jwt } = await fetchSessionDirect(storedToken);
+
+//   //   if (session?.user) {
+//   //     console.log("Session check successful:", session);
+//   //     if (jwt) {
+//   //       sessionStorage.setItem(TOKEN_KEY, jwt);
+//   //       setupAxiosAuth(jwt);
+//   //     }
+//   //     return { authenticated: true };
+//   //   }
+
+//   //   sessionStorage.removeItem(TOKEN_KEY);
+
+//   //   return {
+//   //     authenticated: false,
+//   //     redirectTo: "/login",
+//   //     error: {
+//   //       name: "Unauthorized",
+//   //       message: "No active session",
+//   //       statusCode: 401,
+//   //     },
+//   //   };
+//   // } catch (error) {
+//   //   return {
+//   //     authenticated: false,
+//   //     redirectTo: "/login",
+//   //     error: {
+//   //       name: "SessionError",
+//   //       message:
+//   //         error instanceof Error ? error.message : "Session check failed",
+//   //       statusCode: 401,
+//   //     },
+//   //   };
+//   // }
+
+//   try {
+//     // 1. Check if we already have a JWT in storage for fast path
+//     const storedToken = sessionStorage.getItem(TOKEN_KEY);
+//     if (storedToken) {
+//       setupAxiosAuth(storedToken);
+//       // Optional: you can quickly validate it or return true if you trust the lifespan
+//     }
+
+//     // If no token yet (e.g. just came back from OAuth),
+//     // authClient.getSession() will use the session cookie
+//     // and the response will include set-auth-token via onSuccess
+//     // 2. Fetch the session, forcing credentials for cross-domain support
+//     const { data: session, error } = await authClient.getSession({
+//       fetchOptions: {
+//         credentials: "include", // 👈 Crucial: Forces browser to send cross-domain cookies
+//         // onSuccess: (ctx) => {
+//         //   const token = ctx.response.headers.get(COOKIE_TOKEN_KEY);
+//         //   if (token) {
+//         //     sessionStorage.setItem(TOKEN_KEY, token);
+//         //     setupAxiosAuth(token);
+//         //   }
+//         // },
+//         onSuccess: (ctx) => {
+//           // Better Auth's token header is usually lowercase 'set-auth-token'
+//           const token =
+//             ctx.response.headers.get(COOKIE_TOKEN_KEY) ||
+//             ctx.response.headers.get("set-auth-token");
+
+//           if (token) {
+//             sessionStorage.setItem(TOKEN_KEY, token);
+//             setupAxiosAuth(token);
+//           }
+//         },
+//       },
+//     });
+
+//     if (error || !session)
+//       return {
+//         authenticated: false,
+//         redirectTo: "/login",
+//         error: {
+//           name: "Unauthorized",
+//           message: "Check failed: No active session found.",
+//           statusCode: 401,
+//         },
+//       };
+
+//     // // 3. Fallback: If session is valid but onSuccess didn't catch a new token,
+//     // // check if we can generate/pull the client token directly from the client instance.
+//     // if (!sessionStorage.getItem(TOKEN_KEY)) {
+//     //   // Better Auth client stores the active token in memory/internal storage
+//     //   const clientToken =
+//     //     authClient.getActions?.().getJwt?.() || (authClient as any).token;
+//     //   if (clientToken) {
+//     //     sessionStorage.setItem(TOKEN_KEY, clientToken);
+//     //     setupAxiosAuth(clientToken);
+//     //   }
+//     // }
+
+//     // 3. TypeScript-Safe Runtime Token Fallback
+//     // If the cookie validated correctly but your browser stripped the custom response headers,
+//     // read the internal bearer state or session cache managed natively by Better Auth:
+//     if (!sessionStorage.getItem(TOKEN_KEY)) {
+//       // Better Auth exposes helper contexts or a secondary internal client mapping
+//       // We cast safely via unknown to bypass compile-time restrictions for runtime evaluation
+//       const internalClient = authClient as any;
+//       const fallbackToken =
+//         internalClient.$store?.get?.("token") ||
+//         internalClient.token ||
+//         internalClient.getJwt?.();
+
+//       if (fallbackToken) {
+//         sessionStorage.setItem(TOKEN_KEY, fallbackToken);
+//         setupAxiosAuth(fallbackToken);
+//       }
+//     }
+
+//     console.log("Session verified successfully:", session);
+//     return { authenticated: true };
+//   } catch (error) {
+//     console.error("Error occurred while checking authentication:", error);
+//     sessionStorage.removeItem(TOKEN_KEY);
+//     return {
+//       authenticated: false,
+//       redirectTo: "/login",
+//       error: {
+//         name: "SessionError",
+//         message:
+//           error instanceof Error ? error.message : "Session check failed",
+//         statusCode: 401,
+//       },
+//     };
+//   }
+// },

@@ -11,7 +11,7 @@ i18n
   .use(initReactI18next)
   .init({
     backend: {
-      loadPath: `${API_URL}/api/translations/{{lng}}`,
+      loadPath: `${API_URL}/api/i18n/{{lng}}`,
     },
     lng: "km",
     fallbackLng: "en",

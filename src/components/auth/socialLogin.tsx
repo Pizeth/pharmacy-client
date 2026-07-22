@@ -23,6 +23,7 @@ import {
   PROVIDER_REGISTRY,
   RegisteredProviderId,
 } from "@/lib/providers/socialProvider";
+import { useSearchParams } from "next/navigation";
 
 const PREFIX = "RazethSocialLogin";
 
@@ -67,44 +68,44 @@ const SocialLoginContent = styled(Grid, {
 }));
 
 // Provider configuration
-const PROVIDERS = {
-  google: {
-    name: "Google",
-    icon: <Google />,
-  },
-  apple: {
-    name: "Apple",
-    icon: <Apple />,
-  },
-  // microsoft: {
-  //   name: "Microsoft",
-  //   icon: <Microsoft />,
-  // },
-  meta: {
-    name: "Meta",
-    icon: <Meta />,
-  },
-  // x: {
-  //   name: "X",
-  //   icon: <X />,
-  // },
-  // linkedin: {
-  //   name: "Linkedin",
-  //   icon: <Linkedin />,
-  // },
-  // discord: {
-  //   name: "Discord",
-  //   icon: <Discord />,
-  // },
-  // github: {
-  //   name: "GitHub",
-  //   icon: <Github />,
-  // },
-  // gitlab: {
-  //   name: "GitLab",
-  //   icon: <Gitlab />,
-  // },
-};
+// const PROVIDERS = {
+//   google: {
+//     name: "Google",
+//     icon: <Google />,
+//   },
+//   apple: {
+//     name: "Apple",
+//     icon: <Apple />,
+//   },
+//   // microsoft: {
+//   //   name: "Microsoft",
+//   //   icon: <Microsoft />,
+//   // },
+//   meta: {
+//     name: "Meta",
+//     icon: <Meta />,
+//   },
+//   // x: {
+//   //   name: "X",
+//   //   icon: <X />,
+//   // },
+//   // linkedin: {
+//   //   name: "Linkedin",
+//   //   icon: <Linkedin />,
+//   // },
+//   // discord: {
+//   //   name: "Discord",
+//   //   icon: <Discord />,
+//   // },
+//   // github: {
+//   //   name: "GitHub",
+//   //   icon: <Github />,
+//   // },
+//   // gitlab: {
+//   //   name: "GitLab",
+//   //   icon: <Gitlab />,
+//   // },
+// };
 
 const SocialLogin = (inProps: SocialLoginProps) => {
   const props = useThemeProps({
@@ -113,6 +114,9 @@ const SocialLogin = (inProps: SocialLoginProps) => {
   });
 
   const { children, className, sx, ...rest } = props;
+  const searchParams = useSearchParams();
+  const destination =
+    searchParams?.get("to") ?? searchParams?.get("callbackUrl") ?? "/fts";
 
   // const notify = useNotify();
 
@@ -129,58 +133,65 @@ const SocialLogin = (inProps: SocialLoginProps) => {
     getAuthProvidersConfig().then(setProviders).catch(console.error);
   }, []);
 
-  const handleProviderLogin = useCallback(async (provider: string) => {
-    try {
-      setLoading(provider);
-      // Use authClient directly — it knows the correct baseURL + /api/auth path
-      await authClient.signIn.social({
-        /**
-         * The social provider ID
-         * @example "github", "google", "apple"
-         */
-        provider: provider as Parameters<
-          typeof authClient.signIn.social
-        >[0]["provider"],
-        // 👈 where to redirect after OAuth
-        /**
-         * A URL to redirect after the user authenticates with the provider
-         * @default "/"
-         */
-        // callbackURL: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/dashboard`,
-        callbackURL: `${window.location.origin}/auth/callback`,
-        /**
-         * A URL to redirect if an error occurs during the sign in process
-         */
-        errorCallbackURL: `${window.location.origin}/auth/signup?error=provider_error&provider=${provider}`,
-        /**
-         * A URL to redirect if the user is newly registered
-         */
-        newUserCallbackURL: `${window.location.origin}/welcome`,
-        /**
-         * disable the automatic redirect to the provider.
-         * @default false
-         */
-        // disableRedirect: true,
-      });
-      // setLoading(true);
+  const handleProviderLogin = useCallback(
+    async (provider: string) => {
+      try {
+        setLoading(provider);
+        // Use authClient directly — it knows the correct baseURL + /api/auth path
+        await authClient.signIn.social({
+          /**
+           * The social provider ID
+           * @example "github", "google", "apple"
+           */
+          provider: provider as Parameters<
+            typeof authClient.signIn.social
+          >[0]["provider"],
+          // 👈 where to redirect after OAuth
+          /**
+           * A URL to redirect after the user authenticates with the provider
+           * @default "/"
+           */
+          // callbackURL: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/dashboard`,
+          // callbackURL: `${window.location.origin}/auth/callback`,
+          // 4. Update the callbackURL to route directly to the intended destination
+          // (If you specifically need to hit /auth/callback for custom logic, use:
+          // `${window.location.origin}/auth/callback?to=${encodeURIComponent(destination)}`)
+          callbackURL: `${window.location.origin}${destination}`,
+          /**
+           * A URL to redirect if an error occurs during the sign in process
+           */
+          errorCallbackURL: `${window.location.origin}/auth/signup?error=provider_error&provider=${provider}`,
+          /**
+           * A URL to redirect if the user is newly registered
+           */
+          newUserCallbackURL: `${window.location.origin}/welcome`,
+          /**
+           * disable the automatic redirect to the provider.
+           * @default false
+           */
+          // disableRedirect: true,
+        });
+        // setLoading(true);
 
-      // const backendUrl =
-      //   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
-      // const loginUrl = `${backendUrl}/auth/${provider}/login`;
+        // const backendUrl =
+        //   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
+        // const loginUrl = `${backendUrl}/auth/${provider}/login`;
 
-      // // Redirect to OIDC provider
-      // window.location.href = loginUrl;
-    } catch (err) {
-      console.error("Login error:", err);
-      // notify("razeth.auth.oidc_error", {
-      //   type: "error",
-      // });
-      // Only reset loading if component is still mounted
-      // if (isMounted.current) {
-      //   setLoading(null);
-      // }
-    }
-  }, []);
+        // // Redirect to OIDC provider
+        // window.location.href = loginUrl;
+      } catch (err) {
+        console.error("Login error:", err);
+        // notify("razeth.auth.oidc_error", {
+        //   type: "error",
+        // });
+        // Only reset loading if component is still mounted
+        // if (isMounted.current) {
+        //   setLoading(null);
+        // }
+      }
+    },
+    [destination],
+  );
 
   const isLoading = useCallback((type: string) => loading === type, [loading]);
 

@@ -30,12 +30,12 @@ export const RefineContext = ({ children }: { children: React.ReactNode }) => {
         //   list: "/dashboard",
         //   meta: { label: "ផ្ទាំងសូចនាករ" }, // Example Khmer label
         // },
-        // {
-        //   name: "login",
-        //   list: "/login",
-        //   // meta: { label: "ផ្ទាំងចូលប្រើប្រាស់" }, // Example Khmer label
-        //   // show: "/admin/login",
-        // },
+        {
+          name: "login",
+          list: "/login",
+          // meta: { label: "ផ្ទាំងចូលប្រើប្រាស់" }, // Example Khmer label
+          // show: "/admin/login",
+        },
         {
           name: "translations",
           list: "/admin/translations",

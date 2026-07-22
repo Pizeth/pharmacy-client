@@ -16,16 +16,8 @@ import {
 import { useFieldMachine } from "./useFieldMachine";
 import { getCached, setCached } from "@/caches/validationCache";
 import useRefinement from "./useRefinement";
-import { Score } from "@mui/icons-material";
-import { useSetAtom } from "jotai";
-import {
-  clearValidationMessageAtom,
-  clearValidationScoreAtom,
-  setValidationLoadingAtom,
-  setValidationMessageAtom,
-  setValidationScoreAtom,
-} from "@/Stores/validationStore";
 import { PASSWORD_REGEX } from "@/types/constants";
+import { useGlobalStore } from "./useGlobalStore";
 
 // ─── Async field validation (username / email uniqueness etc.) ────────────────
 
@@ -77,9 +69,10 @@ export const useFieldValidation = (source: string, debounceDelay = 500) => {
  *   <TextField name="username" rules={{ validate: asyncRule }} />
  */
 export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
+  const { setMessage, setLoading } = useGlobalStore(source);
   // const [status, setStatus] = useState<FieldStatus>("idle");
-  const setLoading = useSetAtom(setValidationLoadingAtom);
-  const setMessage = useSetAtom(setValidationMessageAtom); // 👈 add this
+  // const setLoading = useSetAtom(setValidationLoadingAtom);
+  // const setMessage = useSetAtom(setValidationMessageAtom); // 👈 add this
 
   const validator = useMemo(
     () => createAsyncValidator(source, debounceDelay),
@@ -155,7 +148,7 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
           //               RHF's isValidating clears; the next call will validate
           if (result.status === "loading") return; // API in-flight, wait
           // setLoading({ source, loading: false }); // ← terminal: clear loading
-          queueMicrotask(() => setLoading({ source, loading: false })); // ← terminal: clear loading
+          queueMicrotask(() => setLoading(false)); // ← terminal: clear loading
 
           if (result.status === "cancelled") {
             resolve(true);
@@ -164,9 +157,7 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
 
           // 👇 Always store the message — success or failure — for display
           // setMessage({ source, message: result.message ?? "" });
-          queueMicrotask(() =>
-            setMessage({ source, message: result.message ?? "" }),
-          );
+          queueMicrotask(() => setMessage(result.message ?? ""));
 
           // ✅ Return the message string so hybridResolver can surface it
           resolve(
@@ -199,7 +190,7 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
     {
       debounce: debounceDelay,
       cacheKey: (value) => `${source}:${value}`,
-      onStart: () => setLoading({ source, loading: true }), // ← immediate
+      onStart: () => setLoading(true), // ← immediate
     },
   );
   // ✅ FIX: memoize zodRefine so it has a stable reference across renders
@@ -376,9 +367,10 @@ export const usePasswordValidation = (
   //   // warning: "",
   //   status: "idle",
   // });
-  const setScore = useSetAtom(setValidationScoreAtom);
-  const setMessage = useSetAtom(setValidationMessageAtom);
-  const setLoading = useSetAtom(setValidationLoadingAtom);
+  const { setMessage, setLoading, setScore } = useGlobalStore(source);
+  // const setScore = useSetAtom(setValidationScoreAtom);
+  // const setMessage = useSetAtom(setValidationMessageAtom);
+  // const setLoading = useSetAtom(setValidationLoadingAtom);
   // const clearMessage = useSetAtom(clearValidationMessageAtom);
   // const [score, setScore] = useState(0);
 
@@ -402,7 +394,7 @@ export const usePasswordValidation = (
 
           // setLoading({ source, loading: false }); // ← terminal: clear loading
           queueMicrotask(() => {
-            setLoading({ source, loading: false }); // ← terminal: clear loading
+            setLoading(false); // ← terminal: clear loading
           });
 
           if (result.status === "cancelled") {
@@ -425,15 +417,14 @@ export const usePasswordValidation = (
           //       : result.warning || "",
           // });
           // setScore({ source, score: result.score });
+          console.log("result", result);
           queueMicrotask(() => {
-            setMessage({
-              source,
-              message:
-                result.status === "success"
-                  ? "Password strength is good"
-                  : result.warning || "",
-            });
-            setScore({ source, score: result.score });
+            setMessage(
+              result.status === "success"
+                ? "Password strength is good"
+                : result.warning || "",
+            );
+            setScore(result.score);
           });
           resolve(result.status === "success" ? true : result.message);
         });
@@ -446,8 +437,9 @@ export const usePasswordValidation = (
         // setLoading({ source, loading: true }); // ← immediate
         // setMessage({ source, message: "" }); // ← clear stale warning immediately
         queueMicrotask(() => {
-          setLoading({ source, loading: true });
-          setMessage({ source, message: "" });
+          setLoading(true);
+          setMessage("");
+          setScore(0);
         });
       },
     },
