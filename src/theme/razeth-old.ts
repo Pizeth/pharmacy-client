@@ -4,13 +4,13 @@ import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
 import { red, blue } from "@mui/material/colors";
 import { createTheme, Theme } from "@mui/material/styles";
 // import { LoginClasses } from "@/components/auth/login";
-import { ClassKey, CustomComponents } from "@/types/classKey";
-import {
-  Line,
-  Meteor,
-  RazethComponentsPropsList,
-  SideImage,
-} from "@/interfaces/theme.interface";
+// import { ClassKey, CustomComponents } from "@/types/classKey";
+// import {
+//   Line,
+//   Meteor,
+//   RazethComponentsPropsList,
+//   SideImage,
+// } from "@/interfaces/theme.interface";
 import {
   buildResponsiveShadow,
   createStarfield,
@@ -41,113 +41,113 @@ import {
 } from "./keyframes";
 // import { backdropClasses } from "@mui/material";
 
-declare module "@mui/material/styles" {
-  interface Palette {
-    passwordStrength: string[] | ((theme: Theme) => string[]);
-  }
-  interface PaletteOptions {
-    passwordStrength?: string[] | ((theme: Theme) => string[]);
-  }
+// declare module "@mui/material/styles" {
+//   interface Palette {
+//     passwordStrength: string[] | ((theme: Theme) => string[]);
+//   }
+//   interface PaletteOptions {
+//     passwordStrength?: string[] | ((theme: Theme) => string[]);
+//   }
 
-  interface ThemeVars {
-    sideImage?: SideImage;
-  }
-  interface Theme {
-    custom: {
-      sideImage: SideImage;
-      lines: Line[];
-      meteor: Meteor;
-      paper: string;
-    };
-  }
-  interface ThemeOptions {
-    custom?: {
-      sideImage?: SideImage;
-      lines?: Line[];
-      meteor?: Meteor;
-      paper?: string;
-    };
-  }
+//   interface ThemeVars {
+//     sideImage?: SideImage;
+//   }
+//   interface Theme {
+//     custom: {
+//       sideImage: SideImage;
+//       lines: Line[];
+//       meteor: Meteor;
+//       paper: string;
+//     };
+//   }
+//   interface ThemeOptions {
+//     custom?: {
+//       sideImage?: SideImage;
+//       lines?: Line[];
+//       meteor?: Meteor;
+//       paper?: string;
+//     };
+//   }
 
-  // ComponentNameToClassKey can derive its keys from our map.
-  // Note: If each component has different keys (e.g., 'root', 'card'),
-  // this interface should be defined manually for full accuracy.
-  interface ComponentNameToClassKey extends Record<
-    keyof RazethComponentsPropsList,
-    ClassKey
-  > {}
+//   // ComponentNameToClassKey can derive its keys from our map.
+//   // Note: If each component has different keys (e.g., 'root', 'card'),
+//   // this interface should be defined manually for full accuracy.
+//   interface ComponentNameToClassKey extends Record<
+//     keyof RazethComponentsPropsList,
+//     ClassKey
+//   > {}
 
-  // ComponentsPropsList directly extends our map.
-  interface ComponentsPropsList extends RazethComponentsPropsList {}
+//   // ComponentsPropsList directly extends our map.
+//   interface ComponentsPropsList extends RazethComponentsPropsList {}
 
-  interface Components extends CustomComponents {
-    // Your custom components are now automatically included
-    // You can still add standard MUI component overrides here if needed
-  }
+//   interface Components extends CustomComponents {
+//     // Your custom components are now automatically included
+//     // You can still add standard MUI component overrides here if needed
+//   }
 
-  // interface Components {
-  //   RazethLogin?: {
-  //     defaultProps?: ComponentsPropsList["RazethLogin"];
-  //     styleOverrides?: ComponentsOverrides<
-  //       Omit<Theme, "components">
-  //     >["RazethLogin"];
-  //     variants?: Array<{
-  //       props: Partial<LoginProps>;
-  //       style: (props: { theme: Theme }) => unknown;
-  //     }>;
-  //   };
-  //   RazethSideImage?: {
-  //     defaultProps?: ComponentsPropsList["RazethSideImage"];
-  //     styleOverrides?: ComponentsOverrides<
-  //       Omit<Theme, "components">
-  //     >["RazethSideImage"];
-  //     variants?: Array<{
-  //       props: Partial<SideImageProps>;
-  //       style: (props: { theme: Theme }) => unknown;
-  //     }>;
-  //   };
-  //   RazethAvatar?: {
-  //     defaultProps?: ComponentsPropsList["RazethAvatar"];
-  //     styleOverrides?: ComponentsOverrides<
-  //       Omit<Theme, "components">
-  //     >["RazethAvatar"];
-  //     variants?: Array<{
-  //       props: Partial<AvatarProps>;
-  //       style: (props: { theme: Theme }) => unknown;
-  //     }>;
-  //   };
-  //   RazethDivider?: {
-  //     defaultProps?: ComponentsPropsList["RazethDivider"];
-  //     styleOverrides?: ComponentsOverrides<
-  //       Omit<Theme, "components">
-  //     >["RazethDivider"];
-  //     variants?: Array<{
-  //       props: Partial<DividerProps>;
-  //       style: (props: { theme: Theme }) => unknown;
-  //     }>;
-  //   };
-  //   RazethSignUpLink?: {
-  //     defaultProps?: ComponentsPropsList["RazethSignUpLink"];
-  //     styleOverrides?: ComponentsOverrides<
-  //       Omit<Theme, "components">
-  //     >["RazethSignUpLink"];
-  //     variants?: Array<{
-  //       props: Partial<SignUpProps>;
-  //       style: (props: { theme: Theme }) => unknown;
-  //     }>;
-  //   };
-  //   RazethFooter?: {
-  //     defaultProps?: ComponentsPropsList["RazethFooter"];
-  //     styleOverrides?: ComponentsOverrides<
-  //       Omit<Theme, "components">
-  //     >["RazethFooter"];
-  //     variants?: Array<{
-  //       props: Partial<FooterProps>;
-  //       style: (props: { theme: Theme }) => unknown;
-  //     }>;
-  //   };
-  // }
-}
+//   // interface Components {
+//   //   RazethLogin?: {
+//   //     defaultProps?: ComponentsPropsList["RazethLogin"];
+//   //     styleOverrides?: ComponentsOverrides<
+//   //       Omit<Theme, "components">
+//   //     >["RazethLogin"];
+//   //     variants?: Array<{
+//   //       props: Partial<LoginProps>;
+//   //       style: (props: { theme: Theme }) => unknown;
+//   //     }>;
+//   //   };
+//   //   RazethSideImage?: {
+//   //     defaultProps?: ComponentsPropsList["RazethSideImage"];
+//   //     styleOverrides?: ComponentsOverrides<
+//   //       Omit<Theme, "components">
+//   //     >["RazethSideImage"];
+//   //     variants?: Array<{
+//   //       props: Partial<SideImageProps>;
+//   //       style: (props: { theme: Theme }) => unknown;
+//   //     }>;
+//   //   };
+//   //   RazethAvatar?: {
+//   //     defaultProps?: ComponentsPropsList["RazethAvatar"];
+//   //     styleOverrides?: ComponentsOverrides<
+//   //       Omit<Theme, "components">
+//   //     >["RazethAvatar"];
+//   //     variants?: Array<{
+//   //       props: Partial<AvatarProps>;
+//   //       style: (props: { theme: Theme }) => unknown;
+//   //     }>;
+//   //   };
+//   //   RazethDivider?: {
+//   //     defaultProps?: ComponentsPropsList["RazethDivider"];
+//   //     styleOverrides?: ComponentsOverrides<
+//   //       Omit<Theme, "components">
+//   //     >["RazethDivider"];
+//   //     variants?: Array<{
+//   //       props: Partial<DividerProps>;
+//   //       style: (props: { theme: Theme }) => unknown;
+//   //     }>;
+//   //   };
+//   //   RazethSignUpLink?: {
+//   //     defaultProps?: ComponentsPropsList["RazethSignUpLink"];
+//   //     styleOverrides?: ComponentsOverrides<
+//   //       Omit<Theme, "components">
+//   //     >["RazethSignUpLink"];
+//   //     variants?: Array<{
+//   //       props: Partial<SignUpProps>;
+//   //       style: (props: { theme: Theme }) => unknown;
+//   //     }>;
+//   //   };
+//   //   RazethFooter?: {
+//   //     defaultProps?: ComponentsPropsList["RazethFooter"];
+//   //     styleOverrides?: ComponentsOverrides<
+//   //       Omit<Theme, "components">
+//   //     >["RazethFooter"];
+//   //     variants?: Array<{
+//   //       props: Partial<FooterProps>;
+//   //       style: (props: { theme: Theme }) => unknown;
+//   //     }>;
+//   //   };
+//   // }
+// }
 
 // declare module "@mui/material/LinearProgress" {
 //   interface LinearProgressProps {
