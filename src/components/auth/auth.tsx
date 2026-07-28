@@ -1078,7 +1078,7 @@ export const Auth = (inProps: AuthProps) => {
                       {/* Divider and Social Login - shown for both forms */}
                       {divider}
                       {social}
-                      <LogoutButton />
+                      {/* <LogoutButton /> */}
                     </Box>
                   </CardContent>
                 </ParticleHexBackground>
