@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   // experimental: {
   //   appDir: true,
   // },
+  experimental: {
+    useTypeScriptCli: true, // Forces Next.js to use the native tsc binary
+  },
   env: {
     NEXT_PUBLIC_BACKEND_URL:
       process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000",
