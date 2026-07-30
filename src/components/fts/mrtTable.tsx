@@ -331,7 +331,7 @@ const detailPaneHeader_3 = [
 const data = generateRows(200);
 
 // --- Main Table Component ---
-export default function DocumentTable() {
+export default function DocumentTableOld() {
   const router = useRouter();
 
   // Dialog State (from your original code)

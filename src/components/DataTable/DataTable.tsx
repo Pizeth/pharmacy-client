@@ -29,22 +29,25 @@ import {
   Box,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useState, ReactNode, useMemo, useCallback } from "react";
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  horizontalListSortingStrategy,
-  useSortable,
-  arrayMove,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { useState, ReactNode, useMemo, useCallback, Fragment } from "react";
+import { DragDropProvider } from "@dnd-kit/react";
+import { useSortable } from "@dnd-kit/react/sortable";
+import { move } from "@dnd-kit/helpers";
+// import {
+//   DndContext,
+//   closestCenter,
+//   PointerSensor,
+//   useSensor,
+//   useSensors,
+//   type DragEndEvent,
+// } from "@dnd-kit/core";
+// import {
+//   SortableContext,
+//   horizontalListSortingStrategy,
+//   useSortable,
+//   arrayMove,
+// } from "@dnd-kit/sortable";
+// import { CSS } from "@dnd-kit/utilities";
 
 export type Density = "compact" | "standard" | "comfortable";
 
@@ -108,12 +111,12 @@ export interface DataTableProps<TData> {
   onGlobalFilterChange?: OnChangeFn<string>;
   expanded?: ExpandedState;
   onExpandedChange?: OnChangeFn<ExpandedState>;
-  renderDetailPanel?: (row: Row<TData>) => ReactNode;
-  onRowClick?: (row: Row<TData>) => void;
+  // renderDetailPanel?: (row: Row<TData>) => ReactNode;
+  // onRowClick?: (row: Row<TData>) => void;
   enableColumnResizing?: boolean;
   enableColumnOrdering?: boolean;
   enableColumnPinning?: boolean;
-  density?: "compact" | "standard" | "comfortable";
+  // density?: "compact" | "standard" | "comfortable";
   // For server-side pagination — pass Refine's table state through
   manualPagination?: boolean;
   pageCount?: number;
@@ -131,7 +134,7 @@ export function useDataTable<TData>({
   expanded: expandedProp,
   onExpandedChange,
   enableColumnResizing = true,
-  enableColumnPinning = true,
+  // enableColumnPinning = true,
   manualPagination = false,
   pageCount,
 }: DataTableProps<TData>) {
@@ -179,55 +182,50 @@ export function useDataTable<TData>({
     pageCount,
   });
 
-  return table;
+  // return table;
+  return { table, density, setDensity };
 }
 
-// ─── Draggable header cell ─────────────────────────────────────────────────
-function DraggableHeaderCell({
+// ─── Sortable header cell (dnd-kit/react) ──────────────────────────────────
+function SortableHeaderCell({
   header,
+  index,
   density,
   enableColumnResizing,
   enableColumnOrdering,
 }: {
   header: any;
+  index: number;
   density: Density;
   enableColumnResizing: boolean;
   enableColumnOrdering: boolean;
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: header.column.id, disabled: !enableColumnOrdering });
+  const sortable = useSortable({
+    id: header.column.id,
+    index,
+    disabled: !enableColumnOrdering,
+  });
 
   const isPinned = header.column.getIsPinned();
 
-  const style: React.CSSProperties = {
-    transform: CSS.Translate.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    width: header.getSize(),
-    position: isPinned ? "sticky" : "relative",
-    left: isPinned === "left" ? header.column.getStart("left") : undefined,
-    right: isPinned === "right" ? header.column.getAfter("right") : undefined,
-    zIndex: isPinned ? 4 : undefined,
-  };
-
   return (
     <TableCell
-      ref={setNodeRef}
-      style={style}
+      ref={sortable.ref}
       align="center"
       sx={{
         fontWeight: 700,
         padding: DENSITY_PADDING[density],
         backgroundColor: (theme) => theme.vars.palette.background.paper,
         whiteSpace: "nowrap",
+        position: isPinned ? "sticky" : "relative",
+        left: isPinned === "left" ? header.column.getStart("left") : undefined,
+        right:
+          isPinned === "right" ? header.column.getAfter("right") : undefined,
+        zIndex: isPinned ? 4 : undefined,
+        opacity: sortable.isDragging ? 0.5 : 1,
+        cursor: enableColumnOrdering ? "grab" : undefined,
       }}
-      {...(enableColumnOrdering ? { ...attributes, ...listeners } : {})}
+      style={{ width: header.getSize() }}
     >
       {header.isPlaceholder
         ? null
@@ -235,15 +233,82 @@ function DraggableHeaderCell({
       {enableColumnResizing && header.column.getCanResize() && (
         <ResizeHandle
           isResizing={header.column.getIsResizing()}
-          onMouseDown={header.getResizeHandler()}
-          onTouchStart={header.getResizeHandler()}
-          onClick={(e) => e.stopPropagation()} // don't trigger drag
+          onMouseDown={(e) => {
+            e.stopPropagation(); // don't trigger drag when resizing
+            header.getResizeHandler()(e);
+          }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            header.getResizeHandler()(e);
+          }}
         />
       )}
     </TableCell>
   );
 }
 
+// ─── Draggable header cell ─────────────────────────────────────────────────
+// function DraggableHeaderCell({
+//   header,
+//   density,
+//   enableColumnResizing,
+//   enableColumnOrdering,
+// }: {
+//   header: any;
+//   density: Density;
+//   enableColumnResizing: boolean;
+//   enableColumnOrdering: boolean;
+// }) {
+//   const {
+//     attributes,
+//     listeners,
+//     setNodeRef,
+//     transform,
+//     transition,
+//     isDragging,
+//   } = useSortable({ id: header.column.id, disabled: !enableColumnOrdering });
+
+//   const isPinned = header.column.getIsPinned();
+
+//   const style: React.CSSProperties = {
+//     transform: CSS.Translate.toString(transform),
+//     transition,
+//     opacity: isDragging ? 0.5 : 1,
+//     width: header.getSize(),
+//     position: isPinned ? "sticky" : "relative",
+//     left: isPinned === "left" ? header.column.getStart("left") : undefined,
+//     right: isPinned === "right" ? header.column.getAfter("right") : undefined,
+//     zIndex: isPinned ? 4 : undefined,
+//   };
+
+//   return (
+//     <TableCell
+//       ref={setNodeRef}
+//       style={style}
+//       align="center"
+//       sx={{
+//         fontWeight: 700,
+//         padding: DENSITY_PADDING[density],
+//         backgroundColor: (theme) => theme.vars.palette.background.paper,
+//         whiteSpace: "nowrap",
+//       }}
+//       {...(enableColumnOrdering ? { ...attributes, ...listeners } : {})}
+//     >
+//       {header.isPlaceholder
+//         ? null
+//         : flexRender(header.column.columnDef.header, header.getContext())}
+//       {enableColumnResizing && header.column.getCanResize() && (
+//         <ResizeHandle
+//           isResizing={header.column.getIsResizing()}
+//           onMouseDown={header.getResizeHandler()}
+//           onTouchStart={header.getResizeHandler()}
+//           onClick={(e) => e.stopPropagation()} // don't trigger drag
+//         />
+//       )}
+//     </TableCell>
+//   );
+// }
+
 export function DataTable<TData>({
   table,
   density = "standard",
@@ -252,8 +317,8 @@ export function DataTable<TData>({
   isFullScreen = false,
   enableColumnResizing = true,
   enableColumnOrdering = true,
-  enableStickyFooter = false,
-  footerContent,
+  // enableStickyFooter = false,
+  // footerContent,
 }: {
   table: TanStackTable<TData>;
   density?: Density;
@@ -262,230 +327,109 @@ export function DataTable<TData>({
   isFullScreen?: boolean;
   enableColumnResizing?: boolean;
   enableColumnOrdering?: boolean;
-  enableStickyFooter?: boolean;
-  footerContent?: ReactNode;
+  // enableStickyFooter?: boolean;
+  // footerContent?: ReactNode;
 }) {
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-  );
+  // const sensors = useSensors(
+  //   useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  // );
+
+  // const handleDragEnd = useCallback(
+  //   (event: DragEndEvent) => {
+  //     const { active, over } = event;
+  //     if (!over || active.id === over.id) return;
+
+  //     const columnOrder = table.getState().columnOrder;
+  //     const oldIndex = columnOrder.indexOf(active.id as string);
+  //     const newIndex = columnOrder.indexOf(over.id as string);
+  //     table.setColumnOrder(arrayMove(columnOrder, oldIndex, newIndex));
+  //   },
+  //   [table],
+  // );
+
+  // const columnIds = useMemo(
+  //   () => table.getVisibleLeafColumns().map((c) => c.id),
+  //   [table.getState().columnOrder, table.getState().columnVisibility],
+  // );
+
+  const columnOrder = table.getState().columnOrder;
 
   const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
+    (event: any) => {
+      const { operation, canceled } = event;
+      if (canceled) return;
 
-      const columnOrder = table.getState().columnOrder;
-      const oldIndex = columnOrder.indexOf(active.id as string);
-      const newIndex = columnOrder.indexOf(over.id as string);
-      table.setColumnOrder(arrayMove(columnOrder, oldIndex, newIndex));
+      const { source, target } = operation;
+      if (!target || source.id === target.id) return;
+
+      // `move` from @dnd-kit/helpers reorders an array of ids given source/target
+      const newOrder = move(columnOrder, event);
+      table.setColumnOrder(newOrder);
     },
-    [table],
+    [columnOrder, table],
   );
 
-  const columnIds = useMemo(
-    () => table.getVisibleLeafColumns().map((c) => c.id),
-    [table.getState().columnOrder, table.getState().columnVisibility],
-  );
+  const hasFooters = table
+    .getFooterGroups()
+    .some((fg) => fg.headers.some((h) => h.column.columnDef.footer));
 
   return (
     <StyledTableContainer isFullScreen={isFullScreen}>
-      <DndContext
+      {/* <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
-      >
+      > */}
+      <DragDropProvider onDragEnd={handleDragEnd}>
         <Table stickyHeader size="small" style={{ tableLayout: "fixed" }}>
           <StyledTableHead>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableCell
+                {headerGroup.headers.map((header, index) => (
+                  // <TableCell
+                  //   key={header.id}
+                  //   align="center"
+                  //   sx={{ fontWeight: 700 }}
+                  // >
+                  //   {header.isPlaceholder
+                  //     ? null
+                  //     : flexRender(
+                  //         header.column.columnDef.header,
+                  //         header.getContext(),
+                  //       )}
+                  // </TableCell>
+                  // <SortableContext
+                  //   items={columnIds}
+                  //   strategy={horizontalListSortingStrategy}
+                  // >
+                  //   {headerGroup.headers.map((header) => (
+                  //     <DraggableHeaderCell
+                  //       key={header.id}
+                  //       header={header}
+                  //       density={density}
+                  //       enableColumnResizing={enableColumnResizing}
+                  //       enableColumnOrdering={enableColumnOrdering}
+                  //     />
+                  //   ))}
+                  // </SortableContext>
+
+                  <SortableHeaderCell
                     key={header.id}
-                    align="center"
-                    sx={{ fontWeight: 700 }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableCell>
+                    header={header}
+                    index={index}
+                    density={density}
+                    enableColumnResizing={enableColumnResizing}
+                    enableColumnOrdering={enableColumnOrdering}
+                  />
                 ))}
               </TableRow>
             ))}
           </StyledTableHead>
           <TableBody>
             {table.getRowModel().rows.map((row) => (
-              <>
+              <Fragment key={row.id}>
                 <StyledTableRow
-                  key={row.id}
-                  onClick={() => onRowClick?.(row)}
-                  selected={row.getIsSelected()}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} align="center">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </StyledTableRow>
-                {row.getIsExpanded() && renderDetailPanel && (
-                  <TableRow key={`${row.id}-detail`}>
-                    <TableCell colSpan={row.getVisibleCells().length}>
-                      {renderDetailPanel(row)}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </>
-            ))}
-          </TableBody>
-        </Table>
-      </DndContext>
-    </StyledTableContainer>
-  );
-}
-
-export default DataTable;
-
-export function useDataTable<TData>({
-  columns,
-  data,
-  getRowId,
-  enableRowSelection = false,
-  rowSelection: rowSelectionProp,
-  onRowSelectionChange,
-  globalFilter: globalFilterProp,
-  onGlobalFilterChange,
-  expanded: expandedProp,
-  onExpandedChange,
-  enableColumnResizing = true,
-  enableColumnPinning = true,
-  manualPagination = false,
-  pageCount,
-}: DataTableProps<TData>) {
-  const [internalRowSelection, setInternalRowSelection] =
-    useState<RowSelectionState>({});
-  const [internalGlobalFilter, setInternalGlobalFilter] = useState("");
-  const [internalExpanded, setInternalExpanded] = useState<ExpandedState>({});
-  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
-  const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
-    columns.map((c) => (c.id ?? (c as any).accessorKey) as string),
-  );
-  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({});
-  const [density, setDensity] = useState<Density>("standard");
-
-  const table = useReactTable({
-    columns,
-    data,
-    getRowId: getRowId as any,
-    state: {
-      rowSelection: rowSelectionProp ?? internalRowSelection,
-      globalFilter: globalFilterProp ?? internalGlobalFilter,
-      expanded: expandedProp ?? internalExpanded,
-      columnSizing,
-      columnOrder,
-      columnPinning,
-    },
-    enableRowSelection,
-    onRowSelectionChange: onRowSelectionChange ?? setInternalRowSelection,
-    onGlobalFilterChange: onGlobalFilterChange ?? setInternalGlobalFilter,
-    onExpandedChange: onExpandedChange ?? setInternalExpanded,
-    onColumnSizingChange: setColumnSizing,
-    onColumnOrderChange: setColumnOrder,
-    onColumnPinningChange: setColumnPinning,
-    columnResizeMode: "onChange",
-    enableColumnResizing,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: manualPagination ? undefined : getFilteredRowModel(),
-    getPaginationRowModel: manualPagination
-      ? undefined
-      : getPaginationRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    manualPagination,
-    pageCount,
-  });
-
-  return { table, density, setDensity };
-}
-
-export function DataTable<TData>({
-  table,
-  density = "standard",
-  renderDetailPanel,
-  onRowClick,
-  isFullScreen = false,
-  enableColumnResizing = true,
-  enableColumnOrdering = true,
-  enableStickyFooter = false,
-  footerContent,
-}: {
-  table: TanStackTable<TData>;
-  density?: Density;
-  renderDetailPanel?: (row: Row<TData>) => ReactNode;
-  onRowClick?: (row: Row<TData>) => void;
-  isFullScreen?: boolean;
-  enableColumnResizing?: boolean;
-  enableColumnOrdering?: boolean;
-  enableStickyFooter?: boolean;
-  footerContent?: ReactNode;
-}) {
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-  );
-
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
-
-      const columnOrder = table.getState().columnOrder;
-      const oldIndex = columnOrder.indexOf(active.id as string);
-      const newIndex = columnOrder.indexOf(over.id as string);
-      table.setColumnOrder(arrayMove(columnOrder, oldIndex, newIndex));
-    },
-    [table],
-  );
-
-  const columnIds = useMemo(
-    () => table.getVisibleLeafColumns().map((c) => c.id),
-    [table.getState().columnOrder, table.getState().columnVisibility],
-  );
-
-  return (
-    <StyledTableContainer isFullScreen={isFullScreen}>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <Table stickyHeader size="small" style={{ tableLayout: "fixed" }}>
-          <StyledTableHead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                <SortableContext
-                  items={columnIds}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  {headerGroup.headers.map((header) => (
-                    <DraggableHeaderCell
-                      key={header.id}
-                      header={header}
-                      density={density}
-                      enableColumnResizing={enableColumnResizing}
-                      enableColumnOrdering={enableColumnOrdering}
-                    />
-                  ))}
-                </SortableContext>
-              </TableRow>
-            ))}
-          </StyledTableHead>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <React.Fragment key={row.id}>
-                <StyledTableRow
+                  // key={row.id}
                   onClick={() => onRowClick?.(row)}
                   selected={row.getIsSelected()}
                 >
@@ -522,16 +466,16 @@ export function DataTable<TData>({
                   })}
                 </StyledTableRow>
                 {row.getIsExpanded() && renderDetailPanel && (
-                  <TableRow>
+                  <TableRow key={`${row.id}-detail`}>
                     <TableCell colSpan={row.getVisibleCells().length}>
                       {renderDetailPanel(row)}
                     </TableCell>
                   </TableRow>
                 )}
-              </React.Fragment>
+              </Fragment>
             ))}
           </TableBody>
-          {enableStickyFooter && footerContent && (
+          {/* {enableStickyFooter && footerContent && (
             <Box
               component="tfoot"
               sx={{
@@ -547,7 +491,7 @@ export function DataTable<TData>({
                 </TableCell>
               </TableRow>
             </Box>
-          )}
+          )} */}
 
           {table
             .getFooterGroups()
@@ -589,8 +533,47 @@ export function DataTable<TData>({
               ))}
             </Box>
           )}
+
+          {hasFooters && (
+            <Box
+              component="tfoot"
+              sx={{
+                position: "sticky",
+                bottom: 0,
+                zIndex: 3,
+                backgroundColor: (theme) => theme.vars.palette.background.paper,
+                borderTop: (theme) =>
+                  `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.125)}`,
+              }}
+            >
+              {table.getFooterGroups().map((footerGroup) => (
+                <TableRow key={footerGroup.id}>
+                  {footerGroup.headers.map((header) => (
+                    <TableCell
+                      key={header.id}
+                      align="center"
+                      sx={{
+                        fontWeight: 700,
+                        padding: DENSITY_PADDING[density],
+                      }}
+                      style={{ width: header.getSize() }}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.footer,
+                            header.getContext(),
+                          )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </Box>
+          )}
         </Table>
-      </DndContext>
+      </DragDropProvider>
+
+      {/* </DndContext> */}
     </StyledTableContainer>
   );
 }

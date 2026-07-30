@@ -1,4 +1,4 @@
-// src/components/DataTable/DataTableToolbar.tsx
+// src/components/DataTable/DataTableToolbars.tsx
 "use client";
 import {
   TextField,
@@ -17,7 +17,7 @@ import {
   PushPin,
   PushPinOutlined,
 } from "@mui/icons-material";
-import type { Table, Column } from "@tanstack/react-table";
+import type { Table as TanStackTable, Column } from "@tanstack/react-table";
 import { useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -30,10 +30,15 @@ export function GlobalFilterTextField<TData>({
   label = "ស្វែងរក",
   placeholder,
 }: {
-  table: Table<TData>;
+  table: TanStackTable<TData>;
   label?: string;
   placeholder?: string;
 }) {
+  // Safety guard against undefined or un-destructured hook objects
+  if (!table || typeof table.getState !== "function") {
+    return null;
+  }
+
   return (
     <TextField
       label={label}
@@ -56,7 +61,16 @@ export function GlobalFilterTextField<TData>({
   );
 }
 
-export function TablePaginationBar<TData>({ table }: { table: Table<TData> }) {
+export function TablePaginationBar<TData>({
+  table,
+}: {
+  table: TanStackTable<TData>;
+}) {
+  // Safety guard against undefined or un-destructured hook objects
+  if (!table || typeof table.getState !== "function") {
+    return null;
+  }
+
   const { pageIndex, pageSize } = table.getState().pagination;
   return (
     <TablePagination
@@ -74,9 +88,15 @@ export function TablePaginationBar<TData>({ table }: { table: Table<TData> }) {
 export function ShowHideColumnsButton<TData>({
   table,
 }: {
-  table: Table<TData>;
+  table: TanStackTable<TData>;
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  // Safety guard against undefined or un-destructured hook objects
+  if (!table || typeof table.getAllLeafColumns !== "function") {
+    return null;
+  }
+
   return (
     <>
       <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
@@ -145,9 +165,11 @@ export function DensityToggleButton({
 export function ColumnPinningMenuButton<TData>({
   table,
 }: {
-  table: Table<TData>;
+  table: TanStackTable<TData>;
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  if (!table || typeof table.getAllLeafColumns !== "function") return null;
 
   return (
     <>

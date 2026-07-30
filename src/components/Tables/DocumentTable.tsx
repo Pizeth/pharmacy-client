@@ -1,6 +1,6 @@
 // src/components/Tables/DocumentTable.tsx
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type {
   ColumnDef,
   Row,
@@ -56,6 +56,8 @@ import {
   TablePaginationBar,
   ShowHideColumnsButton,
   FullScreenToggleButton,
+  DensityToggleButton,
+  ColumnPinningMenuButton,
 } from "../DataTable/DataTableToolbars";
 
 const PREFIX = "RazethTable";
@@ -83,7 +85,7 @@ const ToolBar = styled(Box)(({ theme }) => ({
 }));
 
 const BottomBar = styled(Box)(({ theme }) => ({
-  alignItems: "flex-start",
+  alignItems: "center",
   backgroundColor: theme.vars.palette.background.paper,
   display: "flex",
   justifyContent: "space-between",
@@ -243,6 +245,7 @@ export default function DocumentTable() {
             checked={table.getIsAllRowsSelected()}
             indeterminate={table.getIsSomeRowsSelected()}
             onChange={table.getToggleAllRowsSelectedHandler()}
+            onClick={(e) => e.stopPropagation()}
           />
         ),
         cell: ({ row }) => (
@@ -252,6 +255,7 @@ export default function DocumentTable() {
             onClick={(e) => e.stopPropagation()}
           />
         ),
+        enableResizing: false,
         size: 40,
       },
       {
@@ -273,6 +277,7 @@ export default function DocumentTable() {
               )}
             </IconButton>
           ) : null,
+        enableResizing: false,
         size: 40,
       },
       {
@@ -283,10 +288,12 @@ export default function DocumentTable() {
       {
         accessorKey: "title",
         header: "ឈ្មោះឯកសារ",
+        size: 200,
       },
       {
         accessorKey: "status",
         header: "ស្ថានភាព",
+        size: 120,
         cell: ({ getValue }) => {
           const value = getValue<string>();
           return (
@@ -326,6 +333,8 @@ export default function DocumentTable() {
       {
         accessorKey: "days",
         header: "ចំនួនថ្ងៃ",
+        size: 100,
+        // 👇 Column-aggregation footer — sums the "days" field across all filtered rows
         footer: ({ table }) => {
           const total = table
             .getFilteredRowModel()
@@ -347,6 +356,7 @@ export default function DocumentTable() {
       {
         id: "actions",
         header: "ចំណាត់ការឯកសារ",
+        size: 120,
         cell: ({ row }) => (
           <Box
             sx={{
@@ -399,13 +409,12 @@ export default function DocumentTable() {
             <RowActionMenu row={row} />
           </Box>
         ),
-        size: 100,
       },
     ],
     [],
   );
 
-  const table = useDataTable({
+  const { table, density, setDensity } = useDataTable({
     columns,
     data,
     getRowId: (row) => row.id.toString(),
@@ -414,11 +423,16 @@ export default function DocumentTable() {
     onRowSelectionChange: setRowSelection,
     expanded,
     onExpandedChange: setExpanded,
+    enableColumnResizing: true,
   });
 
   // Set initial page size to 100 to match your original initialState
-  React.useEffect(() => {
+  useEffect(() => {
     table.setPageSize(100);
+    table.setColumnPinning({
+      left: ["select", "expand"],
+      right: ["actions"],
+    });
   }, [table]);
 
   const selectedCount = Object.keys(rowSelection).length;
@@ -465,6 +479,8 @@ export default function DocumentTable() {
             </span>
           </Tooltip>
           <ShowHideColumnsButton table={table} />
+          <ColumnPinningMenuButton table={table} />
+          <DensityToggleButton density={density} onChange={setDensity} />
           <FullScreenToggleButton
             isFullScreen={isFullScreen}
             onToggle={() => setIsFullScreen((p) => !p)}
@@ -474,6 +490,10 @@ export default function DocumentTable() {
 
       <DataTable
         table={table}
+        density={density}
+        isFullScreen={isFullScreen}
+        enableColumnResizing
+        enableColumnOrdering
         renderDetailPanel={(row: Row<Data>) => {
           const details = row.original.details;
           return (
@@ -636,6 +656,10 @@ export default function DocumentTable() {
               )}
             </DetailPane>
           );
+        }}
+        onRowClick={(row) => {
+          // matches your original: no-op, or navigate if you want
+          // router.push(`/documents/${row.original.id}`);
         }}
       />
 
