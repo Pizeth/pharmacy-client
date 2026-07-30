@@ -310,9 +310,28 @@ export default function DocumentTable() {
           );
         },
       },
+      // {
+      //   accessorKey: "days",
+      //   header: "ចំនួនថ្ងៃ",
+      //   cell: ({ getValue }) => {
+      //     const value = getValue<number>();
+      //     return (
+      //       <DateBox value={value}>
+      //         {MsgUtils.toLocaleNumerals(value, "km-KH")}ថ្ងៃ
+      //       </DateBox>
+      //     );
+      //   },
+      // },
+
       {
         accessorKey: "days",
         header: "ចំនួនថ្ងៃ",
+        footer: ({ table }) => {
+          const total = table
+            .getFilteredRowModel()
+            .rows.reduce((sum, row) => sum + row.original.days, 0);
+          return `សរុប: ${MsgUtils.toLocaleNumerals(total, "km-KH")}`;
+        },
         cell: ({ getValue }) => {
           const value = getValue<number>();
           return (
