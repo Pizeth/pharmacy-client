@@ -5,6 +5,12 @@ import {
   InputAdornment,
   TablePagination,
   IconButton,
+  Box,
+  Button,
+  Divider,
+  Typography,
+  Switch,
+  Collapse,
 } from "@mui/material";
 import {
   SearchOutlined,
@@ -16,6 +22,9 @@ import {
   DensityLarge,
   PushPin,
   PushPinOutlined,
+  FilterListOutlined,
+  DragIndicator,
+  SearchOffOutlined,
 } from "@mui/icons-material";
 import type { Table as TanStackTable, Column } from "@tanstack/react-table";
 import { useState } from "react";
@@ -24,6 +33,202 @@ import MenuItem from "@mui/material/MenuItem";
 import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
 import type { Density } from "./DataTable";
+import Close from "@mui/icons-material/Close";
+import FlipIconWrapper from "../icons/components/FlipIconWrapper";
+
+// DataTableToolbarPieces.tsx — replace GlobalFilterTextField
+export function CollapsibleGlobalFilterOld<TData>({
+  table,
+  label = "ស្វែងរក",
+  placeholder,
+}: {
+  table: TanStackTable<TData>;
+  label?: string;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(true);
+  const value = (table.getState().globalFilter ?? "") as string;
+  // const isExpanded = open || !!value;
+  const isExpanded = open;
+
+  // if (!open && !value) {
+  //   return (
+  //     <IconButton onClick={() => setOpen(true)}>
+  //       <SearchOutlined />
+  //     </IconButton>
+  //   );
+  // }
+
+  // return (
+  //   <TextField
+  //     autoFocus
+  //     size="small"
+  //     placeholder={placeholder}
+  //     value={value}
+  //     onChange={(e) => table.setGlobalFilter(e.target.value)}
+  //     onBlur={() => !value && setOpen(false)}
+  //     slotProps={{
+  //       input: {
+  //         startAdornment: (
+  //           <InputAdornment position="start">
+  //             <SearchOutlined fontSize="small" color="error" />
+  //           </InputAdornment>
+  //         ),
+  //         endAdornment: (
+  //           <InputAdornment position="end">
+  //             <IconButton
+  //               size="small"
+  //               onClick={() => {
+  //                 table.setGlobalFilter("");
+  //                 setOpen(false);
+  //               }}
+  //             >
+  //               <Close fontSize="small" />
+  //             </IconButton>
+  //           </InputAdornment>
+  //         ),
+  //       },
+  //     }}
+  //     sx={{ width: 260, transition: "width 0.2s ease" }}
+  //   />
+  // );
+
+  return (
+    <>
+      {!isExpanded && (
+        <IconButton onClick={() => setOpen(true)}>
+          <SearchOutlined color="error" />
+        </IconButton>
+      )}
+
+      {/* 👇 Collapse wraps the field itself, matching MRT's horizontal collapse */}
+      <Collapse in={isExpanded} orientation="horizontal" sx={{ minWidth: 0 }}>
+        <TextField
+          autoFocus={open}
+          label={label}
+          placeholder={placeholder}
+          variant="outlined"
+          size="small"
+          margin="dense"
+          fullWidth
+          value={value}
+          onChange={(e) => table.setGlobalFilter(e.target.value)}
+          // onBlur={() => !value && setOpen(false)}
+          slotProps={{
+            inputLabel: { shrink: true },
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchOutlined color="error" />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    disabled={!value}
+                    aria-label="សម្អាតការស្វែងរក"
+                    onClick={() => {
+                      table.setGlobalFilter("");
+                      // setOpen(false);
+                    }}
+                  >
+                    <Close />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+      </Collapse>
+    </>
+  );
+}
+
+// DataTableToolbarPieces.tsx
+export function CollapsibleGlobalFilter<TData>({
+  table,
+  open,
+  label = "ស្វែងរក",
+  placeholder,
+}: {
+  table: TanStackTable<TData>;
+  open: boolean;
+  label?: string;
+  placeholder?: string;
+}) {
+  const value = (table.getState().globalFilter ?? "") as string;
+
+  return (
+    <Collapse in={open} orientation="horizontal" sx={{ minWidth: 0 }}>
+      <TextField
+        autoFocus={open}
+        label={label}
+        placeholder={placeholder}
+        variant="outlined"
+        size="small"
+        margin="dense"
+        fullWidth
+        value={value}
+        onChange={(e) => table.setGlobalFilter(e.target.value)}
+        slotProps={{
+          inputLabel: { shrink: true },
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <FlipIconWrapper>
+                  <SearchOutlined color="error" />
+                </FlipIconWrapper>
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  size="small"
+                  disabled={!value}
+                  aria-label="សម្អាតការស្វែងរក"
+                  onClick={() => table.setGlobalFilter("")}
+                >
+                  <Close />
+                </IconButton>
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
+    </Collapse>
+  );
+}
+
+// 👇 Separate toggle button — lives in the toolbar icon cluster, not inside the field
+export function ToggleGlobalFilterButton({
+  open,
+  onToggle,
+}: {
+  open: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <IconButton onClick={onToggle} color={open ? "primary" : "default"}>
+      {open ? <SearchOffOutlined /> : <SearchOutlined />}
+    </IconButton>
+  );
+}
+
+// DataTableToolbarPieces.tsx
+export function ToggleFiltersButton({
+  showFilters,
+  onToggle,
+}: {
+  showFilters: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <IconButton onClick={onToggle} color={showFilters ? "primary" : "default"}>
+      <FilterListOutlined />
+    </IconButton>
+  );
+}
 
 export function GlobalFilterTextField<TData>({
   table,
@@ -85,17 +290,49 @@ export function TablePaginationBar<TData>({
   );
 }
 
-export function ShowHideColumnsButton<TData>({
+// export function ShowHideColumnsButton<TData>({
+//   table,
+// }: {
+//   table: TanStackTable<TData>;
+// }) {
+//   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+//   // Safety guard against undefined or un-destructured hook objects
+//   if (!table || typeof table.getAllLeafColumns !== "function") {
+//     return null;
+//   }
+
+//   return (
+//     <>
+//       <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
+//         <ViewColumn />
+//       </IconButton>
+//       <Menu
+//         anchorEl={anchorEl}
+//         open={!!anchorEl}
+//         onClose={() => setAnchorEl(null)}
+//       >
+//         {table.getAllLeafColumns().map((column) => (
+//           <MenuItem
+//             key={column.id}
+//             onClick={() => column.toggleVisibility()}
+//             dense
+//           >
+//             <Checkbox checked={column.getIsVisible()} size="small" />
+//             <ListItemText primary={column.id} />
+//           </MenuItem>
+//         ))}
+//       </Menu>
+//     </>
+//   );
+// }
+
+export function ColumnSettingsMenu<TData>({
   table,
 }: {
   table: TanStackTable<TData>;
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  // Safety guard against undefined or un-destructured hook objects
-  if (!table || typeof table.getAllLeafColumns !== "function") {
-    return null;
-  }
 
   return (
     <>
@@ -106,17 +343,63 @@ export function ShowHideColumnsButton<TData>({
         anchorEl={anchorEl}
         open={!!anchorEl}
         onClose={() => setAnchorEl(null)}
+        slotProps={{ paper: { sx: { minWidth: 320 } } }}
       >
-        {table.getAllLeafColumns().map((column) => (
-          <MenuItem
-            key={column.id}
-            onClick={() => column.toggleVisibility()}
-            dense
+        <Box
+          sx={{ display: "flex", justifyContent: "space-around", px: 1, pb: 1 }}
+        >
+          <Button
+            size="small"
+            onClick={() => table.toggleAllColumnsVisible(true)}
           >
-            <Checkbox checked={column.getIsVisible()} size="small" />
-            <ListItemText primary={column.id} />
-          </MenuItem>
-        ))}
+            លក់ទាំងអស់
+          </Button>
+          <Button
+            size="small"
+            onClick={() => table.toggleAllColumnsVisible(false)}
+          >
+            ខ្សល់ទាំងអស់
+          </Button>
+          <Button size="small" onClick={() => table.resetColumnOrder()}>
+            បង្ហាញទាំងអស់
+          </Button>
+        </Box>
+        <Divider />
+        {table.getAllLeafColumns().map((column) => {
+          const pinned = column.getIsPinned();
+          return (
+            <MenuItem key={column.id} sx={{ gap: 1 }}>
+              <IconButton
+                size="small"
+                onClick={() => column.pin(pinned === "left" ? false : "left")}
+                color={pinned === "left" ? "primary" : "default"}
+                title="Pin left"
+              >
+                <PushPin fontSize="small" sx={{ transform: "scaleX(-1)" }} />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => column.pin(pinned === "right" ? false : "right")}
+                color={pinned === "right" ? "primary" : "default"}
+                title="Pin right"
+              >
+                <PushPin fontSize="small" />
+              </IconButton>
+              <Typography variant="body2" sx={{ flex: 1 }}>
+                {column.id}
+              </Typography>
+              <Switch
+                size="small"
+                checked={column.getIsVisible()}
+                onChange={() => column.toggleVisibility()}
+              />
+              <DragIndicator
+                fontSize="small"
+                sx={{ opacity: 0.4, cursor: "grab" }}
+              />
+            </MenuItem>
+          );
+        })}
       </Menu>
     </>
   );

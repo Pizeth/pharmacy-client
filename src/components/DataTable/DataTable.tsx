@@ -16,6 +16,7 @@ import {
   type ColumnSizingState,
   type ColumnOrderState,
   type ColumnPinningState,
+  type ColumnFiltersState,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -27,6 +28,7 @@ import {
   Checkbox,
   Paper,
   Box,
+  TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useState, ReactNode, useMemo, useCallback, Fragment } from "react";
@@ -149,6 +151,9 @@ export function useDataTable<TData>({
     columns.map((c) => (c.id ?? (c as any).accessorKey) as string),
   );
   const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [showGlobalFilter, setShowGlobalFilter] = useState(true);
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
   const [density, setDensity] = useState<Density>("standard");
 
   const table = useReactTable({
@@ -162,6 +167,7 @@ export function useDataTable<TData>({
       columnSizing,
       columnOrder,
       columnPinning,
+      columnFilters,
     },
     enableRowSelection,
     onRowSelectionChange: onRowSelectionChange ?? setInternalRowSelection,
@@ -170,6 +176,7 @@ export function useDataTable<TData>({
     onColumnSizingChange: setColumnSizing,
     onColumnOrderChange: setColumnOrder,
     onColumnPinningChange: setColumnPinning,
+    onColumnFiltersChange: setColumnFilters,
     columnResizeMode: "onChange",
     enableColumnResizing,
     getCoreRowModel: getCoreRowModel(),
@@ -183,7 +190,15 @@ export function useDataTable<TData>({
   });
 
   // return table;
-  return { table, density, setDensity };
+  return {
+    table,
+    density,
+    setDensity,
+    showColumnFilters,
+    setShowColumnFilters,
+    showGlobalFilter,
+    setShowGlobalFilter,
+  };
 }
 
 // ─── Sortable header cell (dnd-kit/react) ──────────────────────────────────
@@ -312,6 +327,7 @@ function SortableHeaderCell({
 export function DataTable<TData>({
   table,
   density = "standard",
+  showColumnFilters = false,
   renderDetailPanel,
   onRowClick,
   isFullScreen = false,
@@ -322,6 +338,7 @@ export function DataTable<TData>({
 }: {
   table: TanStackTable<TData>;
   density?: Density;
+  showColumnFilters?: boolean;
   renderDetailPanel?: (row: Row<TData>) => ReactNode;
   onRowClick?: (row: Row<TData>) => void;
   isFullScreen?: boolean;
@@ -424,6 +441,32 @@ export function DataTable<TData>({
                 ))}
               </TableRow>
             ))}
+
+            {/* 👇 use the prop, not table.getState() */}
+            {showColumnFilters && (
+              <TableRow>
+                {table.getVisibleLeafColumns().map((column) => (
+                  <TableCell key={column.id} sx={{ padding: "2px 8px" }}>
+                    {column.getCanFilter() ? (
+                      <TextField
+                        variant="standard"
+                        size="small"
+                        fullWidth
+                        // placeholder={`ត្រង​តាមរយៈ: ${flexRender(column.columnDef.header, {} as any) ?? column.id}`}
+                        placeholder={`ត្រង​តាមរយៈ: ${
+                          typeof column.columnDef.header === "string"
+                            ? column.columnDef.header
+                            : column.id
+                        }`}
+                        value={(column.getFilterValue() ?? "") as string}
+                        onChange={(e) => column.setFilterValue(e.target.value)}
+                        slotProps={{ input: { disableUnderline: false } }}
+                      />
+                    ) : null}
+                  </TableCell>
+                ))}
+              </TableRow>
+            )}
           </StyledTableHead>
           <TableBody>
             {table.getRowModel().rows.map((row) => (

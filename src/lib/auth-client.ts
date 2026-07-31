@@ -11,6 +11,7 @@ import {
 
 import { passkeyClient } from "@better-auth/passkey/client";
 import { API_URL, COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
+import { BetterAuthClientPlugin } from "better-auth/client";
 
 export const authClient = createAuthClient({
   // 👆 Just the origin — Better Auth appends /api/auth internally
@@ -40,7 +41,7 @@ export const authClient = createAuthClient({
   },
   plugins: [
     usernameClient(),
-    jwtClient(),
+    jwtClient() as BetterAuthClientPlugin,
     twoFactorClient(),
     passkeyClient(),
     multiSessionClient(),
@@ -61,7 +62,7 @@ export const authClient = createAuthClient({
         baseDelay: 1000, // Base delay in ms (default: 1000)
         maxAttempts: 5, // Maximum number of attempts before triggering onPromptNotification (default: 5)
       },
-    }),
+    }) as BetterAuthClientPlugin,
   ],
 });
 

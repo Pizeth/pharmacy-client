@@ -132,6 +132,7 @@ export default function AdministrativeForm() {
           </Paper>
           <EnhancedTable /> */}
           <DocumentTable />
+          <br />
           <DocumentTableOld />
           {/* <StickyFAB /> */}
         </form>

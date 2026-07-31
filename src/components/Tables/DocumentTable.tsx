@@ -52,12 +52,16 @@ import NAIcon from "../icons/na";
 import { DataTable, useDataTable } from "../DataTable/DataTable";
 
 import {
-  GlobalFilterTextField,
+  // GlobalFilterTextField,
+  CollapsibleGlobalFilter,
   TablePaginationBar,
-  ShowHideColumnsButton,
+  // ShowHideColumnsButton,
   FullScreenToggleButton,
   DensityToggleButton,
   ColumnPinningMenuButton,
+  ColumnSettingsMenu,
+  ToggleFiltersButton,
+  ToggleGlobalFilterButton,
 } from "../DataTable/DataTableToolbars";
 
 const PREFIX = "RazethTable";
@@ -76,8 +80,12 @@ const ToolBar = styled(Box)(({ theme }) => ({
   gap: "0.5rem",
   justifyContent: "space-between",
   padding: "0.5rem",
+  "@media max-width: 768px": {
+    flexDirection: "column",
+  },
   color: theme.vars.palette.text.primary,
   backgroundColor: theme.vars.palette.background.paper,
+  backgroundImage: "unset",
   overflow: "hidden",
   transition: "all 100ms ease-in-out",
   borderBottom: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.125)}`,
@@ -414,7 +422,15 @@ export default function DocumentTable() {
     [],
   );
 
-  const { table, density, setDensity } = useDataTable({
+  const {
+    table,
+    density = "compact",
+    setDensity,
+    showColumnFilters,
+    setShowColumnFilters,
+    showGlobalFilter,
+    setShowGlobalFilter,
+  } = useDataTable({
     columns,
     data,
     getRowId: (row) => row.id.toString(),
@@ -455,9 +471,17 @@ export default function DocumentTable() {
           </AddButton>
         </Box>
 
-        <GlobalFilterTextField table={table} placeholder="ល.ន.ធ.ម" />
+        <CollapsibleGlobalFilter
+          table={table}
+          open={showGlobalFilter}
+          placeholder="ល.ន.ធ.ម"
+        />
 
-        <Box>
+        <Box sx={{ display: "flex", gap: 0.25 }}>
+          <ToggleGlobalFilterButton
+            open={showGlobalFilter}
+            onToggle={() => setShowGlobalFilter((p) => !p)}
+          />
           <IconButton onClick={() => window.print()}>
             <Print />
           </IconButton>
@@ -478,8 +502,12 @@ export default function DocumentTable() {
               </IconButton>
             </span>
           </Tooltip>
-          <ShowHideColumnsButton table={table} />
-          <ColumnPinningMenuButton table={table} />
+          <ToggleFiltersButton
+            showFilters={showColumnFilters}
+            onToggle={() => setShowColumnFilters((p) => !p)}
+          />
+          <ColumnSettingsMenu table={table} />
+          {/* <ColumnPinningMenuButton table={table} /> */}
           <DensityToggleButton density={density} onChange={setDensity} />
           <FullScreenToggleButton
             isFullScreen={isFullScreen}
@@ -491,6 +519,7 @@ export default function DocumentTable() {
       <DataTable
         table={table}
         density={density}
+        showColumnFilters={showColumnFilters}
         isFullScreen={isFullScreen}
         enableColumnResizing
         enableColumnOrdering
