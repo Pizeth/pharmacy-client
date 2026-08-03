@@ -40,6 +40,8 @@ import {
   ImageNotSupported,
   KeyboardArrowDown,
   KeyboardArrowRight,
+  KeyboardDoubleArrowUp,
+  KeyboardDoubleArrowDown,
 } from "@mui/icons-material";
 import { parse } from "date-fns";
 
@@ -63,6 +65,7 @@ import {
   ToggleFiltersButton,
   ToggleGlobalFilterButton,
 } from "../DataTable/DataTableToolbars";
+import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
 
 const PREFIX = "RazethTable";
 
@@ -264,11 +267,30 @@ export default function DocumentTable() {
           />
         ),
         enableResizing: false,
-        size: 40,
+        // size: 40,
+        // minSize: 40,
+        // maxSize: 40, // 👈 add minSize/maxSize to lock it fully
       },
       {
         id: "expand",
-        header: () => null,
+        header: ({ table }) => {
+          const allExpanded = table.getIsAllRowsExpanded();
+          return (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                table.toggleAllRowsExpanded();
+              }}
+            >
+              {allExpanded ? (
+                <KeyboardDoubleArrowUp />
+              ) : (
+                <KeyboardDoubleArrowDown />
+              )}
+            </IconButton>
+          );
+        },
         cell: ({ row }) =>
           row.original.details ? (
             <IconButton
@@ -279,29 +301,35 @@ export default function DocumentTable() {
               }}
             >
               {row.getIsExpanded() ? (
-                <KeyboardArrowDown />
+                <KeyboardArrowUp />
               ) : (
-                <KeyboardArrowRight />
+                <KeyboardArrowDown />
               )}
             </IconButton>
           ) : null,
         enableResizing: false,
-        size: 40,
+        // size: 40,
+        // minSize: 40,
+        // maxSize: 40, // 👈 add minSize/maxSize to lock it fully
       },
       {
         accessorKey: "id",
         header: "ល.រ នធម",
-        size: 60,
+        // size: 60,
+        enableColumnActions: false, // 👈 matches MRT
+        meta: { align: "center" }, // optional — see note below
+        footer: ({ table }) =>
+          `${table.getFilteredRowModel().rows.length} កំណត់ត្រា`,
       },
       {
         accessorKey: "title",
         header: "ឈ្មោះឯកសារ",
-        size: 200,
+        // size: 200,
       },
       {
         accessorKey: "status",
         header: "ស្ថានភាព",
-        size: 120,
+        // size: 120,
         cell: ({ getValue }) => {
           const value = getValue<string>();
           return (
@@ -341,8 +369,9 @@ export default function DocumentTable() {
       {
         accessorKey: "days",
         header: "ចំនួនថ្ងៃ",
-        size: 100,
+        // size: 100,
         // 👇 Column-aggregation footer — sums the "days" field across all filtered rows
+        enableColumnActions: false,
         footer: ({ table }) => {
           const total = table
             .getFilteredRowModel()
@@ -364,7 +393,8 @@ export default function DocumentTable() {
       {
         id: "actions",
         header: "ចំណាត់ការឯកសារ",
-        size: 120,
+        // size: 120,
+        enableColumnActions: false,
         cell: ({ row }) => (
           <Box
             sx={{

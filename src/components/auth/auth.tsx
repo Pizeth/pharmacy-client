@@ -221,9 +221,10 @@ const Ambient = styled(Box, {
     inset: 0,
     // background: `transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/clouds_repeat.png") repeat`,
     background:
-      "url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png) repeat",
+      "url(https://www.transparenttextures.com/patterns/stardust.png) repeat",
+    // "url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png) repeat",
     backgroundSize: "contain",
-    animation: `${moveBackgroundLeft} 500s linear infinite`,
+    animation: `${moveBackgroundLeft} 700s linear infinite`,
   },
   // "::after": {
   //   content: '""',
@@ -898,13 +899,13 @@ export const Auth = (inProps: AuthProps) => {
           router.replace(destination);
         },
       },
-      onPromptNotification: (notification) => {
-        console.warn(
-          "Prompt was dismissed or skipped. Consider displaying an alternative sign-in option.",
-          notification,
-        );
-        // Render your alternative UI here
-      },
+      // onPromptNotification: (notification) => {
+      //   console.warn(
+      //     "Prompt was dismissed or skipped. Consider displaying an alternative sign-in option.",
+      //     notification,
+      //   );
+      //   // Render your alternative UI here
+      // },
     });
     // not authenticated, stay on the login page
   }, [router, data, isFetching, destination]);
