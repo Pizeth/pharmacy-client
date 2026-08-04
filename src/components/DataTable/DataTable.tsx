@@ -39,18 +39,25 @@ import {
   Divider,
   Menu,
   Typography,
+  TableSortLabel,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, Theme } from "@mui/material/styles";
 import { useState, ReactNode, useMemo, useCallback, Fragment } from "react";
 import { DragDropProvider, DragEndEvent } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { move } from "@dnd-kit/helpers";
 import ArrowUpward from "@mui/icons-material/ArrowUpward";
-import { ArrowDownward, SwapVertOutlined } from "@mui/icons-material";
+import {
+  ArrowDownward,
+  PhotoSizeSelectActualOutlined,
+  SwapVertOutlined,
+  SyncAltOutlined,
+} from "@mui/icons-material";
 import MoreVert from "@mui/icons-material/MoreVert";
 import Close from "@mui/icons-material/Close";
 import RazSortable from "../icons/utils/sort";
 import FlipIconWrapper from "../icons/components/FlipIconWrapper";
+import { ACTION_ICON_WIDTH, SORT_ICON_WIDTH } from "@/types/constants";
 // import {
 //   DndContext,
 //   closestCenter,
@@ -67,12 +74,20 @@ import FlipIconWrapper from "../icons/components/FlipIconWrapper";
 // } from "@dnd-kit/sortable";
 // import { CSS } from "@dnd-kit/utilities";
 
-export type Density = "compact" | "standard" | "comfortable";
+export type Density = "comfortable" | "compact" | "spacius";
 
-const DENSITY_PADDING: Record<Density, string> = {
-  compact: "4px 4px",
-  standard: "8px 16px",
-  comfortable: "16px 24px",
+const DENSITY_PADDING: Record<Density, (theme: Theme) => string> = {
+  // Base Multiplier: 1x (Your exact design baseline)
+  // Yields approx: Top 4px | Right 8px | Bottom 6.4px | Left 8px
+  compact: (theme) => theme.spacing(0.5, 1, 0.8, 1),
+
+  // Base Multiplier: 2x (Balanced standard padding)
+  // Yields approx: Top 8px | Right 16px | Bottom 12.8px | Left 16px
+  comfortable: (theme) => theme.spacing(1, 2, 1.6, 2),
+
+  // Base Multiplier: 3x (Generous spacing for wide layouts)
+  // Yields approx: Top 12px | Right 24px | Bottom 19.2px | Left 24px
+  spacius: (theme) => theme.spacing(1.5, 3, 2.4, 3),
 };
 
 // const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
@@ -126,8 +141,8 @@ const ResizeHandle = styled("div")<{ isResizing?: boolean }>(
   }),
 );
 
-export interface DataTableProps<TData> {
-  columns: ColumnDef<TData, any>[];
+export interface DataTableProps<TData, TValue = unknown> {
+  columns: ColumnDef<TData, TValue>[];
   data: TData[];
   getRowId?: (row: TData) => string;
   enableRowSelection?: boolean;
@@ -209,15 +224,19 @@ export function useDataTable<TData>({
         }
       });
 
+      console.log(`Column "${accessor}" longest width: ${longestWidth}px`);
+
       // 4. Add buffer padding (e.g., 40px for sorting arrows and spacing)
-      const finalFitSize = longestWidth + 40;
+      const finalFitSize = longestWidth + 16;
 
       return {
         ...col,
         // Sets the default column sizing to precisely match cell text constraints
         size: col.size ?? finalFitSize,
-        minSize: col.minSize ?? Math.min(finalFitSize, 50),
-        maxSize: col.maxSize ?? Math.max(finalFitSize, 500), // Dynamic fit content max boundary
+        // minSize: col.minSize ?? Math.min(finalFitSize, 50),
+        // maxSize: col.maxSize ?? Math.max(finalFitSize, 500), // Dynamic fit content max boundary
+        minSize: col.minSize ?? 40, // 👈 was Math.min(finalFitSize, 50) — just use a small fixed floor
+        maxSize: col.maxSize ?? Math.max(finalFitSize, 400), // trim ceiling too
       };
     });
   }, [userColumns, data]);
@@ -351,13 +370,34 @@ function SortableHeaderCell<TData>({
   const renderHeader =
     header.column.columnDef.Header ?? header.column.columnDef.header;
 
+  // 👇 Safely pull your alignment configuration, fallback to 'center'
+  const headerAlign = header.column.columnDef.meta?.headerAlign ?? "center";
+
+  const size = header.getSize();
+
+  console.log(
+    `Header "${header.column.id}" size: ${size}px, align: ${headerAlign}, pinned: ${isPinned}`,
+  );
+
+  const dynamicPaddingLeft = () => {
+    if (canSort && showColumnActions)
+      return `${SORT_ICON_WIDTH + ACTION_ICON_WIDTH}rem`; // 44px -> 2.75rem
+    if (canSort) return `${SORT_ICON_WIDTH}rem`; // 16px -> 1rem
+    if (showColumnActions) return `${ACTION_ICON_WIDTH}rem`; // 28px -> 1.75rem
+    return 0;
+  };
+
   return (
     <TableCell
       ref={sortable.ref}
-      align="center"
+      align={headerAlign}
+      scope="col"
+      data-can-sort={canSort}
+      data-index={index}
       sx={{
         fontWeight: 700,
         padding: DENSITY_PADDING[density],
+        // padding: density === "compact" ? "4px 8px" : DENSITY_PADDING[density], // 👈 tighter for compact
         backgroundColor: (theme) =>
           theme.alpha(theme.vars.palette.background.paper, 0.075),
         borderRight: isLastLeftPinned
@@ -370,6 +410,8 @@ function SortableHeaderCell<TData>({
           : undefined,
         whiteSpace: "nowrap",
         position: isPinned ? "sticky" : "relative",
+        // If left-aligned, make sure the box components align properly inside the cell layout
+        justifyContent: headerAlign === "center" ? "center" : "flex-start",
         left: isPinned === "left" ? header.column.getStart("left") : undefined,
         right:
           isPinned === "right" ? header.column.getAfter("right") : undefined,
@@ -378,9 +420,12 @@ function SortableHeaderCell<TData>({
         cursor: enableColumnOrdering ? "grab" : undefined,
       }}
       style={{
-        width: header.getSize(),
-        minWidth: header.getSize(),
-        maxWidth: header.getSize(),
+        width: `clamp(${size}px, ${size}px, ${size}px)`,
+        // minWidth: header.column.getMinSize(),
+        transition: "padding 150ms ease-in-out",
+        zIndex: 0,
+        // min-width: max(calc(var(--header-title-size) * 1px), 10px);
+        // width: calc(var(--header-title-size) * 1px);
       }}
     >
       {/* {header.isPlaceholder
@@ -390,9 +435,20 @@ function SortableHeaderCell<TData>({
       <Box
         sx={{
           display: "flex",
+          flexDirection: "row",
           alignItems: "center",
-          justifyContent: "center",
-          // gap: 0.5,
+          justifyContent: headerAlign === "center" ? "center" : "flex-start",
+          gap: 0.25,
+          width: "100%",
+          position: "relative",
+          // MRT styling logic targets children inside this block on cell hover
+          "&:hover .Mui-TableHeadCell-Content-Actions button": {
+            opacity: 1,
+          },
+          "&:hover .MuiTableSortLabel-icon": {
+            opacity: 0.3,
+          },
+          "&:hover .faded-icon": { opacity: 1 },
         }}
       >
         <Box
@@ -401,6 +457,9 @@ function SortableHeaderCell<TData>({
             display: "flex",
             alignItems: "center",
             gap: 0.25,
+            flexDirection: "row",
+            overflow: "hidden",
+            paddingLeft: dynamicPaddingLeft(),
           }}
           onClick={
             canSort ? header.column.getToggleSortingHandler() : undefined
@@ -429,35 +488,86 @@ function SortableHeaderCell<TData>({
             : flexRender(renderHeader, header.getContext())}
           {/* </Typography> */}
           {canSort && (
-            <Box
+            <TableSortLabel
+              active={!!sortDirection}
+              direction={sortDirection === "desc" ? "desc" : "asc"}
+              IconComponent={
+                () =>
+                  !sortDirection ? (
+                    // 1. Default unsorted view: Show Swap Vertical Icon
+                    <FlipIconWrapper rotate="up">
+                      <RazSortable
+                        fontSize="inherit"
+                        sx={{ fontSize: "1rem" }}
+                      />
+                    </FlipIconWrapper>
+                  ) : sortDirection === "desc" ? (
+                    // 2. Sorted Descending
+                    <ArrowDownward fontSize="inherit" />
+                  ) : (
+                    // 3. Sorted Ascending
+                    <ArrowUpward fontSize="inherit" />
+                  )
+                // If unsorted, MRT uses SyncAltIcon rotated -90 degrees
+                // if (!sortDirection) {
+                //   return (
+                //     <SyncAltOutlined
+                //       className="MuiTableSortLabel-icon"
+                //       style={{
+                //         transform:
+                //           "rotate(-90deg) scaleX(0.9) translateX(-1px)",
+                //         opacity: 0, // Fades completely away in MRT until hover
+                //         transition: "opacity 0.15s ease",
+                //       }}
+                //     />
+                //   );
+                // }
+                // // If active, map the direction arrows cleanly
+                // return sortDirection === "desc" ? (
+                //   <ArrowDownward />
+                // ) : (
+                //   <ArrowUpward />
+                // );
+              }
               sx={{
-                display: "flex",
-                alignItems: "center",
-                opacity: sortDirection ? 1 : 0.3, // 👈 always visible, faded when inactive
-                color: (theme) =>
-                  sortDirection ? theme.palette.error.main : "inherit",
-                transition: "opacity 0.15s ease",
+                // Fix MUI defaults so it allows styling custom static rules cleanly
+                "& .MuiTableSortLabel-icon": {
+                  color: (theme) =>
+                    sortDirection
+                      ? `${theme.palette.error.main} !important`
+                      : "inherit",
+                },
               }}
-            >
-              {/* {sortDirection === "desc" ? (
-                <ArrowDownward fontSize="inherit" />
-              ) : (
-                <ArrowUpward fontSize="inherit" />
-              )} */}
+            />
+            // <Box
+            //   sx={{
+            //     display: "flex",
+            //     alignItems: "center",
+            //     opacity: sortDirection ? 1 : 0.3, // 👈 always visible, faded when inactive
+            //     color: (theme) =>
+            //       sortDirection ? theme.palette.error.main : "inherit",
+            //     transition: "opacity 0.15s ease",
+            //   }}
+            // >
+            //   {/* {sortDirection === "desc" ? (
+            //     <ArrowDownward fontSize="inherit" />
+            //   ) : (
+            //     <ArrowUpward fontSize="inherit" />
+            //   )} */}
 
-              {!sortDirection ? (
-                // 1. Default unsorted view: Show Swap Vertical Icon
-                <FlipIconWrapper rotate="up">
-                  <RazSortable fontSize="inherit" sx={{ fontSize: "1rem" }} />
-                </FlipIconWrapper>
-              ) : sortDirection === "desc" ? (
-                // 2. Sorted Descending
-                <ArrowDownward fontSize="inherit" />
-              ) : (
-                // 3. Sorted Ascending
-                <ArrowUpward fontSize="inherit" />
-              )}
-            </Box>
+            //   {!sortDirection ? (
+            //     // 1. Default unsorted view: Show Swap Vertical Icon
+            //     <FlipIconWrapper rotate="up">
+            //       <RazSortable fontSize="inherit" sx={{ fontSize: "1rem" }} />
+            //     </FlipIconWrapper>
+            //   ) : sortDirection === "desc" ? (
+            //     // 2. Sorted Descending
+            //     <ArrowDownward fontSize="inherit" />
+            //   ) : (
+            //     // 3. Sorted Ascending
+            //     <ArrowUpward fontSize="inherit" />
+            //   )}
+            // </Box>
           )}
         </Box>
 
@@ -477,22 +587,34 @@ function SortableHeaderCell<TData>({
         {showColumnActions &&
           header.column.id !== "select" &&
           header.column.id !== "expand" && (
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                setMenuAnchor(e.currentTarget);
-              }}
+            <Box
               sx={{
-                padding: "2px",
-                // Permanently matches the dark gray 0.3 opacity standard matching the image blueprint
-                opacity: 0.3,
-                color: "inherit",
-                "&:hover": { opacity: 1 }, // Optional: Highlights sharply on immediate mouse hover
+                display: "flex",
+                alignItems: "center",
+                // marginLeft: "auto", // Snaps the button cleanly to the right side boundary
               }}
             >
-              <MoreVert sx={{ fontSize: "1.25rem" }} />
-            </IconButton>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuAnchor(e.currentTarget);
+                }}
+                sx={{
+                  // padding: "5px",
+                  // Permanently matches the dark gray 0.3 opacity standard matching the image blueprint
+                  opacity: 0.3,
+                  // color: "inherit",
+                  // scale: 0.9,
+                  width: "2rem",
+                  "&:hover": { opacity: 1 }, // Optional: Highlights sharply on immediate mouse hover
+                }}
+              >
+                <MoreVert
+                // sx={{ fontSize: "1.25rem", transform: "scale(0.9)" }}
+                />
+              </IconButton>
+            </Box>
           )}
       </Box>
 
@@ -581,71 +703,9 @@ function SortableHeaderCell<TData>({
   );
 }
 
-// ─── Draggable header cell ─────────────────────────────────────────────────
-// function DraggableHeaderCell({
-//   header,
-//   density,
-//   enableColumnResizing,
-//   enableColumnOrdering,
-// }: {
-//   header: any;
-//   density: Density;
-//   enableColumnResizing: boolean;
-//   enableColumnOrdering: boolean;
-// }) {
-//   const {
-//     attributes,
-//     listeners,
-//     setNodeRef,
-//     transform,
-//     transition,
-//     isDragging,
-//   } = useSortable({ id: header.column.id, disabled: !enableColumnOrdering });
-
-//   const isPinned = header.column.getIsPinned();
-
-//   const style: React.CSSProperties = {
-//     transform: CSS.Translate.toString(transform),
-//     transition,
-//     opacity: isDragging ? 0.5 : 1,
-//     width: header.getSize(),
-//     position: isPinned ? "sticky" : "relative",
-//     left: isPinned === "left" ? header.column.getStart("left") : undefined,
-//     right: isPinned === "right" ? header.column.getAfter("right") : undefined,
-//     zIndex: isPinned ? 4 : undefined,
-//   };
-
-//   return (
-//     <TableCell
-//       ref={setNodeRef}
-//       style={style}
-//       align="center"
-//       sx={{
-//         fontWeight: 700,
-//         padding: DENSITY_PADDING[density],
-//         backgroundColor: (theme) => theme.vars.palette.background.paper,
-//         whiteSpace: "nowrap",
-//       }}
-//       {...(enableColumnOrdering ? { ...attributes, ...listeners } : {})}
-//     >
-//       {header.isPlaceholder
-//         ? null
-//         : flexRender(header.column.columnDef.header, header.getContext())}
-//       {enableColumnResizing && header.column.getCanResize() && (
-//         <ResizeHandle
-//           isResizing={header.column.getIsResizing()}
-//           onMouseDown={header.getResizeHandler()}
-//           onTouchStart={header.getResizeHandler()}
-//           onClick={(e) => e.stopPropagation()} // don't trigger drag
-//         />
-//       )}
-//     </TableCell>
-//   );
-// }
-
 export function DataTable<TData>({
   table,
-  density = "standard",
+  density = "compact",
   showColumnFilters = false,
   renderDetailPanel,
   onRowClick,
@@ -710,26 +770,105 @@ export function DataTable<TData>({
             {/* 👇 use the prop, not table.getState() */}
             {showColumnFilters && (
               <TableRow>
-                {table.getVisibleLeafColumns().map((column) => (
-                  <TableCell key={column.id} sx={{ padding: "2px 8px" }}>
-                    {column.getCanFilter() ? (
-                      <TextField
-                        variant="standard"
-                        size="small"
-                        fullWidth
-                        // placeholder={`ត្រង​តាមរយៈ: ${flexRender(column.columnDef.header, {} as any) ?? column.id}`}
-                        placeholder={`ត្រង​តាមរយៈ: ${
-                          typeof column.columnDef.header === "string"
-                            ? column.columnDef.header
-                            : column.id
-                        }`}
-                        value={(column.getFilterValue() ?? "") as string}
-                        onChange={(e) => column.setFilterValue(e.target.value)}
-                        slotProps={{ input: { disableUnderline: false } }}
-                      />
-                    ) : null}
-                  </TableCell>
-                ))}
+                {table.getVisibleLeafColumns().map((column) => {
+                  const filterVariant =
+                    column.columnDef.meta?.filterVariant ?? "text";
+
+                  // // 1. Extract unique values dynamically from column data for Autocomplete
+                  // const uniqueValues = useMemo(() => {
+                  //   const set = new Set<string>();
+                  //   table.getPreFilteredRowModel().flatRows.forEach((row) => {
+                  //     const value = row.getValue(column.id);
+                  //     if (
+                  //       value !== undefined &&
+                  //       value !== null &&
+                  //       value !== ""
+                  //     ) {
+                  //       set.add(String(value));
+                  //     }
+                  //   });
+                  //   return Array.from(set).sort();
+                  // }, [table.getPreFilteredRowModel().flatRows, column.id]);
+
+                  const size = column.getSize();
+
+                  return (
+                    <TableCell
+                      key={column.id}
+                      sx={{ padding: "2px 8px" }}
+                      style={{
+                        width: `clamp(${size}px, ${size}px, ${PhotoSizeSelectActualOutlined}px)`,
+                      }}
+                    >
+                      {column.getCanFilter() ? (
+                        filterVariant === "autocomplete" ? (
+                          // 1. Calculate unique values natively inline without useMemo!
+                          (() => {
+                            const set = new Set<string>();
+                            table
+                              .getPreFilteredRowModel()
+                              .flatRows.forEach((row) => {
+                                const value = row.getValue(column.id);
+                                if (
+                                  value !== undefined &&
+                                  value !== null &&
+                                  value !== ""
+                                ) {
+                                  set.add(String(value));
+                                }
+                              });
+                            const uniqueValues = Array.from(set).sort();
+
+                            return (
+                              <TextField
+                                select
+                                variant="standard"
+                                size="small"
+                                fullWidth
+                                value={
+                                  (column.getFilterValue() ?? "") as string
+                                }
+                                onChange={(e) =>
+                                  column.setFilterValue(e.target.value)
+                                }
+                                slotProps={{
+                                  select: {
+                                    native: true,
+                                    style: { fontSize: "0.875rem" },
+                                  },
+                                }}
+                              >
+                                <option value="">ទាំងអស់ (All)</option>
+                                {uniqueValues.map((value) => (
+                                  <option key={value} value={value}>
+                                    {value}
+                                  </option>
+                                ))}
+                              </TextField>
+                            );
+                          })()
+                        ) : (
+                          <TextField
+                            variant="standard"
+                            size="small"
+                            fullWidth
+                            // placeholder={`ត្រង​តាមរយៈ: ${flexRender(column.columnDef.header, {} as any) ?? column.id}`}
+                            placeholder={`ត្រង​តាមរយៈ: ${
+                              typeof column.columnDef.header === "string"
+                                ? column.columnDef.header
+                                : column.id
+                            }`}
+                            value={(column.getFilterValue() ?? "") as string}
+                            onChange={(e) =>
+                              column.setFilterValue(e.target.value)
+                            }
+                            slotProps={{ input: { disableUnderline: false } }}
+                          />
+                        )
+                      ) : null}
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             )}
           </StyledTableHead>
@@ -750,10 +889,16 @@ export function DataTable<TData>({
                       isPinned === "right" &&
                       cell.column.getIsFirstColumn("right");
 
+                    // 👇 Read cell-specific alignments mapped out dynamically in your schema metadata
+                    const cellAlign =
+                      cell.column.columnDef.meta?.cellAlign ?? "center";
+
+                    const size = cell.column.getSize();
+
                     return (
                       <TableCell
                         key={cell.id}
-                        align="center"
+                        align={cellAlign}
                         sx={{
                           padding: DENSITY_PADDING[density],
                           position: isPinned ? "sticky" : undefined,
@@ -780,9 +925,7 @@ export function DataTable<TData>({
                             : undefined,
                         }}
                         style={{
-                          width: cell.column.getSize(),
-                          minWidth: cell.column.getSize(),
-                          maxWidth: cell.column.getSize(),
+                          width: `clamp(${size}px, ${size}px, ${size}px)`,
                         }}
                       >
                         {flexRender(
@@ -851,6 +994,68 @@ export function DataTable<TData>({
 }
 
 export default DataTable;
+
+// ─── Draggable header cell ─────────────────────────────────────────────────
+// function DraggableHeaderCell({
+//   header,
+//   density,
+//   enableColumnResizing,
+//   enableColumnOrdering,
+// }: {
+//   header: any;
+//   density: Density;
+//   enableColumnResizing: boolean;
+//   enableColumnOrdering: boolean;
+// }) {
+//   const {
+//     attributes,
+//     listeners,
+//     setNodeRef,
+//     transform,
+//     transition,
+//     isDragging,
+//   } = useSortable({ id: header.column.id, disabled: !enableColumnOrdering });
+
+//   const isPinned = header.column.getIsPinned();
+
+//   const style: React.CSSProperties = {
+//     transform: CSS.Translate.toString(transform),
+//     transition,
+//     opacity: isDragging ? 0.5 : 1,
+//     width: header.getSize(),
+//     position: isPinned ? "sticky" : "relative",
+//     left: isPinned === "left" ? header.column.getStart("left") : undefined,
+//     right: isPinned === "right" ? header.column.getAfter("right") : undefined,
+//     zIndex: isPinned ? 4 : undefined,
+//   };
+
+//   return (
+//     <TableCell
+//       ref={setNodeRef}
+//       style={style}
+//       align="center"
+//       sx={{
+//         fontWeight: 700,
+//         padding: DENSITY_PADDING[density],
+//         backgroundColor: (theme) => theme.vars.palette.background.paper,
+//         whiteSpace: "nowrap",
+//       }}
+//       {...(enableColumnOrdering ? { ...attributes, ...listeners } : {})}
+//     >
+//       {header.isPlaceholder
+//         ? null
+//         : flexRender(header.column.columnDef.header, header.getContext())}
+//       {enableColumnResizing && header.column.getCanResize() && (
+//         <ResizeHandle
+//           isResizing={header.column.getIsResizing()}
+//           onMouseDown={header.getResizeHandler()}
+//           onTouchStart={header.getResizeHandler()}
+//           onClick={(e) => e.stopPropagation()} // don't trigger drag
+//         />
+//       )}
+//     </TableCell>
+//   );
+// }
 
 // const sensors = useSensors(
 //   useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),

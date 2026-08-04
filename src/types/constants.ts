@@ -10,3 +10,6 @@ export const COOKIE_TOKEN_KEY = "set-auth-jwt";
 export const VERIFY_ID_PATH = "/verify-id";
 export const LANDING_PAGE =
   process.env.NEXT_PUBLIC_LANDING_PAGE || "/dashboard";
+
+export const SORT_ICON_WIDTH = 1; // 1rem
+export const ACTION_ICON_WIDTH = 1.75; // 1.75rem

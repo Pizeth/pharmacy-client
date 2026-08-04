@@ -317,13 +317,14 @@ export default function DocumentTable() {
         header: "ល.រ នធម",
         // size: 60,
         enableColumnActions: false, // 👈 matches MRT
-        meta: { align: "center" }, // optional — see note below
+        meta: { headerAlign: "center", cellAlign: "center" }, // optional — see note below
         footer: ({ table }) =>
           `${table.getFilteredRowModel().rows.length} កំណត់ត្រា`,
       },
       {
         accessorKey: "title",
         header: "ឈ្មោះឯកសារ",
+        meta: { headerAlign: "center", cellAlign: "left" },
         // size: 200,
       },
       {
@@ -389,7 +390,11 @@ export default function DocumentTable() {
       },
       { accessorKey: "types", header: "ប្រភេទឯកសារ" },
       { accessorKey: "categories", header: "ឯកសារ" },
-      { accessorKey: "office", header: "ការិយាល័យទទួលបន្ទុក" },
+      {
+        accessorKey: "office",
+        header: "ការិយាល័យទទួលបន្ទុក",
+        meta: { headerAlign: "center", cellAlign: "left" },
+      },
       {
         id: "actions",
         header: "ចំណាត់ការឯកសារ",

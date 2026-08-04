@@ -427,15 +427,15 @@ export function DensityToggleButton({
   onChange: (d: Density) => void;
 }) {
   const cycle: Record<Density, Density> = {
-    compact: "standard",
-    standard: "comfortable",
-    comfortable: "compact",
+    compact: "compact",
+    comfortable: "comfortable",
+    spacius: "spacius",
   };
 
   const icon = {
     compact: <DensitySmall />,
-    standard: <DensityMedium />,
-    comfortable: <DensityLarge />,
+    comfortable: <DensityMedium />,
+    spacius: <DensityLarge />,
   }[density];
 
   return (
