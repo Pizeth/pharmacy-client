@@ -1,5 +1,5 @@
 // src/types/tanstack-table.d.ts (new file)
-import "@tanstack/react-table";
+import type { ColumnDef, RowData, TableOptions } from "@tanstack/react-table";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData, TValue> {
@@ -15,4 +15,23 @@ declare module "@tanstack/react-table" {
       props: import("@tanstack/react-table").HeaderContext<TData, TValue>,
     ) => React.ReactNode;
   }
+}
+
+export type DataTableColumnDef<TData extends RowData> = ColumnDef<
+  TData,
+  unknown
+>;
+
+export interface DataTableOptions<TData extends RowData> {
+  data: TData[];
+
+  columns: DataTableColumnDef<TData>[];
+
+  enableRowSelection?: boolean;
+
+  manualPagination?: boolean;
+
+  pageCount?: number;
+
+  initialState?: TableOptions<TData>["initialState"];
 }

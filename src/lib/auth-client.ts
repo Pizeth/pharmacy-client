@@ -41,7 +41,7 @@ export const authClient = createAuthClient({
   },
   plugins: [
     usernameClient(),
-    jwtClient() as BetterAuthClientPlugin,
+    jwtClient(),
     twoFactorClient(),
     passkeyClient(),
     multiSessionClient(),
@@ -62,7 +62,7 @@ export const authClient = createAuthClient({
         baseDelay: 1000, // Base delay in ms (default: 1000)
         maxAttempts: 1, // Maximum number of attempts before triggering onPromptNotification (default: 5)
       },
-    }) as BetterAuthClientPlugin,
+    }),
   ],
 });
 

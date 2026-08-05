@@ -1,11 +1,14 @@
 // src/components/DataTable/DataTable.tsx
 "use client";
 import {
-  useReactTable,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getExpandedRowModel,
+  useTable,
+  stockFeatures,
+  // useReactTable,
+  // getCoreRowModel,
+  // getFilteredRowModel,
+  // getPaginationRowModel,
+  // getExpandedRowModel,
+  // getSortedRowModel,
   flexRender,
   type ColumnDef,
   type Table as TanStackTable,
@@ -17,9 +20,9 @@ import {
   type ColumnOrderState,
   type ColumnPinningState,
   type ColumnFiltersState,
-  SortingState,
-  getSortedRowModel,
-  Header,
+  type SortingState,
+  type Header,
+  RowData,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -52,27 +55,13 @@ import {
   PhotoSizeSelectActualOutlined,
   SwapVertOutlined,
   SyncAltOutlined,
+  MoreVert,
 } from "@mui/icons-material";
-import MoreVert from "@mui/icons-material/MoreVert";
+// import MoreVert from "@mui/icons-material/MoreVert";
 import Close from "@mui/icons-material/Close";
 import RazSortable from "../icons/utils/sort";
 import FlipIconWrapper from "../icons/components/FlipIconWrapper";
 import { ACTION_ICON_WIDTH, SORT_ICON_WIDTH } from "@/types/constants";
-// import {
-//   DndContext,
-//   closestCenter,
-//   PointerSensor,
-//   useSensor,
-//   useSensors,
-//   type DragEndEvent,
-// } from "@dnd-kit/core";
-// import {
-//   SortableContext,
-//   horizontalListSortingStrategy,
-//   useSortable,
-//   arrayMove,
-// } from "@dnd-kit/sortable";
-// import { CSS } from "@dnd-kit/utilities";
 
 export type Density = "comfortable" | "compact" | "spacius";
 
@@ -90,9 +79,7 @@ const DENSITY_PADDING: Record<Density, (theme: Theme) => string> = {
   spacius: (theme) => theme.spacing(1.5, 3, 2.4, 3),
 };
 
-// const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-//   maxHeight: "calc(100vh - 370px)",
-// }));
+const TABLE_FEATURES = stockFeatures;
 
 const StyledTableContainer = styled(TableContainer, {
   shouldForwardProp: (prop) => prop !== "isFullScreen",
@@ -141,8 +128,8 @@ const ResizeHandle = styled("div")<{ isResizing?: boolean }>(
   }),
 );
 
-export interface DataTableProps<TData, TValue = unknown> {
-  columns: ColumnDef<TData, TValue>[];
+export interface DataTableProps<TData extends RowData> {
+  columns: ColumnDef<typeof TABLE_FEATURES, TData>[];
   data: TData[];
   getRowId?: (row: TData) => string;
   enableRowSelection?: boolean;
@@ -178,7 +165,7 @@ function measureTextWidth(
   return Math.ceil(context.measureText(text).width);
 }
 
-export function useDataTable<TData>({
+export function useDataTable<TData extends RowData>({
   columns: userColumns,
   data,
   getRowId,
@@ -251,14 +238,19 @@ export function useDataTable<TData>({
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     columns.map((c) => (c.id ?? (c as any).accessorKey) as string),
   );
-  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({});
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
+    start: [],
+    end: [],
+  });
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [showGlobalFilter, setShowGlobalFilter] = useState(true);
   const [showColumnFilters, setShowColumnFilters] = useState(false);
   const [density, setDensity] = useState<Density>("compact");
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const table = useReactTable({
+  const table = useTable({
+    key: "data-table",
+    features: TABLE_FEATURES,
     columns,
     data,
     defaultColumn: {
@@ -301,6 +293,12 @@ export function useDataTable<TData>({
       sorting,
     },
     enableRowSelection,
+    enableColumnResizing,
+    enableColumnPinning: true,
+    enableRowPinning: true,
+    manualPagination,
+    manualFiltering: manualPagination,
+    pageCount,
     onRowSelectionChange: onRowSelectionChange ?? setInternalRowSelection,
     onGlobalFilterChange: onGlobalFilterChange ?? setInternalGlobalFilter,
     onExpandedChange: onExpandedChange ?? setInternalExpanded,
@@ -310,16 +308,13 @@ export function useDataTable<TData>({
     onColumnFiltersChange: setColumnFilters,
     onSortingChange: setSorting,
     columnResizeMode: "onChange",
-    enableColumnResizing,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: manualPagination ? undefined : getFilteredRowModel(),
-    getPaginationRowModel: manualPagination
-      ? undefined
-      : getPaginationRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    manualPagination,
-    pageCount,
+    // getCoreRowModel: getCoreRowModel(),
+    // getSortedRowModel: getSortedRowModel(),
+    // getFilteredRowModel: manualPagination ? undefined : getFilteredRowModel(),
+    // getPaginationRowModel: manualPagination
+    //   ? undefined
+    //   : getPaginationRowModel(),
+    // getExpandedRowModel: getExpandedRowModel(),
   });
 
   // return table;
@@ -335,14 +330,16 @@ export function useDataTable<TData>({
 }
 
 // ─── Sortable header cell (dnd-kit/react) ──────────────────────────────────
-function SortableHeaderCell<TData>({
+function SortableHeaderCell<TData extends RowData>({
+  table,
   header,
   index,
   density,
   enableColumnResizing,
   enableColumnOrdering,
 }: {
-  header: Header<TData, unknown>;
+  table: TanStackTable<typeof TABLE_FEATURES, TData>;
+  header: Header<typeof TABLE_FEATURES, TData, unknown>;
   index: number;
   density: Density;
   enableColumnResizing: boolean;
@@ -359,9 +356,9 @@ function SortableHeaderCell<TData>({
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const isPinned = header.column.getIsPinned();
   const isLastLeftPinned =
-    isPinned === "left" && header.column.getIsLastColumn("left");
+    isPinned === "start" && header.column.getIsLastColumn("start");
   const isFirstRightPinned =
-    isPinned === "right" && header.column.getIsFirstColumn("right");
+    isPinned === "end" && header.column.getIsFirstColumn("end");
   const canSort = header.column.getCanSort();
   const sortDirection = header.column.getIsSorted();
   const showColumnActions = header.column.columnDef.enableColumnActions ?? true; // default true, matching MRT
@@ -412,9 +409,9 @@ function SortableHeaderCell<TData>({
         position: isPinned ? "sticky" : "relative",
         // If left-aligned, make sure the box components align properly inside the cell layout
         justifyContent: headerAlign === "center" ? "center" : "flex-start",
-        left: isPinned === "left" ? header.column.getStart("left") : undefined,
-        right:
-          isPinned === "right" ? header.column.getAfter("right") : undefined,
+        left:
+          isPinned === "start" ? header.column.getStart("start") : undefined,
+        right: isPinned === "end" ? header.column.getAfter("end") : undefined,
         zIndex: isPinned ? 4 : undefined,
         opacity: sortable.isDragging ? 0.5 : 1,
         cursor: enableColumnOrdering ? "grab" : undefined,
@@ -428,10 +425,6 @@ function SortableHeaderCell<TData>({
         // width: calc(var(--header-title-size) * 1px);
       }}
     >
-      {/* {header.isPlaceholder
-        ? null
-        : flexRender(header.column.columnDef.header, header.getContext())} */}
-
       <Box
         sx={{
           display: "flex",
@@ -465,24 +458,6 @@ function SortableHeaderCell<TData>({
             canSort ? header.column.getToggleSortingHandler() : undefined
           }
         >
-          {/* {header.isPlaceholder
-            ? null
-            : flexRender(header.column.columnDef.header, header.getContext())}
-          {canSort && sortDirection === "asc" && (
-            <ArrowUpward fontSize="inherit" />
-          )}
-          {canSort && sortDirection === "desc" && (
-            <ArrowDownward fontSize="inherit" />
-          )} */}
-
-          {/* <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              fontFamily: "var(--font-interkhmerloopless)", // 👈 match your Khmer font
-              color: (theme) => theme.palette.error.main, // 👈 match MRT's header text color (orange/red in your screenshots)
-            }}
-          > */}
           {header.isPlaceholder
             ? null
             : flexRender(renderHeader, header.getContext())}
@@ -491,43 +466,22 @@ function SortableHeaderCell<TData>({
             <TableSortLabel
               active={!!sortDirection}
               direction={sortDirection === "desc" ? "desc" : "asc"}
-              IconComponent={
-                () =>
-                  !sortDirection ? (
-                    // 1. Default unsorted view: Show Swap Vertical Icon
-                    <FlipIconWrapper rotate="up">
-                      <RazSortable
-                        fontSize="inherit"
-                        sx={{ fontSize: "1rem" }}
-                      />
-                    </FlipIconWrapper>
-                  ) : sortDirection === "desc" ? (
-                    // 2. Sorted Descending
-                    <ArrowDownward fontSize="inherit" />
-                  ) : (
-                    // 3. Sorted Ascending
-                    <ArrowUpward fontSize="inherit" />
-                  )
-                // If unsorted, MRT uses SyncAltIcon rotated -90 degrees
-                // if (!sortDirection) {
-                //   return (
-                //     <SyncAltOutlined
-                //       className="MuiTableSortLabel-icon"
-                //       style={{
-                //         transform:
-                //           "rotate(-90deg) scaleX(0.9) translateX(-1px)",
-                //         opacity: 0, // Fades completely away in MRT until hover
-                //         transition: "opacity 0.15s ease",
-                //       }}
-                //     />
-                //   );
-                // }
-                // // If active, map the direction arrows cleanly
-                // return sortDirection === "desc" ? (
-                //   <ArrowDownward />
-                // ) : (
-                //   <ArrowUpward />
-                // );
+              IconComponent={() =>
+                !sortDirection ? (
+                  // 1. Default unsorted view: Show Swap Vertical Icon
+                  <FlipIconWrapper rotate="up">
+                    <SyncAltOutlined
+                      fontSize="inherit"
+                      sx={{ fontSize: "1rem" }}
+                    />
+                  </FlipIconWrapper>
+                ) : sortDirection === "desc" ? (
+                  // 2. Sorted Descending
+                  <ArrowDownward fontSize="inherit" />
+                ) : (
+                  // 3. Sorted Ascending
+                  <ArrowUpward fontSize="inherit" />
+                )
               }
               sx={{
                 // Fix MUI defaults so it allows styling custom static rules cleanly
@@ -539,50 +493,8 @@ function SortableHeaderCell<TData>({
                 },
               }}
             />
-            // <Box
-            //   sx={{
-            //     display: "flex",
-            //     alignItems: "center",
-            //     opacity: sortDirection ? 1 : 0.3, // 👈 always visible, faded when inactive
-            //     color: (theme) =>
-            //       sortDirection ? theme.palette.error.main : "inherit",
-            //     transition: "opacity 0.15s ease",
-            //   }}
-            // >
-            //   {/* {sortDirection === "desc" ? (
-            //     <ArrowDownward fontSize="inherit" />
-            //   ) : (
-            //     <ArrowUpward fontSize="inherit" />
-            //   )} */}
-
-            //   {!sortDirection ? (
-            //     // 1. Default unsorted view: Show Swap Vertical Icon
-            //     <FlipIconWrapper rotate="up">
-            //       <RazSortable fontSize="inherit" sx={{ fontSize: "1rem" }} />
-            //     </FlipIconWrapper>
-            //   ) : sortDirection === "desc" ? (
-            //     // 2. Sorted Descending
-            //     <ArrowDownward fontSize="inherit" />
-            //   ) : (
-            //     // 3. Sorted Ascending
-            //     <ArrowUpward fontSize="inherit" />
-            //   )}
-            // </Box>
           )}
         </Box>
-
-        {/* {header.column.id !== "select" && header.column.id !== "expand" && (
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuAnchor(e.currentTarget);
-            }}
-            sx={{ padding: "2px" }} // tighter hit area so the bigger icon doesn't bloat the header
-          >
-            <MoreVert fontSize="inherit" sx={{ fontSize: "1.25rem" }} />
-          </IconButton>
-        )} */}
 
         {showColumnActions &&
           header.column.id !== "select" &&
@@ -659,22 +571,22 @@ function SortableHeaderCell<TData>({
         <Divider />
         <MenuItem
           onClick={() => {
-            header.column.pin(isPinned === "left" ? false : "left");
+            header.column.pin(isPinned === "start" ? false : "start");
             setMenuAnchor(null);
           }}
         >
           <ListItemText>
-            {isPinned === "left" ? "ដកចេញ" : "ខ្ទាស់ទៅឆ្វេង"}
+            {isPinned === "start" ? "ដកចេញ" : "ខ្ទាស់ទៅឆ្វេង"}
           </ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
-            header.column.pin(isPinned === "right" ? false : "right");
+            header.column.pin(isPinned === "end" ? false : "end");
             setMenuAnchor(null);
           }}
         >
           <ListItemText>
-            {isPinned === "right" ? "ដកចេញ" : "ខ្ទាស់ទៅស្តាំ"}
+            {isPinned === "end" ? "ដកចេញ" : "ខ្ទាស់ទៅស្តាំ"}
           </ListItemText>
         </MenuItem>
         <MenuItem
@@ -715,18 +627,19 @@ export function DataTable<TData>({
   // enableStickyFooter = false,
   // footerContent,
 }: {
-  table: TanStackTable<TData>;
+  table: TanStackTable<typeof TABLE_FEATURES, TData>;
   density?: Density;
   showColumnFilters?: boolean;
-  renderDetailPanel?: (row: Row<TData>) => ReactNode;
-  onRowClick?: (row: Row<TData>) => void;
+  // renderDetailPanel?: (row: Row<TData>) => ReactNode;
+  renderDetailPanel?: (row: Row<typeof TABLE_FEATURES, TData>) => ReactNode;
+  onRowClick?: (row: Row<typeof TABLE_FEATURES, TData>) => void;
   isFullScreen?: boolean;
   enableColumnResizing?: boolean;
   enableColumnOrdering?: boolean;
   // enableStickyFooter?: boolean;
   // footerContent?: ReactNode;
 }) {
-  const columnOrder = table.getState().columnOrder;
+  const columnOrder = table.state.columnOrder;
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -757,6 +670,7 @@ export function DataTable<TData>({
                 {headerGroup.headers.map((header, index) => (
                   <SortableHeaderCell
                     key={header.id}
+                    table={table}
                     header={header}
                     index={index}
                     density={density}
@@ -773,23 +687,6 @@ export function DataTable<TData>({
                 {table.getVisibleLeafColumns().map((column) => {
                   const filterVariant =
                     column.columnDef.meta?.filterVariant ?? "text";
-
-                  // // 1. Extract unique values dynamically from column data for Autocomplete
-                  // const uniqueValues = useMemo(() => {
-                  //   const set = new Set<string>();
-                  //   table.getPreFilteredRowModel().flatRows.forEach((row) => {
-                  //     const value = row.getValue(column.id);
-                  //     if (
-                  //       value !== undefined &&
-                  //       value !== null &&
-                  //       value !== ""
-                  //     ) {
-                  //       set.add(String(value));
-                  //     }
-                  //   });
-                  //   return Array.from(set).sort();
-                  // }, [table.getPreFilteredRowModel().flatRows, column.id]);
-
                   const size = column.getSize();
 
                   return (
@@ -883,11 +780,10 @@ export function DataTable<TData>({
                   {row.getVisibleCells().map((cell) => {
                     const isPinned = cell.column.getIsPinned();
                     const isLastLeftPinned =
-                      isPinned === "left" &&
-                      cell.column.getIsLastColumn("left");
+                      isPinned === "start" &&
+                      cell.column.getIsLastColumn("start");
                     const isFirstRightPinned =
-                      isPinned === "right" &&
-                      cell.column.getIsFirstColumn("right");
+                      isPinned === "end" && cell.column.getIsFirstColumn("end");
 
                     // 👇 Read cell-specific alignments mapped out dynamically in your schema metadata
                     const cellAlign =
@@ -903,12 +799,12 @@ export function DataTable<TData>({
                           padding: DENSITY_PADDING[density],
                           position: isPinned ? "sticky" : undefined,
                           left:
-                            isPinned === "left"
-                              ? cell.column.getStart("left")
+                            isPinned === "start"
+                              ? cell.column.getStart("start")
                               : undefined,
                           right:
-                            isPinned === "right"
-                              ? cell.column.getAfter("right")
+                            isPinned === "end"
+                              ? cell.column.getAfter("end")
                               : undefined,
                           zIndex: isPinned ? 1 : undefined,
                           backgroundColor: isPinned
@@ -994,6 +890,59 @@ export function DataTable<TData>({
 }
 
 export default DataTable;
+
+{
+  /* {header.isPlaceholder
+            ? null
+            : flexRender(header.column.columnDef.header, header.getContext())}
+          {canSort && sortDirection === "asc" && (
+            <ArrowUpward fontSize="inherit" />
+          )}
+          {canSort && sortDirection === "desc" && (
+            <ArrowDownward fontSize="inherit" />
+          )} */
+}
+
+// <Box
+//   sx={{
+//     display: "flex",
+//     alignItems: "center",
+//     opacity: sortDirection ? 1 : 0.3, // 👈 always visible, faded when inactive
+//     color: (theme) =>
+//       sortDirection ? theme.palette.error.main : "inherit",
+//     transition: "opacity 0.15s ease",
+//   }}
+// >
+//   {/* {sortDirection === "desc" ? (
+//     <ArrowDownward fontSize="inherit" />
+//   ) : (
+//     <ArrowUpward fontSize="inherit" />
+//   )} */}
+
+//   {!sortDirection ? (
+//     // 1. Default unsorted view: Show Swap Vertical Icon
+//     <FlipIconWrapper rotate="up">
+//       <RazSortable fontSize="inherit" sx={{ fontSize: "1rem" }} />
+//     </FlipIconWrapper>
+//   ) : sortDirection === "desc" ? (
+//     // 2. Sorted Descending
+//     <ArrowDownward fontSize="inherit" />
+//   ) : (
+//     // 3. Sorted Ascending
+//     <ArrowUpward fontSize="inherit" />
+//   )}
+// </Box>
+
+{
+  /* <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              fontFamily: "var(--font-interkhmerloopless)", // 👈 match your Khmer font
+              color: (theme) => theme.palette.error.main, // 👈 match MRT's header text color (orange/red in your screenshots)
+            }}
+          > */
+}
 
 // ─── Draggable header cell ─────────────────────────────────────────────────
 // function DraggableHeaderCell({
