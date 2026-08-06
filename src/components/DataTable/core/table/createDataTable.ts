@@ -44,3 +44,26 @@ export function createDataTable<
   const options = buildTableOptions(input);
   return constructTable(options);
 }
+
+type User = {
+  id: number;
+  name: string;
+};
+
+const table = createDataTable({
+  data: [
+    {
+      id: 1,
+      name: "John",
+    },
+  ],
+
+  columns: [],
+
+  features: {
+    sorting: true,
+    pagination: true,
+  },
+});
+
+console.log(table.getSortedRowModel());

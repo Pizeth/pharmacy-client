@@ -72,26 +72,3 @@ export function buildTableOptions<
     TData
   >;
 }
-
-type User = {
-  id: number;
-  name: string;
-};
-
-const options = buildTableOptions({
-  data: [
-    {
-      id: 1,
-      name: "John",
-    },
-  ],
-
-  columns: [],
-
-  features: {
-    sorting: true,
-    pagination: true,
-  },
-});
-
-console.log(options.features);
