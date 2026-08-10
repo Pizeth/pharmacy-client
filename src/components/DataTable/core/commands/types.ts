@@ -13,40 +13,76 @@ import type { DataTableTypesBase } from "../types";
  *   void
  *   { rowId: number }
  *   { columnId: string }
+ *
+ * We intentionally do not allow primitive payloads.
+ * DataTable commands should use named object payloads.
  */
 export type CommandPayload = void | object;
 
 /**
  * Context available to every command handlers.
  *
- * This is the low-level command context.
+ * Commands consume a readonly context object.
  *
- * This is intentionally generic.
- *
- * The complete DataTableContext will be introduced when
- * the command system is integrated into the runtime.
+ * The concrete DataTable context supplies the actual type.
  */
-export interface CommandContext<TTypes extends DataTableTypesBase> {
-  readonly table: TTypes;
-}
+// export interface CommandContext<TTypes extends DataTableTypesBase> {
+//   readonly table: TTypes;
+// }
+export type CommandContext<TContext extends object> = Readonly<TContext>;
 
 /**
  * Converts a payload type into the argument tuple
  * required by a command.
  *
- * No payload:
+ * No-payload command:
  *
- *     []
+ *   execute(context)
  *
- * Payload:
+ * Payload command:
  *
- *     [payload]
+ *   execute(context, payload)
  */
 export type CommandArguments<TPayload extends CommandPayload> = [
   TPayload,
 ] extends [void]
   ? []
-  : [payload: TPayload];
+  : [payload: Exclude<TPayload, void>];
+
+/**
+ * Command that does not require a payload.
+ *
+ * `hasPayload` is both:
+ *
+ * 1. a runtime value
+ * 2. a TypeScript discriminant
+ */
+export interface NoPayloadCommand<TTypes extends object> {
+  readonly hasPayload: false;
+
+  readonly execute: (context: CommandContext<TTypes>) => void;
+}
+
+/**
+ * Command with a payload.
+ *
+ * `hasPayload: true` is the runtime discriminant that lets
+ * the implementation safely distinguish this command from
+ * a no-payload command.
+ *
+ * The payload is explicitly constrained to `object`.
+ */
+export interface PayloadCommand<
+  TTypes extends object,
+  TPayload extends object,
+> {
+  readonly hasPayload: true;
+
+  readonly execute: (
+    context: CommandContext<TTypes>,
+    payload: TPayload,
+  ) => void;
+}
 
 /**
  * A command handler.
@@ -91,36 +127,25 @@ export type CommandHandler<
 ) => void;
 
 /**
- * Definition of one command.
+ * Public command definition.
  *
- * The payload type is permanently associated with
- * the command definition.
+ * This is the important type-level bridge between:
+ *
+ *     void
+ *
+ * and:
+ *
+ *     object payload
+ *
+ * `Exclude<TPayload, void>` is required because
+ * PayloadCommand only accepts object payloads.
  */
-export interface CommandDefinition<
-  TTypes extends DataTableTypesBase,
+export type CommandDefinition<
+  TContext extends object,
   TPayload extends CommandPayload = void,
-> {
-  readonly execute: CommandHandler<TTypes, TPayload>;
-}
-
-/**
- * Converts a command definition into the arguments
- * accepted by CommandRegistry.execute().
- *
- * No payload:
- *
- *   []
- *
- * Payload:
- *
- *   [payload]
- */
-// export type CommandExecuteArguments<TCommand> =
-//   TCommand extends CommandDefinition<infer _TTypes, infer TPayload>
-//     ? [TPayload] extends [void]
-//       ? []
-//       : [payload: TPayload]
-//     : never;
+> = [TPayload] extends [void]
+  ? NoPayloadCommand<TContext>
+  : PayloadCommand<TContext, Exclude<TPayload, void>>;
 
 /**
  * Extracts the payload type from a command definition.
@@ -177,7 +202,6 @@ export type CommandMap<TTypes extends DataTableTypesBase> = Record<
 export interface RuntimeCommand<TTypes extends DataTableTypesBase> {
   readonly invoke: (
     context: CommandContext<TTypes>,
-
     args: readonly unknown[],
   ) => void;
 }
@@ -204,11 +228,15 @@ export interface CommandRegistry<
 > {
   /**
    * Register a command.
+   *
+   * The command key determines the command definition.
    */
   register<K extends keyof TCommands>(key: K, command: TCommands[K]): void;
 
   /**
-   * Execute a command that accepts a payload.
+   * Execute a command.
+   *
+   * The command key determines the payload type.
    */
   execute<K extends keyof TCommands>(
     key: K,

@@ -36,9 +36,10 @@
 //   }
 // }
 
+import { RegistryImpl } from "../registry/registryImpl";
 import type { DataTableTypesBase } from "../types";
 
-import { RegistryImpl } from "../registry";
+// import { RegistryImpl } from "../registry";
 
 import type {
   CommandContext,
@@ -47,24 +48,35 @@ import type {
   CommandMap,
   CommandPayload,
   CommandRegistry,
+  PayloadCommand,
   RuntimeCommand,
   RuntimeCommandMap,
 } from "./types";
 
 /**
- * Runtime implementation of the strongly typed command registry.
+ * Runtime implementation of CommandRegistry.
  *
- * Publicly, this class preserves:
+ * The important architectural distinction is:
  *
- *     command key -> command payload
- * Internally, commands are normalized into RuntimeCommand
- * objects before being stored.
+ * PUBLIC
  *
- * This separation is important because TypeScript cannot
- * maintain dependent relationships between a generic command
- * key and independently stored runtime values.
+ *     command key -> strongly typed command
  *
- * The generic RegistryImpl provides the storage mechanism.
+ * INTERNAL
+ *
+ *     command key -> RuntimeCommand
+ *
+ * Commands are normalized when registered. This prevents
+ * the runtime execution path from having to correlate:
+ *
+ *     TCommands[K]
+ *
+ * with:
+ *
+ *     CommandExecuteArguments<TCommands[K]>
+ *
+ * which TypeScript cannot reliably narrow after the values
+ * have been separated.
  *
  * This class adds command-specific behavior:
  *
@@ -95,17 +107,16 @@ export class CommandRegistryImpl<
 
   constructor(context: CommandContext<TTypes>) {
     this.context = context;
-
     this.registry = new RegistryImpl<RuntimeCommandMap<TTypes, TCommands>>();
   }
 
   /**
    * Register a command.
    *
-   * The public API remains fully strongly typed.
+   * The caller receives the fully typed command API.
    *
-   * The command is normalized into a RuntimeCommand before
-   * being stored.
+   * Internally the command is immediately normalized into
+   * a runtime invoker.
    */
   register<K extends keyof TCommands>(key: K, command: TCommands[K]): void {
     const runtimeCommand = this.createRuntimeCommand(command);
@@ -132,23 +143,17 @@ export class CommandRegistryImpl<
   }
 
   /**
-   * Convert a public command definition into its normalized
-   * runtime representation.
+   * Normalize a public command into a runtime command.
    *
-   * The important detail is that the generic payload
-   * relationship is resolved HERE, at registration time.
+   * Notice that we do NOT attempt to inspect TPayload here.
    *
-   * After this method returns, the runtime registry no longer
-   * needs to know the payload type.
+   * TPayload is a type and therefore does not exist at runtime.
+   *
+   * Instead, the command's `hasPayload` property is used.
    */
-  private createRuntimeCommand<
-    TPayload extends CommandDefinition<
-      TTypes,
-      CommandPayload
-    > extends CommandDefinition<TTypes, infer _TPayload>
-      ? _TPayload
-      : never,
-  >(command: TPayload): RuntimeCommand<TTypes> {
+  private createRuntimeCommand<TPayload extends CommandPayload>(
+    command: CommandDefinition<TTypes, TPayload>,
+  ): RuntimeCommand<TTypes> {
     return {
       invoke: (context, args) => {
         this.invokeCommand(command, context, args);
@@ -156,61 +161,48 @@ export class CommandRegistryImpl<
     };
   }
 
- /**
-   * Invoke a concrete command definition.
+  /**
+   * Invoke a normalized command.
    *
-   * This method is the only place where the normalized
-   * runtime argument array is converted back into the
-   * command's actual argument tuple.
+   * `hasPayload` is a real runtime discriminant, so TypeScript
+   * can safely narrow the command here.
    */
-  private invokeCommand<
-    TPayload extends CommandPayload
-  >(
-    command:
-      CommandDefinition<
-        TTypes,
-        TPayload
-      >,
-
-    context:
-      CommandContext<TTypes>,
-
-    args:
-      readonly unknown[],
-  ): void
-  {
-    if (
-      [TPayload] extends [void]
-    )
-    {
-      command.execute(
-        context,
-      );
-
+  private invokeCommand<TPayload extends CommandPayload>(
+    command: CommandDefinition<TTypes, TPayload>,
+    context: CommandContext<TTypes>,
+    args: readonly unknown[],
+  ): void {
+    if (!command.hasPayload) {
+      command.execute(context);
       return;
     }
 
-
-    const payload =
-      args[0];
-
-
-    if (
-      payload === undefined
-    )
-    {
-      throw new Error(
-        "Command payload is required.",
-      );
-    }
-
-
-    command.execute(
-      context,
-      payload as TPayload,
-    );
+    this.invokePayloadCommand(command, context, args);
   }
 
+  /**
+   * Invoke a command that explicitly requires a payload.
+   *
+   * Because this method only accepts PayloadCommand, TypeScript
+   * knows that `execute()` requires the second argument.
+   */
+  private invokePayloadCommand<TPayload extends object>(
+    command: PayloadCommand<TTypes, TPayload>,
+    context: CommandContext<TTypes>,
+    args: readonly unknown[],
+  ): void {
+    const payload = args[0];
+
+    if (
+      payload === undefined ||
+      typeof payload !== "object" ||
+      payload === null
+    ) {
+      throw new Error("Command payload must be a non-null object.");
+    }
+
+    command.execute(context, payload as TPayload);
+  }
 
   /**
    * Determine whether a command exists.
