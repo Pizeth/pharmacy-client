@@ -1,3 +1,5 @@
+import { createContext } from "react";
+import type { ReactNode } from "react";
 import type { RowData, Table, TableFeatures } from "@tanstack/table-core";
 import { CommandRegistryImpl } from "../commands/commandRegistry";
 import type { CommandMap } from "../commands/types";
@@ -11,8 +13,50 @@ import type {
 } from "./dataTableContext.types";
 
 /**
+ * Options used to create a DataTable context.
+ */
+export interface CreateDataTableContextOptions<
+  TFeatures extends TableFeatures,
+  TData extends RowData,
+  TServices extends ServiceMap,
+  TPlugins extends PluginMap,
+> {
+  /**
+   * The already-created TanStack Table v9 instance.
+   *
+   * The context does not construct the table.
+   */
+  readonly table: Table<TFeatures, TData>;
+
+  /**
+   * The row associated with the current command context.
+   *
+   * This is intentionally separate from the table because
+   * TData describes the row type while this value represents
+   * the actual row being operated on.
+   */
+  readonly row: TData;
+
+  /**
+   * Initial services to register.
+   */
+  readonly services?: Partial<TServices>;
+
+  /**
+   * Initial plugins to register.
+   */
+  readonly plugins?: Partial<TPlugins>;
+}
+
+/**
  * Creates the runtime context for a DataTable.
  *
+ * The table instance is supplied by the caller and remains the
+ * single source of truth for TanStack Table state and features.
+ * The context provides the runtime infrastructure for commands,
+ * services, and plugins.
+ *
+ * The context is strongly typed and satisfies DataTableTypesBase.
  * IMPORTANT:
  *
  * The table instance is supplied by the caller.
@@ -37,20 +81,16 @@ export function createDataTableContext<
   TCommands extends CommandMap<
     DataTableCommandContext<TFeatures, TData, TServices, TPlugins>
   >,
->(options: {
-  readonly table: Table<TFeatures, TData>;
-
-  readonly services?: Partial<TServices>;
-
-  readonly plugins?: Partial<TPlugins>;
-}): DataTableContext<TFeatures, TData, TServices, TPlugins, TCommands> {
+>(
+  options: CreateDataTableContextOptions<TFeatures, TData, TServices, TPlugins>,
+): DataTableContext<TFeatures, TData, TServices, TPlugins, TCommands> {
   /**
    * Create service registry.
    */
   const services = new ServiceRegistryImpl<TServices>();
 
   /**
-   * Register initial services.
+   * Register the supplied initial services.
    */
   if (options.services) {
     registerEntries(services, options.services);
@@ -62,7 +102,7 @@ export function createDataTableContext<
   const plugins = new PluginRegistryImpl<TPlugins>();
 
   /**
-   * Register initial plugins.
+   * Register the supplied initial plugins.
    */
   if (options.plugins) {
     registerEntries(plugins, options.plugins);
@@ -71,8 +111,17 @@ export function createDataTableContext<
   /**
    * Build the context exposed to commands.
    *
-   * Notice that commands receive the infrastructure
-   * context, but not the command registry itself.
+   * Every property required by DataTableTypesBase is
+   * explicitly represented here:
+   *
+   *     features
+   *     row
+   *
+   * while the DataTable-specific infrastructure adds:
+   *
+   *     table
+   *     services
+   *     plugins
    */
   const commandContext: DataTableCommandContext<
     TFeatures,
@@ -82,13 +131,20 @@ export function createDataTableContext<
   > = {
     table: options.table,
 
+    features: options.table.options.features,
+
+    row: options.row,
+
     services,
 
     plugins,
   };
 
   /**
-   * Create command registry.
+   * Create the command registry.
+   *
+   * Commands receive commandContext rather than the command
+   * registry itself.
    */
   const commands = new CommandRegistryImpl<
     DataTableCommandContext<TFeatures, TData, TServices, TPlugins>,
@@ -101,6 +157,10 @@ export function createDataTableContext<
   return {
     table: options.table,
 
+    features: options.table.options.features,
+
+    row: options.row,
+
     services,
 
     plugins,
@@ -110,7 +170,10 @@ export function createDataTableContext<
 }
 
 /**
- * Register all entries from a partial map.
+ * Register every defined entry from a partial map.
+ *
+ * `Object.keys()` only returns string keys at runtime, so the
+ * result is narrowed back to keyof TMap before registration.
  *
  * This helper intentionally accepts Partial<TMap> because the
  * caller may choose to register only a subset of available

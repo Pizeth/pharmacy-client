@@ -9,6 +9,7 @@ export type {
   CommandPayload,
   CommandPayloadOf,
   CommandRegistry,
+  // CommandRegistryMap,
 } from "./types";
 
 export { CommandRegistryImpl } from "./commandRegistry";

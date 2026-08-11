@@ -85,6 +85,21 @@ export interface PayloadCommand<
 }
 
 /**
+ * Structural constraint representing any valid command.
+ *
+ * `never` is intentionally used for the payload side of
+ * PayloadCommand. Because command execution is contravariant
+ * in its payload parameter, every concrete object payload
+ * command is assignable to PayloadCommand<TContext, never>.
+ *
+ * This gives us a heterogeneous command-map constraint
+ * without using `any`.
+ */
+export type AnyCommandDefinition<TContext extends object> =
+  | NoPayloadCommand<TContext>
+  | PayloadCommand<TContext, never>;
+
+/**
  * A command handler.
  *
  * The important part here is that the payload is represented
@@ -147,26 +162,77 @@ export type CommandDefinition<
   ? NoPayloadCommand<TContext>
   : PayloadCommand<TContext, Exclude<TPayload, void>>;
 
+// /**
+//  * Extracts the payload type from a command definition.
+//  */
+// export type CommandPayloadOf<TCommand> =
+//   TCommand extends CommandDefinition<infer _TTypes, infer TPayload>
+//     ? TPayload
+//     : never;
+
 /**
- * Extracts the payload type from a command definition.
+ * Extract the payload type from a command definition.
  */
 export type CommandPayloadOf<TCommand> =
-  TCommand extends CommandDefinition<infer _TTypes, infer TPayload>
-    ? TPayload
-    : never;
+  TCommand extends NoPayloadCommand<object>
+    ? void
+    : TCommand extends PayloadCommand<object, infer TPayload>
+      ? TPayload
+      : never;
+
+/**
+ * Convert a command definition into its execution
+ * argument tuple.
+ */
+// export type CommandExecuteArguments<TCommand> =
+//   TCommand extends CommandDefinition<infer _TTypes, infer TPayload>
+//     ? CommandArguments<TPayload>
+//     : never;
 
 /**
  * Convert a command definition into its execution
  * argument tuple.
  */
 export type CommandExecuteArguments<TCommand> =
-  TCommand extends CommandDefinition<infer _TTypes, infer TPayload>
-    ? CommandArguments<TPayload>
-    : never;
+  TCommand extends NoPayloadCommand<object>
+    ? []
+    : TCommand extends PayloadCommand<object, infer TPayload>
+      ? [payload: TPayload]
+      : never;
+
+// /**
+//  * A map of command names to command definitions.
+//  *
+//  * The exact key -> command relationship is preserved.
+//  *
+//  * Example:
+//  *
+//  * type Commands = {
+//  *   reset:
+//  *     CommandDefinition<MyTypes>;
+//  *
+//  *   deleteRow:
+//  *     CommandDefinition<
+//  *       MyTypes,
+//  *       { rowId: number }
+//  *     >;
+//  * };
+//  */
+// export type CommandMap<TTypes extends DataTableTypesBase> = Record<
+//   PropertyKey,
+//   CommandDefinition<TTypes, CommandPayload>
+// >;
 
 /**
- * A map of command names to command definitions.
+ * Map of command names to command definitions.
  *
+ * The map is intentionally heterogeneous:
+ *
+ * - some commands may have no payload
+ * - some commands may have a strongly typed object payload
+ *
+ * `AnyCommandDefinition` provides the structural constraint
+ * without widening concrete payload types to `object` or `any`.
  * The exact key -> command relationship is preserved.
  *
  * Example:
@@ -184,7 +250,7 @@ export type CommandExecuteArguments<TCommand> =
  */
 export type CommandMap<TTypes extends DataTableTypesBase> = Record<
   PropertyKey,
-  CommandDefinition<TTypes, CommandPayload>
+  AnyCommandDefinition<TTypes>
 >;
 
 /**

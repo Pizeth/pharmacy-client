@@ -1,3 +1,8 @@
-export type { DataTableContext } from "./types";
+export type {
+  DataTableContext,
+  DataTableCommandContext,
+} from "./dataTableContext.types";
 
-export { createDataTableContext } from "./createContext";
+export { createDataTableContext } from "./createDataTableContext";
+
+export { createDataTableProvider } from "./createDataTableProvider";

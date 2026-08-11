@@ -1,5 +1,6 @@
-import { RegistryImpl } from "./registry";
+// import { RegistryImpl } from "./registry";
 
+import { RegistryImpl } from "./registryImpl";
 import type { Registry } from "./types";
 
 export function createRegistry<
