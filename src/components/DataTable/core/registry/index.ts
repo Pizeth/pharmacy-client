@@ -1,5 +1,2 @@
-export type { Registry, RegistryKey, RegistryMap } from "./types";
-
-// export { RegistryImpl } from "./registry";
-
-// export { createRegistry } from "./createRegistry";
+export type { Registry, RegistryKey } from "./registry";
+export { RegistryImpl } from "./registryImpl";

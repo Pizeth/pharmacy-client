@@ -1,52 +1,11 @@
-// import type { DataTableContext, DataTableTypesBase } from "../types";
-
-// import type {
-//   CommandDefinition,
-//   CommandRegistry,
-//   CommandRegistryMap,
-// } from "./types";
-
-// export class CommandRegistryImpl<
-//   TTypes extends DataTableTypesBase,
-//   TCommands extends CommandRegistryMap,
-// > implements CommandRegistry<TTypes, TCommands> {
-//   private readonly commands: Partial<TCommands> = {};
-
-//   constructor(private readonly context: DataTableContext<TTypes>) {}
-
-//   register<K extends keyof TCommands>(key: K, command: TCommands[K]): void {
-//     this.commands[key] = command;
-//   }
-
-//   execute<K extends keyof TCommands>(
-//     key: K,
-//     payload: Parameters<TCommands[K]["execute"]>[1],
-//   ): void {
-//     const command = this.commands[key];
-
-//     if (!command) {
-//       throw new Error(`Command '${String(key)}' is not registered`);
-//     }
-
-//     command.execute(this.context, payload);
-//   }
-
-//   has<K extends keyof TCommands>(key: K): boolean {
-//     return key in this.commands;
-//   }
-// }
-
 import { RegistryImpl } from "../registry/registryImpl";
 import type { DataTableTypesBase } from "../types";
 
-// import { RegistryImpl } from "../registry";
-
 import type {
+  AnyCommandDefinition,
   CommandContext,
-  CommandDefinition,
   CommandExecuteArguments,
   CommandMap,
-  CommandPayload,
   CommandRegistry,
   PayloadCommand,
   RuntimeCommand,
@@ -56,22 +15,22 @@ import type {
 /**
  * Runtime implementation of CommandRegistry.
  *
- * The important architectural distinction is:
+ * The architecture deliberately separates:
  *
  * PUBLIC
  *
- *     command key -> strongly typed command
+ *     command key -> strongly typed command definition
  *
  * INTERNAL
  *
- *     command key -> RuntimeCommand
+ *     command key -> normalized RuntimeCommand
  *
- * Commands are normalized when registered. This prevents
- * the runtime execution path from having to correlate:
+ * This prevents the runtime execution layer from having
+ * to maintain the relationship between:
  *
  *     TCommands[K]
  *
- * with:
+ * and:
  *
  *     CommandExecuteArguments<TCommands[K]>
  *
@@ -90,7 +49,10 @@ export class CommandRegistryImpl<
   TCommands extends CommandMap<TTypes>,
 > implements CommandRegistry<TTypes, TCommands> {
   /**
-   * Runtime command storage.
+   * Internal runtime registry.
+   *
+   * The public command definition is normalized before
+   * entering this registry.
    *
    * Notice that the underlying registry is now storing
    * RuntimeCommand objects rather than the public command
@@ -99,7 +61,7 @@ export class CommandRegistryImpl<
   private readonly registry: RegistryImpl<RuntimeCommandMap<TTypes, TCommands>>;
 
   /**
-   * Command execution context.
+   * Context supplied to every command.
    *
    * This will eventually become the full DataTableContext.
    */
@@ -113,10 +75,11 @@ export class CommandRegistryImpl<
   /**
    * Register a command.
    *
-   * The caller receives the fully typed command API.
+   * The public API preserves the exact relationship:
    *
-   * Internally the command is immediately normalized into
-   * a runtime invoker.
+   *   key -> TCommands[K]
+   *
+   * Internally the command is normalized into a RuntimeCommand.
    */
   register<K extends keyof TCommands>(key: K, command: TCommands[K]): void {
     const runtimeCommand = this.createRuntimeCommand(command);
@@ -127,7 +90,8 @@ export class CommandRegistryImpl<
   /**
    * Execute a registered command.
    *
-   * The public API signature preserves the key -> payload relationship.
+   * The command key determines the payload type at the
+   * public API level.
    */
   execute<K extends keyof TCommands>(
     key: K,
@@ -145,14 +109,20 @@ export class CommandRegistryImpl<
   /**
    * Normalize a public command into a runtime command.
    *
-   * Notice that we do NOT attempt to inspect TPayload here.
+   * Notice that we intentionally do not attempt to inspect
+   * generic types at runtime.
    *
-   * TPayload is a type and therefore does not exist at runtime.
+   * Generic types such as:
    *
-   * Instead, the command's `hasPayload` property is used.
+   *   TPayload
+   *
+   * do not exist at runtime.
+   *
+   * Instead, `hasPayload` is used as the runtime and
+   * compile-time discriminant.
    */
-  private createRuntimeCommand<TPayload extends CommandPayload>(
-    command: CommandDefinition<TTypes, TPayload>,
+  private createRuntimeCommand(
+    command: AnyCommandDefinition<TTypes>,
   ): RuntimeCommand<TTypes> {
     return {
       invoke: (context, args) => {
@@ -162,13 +132,16 @@ export class CommandRegistryImpl<
   }
 
   /**
-   * Invoke a normalized command.
+   * Invoke a command using its runtime discriminant.
    *
-   * `hasPayload` is a real runtime discriminant, so TypeScript
-   * can safely narrow the command here.
+   * `hasPayload` is a real property, so TypeScript can
+   * safely narrow:
+   *
+   *   false -> NoPayloadCommand
+   *   true  -> PayloadCommand
    */
-  private invokeCommand<TPayload extends CommandPayload>(
-    command: CommandDefinition<TTypes, TPayload>,
+  private invokeCommand(
+    command: AnyCommandDefinition<TTypes>,
     context: CommandContext<TTypes>,
     args: readonly unknown[],
   ): void {

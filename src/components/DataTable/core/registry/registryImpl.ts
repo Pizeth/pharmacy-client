@@ -1,19 +1,28 @@
-import type { Registry, RegistryKey } from "./registry";
+import type { Registry } from "./registry";
 
 /**
  * Runtime implementation of the generic Registry contract.
  *
- * Map is used internally because it gives us:
+ * Map is used internally because it provides:
  *
- * - correct PropertyKey support
+ * - PropertyKey-compatible keys
+ * - predictable insertion semantics
  * - O(1) lookup
  * - clean runtime semantics
  * - no prototype-chain collisions
  *
- * The generic relationship between key and value is preserved
- * at the public API boundary.
+ * The public API restores the relationship:
+ *
+ *   K -> TMap[K]
  */
 export class RegistryImpl<TMap extends object> implements Registry<TMap> {
+  /**
+   * Runtime storage.
+   *
+   * JavaScript Map cannot retain the relationship between a
+   * particular key K and TMap[K], so internally the value type
+   * is the union of all possible map values.
+   */
   private readonly values = new Map<keyof TMap, TMap[keyof TMap]>();
 
   /**

@@ -14,7 +14,7 @@ import type { DataTableTypesBase } from "../types";
  *   { rowId: number }
  *   { columnId: string }
  *
- * We intentionally do not allow primitive payloads.
+ * Primitive payloads are intentionally not supported.
  * DataTable commands should use named object payloads.
  */
 export type CommandPayload = void | object;
@@ -22,13 +22,9 @@ export type CommandPayload = void | object;
 /**
  * Context available to every command handlers.
  *
- * Commands consume a readonly context object.
- *
- * The concrete DataTable context supplies the actual type.
+ * The concrete command context is supplied by the DataTable
+ * runtime. Commands receive a readonly view of that context.
  */
-// export interface CommandContext<TTypes extends DataTableTypesBase> {
-//   readonly table: TTypes;
-// }
 export type CommandContext<TContext extends object> = Readonly<TContext>;
 
 /**
@@ -73,16 +69,36 @@ export interface NoPayloadCommand<TTypes extends object> {
  * The payload is explicitly constrained to `object`.
  */
 export interface PayloadCommand<
-  TTypes extends object,
+  TContext extends object,
   TPayload extends object,
 > {
   readonly hasPayload: true;
-
   readonly execute: (
-    context: CommandContext<TTypes>,
+    context: CommandContext<TContext>,
     payload: TPayload,
   ) => void;
 }
+
+/**
+ * Public command definition.
+ *
+ * This is the important type-level bridge between:
+ *
+ *     void
+ *
+ * and:
+ *
+ *     object payload
+ *
+ * `Exclude<TPayload, void>` is required because
+ * PayloadCommand only accepts object payloads.
+ */
+export type CommandDefinition<
+  TContext extends object,
+  TPayload extends CommandPayload = void,
+> = [TPayload] extends [void]
+  ? NoPayloadCommand<TContext>
+  : PayloadCommand<TContext, Exclude<TPayload, void>>;
 
 /**
  * Structural constraint representing any valid command.
@@ -94,10 +110,72 @@ export interface PayloadCommand<
  *
  * This gives us a heterogeneous command-map constraint
  * without using `any`.
+ * This is intentionally an explicit union.
+ *
+ * We must NOT write:
+ *
+ *   CommandDefinition<TContext, CommandPayload>
+ *
+ * because `CommandPayload` is `void | object`, and the
+ * conditional type inside CommandDefinition does not
+ * distribute because it uses the tuple `[TPayload]`.
  */
 export type AnyCommandDefinition<TContext extends object> =
   | NoPayloadCommand<TContext>
   | PayloadCommand<TContext, never>;
+
+/**
+ * Map of command names to command definitions.
+ *
+ * The map is intentionally heterogeneous:
+ *
+ * - some commands may have no payload
+ * - some commands may have a strongly typed object payload
+ *
+ * `AnyCommandDefinition` provides the structural constraint
+ * without widening concrete payload types to `object` or `any`.
+ *
+ * Concrete command maps preserve the exact payload type
+ * associated with each command key.
+ *
+ * Example:
+ *
+ * type Commands = {
+ *   reset:
+ *     CommandDefinition<MyTypes>;
+ *
+ *   deleteRow:
+ *     CommandDefinition<
+ *       MyTypes,
+ *       { rowId: number }
+ *     >;
+ * };
+ */
+export type CommandMap<TTypes extends DataTableTypesBase> = Record<
+  PropertyKey,
+  AnyCommandDefinition<TTypes>
+>;
+
+/**
+ * Extract the payload type from a command definition.
+ */
+export type CommandPayloadOf<TCommand> =
+  TCommand extends NoPayloadCommand<object>
+    ? void
+    : TCommand extends PayloadCommand<object, infer TPayload>
+      ? TPayload
+      : never;
+
+/**
+ * Convert a command definition into its execution
+ * argument tuple.
+ */
+export type CommandExecuteArguments<TCommand> =
+  TCommand extends NoPayloadCommand<object>
+    ? []
+    : TCommand extends PayloadCommand<object, infer TPayload>
+      ? [payload: TPayload]
+      : never;
 
 /**
  * A command handler.
@@ -122,139 +200,16 @@ export type AnyCommandDefinition<TContext extends object> =
  *
  *   context
  */
-// export type CommandHandler<
-//   TTypes extends DataTableTypesBase,
-//   TPayload extends CommandPayload,
-// > = [TPayload] extends [void]
-//   ? (context: CommandContext<TTypes>) => void
-//   : (
-//       context: CommandContext<TTypes>,
-
-//       payload: TPayload,
-//     ) => void;
 export type CommandHandler<
   TTypes extends DataTableTypesBase,
   TPayload extends CommandPayload,
 > = (
   context: CommandContext<TTypes>,
-
   ...args: CommandArguments<TPayload>
 ) => void;
 
 /**
- * Public command definition.
- *
- * This is the important type-level bridge between:
- *
- *     void
- *
- * and:
- *
- *     object payload
- *
- * `Exclude<TPayload, void>` is required because
- * PayloadCommand only accepts object payloads.
- */
-export type CommandDefinition<
-  TContext extends object,
-  TPayload extends CommandPayload = void,
-> = [TPayload] extends [void]
-  ? NoPayloadCommand<TContext>
-  : PayloadCommand<TContext, Exclude<TPayload, void>>;
-
-// /**
-//  * Extracts the payload type from a command definition.
-//  */
-// export type CommandPayloadOf<TCommand> =
-//   TCommand extends CommandDefinition<infer _TTypes, infer TPayload>
-//     ? TPayload
-//     : never;
-
-/**
- * Extract the payload type from a command definition.
- */
-export type CommandPayloadOf<TCommand> =
-  TCommand extends NoPayloadCommand<object>
-    ? void
-    : TCommand extends PayloadCommand<object, infer TPayload>
-      ? TPayload
-      : never;
-
-/**
- * Convert a command definition into its execution
- * argument tuple.
- */
-// export type CommandExecuteArguments<TCommand> =
-//   TCommand extends CommandDefinition<infer _TTypes, infer TPayload>
-//     ? CommandArguments<TPayload>
-//     : never;
-
-/**
- * Convert a command definition into its execution
- * argument tuple.
- */
-export type CommandExecuteArguments<TCommand> =
-  TCommand extends NoPayloadCommand<object>
-    ? []
-    : TCommand extends PayloadCommand<object, infer TPayload>
-      ? [payload: TPayload]
-      : never;
-
-// /**
-//  * A map of command names to command definitions.
-//  *
-//  * The exact key -> command relationship is preserved.
-//  *
-//  * Example:
-//  *
-//  * type Commands = {
-//  *   reset:
-//  *     CommandDefinition<MyTypes>;
-//  *
-//  *   deleteRow:
-//  *     CommandDefinition<
-//  *       MyTypes,
-//  *       { rowId: number }
-//  *     >;
-//  * };
-//  */
-// export type CommandMap<TTypes extends DataTableTypesBase> = Record<
-//   PropertyKey,
-//   CommandDefinition<TTypes, CommandPayload>
-// >;
-
-/**
- * Map of command names to command definitions.
- *
- * The map is intentionally heterogeneous:
- *
- * - some commands may have no payload
- * - some commands may have a strongly typed object payload
- *
- * `AnyCommandDefinition` provides the structural constraint
- * without widening concrete payload types to `object` or `any`.
- * The exact key -> command relationship is preserved.
- *
- * Example:
- *
- * type Commands = {
- *   reset:
- *     CommandDefinition<MyTypes>;
- *
- *   deleteRow:
- *     CommandDefinition<
- *       MyTypes,
- *       { rowId: number }
- *     >;
- * };
- */
-export type CommandMap<TTypes extends DataTableTypesBase> = Record<
-  PropertyKey,
-  AnyCommandDefinition<TTypes>
->;
-
-/**
- * Internal runtime command.
+ * Internal normalized runtime command.
  *
  * This is the crucial abstraction that removes the
  * generic correlation problem from command execution.
@@ -349,6 +304,16 @@ export interface CommandRegistry<
 //   PropertyKey,
 //   CommandDefinition<DataTableTypesBase, object>
 // >;
+
+/**
+ * Generic command registry map.
+ *
+ * A command may either require a payload or not.
+ */
+export type CommandRegistryMap = Record<
+  PropertyKey,
+  AnyCommandDefinition<DataTableTypesBase>
+>;
 
 // export interface CommandRegistry<
 //   TTypes extends DataTableTypesBase,

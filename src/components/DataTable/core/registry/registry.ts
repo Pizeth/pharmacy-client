@@ -1,12 +1,12 @@
 // import type { Registry, RegistryMap } from "./types";
 
 /**
- * A key that can safely be used by a JavaScript Map.
+ * A key that can safely be used by JavaScript keyed collections.
  */
 export type RegistryKey = PropertyKey;
 
 /**
- * Generic registry contract.
+ * Generic strongly typed registry contract.
  *
  * TMap represents the relationship:
  *
@@ -14,18 +14,18 @@ export type RegistryKey = PropertyKey;
  *
  * For example:
  *
- *     {
- *       sorting: SortingService;
- *       filtering: FilteringService;
- *     }
+ * interface Services {
+ *   logger: LoggerService;
+ *   persistence: PersistenceService;
+ * }
  *
- * guarantees that:
+ * Then:
  *
- *     registry.get("sorting")
+ * registry.get("logger")
  *
- * returns:
+ * is inferred as:
  *
- *     SortingService | undefined
+ * LoggerService | undefined
  */
 export interface Registry<TMap extends object> {
   /**
