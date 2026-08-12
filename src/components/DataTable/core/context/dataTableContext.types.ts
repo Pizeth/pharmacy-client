@@ -2,13 +2,15 @@ import type { RowData, Table, TableFeatures } from "@tanstack/table-core";
 
 import type { CommandMap, CommandRegistry } from "../commands/types";
 
-import type { ServiceMap, TypedServiceRegistry } from "../services";
+// import type { ServiceMap, TypedServiceRegistry } from "../services";
 
-import type { PluginMap, TypedPluginRegistry } from "../plugins";
+// import type { PluginMap, TypedPluginRegistry } from "../plugins";
 import { DataTableTypesBase } from "../types";
+import { ServiceRegistry } from "../services";
+import { PluginRegistry } from "../plugins";
 
 /**
- * Context exposed to DataTable commands.
+ * Runtime context exposed to command handlers.
  *
  * This context satisfies DataTableTypesBase while also
  * providing the runtime infrastructure available to commands.
@@ -24,8 +26,8 @@ import { DataTableTypesBase } from "../types";
 export interface DataTableCommandContext<
   TFeatures extends TableFeatures,
   TData extends RowData,
-  TServices extends ServiceMap,
-  TPlugins extends PluginMap,
+  TServices extends object,
+  TPlugins extends object,
 > extends DataTableTypesBase {
   /**
    * TanStack Table v9 table instance.
@@ -61,14 +63,14 @@ export interface DataTableCommandContext<
    *
    * The generic TServices preserves the key/value relationship.
    */
-  readonly services: TypedServiceRegistry<TServices>;
+  readonly services: ServiceRegistry<TServices>;
 
   /**
    * DataTable plugins available to commands.
    *
    * The generic TPlugins preserves the key/value relationship.
    */
-  readonly plugins: TypedPluginRegistry<TPlugins>;
+  readonly plugins: PluginRegistry<TPlugins>;
 }
 
 /**
@@ -102,8 +104,8 @@ export interface DataTableCommandContext<
 export interface DataTableContext<
   TFeatures extends TableFeatures,
   TData extends RowData,
-  TServices extends ServiceMap,
-  TPlugins extends PluginMap,
+  TServices extends object,
+  TPlugins extends object,
   TCommands extends CommandMap<
     DataTableCommandContext<TFeatures, TData, TServices, TPlugins>
   >,
@@ -126,12 +128,12 @@ export interface DataTableContext<
 export interface DataTableContextTypes<
   TFeatures extends TableFeatures,
   TData extends RowData,
-  TServices extends ServiceMap,
-  TPlugins extends PluginMap,
+  TServices extends object,
+  TPlugins extends object,
 > {
   readonly table: Table<TFeatures, TData>;
 
-  readonly services: TypedServiceRegistry<TServices>;
+  readonly services: ServiceRegistry<TServices>;
 
-  readonly plugins: TypedPluginRegistry<TPlugins>;
+  readonly plugins: PluginRegistry<TPlugins>;
 }

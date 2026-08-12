@@ -1,37 +1,53 @@
 // src/components/DataTable/core/table/createDataTable.ts
 
-import { constructTable } from "@tanstack/react-table";
-
-import type { RowData, TableFeatures, Table } from "@tanstack/table-core";
-
-import { buildTableOptions } from "../builder/buildTableOptions";
-import type { CreateDataTableInput } from "./createDataTable.types";
+import { type RowData, type Table, constructTable } from "@tanstack/table-core";
+import {
+  buildTableOptions,
+  BuiltTableFeatures,
+  BuiltTableOptions,
+} from "../builder/buildTableOptions";
 import type { DataTableFeatureConfig } from "../features/types";
-import type { ResolveFeatures } from "../features/resolveFeatures.types";
-import type { FrameworkFeatures } from "../defaults/frameworkFeatures";
-import type { MergeFeatures } from "../types/mergeFeatures";
-
-import type { DataTableInstance } from "./types.instance";
-import { DataTableOptions } from "./types";
+import { BuildTableOptionsInput } from "../builder/types";
 
 /**
- * Creates our framework table instance.
+ * Creates the underlying TanStack Table v9 instance from the framework's
+ * public DataTable configuration.
  *
- * This is NOT a React hook.
+ * This function is framework-core code:
  *
- * It is pure table creation logic.
+ * - it is not a React hook
+ * - it does not render anything
+ * - it does not use `useTable`
+ * - it does not use the v8 `useReactTable`
+ *
+ * The complete construction pipeline is:
+ *
+ *   DataTableFeatureConfig
+ *            ↓
+ *   resolveFeatures()
+ *            ↓
+ *   BuiltTableFeatures<TConfig>
+ *            ↓
+ *   buildTableOptions()
+ *            ↓
+ *   BuiltTableOptions<TConfig, TData>
+ *            ↓
+ *   constructTable<
+ *     BuiltTableFeatures<TConfig>,
+ *     TData
+ *   >()
+ *            ↓
+ *   Table<
+ *     BuiltTableFeatures<TConfig>,
+ *     TData
+ *   >
  */
-// export function createDataTable<
-//   TFeatures extends TableFeatures,
-//   TData extends RowData,
-// >(options: DataTableOptions<TFeatures, TData>): Table<TFeatures, TData> {
 export function createDataTable<
   const TConfig extends DataTableFeatureConfig,
   TData extends RowData,
 >(
-  input: CreateDataTableInput<TData, TConfig>,
-): Table<MergeFeatures<FrameworkFeatures, ResolveFeatures<TConfig>>, TData> {
-  // ): DataTableInstance<TFeatures, TData> {
+  input: BuildTableOptionsInput<TData, TConfig>,
+): Table<BuiltTableFeatures<TConfig>, TData> {
   /**
    * v9 table creation will happen here.
    *
@@ -41,29 +57,31 @@ export function createDataTable<
    * should know how TanStack creates
    * the instance.
    */
-  const options = buildTableOptions(input);
-  return constructTable(options);
+  // const options = buildTableOptions(input);
+  // return constructTable(options);
+  // return constructTable(buildTableOptions(input));
+
+  /**
+   * Preserve the already-resolved feature relationship
+   * produced by our builder.
+   *
+   * v9 table creation will happen here.
+   *
+   * We intentionally isolate this.
+   *
+   * Nothing else in the application
+   * should know how TanStack creates
+   * the instance.
+   */
+  const options: BuiltTableOptions<TConfig, TData> = buildTableOptions(input);
+
+  /**
+   * Explicitly provide TanStack's two generic arguments.
+   *
+   * Do NOT let constructTable infer TFeatures here.
+   *
+   * The first generic is the resolved TanStack feature set,
+   * not our public DataTable feature configuration.
+   */
+  return constructTable<BuiltTableFeatures<TConfig>, TData>(options);
 }
-
-type User = {
-  id: number;
-  name: string;
-};
-
-const table = createDataTable({
-  data: [
-    {
-      id: 1,
-      name: "John",
-    },
-  ],
-
-  columns: [],
-
-  features: {
-    sorting: true,
-    pagination: true,
-  },
-});
-
-console.log(table.getSortedRowModel());

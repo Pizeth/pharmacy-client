@@ -1,18 +1,30 @@
 import type { RowData, TableFeatures } from "@tanstack/table-core";
 
-import type { DataTableTypesBase } from "./baseTypes";
-
 /**
- * Root type map for the framework.
+ * Root type map for one DataTable configuration.
  *
- * Every module receives exactly a single generic:
+ * Framework modules should normally receive this type map
+ * as a single generic rather than separately carrying:
  *
- * TTypes representing the entire table.
+ *   TFeatures
+ *   TRow
+ *
+ * throughout the framework.
+ *
+ * Additional framework-level type slots may be introduced
+ * here later as the architecture grows.
  */
 export type DataTableTypes<
   TFeatures extends TableFeatures,
   TRow extends RowData,
-> = DataTableTypesBase & {
+> = {
+  /**
+   * Concrete TanStack feature set.
+   */
   features: TFeatures;
+
+  /**
+   * Concrete application row-data type.
+   */
   row: TRow;
 };

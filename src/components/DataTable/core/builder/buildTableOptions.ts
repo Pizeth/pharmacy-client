@@ -8,67 +8,82 @@ import type {
 import { resolveFeatures } from "../features/resolveFeatures";
 import { DataTableFeatureConfig } from "../features/types";
 import type { ResolveFeatures } from "../features/resolveFeatures.types";
-import { frameworkFeatures } from "../defaults/frameworkFeatures";
-import type { FrameworkFeatures } from "../defaults/frameworkFeatures";
 import type { MergeFeatures } from "../types/mergeFeatures";
-
-// import { DataTableFeatureConfig } from "../table/types";
-
-// import type { DataTableFeatureConfig } from "../table/types";
-
-// export interface BuildTableOptionsInput<TData extends RowData> {
-//   data: TData[];
-//   columns: unknown[];
-//   features?: DataTableFeatureConfig;
-// }
-
-export interface BuildTableOptionsInput<
-  TData extends RowData,
-  TConfig extends DataTableFeatureConfig,
-> {
-  data: TData[];
-
-  columns: unknown[];
-
-  features: TConfig;
-}
+import { BuildTableOptionsInput } from "./types";
 
 /**
- * Converts our public configuration
- * into TanStack TableOptions.
+ * Final TanStack feature set produced from one
+ * DataTable feature configuration.
+ *
+ * Today it maps directly to ResolveFeatures<TConfig>.
+ * Future framework-level TanStack features may be composed
+ * here if we actually introduce them.
  */
-// export function buildTableOptions<
-//   TFeatures extends TableFeatures,
-//   TData extends RowData,
-// >(_input: BuildTableOptionsInput<TData>): TableOptions<TFeatures, TData> {
-//   throw new Error("Not implemented yet.");
-// }
+export type BuiltTableFeatures<TConfig extends DataTableFeatureConfig> =
+  ResolveFeatures<TConfig>;
 
+/**
+ * Final TanStack options type produced by the builder.
+ */
+export type BuiltTableOptions<
+  TConfig extends DataTableFeatureConfig,
+  TData extends RowData,
+> = TableOptions<BuiltTableFeatures<TConfig>, TData>;
+
+/**
+ * Converts the framework's public DataTable configuration
+ * into TanStack Table v9 options.
+ *
+ * Important:
+ *
+ * TanStack validates the feature object using its internal
+ * ValidateFeatureSlots<TFeatures> type.
+ *
+ * Our resolver constructs that object dynamically from
+ * TConfig. TypeScript retains the exact feature-slot type
+ * through ResolveFeatures<TConfig>, but cannot prove the
+ * resulting generic object satisfies TanStack's internal
+ * validator.
+ *
+ * Therefore this function is the single intentional assertion
+ * boundary between:
+ *
+ *   our strongly typed feature resolver
+ *
+ * and:
+ *
+ *   TanStack's internal feature-slot validator.
+ *
+ * Do not spread this assertion elsewhere in the framework.
+ */
 export function buildTableOptions<
   const TConfig extends DataTableFeatureConfig,
   TData extends RowData,
 >(
   input: BuildTableOptionsInput<TData, TConfig>,
-): TableOptions<
-  MergeFeatures<FrameworkFeatures, ResolveFeatures<TConfig>>,
-  TData
-> {
-  // ): TableOptions<ResolveFeatures<TConfig>, TData> {
-  // const features = resolveFeatures(input.features);
+): BuiltTableOptions<TConfig, TData> {
+  // const userFeatures = resolveFeatures(input.features);
 
-  const userFeatures = resolveFeatures(input.features);
+  // const features = {
+  //   ...frameworkFeatures,
+  //   ...userFeatures,
+  // };
 
-  const features = {
-    ...frameworkFeatures,
-    ...userFeatures,
-  };
+  const features = resolveFeatures(input.features);
 
+  /**
+   * TanStack's TableOptions performs additional validation
+   * of the feature slots.
+   *
+   * Our resolver constructs those slots dynamically, so
+   * TypeScript may not always be able to prove the complete
+   * ValidateFeatureSlots relationship from this local object.
+   *
+   * Keep any assertion isolated to this framework boundary.
+   */
   return {
     data: input.data,
     columns: input.columns,
     features,
-  } as unknown as TableOptions<
-    MergeFeatures<FrameworkFeatures, ResolveFeatures<TConfig>>,
-    TData
-  >;
+  } as unknown as BuiltTableOptions<TConfig, TData>;
 }

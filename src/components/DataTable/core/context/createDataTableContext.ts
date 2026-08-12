@@ -4,9 +4,9 @@ import type { RowData, Table, TableFeatures } from "@tanstack/table-core";
 import { CommandRegistryImpl } from "../commands/commandRegistry";
 import type { CommandMap } from "../commands/types";
 import { PluginRegistryImpl } from "../plugins/pluginRegistryImpl";
-import type { PluginMap } from "../plugins/pluginMap";
+// import type { PluginMap } from "../plugins/pluginMap";
 import { ServiceRegistryImpl } from "../services/serviceRegistryImpl";
-import type { ServiceMap } from "../services/serviceMap";
+// import type { ServiceMap } from "../services/serviceMap";
 import type {
   DataTableCommandContext,
   DataTableContext,
@@ -18,8 +18,8 @@ import type {
 export interface CreateDataTableContextOptions<
   TFeatures extends TableFeatures,
   TData extends RowData,
-  TServices extends ServiceMap,
-  TPlugins extends PluginMap,
+  TServices extends object,
+  TPlugins extends object,
 > {
   /**
    * The already-created TanStack Table v9 instance.
@@ -76,8 +76,8 @@ export interface CreateDataTableContextOptions<
 export function createDataTableContext<
   TFeatures extends TableFeatures,
   TData extends RowData,
-  TServices extends ServiceMap,
-  TPlugins extends PluginMap,
+  TServices extends object,
+  TPlugins extends object,
   TCommands extends CommandMap<
     DataTableCommandContext<TFeatures, TData, TServices, TPlugins>
   >,

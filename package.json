@@ -6,7 +6,12 @@
     "dev": "cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack -p 8080",
     "build": "cross-env NODE_OPTIONS='--max-old-space-size=4096' next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate:tanstack-features": "tsx scripts/generate-tanstack-features.ts",
+    "check:tanstack-features": "tsx scripts/generate-tanstack-features.ts --check",
+    "postinstall": "npm run generate:tanstack-features",
+    "prebuild": "npm run generate:tanstack-features",
+    "typecheck": "npm run check:tanstack-features && tsc --noEmit"
   },
   "dependencies": {
     "@better-auth/passkey": "^1.6.26",
@@ -87,6 +92,7 @@
     "react-hook-form": "^7.85.0",
     "react-i18next": "^17.0.11",
     "sonner": "^2.0.8",
+    "tsx": "^4.23.12",
     "uuid": "^14.0.1",
     "vaul": "^1.1.2",
     "zod": "^4.4.3"

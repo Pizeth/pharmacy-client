@@ -1,5 +1,11 @@
-export type * from "./baseTypes";
-export type * from "./dataTableTypes";
-export type * from "./extract";
-export type * from "./infer";
-export type * from "./mergeFeatures";
+export type {
+  DataTableTypesBase,
+  FeaturesOf,
+  RowOf,
+  TableOf,
+} from "./baseTypes";
+export type { DataTableTypes } from "./dataTableTypes";
+
+export type { MergeFeatures } from "./mergeFeatures";
+// export type * from "./extract";
+// export type * from "./infer";
