@@ -10,7 +10,7 @@ export type TanStackStockFeatureSlot = keyof StockFeatures;
 
 /**
  * Maps the DataTable framework's stable public feature names
- * to TanStack Table's stock feature slots.
+ * to TanStack Table's stock feature slots and implementations.
  *
  * This file is intentionally handwritten.
  *
@@ -51,7 +51,7 @@ export const featureAliases = {
 export type DataTableFeatureName = keyof typeof featureAliases;
 
 /**
- * TanStack feature slots currently exposed by DataTable.
+ * Upstream feature slots currently exposed through DataTable.
  */
 export type ExposedTanStackFeatureSlot =
   (typeof featureAliases)[DataTableFeatureName];

@@ -6,6 +6,6 @@ export type {
 } from "./baseTypes";
 export type { DataTableTypes } from "./dataTableTypes";
 
-export type { MergeFeatures } from "./mergeFeatures";
+// export type { MergeFeatures } from "./mergeFeatures";
 // export type * from "./extract";
 // export type * from "./infer";

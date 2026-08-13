@@ -10,12 +10,12 @@
  */
 export type EventKey = PropertyKey;
 
-// /**
-//  * Event map constraint.
-//  *
-//  * Every event key maps to a payload object.
-//  */
-// export type EventMap = Record<EventKey, object>;
+/**
+ * Convert an event payload into its emit argument tuple.
+ */
+export type EventArguments<TPayload> = [TPayload] extends [void]
+  ? []
+  : [payload: TPayload];
 
 /**
  * Strongly typed Event Bus contract.
@@ -63,7 +63,11 @@ export interface EventBus<TEvents extends object> {
    *
    * The event key determines the required payload type.
    */
-  emit<K extends keyof TEvents>(event: K, payload: TEvents[K]): void;
+  // emit<K extends keyof TEvents>(event: K, payload: TEvents[K]): void;
+  emit<K extends keyof TEvents>(
+    event: K,
+    ...args: EventArguments<TEvents[K]>
+  ): void;
 
   /**
    * Remove all listeners.

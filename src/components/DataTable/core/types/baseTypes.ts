@@ -1,34 +1,36 @@
 import type { RowData, Table, TableFeatures } from "@tanstack/table-core";
 
 /**
- * Minimum type contract understood by the DataTable framework.
+ * Minimum type contract shared by the DataTable framework.
  *
  * Framework subsystems that only need access to the table's
  * feature set and row-data type can constrain themselves to
  * this type instead of depending on the complete DataTable
  * type map.
+ *
+ * Higher-level framework objects may contain additional
+ * information, but anything that satisfies this shape can
+ * participate in the core type system.
  */
 export type DataTableTypesBase = {
   /**
-   * TanStack features registered for the table.
+   * Concrete TanStack feature set.
    */
   features: TableFeatures;
 
   /**
-   * Shape of one row's application data.
+   * Application row-data shape.
    */
   row: RowData;
 };
 
 /**
- * Extract the concrete TanStack feature set from a
- * DataTable type map.
+ * Extract the concrete feature set from a framework type map.
  */
 export type FeaturesOf<TTypes extends DataTableTypesBase> = TTypes["features"];
 
 /**
- * Extract the concrete row-data type from a
- * DataTable type map.
+ * Extract the concrete row-data type from a framework type map.
  */
 export type RowOf<TTypes extends DataTableTypesBase> = TTypes["row"];
 

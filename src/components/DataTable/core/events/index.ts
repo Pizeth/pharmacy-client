@@ -1,4 +1,4 @@
-export type { EventBus, EventMap, EventKey } from "./types";
+export type { EventArguments, EventBus, EventKey } from "./types";
 
 export { EventBusImpl } from "./eventBus";
 

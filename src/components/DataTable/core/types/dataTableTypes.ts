@@ -1,7 +1,7 @@
 import type { RowData, TableFeatures } from "@tanstack/table-core";
 
 /**
- * Root type map for one DataTable configuration.
+ * Root type map representing one DataTable configuration.
  *
  * Framework modules should normally receive this type map
  * as a single generic rather than separately carrying:

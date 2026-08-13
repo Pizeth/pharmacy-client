@@ -1,5 +1,4 @@
 import type { RowData } from "@tanstack/table-core";
-
 import type { DataTableFeatureConfig } from "../features/types";
 
 /**
@@ -12,19 +11,22 @@ export interface BuildTableOptionsInput<
   TConfig extends DataTableFeatureConfig,
 > {
   /**
-   * Table row data.
+   * Application rows.
    */
   data: TData[];
 
   /**
    * Column definitions.
    *
-   * Kept broad until we finalize the v9 column-helper layer.
+   * Intentionally temporary.
+   *
+   * We will replace this with the correct TanStack v9
+   * column type when we audit the column architecture.
    */
   columns: unknown[];
 
   /**
-   * Public framework feature configuration.
+   * Stable DataTable feature configuration.
    */
   features: TConfig;
 }

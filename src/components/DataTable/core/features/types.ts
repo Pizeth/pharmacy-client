@@ -1,5 +1,3 @@
-// import { DataTableFeatureName } from "./featureMap";
-
 import { DataTableFeatureName } from "./featureAliases";
 
 /**

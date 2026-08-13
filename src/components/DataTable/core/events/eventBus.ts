@@ -1,13 +1,9 @@
-import type { EventBus } from "./types";
+import type { EventArguments, EventBus } from "./types";
 
 /**
  * Listener associated with a single event payload type.
  */
 type Listener<TPayload> = (payload: TPayload) => void;
-
-// type ListenerMap<TEvents extends object> = {
-//   [K in keyof TEvents]?: Set<Listener<TEvents[K]>>;
-// };
 
 /**
  * Strongly typed listener storage.
@@ -68,12 +64,33 @@ export class EventBusImpl<TEvents extends object> implements EventBus<TEvents> {
   /**
    * Emit an event.
    */
-  emit<K extends keyof TEvents>(event: K, payload: TEvents[K]): void {
+  // emit<K extends keyof TEvents>(event: K, payload: TEvents[K]): void {
+  //   const bucket = this.listeners[event];
+
+  //   if (!bucket) {
+  //     return;
+  //   }
+
+  //   for (const listener of bucket) {
+  //     listener(payload);
+  //   }
+  // }
+  emit<K extends keyof TEvents>(
+    event: K,
+    ...args: EventArguments<TEvents[K]>
+  ): void {
     const bucket = this.listeners[event];
 
     if (!bucket) {
       return;
     }
+
+    /**
+     * Runtime argument representation.
+     *
+     * For void events args[0] is undefined.
+     */
+    const payload = args[0] as TEvents[K];
 
     for (const listener of bucket) {
       listener(payload);
@@ -84,11 +101,6 @@ export class EventBusImpl<TEvents extends object> implements EventBus<TEvents> {
    * Remove every registered listener.
    */
   clear(): void {
-    // this.listeners.clear();
-    // for (const key of Object.keys(this.listeners)) {
-    //   delete this.listeners[key as keyof TEvents];
-    // }
-
     for (const key of Reflect.ownKeys(this.listeners) as Array<keyof TEvents>) {
       delete this.listeners[key];
     }

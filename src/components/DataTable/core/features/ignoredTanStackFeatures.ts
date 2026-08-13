@@ -26,6 +26,8 @@ import { TanStackStockFeatureSlot } from "./featureAliases";
  *
  * 1. become part of the DataTable public API, or
  * 2. be explicitly ignored.
+ *
+ * New features therefore require conscious review.
  */
 export const ignoredTanStackFeatures = [
   "cellSelectionFeature",

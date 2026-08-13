@@ -1,18 +1,27 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import type { RowData, TableFeatures } from "@tanstack/table-core";
 import type { CommandMap } from "../commands/types";
-import type { ServiceMap } from "../services/serviceMap";
-import type { PluginMap } from "../plugins/pluginMap";
+import type { DataTableTypesBase } from "../types";
 import type {
-  DataTableCommandContext,
   DataTableContext,
+  DataTableRuntimeContext,
 } from "./dataTableContext.types";
 
 /**
- * Creates a complete, strongly typed React integration for
- * a DataTable configuration.
+ * Create a fully typed React context/provider/hook set for
+ * one concrete DataTable type configuration.
+ *
+ * Why a factory?
+ *
+ * React's createContext() needs one concrete value type at
+ * creation time.
+ *
+ * A generic global context such as:
+ *
+ *   createContext<DataTableContext<???>>(...)
+ *
+ * cannot preserve arbitrary per-table generics.
  *
  * The returned object contains:
  *
@@ -20,51 +29,63 @@ import type {
  * - useDataTableContext
  * - Context
  *
- * The generic types are captured by the factory.
+ * This factory captures those generics once and returns
+ * correctly typed React primitives.
  */
+// export function createDataTableProvider<
+//   TFeatures extends TableFeatures,
+//   TData extends RowData,
+//   TServices extends object,
+//   TPlugins extends object,
+//   TCommands extends CommandMap<
+//     DataTableCommandContext<TFeatures, TData, TServices, TPlugins>
+//   >,
 export function createDataTableProvider<
-  TFeatures extends TableFeatures,
-  TData extends RowData,
-  TServices extends ServiceMap,
-  TPlugins extends PluginMap,
+  TTypes extends DataTableTypesBase,
+  TEvents extends object,
+  TServices extends object,
+  TPlugins extends object,
   TCommands extends CommandMap<
-    DataTableCommandContext<TFeatures, TData, TServices, TPlugins>
+    DataTableRuntimeContext<TTypes, TEvents, TServices, TPlugins>
   >,
 >() {
-  type Context = DataTableContext<
-    TFeatures,
-    TData,
+  type ContextValue = DataTableContext<
+    TTypes,
+    TEvents,
     TServices,
     TPlugins,
     TCommands
   >;
 
-  const ReactContext = createContext<Context | null>(null);
+  /**
+   * null is used only to detect missing providers.
+   */
+  const Context = createContext<ContextValue | null>(null);
+
+  interface ProviderProps {
+    readonly value: ContextValue;
+
+    readonly children: ReactNode;
+  }
 
   /**
    * React provider for this specific DataTable
    * configuration.
    */
-  function Provider(props: {
-    readonly context: Context;
-
-    readonly children: ReactNode;
-  }) {
+  function Provider(props: ProviderProps) {
     return (
-      <ReactContext.Provider value={props.context}>
-        {props.children}
-      </ReactContext.Provider>
+      <Context.Provider value={props.value}>{props.children}</Context.Provider>
     );
   }
 
   /**
    * Retrieve the DataTable context from React.
    *
-   * Throws a descriptive error when used outside the
-   * corresponding Provider.
+   * Throws when called outside the matching provider so
+   * consumers never have to handle null.
    */
-  function useDataTableContext(): Context {
-    const context = useContext(ReactContext);
+  function useDataTableContext(): ContextValue {
+    const context = useContext(Context);
 
     if (context === null) {
       throw new Error(
@@ -76,8 +97,8 @@ export function createDataTableProvider<
   }
 
   return {
-    Context: ReactContext,
+    Context,
     Provider,
     useDataTableContext,
-  };
+  } as const;
 }

@@ -49,19 +49,8 @@ export function createDataTable<
   input: BuildTableOptionsInput<TData, TConfig>,
 ): Table<BuiltTableFeatures<TConfig>, TData> {
   /**
-   * v9 table creation will happen here.
+   * Explicit checkpoint for the resolved options type.
    *
-   * We intentionally isolate this.
-   *
-   * Nothing else in the application
-   * should know how TanStack creates
-   * the instance.
-   */
-  // const options = buildTableOptions(input);
-  // return constructTable(options);
-  // return constructTable(buildTableOptions(input));
-
-  /**
    * Preserve the already-resolved feature relationship
    * produced by our builder.
    *
@@ -78,10 +67,15 @@ export function createDataTable<
   /**
    * Explicitly provide TanStack's two generic arguments.
    *
+   * TConfig is our public flag configuration.
+   *
    * Do NOT let constructTable infer TFeatures here.
    *
    * The first generic is the resolved TanStack feature set,
    * not our public DataTable feature configuration.
+   *
+   * BuiltTableFeatures<TConfig> is the actual TanStack
+   * feature object.
    */
   return constructTable<BuiltTableFeatures<TConfig>, TData>(options);
 }

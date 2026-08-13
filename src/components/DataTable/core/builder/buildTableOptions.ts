@@ -1,14 +1,9 @@
 // src/components/DataTable/core/builder/buildTableOptions.ts
 
-import type {
-  RowData,
-  TableFeatures,
-  TableOptions,
-} from "@tanstack/table-core";
+import type { RowData, TableOptions } from "@tanstack/table-core";
 import { resolveFeatures } from "../features/resolveFeatures";
 import { DataTableFeatureConfig } from "../features/types";
 import type { ResolveFeatures } from "../features/resolveFeatures.types";
-import type { MergeFeatures } from "../types/mergeFeatures";
 import { BuildTableOptionsInput } from "./types";
 
 /**
@@ -62,13 +57,6 @@ export function buildTableOptions<
 >(
   input: BuildTableOptionsInput<TData, TConfig>,
 ): BuiltTableOptions<TConfig, TData> {
-  // const userFeatures = resolveFeatures(input.features);
-
-  // const features = {
-  //   ...frameworkFeatures,
-  //   ...userFeatures,
-  // };
-
   const features = resolveFeatures(input.features);
 
   /**

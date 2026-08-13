@@ -337,6 +337,14 @@ Run:
 
   console.log(`   ${ignoredFeatureSlots.length} intentionally ignored`);
 
+  if (ignoredFeatureSlots.length > 0) {
+    console.log(`\nIgnored TanStack features:`);
+
+    for (const feature of ignoredFeatureSlots) {
+      console.log(`  - ${feature}`);
+    }
+  }
+
   process.exit(0);
 }
 
@@ -358,5 +366,13 @@ console.log(`   ${tanstackFeatureSlots.length} stock features discovered`);
 console.log(`   ${exposedFeatureSlots.length} exposed by DataTable`);
 
 console.log(`   ${ignoredFeatureSlots.length} intentionally ignored`);
+
+if (ignoredFeatureSlots.length > 0) {
+  console.log(`\nIgnored TanStack features:`);
+
+  for (const feature of ignoredFeatureSlots) {
+    console.log(`  - ${feature}`);
+  }
+}
 
 console.log(`   Output: ${outputPath}`);

@@ -32,4 +32,4 @@
  *     ...b,
  *   }
  */
-export type MergeFeatures<A, B> = Omit<A, keyof B> & B;
+// export type MergeFeatures<A, B> = Omit<A, keyof B> & B;

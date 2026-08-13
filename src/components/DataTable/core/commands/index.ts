@@ -1,15 +1,20 @@
 // export { createCommandRegistry } from "./createCommandRegistry";
 
 export type {
+  // CommandHandler,
+  AnyCommandDefinition,
+  CommandArguments,
   CommandContext,
   CommandDefinition,
   CommandExecuteArguments,
-  CommandHandler,
   CommandMap,
   CommandPayload,
   CommandPayloadOf,
   CommandRegistry,
-  // CommandRegistryMap,
+  NoPayloadCommand,
+  PayloadCommand,
+  RuntimeCommand,
+  RuntimeCommandMap,
 } from "./types";
 
 export { CommandRegistryImpl } from "./commandRegistry";

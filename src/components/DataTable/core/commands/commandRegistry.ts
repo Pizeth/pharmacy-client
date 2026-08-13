@@ -45,31 +45,37 @@ import type {
  *   - command removal
  */
 export class CommandRegistryImpl<
-  TTypes extends DataTableTypesBase,
-  TCommands extends CommandMap<TTypes>,
-> implements CommandRegistry<TTypes, TCommands> {
+  // TTypes extends DataTableTypesBase,
+  TContext extends object,
+  TCommands extends CommandMap<TContext>,
+> implements CommandRegistry<TContext, TCommands> {
   /**
    * Internal runtime registry.
    *
-   * The public command definition is normalized before
-   * entering this registry.
+   * The public Ccmmands are normalized into RuntimeCommand objects before
+   * storage.
    *
    * Notice that the underlying registry is now storing
    * RuntimeCommand objects rather than the public command
    * definitions.
+   *
+   * That lets the public API remain strongly typed while the
+   * internal dispatch mechanism has one consistent shape.
    */
-  private readonly registry: RegistryImpl<RuntimeCommandMap<TTypes, TCommands>>;
+  private readonly registry: RegistryImpl<
+    RuntimeCommandMap<TContext, TCommands>
+  >;
 
   /**
    * Context supplied to every command.
    *
    * This will eventually become the full DataTableContext.
    */
-  private readonly context: CommandContext<TTypes>;
+  private readonly context: CommandContext<TContext>;
 
-  constructor(context: CommandContext<TTypes>) {
+  constructor(context: CommandContext<TContext>) {
     this.context = context;
-    this.registry = new RegistryImpl<RuntimeCommandMap<TTypes, TCommands>>();
+    this.registry = new RegistryImpl<RuntimeCommandMap<TContext, TCommands>>();
   }
 
   /**
@@ -122,8 +128,8 @@ export class CommandRegistryImpl<
    * compile-time discriminant.
    */
   private createRuntimeCommand(
-    command: AnyCommandDefinition<TTypes>,
-  ): RuntimeCommand<TTypes> {
+    command: AnyCommandDefinition<TContext>,
+  ): RuntimeCommand<TContext> {
     return {
       invoke: (context, args) => {
         this.invokeCommand(command, context, args);
@@ -141,8 +147,8 @@ export class CommandRegistryImpl<
    *   true  -> PayloadCommand
    */
   private invokeCommand(
-    command: AnyCommandDefinition<TTypes>,
-    context: CommandContext<TTypes>,
+    command: AnyCommandDefinition<TContext>,
+    context: CommandContext<TContext>,
     args: readonly unknown[],
   ): void {
     if (!command.hasPayload) {
@@ -158,10 +164,18 @@ export class CommandRegistryImpl<
    *
    * Because this method only accepts PayloadCommand, TypeScript
    * knows that `execute()` requires the second argument.
+   *
+   * Compile-time callers already receive exact payload typing,
+   * but JavaScript callers or unsafe external boundaries can
+   * still reach runtime with malformed values.
    */
-  private invokePayloadCommand<TPayload extends object>(
-    command: PayloadCommand<TTypes, TPayload>,
-    context: CommandContext<TTypes>,
+  // private invokePayloadCommand<TPayload extends object>(
+  //   command: PayloadCommand<TContext, TPayload>,
+  //   context: CommandContext<TContext>,
+  //   args: readonly unknown[],
+  private invokePayloadCommand(
+    command: PayloadCommand<TContext, object>,
+    context: CommandContext<TContext>,
     args: readonly unknown[],
   ): void {
     const payload = args[0];
@@ -174,7 +188,7 @@ export class CommandRegistryImpl<
       throw new Error("Command payload must be a non-null object.");
     }
 
-    command.execute(context, payload as TPayload);
+    command.execute(context, payload);
   }
 
   /**

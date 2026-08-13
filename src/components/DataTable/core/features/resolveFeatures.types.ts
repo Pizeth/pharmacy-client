@@ -1,11 +1,10 @@
-import type { FeatureMap } from "./featureMap";
+// import type { FeatureMap } from "./featureMap";
 
-// import type { FeatureMap } from "./featureMap.generated";
-
+import type { FeatureMap } from "./featureMap.generated";
 import type { DataTableFeatureConfig } from "./types";
 
 /**
- * Resolve a public DataTable feature configuration into the
+ * Resolve a public DataTable feature flags configuration into the
  * corresponding TanStack feature-slot object.
  *
  * Example:

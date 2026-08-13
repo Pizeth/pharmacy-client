@@ -16,6 +16,15 @@ import type { DataTableTypesBase } from "../types";
  *
  * Primitive payloads are intentionally not supported.
  * DataTable commands should use named object payloads.
+ *
+ * Commands may either:
+ *
+ * - have no payload
+ * - receive one structured object payload
+ *
+ * We intentionally use object payloads for commands because
+ * commands generally represent application actions and tend
+ * to grow over time.
  */
 export type CommandPayload = void | object;
 
@@ -24,12 +33,16 @@ export type CommandPayload = void | object;
  *
  * The concrete command context is supplied by the DataTable
  * runtime. Commands receive a readonly view of that context.
+ *
+ * Commands may call services, emit events, manipulate the
+ * table, etc., but they should not replace properties on the
+ * context object itself.
  */
 export type CommandContext<TContext extends object> = Readonly<TContext>;
 
 /**
- * Converts a payload type into the argument tuple
- * required by a command.
+ * Convert a command payload type into the argument tuple used
+ * by CommandRegistry.execute().
  *
  * No-payload command:
  *
@@ -38,6 +51,28 @@ export type CommandContext<TContext extends object> = Readonly<TContext>;
  * Payload command:
  *
  *   execute(context, payload)
+ *
+ * Example:
+ *
+ * void
+ *
+ * becomes:
+ *
+ * []
+ *
+ * while:
+ *
+ * {
+ *   id: number;
+ * }
+ *
+ * becomes:
+ *
+ * [
+ *   payload: {
+ *     id: number;
+ *   }
+ * ]
  */
 export type CommandArguments<TPayload extends CommandPayload> = [
   TPayload,
@@ -92,6 +127,21 @@ export interface PayloadCommand<
  *
  * `Exclude<TPayload, void>` is required because
  * PayloadCommand only accepts object payloads.
+ *
+ * Example:
+ *
+ * type RefreshCommand =
+ *   CommandDefinition<
+ *     MyContext
+ *   >;
+ *
+ * type DeleteCommand =
+ *   CommandDefinition<
+ *     MyContext,
+ *     {
+ *       id: number;
+ *     }
+ *   >;
  */
 export type CommandDefinition<
   TContext extends object,
@@ -101,6 +151,8 @@ export type CommandDefinition<
   : PayloadCommand<TContext, Exclude<TPayload, void>>;
 
 /**
+ * Broad command constraint used for heterogeneous command maps.
+ *
  * Structural constraint representing any valid command.
  *
  * `never` is intentionally used for the payload side of
@@ -119,10 +171,15 @@ export type CommandDefinition<
  * because `CommandPayload` is `void | object`, and the
  * conditional type inside CommandDefinition does not
  * distribute because it uses the tuple `[TPayload]`.
+ *
+ * This union exists only so one registry may contain both:
+ *
+ * - commands without payloads
+ * - commands with object payloads
  */
 export type AnyCommandDefinition<TContext extends object> =
   | NoPayloadCommand<TContext>
-  | PayloadCommand<TContext, never>;
+  | PayloadCommand<TContext, object>;
 
 /**
  * Map of command names to command definitions.
@@ -150,10 +207,17 @@ export type AnyCommandDefinition<TContext extends object> =
  *       { rowId: number }
  *     >;
  * };
+ *
+ * IMPORTANT:
+ *
+ * TContext is the actual runtime context available to command
+ * handlers.
+ *
+ * It is no longer tied to DataTableTypesBase.
  */
-export type CommandMap<TTypes extends DataTableTypesBase> = Record<
+export type CommandMap<TContext extends object> = Record<
   PropertyKey,
-  AnyCommandDefinition<TTypes>
+  AnyCommandDefinition<TContext>
 >;
 
 /**
@@ -167,8 +231,7 @@ export type CommandPayloadOf<TCommand> =
       : never;
 
 /**
- * Convert a command definition into its execution
- * argument tuple.
+ * Resolve arguments accepted by execute() for a specific command.
  */
 export type CommandExecuteArguments<TCommand> =
   TCommand extends NoPayloadCommand<object>
@@ -177,36 +240,36 @@ export type CommandExecuteArguments<TCommand> =
       ? [payload: TPayload]
       : never;
 
-/**
- * A command handler.
- *
- * The important part here is that the payload is represented
- * as a tuple rather than as an optional parameter.
- *
- * This preserves the difference between:
- *
- *     execute(context)
- *
- * and:
- *
- *     execute(context, payload)
- *
- * Commands with a payload receive:
- *
- *   context
- *   payload
- *
- * Commands whose payload is `void` receive only:
- *
- *   context
- */
-export type CommandHandler<
-  TTypes extends DataTableTypesBase,
-  TPayload extends CommandPayload,
-> = (
-  context: CommandContext<TTypes>,
-  ...args: CommandArguments<TPayload>
-) => void;
+// /**
+//  * A command handler.
+//  *
+//  * The important part here is that the payload is represented
+//  * as a tuple rather than as an optional parameter.
+//  *
+//  * This preserves the difference between:
+//  *
+//  *     execute(context)
+//  *
+//  * and:
+//  *
+//  *     execute(context, payload)
+//  *
+//  * Commands with a payload receive:
+//  *
+//  *   context
+//  *   payload
+//  *
+//  * Commands whose payload is `void` receive only:
+//  *
+//  *   context
+//  */
+// export type CommandHandler<
+//   TTypes extends DataTableTypesBase,
+//   TPayload extends CommandPayload,
+// > = (
+//   context: CommandContext<TTypes>,
+//   ...args: CommandArguments<TPayload>
+// ) => void;
 
 /**
  * Internal normalized runtime command.
@@ -219,8 +282,12 @@ export type CommandHandler<
  *
  * The command itself already knows how to invoke its
  * handler.
+ *
+ * unknown[] is deliberate here because this object sits at
+ * the erased runtime boundary after compile-time command
+ * argument validation has already occurred.
  */
-export interface RuntimeCommand<TTypes extends DataTableTypesBase> {
+export interface RuntimeCommand<TTypes extends object> {
   readonly invoke: (
     context: CommandContext<TTypes>,
     args: readonly unknown[],
@@ -234,7 +301,7 @@ export interface RuntimeCommand<TTypes extends DataTableTypesBase> {
  * the runtime representation to be normalized.
  */
 export type RuntimeCommandMap<
-  TTypes extends DataTableTypesBase,
+  TTypes extends object,
   TCommands extends CommandMap<TTypes>,
 > = {
   [K in keyof TCommands]: RuntimeCommand<TTypes>;
@@ -244,7 +311,7 @@ export type RuntimeCommandMap<
  * Strongly typed command registry.
  */
 export interface CommandRegistry<
-  TTypes extends DataTableTypesBase,
+  TTypes extends object,
   TCommands extends CommandMap<TTypes>,
 > {
   /**
@@ -279,52 +346,3 @@ export interface CommandRegistry<
    */
   keys(): Array<keyof TCommands>;
 }
-
-// /**
-//  * Every command can optionally
-//  * receive a payload.
-//  */
-// export type CommandHandler<TTypes extends DataTableTypesBase, TPayload> = (
-//   context: DataTableContext<TTypes>,
-
-//   payload: TPayload,
-// ) => void;
-
-// /**
-//  * Command definition.
-//  */
-// export interface CommandDefinition<
-//   TTypes extends DataTableTypesBase,
-//   TPayload,
-// > {
-//   execute: CommandHandler<TTypes, TPayload>;
-// }
-
-// export type CommandRegistryMap = Record<
-//   PropertyKey,
-//   CommandDefinition<DataTableTypesBase, object>
-// >;
-
-/**
- * Generic command registry map.
- *
- * A command may either require a payload or not.
- */
-export type CommandRegistryMap = Record<
-  PropertyKey,
-  AnyCommandDefinition<DataTableTypesBase>
->;
-
-// export interface CommandRegistry<
-//   TTypes extends DataTableTypesBase,
-//   TCommands extends CommandRegistryMap,
-// > {
-//   register<K extends keyof TCommands>(key: K, command: TCommands[K]): void;
-
-//   execute<K extends keyof TCommands>(
-//     key: K,
-//     payload: Parameters<TCommands[K]["execute"]>[1],
-//   ): void;
-
-//   has<K extends keyof TCommands>(key: K): boolean;
-// }
