@@ -1,31 +1,18 @@
 // src/components/DataTable/react/types/reactDataTable.types.ts
 
-import type { RowData, TableState } from "@tanstack/table-core";
 import type { ReactTable } from "@tanstack/react-table";
+import type { RowData, TableState } from "@tanstack/table-core";
 import type {
   BuiltTableFeatures,
   BuildTableOptionsInput,
 } from "../../core/builder";
-
-import type { DataTableFeatureConfig } from "../../core/features";
-
+import type { CommandMap } from "../../core/commands";
 import type {
-  DataTableTypes,
-  DataTableTypesBase,
-  FeaturesOf,
-  RowOf,
-} from "../../core/types";
-import { CommandMap, DataTableRuntimeContext } from "../../core";
-import { EventBus } from "../../core/events";
-
-/**
- * Complete framework type bag produced from a public
- * DataTable feature configuration and row-data type.
- */
-export type ReactDataTableTypes<
-  TConfig extends DataTableFeatureConfig,
-  TData extends RowData,
-> = DataTableTypes<BuiltTableFeatures<TConfig>, TData>;
+  DataTableCommandContext,
+  DataTableContext,
+} from "../../core/context";
+import type { DataTableFeatureConfig } from "../../core/features";
+import type { EventBus } from "../../core/events";
 
 /**
  * React-specific TanStack table instance produced by
@@ -63,25 +50,43 @@ export type UseDataTableInput<
 > = BuildTableOptionsInput<TData, TConfig>;
 
 /**
- * Runtime dependencies used when connecting a React table to
- * the DataTable framework runtime.
+ * Input for React runtime composition.
+ *
+ * services/plugins/commands are initialization definitions.
+ *
+ * They are consumed on the first committed table lifecycle and
+ * are not rebuilt every time React table state changes.
+ *
+ * Registry mutations should happen through their registry APIs,
+ * not by replacing these configuration objects every render.
  */
 export type UseDataTableRuntimeInput<
-  //   TTypes extends DataTableTypesBase,
   TTable extends object,
   TEvents extends object,
   TServices extends object,
   TPlugins extends object,
   TCommands extends CommandMap<
-    // DataTableRuntimeContext<TTypes, TEvents, TServices, TPlugins>
-    DataTableRuntimeContext<TTable, TEvents, TServices, TPlugins>
+    DataTableCommandContext<TTable, TEvents, TServices, TPlugins>,
+    TCommands
   >,
-  //   TSelected,
 > = {
-  //   readonly table: ReactTable<FeaturesOf<TTypes>, RowOf<TTypes>, TSelected>;
   readonly table: TTable;
   readonly events?: EventBus<TEvents>;
   readonly services?: Partial<TServices>;
   readonly plugins?: Partial<TPlugins>;
   readonly commands?: Partial<TCommands>;
 };
+
+/**
+ * Result of useDataTableRuntime().
+ */
+export type ReactDataTableContext<
+  TTable extends object,
+  TEvents extends object,
+  TServices extends object,
+  TPlugins extends object,
+  TCommands extends CommandMap<
+    DataTableCommandContext<TTable, TEvents, TServices, TPlugins>,
+    TCommands
+  >,
+> = DataTableContext<TTable, TEvents, TServices, TPlugins, TCommands>;

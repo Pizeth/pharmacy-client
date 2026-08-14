@@ -1,9 +1,120 @@
-import type { RowData, Table, TableFeatures } from "@tanstack/table-core";
-import type { CommandMap, CommandRegistry } from "../commands/types";
-import { DataTableTypesBase, FeaturesOf, RowOf } from "../types";
-import { ServiceRegistry } from "../services";
-import { PluginRegistry } from "../plugins";
-import { EventBus } from "../events";
+import type { CommandMap, CommandRegistry } from "../commands";
+import type { EventBus } from "../events";
+import type { PluginRegistry } from "../plugins";
+import type { ServiceRegistry } from "../services";
+// import type { RowData, Table, TableFeatures } from "@tanstack/table-core";
+// import type { CommandMap, CommandRegistry } from "../commands/types";
+// import { DataTableTypesBase, FeaturesOf, RowOf } from "../types";
+
+/**
+ * Stable runtime infrastructure.
+ *
+ * These objects are intended to survive table state changes.
+ *
+ * The table is deliberately NOT stored here because React may
+ * expose a new ReactTable projection while these registries
+ * should retain their identities.
+ */
+export interface DataTableRuntime<
+  TEvents extends object,
+  TServices extends object,
+  TPlugins extends object,
+> {
+  readonly events: EventBus<TEvents>;
+  readonly services: ServiceRegistry<TServices>;
+  readonly plugins: PluginRegistry<TPlugins>;
+}
+
+/**
+ * Context visible to a command while it executes.
+ *
+ * Unlike DataTableRuntime, this includes the current concrete
+ * table object.
+ *
+ * For a core table:
+ *
+ *   TTable = Table<TFeatures, TData>
+ *
+ * For React:
+ *
+ *   TTable = ReactTable<
+ *     TFeatures,
+ *     TData,
+ *     TSelected
+ *   >
+ */
+export interface DataTableCommandContext<
+  TTable extends object,
+  TEvents extends object,
+  TServices extends object,
+  TPlugins extends object,
+> extends DataTableRuntime<TEvents, TServices, TPlugins> {
+  readonly table: TTable;
+}
+
+/**
+ * Runtime context exposed to command handlers.
+ *
+ * This context satisfies DataTableTypesBase while also
+ * providing the runtime infrastructure available to commands.
+ *
+ * The context combines:
+ *
+ * - TanStack Table v9 instance
+ * - active table feature set
+ * - current row data
+ * - strongly typed services
+ * - strongly typed plugins
+ */
+// export interface DataTableCommandContext<
+//   TFeatures extends TableFeatures,
+//   TData extends RowData,
+//   TServices extends object,
+//   TPlugins extends object,
+// > extends DataTableTypesBase {
+//   /**
+//    * TanStack Table v9 table instance.
+//    *
+//    * IMPORTANT:
+//    *
+//    * TanStack Table v9 uses:
+//    *
+//    *     Table<TFeatures, TData>
+//    *
+//    * not:
+//    *
+//    *     Table<TData>
+//    */
+//   readonly table: Table<TFeatures, TData>;
+
+//   /**
+//    * Feature set registered on the table.
+//    *
+//    * This satisfies DataTableTypesBase.features.
+//    */
+//   readonly features: TFeatures;
+
+//   /**
+//    * Current row model.
+//    *
+//    * This satisfies DataTableTypesBase.row.
+//    */
+//   readonly row: TData;
+
+//   /**
+//    * Application services available to commands.
+//    *
+//    * The generic TServices preserves the key/value relationship.
+//    */
+//   readonly services: ServiceRegistry<TServices>;
+
+//   /**
+//    * DataTable plugins available to commands.
+//    *
+//    * The generic TPlugins preserves the key/value relationship.
+//    */
+//   readonly plugins: PluginRegistry<TPlugins>;
+// }
 
 /**
  * Runtime environment available to every DataTable command.
@@ -43,7 +154,7 @@ import { EventBus } from "../events";
  * Row-specific commands should receive the target row or row
  * identifier through their command payload.
  */
-export interface DataTableRuntimeContext<
+export interface DataTableRuntimeContextUnused<
   // TTypes extends DataTableTypesBase,
   TTable extends object,
   TEvents extends object,
@@ -76,7 +187,7 @@ export interface DataTableRuntimeContext<
  * Values accepted when constructing a DataTable runtime
  * context.
  */
-export interface CreateDataTableContextOptions<
+export interface CreateDataTableContextOptionsUnused<
   // TTypes extends DataTableTypesBase,
   TTable extends object,
   TEvents extends object,
@@ -111,10 +222,13 @@ export interface CreateDataTableContextOptions<
 }
 
 /**
- * Final DataTable context.
+ * Complete DataTable context exposed to consumers.
  *
- * It contains the runtime environment plus the command
- * registry whose handlers receive exactly that environment.
+ * It contains:
+ *
+ * - the current table
+ * - stable runtime registries
+ * - the stable command registry
  */
 export interface DataTableContext<
   // TTypes extends DataTableTypesBase,
@@ -122,24 +236,53 @@ export interface DataTableContext<
   TEvents extends object,
   TServices extends object,
   TPlugins extends object,
+  // TCommands extends CommandMap<
+  //   DataTableRuntimeContext<TTable, TEvents, TServices, TPlugins>
+  // >,
   TCommands extends CommandMap<
-    // DataTableRuntimeContext<TTypes, TEvents, TServices, TPlugins>
-    DataTableRuntimeContext<TTable, TEvents, TServices, TPlugins>
+    DataTableCommandContext<TTable, TEvents, TServices, TPlugins>,
+    TCommands
   >,
-  // > extends DataTableRuntimeContext<TTypes, TEvents, TServices, TPlugins> {
-> extends DataTableRuntimeContext<TTable, TEvents, TServices, TPlugins> {
+  // > extends DataTableRuntimeContext<TTable, TEvents, TServices, TPlugins> {
+> extends DataTableCommandContext<TTable, TEvents, TServices, TPlugins> {
   /**
    * Strongly typed command registry.
    */
   readonly commands: CommandRegistry<
-    // DataTableRuntimeContext<TTypes, TEvents, TServices, TPlugins>,
-    DataTableRuntimeContext<TTable, TEvents, TServices, TPlugins>,
+    // DataTableRuntimeContext<TTable, TEvents, TServices, TPlugins>,
+    DataTableCommandContext<TTable, TEvents, TServices, TPlugins>,
     TCommands
   >;
 }
 
 /**
- * Fully typed factory options including initial commands.
+ * Options required to create the stable runtime registries.
+ */
+export interface CreateDataTableRuntimeOptions<
+  TEvents extends object,
+  TServices extends object,
+  TPlugins extends object,
+> {
+  /**
+   * Optional externally-created event bus.
+   *
+   * When omitted, DataTable creates one.
+   */
+  readonly events?: EventBus<TEvents>;
+
+  /**
+   * Initial service registry entries.
+   */
+  readonly services?: Partial<TServices>;
+
+  /**
+   * Initial plugin registry entries.
+   */
+  readonly plugins?: Partial<TPlugins>;
+}
+
+/**
+ * Complete core DataTable context creation input.
  */
 export type CreateDataTableContextInput<
   // TTypes extends DataTableTypesBase,
@@ -147,81 +290,21 @@ export type CreateDataTableContextInput<
   TEvents extends object,
   TServices extends object,
   TPlugins extends object,
+  // TCommands extends CommandMap<
+  //   DataTableRuntimeContext<TTable, TEvents, TServices, TPlugins>
+  // >,
   TCommands extends CommandMap<
-    // DataTableRuntimeContext<TTypes, TEvents, TServices, TPlugins>
-    DataTableRuntimeContext<TTable, TEvents, TServices, TPlugins>
+    DataTableCommandContext<TTable, TEvents, TServices, TPlugins>,
+    TCommands
   >,
-  // > = CreateDataTableContextOptions<TTypes, TEvents, TServices, TPlugins> & {
-> = CreateDataTableContextOptions<TTable, TEvents, TServices, TPlugins> & {
+  // > = CreateDataTableContextOptions<TTable, TEvents, TServices, TPlugins> & {
+> = CreateDataTableRuntimeOptions<TEvents, TServices, TPlugins> & {
+  readonly table: TTable;
   /**
    * Commands to register during context creation.
    */
   readonly commands?: Partial<TCommands>;
 };
-
-/**
- * Runtime context exposed to command handlers.
- *
- * This context satisfies DataTableTypesBase while also
- * providing the runtime infrastructure available to commands.
- *
- * The context combines:
- *
- * - TanStack Table v9 instance
- * - active table feature set
- * - current row data
- * - strongly typed services
- * - strongly typed plugins
- */
-export interface DataTableCommandContext<
-  TFeatures extends TableFeatures,
-  TData extends RowData,
-  TServices extends object,
-  TPlugins extends object,
-> extends DataTableTypesBase {
-  /**
-   * TanStack Table v9 table instance.
-   *
-   * IMPORTANT:
-   *
-   * TanStack Table v9 uses:
-   *
-   *     Table<TFeatures, TData>
-   *
-   * not:
-   *
-   *     Table<TData>
-   */
-  readonly table: Table<TFeatures, TData>;
-
-  /**
-   * Feature set registered on the table.
-   *
-   * This satisfies DataTableTypesBase.features.
-   */
-  readonly features: TFeatures;
-
-  /**
-   * Current row model.
-   *
-   * This satisfies DataTableTypesBase.row.
-   */
-  readonly row: TData;
-
-  /**
-   * Application services available to commands.
-   *
-   * The generic TServices preserves the key/value relationship.
-   */
-  readonly services: ServiceRegistry<TServices>;
-
-  /**
-   * DataTable plugins available to commands.
-   *
-   * The generic TPlugins preserves the key/value relationship.
-   */
-  readonly plugins: PluginRegistry<TPlugins>;
-}
 
 /**
  * Complete DataTable runtime context.
@@ -254,23 +337,23 @@ export interface DataTableCommandContext<
  * It contains the runtime environment plus the command
  * registry whose handlers receive exactly that environment.
  */
-export interface DataTableContextOld<
-  TFeatures extends TableFeatures,
-  TData extends RowData,
-  TServices extends object,
-  TPlugins extends object,
-  TCommands extends CommandMap<
-    DataTableCommandContext<TFeatures, TData, TServices, TPlugins>
-  >,
-> extends DataTableCommandContext<TFeatures, TData, TServices, TPlugins> {
-  /**
-   * Registry containing all commands available to this table.
-   */
-  readonly commands: CommandRegistry<
-    DataTableCommandContext<TFeatures, TData, TServices, TPlugins>,
-    TCommands
-  >;
-}
+// export interface DataTableContextOld<
+//   TFeatures extends TableFeatures,
+//   TData extends RowData,
+//   TServices extends object,
+//   TPlugins extends object,
+//   TCommands extends CommandMap<
+//     DataTableCommandContext<TFeatures, TData, TServices, TPlugins>
+//   >,
+// > extends DataTableCommandContext<TFeatures, TData, TServices, TPlugins> {
+//   /**
+//    * Registry containing all commands available to this table.
+//    */
+//   readonly commands: CommandRegistry<
+//     DataTableCommandContext<TFeatures, TData, TServices, TPlugins>,
+//     TCommands
+//   >;
+// }
 
 /**
  * The subset of the context exposed to command handlers.
@@ -278,15 +361,15 @@ export interface DataTableContextOld<
  * This type exists to avoid a circular dependency between
  * CommandContext and DataTableContext.
  */
-export interface DataTableContextTypes<
-  TFeatures extends TableFeatures,
-  TData extends RowData,
-  TServices extends object,
-  TPlugins extends object,
-> {
-  readonly table: Table<TFeatures, TData>;
+// export interface DataTableContextTypes<
+//   TFeatures extends TableFeatures,
+//   TData extends RowData,
+//   TServices extends object,
+//   TPlugins extends object,
+// > {
+//   readonly table: Table<TFeatures, TData>;
 
-  readonly services: ServiceRegistry<TServices>;
+//   readonly services: ServiceRegistry<TServices>;
 
-  readonly plugins: PluginRegistry<TPlugins>;
-}
+//   readonly plugins: PluginRegistry<TPlugins>;
+// }

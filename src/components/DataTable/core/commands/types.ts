@@ -1,4 +1,4 @@
-import type { DataTableTypesBase } from "../types";
+// src/components/DataTable/core/commands/types.ts
 
 /**
  * Payload accepted by a command.
@@ -37,6 +37,12 @@ export type CommandPayload = void | object;
  * Commands may call services, emit events, manipulate the
  * table, etc., but they should not replace properties on the
  * context object itself.
+ *
+ * Runtime command context is readonly from the command's
+ * perspective.
+ *
+ * Services contained inside the context may themselves expose
+ * mutable APIs, but the context references cannot be replaced.
  */
 export type CommandContext<TContext extends object> = Readonly<TContext>;
 
@@ -74,11 +80,21 @@ export type CommandContext<TContext extends object> = Readonly<TContext>;
  *   }
  * ]
  */
-export type CommandArguments<TPayload extends CommandPayload> = [
+export type CommandArgumentsUnused<TPayload extends CommandPayload> = [
   TPayload,
 ] extends [void]
   ? []
   : [payload: Exclude<TPayload, void>];
+
+/**
+ * Common discriminant shared by every command definition.
+ *
+ * This exists so generic command infrastructure can safely
+ * inspect `hasPayload` without knowing the concrete payload type.
+ */
+export interface CommandBase {
+  readonly hasPayload: boolean;
+}
 
 /**
  * Command that does not require a payload.
@@ -88,10 +104,10 @@ export type CommandArguments<TPayload extends CommandPayload> = [
  * 1. a runtime value
  * 2. a TypeScript discriminant
  */
-export interface NoPayloadCommand<TTypes extends object> {
-  readonly hasPayload: false;
 
-  readonly execute: (context: CommandContext<TTypes>) => void;
+export interface NoPayloadCommand<TContext extends object> extends CommandBase {
+  readonly hasPayload: false;
+  readonly execute: (context: CommandContext<TContext>) => void;
 }
 
 /**
@@ -106,10 +122,12 @@ export interface NoPayloadCommand<TTypes extends object> {
 export interface PayloadCommand<
   TContext extends object,
   TPayload extends object,
-> {
+> extends CommandBase {
   readonly hasPayload: true;
+
   readonly execute: (
     context: CommandContext<TContext>,
+
     payload: TPayload,
   ) => void;
 }
@@ -151,6 +169,67 @@ export type CommandDefinition<
   : PayloadCommand<TContext, Exclude<TPayload, void>>;
 
 /**
+ * Validates one command value.
+ *
+ * Notice that this does NOT compare a payload command against
+ * `PayloadCommand<TContext, object>`.
+ *
+ * Doing that would lose correctness under strict function
+ * parameter variance:
+ *
+ *   PayloadCommand<Ctx, SpecificPayload>
+ *
+ * is not generally assignable to:
+ *
+ *   PayloadCommand<Ctx, object>
+ *
+ * because its execute function requires the narrower payload.
+ */
+// export type ValidCommand<TContext extends object, TCommand> =
+//   TCommand extends NoPayloadCommand<TContext>
+//     ? TCommand
+//     : TCommand extends PayloadCommand<TContext, infer TPayload extends object>
+//       ? PayloadCommand<TContext, TPayload>
+//       : never;
+
+export type ValidCommand<TContext extends object, TCommand> =
+  TCommand extends NoPayloadCommand<TContext>
+    ? TCommand
+    : TCommand extends PayloadCommand<TContext, infer TPayload extends object>
+      ? TCommand
+      : never;
+
+/**
+ * Self-mapped constraint for a concrete command map.
+ *
+ * Example:
+ *
+ * type Commands = {
+ *   refresh: NoPayloadCommand<Context>;
+ *   remove: PayloadCommand<Context, { id: number }>;
+ * };
+ *
+ * No PropertyKey index signature is required.
+ */
+export type CommandMapConstraint<
+  TContext extends object,
+  TCommands extends object,
+> = {
+  [K in keyof TCommands]: ValidCommand<TContext, TCommands[K]>;
+};
+
+/**
+ * Explicit structural constraint used by command infrastructure.
+ *
+ * Unlike CommandMapConstraint, this tells TypeScript directly
+ * that every indexed command has the common `CommandBase`
+ * discriminant.
+ */
+export type CommandBaseMap<TCommands extends object> = {
+  [K in keyof TCommands]: CommandBase;
+};
+
+/**
  * Broad command constraint used for heterogeneous command maps.
  *
  * Structural constraint representing any valid command.
@@ -177,66 +256,41 @@ export type CommandDefinition<
  * - commands without payloads
  * - commands with object payloads
  */
-export type AnyCommandDefinition<TContext extends object> =
+export type AnyCommandDefinitionUnused<TContext extends object> =
   | NoPayloadCommand<TContext>
   | PayloadCommand<TContext, object>;
 
 /**
- * Map of command names to command definitions.
+ * Complete constraint for a concrete command map.
  *
- * The map is intentionally heterogeneous:
+ * The first half gives generic infrastructure access to
+ * `hasPayload`.
  *
- * - some commands may have no payload
- * - some commands may have a strongly typed object payload
- *
- * `AnyCommandDefinition` provides the structural constraint
- * without widening concrete payload types to `object` or `any`.
- *
- * Concrete command maps preserve the exact payload type
- * associated with each command key.
- *
- * Example:
- *
- * type Commands = {
- *   reset:
- *     CommandDefinition<MyTypes>;
- *
- *   deleteRow:
- *     CommandDefinition<
- *       MyTypes,
- *       { rowId: number }
- *     >;
- * };
- *
- * IMPORTANT:
- *
- * TContext is the actual runtime context available to command
- * handlers.
- *
- * It is no longer tied to DataTableTypesBase.
+ * The second half validates the actual context/payload
+ * signatures.
  */
-export type CommandMap<TContext extends object> = Record<
-  PropertyKey,
-  AnyCommandDefinition<TContext>
->;
+export type CommandMap<
+  TContext extends object,
+  TCommands extends object,
+> = CommandBaseMap<TCommands> & CommandMapConstraint<TContext, TCommands>;
 
 /**
- * Extract the payload type from a command definition.
+ * Resolve the payload type for one command.
  */
-export type CommandPayloadOf<TCommand> =
-  TCommand extends NoPayloadCommand<object>
+export type CommandPayloadOf<TContext extends object, TCommand> =
+  TCommand extends NoPayloadCommand<TContext>
     ? void
-    : TCommand extends PayloadCommand<object, infer TPayload>
+    : TCommand extends PayloadCommand<TContext, infer TPayload extends object>
       ? TPayload
       : never;
 
 /**
- * Resolve arguments accepted by execute() for a specific command.
+ * Resolve the execute() arguments for one command.
  */
-export type CommandExecuteArguments<TCommand> =
-  TCommand extends NoPayloadCommand<object>
+export type CommandExecuteArguments<TContext extends object, TCommand> =
+  TCommand extends NoPayloadCommand<TContext>
     ? []
-    : TCommand extends PayloadCommand<object, infer TPayload>
+    : TCommand extends PayloadCommand<TContext, infer TPayload extends object>
       ? [payload: TPayload]
       : never;
 
@@ -286,12 +340,12 @@ export type CommandExecuteArguments<TCommand> =
  * unknown[] is deliberate here because this object sits at
  * the erased runtime boundary after compile-time command
  * argument validation has already occurred.
+ *
+ * This is the exact point where compile-time command signatures
+ * cross into runtime dispatch.
  */
-export interface RuntimeCommand<TTypes extends object> {
-  readonly invoke: (
-    context: CommandContext<TTypes>,
-    args: readonly unknown[],
-  ) => void;
+export interface RuntimeCommand<TContext extends object> {
+  invoke(context: CommandContext<TContext>, args: readonly unknown[]): void;
 }
 
 /**
@@ -301,18 +355,34 @@ export interface RuntimeCommand<TTypes extends object> {
  * the runtime representation to be normalized.
  */
 export type RuntimeCommandMap<
-  TTypes extends object,
-  TCommands extends CommandMap<TTypes>,
+  TContext extends object,
+  TCommands extends object,
 > = {
-  [K in keyof TCommands]: RuntimeCommand<TTypes>;
+  [K in keyof TCommands]: RuntimeCommand<TContext>;
 };
+
+/**
+ * Erased command definition used only by runtime dispatch.
+ *
+ * Concrete payload typing has already been enforced by the
+ * public registry API before reaching this boundary.
+ */
+export type RuntimeCommandDefinition<TContext extends object> =
+  | NoPayloadCommand<TContext>
+  | {
+      readonly hasPayload: true;
+      readonly execute: (
+        context: CommandContext<TContext>,
+        payload: object,
+      ) => void;
+    };
 
 /**
  * Strongly typed command registry.
  */
 export interface CommandRegistry<
-  TTypes extends object,
-  TCommands extends CommandMap<TTypes>,
+  TContext extends object,
+  TCommands extends CommandMap<TContext, TCommands>,
 > {
   /**
    * Register a command.
@@ -328,7 +398,7 @@ export interface CommandRegistry<
    */
   execute<K extends keyof TCommands>(
     key: K,
-    ...args: CommandExecuteArguments<TCommands[K]>
+    ...args: CommandExecuteArguments<TContext, TCommands[K]>
   ): void;
 
   /**

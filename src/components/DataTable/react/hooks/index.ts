@@ -1,2 +1,2 @@
-export { useDataTable } from "./useDataTable";
-export { useDataTableRuntime } from "./useDataTableRuntime";
+export * from "./useDataTable";
+export * from "./useDataTableRuntime";

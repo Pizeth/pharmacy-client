@@ -11,7 +11,23 @@
 export type EventKey = PropertyKey;
 
 /**
+ * Listener associated with a single event payload type.
+ */
+export type EventListener<TPayload> = (payload: TPayload) => void;
+
+/**
  * Convert an event payload into its emit argument tuple.
+ *
+ * Void events:
+ *
+ *   events.emit("refreshed")
+ *
+ * Payload events:
+ *
+ *   events.emit(
+ *     "rowOpened",
+ *     { rowId: "123" },
+ *   )
  */
 export type EventArguments<TPayload> = [TPayload] extends [void]
   ? []
@@ -55,7 +71,7 @@ export interface EventBus<TEvents extends object> {
    */
   on<K extends keyof TEvents>(
     event: K,
-    listener: (payload: TEvents[K]) => void,
+    listener: EventListener<TEvents[K]>,
   ): () => void;
 
   /**

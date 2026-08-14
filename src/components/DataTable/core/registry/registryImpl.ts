@@ -40,6 +40,15 @@ export class RegistryImpl<TMap extends object> implements Registry<TMap> {
    * boundary.
    */
   get<K extends keyof TMap>(key: K): TMap[K] | undefined {
+    /**
+     * Map stores the union of all values in TMap.
+     *
+     * The runtime key/value relationship is preserved by Map,
+     * but TypeScript cannot recover that correlation from
+     * `Map<keyof TMap, TMap[keyof TMap]>`.
+     *
+     * Keep the assertion local to this generic registry boundary.
+     */
     return this.values.get(key) as TMap[K] | undefined;
   }
 

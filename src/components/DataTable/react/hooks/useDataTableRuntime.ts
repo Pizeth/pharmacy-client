@@ -1,102 +1,132 @@
 "use client";
 
-import { useMemo } from "react";
-
-import { createDataTableContext } from "../../core/context";
-
+import { useMemo, useRef, useState } from "react";
+import { CommandRegistryImpl } from "../../core/commands";
 import type { CommandMap } from "../../core/commands";
-
+import { createDataTableRuntime } from "../../core/context";
 import type {
+  DataTableCommandContext,
   DataTableContext,
-  DataTableRuntimeContext,
+  DataTableRuntime,
 } from "../../core/context";
-
-// import type { DataTableTypesBase } from "../../core/types";
-
-// import type { DataTableReactContext } from "../context";
-
+import { registerEntries } from "../../core/registry";
 import type { UseDataTableRuntimeInput } from "../types";
 
 /**
- * Connect a ReactTable instance to the framework runtime.
+ * Compose a React table with DataTable's framework runtime.
  *
- * The runtime contains:
+ * Important lifetime rules:
  *
- * - event bus
- * - service registry
- * - plugin registry
- * - command registry
+ * 1. events/services/plugins are created once
+ * 2. command registry is created once
+ * 3. registered command definitions are initial configuration
+ * 4. the current React table may change
+ * 5. command execution always receives the latest table
  *
- * These should not be recreated merely because table state
- * caused a React render.
+ * This mirrors TanStack's own approach in createTableHook(),
+ * where stable wrapper components resolve the current table
+ * through a ref.
  */
 export function useDataTableRuntime<
-  //   TTypes extends DataTableTypesBase,
   TTable extends object,
   TEvents extends object,
   TServices extends object,
   TPlugins extends object,
   TCommands extends CommandMap<
-    // DataTableRuntimeContext<TTypes, TEvents, TServices, TPlugins>
-    DataTableRuntimeContext<TTable, TEvents, TServices, TPlugins>
+    DataTableCommandContext<TTable, TEvents, TServices, TPlugins>,
+    TCommands
   >,
-  TSelected,
 >(
   input: UseDataTableRuntimeInput<
-    // TTypes,
     TTable,
     TEvents,
     TServices,
     TPlugins,
     TCommands
-    // TSelected
   >,
-): DataTableContext<
-  //   TTypes,
-  TTable,
-  TEvents,
-  TServices,
-  TPlugins,
-  TCommands
-  //   TSelected
-> {
-  /**
-   * Core runtime creation.
-   *
-   * `input.table` is a ReactTable, which contains the
-   * underlying TanStack Table APIs required by the core
-   * context.
-   */
-  const coreContext = useMemo(
-    () =>
-      //   createDataTableContext<TTypes, TEvents, TServices, TPlugins, TCommands>({
-      createDataTableContext<TTable, TEvents, TServices, TPlugins, TCommands>({
-        table: input.table,
+): DataTableContext<TTable, TEvents, TServices, TPlugins, TCommands> {
+  type CommandContext = DataTableCommandContext<
+    TTable,
+    TEvents,
+    TServices,
+    TPlugins
+  >;
 
+  /**
+   * Holds the latest execution context.
+   *
+   * The command registry itself remains stable and resolves
+   * this ref only when execute() is called.
+   */
+  const commandContextRef = useRef<CommandContext | null>(null);
+
+  /**
+   * Runtime infrastructure is initialized once for this hook
+   * lifecycle.
+   *
+   * We intentionally do not depend on `input.table`.
+   *
+   * ReactTable's public projection may change as TanStack
+   * updates selected state/options; recreating the runtime on
+   * every such change would destroy registry identity.
+   */
+  const [stableRuntime] = useState(() => {
+    const runtime: DataTableRuntime<TEvents, TServices, TPlugins> =
+      createDataTableRuntime<TEvents, TServices, TPlugins>({
         events: input.events,
-
         services: input.services,
-
         plugins: input.plugins,
+      });
 
-        commands: input.commands,
-      }),
-    [input.table, input.events, input.services, input.plugins, input.commands],
-  );
+    const commands = new CommandRegistryImpl<CommandContext, TCommands>(() => {
+      const context = commandContextRef.current;
+
+      if (!context) {
+        throw new Error("DataTable command context is not available yet.");
+      }
+
+      return context;
+    });
+
+    registerEntries(commands, input.commands);
+
+    return {
+      runtime,
+      commands,
+    };
+  });
 
   /**
-   * Reintroduce the richer ReactTable type at the React
-   * boundary.
+   * Public context follows the current React table projection.
    *
-   * The core context deliberately types table as the
-   * framework-independent Table.
+   * The runtime registries and command registry retain stable
+   * identity.
    */
-  return useMemo(
-    () => ({
-      ...coreContext,
-
+  const context = useMemo(() => {
+    const value: DataTableContext<
+      TTable,
+      TEvents,
+      TServices,
+      TPlugins,
+      TCommands
+    > = {
       table: input.table,
-    }),
-    [coreContext, input.table],
-  );
+      events: stableRuntime.runtime.events,
+      services: stableRuntime.runtime.services,
+      plugins: stableRuntime.runtime.plugins,
+      commands: stableRuntime.commands,
+    };
+
+    return value;
+  }, [input.table, stableRuntime]);
+
+  /**
+   * Update the lazy command context every render.
+   *
+   * Commands executed after this point always observe the
+   * latest React table projection.
+   */
+  commandContextRef.current = context;
+
+  return context;
 }

@@ -1,9 +1,4 @@
-import type { EventArguments, EventBus } from "./types";
-
-/**
- * Listener associated with a single event payload type.
- */
-type Listener<TPayload> = (payload: TPayload) => void;
+import type { EventArguments, EventBus, EventListener } from "./types";
 
 /**
  * Strongly typed listener storage.
@@ -27,7 +22,7 @@ type Listener<TPayload> = (payload: TPayload) => void;
  *   event key -> listener payload
  */
 type ListenerMap<TEvents extends object> = {
-  [K in keyof TEvents]?: Set<Listener<TEvents[K]>>;
+  [K in keyof TEvents]?: Set<EventListener<TEvents[K]>>;
 };
 
 /**
@@ -44,20 +39,45 @@ export class EventBusImpl<TEvents extends object> implements EventBus<TEvents> {
    */
   on<K extends keyof TEvents>(
     event: K,
-    listener: Listener<TEvents[K]>,
+    // listener: Listener<TEvents[K]>,
+    listener: EventListener<TEvents[K]>,
   ): () => void {
-    const bucket = this.getListeners(event);
+    // const bucket = this.getListeners(event);
 
-    bucket.add(listener);
+    // bucket.add(listener);
+
+    // /**
+    //  * Return an unsubscribe function.
+    //  *
+    //  * Capturing the bucket directly means we don't need
+    //  * another lookup when unsubscribing.
+    //  */
+    // return () => {
+    //   bucket?.delete(listener);
+    // };
+
+    // let eventListeners = this.listeners[event];
+    //  if (!eventListeners) {
+    //    eventListeners = new Set<EventListener<TEvents[K]>>();
+
+    //    this.listeners[event] = eventListeners;
+    //  }
+    const eventListeners = this.getListeners(event);
+
+    eventListeners.add(listener);
 
     /**
      * Return an unsubscribe function.
      *
-     * Capturing the bucket directly means we don't need
+     * Capturing the eventListeners directly means we don't need
      * another lookup when unsubscribing.
      */
     return () => {
-      bucket?.delete(listener);
+      eventListeners.delete(listener);
+
+      if (eventListeners.size === 0) {
+        delete this.listeners[event];
+      }
     };
   }
 
@@ -79,20 +99,50 @@ export class EventBusImpl<TEvents extends object> implements EventBus<TEvents> {
     event: K,
     ...args: EventArguments<TEvents[K]>
   ): void {
-    const bucket = this.listeners[event];
+    // const bucket = this.listeners[event];
 
-    if (!bucket) {
+    // if (!bucket) {
+    //   return;
+    // }
+
+    // /**
+    //  * Runtime argument representation.
+    //  *
+    //  * For void events args[0] is undefined.
+    //  */
+    // const payload = args[0] as TEvents[K];
+
+    // for (const listener of bucket) {
+    //   listener(payload);
+    // }
+
+    const eventListeners = this.listeners[event];
+
+    if (!eventListeners) {
       return;
     }
 
     /**
-     * Runtime argument representation.
+     * A void event arrives here as an empty tuple.
      *
-     * For void events args[0] is undefined.
+     * Reading args[0] therefore yields undefined, which is the
+     * runtime representation of void.
+     *
+     * For payload events args[0] is TEvents[K].
+     *
+     * Generic tuple correlation cannot be recovered by
+     * TypeScript inside the implementation, so keep the
+     * assertion at this runtime boundary.
      */
     const payload = args[0] as TEvents[K];
 
-    for (const listener of bucket) {
+    /**
+     * Copy before iteration so listeners may safely unsubscribe
+     * themselves while an event is being emitted.
+     */
+    const snapshot = Array.from(eventListeners);
+
+    for (const listener of snapshot) {
       listener(payload);
     }
   }
@@ -101,7 +151,12 @@ export class EventBusImpl<TEvents extends object> implements EventBus<TEvents> {
    * Remove every registered listener.
    */
   clear(): void {
-    for (const key of Reflect.ownKeys(this.listeners) as Array<keyof TEvents>) {
+    /**
+     * Reflect.ownKeys preserves symbol event names.
+     */
+    const keys = Reflect.ownKeys(this.listeners) as Array<keyof TEvents>;
+
+    for (const key of keys) {
       delete this.listeners[key];
     }
   }
@@ -114,11 +169,11 @@ export class EventBusImpl<TEvents extends object> implements EventBus<TEvents> {
    */
   private getListeners<K extends keyof TEvents>(
     event: K,
-  ): Set<Listener<TEvents[K]>> {
+  ): Set<EventListener<TEvents[K]>> {
     let bucket = this.listeners[event];
 
     if (!bucket) {
-      bucket = new Set<Listener<TEvents[K]>>();
+      bucket = new Set<EventListener<TEvents[K]>>();
 
       this.listeners[event] = bucket;
     }

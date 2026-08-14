@@ -1,6 +1,10 @@
 import type { RowData, Table, TableFeatures } from "@tanstack/table-core";
 
 /**
+ * Compile-time identity of a DataTable family.
+ *
+ * This is not runtime context.
+ *
  * Minimum type contract shared by the DataTable framework.
  *
  * Framework subsystems that only need access to the table's

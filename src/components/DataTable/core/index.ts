@@ -12,14 +12,13 @@
 
 // export type { DataTableInstance } from "./table/types.instance";
 
-export * from "./context";
-
+export * from "./builder";
 export * from "./commands";
-
+export * from "./context";
+export * from "./events";
+export * from "./features";
 export * from "./plugins";
-
-export * from "./services";
-
 export * from "./registry";
-
+export * from "./services";
+export * from "./table";
 export * from "./types";
