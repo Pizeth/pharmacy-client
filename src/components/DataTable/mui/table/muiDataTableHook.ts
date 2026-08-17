@@ -3,9 +3,8 @@
 "use client";
 
 import { createTableHook } from "@tanstack/react-table";
-
+import { DataTableResizeHandle } from "../components/DataTableResizeHandle";
 import { muiDataTableFeatures } from "../features";
-
 import {
   muiDataTableCellContext,
   muiDataTableContext,
@@ -13,17 +12,20 @@ import {
 } from "./muiDataTableContexts";
 
 /**
- * TanStack React composition family for our MUI DataTable.
+ * MUI DataTable React composition family.
  *
- * Phase 1.4 intentionally registers no custom UI components yet.
+ * TFeatures is statically bound here once for every high-level MUI table.
  *
- * Phase 1.5 will introduce:
+ * Per-table behavior continues to be controlled through options such as:
  *
- * - tableComponents
- * - cellComponents
- * - headerComponents
- *
- * without changing this family's static feature identity.
+ * - enableSorting
+ * - enableFilters
+ * - enableRowSelection
+ * - enableColumnPinning
+ * - enableColumnResizing
+ * - manualSorting
+ * - manualFiltering
+ * - manualPagination
  */
 export const {
   /**
@@ -62,10 +64,34 @@ export const {
   appFeatures: muiAppFeatures,
 } = createTableHook({
   features: muiDataTableFeatures,
-
   tableContext: muiDataTableContext,
-
   cellContext: muiDataTableCellContext,
-
   headerContext: muiDataTableHeaderContext,
+
+  /**
+   * Header-level reusable components.
+   *
+   * These become available as:
+   *
+   *   header.ResizeHandle
+   *
+   * inside createAppColumnHelper() header definitions and inside AppHeader
+   * children.
+   */
+  headerComponents: {
+    ResizeHandle: DataTableResizeHandle,
+  },
+
+  /**
+   * MUI DataTable sizing defaults.
+   *
+   * Individual column definitions may override all three values.
+   */
+  defaultColumn: {
+    size: 180,
+
+    minSize: 64,
+
+    maxSize: 600,
+  },
 });
