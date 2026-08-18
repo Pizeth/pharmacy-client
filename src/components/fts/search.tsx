@@ -16,7 +16,7 @@ import EnhancedTable from "./table";
 import StickyFAB from "../CustomComponents/StickyFab";
 import DocumentTableOld from "./mrtTable";
 import { Authenticated } from "@refinedev/core";
-import DocumentTable from "../Tables/DocumentTable";
+// import DocumentTable from "../Tables/DocumentTable";
 
 export default function AdministrativeForm() {
   const methods = useForm();
@@ -131,8 +131,8 @@ export default function AdministrativeForm() {
             </Grid>
           </Paper>
           <EnhancedTable /> */}
-          <DocumentTable />
-          <br />
+          {/* <DocumentTable /> */}
+          {/* <br /> */}
           <DocumentTableOld />
           {/* <StickyFAB /> */}
         </form>

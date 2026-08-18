@@ -95,17 +95,18 @@ export function DataTableResizeHandle() {
       //   onMouseDown={handleResizeStart}
       //   onTouchStart={handleResizeStart}
       onMouseDown={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
         handleResizeStart(event);
       }}
       onTouchStart={(event) => {
+        event.stopPropagation();
         handleResizeStart(event);
       }}
       onDoubleClick={handleDoubleClick}
       sx={{
         position: "absolute",
-
         top: 0,
-
         bottom: 0,
 
         /**
@@ -117,17 +118,10 @@ export function DataTableResizeHandle() {
          * RTL -> left
          */
         insetInlineEnd: -4,
-
-        // [logicalEndSide]: -4,
-
         width: 8,
-
         zIndex: 5,
-
         cursor: "col-resize",
-
         touchAction: "none",
-
         userSelect: "none",
 
         /**
@@ -136,25 +130,15 @@ export function DataTableResizeHandle() {
          */
         "&::after": {
           content: '""',
-
           position: "absolute",
-
           top: "20%",
-
           bottom: "20%",
-
           left: "50%",
-
           width: 2,
-
           transform: "translateX(-50%)",
-
           borderRadius: 1,
-
           backgroundColor: isResizing ? "primary.main" : "divider",
-
           opacity: isResizing ? 1 : 0,
-
           transition: theme.transitions.create("opacity", {
             duration: theme.transitions.duration.shortest,
           }),

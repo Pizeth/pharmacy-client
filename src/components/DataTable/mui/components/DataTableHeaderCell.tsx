@@ -6,6 +6,7 @@ import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
 import { resolveTableCellAlignment } from "./alignment";
 import { getDataTablePinnedLayout, getDataTablePinnedSx } from "./pinning";
+import { DataTableHeaderContent } from "./DataTableHeaderContent";
 
 export interface DataTableHeaderCellProps<
   TData extends RowData,
@@ -102,6 +103,7 @@ export function DataTableHeaderCell<
         columnResizing: state.columnResizing,
         columnVisibility: state.columnVisibility,
         columnPinning: state.columnPinning,
+        sorting: state.sorting,
       })}
     >
       {(appHeader) => {
@@ -119,6 +121,10 @@ export function DataTableHeaderCell<
 
         const pinnedSx = getDataTablePinnedSx(pinnedLayout, "header");
 
+        const sortDirection = isLeafHeader
+          ? header.column.getIsSorted()
+          : false;
+
         return (
           <TableCell
             align={align}
@@ -126,6 +132,7 @@ export function DataTableHeaderCell<
             scope="col"
             data-column-id={header.column.id}
             data-pinned={pinnedLayout?.position}
+            sortDirection={sortDirection}
             sx={{
               /**
                * MUI stickyHeader supplies sticky top positioning.
@@ -134,19 +141,12 @@ export function DataTableHeaderCell<
                * inline positioning through pinnedSx.
                */
               position: "relative",
-
               boxSizing: "border-box",
-
               width: `${size}px`,
-
               minWidth: `${size}px`,
-
               maxWidth: `${size}px`,
-
               whiteSpace: "nowrap",
-
               overflow: "hidden",
-
               ...pinnedSx,
             }}
           >
@@ -165,7 +165,7 @@ export function DataTableHeaderCell<
                 overflow: "hidden",
               }}
             >
-              <Box
+              {/* <Box
                 sx={{
                   minWidth: 0,
                   overflow: "hidden",
@@ -173,6 +173,23 @@ export function DataTableHeaderCell<
                 }}
               >
                 <appHeader.FlexRender />
+              </Box> */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent:
+                    align === "right"
+                      ? "flex-end"
+                      : align === "center"
+                        ? "center"
+                        : "flex-start",
+                  minWidth: 0,
+                  height: "100%",
+                  overflow: "hidden",
+                }}
+              >
+                <DataTableHeaderContent table={table} header={header} />
               </Box>
             </Box>
             {/**

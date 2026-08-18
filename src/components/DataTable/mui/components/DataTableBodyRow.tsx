@@ -1,6 +1,6 @@
 "use client";
 
-import { TableRow } from "@mui/material";
+import { alpha, TableRow } from "@mui/material";
 
 import type { Row, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../features";
@@ -9,7 +9,6 @@ import { DataTableBodyCell } from "./DataTableBodyCell";
 
 export interface DataTableBodyRowProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
-
   readonly row: Row<MuiDataTableFeatures, TData>;
 }
 
@@ -33,39 +32,70 @@ export function DataTableBodyRow<TData extends RowData>(
   const { table, row } = props;
 
   return (
-    <TableRow
-      hover
-      data-row-id={row.id}
-      sx={(theme) => ({
-        /**
-         * Base background consumed by sticky body cells.
-         */
-        "--DataTable-row-background": theme.palette.background.paper,
-
-        /**
-         * Keep pinned cells visually synchronized with MUI's
-         * row hover state.
-         */
-        "&:hover": {
-          "--DataTable-row-background": theme.palette.action.hover,
-        },
-      })}
+    <table.Subscribe
+      source={table.atoms.rowSelection}
+      selector={(rowSelection) => Boolean(rowSelection?.[row.id])}
     >
-      <table.Subscribe
-        selector={(state) => ({
-          columnVisibility: state.columnVisibility,
+      {(selected) => (
+        <TableRow
+          hover
+          selected={selected}
+          data-row-id={row.id}
+          data-selected={selected ? "true" : undefined}
+          sx={(theme) => {
+            const baseBackground = theme.palette.background.paper;
 
-          columnPinning: state.columnPinning,
-        })}
-      >
-        {() =>
-          row
-            .getVisibleCells()
-            .map((cell) => (
-              <DataTableBodyCell key={cell.id} table={table} cell={cell} />
-            ))
-        }
-      </table.Subscribe>
-    </TableRow>
+            const hoverBackground = theme.palette.action.hover;
+
+            // const selectedBackground = theme.palette.action.selected;
+
+            const selectedBackground = alpha(
+              theme.palette.primary.main,
+              theme.palette.action.selectedOpacity,
+            );
+
+            const selectedHoverBackground = alpha(
+              theme.palette.primary.main,
+              theme.palette.action.selectedOpacity +
+                theme.palette.action.hoverOpacity,
+            );
+
+            return {
+              /**
+               * Base background consumed by sticky body cells.
+               */
+              "--DataTable-row-background": selected
+                ? selectedBackground
+                : baseBackground,
+
+              /**
+               * Keep pinned cells visually synchronized with MUI's
+               * row hover state.
+               */
+              "&:hover": {
+                "--DataTable-row-background": selected
+                  ? selectedHoverBackground
+                  : hoverBackground,
+              },
+            };
+          }}
+        >
+          <table.Subscribe
+            selector={(state) => ({
+              columnVisibility: state.columnVisibility,
+              columnPinning: state.columnPinning,
+            })}
+          >
+            {() =>
+              row
+                .getVisibleCells()
+                .map((cell) => (
+                  <DataTableBodyCell key={cell.id} table={table} cell={cell} />
+                ))
+            }
+          </table.Subscribe>
+        </TableRow>
+      )}
+    </table.Subscribe>
   );
 }

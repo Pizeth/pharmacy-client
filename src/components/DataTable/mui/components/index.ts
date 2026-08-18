@@ -1,5 +1,6 @@
 // mui/components/index.ts
 
+export * from "./sorting";
 export * from "./DataTable";
 export * from "./DataTableBody";
 export * from "./DataTableBodyCell";
