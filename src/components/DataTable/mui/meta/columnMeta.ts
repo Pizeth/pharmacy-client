@@ -32,12 +32,30 @@ export type MuiDataTableFilterVariant =
   | "number-range";
 
 /**
- * MUI-specific metadata attached to columnDef.meta.
+ * One option rendered by select-style filters.
  *
- * Keep this object focused on presentation.
+ * TValue is intentionally restricted to primitive values suitable for
+ * HTML/MUI selection controls.
+ */
+export interface MuiDataTableFilterOption<
+  TValue extends string | number | boolean = string | number | boolean,
+> {
+  readonly label: string;
+  readonly value: TValue;
+}
+
+/**
+ * MUI-specific column presentation metadata.
  *
- * Behavioral capabilities must continue to use TanStack's own
- * feature-aware ColumnDef options.
+ * TanStack behavioral options such as:
+ *
+ * - enableSorting
+ * - enableColumnFilter
+ * - filterFn
+ * - enablePinning
+ * - enableResizing
+ *
+ * remain directly on ColumnDef.
  */
 export interface MuiDataTableColumnMeta {
   /**
@@ -55,8 +73,37 @@ export interface MuiDataTableColumnMeta {
   readonly headerAlign?: MuiDataTableAlignment;
 
   /**
-   * Hint used by the future filter UI to determine which
-   * MUI filtering control should be rendered.
+   * Controls which MUI editor is used for this column's filter UI.
+   *
+   * This does not enable filtering by itself.
+   *
+   * TanStack's `enableColumnFilter` / `enableFilters` remain the
+   * behavioral source of truth.
    */
   readonly filterVariant?: MuiDataTableFilterVariant;
+
+  /**
+   * Options for select and multi-select filter variants.
+   */
+  readonly filterOptions?: readonly MuiDataTableFilterOption[];
+
+  /**
+   * Optional UI label override for the filter input.
+   *
+   * Useful when the rendered header is not a simple string.
+   */
+  readonly filterLabel?: string;
+
+  /**
+   * Whether the standard DataTable column menu should be available.
+   *
+   * Defaults to true.
+   *
+   * Useful for internal utility columns such as:
+   *
+   * - selection
+   * - row actions
+   * - expander
+   */
+  readonly enableColumnMenu?: boolean;
 }

@@ -1,11 +1,12 @@
 "use client";
 
+import { Box, useTheme, Paper } from "@mui/material";
 import {
   DataTable,
+  DataTableColumnFilter,
   createMuiDataTableColumnHelper,
   useMuiDataTable,
 } from "@/components/DataTable";
-import { Box, useTheme } from "@mui/material";
 
 type User = {
   id: number;

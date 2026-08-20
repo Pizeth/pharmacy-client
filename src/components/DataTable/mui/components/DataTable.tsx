@@ -1,12 +1,13 @@
 "use client";
 
-import { Table, TableContainer, useTheme } from "@mui/material";
+import { Box, Table, TableContainer, useTheme } from "@mui/material";
 import type { PaperProps, TableProps } from "@mui/material";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../table";
 import { DataTableBody } from "./DataTableBody";
 import { DataTableColumnGroup } from "./DataTableColumnGroup";
 import { DataTableHead } from "./DataTableHead";
+import { DataTablePagination, DataTablePaginationConfig } from "./pagination";
 
 export interface DataTableProps<TData extends RowData> {
   /**
@@ -28,6 +29,13 @@ export interface DataTableProps<TData extends RowData> {
    * Props forwarded to MUI's <TableContainer>.
    */
   readonly containerProps?: Omit<PaperProps, "children">;
+
+  /**
+   * false disables pagination UI.
+   *
+   * An object customizes the pagination renderer.
+   */
+  readonly pagination?: false | DataTablePaginationConfig;
 }
 
 /**
@@ -59,7 +67,7 @@ export interface DataTableProps<TData extends RowData> {
  * This component owns only the native/MUI rendering shell.
  */
 export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
-  const { table, tableProps, containerProps } = props;
+  const { table, tableProps, containerProps, pagination = {} } = props;
   //   const theme = useTheme();
 
   /**
@@ -76,86 +84,98 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
 
   return (
     <table.AppTable>
-      <TableContainer
-        {...containerProps}
-        // sx={[
-        //   {
-        //     overflowX: "auto",
-        //   },
-
-        //   ...(Array.isArray(containerProps?.sx)
-        //     ? containerProps.sx
-        //     : containerProps?.sx
-        //       ? [containerProps.sx]
-        //       : []),
-        // ]}
+      <Box
         sx={{
-          /**
-           * This element is the horizontal scrolling viewport against
-           * which sticky inline positioning operates.
-           */
-          overflowX: "auto",
-
-          /**
-           * Prevent outer content from leaking through sticky cells
-           * around rounded/contained table layouts.
-           */
-          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
         }}
       >
-        <table.Subscribe
-          selector={(state) => ({
-            columnSizing: state.columnSizing,
-            columnVisibility: state.columnVisibility,
-          })}
-        >
-          {() => {
-            const totalSize = table.getTotalSize();
+        {" "}
+        <TableContainer
+          {...containerProps}
+          // sx={[
+          //   {
+          //     overflowX: "auto",
+          //   },
 
-            return (
-              <Table
-                stickyHeader
-                size="small"
-                {...tableProps}
-                // data-direction={direction}
-                sx={[
-                  {
-                    /**
-                     * Required for predictable TanStack-controlled widths.
-                     */
-                    tableLayout: "fixed",
+          //   ...(Array.isArray(containerProps?.sx)
+          //     ? containerProps.sx
+          //     : containerProps?.sx
+          //       ? [containerProps.sx]
+          //       : []),
+          // ]}
+          sx={{
+            /**
+             * This element is the horizontal scrolling viewport against
+             * which sticky inline positioning operates.
+             */
+            overflowX: "auto",
 
-                    /**
-                     * Separate borders behave much more predictably with
-                     * sticky native table cells than collapsed borders.
-                     */
-                    borderCollapse: "separate",
-
-                    borderSpacing: 0,
-
-                    /**
-                     * Exact sum of visible leaf column sizes.
-                     */
-                    width: `${totalSize}px`,
-
-                    minWidth: `${totalSize}px`,
-                  },
-
-                  //   ...(Array.isArray(tableProps?.sx)
-                  //     ? tableProps.sx
-                  //     : tableProps?.sx
-                  //       ? [tableProps.sx]
-                  //       : []),
-                ]}
-              >
-                <DataTableColumnGroup table={table} />
-                <DataTableHead table={table} />
-                <DataTableBody table={table} />
-              </Table>
-            );
+            /**
+             * Prevent outer content from leaking through sticky cells
+             * around rounded/contained table layouts.
+             */
+            position: "relative",
           }}
-        </table.Subscribe>
-      </TableContainer>
+        >
+          <table.Subscribe
+            selector={(state) => ({
+              columnSizing: state.columnSizing,
+              columnVisibility: state.columnVisibility,
+            })}
+          >
+            {() => {
+              const totalSize = table.getTotalSize();
+
+              return (
+                <Table
+                  stickyHeader
+                  size="small"
+                  {...tableProps}
+                  // data-direction={direction}
+                  sx={[
+                    {
+                      /**
+                       * Required for predictable TanStack-controlled widths.
+                       */
+                      tableLayout: "fixed",
+
+                      /**
+                       * Separate borders behave much more predictably with
+                       * sticky native table cells than collapsed borders.
+                       */
+                      borderCollapse: "separate",
+
+                      borderSpacing: 0,
+
+                      /**
+                       * Exact sum of visible leaf column sizes.
+                       */
+                      width: `${totalSize}px`,
+
+                      minWidth: `${totalSize}px`,
+                    },
+
+                    //   ...(Array.isArray(tableProps?.sx)
+                    //     ? tableProps.sx
+                    //     : tableProps?.sx
+                    //       ? [tableProps.sx]
+                    //       : []),
+                  ]}
+                >
+                  <DataTableColumnGroup table={table} />
+                  <DataTableHead table={table} />
+                  <DataTableBody table={table} />
+                </Table>
+              );
+            }}
+          </table.Subscribe>
+        </TableContainer>
+        {pagination !== false && (
+          <DataTablePagination table={table} {...pagination} />
+        )}
+      </Box>
     </table.AppTable>
   );
 }
