@@ -3,18 +3,10 @@
 import type { ReactNode } from "react";
 
 /**
- * Density modes understood by the MUI DataTable renderer.
- *
- * This belongs to our rendering system rather than TanStack's
- * feature/state system.
- */
-export type MuiDataTableDensity = "compact" | "standard" | "comfortable";
-
-/**
  * MUI-specific table metadata.
  * Rendering-only metadata for the high-level MUI DataTable
  *
- * This is intentionally small during Phase 1.4.
+ * This contains descriptive table rendering information only.
  *
  * Do not put:
  *
@@ -23,6 +15,8 @@ export type MuiDataTableDensity = "compact" | "standard" | "comfortable";
  * - plugins
  * - event bus
  *
+ * Mutable MUI view state such as density does NOT belong here.
+ *
  * in this object.
  * Those belong to our DataTable runtime infrastructure.
  */
@@ -30,7 +24,7 @@ export interface MuiDataTableMeta {
   /**
    * Rendering density.
    */
-  readonly density?: MuiDataTableDensity;
+  // readonly density?: MuiDataTableDensity;
 
   /**
    * Whether the table body is currently loading data.
@@ -45,7 +39,8 @@ export interface MuiDataTableMeta {
   readonly error?: ReactNode;
 
   /**
-   * Custom empty-state content.
+   * Content used when the source/current row model is empty without
+   * an active filtering condition.
    */
   readonly emptyContent?: ReactNode;
 
@@ -53,4 +48,10 @@ export interface MuiDataTableMeta {
    * Custom loading-state content.
    */
   readonly loadingContent?: ReactNode;
+
+  /**
+   * Content used when column/global filtering produces no matching
+   * rows.
+   */
+  readonly noResultsContent?: ReactNode;
 }

@@ -1,11 +1,21 @@
 "use client";
 
 import { Box, TableCell, TableRow, Typography } from "@mui/material";
-import { SearchOffOutlined } from "@mui/icons-material";
+import { InboxOutlined, SearchOffOutlined } from "@mui/icons-material";
 import type { DataTableBodyStateProps } from "./types";
 
-export function DataTableEmptyState(props: DataTableBodyStateProps) {
-  const { colSpan, children } = props;
+export interface DataTableEmptyStateProps extends DataTableBodyStateProps {
+  /**
+   * Whether rows are absent because an active search/filter produced
+   * no matches.
+   */
+  readonly filtered?: boolean;
+}
+
+export function DataTableEmptyState(props: DataTableEmptyStateProps) {
+  const { colSpan, children, filtered = false } = props;
+
+  const Icon = filtered ? SearchOffOutlined : InboxOutlined;
 
   return (
     <TableRow>
@@ -27,7 +37,7 @@ export function DataTableEmptyState(props: DataTableBodyStateProps) {
             textAlign: "center",
           }}
         >
-          <SearchOffOutlined
+          <Icon
             sx={{
               fontSize: 40,
               opacity: 0.7,
@@ -35,7 +45,9 @@ export function DataTableEmptyState(props: DataTableBodyStateProps) {
           />
 
           {children ?? (
-            <Typography variant="body2">No rows to display</Typography>
+            <Typography variant="body2">
+              {filtered ? "No matching rows" : "No rows to display"}
+            </Typography>
           )}
         </Box>
       </TableCell>

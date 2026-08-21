@@ -6,6 +6,7 @@ import type { MuiDataTableInstance } from "../../table";
 import { DataTablePageSizeSelect } from "./DataTablePageSizeSelect";
 import { DataTablePaginationActions } from "./DataTablePaginationActions";
 import type { DataTablePaginationConfig } from "./types";
+import { getDataTableDensityMetrics, useDataTableDensity } from "../../density";
 
 export interface DataTablePaginationProps<
   TData extends RowData,
@@ -37,6 +38,10 @@ export function DataTablePagination<TData extends RowData>(
     showPageSizeSelector = true,
   } = props;
 
+  const { density } = useDataTableDensity();
+
+  const densityMetrics = getDataTableDensityMetrics(density);
+
   return (
     <table.Subscribe source={table.atoms.pagination}>
       {(pagination) => {
@@ -61,14 +66,15 @@ export function DataTablePagination<TData extends RowData>(
             <Divider />
             <Box
               component="footer"
+              data-density={density}
               sx={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: 2,
                 px: 2,
-                py: 1,
-                minHeight: 52,
+                py: densityMetrics.footerPaddingBlock,
+                minHeight: `${densityMetrics.footerHeight}px`,
                 flexWrap: "wrap",
               }}
             >

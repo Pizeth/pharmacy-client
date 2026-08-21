@@ -33,11 +33,12 @@ export function DataTableHead<TData extends RowData>(
     >
       {() => (
         <TableHead>
-          {table.getHeaderGroups().map((headerGroup) => (
+          {table.getHeaderGroups().map((headerGroup, headerRowIndex) => (
             <DataTableHeaderRow
               key={headerGroup.id}
               table={table}
               headerGroup={headerGroup}
+              headerRowIndex={headerRowIndex}
             />
           ))}
         </TableHead>

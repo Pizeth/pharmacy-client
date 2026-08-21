@@ -5,3 +5,5 @@ export * from "./components";
 export * from "./features";
 export * from "./meta";
 export * from "./table";
+export * from "./density";
+export * from "./fullscreen";

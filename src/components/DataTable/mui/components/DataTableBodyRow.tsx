@@ -6,6 +6,7 @@ import type { Row, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
 import { DataTableBodyCell } from "./DataTableBodyCell";
+import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
 
 export interface DataTableBodyRowProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -31,6 +32,10 @@ export function DataTableBodyRow<TData extends RowData>(
 ) {
   const { table, row } = props;
 
+  const { density } = useDataTableDensity();
+
+  const densityMetrics = getDataTableDensityMetrics(density);
+
   return (
     <table.Subscribe
       source={table.atoms.rowSelection}
@@ -42,6 +47,7 @@ export function DataTableBodyRow<TData extends RowData>(
           selected={selected}
           data-row-id={row.id}
           data-selected={selected ? "true" : undefined}
+          data-density={density}
           sx={(theme) => {
             const baseBackground = theme.palette.background.paper;
 
@@ -54,13 +60,24 @@ export function DataTableBodyRow<TData extends RowData>(
               theme.palette.action.selectedOpacity,
             );
 
+            // const selectedHoverBackground = alpha(
+            //   theme.palette.primary.main,
+            //   theme.palette.action.selectedOpacity +
+            //     theme.palette.action.hoverOpacity,
+            // );
+
             const selectedHoverBackground = alpha(
               theme.palette.primary.main,
-              theme.palette.action.selectedOpacity +
-                theme.palette.action.hoverOpacity,
+              Math.min(
+                1,
+                theme.palette.action.selectedOpacity +
+                  theme.palette.action.hoverOpacity,
+              ),
             );
 
             return {
+              minHeight: `${densityMetrics.bodyRowHeight}px`,
+
               /**
                * Base background consumed by sticky body cells.
                */

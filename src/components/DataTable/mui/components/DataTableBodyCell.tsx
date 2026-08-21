@@ -6,6 +6,7 @@ import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
 import { resolveTableCellAlignment } from "./alignment";
 import { getDataTablePinnedLayout, getDataTablePinnedSx } from "./pinning";
+import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
 
 export interface DataTableBodyCellProps<
   TData extends RowData,
@@ -35,6 +36,10 @@ export function DataTableBodyCell<
 >(props: DataTableBodyCellProps<TData, TValue>) {
   const { table, cell } = props;
 
+  const { density } = useDataTableDensity();
+
+  const densityMetrics = getDataTableDensityMetrics(density);
+
   const meta = cell.column.columnDef.meta;
 
   const align = resolveTableCellAlignment(meta?.align);
@@ -62,14 +67,30 @@ export function DataTableBodyCell<
             align={align}
             data-column-id={cell.column.id}
             data-pinned={pinnedLayout?.position}
+            data-density={density}
             sx={{
               boxSizing: "border-box",
+
+              /**
+               * TanStack-controlled horizontal sizing.
+               */
               width: `${size}px`,
               minWidth: `${size}px`,
               maxWidth: `${size}px`,
-              whiteSpace: "nowrap",
+
+              /**
+               * MUI density-controlled vertical layout.
+               */
+              height: densityMetrics.nowrap
+                ? `${densityMetrics.bodyRowHeight}px`
+                : undefined,
+              minHeight: `${densityMetrics.bodyRowHeight}px`,
+              px: densityMetrics.cellPaddingInline,
+              py: densityMetrics.cellPaddingBlock,
+
+              whiteSpace: densityMetrics.nowrap ? "nowrap" : "normal",
               overflow: "hidden",
-              textOverflow: "ellipsis",
+              textOverflow: densityMetrics.nowrap ? "ellipsis" : undefined,
               ...pinnedSx,
             }}
           >

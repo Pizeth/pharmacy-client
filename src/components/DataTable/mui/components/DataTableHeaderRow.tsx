@@ -9,6 +9,13 @@ import { DataTableHeaderCell } from "./DataTableHeaderCell";
 export interface DataTableHeaderRowProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
   readonly headerGroup: HeaderGroup<MuiDataTableFeatures, TData>;
+
+  /**
+   * Zero-based visual header row position.
+   *
+   * Used to calculate vertical sticky offsets.
+   */
+  readonly headerRowIndex: number;
 }
 
 /**
@@ -17,12 +24,20 @@ export interface DataTableHeaderRowProps<TData extends RowData> {
 export function DataTableHeaderRow<TData extends RowData>(
   props: DataTableHeaderRowProps<TData>,
 ) {
-  const { table, headerGroup } = props;
+  const { table, headerGroup, headerRowIndex } = props;
 
   return (
-    <TableRow data-header-group-id={headerGroup.id}>
+    <TableRow
+      data-header-group-id={headerGroup.id}
+      data-header-row-index={headerRowIndex}
+    >
       {headerGroup.headers.map((header) => (
-        <DataTableHeaderCell key={header.id} table={table} header={header} />
+        <DataTableHeaderCell
+          key={header.id}
+          table={table}
+          header={header}
+          headerRowIndex={headerRowIndex}
+        />
       ))}
     </TableRow>
   );

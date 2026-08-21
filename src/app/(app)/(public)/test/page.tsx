@@ -126,9 +126,9 @@ export default function UsersPage() {
       },
     },
 
-    meta: {
-      density: "standard",
-    },
+    // meta: {
+    //   density: "comfortable",
+    // },
   });
 
   return (

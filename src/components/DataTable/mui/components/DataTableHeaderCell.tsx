@@ -7,6 +7,7 @@ import type { MuiDataTableInstance } from "../table";
 import { resolveTableCellAlignment } from "./alignment";
 import { getDataTablePinnedLayout, getDataTablePinnedSx } from "./pinning";
 import { DataTableHeaderContent } from "./DataTableHeaderContent";
+import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
 
 export interface DataTableHeaderCellProps<
   TData extends RowData,
@@ -14,6 +15,13 @@ export interface DataTableHeaderCellProps<
 > {
   readonly table: MuiDataTableInstance<TData>;
   readonly header: Header<MuiDataTableFeatures, TData, TValue>;
+
+  /**
+   * Zero-based visual header row position.
+   *
+   * Used to calculate vertical sticky offsets.
+   */
+  readonly headerRowIndex: number;
 }
 
 /**
@@ -33,7 +41,13 @@ export function DataTableHeaderCell<
   TData extends RowData,
   TValue extends CellData = CellData,
 >(props: DataTableHeaderCellProps<TData, TValue>) {
-  const { table, header } = props;
+  const { table, header, headerRowIndex } = props;
+
+  const { density } = useDataTableDensity();
+
+  const densityMetrics = getDataTableDensityMetrics(density);
+
+  const stickyTop = headerRowIndex * densityMetrics.headerHeight;
 
   const meta = header.column.columnDef.meta;
 
@@ -72,20 +86,28 @@ export function DataTableHeaderCell<
               colSpan={header.colSpan}
               data-column-id={header.column.id}
               data-pinned={pinnedLayout?.position}
+              data-density={density}
               sx={{
                 /**
-                 * MUI stickyHeader supplies sticky top positioning.
+                 * All header cells own vertical stickiness.
                  *
                  * Pinned leaf headers additionally receive logical
                  * inline positioning through pinnedSx.
                  */
-                position: "relative",
+                position: "sticky",
+                top: `${stickyTop}px`,
+                zIndex: 2,
+                backgroundColor: "background.paper",
                 boxSizing: "border-box",
                 width: `${size}px`,
                 minWidth: `${size}px`,
                 maxWidth: `${size}px`,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
+                height: `${densityMetrics.headerHeight}px`,
+                minHeight: `${densityMetrics.headerHeight}px`,
+                px: densityMetrics.cellPaddingInline,
+                py: densityMetrics.cellPaddingBlock,
+                // whiteSpace: "nowrap",
+                // overflow: "hidden",
                 ...pinnedSx,
               }}
             />
@@ -132,21 +154,34 @@ export function DataTableHeaderCell<
             scope="col"
             data-column-id={header.column.id}
             data-pinned={pinnedLayout?.position}
+            data-density={density}
             sortDirection={sortDirection}
             sx={{
               /**
-               * MUI stickyHeader supplies sticky top positioning.
+               * Vertically sticky for every header.
                *
                * Pinned leaf headers additionally receive logical
                * inline positioning through pinnedSx.
                */
-              position: "relative",
+              position: "sticky",
+              top: `${stickyTop}px`,
+              zIndex: 2,
+              backgroundColor: "background.paper",
               boxSizing: "border-box",
               width: `${size}px`,
               minWidth: `${size}px`,
               maxWidth: `${size}px`,
-              whiteSpace: "nowrap",
+              height: `${densityMetrics.headerHeight}px`,
+              minHeight: `${densityMetrics.headerHeight}px`,
+              px: densityMetrics.cellPaddingInline,
+              py: densityMetrics.cellPaddingBlock,
+              whiteSpace: densityMetrics.nowrap ? "nowrap" : "normal",
               overflow: "hidden",
+
+              /**
+               * Pinned leaf headers override the inline sticky position and
+               * z-index while preserving the top offset above.
+               */
               ...pinnedSx,
             }}
           >

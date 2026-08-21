@@ -2,9 +2,11 @@
 
 export * from "./column-menu";
 export * from "./filtering";
+export * from "./global-filtering";
 export * from "./pagination";
 export * from "./sorting";
 export * from "./states";
+export * from "./toolbar";
 
 export * from "./DataTable";
 export * from "./DataTableBody";
@@ -16,3 +18,4 @@ export * from "./DataTableHeaderCell";
 export * from "./DataTableHeaderContent";
 export * from "./DataTableHeaderRow";
 export * from "./DataTableResizeHandle";
+export * from "./DataTableShell";

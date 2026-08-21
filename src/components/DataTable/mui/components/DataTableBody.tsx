@@ -9,6 +9,7 @@ import {
   DataTableErrorState,
   DataTableLoadingState,
 } from "./states";
+import { normalizeDataTableGlobalFilter } from "../utils";
 
 export interface DataTableBodyProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -58,14 +59,13 @@ export function DataTableBody<TData extends RowData>(
         pagination: state.pagination,
         sorting: state.sorting,
         columnFilters: state.columnFilters,
+        globalFilter: state.globalFilter,
       })}
     >
-      {() => {
+      {(selected) => {
         const rows = table.getRowModel().rows;
 
         const visibleColumnCount = table.getVisibleLeafColumns().length;
-
-        const meta = table.options.meta;
 
         /**
          * Guard against an invalid colSpan=0.
@@ -75,6 +75,16 @@ export function DataTableBody<TData extends RowData>(
          * hideable column becomes hidden.
          */
         const colSpan = Math.max(1, visibleColumnCount);
+
+        const meta = table.options.meta;
+
+        const globalFilter = normalizeDataTableGlobalFilter(
+          selected.globalFilter,
+        );
+
+        const hasActiveFilters =
+          selected.columnFilters.length > 0 ||
+          normalizeDataTableGlobalFilter(selected.globalFilter).length > 0;
 
         if (meta?.error) {
           return (
@@ -99,8 +109,11 @@ export function DataTableBody<TData extends RowData>(
         if (rows.length === 0) {
           return (
             <TableBody>
-              <DataTableEmptyState colSpan={colSpan}>
-                {meta?.emptyContent}
+              <DataTableEmptyState
+                colSpan={colSpan}
+                filtered={hasActiveFilters}
+              >
+                {hasActiveFilters ? meta?.noResultsContent : meta?.emptyContent}
               </DataTableEmptyState>
             </TableBody>
           );
