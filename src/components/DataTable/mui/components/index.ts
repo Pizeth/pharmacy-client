@@ -1,6 +1,8 @@
 // mui/components/index.ts
 
+export * from "./column-manager";
 export * from "./column-menu";
+export * from "./detail-panel";
 export * from "./filtering";
 export * from "./global-filtering";
 export * from "./pagination";

@@ -4,14 +4,18 @@ import { Stack } from "@mui/material";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
 import {
-  DataTableColumnVisibilityButton,
+  // DataTableColumnVisibilityButton,
   DataTableDensityButton,
   DataTableFullscreenButton,
 } from "./actions";
+import { DataTableColumnManagerButton } from "../column-manager";
+import type { DataTableColumnManagerConfig } from "../column-manager";
 
 export interface DataTableToolbarActionsProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
-  readonly enableColumnVisibility: boolean;
+  // readonly enableColumnVisibility: boolean;
+  readonly enableColumnManager: boolean;
+  readonly columnManager?: DataTableColumnManagerConfig;
   readonly enableDensity: boolean;
   readonly enableFullscreen: boolean;
 }
@@ -25,8 +29,14 @@ export interface DataTableToolbarActionsProps<TData extends RowData> {
 export function DataTableToolbarActions<TData extends RowData>(
   props: DataTableToolbarActionsProps<TData>,
 ) {
-  const { table, enableColumnVisibility, enableDensity, enableFullscreen } =
-    props;
+  const {
+    table,
+    // enableColumnVisibility,
+    enableColumnManager,
+    columnManager,
+    enableDensity,
+    enableFullscreen,
+  } = props;
 
   return (
     <Stack
@@ -37,8 +47,8 @@ export function DataTableToolbarActions<TData extends RowData>(
         flexShrink: 0,
       }}
     >
-      {enableColumnVisibility && (
-        <DataTableColumnVisibilityButton table={table} />
+      {enableColumnManager && (
+        <DataTableColumnManagerButton table={table} {...columnManager} />
       )}
 
       {enableDensity && <DataTableDensityButton />}

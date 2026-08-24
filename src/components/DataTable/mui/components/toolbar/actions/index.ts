@@ -1,5 +1,5 @@
 // mui/components/toolbar/actions/index.ts
 
-export * from "./DataTableColumnVisibilityButton";
+// export * from "./DataTableColumnVisibilityButtonUnused";
 export * from "./DataTableDensityButton";
 export * from "./DataTableFullscreenButton";

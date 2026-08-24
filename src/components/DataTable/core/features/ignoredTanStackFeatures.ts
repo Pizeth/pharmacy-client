@@ -3,8 +3,8 @@
 import { TanStackStockFeatureSlot } from "./featureAliases";
 
 /**
- * TanStack stock features that DataTable intentionally does
- * not expose yet.
+ * TanStack stock features that DataTable intentionally does not
+ * expose through its stable public feature configuration yet.
  *
  * Why keep this explicit?
  *
@@ -18,8 +18,17 @@ import { TanStackStockFeatureSlot } from "./featureAliases";
  *   +
  *   intentionally ignored features
  *
- * If TanStack introduces a NEW stock feature that appears in
- * neither collection, generation/checking fails immediately.
+ * The feature synchronization generator verifies that every upstream
+ * stock feature belongs to exactly one of two conceptual groups:
+ *
+ *   1. exposed through featureAliases
+ *
+ *   or
+ *
+ *   2. explicitly ignored here
+ *
+ * If TanStack adds a new stock feature and it appears in neither
+ * collection, generation/checking fails.
  *
  * We are then forced to consciously decide whether the new
  * feature should:
@@ -30,15 +39,24 @@ import { TanStackStockFeatureSlot } from "./featureAliases";
  * New features therefore require conscious review.
  */
 export const ignoredTanStackFeatures = [
+  /**
+   * Cell-level functionality not yet exposed.
+   */
   "cellSelectionFeature",
   "cellSpanningFeature",
 
+  /**
+   * Advanced column processing not yet exposed.
+   */
   "columnFacetingFeature",
   "columnGroupingFeature",
-  "columnOrderingFeature",
-  "columnResizingFeature",
 
+  /**
+   * Advanced row processing not yet exposed.
+   *
+   * rowExpandingFeature will move out of this list when we begin
+   * Phase 1.6.3.
+   */
   "rowAggregationFeature",
-  "rowExpandingFeature",
   "rowPinningFeature",
 ] as const satisfies readonly TanStackStockFeatureSlot[];

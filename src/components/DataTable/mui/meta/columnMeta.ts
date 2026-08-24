@@ -106,4 +106,34 @@ export interface MuiDataTableColumnMeta {
    * - expander
    */
   readonly enableColumnMenu?: boolean;
+
+  /**
+   * Whether this column can be reordered through the MUI DataTable
+   * column-management UI.
+   *
+   * TanStack's columnOrderingFeature does not provide a per-column
+   * ordering capability flag, so this is intentionally MUI-layer
+   * policy.
+   *
+   * Default: true.
+   *
+   * Internal utility columns such as selection/actions/expanders may
+   * set this to false.
+   */
+  readonly enableColumnOrdering?: boolean;
+
+  /**
+   * Human-readable column label used outside the rendered header.
+   *
+   * Useful for:
+   *
+   * - column manager
+   * - toolbar controls
+   * - accessibility labels
+   * - future export/preferences UI
+   *
+   * This is intentionally separate from `header`, because `header`
+   * may be a React renderer rather than plain text.
+   */
+  readonly label?: string;
 }

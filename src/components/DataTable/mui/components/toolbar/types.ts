@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
+import { DataTableColumnManagerConfig } from "../column-manager";
 
 export type DataTableToolbarSearchPosition = "start" | "center" | "end";
 
@@ -53,7 +54,16 @@ export interface DataTableToolbarConfig<TData extends RowData> {
   /**
    * Built-in table action switches.
    */
-  readonly enableColumnVisibility?: boolean;
+  // readonly enableColumnVisibility?: boolean;
+
+  /**
+   * Enable the standard column-management surface.
+   *
+   * Includes visibility and pinning.
+   */
+  readonly enableColumnManager?: boolean;
+
+  readonly columnManager?: DataTableColumnManagerConfig;
 
   readonly enableDensity?: boolean;
 

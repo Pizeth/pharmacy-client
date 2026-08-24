@@ -18,10 +18,13 @@
 
 import {
   columnFilteringFeature,
+  columnOrderingFeature,
   columnPinningFeature,
+  columnResizingFeature,
   columnSizingFeature,
   columnVisibilityFeature,
   globalFilteringFeature,
+  rowExpandingFeature,
   rowPaginationFeature,
   rowSelectionFeature,
   rowSortingFeature,
@@ -51,6 +54,11 @@ export const featureMap = {
     feature: globalFilteringFeature,
   },
 
+  ordering: {
+    slot: "columnOrderingFeature",
+    feature: columnOrderingFeature,
+  },
+
   pagination: {
     slot: "rowPaginationFeature",
     feature: rowPaginationFeature,
@@ -59,6 +67,11 @@ export const featureMap = {
   selection: {
     slot: "rowSelectionFeature",
     feature: rowSelectionFeature,
+  },
+
+  expanding: {
+    slot: "rowExpandingFeature",
+    feature: rowExpandingFeature,
   },
 
   visibility: {
@@ -74,6 +87,11 @@ export const featureMap = {
   sizing: {
     slot: "columnSizingFeature",
     feature: columnSizingFeature,
+  },
+
+  resizing: {
+    slot: "columnResizingFeature",
+    feature: columnResizingFeature,
   },
 } as const;
 

@@ -44,7 +44,9 @@ export function DataTableToolbar<TData extends RowData>(
     searchPlaceholder = "Search…",
     startContent,
     endContent,
-    enableColumnVisibility = true,
+    // enableColumnVisibility = true,
+    enableColumnManager = true,
+    columnManager,
     enableDensity = true,
     enableFullscreen = true,
     showSelectionSummary = true,
@@ -170,7 +172,9 @@ export function DataTableToolbar<TData extends RowData>(
 
           <DataTableToolbarActions
             table={table}
-            enableColumnVisibility={enableColumnVisibility}
+            // enableColumnVisibility={enableColumnVisibility}
+            enableColumnManager={enableColumnManager}
+            columnManager={columnManager}
             enableDensity={enableDensity}
             enableFullscreen={enableFullscreen}
           />

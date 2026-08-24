@@ -2,10 +2,12 @@
 
 import {
   columnFilteringFeature,
+  columnOrderingFeature,
   columnPinningFeature,
   columnResizingFeature,
   columnSizingFeature,
   columnVisibilityFeature,
+  createExpandedRowModel,
   createFilteredRowModel,
   createPaginatedRowModel,
   createSortedRowModel,
@@ -16,6 +18,7 @@ import {
   filterFn_includesString,
   filterFn_weakEquals,
   globalFilteringFeature,
+  rowExpandingFeature,
   rowPaginationFeature,
   rowSelectionFeature,
   rowSortingFeature,
@@ -52,6 +55,23 @@ export const muiDataTableFeatures = tableFeatures({
   columnFilteringFeature,
 
   /**
+   * Leaf-column ordering state and APIs.
+   *
+   * This enables:
+   *
+   * - state.columnOrder
+   * - table.setColumnOrder()
+   * - table.resetColumnOrder()
+   * - column.getIndex()
+   * - column.getIsFirstColumn()
+   * - column.getIsLastColumn()
+   *
+   * Pinned-region ordering remains coordinated with
+   * columnPinningFeature.
+   */
+  columnOrderingFeature,
+
+  /**
    * Global table search/filtering.
    *
    * TanStack validates that columnFilteringFeature is also present.
@@ -62,6 +82,16 @@ export const muiDataTableFeatures = tableFeatures({
    * Row sorting state and APIs.
    */
   rowSortingFeature,
+
+  /**
+   * Row expansion state and APIs.
+   *
+   * Supports both:
+   *
+   * - hierarchical subRows
+   * - MUI detail-panel expansion through getRowCanExpand()
+   */
+  rowExpandingFeature,
 
   /**
    * Pagination state and APIs.
@@ -112,6 +142,14 @@ export const muiDataTableFeatures = tableFeatures({
   filteredRowModel: createFilteredRowModel(),
 
   sortedRowModel: createSortedRowModel(),
+
+  /**
+   * Expands hierarchical subRows into the visible row model.
+   *
+   * Detail panels are rendered by our MUI layer and therefore do not
+   * themselves require subRows.
+   */
+  expandedRowModel: createExpandedRowModel(),
 
   paginatedRowModel: createPaginatedRowModel(),
 
