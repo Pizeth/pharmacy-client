@@ -10,9 +10,12 @@ import {
   DataTableLoadingState,
 } from "./states";
 import { normalizeDataTableGlobalFilter } from "../utils";
+import { DataTableDetailPanelRenderer } from "./detail-panel";
+import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
 
 export interface DataTableBodyProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
+  readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
 }
 
 /**
@@ -39,7 +42,7 @@ export interface DataTableBodyProps<TData extends RowData> {
 export function DataTableBody<TData extends RowData>(
   props: DataTableBodyProps<TData>,
 ) {
-  const { table } = props;
+  const { table, renderDetailPanel } = props;
 
   // const rows = table.getRowModel().rows;
 
@@ -60,6 +63,7 @@ export function DataTableBody<TData extends RowData>(
         sorting: state.sorting,
         columnFilters: state.columnFilters,
         globalFilter: state.globalFilter,
+        expanded: state.expanded,
       })}
     >
       {(selected) => {
@@ -122,7 +126,12 @@ export function DataTableBody<TData extends RowData>(
         return (
           <TableBody>
             {rows.map((row) => (
-              <DataTableBodyRow key={row.id} table={table} row={row} />
+              <DataTableBodyRowGroup
+                key={row.id}
+                table={table}
+                row={row}
+                renderDetailPanel={renderDetailPanel}
+              />
             ))}
           </TableBody>
         );

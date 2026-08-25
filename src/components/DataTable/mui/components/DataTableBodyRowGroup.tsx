@@ -10,9 +10,7 @@ import type { DataTableDetailPanelRenderer } from "./detail-panel";
 
 export interface DataTableBodyRowGroupProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
-
   readonly row: Row<MuiDataTableFeatures, TData>;
-
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
 }
 

@@ -16,6 +16,7 @@ import type { DataTablePaginationConfig } from "./pagination";
 import { DataTableShell } from "./DataTableShell";
 import { DataTableToolbar } from "./toolbar";
 import type { DataTableToolbarConfig } from "./toolbar";
+import { DataTableDetailPanelRenderer } from "./detail-panel";
 
 export interface DataTableProps<TData extends RowData>
   extends DataTableDensityConfig, DataTableFullscreenConfig {
@@ -50,6 +51,8 @@ export interface DataTableProps<TData extends RowData>
    *   configure standard toolbar.
    */
   readonly toolbar?: boolean | DataTableToolbarConfig<TData>;
+
+  readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
 
   /**
    * false disables pagination UI.
@@ -93,6 +96,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     tableProps,
     containerProps,
     toolbar = true,
+    renderDetailPanel,
     pagination = {},
     density,
     defaultDensity,
@@ -230,7 +234,10 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                       >
                         <DataTableColumnGroup table={table} />
                         <DataTableHead table={table} />
-                        <DataTableBody table={table} />
+                        <DataTableBody
+                          table={table}
+                          renderDetailPanel={renderDetailPanel}
+                        />
                       </Table>
                     );
                   }}
