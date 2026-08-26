@@ -58,6 +58,7 @@ export function DataTableColumnOrderHandle<
         size="small"
         draggable
         aria-label={`Reorder ${label}`}
+        aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
         onKeyDown={handleKeyDown}
         onDragStart={(event) => {
           event.stopPropagation();
@@ -77,15 +78,18 @@ export function DataTableColumnOrderHandle<
         }}
         sx={{
           cursor: "grab",
-
           width: 28,
-
           height: 28,
-
           color: "text.secondary",
 
           "&:active": {
             cursor: "grabbing",
+          },
+
+          "&:focus-visible": {
+            outline: "2px solid",
+            outlineColor: "primary.main",
+            outlineOffset: 2,
           },
         }}
       >

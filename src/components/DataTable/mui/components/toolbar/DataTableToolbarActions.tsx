@@ -2,18 +2,18 @@
 
 import { Stack } from "@mui/material";
 import type { RowData } from "@tanstack/table-core";
-import type { MuiDataTableInstance } from "../../table";
-import {
-  // DataTableColumnVisibilityButton,
-  DataTableDensityButton,
-  DataTableFullscreenButton,
-} from "./actions";
 import { DataTableColumnManagerButton } from "../column-manager";
 import type { DataTableColumnManagerConfig } from "../column-manager";
+import type { MuiDataTableInstance } from "../../table";
+import {
+  DataTableDensityButton,
+  DataTableFilterToggleButton,
+  DataTableFullscreenButton,
+} from "./actions";
 
 export interface DataTableToolbarActionsProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
-  // readonly enableColumnVisibility: boolean;
+  readonly enableFilterToggle: boolean;
   readonly enableColumnManager: boolean;
   readonly columnManager?: DataTableColumnManagerConfig;
   readonly enableDensity: boolean;
@@ -21,17 +21,18 @@ export interface DataTableToolbarActionsProps<TData extends RowData> {
 }
 
 /**
- * Standard framework-owned toolbar action area.
+ * Standard DataTable-internal toolbar actions.
  *
- * This is analogous in role to MRT's internal toolbar button area,
- * but intentionally much smaller and composable.
+ * Search visibility is intentionally handled by DataTableToolbar
+ * itself because the search button and search input form one
+ * presentation feature.
  */
 export function DataTableToolbarActions<TData extends RowData>(
   props: DataTableToolbarActionsProps<TData>,
 ) {
   const {
     table,
-    // enableColumnVisibility,
+    enableFilterToggle,
     enableColumnManager,
     columnManager,
     enableDensity,
@@ -47,6 +48,10 @@ export function DataTableToolbarActions<TData extends RowData>(
         flexShrink: 0,
       }}
     >
+      {enableFilterToggle && (
+        <DataTableFilterToggleButton<TData> table={table} />
+      )}
+
       {enableColumnManager && (
         <DataTableColumnManagerButton table={table} {...columnManager} />
       )}

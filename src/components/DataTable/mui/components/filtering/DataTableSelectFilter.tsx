@@ -6,13 +6,9 @@ export type DataTableSelectFilterValue = string | number | boolean;
 
 export interface DataTableSelectFilterProps {
   readonly value: DataTableSelectFilterValue | undefined;
-
   readonly label: string;
-
   readonly options: readonly MuiDataTableFilterOption[];
-
   readonly onChange: (value: DataTableSelectFilterValue) => void;
-
   readonly onClear: () => void;
 }
 

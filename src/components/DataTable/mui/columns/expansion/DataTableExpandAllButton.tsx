@@ -21,9 +21,9 @@ export function DataTableExpandAllButton() {
 
         const allExpanded = table.getIsAllRowsExpanded();
 
-        const someExpanded = table.getIsSomeRowsExpanded();
+        // const someExpanded = table.getIsSomeRowsExpanded();
 
-        const active = allExpanded || someExpanded;
+        // const active = allExpanded || someExpanded;
 
         return (
           <Tooltip title={allExpanded ? "Collapse all" : "Expand all"}>
@@ -32,10 +32,14 @@ export function DataTableExpandAllButton() {
                 size="small"
                 disabled={!canExpand}
                 aria-label={
-                  allExpanded ? "Collapse all rows" : "Expand all rows"
+                  allExpanded
+                    ? "Collapse all expandable rows"
+                    : "Expand all expandable rows"
                 }
-                aria-pressed={active}
+                aria-pressed={allExpanded}
+                // aria-pressed={active}
                 onClick={(event) => {
+                  event.preventDefault();
                   event.stopPropagation();
 
                   table.toggleAllRowsExpanded();
@@ -43,6 +47,12 @@ export function DataTableExpandAllButton() {
                 sx={{
                   width: 28,
                   height: 28,
+
+                  "&:focus-visible": {
+                    outline: "2px solid",
+                    outlineColor: "primary.main",
+                    outlineOffset: 2,
+                  },
                 }}
               >
                 {allExpanded ? (

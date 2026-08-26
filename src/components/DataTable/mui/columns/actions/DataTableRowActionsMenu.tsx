@@ -45,19 +45,26 @@ export function DataTableRowActionsMenu<TData extends RowData>(
     return null;
   }
 
+  const rowId = actions[0].context.row.id;
+
   return (
     <>
       <Tooltip title="More actions">
         <IconButton
           size="small"
-          aria-label="More row actions"
+          aria-label={`More actions for row ${rowId}`}
           aria-haspopup="menu"
           aria-expanded={open ? "true" : undefined}
           onClick={handleOpen}
           sx={{
             width: 28,
-
             height: 28,
+
+            "&:focus-visible": {
+              outline: "2px solid",
+              outlineColor: "primary.main",
+              outlineOffset: 2,
+            },
           }}
         >
           <MoreVert fontSize="small" />
@@ -68,11 +75,17 @@ export function DataTableRowActionsMenu<TData extends RowData>(
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        MenuListProps={{
-          dense: true,
-
-          "aria-label": "Row actions",
+        slotProps={{
+          list: {
+            dense: true,
+            "aria-label": `Actions for row ${rowId}`,
+          },
         }}
+        // MenuListProps={{
+        //   dense: true,
+
+        //   "aria-label": `Actions for row ${rowId}`,
+        // }}
       >
         {actions.map((action) => {
           const { definition, context, icon, disabled, color } = action;

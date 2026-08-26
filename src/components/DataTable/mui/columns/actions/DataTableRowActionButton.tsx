@@ -29,7 +29,7 @@ export function DataTableRowActionButton<TData extends RowData>(
           size="small"
           color={color}
           disabled={disabled}
-          aria-label={definition.label}
+          aria-label={`${definition.label} for row ${context.row.id}`}
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -43,6 +43,12 @@ export function DataTableRowActionButton<TData extends RowData>(
           sx={{
             width: 28,
             height: 28,
+
+            "&:focus-visible": {
+              outline: "2px solid",
+              outlineColor: "primary.main",
+              outlineOffset: 2,
+            },
           }}
         >
           {icon}

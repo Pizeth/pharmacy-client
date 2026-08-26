@@ -47,8 +47,9 @@ export function createActionsColumn<TData extends RowData>(
      */
     header: undefined,
 
-    cell: () => (
-      <DataTableRowActions
+    cell: ({ row }) => (
+      <DataTableRowActions<TData>
+        row={row}
         actions={actions}
         maxInlineActions={maxInlineActions}
       />

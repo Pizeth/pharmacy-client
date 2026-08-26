@@ -5,11 +5,8 @@ import type { DataTableNumberRangeValue } from "./types";
 
 export interface DataTableNumberRangeFilterProps {
   readonly value: DataTableNumberRangeValue;
-
   readonly label: string;
-
   readonly onChange: (value: DataTableNumberRangeValue) => void;
-
   readonly onClear: () => void;
 }
 
@@ -53,7 +50,22 @@ export function DataTableNumberRangeFilter(
   };
 
   return (
-    <Stack direction="row" spacing={1}>
+    <Stack
+      direction="row"
+      spacing={1}
+      sx={{
+        width: "100%",
+        minWidth: 0,
+
+        "& .MuiTextField-root": {
+          minWidth: 0,
+        },
+
+        "& .MuiInputBase-root": {
+          minWidth: 0,
+        },
+      }}
+    >
       <TextField
         fullWidth
         size="small"

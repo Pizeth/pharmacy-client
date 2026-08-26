@@ -6,6 +6,9 @@ export type DataTableToolbarContent<TData extends RowData> =
   | ReactNode
   | ((context: DataTableToolbarRenderContext<TData>) => ReactNode);
 
+/**
+ * Resolve static or table-aware custom toolbar content.
+ */
 export function renderDataTableToolbarContent<TData extends RowData>(
   content: DataTableToolbarContent<TData> | undefined,
   context: DataTableToolbarRenderContext<TData>,

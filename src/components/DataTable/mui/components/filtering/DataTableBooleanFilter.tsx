@@ -1,6 +1,7 @@
 "use client";
 
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { useId } from "react";
 
 type BooleanSelectValue = "" | "true" | "false";
 
@@ -26,15 +27,17 @@ export interface DataTableBooleanFilterProps {
 export function DataTableBooleanFilter(props: DataTableBooleanFilterProps) {
   const { value, label, onChange, onClear } = props;
 
+  const labelId = useId();
+
   const selectValue: BooleanSelectValue =
     value === undefined ? "" : value ? "true" : "false";
 
   return (
     <FormControl fullWidth size="small">
-      <InputLabel id="data-table-boolean-filter-label">{label}</InputLabel>
+      <InputLabel id={labelId}>{label}</InputLabel>
 
       <Select<BooleanSelectValue>
-        labelId="data-table-boolean-filter-label"
+        labelId={labelId}
         label={label}
         value={selectValue}
         onChange={(event) => {

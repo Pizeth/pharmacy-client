@@ -1,7 +1,7 @@
 "use client";
 
 import { Stack } from "@mui/material";
-import type { RowData } from "@tanstack/table-core";
+import type { Row, RowData } from "@tanstack/table-core";
 import {
   useMuiDataTableCellContext,
   useMuiDataTableContext,
@@ -9,33 +9,77 @@ import {
 import { DataTableRowActionButton } from "./DataTableRowActionButton";
 import { DataTableRowActionsMenu } from "./DataTableRowActionsMenu";
 import { resolveDataTableRowActions } from "./resolveRowActions";
-import type { DataTableRowAction } from "./types";
+import type { DataTableRowAction, DataTableRowActionContext } from "./types";
+import { MuiDataTableFeatures } from "../../features";
 
 export interface DataTableRowActionsProps<TData extends RowData> {
+  /**
+   * Concrete row supplied directly by the TanStack cell renderer.
+   *
+   * Passing this explicitly preserves TData and avoids recovering the
+   * row indirectly through a generic React context.
+   */
+  readonly row: Row<MuiDataTableFeatures, TData>;
   readonly actions: readonly DataTableRowAction<TData>[];
   readonly maxInlineActions: number;
 }
 
 /**
  * Standard renderer for the DataTable row-actions display column.
+ *
+ * TData must remain intact through:
+ *
+ *   action definitions
+ *       ↓
+ *   React table context
+ *       ↓
+ *   cell / row context
+ *       ↓
+ *   resolved action context
+ *
+ * Widening any of those to RowData would make the callback-bearing
+ * DataTableRowAction<TData> type incompatible.
  */
 export function DataTableRowActions<TData extends RowData>(
   props: DataTableRowActionsProps<TData>,
 ) {
-  const { actions, maxInlineActions } = props;
+  const { row, actions, maxInlineActions } = props;
 
-  const table = useMuiDataTableContext();
+  /**
+  /**
+   * React table context is still used because the action API
+   * deliberately exposes MuiDataTableInstance<TData>, not the core
+   * Table contained in CellContext.
+   */
+  const table = useMuiDataTableContext<TData>();
 
-  const cell = useMuiDataTableCellContext();
+  // const cell = useMuiDataTableCellContext<TData>();
 
-  const row = cell.row;
+  // const row = cell.row;
 
-  const context = {
+  // const context = {
+  //   table,
+  //   row,
+  // };
+
+  /**
+   * Do not leave this object to broad structural inference.
+   *
+   * The annotation ensures that a future change which accidentally
+   * widens either `table` or `row` to RowData fails here, close to
+   * the source of the problem.
+   */
+  const context: DataTableRowActionContext<TData> = {
     table,
     row,
   };
 
-  const resolvedActions = resolveDataTableRowActions(actions, context);
+  // const resolvedActions = resolveDataTableRowActions(actions, context);
+
+  /**
+   * Explicitly preserve TData through the resolver as well.
+   */
+  const resolvedActions = resolveDataTableRowActions<TData>(actions, context);
 
   /**
    * Explicitly inline actions take priority.
@@ -49,13 +93,11 @@ export function DataTableRowActions<TData extends RowData>(
    */
   const remainingInlineCapacity = Math.max(
     0,
-
     maxInlineActions - preferredInline.length,
   );
 
   const inlineActions = [
     ...preferredInline.slice(0, maxInlineActions),
-
     ...remaining.slice(0, remainingInlineCapacity),
   ];
 
@@ -85,15 +127,17 @@ export function DataTableRowActions<TData extends RowData>(
       spacing={0.25}
       sx={{
         width: "100%",
-
         minWidth: 0,
       }}
     >
       {inlineActions.map((action) => (
-        <DataTableRowActionButton key={action.definition.id} action={action} />
+        <DataTableRowActionButton<TData>
+          key={action.definition.id}
+          action={action}
+        />
       ))}
 
-      <DataTableRowActionsMenu actions={overflowActions} />
+      <DataTableRowActionsMenu<TData> actions={overflowActions} />
     </Stack>
   );
 }

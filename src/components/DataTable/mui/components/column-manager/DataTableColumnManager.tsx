@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import {
   Box,
   Button,
@@ -15,7 +15,6 @@ import { RestartAltOutlined } from "@mui/icons-material";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
 import { DataTableColumnManagerSection } from "./DataTableColumnManagerSection";
-// import { DataTableColumnManagerItem } from "./DataTableColumnManagerItem";
 import { getDataTableColumnRegion, reorderDataTableColumn } from "./ordering";
 import type { DataTableColumnManagerConfig } from "./types";
 
@@ -52,6 +51,10 @@ export function DataTableColumnManager<TData extends RowData>(
     enablePinning = true,
     enableReset = true,
   } = props;
+
+  const titleId = useId();
+
+  const descriptionId = useId();
 
   const [draggingColumnId, setDraggingColumnId] = useState<string | null>(null);
 
@@ -147,6 +150,10 @@ export function DataTableColumnManager<TData extends RowData>(
             }}
             slotProps={{
               paper: {
+                role: "dialog",
+                "aria-modal": false,
+                "aria-labelledby": titleId,
+                "aria-describedby": descriptionId,
                 sx: {
                   width: 400,
                   maxWidth: "calc(100vw - 32px)",
@@ -163,11 +170,15 @@ export function DataTableColumnManager<TData extends RowData>(
                 py: 1.5,
               }}
             >
-              <Typography variant="subtitle1" fontWeight={600}>
+              <Typography id={titleId} variant="subtitle1" fontWeight={600}>
                 Columns
               </Typography>
 
-              <Typography variant="caption" color="text.secondary">
+              <Typography
+                id={descriptionId}
+                variant="caption"
+                color="text.secondary"
+              >
                 Reorder, pin, and show or hide columns
               </Typography>
             </Box>

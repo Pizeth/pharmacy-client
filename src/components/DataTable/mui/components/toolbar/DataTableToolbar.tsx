@@ -1,18 +1,20 @@
 "use client";
 
-import { Box, Stack, useMediaQuery } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Box, Stack, useMediaQuery, useTheme } from "@mui/material";
 import type { RowData } from "@tanstack/table-core";
-import type { MuiDataTableInstance } from "../../table";
 import { DataTableGlobalFilter } from "../global-filtering";
+import type { MuiDataTableInstance } from "../../table";
+import { DataTableSearchToggleButton } from "./actions";
 import { DataTableToolbarActions } from "./DataTableToolbarActions";
+import { DataTableToolbarFilterStatus } from "./DataTableToolbarFilterStatus";
 import { DataTableToolbarSelection } from "./DataTableToolbarSelection";
 import { renderDataTableToolbarContent } from "./renderToolbarContent";
-
 import type {
   DataTableToolbarConfig,
   DataTableToolbarRenderContext,
 } from "./types";
+import { useDataTableToolbarSearchVisibility } from "./useDataTableToolbarSearchVisibility";
+import { useDataTableAccessibility } from "../../accessibility";
 
 export interface DataTableToolbarProps<
   TData extends RowData,
@@ -21,18 +23,19 @@ export interface DataTableToolbarProps<
 }
 
 /**
- * Standard high-level DataTable toolbar.
+ * Standard High-level MUI toolbar.
  *
  * Layout responsibilities:
  *
- * - application/custom start content
- * - global search
- * - selection summary
- * - custom end content
- * - built-in internal actions
- * - responsive reflow
+ * - application-defined start/end actions
+ * - global-search presentation
+ * - search visibility toggle
+ * - selected-row summary
+ * - active-filter status
+ * - internal DataTable actions
+ * - responsive toolbar layout
  *
- * Table feature state remains completely owned by TanStack.
+ * TanStack remains responsible for actual table state.
  */
 export function DataTableToolbar<TData extends RowData>(
   props: DataTableToolbarProps<TData>,
@@ -40,20 +43,31 @@ export function DataTableToolbar<TData extends RowData>(
   const {
     table,
     search = true,
+    searchMode = "always",
     searchPosition = "center",
     searchPlaceholder = "Search…",
+    searchOpen: controlledSearchOpen,
+    defaultSearchOpen = false,
+    onSearchOpenChange,
     startContent,
     endContent,
-    // enableColumnVisibility = true,
+    showSelectionSummary = true,
+    enableFilterToggle = true,
+    showFilterStatus = false,
     enableColumnManager = true,
     columnManager,
     enableDensity = true,
     enableFullscreen = true,
-    showSelectionSummary = true,
   } = props;
 
   const theme = useTheme();
 
+  const { globalSearchId } = useDataTableAccessibility();
+
+  /**
+   * On narrower screens, search always moves beneath the primary
+   * toolbar row and takes the available width.
+   */
   const narrow = useMediaQuery(theme.breakpoints.down("md"));
 
   const context: DataTableToolbarRenderContext<TData> = {
@@ -67,28 +81,74 @@ export function DataTableToolbar<TData extends RowData>(
 
   const renderedEndContent = renderDataTableToolbarContent(endContent, context);
 
-  const searchNode = search ? (
-    <DataTableGlobalFilter
-      table={table}
-      placeholder={searchPlaceholder}
-      fullWidth={narrow}
-    />
+  const searchVisibility = useDataTableToolbarSearchVisibility({
+    enabled: search,
+    mode: searchMode,
+    open: controlledSearchOpen,
+    defaultOpen: defaultSearchOpen,
+    onOpenChange: onSearchOpenChange,
+  });
+
+  /**
+   * Search field is created once and placed in the appropriate
+   * desktop region, or its own responsive row on narrow screens.
+   */
+  const searchField = searchVisibility.open ? (
+    <Box
+      id={globalSearchId}
+      role="search"
+      aria-label="Table search"
+      sx={{
+        width: {
+          xs: "100%",
+          sm: 320,
+        },
+
+        maxWidth: "100%",
+        minWidth: 0,
+        flexShrink: 1,
+      }}
+    >
+      <DataTableGlobalFilter table={table} placeholder={searchPlaceholder} />
+    </Box>
   ) : null;
 
-  const startSearch = !narrow && searchPosition === "start";
+  const desktopStartSearch =
+    !narrow && searchPosition === "start" ? searchField : null;
 
-  const centerSearch = !narrow && searchPosition === "center";
+  const desktopCenterSearch =
+    !narrow && searchPosition === "center" ? searchField : null;
 
-  const endSearch = !narrow && searchPosition === "end";
+  const desktopEndSearch =
+    !narrow && searchPosition === "end" ? searchField : null;
+
+  // const searchNode = search ? (
+  //   <DataTableGlobalFilter
+  //     table={table}
+  //     placeholder={searchPlaceholder}
+  //     fullWidth={narrow}
+  //   />
+  // ) : null;
+
+  // const startSearch = !narrow && searchPosition === "start";
+
+  // const centerSearch = !narrow && searchPosition === "center";
+
+  // const endSearch = !narrow && searchPosition === "end";
 
   return (
     <Box
       component="header"
+      data-data-table-toolbar="true"
       sx={{
-        display: "grid",
+        // display: "grid",
+        display: "flex",
+        flexDirection: "column",
         gap: 1,
-        px: 1.5,
+        width: "100%",
+        px: 2,
         py: 1,
+        minWidth: 0,
         borderBottom: "1px solid",
         borderColor: "divider",
         backgroundColor: "background.paper",
@@ -102,18 +162,23 @@ export function DataTableToolbar<TData extends RowData>(
          * narrow:
          *   controls row + full-width search row
          */
-        gridTemplateColumns: "minmax(0, 1fr)",
-        minHeight: 56,
+        // gridTemplateColumns: "minmax(0, 1fr)",
+        // minHeight: 56,
       }}
     >
-      <Box
+      {/**
+       * ----------------------------------------------------------
+       * Primary toolbar row
+       * ----------------------------------------------------------
+       */}
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={1}
         sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 1,
+          width: "100%",
           minWidth: 0,
-          flexWrap: narrow ? "wrap" : "nowrap",
+          flexWrap: "wrap",
         }}
       >
         {/**
@@ -124,32 +189,32 @@ export function DataTableToolbar<TData extends RowData>(
           alignItems="center"
           spacing={1}
           sx={{
+            flex: "1 1 0",
             minWidth: 0,
-            flex: centerSearch ? 1 : "0 1 auto",
+            flexWrap: "wrap",
           }}
         >
-          {startSearch && searchNode}
-
           {renderedStartContent}
-
           {showSelectionSummary && <DataTableToolbarSelection table={table} />}
+          {desktopStartSearch}
         </Stack>
 
         {/**
          * CENTER REGION
+         *
+         * Only reserve center space while a centered search field is
+         * actually visible.
          */}
-        {centerSearch && (
+        {desktopCenterSearch && (
           <Box
             sx={{
-              flex: "1 1 360px",
+              flex: "0 1 auto",
+              minWidth: 0,
               display: "flex",
               justifyContent: "center",
-              minWidth: 220,
-              maxWidth: 520,
-              mx: 1,
             }}
           >
-            {searchNode}
+            {desktopCenterSearch}
           </Box>
         )}
 
@@ -162,33 +227,150 @@ export function DataTableToolbar<TData extends RowData>(
           justifyContent="flex-end"
           spacing={0.5}
           sx={{
-            flexShrink: 0,
+            flex: "1 1 0",
             minWidth: 0,
+            flexWrap: "wrap",
           }}
         >
-          {endSearch && searchNode}
+          {desktopEndSearch}
+
+          {/**
+           * Search visibility control comes before application
+           * end-actions, matching the interaction order of the
+           * existing MRT toolbar.
+           */}
+          {searchVisibility.canToggle && (
+            <DataTableSearchToggleButton<TData>
+              table={table}
+              open={searchVisibility.open}
+              onToggle={searchVisibility.toggle}
+            />
+          )}
 
           {renderedEndContent}
 
-          <DataTableToolbarActions
+          {showFilterStatus && (
+            <DataTableToolbarFilterStatus<TData> table={table} />
+          )}
+
+          <DataTableToolbarActions<TData>
             table={table}
-            // enableColumnVisibility={enableColumnVisibility}
+            enableFilterToggle={enableFilterToggle}
             enableColumnManager={enableColumnManager}
             columnManager={columnManager}
             enableDensity={enableDensity}
             enableFullscreen={enableFullscreen}
           />
         </Stack>
-      </Box>
-
+      </Stack>
       {/**
-       * On narrow layouts search receives its own full-width row.
+       * ----------------------------------------------------------
+       * Responsive search row
+       * ----------------------------------------------------------
        *
-       * This avoids the complexity MRT has to handle when custom
-       * actions + global filter + tablet widths all compete for the
-       * same horizontal space.
+       * On narrow screens the search position is ignored and the
+       * field receives its own row.
        */}
-      {narrow && searchNode}
+      {narrow && searchField && (
+        <Box
+          sx={{
+            width: "100%",
+
+            minWidth: 0,
+          }}
+        >
+          {searchField}
+        </Box>
+      )}
     </Box>
   );
 }
+
+// {/* <Box
+//   sx={{
+//     display: "flex",
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//     gap: 1,
+//     minWidth: 0,
+//     flexWrap: narrow ? "wrap" : "nowrap",
+//   }}
+// >
+//   {/**
+//    * START REGION
+//    */}
+//   <Stack
+//     direction="row"
+//     alignItems="center"
+//     spacing={1}
+//     sx={{
+//       minWidth: 0,
+//       flex: centerSearch ? 1 : "0 1 auto",
+//     }}
+//   >
+//     {startSearch && searchNode}
+
+//     {renderedStartContent}
+
+//     {showSelectionSummary && <DataTableToolbarSelection table={table} />}
+//   </Stack>
+
+//   {/**
+//    * CENTER REGION
+//    */}
+//   {centerSearch && (
+//     <Box
+//       sx={{
+//         flex: "1 1 360px",
+//         display: "flex",
+//         justifyContent: "center",
+//         minWidth: 220,
+//         maxWidth: 520,
+//         mx: 1,
+//       }}
+//     >
+//       {searchNode}
+//     </Box>
+//   )}
+
+//   {/**
+//    * END REGION
+//    */}
+//   <Stack
+//     direction="row"
+//     alignItems="center"
+//     justifyContent="flex-end"
+//     spacing={0.5}
+//     sx={{
+//       flexShrink: 0,
+//       minWidth: 0,
+//     }}
+//   >
+//     {endSearch && searchNode}
+
+//     {renderedEndContent}
+
+//     <DataTableToolbarActions
+//       table={table}
+//       // enableColumnVisibility={enableColumnVisibility}
+//       enableFilterToggle={enableFilterToggle}
+//       enableColumnManager={enableColumnManager}
+//       columnManager={columnManager}
+//       enableDensity={enableDensity}
+//       enableFullscreen={enableFullscreen}
+//     />
+//   </Stack>
+// </Box>;
+
+// {
+//   /**
+//    * On narrow layouts search receives its own full-width row.
+//    *
+//    * This avoids the complexity MRT has to handle when custom
+//    * actions + global filter + tablet widths all compete for the
+//    * same horizontal space.
+//    */
+// }
+// {
+//   narrow && searchNode;
+// } */}

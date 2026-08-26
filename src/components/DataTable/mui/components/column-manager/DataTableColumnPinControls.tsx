@@ -6,6 +6,7 @@ import { IconButton, Stack, Tooltip } from "@mui/material";
 import { PushPinOutlined } from "@mui/icons-material";
 import type { CellData, Column, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../../features";
+import { getColumnManagerLabel } from "./getColumnManagerLabel";
 
 export interface DataTableColumnPinControlsProps<
   TData extends RowData,
@@ -24,6 +25,8 @@ export function DataTableColumnPinControls<
   TValue extends CellData = CellData,
 >(props: DataTableColumnPinControlsProps<TData, TValue>) {
   const { column } = props;
+
+  const label = getColumnManagerLabel(column);
 
   const canPin = column.getCanPin();
 
@@ -62,7 +65,7 @@ export function DataTableColumnPinControls<
           size="small"
           color={pinnedStart ? "primary" : "default"}
           aria-label={
-            pinnedStart ? `Unpin ${column.id}` : `Pin ${column.id} to start`
+            pinnedStart ? `Unpin ${label} from start` : `Pin ${label} to start`
           }
           aria-pressed={pinnedStart}
           onClick={(event) => {
@@ -72,8 +75,13 @@ export function DataTableColumnPinControls<
           }}
           sx={{
             width: 28,
-
             height: 28,
+
+            "&:focus-visible": {
+              outline: "2px solid",
+              outlineColor: "primary.main",
+              outlineOffset: 2,
+            },
           }}
         >
           <PushPinOutlined
@@ -95,7 +103,7 @@ export function DataTableColumnPinControls<
           size="small"
           color={pinnedEnd ? "primary" : "default"}
           aria-label={
-            pinnedEnd ? `Unpin ${column.id}` : `Pin ${column.id} to end`
+            pinnedEnd ? `Unpin ${label} from end` : `Pin ${label} to end`
           }
           aria-pressed={pinnedEnd}
           onClick={(event) => {
@@ -105,8 +113,13 @@ export function DataTableColumnPinControls<
           }}
           sx={{
             width: 28,
-
             height: 28,
+
+            "&:focus-visible": {
+              outline: "2px solid",
+              outlineColor: "primary.main",
+              outlineOffset: 2,
+            },
           }}
         >
           <PushPinOutlined

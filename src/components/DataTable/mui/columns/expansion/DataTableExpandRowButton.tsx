@@ -8,6 +8,7 @@ import {
   useMuiDataTableCellContext,
   useMuiDataTableContext,
 } from "../../table";
+import { useDataTableAccessibility } from "../../accessibility";
 
 /**
  * Expansion control rendered inside the dedicated expansion display
@@ -23,6 +24,12 @@ export function DataTableExpandRowButton() {
 
   const row = cell.row;
 
+  const { getExpandButtonId, getDetailPanelId } = useDataTableAccessibility();
+
+  const expandButtonId = getExpandButtonId(row.id);
+
+  const detailPanelId = getDetailPanelId(row.id);
+
   return (
     <table.Subscribe selector={(state) => state.expanded}>
       {() => {
@@ -37,11 +44,15 @@ export function DataTableExpandRowButton() {
         return (
           <Tooltip title={expanded ? "Collapse row" : "Expand row"}>
             <IconButton
+              id={expandButtonId}
               size="small"
               aria-label={
-                expanded ? `Collapse row ${row.id}` : `Expand row ${row.id}`
+                expanded
+                  ? `Collapse details for row ${row.id}`
+                  : `Expand details for row ${row.id}`
               }
               aria-expanded={expanded}
+              aria-controls={expanded ? detailPanelId : undefined}
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -51,6 +62,12 @@ export function DataTableExpandRowButton() {
               sx={{
                 width: 28,
                 height: 28,
+
+                "&:focus-visible": {
+                  outline: "2px solid",
+                  outlineColor: "primary.main",
+                  outlineOffset: 2,
+                },
               }}
             >
               {expanded ? (

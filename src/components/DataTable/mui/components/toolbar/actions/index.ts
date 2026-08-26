@@ -2,4 +2,6 @@
 
 // export * from "./DataTableColumnVisibilityButtonUnused";
 export * from "./DataTableDensityButton";
+export * from "./DataTableFilterToggleButton";
 export * from "./DataTableFullscreenButton";
+export * from "./DataTableSearchToggleButton";

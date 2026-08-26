@@ -7,6 +7,7 @@ import type { Row, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../../features";
 import type { MuiDataTableInstance } from "../../table";
 import type { DataTableDetailPanelRenderer } from "./types";
+import { useDataTableAccessibility } from "../../accessibility";
 
 export interface DataTableDetailPanelRowProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -26,6 +27,12 @@ export function DataTableDetailPanelRow<TData extends RowData>(
   props: DataTableDetailPanelRowProps<TData>,
 ) {
   const { table, row, renderDetailPanel } = props;
+
+  const { getExpandButtonId, getDetailPanelId } = useDataTableAccessibility();
+
+  const expandButtonId = getExpandButtonId(row.id);
+
+  const detailPanelId = getDetailPanelId(row.id);
 
   return (
     <table.Subscribe
@@ -76,6 +83,9 @@ export function DataTableDetailPanelRow<TData extends RowData>(
               }}
             >
               <Box
+                id={detailPanelId}
+                role="region"
+                aria-labelledby={expandButtonId}
                 data-detail-panel={row.id}
                 sx={{
                   width: "100%",

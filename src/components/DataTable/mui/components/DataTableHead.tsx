@@ -2,7 +2,9 @@
 
 import { TableHead } from "@mui/material";
 import type { RowData } from "@tanstack/table-core";
+import { useDataTableFilterDisplay } from "../filter-display";
 import type { MuiDataTableInstance } from "../table";
+import { DataTableFilterRow } from "./filter-row";
 import { DataTableHeaderRow } from "./DataTableHeaderRow";
 
 export interface DataTableHeadProps<TData extends RowData> {
@@ -24,25 +26,42 @@ export function DataTableHead<TData extends RowData>(
 ) {
   const { table } = props;
 
+  const { columnFilterDisplayMode, showColumnFilters } =
+    useDataTableFilterDisplay();
+
   return (
     <table.Subscribe
       selector={(state) => ({
         columnVisibility: state.columnVisibility,
+        columnOrder: state.columnOrder,
         columnPinning: state.columnPinning,
       })}
     >
-      {() => (
-        <TableHead>
-          {table.getHeaderGroups().map((headerGroup, headerRowIndex) => (
-            <DataTableHeaderRow
-              key={headerGroup.id}
-              table={table}
-              headerGroup={headerGroup}
-              headerRowIndex={headerRowIndex}
-            />
-          ))}
-        </TableHead>
-      )}
+      {() => {
+        const headerGroups = table.getHeaderGroups();
+
+        const renderFilterRow =
+          columnFilterDisplayMode === "subheader" && showColumnFilters;
+
+        return (
+          <TableHead>
+            {headerGroups.map((headerGroup, headerRowIndex) => (
+              <DataTableHeaderRow
+                key={headerGroup.id}
+                table={table}
+                headerGroup={headerGroup}
+                headerRowIndex={headerRowIndex}
+              />
+            ))}
+            {renderFilterRow && (
+              <DataTableFilterRow
+                table={table}
+                headerRowCount={headerGroups.length}
+              />
+            )}
+          </TableHead>
+        );
+      }}
     </table.Subscribe>
   );
 }
