@@ -12,10 +12,17 @@ export function DataTableFullscreenButton() {
       <IconButton
         size="small"
         aria-label={
-          fullscreen ? "Exit table fullscreen" : "Enter table fullscreen"
+          fullscreen ? "Exit fullscreen table" : "Enter fullscreen table"
         }
         aria-pressed={fullscreen}
         onClick={toggleFullscreen}
+        sx={{
+          "&:focus-visible": {
+            outline: "2px solid",
+            outlineColor: "primary.main",
+            outlineOffset: 2,
+          },
+        }}
       >
         {fullscreen ? (
           <FullscreenExit fontSize="small" />

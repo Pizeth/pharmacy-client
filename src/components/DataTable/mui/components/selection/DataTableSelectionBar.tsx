@@ -151,6 +151,7 @@ export function DataTableSelectionBar<TData extends RowData>(
                   <Button
                     size="small"
                     color="inherit"
+                    aria-label="Clear all selected rows"
                     startIcon={<CloseOutlined fontSize="small" />}
                     onClick={(event) => {
                       event.preventDefault();

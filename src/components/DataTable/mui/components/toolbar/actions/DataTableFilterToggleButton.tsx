@@ -57,6 +57,13 @@ export function DataTableFilterToggleButton<TData extends RowData>(
               aria-expanded={showColumnFilters}
               aria-controls={showColumnFilters ? filterRowId : undefined}
               onClick={toggleColumnFilters}
+              sx={{
+                "&:focus-visible": {
+                  outline: "2px solid",
+                  outlineColor: "primary.main",
+                  outlineOffset: 2,
+                },
+              }}
             >
               <Badge
                 color="primary"

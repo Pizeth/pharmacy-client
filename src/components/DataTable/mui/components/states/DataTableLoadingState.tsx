@@ -23,6 +23,9 @@ export function DataTableLoadingState(props: DataTableBodyStateProps) {
         }}
       >
         <Box
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
           sx={{
             display: "flex",
             flexDirection: "column",

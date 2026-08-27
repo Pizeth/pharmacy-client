@@ -27,6 +27,8 @@ export function DataTableEmptyState(props: DataTableEmptyStateProps) {
         }}
       >
         <Box
+          role="status"
+          aria-live="polite"
           sx={{
             display: "flex",
             flexDirection: "column",

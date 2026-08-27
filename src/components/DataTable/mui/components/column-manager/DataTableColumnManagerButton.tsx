@@ -45,6 +45,13 @@ export function DataTableColumnManagerButton<TData extends RowData>(
           aria-haspopup="dialog"
           aria-expanded={open ? "true" : undefined}
           onClick={handleOpen}
+          sx={{
+            "&:focus-visible": {
+              outline: "2px solid",
+              outlineColor: "primary.main",
+              outlineOffset: 2,
+            },
+          }}
         >
           <ViewColumnOutlined fontSize="small" />
         </IconButton>

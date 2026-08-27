@@ -10,6 +10,8 @@ export function DataTableErrorState(props: DataTableBodyStateProps) {
     <TableRow>
       <TableCell
         colSpan={colSpan}
+        role="alert"
+        aria-live="assertive"
         sx={{
           borderBottom: 0,
           p: 2,

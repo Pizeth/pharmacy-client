@@ -50,6 +50,11 @@ export function DataTableToolbarFilterStatus<TData extends RowData>(
             size="small"
             variant="outlined"
             label={activeCount === 1 ? "1 filter" : `${activeCount} filters`}
+            aria-label={
+              activeCount === 1
+                ? "1 active column filter"
+                : `${activeCount} active column filters`
+            }
             deleteIcon={<FilterAltOffOutlined fontSize="small" />}
             onDelete={clearFilters}
             sx={{

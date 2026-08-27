@@ -49,6 +49,13 @@ export function DataTableSearchToggleButton<TData extends RowData>(
 
                 onToggle();
               }}
+              sx={{
+                "&:focus-visible": {
+                  outline: "2px solid",
+                  outlineColor: "primary.main",
+                  outlineOffset: 2,
+                },
+              }}
             >
               <Badge color="primary" variant="dot" invisible={!active}>
                 {open ? (

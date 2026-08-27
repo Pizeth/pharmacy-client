@@ -87,10 +87,16 @@ export function DataTableDensityButton() {
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        MenuListProps={{
-          dense: density === "compact",
-          "aria-label": "Table density",
+        slotProps={{
+          list: {
+            dense: density === "compact",
+            "aria-label": "Table density",
+          },
         }}
+        // MenuListProps={{
+        //   dense: density === "compact",
+        //   "aria-label": "Table density",
+        // }}
       >
         {DENSITY_OPTIONS.map((option) => {
           const Icon = option.icon;

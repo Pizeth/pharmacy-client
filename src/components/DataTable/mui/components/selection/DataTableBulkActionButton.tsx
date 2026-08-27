@@ -32,6 +32,9 @@ export function DataTableBulkActionButton<TData extends RowData>(
       color={action.color ?? "primary"}
       variant={action.variant ?? "text"}
       disabled={disabled}
+      aria-label={`${action.label} for ${context.selectedCount} selected ${
+        context.selectedCount === 1 ? "row" : "rows"
+      }`}
       startIcon={icon}
       onClick={(event) => {
         event.preventDefault();
