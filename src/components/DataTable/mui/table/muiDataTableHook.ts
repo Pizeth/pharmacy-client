@@ -89,9 +89,7 @@ export const {
    */
   defaultColumn: {
     size: 180,
-
     minSize: 64,
-
     maxSize: 600,
   },
 });

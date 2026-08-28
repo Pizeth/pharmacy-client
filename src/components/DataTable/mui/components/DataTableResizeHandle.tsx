@@ -158,22 +158,13 @@
 
 // src/components/DataTable/mui/components/DataTableResizeHandle.tsx
 
-"use client";
+("use client");
 
-import {
-  Box,
-  useTheme,
-} from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 
-import type {
-  KeyboardEvent,
-} from "react";
+import type { KeyboardEvent } from "react";
 
-import {
-  useMuiDataTableContext,
-  useMuiDataTableHeaderContext,
-} from "../table";
-
+import { useMuiDataTableContext, useMuiDataTableHeaderContext } from "../table";
 
 /**
  * TanStack's stock default minimum column size.
@@ -183,32 +174,24 @@ import {
  *
  * The actual committed size is still owned and constrained by TanStack.
  */
-const DEFAULT_MIN_COLUMN_SIZE =
-  20;
-
+const DEFAULT_MIN_COLUMN_SIZE = 20;
 
 /**
  * TanStack's stock default maximum column size.
  */
-const DEFAULT_MAX_COLUMN_SIZE =
-  Number.MAX_SAFE_INTEGER;
-
+const DEFAULT_MAX_COLUMN_SIZE = Number.MAX_SAFE_INTEGER;
 
 /**
  * Normal keyboard resize increment in pixels.
  *
  * Eight pixels aligns naturally with MUI's default spacing grid.
  */
-const KEYBOARD_RESIZE_STEP =
-  8;
-
+const KEYBOARD_RESIZE_STEP = 8;
 
 /**
  * Shift + Arrow uses a larger resize increment.
  */
-const KEYBOARD_RESIZE_LARGE_STEP =
-  32;
-
+const KEYBOARD_RESIZE_LARGE_STEP = 32;
 
 /**
  * Clamp a requested width to the column's configured sizing range.
@@ -218,15 +201,8 @@ function clampColumnSize(
   minSize: number,
   maxSize: number,
 ): number {
-  return Math.min(
-    maxSize,
-    Math.max(
-      minSize,
-      size,
-    ),
-  );
+  return Math.min(maxSize, Math.max(minSize, size));
 }
-
 
 /**
  * Keep committed keyboard sizes at a maximum of two decimal places.
@@ -234,18 +210,9 @@ function clampColumnSize(
  * Pointer resizing can produce fractional sizes, so we deliberately
  * avoid forcing all sizes to integers.
  */
-function normalizeColumnSize(
-  size: number,
-): number {
-  return (
-    Math.round(
-      size *
-        100,
-    ) /
-    100
-  );
+function normalizeColumnSize(size: number): number {
+  return Math.round(size * 100) / 100;
 }
-
 
 /**
  * Resolve a human-readable column label for accessibility.
@@ -260,40 +227,22 @@ function normalizeColumnSize(
  * a dependency from the low-level resize handle to that component.
  */
 function getResizeColumnLabel(
-  column: ReturnType<
-    typeof useMuiDataTableHeaderContext
-  >["column"],
+  column: ReturnType<typeof useMuiDataTableHeaderContext>["column"],
 ): string {
-  const meta =
-    column
-      .columnDef
-      .meta;
+  const meta = column.columnDef.meta;
 
-
-  if (
-    meta?.label
-  ) {
+  if (meta?.label) {
     return meta.label;
   }
 
+  const header = column.columnDef.header;
 
-  const header =
-    column
-      .columnDef
-      .header;
-
-
-  if (
-    typeof header ===
-    "string"
-  ) {
+  if (typeof header === "string") {
     return header;
   }
 
-
   return column.id;
 }
-
 
 /**
  * Interactive resize handle for one leaf header.
@@ -330,96 +279,54 @@ function getResizeColumnLabel(
  * handle in each writing direction.
  */
 export function DataTableResizeHandle() {
-  const table =
-    useMuiDataTableContext();
+  const table = useMuiDataTableContext();
 
+  const header = useMuiDataTableHeaderContext();
 
-  const header =
-    useMuiDataTableHeaderContext();
+  const theme = useTheme();
 
-
-  const theme =
-    useTheme();
-
-
-  const column =
-    header.column;
-
+  const column = header.column;
 
   /**
-   * Group headers must not own independent resize handles in our
-   * renderer.
+   * Group headers must not own independent resize handles in renderer.
    *
    * Their width is derived from their leaf columns.
    */
-  const leafHeader =
-    header.subHeaders.length ===
-    0;
+  const leafHeader = header.subHeaders.length === 0;
 
+  const canResize = leafHeader && column.getCanResize();
 
-  const canResize =
-    leafHeader &&
-    column.getCanResize();
-
-
-  if (
-    !canResize
-  ) {
+  if (!canResize) {
     return null;
   }
 
+  const resizeHandler = header.getResizeHandler();
 
-  const resizeHandler =
-    header.getResizeHandler();
-
-
-  const label =
-    getResizeColumnLabel(
-      column,
-    );
-
+  const label = getResizeColumnLabel(column);
 
   return (
     <table.Subscribe
-      selector={
-        state => ({
-          /**
-           * Re-render when committed widths change.
-           */
-          columnSizing:
-            state.columnSizing,
+      selector={(state) => ({
+        /**
+         * Re-render when committed widths change.
+         */
+        columnSizing: state.columnSizing,
 
-          /**
-           * Re-render while pointer/touch resizing begins, moves,
-           * and ends.
-           */
-          columnResizing:
-            state.columnResizing,
-        })
-      }
+        /**
+         * Re-render while pointer/touch resizing begins, moves,
+         * and ends.
+         */
+        columnResizing: state.columnResizing,
+      })}
     >
       {() => {
-        const size =
-          column.getSize();
+        const size = column.getSize();
 
+        const isResizing = column.getIsResizing();
 
-        const isResizing =
-          column.getIsResizing();
+        const minSize = column.columnDef.minSize ?? DEFAULT_MIN_COLUMN_SIZE;
 
-
-        const minSize =
-          column
-            .columnDef
-            .minSize ??
-          DEFAULT_MIN_COLUMN_SIZE;
-
-
-        const maxSize =
-          column
-            .columnDef
-            .maxSize ??
-          DEFAULT_MAX_COLUMN_SIZE;
-
+        const maxSize = column.columnDef.maxSize ?? DEFAULT_MAX_COLUMN_SIZE;
 
         /**
          * TanStack's columnResizeDirection is already synchronized
@@ -429,11 +336,7 @@ export function DataTableResizeHandle() {
          * even if a lower-level consumer omits that option.
          */
         const resizeDirection =
-          table
-            .options
-            .columnResizeDirection ??
-          theme.direction;
-
+          table.options.columnResizeDirection ?? theme.direction;
 
         /**
          * Commit one keyboard size adjustment.
@@ -451,203 +354,105 @@ export function DataTableResizeHandle() {
          *
          * A keyboard press has no corresponding drag lifecycle.
          */
-        const resizeBy =
-          (
-            delta:
-              number,
-          ): void => {
-            const currentSize =
-              column.getSize();
+        const resizeBy = (delta: number): void => {
+          const currentSize = column.getSize();
 
+          const nextSize = normalizeColumnSize(
+            clampColumnSize(currentSize + delta, minSize, maxSize),
+          );
 
-            const nextSize =
-              normalizeColumnSize(
-                clampColumnSize(
-                  currentSize +
-                    delta,
+          if (nextSize === currentSize) {
+            return;
+          }
 
-                  minSize,
+          table.setColumnSizing((previous) => ({
+            ...previous,
 
-                  maxSize,
-                ),
-              );
+            [column.id]: nextSize,
+          }));
+        };
 
+        const handleKeyDown = (event: KeyboardEvent<HTMLSpanElement>): void => {
+          if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+            return;
+          }
 
-            if (
-              nextSize ===
-              currentSize
-            ) {
-              return;
-            }
+          event.preventDefault();
 
+          event.stopPropagation();
 
-            table.setColumnSizing(
-              previous => ({
-                ...previous,
+          const step = event.shiftKey
+            ? KEYBOARD_RESIZE_LARGE_STEP
+            : KEYBOARD_RESIZE_STEP;
 
-                [column.id]:
-                  nextSize,
-              }),
-            );
-          };
+          /**
+           * The handle lives on logical inline-end.
+           *
+           * LTR:
+           *
+           *     column |handle
+           *
+           * ArrowRight physically moves the handle outward and
+           * therefore increases width.
+           *
+           * RTL:
+           *
+           *     handle| column
+           *
+           * ArrowLeft physically moves the handle outward and
+           * therefore increases width.
+           */
+          const increasing =
+            resizeDirection === "rtl"
+              ? event.key === "ArrowLeft"
+              : event.key === "ArrowRight";
 
-
-        const handleKeyDown =
-          (
-            event:
-              KeyboardEvent<HTMLSpanElement>,
-          ): void => {
-            if (
-              event.key !==
-                "ArrowLeft" &&
-              event.key !==
-                "ArrowRight"
-            ) {
-              return;
-            }
-
-
-            event.preventDefault();
-
-            event.stopPropagation();
-
-
-            const step =
-              event.shiftKey
-                ? KEYBOARD_RESIZE_LARGE_STEP
-                : KEYBOARD_RESIZE_STEP;
-
-
-            /**
-             * The handle lives on logical inline-end.
-             *
-             * LTR:
-             *
-             *     column |handle
-             *
-             * ArrowRight physically moves the handle outward and
-             * therefore increases width.
-             *
-             * RTL:
-             *
-             *     handle| column
-             *
-             * ArrowLeft physically moves the handle outward and
-             * therefore increases width.
-             */
-            const increasing =
-              resizeDirection ===
-              "rtl"
-                ? event.key ===
-                  "ArrowLeft"
-                : event.key ===
-                  "ArrowRight";
-
-
-            resizeBy(
-              increasing
-                ? step
-                : -step,
-            );
-          };
-
+          resizeBy(increasing ? step : -step);
+        };
 
         return (
           <Box
             component="span"
-
             role="separator"
-
-            tabIndex={
-              0
-            }
-
-            aria-label={
-              `Resize ${label}`
-            }
-
+            tabIndex={0}
+            aria-label={`Resize ${label}`}
             aria-orientation="vertical"
-
-            aria-valuemin={
-              minSize
-            }
-
-            aria-valuemax={
-              maxSize
-            }
-
-            aria-valuenow={
-              Math.round(
-                size,
-              )
-            }
-
-            aria-valuetext={
-              `${Math.round(
-                size,
-              )} pixels`
-            }
-
+            aria-valuemin={minSize}
+            aria-valuemax={maxSize}
+            aria-valuenow={Math.round(size)}
+            aria-valuetext={`${Math.round(size)} pixels`}
             aria-keyshortcuts="ArrowLeft ArrowRight Shift+ArrowLeft Shift+ArrowRight"
-
-            data-column-resize-handle={
-              column.id
-            }
-
-            data-resizing={
-              isResizing
-                ? "true"
-                : undefined
-            }
-
+            data-column-resize-handle={column.id}
+            data-resizing={isResizing ? "true" : undefined}
             /**
              * TanStack owns pointer/touch resize lifecycle.
              */
-            onMouseDown={
-              resizeHandler
-            }
-
-            onTouchStart={
-              resizeHandler
-            }
-
+            onMouseDown={resizeHandler}
+            onTouchStart={resizeHandler}
             /**
              * Keyboard resizing commits directly into columnSizing.
              */
-            onKeyDown={
-              handleKeyDown
-            }
-
+            onKeyDown={handleKeyDown}
             /**
              * Pointer users retain the familiar double-click reset.
              *
              * Keyboard users can reach the existing "Reset width"
              * action through the column menu.
              */
-            onDoubleClick={
-              event => {
-                event.preventDefault();
+            onDoubleClick={(event) => {
+              event.preventDefault();
 
-                event.stopPropagation();
+              event.stopPropagation();
 
-
-                column.resetSize();
-              }
-            }
-
+              column.resetSize();
+            }}
             sx={{
               /**
                * Fill the complete header-cell height.
                */
-              position:
-                "absolute",
-
-              top:
-                0,
-
-              bottom:
-                0,
-
+              position: "absolute",
+              top: 0,
+              bottom: 0,
 
               /**
                * Keep the hit area centered over the logical
@@ -655,132 +460,67 @@ export function DataTableResizeHandle() {
                *
                * This works naturally in both LTR and RTL.
                */
-              insetInlineEnd:
-                -4,
-
-              width:
-                8,
-
+              insetInlineEnd: -4,
+              width: 8,
 
               /**
                * The resize target must remain above normal header
                * content.
                */
-              zIndex:
-                5,
-
-
-              cursor:
-                "col-resize",
-
-              touchAction:
-                "none",
-
-              userSelect:
-                "none",
-
-              WebkitUserSelect:
-                "none",
-
+              zIndex: 5,
+              cursor: "col-resize",
+              touchAction: "none",
+              userSelect: "none",
+              WebkitUserSelect: "none",
 
               /**
                * Do not add visible layout width.
                */
-              display:
-                "block",
-
+              display: "block",
 
               /**
                * Narrow visual resize rule inside the larger 8px hit
                * target.
                */
               "&::after": {
-                content:
-                  '""',
+                content: '""',
+                position: "absolute",
+                top: "20%",
+                bottom: "20%",
+                insetInlineStart: "50%",
+                width: 2,
+                borderRadius: 1,
+                transform: "translateX(-50%)",
+                backgroundColor: isResizing ? "primary.main" : "divider",
+                opacity: isResizing ? 1 : 0.65,
+                transition: theme.transitions.create(
+                  ["background-color", "opacity"],
 
-                position:
-                  "absolute",
-
-                top:
-                  "20%",
-
-                bottom:
-                  "20%",
-
-                insetInlineStart:
-                  "50%",
-
-                width:
-                  2,
-
-                borderRadius:
-                  1,
-
-                transform:
-                  "translateX(-50%)",
-
-                backgroundColor:
-                  isResizing
-                    ? "primary.main"
-                    : "divider",
-
-                opacity:
-                  isResizing
-                    ? 1
-                    : 0.65,
-
-                transition:
-                  theme.transitions.create(
-                    [
-                      "background-color",
-                      "opacity",
-                    ],
-
-                    {
-                      duration:
-                        theme
-                          .transitions
-                          .duration
-                          .shortest,
-                    },
-                  ),
+                  {
+                    duration: theme.transitions.duration.shortest,
+                  },
+                ),
               },
-
 
               "&:hover::after": {
-                backgroundColor:
-                  "primary.main",
-
-                opacity:
-                  1,
+                backgroundColor: "primary.main",
+                opacity: 1,
               },
-
 
               /**
                * Keyboard focus must be obvious even though the
                * physical target is intentionally narrow.
                */
               "&:focus-visible": {
-                outline:
-                  "2px solid",
-
-                outlineColor:
-                  "primary.main",
-
-                outlineOffset:
-                  1,
-
-                borderRadius:
-                  0.5,
+                outline: "2px solid",
+                outlineColor: "primary.main",
+                outlineOffset: 1,
+                borderRadius: 0.5,
               },
 
-
               "&:focus-visible::after": {
-                backgroundColor:
-                  "primary.main",
-
-                opacity:
-                  1,
+                backgroundColor: "primary.main",
+                opacity: 1,
               },
             }}
           />

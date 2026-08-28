@@ -16,6 +16,7 @@ import type { DataTableSelectionBarConfig } from "./selection";
 import { DataTablePagination } from "./pagination";
 import type { DataTablePaginationConfig } from "./pagination";
 import { DataTableShell } from "./DataTableShell";
+import { DataTableRefreshingIndicator } from "./states";
 import { DataTableToolbar } from "./toolbar";
 import type { DataTableToolbarConfig } from "./toolbar";
 import { DataTableFilterDisplayProvider } from "../filter-display";
@@ -80,6 +81,26 @@ export interface DataTableProps<TData extends RowData>
    * An object customizes the pagination renderer.
    */
   readonly pagination?: false | DataTablePaginationConfig;
+
+  /**
+   * Non-blocking server/background refresh state.
+   *
+   * Unlike table meta.loading, this does NOT replace the current rows.
+   *
+   * Default: false.
+   */
+  readonly refreshing?: boolean;
+
+  /**
+   * Optional real background-request progress in the range 0..100.
+   *
+   * When omitted while `refreshing` is true, the refresh indicator uses
+   * a YouTube/NProgress-style simulated trickle.
+   *
+   * This value is presentation-only and is never stored in TanStack
+   * table state.
+   */
+  readonly refreshProgress?: number;
 }
 
 /**
@@ -117,6 +138,8 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     containerProps,
     toolbar = true,
     renderDetailPanel,
+    refreshing = false,
+    refreshProgress,
     selectionBar = false,
     pagination = {},
     density,
@@ -179,6 +202,10 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                     minWidth: 0,
                   }}
                 >
+                  <DataTableRefreshingIndicator
+                    refreshing={refreshing}
+                    progress={refreshProgress}
+                  />
                   <TableContainer
                     {...containerProps}
                     // sx={[

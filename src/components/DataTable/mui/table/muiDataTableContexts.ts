@@ -7,7 +7,25 @@ import { createTableHookContexts } from "@tanstack/react-table";
 import type { MuiDataTableFeatures } from "../features";
 
 /**
- * Dedicated TanStack context family for the MUI DataTable.
+ * Single dedicated TanStack React context family for the entire
+ * MUI DataTable implementation.
+ *
+ * IMPORTANT:
+ *
+ * createTableHookContexts() must only be called ONCE for this family.
+ *
+ * Every Context object and every low-level context hook exported by
+ * this module must belong to the same context namespace.
+ *
+ * Otherwise we could end up with:
+ *
+ *   AppTable providing TableContext A
+ *
+ * while:
+ *
+ *   useScopedTableContext() reads TableContext B
+ *
+ * which would make the hook unable to see the table provider.
  *
  * Using scoped contexts instead of TanStack's shared default contexts so
  * nested/independent table families cannot accidentally read one another's
@@ -27,9 +45,51 @@ const muiDataTableHookContexts =
   createTableHookContexts<MuiDataTableFeatures>();
 
 /**
- * Low-level scoped context hooks.
+ * ------------------------------------------------------------------
+ * Actual React Context objects
+ * ------------------------------------------------------------------
  *
- * These are primarily intended for MUI DataTable infrastructure components.
+ * These are supplied to createTableHook() in muiDataTableHook.ts.
+ *
+ * createTableHook() uses them when constructing:
+ *
+ *   <table.AppTable>
+ *   <table.AppCell>
+ *   <table.AppHeader>
+ *   <table.AppFooter>
+ *
+ * and their corresponding richer hooks.
+ */
+export const muiDataTableContext = muiDataTableHookContexts.tableContext;
+
+export const muiDataTableCellContext = muiDataTableHookContexts.cellContext;
+
+export const muiDataTableHeaderContext = muiDataTableHookContexts.headerContext;
+
+/**
+ * ------------------------------------------------------------------
+ * Low-level scoped hooks
+ * ------------------------------------------------------------------
+ *
+ * These hooks know:
+ *
+ *   TFeatures = MuiDataTableFeatures
+ *
+ * and read directly from our isolated MUI context family.
+ *
+ * They do NOT know about component maps registered later through
+ * createTableHook().
+ *
+ * Most normal MUI DataTable components should therefore prefer the
+ * richer hooks exported by muiDataTableHook.ts:
+ *
+ *   useMuiDataTableContext
+ *   useMuiDataTableCellContext
+ *   useMuiDataTableHeaderContext
+ *
+ * These scoped hooks remain useful for infrastructure that needs
+ * direct access to the underlying feature-bound contexts without
+ * depending on the higher-level component registration.
  */
 export const useMuiDataTableScopedTableContext =
   muiDataTableHookContexts.useTableContext;
@@ -39,25 +99,3 @@ export const useMuiDataTableScopedCellContext =
 
 export const useMuiDataTableScopedHeaderContext =
   muiDataTableHookContexts.useHeaderContext;
-
-/**
- * Isolated TanStack React contexts for the MUI DataTable family.
- *
- * We intentionally avoid TanStack's shared module-level contexts.
- *
- * This gives our DataTable family its own:
- *
- * - table context
- * - cell context
- * - header context
- *
- * and prevents unrelated createTableHook families from sharing the
- * same context namespace.
- */
-export const {
-  tableContext: muiDataTableContext,
-
-  cellContext: muiDataTableCellContext,
-
-  headerContext: muiDataTableHeaderContext,
-} = createTableHookContexts<MuiDataTableFeatures>();
