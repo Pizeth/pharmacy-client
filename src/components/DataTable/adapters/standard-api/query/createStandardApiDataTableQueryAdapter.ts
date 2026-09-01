@@ -3,13 +3,83 @@
 import type { DataTableServerQueryAdapter } from "../../../mui/server-data";
 import type {
   DataTableSemanticServerQueryAdapter,
+  DataTableServerFilterDescriptor,
   DataTableServerSemanticQuery,
+  DataTableServerSortDescriptor,
 } from "../../../mui/server-query";
-import type { StandardApiDataTableQueryRequest } from "./types";
+import type {
+  StandardApiDataTableFilter,
+  StandardApiDataTableQueryRequest,
+  StandardApiDataTableSort,
+} from "./types";
 
 /**
- * Convert our backend-independent semantic query into the application's
- * Standard API wire contract.
+ * Convert one semantic sorting descriptor into the public Standard API
+ * wire representation.
+ *
+ * Keeping this conversion explicit prevents the HTTP contract from
+ * being silently coupled to our internal semantic-query types.
+ */
+function createStandardApiSort(
+  sort: DataTableServerSortDescriptor,
+): StandardApiDataTableSort {
+  return {
+    field: sort.field,
+    direction: sort.direction,
+  };
+}
+
+/**
+ * Convert one internal semantic filter into the Standard API wire
+ * representation.
+ *
+ * The switch is deliberately exhaustive over the currently supported
+ * operator family.
+ */
+function createStandardApiFilter(
+  filter: DataTableServerFilterDescriptor,
+): StandardApiDataTableFilter {
+  switch (filter.operator) {
+    case "equals":
+      return {
+        field: filter.field,
+        operator: "equals",
+        value: filter.value,
+      };
+
+    case "contains":
+      return {
+        field: filter.field,
+        operator: "contains",
+        value: filter.value,
+      };
+
+    case "gte":
+      return {
+        field: filter.field,
+        operator: "gte",
+        value: filter.value,
+      };
+
+    case "lte":
+      return {
+        field: filter.field,
+        operator: "lte",
+        value: filter.value,
+      };
+
+    case "in":
+      return {
+        field: filter.field,
+        operator: "in",
+        value: [...filter.value],
+      };
+  }
+}
+
+/**
+ * Convert our backend-independent semantic DataTable query into the
+ * application's Standard API request contract.
  *
  * The semantic layer contains:
  *
@@ -19,15 +89,20 @@ import type { StandardApiDataTableQueryRequest } from "./types";
  *   search.term
  *   search.fields
  *
- * The Standard API deliberately strips search.fields because searchable
- * fields are server-owned policy.
+ * Important security boundary:
+ *
+ * semanticQuery.search.fields
+ *
+ * is deliberately NOT copied to the HTTP request.
+ *
+ * Searchable fields remain server-owned policy.
  */
 export function createStandardApiDataTableQueryRequest(
-  query: DataTableServerSemanticQuery,
+  semanticQuery: DataTableServerSemanticQuery,
 ): StandardApiDataTableQueryRequest {
-  return {
-    page: query.pagination.page,
-    pageSize: query.pagination.pageSize,
+  const baseRequest = {
+    page: semanticQuery.pagination.page,
+    pageSize: semanticQuery.pagination.pageSize,
 
     /**
      * Copy arrays instead of returning the semantic query's readonly
@@ -36,19 +111,42 @@ export function createStandardApiDataTableQueryRequest(
      * This produces a clean plain request object at the transport
      * boundary.
      */
-    sorting: [...query.sorting],
+    sorting: semanticQuery.sorting.map(createStandardApiSort),
 
-    filters: [...query.filters],
-    search: query.search
-      ? {
-          term: query.search.term,
-        }
-      : undefined,
+    filters: semanticQuery.filters.map(createStandardApiFilter),
+
+    // search: semanticQuery.search
+    //   ? {
+    //       term: semanticQuery.search.term,
+    //     }
+    //   : undefined,
+  } satisfies Omit<StandardApiDataTableQueryRequest, "search">;
+
+  /**
+   * Avoid serializing:
+   *
+   *   search: undefined
+   *
+   * The property simply does not exist when no global search is active.
+   */
+  if (!semanticQuery.search) {
+    return baseRequest;
+  }
+
+  return {
+    ...baseRequest,
+
+    search: {
+      term: semanticQuery.search.term,
+    },
   };
 }
 
 /**
- * Compose:
+ * Compose a resource semantic-query adapter with the Standard API
+ * transport adapter.
+ *
+ * Result:
  *
  *   DataTableServerQueryState
  *
