@@ -27,10 +27,12 @@ export default function ApiTester() {
   );
   const [response, setResponse] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<number | null>(null);
 
   const handleSend = async () => {
     setLoading(true);
     setResponse("");
+    setStatus(null);
 
     try {
       const parsedHeaders = headers ? JSON.parse(headers) : {};
@@ -45,13 +47,50 @@ export default function ApiTester() {
       }
 
       const res = await fetch(url, options);
+      setStatus(res.status);
       const data = await res.json();
 
       setResponse(JSON.stringify(data, null, 2));
-    } catch (err: any) {
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Invalid request or JSON";
+      setResponse(JSON.stringify({ error: message }, null, 2));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCheckSession = async () => {
+    setLoading(true);
+
+    setStatus(null);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/get-session`,
+        {
+          method: "GET",
+
+          credentials: "include",
+        },
+      );
+
+      setStatus(res.status);
+
+      const data: unknown = await res.json();
+
+      setResponse(JSON.stringify(data, null, 2));
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to read the current session";
+
       setResponse(
         JSON.stringify(
-          { error: err.message || "Invalid Request or JSON" },
+          {
+            error: message,
+          },
           null,
           2,
         ),
@@ -97,6 +136,14 @@ export default function ApiTester() {
           >
             {loading ? <CircularProgress size={24} color="inherit" /> : "Send"}
           </Button>
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={handleCheckSession}
+            disabled={loading}
+          >
+            Session
+          </Button>
         </Box>
 
         {/* Inputs Section */}
@@ -130,6 +177,17 @@ export default function ApiTester() {
           </Grid>
         </Grid>
       </Paper>
+
+      {status !== null && (
+        <Typography
+          variant="subtitle2"
+          sx={{
+            mb: 1,
+          }}
+        >
+          HTTP {status}
+        </Typography>
+      )}
 
       {/* Response Panel */}
       <Paper sx={{ p: 3, bgcolor: "#1e1e1e", color: "#fff" }}>
