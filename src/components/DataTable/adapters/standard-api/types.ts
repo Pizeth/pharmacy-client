@@ -21,9 +21,20 @@ export interface StandardApiResponse<TData> {
 }
 
 /**
- * Pagination metadata returned by the current backend DBHelper.
+ * Backend pagination metadata.
  *
- * currentPage is ONE-BASED.
+ * Important:
+ *
+ * backend pages are 1-based:
+ *
+ *   page = 1
+ *
+ * TanStack pagination remains:
+ *
+ *   pageIndex = 0
+ *
+ * That translation belongs to our generic DataTable query layer,
+ * not this resource.
  */
 export interface StandardApiPaginationMetadata {
   readonly currentPage: number;

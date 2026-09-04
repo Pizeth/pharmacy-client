@@ -34,11 +34,18 @@ export const {
   useAppTable: useMuiDataTable,
 
   /**
-   * Feature-bound, component-aware column helper.
+   * Feature-bound, component-aware MUI DataTable column helper.
    *
-   * During Phase 1.4 no custom components are registered yet,
-   * but this is still preferable to using createColumnHelper directly
-   * because the feature type is permanently bound here.
+   * `createTableHook()` exposes this property as:
+   *
+   *   createAppColumnHelper
+   *
+   * but our configured MUI family deliberately exports it as:
+   *
+   *   createMuiDataTableColumnHelper
+   *
+   * Application/resource code should use the MUI-specific alias rather
+   * than importing TanStack's generic createColumnHelper directly.
    */
   createAppColumnHelper: createMuiDataTableColumnHelper,
 

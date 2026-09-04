@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Paper,
@@ -13,11 +13,15 @@ import {
   Grid,
   CircularProgress,
 } from "@mui/material";
+import { API_URL } from "@/types/constants";
+import {
+  loadTranslationKeyDataTableResult,
+  queryTranslationKeys,
+  translationKeyDataTableServerAdapter,
+} from "@/features/i18n/translation-keys";
 
-export default function ApiTester() {
-  const [url, setUrl] = useState(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/v1/i18n/keys/query`,
-  );
+export default async function ApiTester() {
+  const [url, setUrl] = useState(`${API_URL}/api/v1/i18n/keys/query`);
   const [method, setMethod] = useState("POST");
   const [headers, setHeaders] = useState(
     '{\n  "Content-Type": "application/json"\n}',
@@ -28,6 +32,61 @@ export default function ApiTester() {
   const [response, setResponse] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<number | null>(null);
+
+  const request = translationKeyDataTableServerAdapter.createRequest({
+    pagination: {
+      pageIndex: 1,
+      pageSize: 10,
+    },
+
+    sorting: [
+      {
+        id: "category",
+        desc: false,
+      },
+
+      {
+        id: "key",
+        desc: true,
+      },
+    ],
+
+    columnFilters: [
+      {
+        id: "category",
+        value: 2,
+      },
+
+      {
+        id: "locale",
+        value: "km",
+      },
+
+      {
+        id: "key",
+        value: "auth",
+      },
+    ],
+
+    globalFilter: "Login",
+  });
+
+  console.log(request);
+
+  const result = await loadTranslationKeyDataTableResult({
+    pagination: {
+      pageIndex: 0,
+      pageSize: 25,
+    },
+
+    sorting: [],
+
+    columnFilters: [],
+
+    globalFilter: "Login",
+  });
+
+  console.log(result);
 
   const handleSend = async () => {
     setLoading(true);
@@ -66,14 +125,11 @@ export default function ApiTester() {
     setStatus(null);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/get-session`,
-        {
-          method: "GET",
+      const res = await fetch(`${API_URL}/api/auth/get-session`, {
+        method: "GET",
 
-          credentials: "include",
-        },
-      );
+        credentials: "include",
+      });
 
       setStatus(res.status);
 
@@ -117,6 +173,7 @@ export default function ApiTester() {
             <MenuItem value="GET">GET</MenuItem>
             <MenuItem value="POST">POST</MenuItem>
             <MenuItem value="PUT">PUT</MenuItem>
+            <MenuItem value="PATCH">PATCH</MenuItem>
             <MenuItem value="DELETE">DELETE</MenuItem>
           </Select>
 

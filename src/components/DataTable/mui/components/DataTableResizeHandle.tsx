@@ -1,6 +1,6 @@
-// src/components/DataTable/mui/components/DataTableResizeHandle.tsx
-
 ("use client");
+
+// src/components/DataTable/mui/components/DataTableResizeHandle.tsx
 
 import { Box, useTheme } from "@mui/material";
 
