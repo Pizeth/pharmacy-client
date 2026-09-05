@@ -13,6 +13,7 @@ import type {
 import { translationKeyColumns } from "../columns";
 import type { TranslationKey } from "../schemas";
 import { useTranslationKeyDataTableRequest } from "./useTranslationKeyDataTableRequest";
+import { useTheme } from "@mui/material";
 
 /**
  * Return type of the first real TranslationKey server-backed table
@@ -38,11 +39,21 @@ export interface UseTranslationKeyDataTableResult {
 
 /**
  * Complete TranslationKey server-backed DataTable controller.
+ *
+ * This is where the infrastructure built throughout Phase 1.7 finally
+ * converges into one real TanStack v9 table instance.
+ *
+ * We deliberately allow TypeScript to infer the return type.
+ *
+ * In particular, we do not manually recreate the complicated
+ * createTableHook() feature-bound table type.
  */
 export function useTranslationKeyDataTable(): UseTranslationKeyDataTableResult {
+  const theme = useTheme();
+
   /**
    * --------------------------------------------------------------
-   * 1. Query state
+   * 1. Server query state
    * --------------------------------------------------------------
    *
    * TanStack-facing pagination is zero-based:
@@ -72,6 +83,14 @@ export function useTranslationKeyDataTable(): UseTranslationKeyDataTableResult {
       columnFilters: [],
       globalFilter: "",
     },
+
+    /**
+     * These are already true by default, but listing them here makes
+     * this resource's server behavior explicit.
+     */
+    resetPageOnSortingChange: true,
+    resetPageOnColumnFiltersChange: true,
+    resetPageOnGlobalFilterChange: true,
   });
 
   /**
@@ -82,9 +101,19 @@ export function useTranslationKeyDataTable(): UseTranslationKeyDataTableResult {
   const request = useTranslationKeyDataTableRequest(query.state);
 
   /**
-   * --------------------------------------------------------------
-   * 3. Normalize request lifecycle for DataTable
-   * --------------------------------------------------------------
+   * ================================================================
+   * 3. Generic server-result lifecycle
+   * ================================================================
+   *
+   * This gives us:
+   *
+   *   rows
+   *   pagination
+   *   initial loading
+   *   background refresh
+   *   previous-result preservation
+   *   blocking error
+   *   refresh error
    */
   const server = useDataTableServerResult<TranslationKey>({
     query: query.state,
@@ -101,9 +130,24 @@ export function useTranslationKeyDataTable(): UseTranslationKeyDataTableResult {
   });
 
   /**
-   * --------------------------------------------------------------
-   * 4. Convert server lifecycle + controller into TanStack options
-   * --------------------------------------------------------------
+   * ================================================================
+   * 4. Generic server -> TanStack binding
+   * ================================================================
+   *
+   * Produces:
+   *
+   *   data
+   *   state
+   *   onPaginationChange
+   *   onSortingChange
+   *   onColumnFiltersChange
+   *   onGlobalFilterChange
+   *
+   *   manualPagination: true
+   *   manualSorting: true
+   *   manualFiltering: true
+   *
+   *   pageCount
    */
   const binding = createDataTableServerTableBinding<TranslationKey>({
     query,
@@ -138,7 +182,53 @@ export function useTranslationKeyDataTable(): UseTranslationKeyDataTableResult {
      */
     enableSorting: true,
 
-    enableColumnFilters: true,
+    /**
+     * Backend supports up to 10 sorting descriptors.
+     *
+     * Keep the client-side capability aligned with the server
+     * structural validation limit.
+     */
+    enableMultiSort: true,
+
+    maxMultiSortColCount: 10,
+
+    /**
+     * Global search is already safe:
+     *
+     * UI string
+     *   ↓
+     * semantic resource capability
+     *   ↓
+     * Standard API sends only search.term
+     *   ↓
+     * Nest owns actual searchable fields
+     */
+    enableGlobalFilter: true,
+
+    /**
+     * TEMPORARY FOR 1.7.10.4
+     *
+     * Keep column-filter controls disabled until Phase 1.7.10.5,
+     * where we will bind the correct UI variants:
+     *
+     *   ID          -> numeric
+     *   Key         -> text
+     *   Description -> text
+     *   Category    -> category select returning NUMBER
+     *   Locale      -> locale select returning STRING
+     *
+     * The server infrastructure itself is already ready.
+     */
+    enableColumnFilters: false,
+
+    /**
+     * TanStack logical resize direction should agree with the MUI
+     * theme.
+     *
+     * Your renderer explicitly notes that this belongs at table
+     * creation time rather than being mutated by the renderer.
+     */
+    columnResizeDirection: theme.direction,
 
     /**
      * Server-backed tables should never apply local filtering or
@@ -155,9 +245,24 @@ export function useTranslationKeyDataTable(): UseTranslationKeyDataTableResult {
   });
 
   return {
+    /**
+     * Completed MUI-family TanStack v9 table.
+     */
     table,
+
+    /**
+     * Controlled server query state.
+     */
     query,
+
+    /**
+     * Presentation-ready server lifecycle.
+     */
     server,
+
+    /**
+     * Explicit reload without changing query state.
+     */
     refresh: request.refresh,
   };
 }

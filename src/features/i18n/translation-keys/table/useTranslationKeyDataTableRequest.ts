@@ -75,21 +75,21 @@ function isAbortError(error: unknown): boolean {
  *
  * Responsibilities:
  *
- *   query changes
- *       ↓
- *   cancel obsolete request
- *       ↓
- *   execute resource loader
- *       ↓
- *   expose primitive request state
+ * DataTableServerQueryState
+ *        ↓
+ * cancel obsolete request
+ *        ↓
+ * loadTranslationKeyDataTableResult()
+ *        ↓
+ * expose result/loading/fetching/error
  *
+ * It deliberately knows nothing about:
  *
- * It deliberately does NOT:
- *
- * - create the TanStack table
- * - derive table presentation lifecycle
- * - adapt HTTP response shapes
- * - know about MUI
+ * - MUI rendering
+ * - table creation
+ * - pagination widgets
+ * - preserved-result presentation
+ * - toolbar state
  *
  * Those responsibilities already belong to other layers.
  */
@@ -100,20 +100,27 @@ export function useTranslationKeyDataTableRequest(
     DataTableServerResult<TranslationKey> | undefined
   >(undefined);
 
+  /**
+   * Start as true.
+   *
+   * The first request is guaranteed to begin after mount. Starting at
+   * false would allow one initial render where the table appears empty
+   * before the effect has a chance to mark the request as fetching.
+   */
   const [fetching, setFetching] = useState(false);
 
   const [error, setError] = useState<unknown>(undefined);
 
   /**
-   * Whether at least one successful response has been received.
-   *
-   * This does not need to trigger rendering by itself because every
-   * transition to successful state also updates `result`.
+   * Once true, later requests should be treated as refresh/replacement
+   * requests rather than blocking initial loads.
    */
   const hasSuccessfulResultRef = useRef(false);
 
   /**
    * Monotonically increasing request identifier.
+   *
+   * Additional protection against stale requests committing state.
    *
    * AbortController already cancels old fetches, but the identifier
    * also guarantees that an obsolete request cannot commit state even
@@ -138,11 +145,13 @@ export function useTranslationKeyDataTableRequest(
     requestIdRef.current = requestId;
 
     /**
-     * The current result is intentionally cleared while a replacement
-     * request runs.
+     * Remove the current result while its replacement is loading.
      *
-     * useDataTableServerResult() already owns previous-result
-     * preservation, so we should not duplicate that concern here.
+     * This is intentional.
+     *
+     * useDataTableServerResult() already stores and exposes the
+     * previous successful normalized result, so previous-result
+     * preservation must not be duplicated here.
      */
     setResult(undefined);
 

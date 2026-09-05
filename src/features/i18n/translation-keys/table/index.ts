@@ -1,3 +1,5 @@
+export { TranslationKeyTable } from "./TranslationKeyTable";
+
 export { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
 
 export { useTranslationKeyDataTableRequest } from "./useTranslationKeyDataTableRequest";

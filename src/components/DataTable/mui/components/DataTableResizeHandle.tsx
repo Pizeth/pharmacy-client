@@ -1,4 +1,4 @@
-("use client");
+"use client";
 
 // src/components/DataTable/mui/components/DataTableResizeHandle.tsx
 
