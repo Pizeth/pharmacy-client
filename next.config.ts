@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
     "*.local-origin.dev",
     "local-store.razeth.com",
     "*.local-store.razeth.com",
+    "local-hr.razeth.com",
+    "*.local-hr.razeth.com",
   ],
   images: {
     remotePatterns: [
