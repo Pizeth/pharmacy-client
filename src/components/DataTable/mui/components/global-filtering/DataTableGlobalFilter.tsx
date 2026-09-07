@@ -1,5 +1,7 @@
 "use client";
 
+// src/components/DataTable/mui/components/global-filtering/DataTableGlobalFilter.tsx
+
 import { IconButton, InputAdornment, TextField, Tooltip } from "@mui/material";
 import { Close, SearchOutlined } from "@mui/icons-material";
 import type { RowData } from "@tanstack/table-core";

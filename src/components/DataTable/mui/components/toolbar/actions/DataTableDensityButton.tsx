@@ -1,5 +1,7 @@
 "use client";
 
+// src/components/DataTable/mui/components/toolbar/actions/DataTableDensityButton.tsx
+
 import {
   IconButton,
   ListItemIcon,

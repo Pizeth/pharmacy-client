@@ -1,5 +1,7 @@
 "use client";
 
+// src/components/DataTable/mui/components/filtering/DataTableNumberRangeFilter.tsx
+
 import { Stack, TextField } from "@mui/material";
 import type { DataTableNumberRangeValue } from "./types";
 

@@ -1,5 +1,7 @@
 "use client";
 
+// src/components/DataTable/mui/components/toolbar/actions/DataTableFullscreenButton.tsx
+
 import { IconButton, Tooltip } from "@mui/material";
 import { Fullscreen, FullscreenExit } from "@mui/icons-material";
 import { useDataTableFullscreen } from "../../../fullscreen";

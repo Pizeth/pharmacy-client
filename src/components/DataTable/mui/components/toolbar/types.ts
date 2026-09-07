@@ -1,3 +1,5 @@
+// src/components/DataTable/mui/components/toolbar/types.ts
+
 import type { ReactNode } from "react";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";

@@ -28,6 +28,15 @@ import type {
 import { API_URL } from "@/types/constants";
 
 /**
+ * Translation resource path.
+ *
+ * Important:
+ *
+ * This is a PATH, not another absolute URL.
+ */
+const TRANSLATION_API_PATH = "/api/v1/i18n";
+
+/**
  * Error envelope produced by the Nest application error handler.
  *
  * We intentionally only model fields needed by generic frontend
@@ -64,22 +73,34 @@ export class TranslationKeyApiError extends Error {
 /**
  * ------------------------------------------------------------------
  * Normalizes API base endpoint to avoid double-slash URL corruption.
+ *
+ * Build one absolute API URL.
+ *
+ * This is the ONLY place in this resource client where
+ * NEXT_PUBLIC_API_URL is prepended.
  * ------------------------------------------------------------------
  */
-
-function getTranslationApiBaseUrl(): string {
+function createApiUrl(path: string): string {
   if (!API_URL) {
     throw new Error("NEXT_PUBLIC_API_URL is not configured.");
   }
 
   /**
+   * API origin only.
+   *
+   * Example:
+   *
+   *   https://api.razeth.com
+   *
    * Prevent:
    *
    *   http://localhost:3000//api/v1/i18n
    */
-  const normalizedApiUrl = API_URL.replace(/\/+$/, "");
+  const normalizedApiBaseUrl = API_URL.replace(/\/+$/, "");
 
-  return `${normalizedApiUrl}/api/v1/i18n`;
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  return `${normalizedApiBaseUrl}${normalizedPath}`;
 }
 
 /**
@@ -124,11 +145,11 @@ async function requestJson(
   endpoint: string,
   init: RequestInit,
 ): Promise<unknown> {
-  const baseUrl = getTranslationApiBaseUrl();
-  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  const url = `${baseUrl}${cleanEndpoint}`;
+  // const baseUrl = createApiUrl(endpoint);
+  // const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  // const url = `${baseUrl}${cleanEndpoint}`;
 
-  const response = await fetch(url, {
+  const response = await fetch(createApiUrl(endpoint), {
     ...init,
 
     /**
@@ -197,14 +218,11 @@ export async function queryTranslationKeys(
   request: StandardApiDataTableQueryRequest,
   signal?: AbortSignal,
 ): Promise<TranslationKeyQueryResponse> {
-  const payload = await requestJson(
-    `${getTranslationApiBaseUrl()}/keys/query`,
-    {
-      method: "POST",
-      signal,
-      body: JSON.stringify(request),
-    },
-  );
+  const payload = await requestJson(`${TRANSLATION_API_PATH}/keys/query`, {
+    method: "POST",
+    signal,
+    body: JSON.stringify(request),
+  });
 
   return translationKeyQueryResponseSchema.parse(payload);
 }
@@ -218,13 +236,10 @@ export async function queryTranslationKeys(
 export async function getTranslationCategories(
   signal?: AbortSignal,
 ): Promise<TranslationCategoriesResponse> {
-  const payload = await requestJson(
-    `${getTranslationApiBaseUrl()}/categories`,
-    {
-      method: "GET",
-      signal,
-    },
-  );
+  const payload = await requestJson(`${TRANSLATION_API_PATH}/categories`, {
+    method: "GET",
+    signal,
+  });
 
   return translationCategoriesResponseSchema.parse(payload);
 }
@@ -239,13 +254,10 @@ export async function getTranslationKey(
   id: number,
   signal?: AbortSignal,
 ): Promise<TranslationKeyResponse> {
-  const payload = await requestJson(
-    `${getTranslationApiBaseUrl()}/keys/${id}`,
-    {
-      method: "GET",
-      signal,
-    },
-  );
+  const payload = await requestJson(`${TRANSLATION_API_PATH}/keys/${id}`, {
+    method: "GET",
+    signal,
+  });
 
   return translationKeyResponseSchema.parse(payload);
 }
@@ -260,7 +272,7 @@ export async function createTranslationKey(
   input: CreateTranslationKeyInput,
   signal?: AbortSignal,
 ): Promise<TranslationKeyResponse> {
-  const payload = await requestJson(`${getTranslationApiBaseUrl()}/keys`, {
+  const payload = await requestJson(`${TRANSLATION_API_PATH}/keys`, {
     method: "POST",
     signal,
     body: JSON.stringify(input),
@@ -280,14 +292,11 @@ export async function updateTranslationKey(
   input: UpdateTranslationKeyInput,
   signal?: AbortSignal,
 ): Promise<TranslationKeyResponse> {
-  const payload = await requestJson(
-    `${getTranslationApiBaseUrl()}/keys/${id}`,
-    {
-      method: "PATCH",
-      signal,
-      body: JSON.stringify(input),
-    },
-  );
+  const payload = await requestJson(`${TRANSLATION_API_PATH}/keys/${id}`, {
+    method: "PATCH",
+    signal,
+    body: JSON.stringify(input),
+  });
 
   return translationKeyResponseSchema.parse(payload);
 }
@@ -302,13 +311,10 @@ export async function deleteTranslationKey(
   id: number,
   signal?: AbortSignal,
 ): Promise<DeleteTranslationKeyResponse> {
-  const payload = await requestJson(
-    `${getTranslationApiBaseUrl()}/keys/${id}`,
-    {
-      method: "DELETE",
-      signal,
-    },
-  );
+  const payload = await requestJson(`${TRANSLATION_API_PATH}/keys/${id}`, {
+    method: "DELETE",
+    signal,
+  });
 
   return deleteTranslationKeyResponseSchema.parse(payload);
 }
@@ -325,7 +331,7 @@ export async function createTranslation(
   signal?: AbortSignal,
 ): Promise<TranslationValueResponse> {
   const payload = await requestJson(
-    `${getTranslationApiBaseUrl()}/keys/${keyId}/translations`,
+    `${TRANSLATION_API_PATH}/keys/${keyId}/translations`,
     {
       method: "POST",
       signal,
@@ -349,7 +355,7 @@ export async function updateTranslation(
   signal?: AbortSignal,
 ): Promise<TranslationValueResponse> {
   const payload = await requestJson(
-    `${getTranslationApiBaseUrl()}/keys/${keyId}/translations/${encodeURIComponent(locale)}`,
+    `${TRANSLATION_API_PATH}/keys/${keyId}/translations/${encodeURIComponent(locale)}`,
     {
       method: "PATCH",
       signal,
@@ -372,7 +378,7 @@ export async function deleteTranslation(
   signal?: AbortSignal,
 ): Promise<DeleteTranslationResponse> {
   const payload = await requestJson(
-    `${getTranslationApiBaseUrl()}/keys/${keyId}/translations/${encodeURIComponent(locale)}`,
+    `${TRANSLATION_API_PATH}/keys/${keyId}/translations/${encodeURIComponent(locale)}`,
     {
       method: "DELETE",
       signal,

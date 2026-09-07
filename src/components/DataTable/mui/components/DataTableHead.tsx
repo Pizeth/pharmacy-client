@@ -1,5 +1,7 @@
 "use client";
 
+// src/components/DataTable/mui/components/DataTableHead.tsx
+
 import { TableHead } from "@mui/material";
 import type { RowData } from "@tanstack/table-core";
 import { useDataTableFilterDisplay } from "../filter-display";

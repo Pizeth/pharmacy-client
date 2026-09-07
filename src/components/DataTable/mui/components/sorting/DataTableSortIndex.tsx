@@ -1,6 +1,9 @@
 "use client";
 
+// src/components/DataTable/mui/components/sorting/DataTableSortIndex.tsx
+
 import { Box } from "@mui/material";
+import { DATA_TABLE_HEADER_SORT_INDEX_SIZE_PX } from "../headerLayout";
 
 export interface DataTableSortIndexProps {
   /**
@@ -31,9 +34,12 @@ export function DataTableSortIndex(props: DataTableSortIndexProps) {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        minWidth: 16,
-        height: 16,
-        px: 0.5,
+        width: `${DATA_TABLE_HEADER_SORT_INDEX_SIZE_PX}px`,
+        minWidth: `${DATA_TABLE_HEADER_SORT_INDEX_SIZE_PX}px`,
+        maxWidth: `${DATA_TABLE_HEADER_SORT_INDEX_SIZE_PX}px`,
+        height: `${DATA_TABLE_HEADER_SORT_INDEX_SIZE_PX}px`,
+        p: 0,
+        boxSizing: "border-box",
         borderRadius: 0.75,
         typography: "caption",
         fontSize: "0.625rem",

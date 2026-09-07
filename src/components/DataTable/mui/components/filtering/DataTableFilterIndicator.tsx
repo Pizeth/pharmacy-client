@@ -1,7 +1,10 @@
 "use client";
 
+// src/components/DataTable/mui/components/filtering/DataTableFilterIndicator.tsx
+
 import { Box } from "@mui/material";
 import { FilterAlt } from "@mui/icons-material";
+import { DATA_TABLE_HEADER_FILTER_INDICATOR_SIZE_PX } from "../headerLayout";
 
 export interface DataTableFilterIndicatorProps {
   readonly active: boolean;
@@ -30,13 +33,18 @@ export function DataTableFilterIndicator(props: DataTableFilterIndicatorProps) {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        flexShrink: 0,
+        width: `${DATA_TABLE_HEADER_FILTER_INDICATOR_SIZE_PX}px`,
+        minWidth: `${DATA_TABLE_HEADER_FILTER_INDICATOR_SIZE_PX}px`,
+        maxWidth: `${DATA_TABLE_HEADER_FILTER_INDICATOR_SIZE_PX}px`,
+        height: `${DATA_TABLE_HEADER_FILTER_INDICATOR_SIZE_PX}px`,
+        flex: "0 0 auto",
+        // flexShrink: 0,
         color: "primary.main",
       }}
     >
       <FilterAlt
         sx={{
-          fontSize: 16,
+          fontSize: `${DATA_TABLE_HEADER_FILTER_INDICATOR_SIZE_PX}px`,
         }}
       />
     </Box>

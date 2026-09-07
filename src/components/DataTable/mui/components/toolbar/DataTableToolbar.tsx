@@ -1,5 +1,7 @@
 "use client";
 
+// src/components/DataTable/mui/components/toolbar/DataTableToolbar.tsx
+
 import { Box, Stack, useMediaQuery, useTheme } from "@mui/material";
 import type { RowData } from "@tanstack/table-core";
 import { DataTableGlobalFilter } from "../global-filtering";
