@@ -9,11 +9,11 @@ import type { MuiDataTableInstance } from "../table";
 import { DataTableColumnMenuButton } from "./column-menu";
 import { DataTableFilterIndicator } from "./filtering";
 import { DataTableSortLabel } from "./sorting";
-import {
-  DATA_TABLE_HEADER_AFFORDANCE_GAP_PX,
-  DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX,
-  getDataTableHeaderCenterCompensationPx,
-} from "./headerLayout";
+// import {
+//   DATA_TABLE_HEADER_AFFORDANCE_GAP_PX,
+//   DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX,
+//   getDataTableHeaderCenterCompensationPx,
+// } from "./headerLayout";
 import { DataTableSortIndicator } from "./sorting/DataTableSortIndicator";
 
 export interface DataTableHeaderContentProps<
@@ -35,18 +35,30 @@ export interface DataTableHeaderContentProps<
 /**
  * Renders Semantic/interactable content of one DataTable header.
  *
- * Visual model:
+ * CENTERED HEADER GEOMETRY
+ * ------------------------------------------------------------------
  *
- *   [ Header Label ][ Sort ][ Filter ][ Menu ]
+ * A centered header does NOT center:
  *
- * The complete cluster is aligned by DataTableHeaderCell.
+ *   [label + sort + filter + menu]
  *
- * Therefore, with the default header alignment:
+ * Instead it uses a symmetric three-track grid:
  *
- *              [ Label ⇅ ⋮ ]
+ *   1fr | label | 1fr
  *
- * is centered as one unit rather than centering the label while
- * pushing actions to the edge of the physical cell.
+ * The label therefore occupies the exact physical center of the
+ * column regardless of how many controls are rendered after it.
+ *
+ * Controls live at the inline-start edge of the trailing 1fr track:
+ *
+ *              column center
+ *                   │
+ *                   ▼
+ *
+ *   [     1fr     ][Label][ sort filter menu ........ ]
+ *
+ * This keeps controls visually adjacent to the label while making
+ * their width irrelevant to label alignment.
  *
  * Center alignment intentionally means:
  *
@@ -88,34 +100,6 @@ export interface DataTableHeaderContentProps<
  *
  * Remain in DataTableHeaderCell.
  */
-/**
- * Semantic/interactable content of one DataTable header.
- *
- * CENTERED HEADER GEOMETRY
- * ------------------------------------------------------------------
- *
- * A centered header does NOT center:
- *
- *   [label + sort + filter + menu]
- *
- * Instead it uses a symmetric three-track grid:
- *
- *   1fr | label | 1fr
- *
- * The label therefore occupies the exact physical center of the
- * column regardless of how many controls are rendered after it.
- *
- * Controls live at the inline-start edge of the trailing 1fr track:
- *
- *              column center
- *                   │
- *                   ▼
- *
- *   [     1fr     ][Label][ sort filter menu ........ ]
- *
- * This keeps controls visually adjacent to the label while making
- * their width irrelevant to label alignment.
- */
 export function DataTableHeaderContent<
   TData extends RowData,
   TValue extends CellData = CellData,
@@ -142,12 +126,6 @@ export function DataTableHeaderContent<
     return (
       <Box
         className="DataTable-headerGroupLabel"
-        // sx={{
-        //   width: "100%",
-        //   minWidth: 0,
-        //   overflow: "hidden",
-        //   textOverflow: "ellipsis",
-        // }}
         sx={{
           display: "block",
           minWidth: 0,
@@ -286,6 +264,13 @@ export function DataTableHeaderContent<
                   alignItems: "center",
                   justifySelf: "center",
                   overflow: "hidden",
+                  color: "error.main",
+                  "&:hover .MuiButtonBase-root": {
+                    color: "primary.main",
+                  },
+                  "&:hover .DataTable-headerLabel": {
+                    color: "primary.main",
+                  },
                 }}
               >
                 <DataTableSortLabel
@@ -424,7 +409,9 @@ export function DataTableHeaderContent<
                    * Keep the actual glyph compact too.
                    */
                   "& .MuiIconButton-root .MuiSvgIcon-root": {
-                    fontSize: 16,
+                    ml: "4px",
+                    mr: "4px",
+                    fontSize: 18,
                   },
                 }}
               >
@@ -661,7 +648,6 @@ export function DataTableHeaderContent<
                     sortHandler
                       ? (event) => {
                           event.stopPropagation();
-
                           sortHandler(event);
                         }
                       : undefined
@@ -669,117 +655,142 @@ export function DataTableHeaderContent<
                 />
               )}
 
+              {/**
+               * ------------------------------------------------------
+               * Active filter indicator
+               * ------------------------------------------------------
+               */}
               {showFilterIndicator && <DataTableFilterIndicator active />}
 
+              {/**
+               * ------------------------------------------------------
+               * Column action menu
+               * ------------------------------------------------------
+               *
+               * Keep it next to the header label/sort icon.
+               *
+               * It is faintly visible at rest rather than completely
+               * disappearing until hover.
+               */}
               {enableColumnMenu && (
                 <DataTableColumnMenuButton table={table} column={column} />
               )}
             </Box>
-
-            {/**
-             * ------------------------------------------------------
-             * Active filter indicator
-             * ------------------------------------------------------
-             */}
-            {showFilterIndicator && <DataTableFilterIndicator active />}
-
-            {/**
-             * ------------------------------------------------------
-             * Active filter indicator
-             * ------------------------------------------------------
-             *
-             *{canFilter && <DataTableFilterIndicator active={isFiltered} />}
-             */}
-
-            {/**
-             * ------------------------------------------------------
-             * Column action menu
-             * ------------------------------------------------------
-             *
-             * Keep it next to the header label/sort icon.
-             *
-             * It is faintly visible at rest rather than completely
-             * disappearing until hover.
-             */}
-            {enableColumnMenu && (
-              <Box
-                className="DataTable-headerActions"
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
-                  minWidth: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
-                  maxWidth: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
-                  flex: "0 0 auto",
-
-                  /**
-                   * MRT-like discoverability:
-                   *
-                   * visible but visually subordinate at rest;
-                   * full emphasis on hover/focus.
-                   */
-                  opacity: 0.35,
-
-                  transition: (theme) =>
-                    theme.transitions.create("opacity", {
-                      duration: theme.transitions.duration.shortest,
-                    }),
-
-                  /**
-                   * Override a menu button implementation that may
-                   * itself use hover-only opacity.
-                   *
-                   * The two-class descendant selector intentionally
-                   * has enough specificity to establish the header
-                   * presentation policy here.
-                   *
-                   * Establish the physical geometry that our center
-                   * compensation calculation expects.
-                   */
-                  "& .MuiIconButton-root": {
-                    width: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
-                    height: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
-                    minWidth: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
-                    p: 0,
-                    opacity: "inherit",
-                    visibility: "visible",
-                    // width: 24,
-                    // height: 24,
-                    // p: 0.25,
-                    color: "text.secondary",
-
-                    transition: (theme) =>
-                      theme.transitions.create(
-                        ["opacity", "color", "background-color"],
-                        {
-                          duration: theme.transitions.duration.shortest,
-                        },
-                      ),
-
-                    "&:hover": {
-                      color: "text.primary",
-                      backgroundColor: "action.hover",
-                    },
-
-                    "&:focus-visible": {
-                      opacity: 1,
-                      color: "text.primary",
-                    },
-                  },
-
-                  // flexShrink: 0,
-                }}
-              >
-                <DataTableColumnMenuButton table={table} column={column} />
-              </Box>
-            )}
           </Box>
         );
       }}
     </table.Subscribe>
   );
 }
+
+//  {
+//    /**
+//     * ------------------------------------------------------
+//     * Active filter indicator
+//     * ------------------------------------------------------
+//     */
+//  }
+//  {
+//    /* {showFilterIndicator && <DataTableFilterIndicator active />} */
+//  }
+
+//  {
+//    /**
+//     * ------------------------------------------------------
+//     * Active filter indicator
+//     * ------------------------------------------------------
+//     *
+//     *{canFilter && <DataTableFilterIndicator active={isFiltered} />}
+//     */
+//  }
+
+//  {
+//    /**
+//     * ------------------------------------------------------
+//     * Column action menu
+//     * ------------------------------------------------------
+//     *
+//     * Keep it next to the header label/sort icon.
+//     *
+//     * It is faintly visible at rest rather than completely
+//     * disappearing until hover.
+//     */
+//  }
+//  {
+//    enableColumnMenu && (
+//      <Box
+//        className="DataTable-headerActions"
+//        sx={{
+//          display: "inline-flex",
+//          alignItems: "center",
+//          justifyContent: "center",
+//          width: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
+//          minWidth: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
+//          maxWidth: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
+//          flex: "0 0 auto",
+
+//          /**
+//           * MRT-like discoverability:
+//           *
+//           * visible but visually subordinate at rest;
+//           * full emphasis on hover/focus.
+//           */
+//          opacity: 0.35,
+
+//          transition: (theme) =>
+//            theme.transitions.create("opacity", {
+//              duration: theme.transitions.duration.shortest,
+//            }),
+
+//          /**
+//           * Override a menu button implementation that may
+//           * itself use hover-only opacity.
+//           *
+//           * The two-class descendant selector intentionally
+//           * has enough specificity to establish the header
+//           * presentation policy here.
+//           *
+//           * Establish the physical geometry that our center
+//           * compensation calculation expects.
+//           */
+//          "& .MuiIconButton-root": {
+//            width: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
+//            height: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
+//            minWidth: `${DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX}px`,
+//            p: 0,
+//            opacity: "inherit",
+//            visibility: "visible",
+//            // width: 24,
+//            // height: 24,
+//            // p: 0.25,
+//            color: "text.secondary",
+
+//            transition: (theme) =>
+//              theme.transitions.create(
+//                ["opacity", "color", "background-color"],
+//                {
+//                  duration: theme.transitions.duration.shortest,
+//                },
+//              ),
+
+//            "&:hover": {
+//              color: "text.primary",
+//              backgroundColor: "action.hover",
+//            },
+
+//            "&:focus-visible": {
+//              opacity: 1,
+//              color: "text.primary",
+//            },
+//          },
+
+//          // flexShrink: 0,
+//        }}
+//      >
+//        <DataTableColumnMenuButton table={table} column={column} />
+//      </Box>
+//    );
+//  }
 
 /**
  * Show an index only when more than one column participates

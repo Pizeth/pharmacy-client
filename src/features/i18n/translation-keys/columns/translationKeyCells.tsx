@@ -1,6 +1,13 @@
 "use client";
 
-import { Box, Chip, Stack, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Chip,
+  ChipProps,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import type { TranslationValue } from "../schemas";
 import { CellContext } from "@tanstack/react-table";
 
@@ -45,6 +52,16 @@ export interface TranslationKeyLocalesCellProps {
   readonly align?: "start" | "center" | "end"; // Accepts standard alignment values
 }
 
+// Define the palette order you want to cycle through
+const CHIP_COLORS: NonNullable<ChipProps["color"]>[] = [
+  "primary",
+  "secondary",
+  "success",
+  "info",
+  "warning",
+  "error",
+];
+
 export function TranslationKeyLocalesCell1({
   translations,
 }: TranslationKeyLocalesCellProps) {
@@ -84,9 +101,18 @@ export function TranslationKeyLocalesCell({
       flexWrap="wrap"
       justifyContent={justifyContent} // Dynamically justify the flex items
     >
-      {translations.map((translation) => (
-        <Chip key={translation.id} label={translation.locale} size="small" />
-      ))}
+      {translations.map((translation, index) => {
+        // Use the remainder (%) operator to cleanly loop back around the array length
+        const chipColor = CHIP_COLORS[index % CHIP_COLORS.length];
+        return (
+          <Chip
+            key={translation.id}
+            label={translation.locale.toLocaleUpperCase()}
+            size="small"
+            color={chipColor}
+          />
+        );
+      })}
     </Stack>
   );
 }

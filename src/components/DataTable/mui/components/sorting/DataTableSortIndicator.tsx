@@ -44,10 +44,13 @@ export function DataTableSortIndicator(props: DataTableSortIndicatorProps) {
         tabIndex={-1}
         onClick={onClick}
         sx={{
-          width: 18,
-          height: 20,
+          // width: 18,
+          // height: 20,
           minWidth: 18,
+          width: "3ch",
+          height: 20,
           p: 0,
+          m: 0,
           color: active ? "primary.main" : "text.secondary",
           opacity: active ? 1 : 0.35,
 
@@ -65,7 +68,7 @@ export function DataTableSortIndicator(props: DataTableSortIndicatorProps) {
         {active ? (
           <ArrowDownward
             sx={{
-              fontSize: 15,
+              fontSize: "18px",
               transform: direction === "asc" ? "rotate(180deg)" : "none",
 
               transition: (theme) =>
@@ -77,7 +80,7 @@ export function DataTableSortIndicator(props: DataTableSortIndicatorProps) {
         ) : (
           <SyncAlt
             sx={{
-              fontSize: 16,
+              fontSize: "18px",
 
               /**
                * Similar visual language to MRT's inactive sorting

@@ -2,13 +2,11 @@
 
 // src/components/DataTable/mui/components/sorting/DataTableSortLabel.tsx
 
-import { Box, ButtonBase, TableSortLabel } from "@mui/material";
-import type { ReactNode } from "react";
+import { Box, ButtonBase } from "@mui/material";
+
+import type { MouseEvent, ReactNode } from "react";
+
 import { DataTableSortIndex } from "./DataTableSortIndex";
-import {
-  DATA_TABLE_HEADER_AFFORDANCE_GAP_PX,
-  DATA_TABLE_HEADER_SORT_ICON_SIZE_PX,
-} from "../headerLayout";
 
 export type DataTableSortDirection = "asc" | "desc" | false;
 
@@ -45,7 +43,23 @@ export interface DataTableSortLabelProps {
 }
 
 /**
- * Standard MUI presentation for DataTable sorting headers.
+ * Standard MUI presentation for DataTable
+ * semantic/clickable LABEL of a sortable header.
+ *
+ * Important architectural distinction:
+ *
+ * This component no longer renders the sort icon.
+ *
+ * Why?
+ *
+ * If the icon participates in this box's width, then centering this box
+ * centers:
+ *
+ *   label + icon
+ *
+ * rather than:
+ *
+ *   label
  *
  * UX policy:
  *
@@ -71,27 +85,6 @@ export interface DataTableSortLabelProps {
  * - multi-sort behavior
  * - modifier-key interpretation
  */
-/**
- * The semantic/clickable LABEL of a sortable header.
- *
- * Important architectural distinction:
- *
- * This component no longer renders the sort icon.
- *
- * Why?
- *
- * If the icon participates in this box's width, then centering this box
- * centers:
- *
- *   label + icon
- *
- * rather than:
- *
- *   label
- *
- * Sort presentation is therefore delegated to
- * DataTableSortIndicator.
- */
 export function DataTableSortLabel(props: DataTableSortLabelProps) {
   const {
     children,
@@ -107,7 +100,7 @@ export function DataTableSortLabel(props: DataTableSortLabelProps) {
    *
    * The direction is visually relevant only when active=true.
    */
-  const muiDirection = direction === "desc" ? "desc" : "asc";
+  // const muiDirection = direction === "desc" ? "desc" : "asc";
 
   const active = direction !== false;
 
@@ -147,27 +140,6 @@ export function DataTableSortLabel(props: DataTableSortLabelProps) {
    */
   if (!canSort) {
     return label;
-    // return (
-    //   <Box
-    //     component="span"
-    //     sx={{
-    //       display: "inline-flex",
-    //       alignItems: "center",
-
-    //       /**
-    //        * This component occupies the available first grid track.
-    //        */
-    //       // flex: "1 1 auto",
-
-    //       minWidth: 0,
-    //       maxWidth: "100%",
-    //       overflow: "hidden",
-    //       color: "inherit",
-    //     }}
-    //   >
-    //     {label}
-    //   </Box>
-    // );
   }
 
   /**
