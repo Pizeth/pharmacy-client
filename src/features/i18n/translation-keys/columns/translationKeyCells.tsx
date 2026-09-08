@@ -2,6 +2,7 @@
 
 import { Box, Chip, Stack, Tooltip, Typography } from "@mui/material";
 import type { TranslationValue } from "../schemas";
+import { CellContext } from "@tanstack/react-table";
 
 /**
  * ------------------------------------------------------------------
@@ -41,9 +42,10 @@ export function TranslationKeyCategoryCell({
 
 export interface TranslationKeyLocalesCellProps {
   readonly translations: readonly TranslationValue[];
+  readonly align?: "start" | "center" | "end"; // Accepts standard alignment values
 }
 
-export function TranslationKeyLocalesCell({
+export function TranslationKeyLocalesCell1({
   translations,
 }: TranslationKeyLocalesCellProps) {
   if (translations.length === 0) {
@@ -52,6 +54,36 @@ export function TranslationKeyLocalesCell({
 
   return (
     <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap">
+      {translations.map((translation) => (
+        <Chip key={translation.id} label={translation.locale} size="small" />
+      ))}
+    </Stack>
+  );
+}
+
+export function TranslationKeyLocalesCell({
+  translations,
+  align = "start",
+}: TranslationKeyLocalesCellProps) {
+  // Replace 'any' with your actual table types
+
+  if (translations.length === 0) {
+    return <TranslationKeyEmptyCell />;
+  }
+
+  // Map the text-alignment to flex justification
+  // Convert text alignment keyword to flex layout keyword
+  const justifyContent =
+    align === "center" ? "center" : align === "end" ? "flex-end" : "flex-start";
+
+  return (
+    <Stack
+      direction="row"
+      spacing={0.5}
+      useFlexGap
+      flexWrap="wrap"
+      justifyContent={justifyContent} // Dynamically justify the flex items
+    >
       {translations.map((translation) => (
         <Chip key={translation.id} label={translation.locale} size="small" />
       ))}

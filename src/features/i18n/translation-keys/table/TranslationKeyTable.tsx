@@ -59,11 +59,8 @@ export function TranslationKeyTable() {
         variant="outlined"
         sx={{
           minHeight: 360,
-
           display: "grid",
-
           placeItems: "center",
-
           p: 4,
         }}
       >
@@ -195,7 +192,6 @@ export function TranslationKeyTable() {
           containerProps={{
             sx: {
               maxHeight: "calc(100vh - 240px)",
-
               minHeight: 320,
             },
           }}

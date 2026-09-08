@@ -40,6 +40,7 @@ export function DataTableColumnManagerButton<TData extends RowData>(
     <>
       <Tooltip title="Manage columns">
         <IconButton
+          className="DataTable-columnMenuButton"
           size="small"
           aria-label="Manage table columns"
           aria-haspopup="dialog"

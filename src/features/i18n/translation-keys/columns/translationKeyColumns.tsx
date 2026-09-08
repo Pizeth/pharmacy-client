@@ -92,6 +92,7 @@ export const translationKeyColumns = columnHelper.columns([
     size: 90,
     minSize: 70,
     maxSize: 140,
+    meta: { align: "center" },
     cell: ({ getValue }) => (
       <Typography
         component="span"
@@ -218,6 +219,7 @@ export const translationKeyColumns = columnHelper.columns([
     size: 180,
     minSize: 140,
     maxSize: 280,
+    meta: { align: "center" },
     cell: ({ getValue }) => <TranslationKeyCategoryCell name={getValue()} />,
   }),
 
@@ -264,8 +266,12 @@ export const translationKeyColumns = columnHelper.columns([
       size: 180,
       minSize: 140,
       maxSize: 320,
-      cell: ({ row }) => (
-        <TranslationKeyLocalesCell translations={row.original.translations} />
+      meta: { align: "center" },
+      cell: ({ row, column }) => (
+        <TranslationKeyLocalesCell
+          translations={row.original.translations}
+          align={column.columnDef.meta?.align}
+        />
       ),
     },
   ),
@@ -295,7 +301,7 @@ export const translationKeyColumns = columnHelper.columns([
       enableColumnFilter: false,
       size: 420,
       minSize: 240,
-      maxSize: 640,
+      maxSize: 550,
       cell: ({ row }) => (
         <TranslationKeyValuesCell translations={row.original.translations} />
       ),

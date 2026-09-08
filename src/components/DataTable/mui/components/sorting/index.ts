@@ -2,3 +2,4 @@
 
 export * from "./DataTableSortIndex";
 export * from "./DataTableSortLabel";
+export * from "./DataTableSortIndicator";

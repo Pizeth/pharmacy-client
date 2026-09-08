@@ -66,6 +66,7 @@ export function DataTableColumnMenuButton<
     <>
       <Tooltip title="Column options">
         <IconButton
+          className="DataTable-columnMenuButton"
           size="small"
           aria-label={`Open options for column ${column.id}`}
           aria-haspopup="menu"
@@ -73,12 +74,9 @@ export function DataTableColumnMenuButton<
           onClick={handleOpenMenu}
           sx={{
             flexShrink: 0,
-
             width: 28,
-
             height: 28,
-
-            opacity: menuOpen ? 1 : 0,
+            opacity: menuOpen ? 1 : 0.3,
 
             transition: (theme) =>
               theme.transitions.create("opacity", {

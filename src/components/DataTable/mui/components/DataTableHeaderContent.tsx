@@ -14,6 +14,7 @@ import {
   DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX,
   getDataTableHeaderCenterCompensationPx,
 } from "./headerLayout";
+import { DataTableSortIndicator } from "./sorting/DataTableSortIndicator";
 
 export interface DataTableHeaderContentProps<
   TData extends RowData,
@@ -87,6 +88,34 @@ export interface DataTableHeaderContentProps<
  *
  * Remain in DataTableHeaderCell.
  */
+/**
+ * Semantic/interactable content of one DataTable header.
+ *
+ * CENTERED HEADER GEOMETRY
+ * ------------------------------------------------------------------
+ *
+ * A centered header does NOT center:
+ *
+ *   [label + sort + filter + menu]
+ *
+ * Instead it uses a symmetric three-track grid:
+ *
+ *   1fr | label | 1fr
+ *
+ * The label therefore occupies the exact physical center of the
+ * column regardless of how many controls are rendered after it.
+ *
+ * Controls live at the inline-start edge of the trailing 1fr track:
+ *
+ *              column center
+ *                   │
+ *                   ▼
+ *
+ *   [     1fr     ][Label][ sort filter menu ........ ]
+ *
+ * This keeps controls visually adjacent to the label while making
+ * their width irrelevant to label alignment.
+ */
 export function DataTableHeaderContent<
   TData extends RowData,
   TValue extends CellData = CellData,
@@ -122,7 +151,9 @@ export function DataTableHeaderContent<
         sx={{
           display: "block",
           minWidth: 0,
-          maxWidth: "100%",
+          width: "100%",
+          textAlign:
+            align === "right" ? "right" : align === "left" ? "left" : "center",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
@@ -183,6 +214,248 @@ export function DataTableHeaderContent<
         const showFilterIndicator = canFilter && isFiltered;
 
         /**
+         * Center-aligned headers use the mathematically symmetric
+         * three-track layout.
+         */
+        if (align === "center") {
+          return (
+            <Box
+              className="DataTable-headerContent"
+              sx={{
+                /**
+                 * This MUST occupy the physical column width.
+                 *
+                 * Unlike the old nested 100% chain, this is a single
+                 * intentional layout canvas directly beneath the
+                 * physical TableCell wrapper.
+                 */
+                width: "100%",
+                minWidth: 0,
+
+                display: "grid",
+
+                /**
+                 * The two 1fr tracks are always identical.
+                 *
+                 * Therefore the middle auto track is centered exactly.
+                 */
+                gridTemplateColumns: "minmax(0, 1fr) auto minmax(0, 1fr)",
+
+                alignItems: "center",
+                whiteSpace: "nowrap",
+
+                /**
+                 * Header action discoverability.
+                 */
+                "&:hover .DataTable-headerActions, &:focus-within .DataTable-headerActions":
+                  {
+                    opacity: 1,
+                  },
+              }}
+            >
+              {/**
+               * ----------------------------------------------------
+               * Track 1 — symmetric empty space
+               * ----------------------------------------------------
+               *
+               * It intentionally contains nothing.
+               */}
+              <Box
+                aria-hidden="true"
+                sx={{
+                  minWidth: 0,
+                }}
+              />
+
+              {/**
+               * ----------------------------------------------------
+               * Track 2 — THE LABEL
+               * ----------------------------------------------------
+               *
+               * This track is mathematically centered.
+               *
+               * Sort affordances are deliberately NOT part of this
+               * track's intrinsic width.
+               */}
+              <Box
+                className="DataTable-headerLabelTrack"
+                sx={{
+                  gridColumn: 2,
+                  minWidth: 0,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifySelf: "center",
+                  overflow: "hidden",
+                }}
+              >
+                <DataTableSortLabel
+                  canSort={canSort}
+                  direction={direction}
+                  onClick={
+                    canSort
+                      ? (event) => {
+                          event.stopPropagation();
+
+                          sortHandler?.(event);
+                        }
+                      : undefined
+                  }
+                >
+                  <table.FlexRender header={header} />
+                </DataTableSortLabel>
+              </Box>
+
+              {/**
+               * ----------------------------------------------------
+               * Track 3 — AFFORDANCES
+               * ----------------------------------------------------
+               *
+               * The track begins exactly at the right edge of the
+               * centered label.
+               *
+               * This is why the controls appear immediately beside
+               * the label while having ZERO influence on its center.
+               */}
+              <Box
+                className="DataTable-headerActions"
+                sx={{
+                  gridColumn: 3,
+
+                  /**
+                   * Begin immediately after the perfectly centered label track.
+                   */
+                  justifySelf: "start",
+
+                  display: "inline-flex",
+                  alignItems: "center",
+
+                  /**
+                   * Sort/filter/menu should visually form one compact affordance
+                   * cluster.
+                   *
+                   * Do not add spacing between:
+                   *
+                   *   sort
+                   *   filter indicator
+                   *   menu
+                   *
+                   * Each control already owns its own tiny internal geometry.
+                   */
+                  gap: 0,
+
+                  minWidth: 0,
+
+                  /**
+                   * Only a tiny separation between the label and the first
+                   * affordance.
+                   *
+                   * 1px is enough to avoid making the label/icon look joined.
+                   */
+                  ml: "1px",
+
+                  opacity: 0.4,
+
+                  transition: (theme) =>
+                    theme.transitions.create("opacity", {
+                      duration: theme.transitions.duration.shortest,
+                    }),
+
+                  /**
+                   * Sort affordance.
+                   */
+                  "& .DataTable-sortButton": {
+                    width: 18,
+                    height: 20,
+                    minWidth: 18,
+                    p: 0,
+                    m: 0,
+                    flex: "0 0 18px",
+                  },
+
+                  "& .DataTable-sortButton .MuiSvgIcon-root": {
+                    fontSize: 15,
+                  },
+
+                  /**
+                   * Column-menu affordance.
+                   */
+                  "& .DataTable-columnMenuButton": {
+                    width: 20,
+                    height: 20,
+                    minWidth: 20,
+                    p: 0,
+                    m: 0,
+                    flex: "0 0 20px",
+                  },
+
+                  "& .DataTable-columnMenuButton .MuiSvgIcon-root": {
+                    fontSize: 15,
+                  },
+
+                  /**
+                   * ------------------------------------------------------------
+                   * Compact all header IconButtons
+                   * ------------------------------------------------------------
+                   *
+                   * This applies to:
+                   *
+                   *   sort indicator
+                   *   column-menu button
+                   *
+                   * but only while they live inside the header action cluster.
+                   */
+                  "& .MuiIconButton-root": {
+                    width: 20,
+                    height: 20,
+                    minWidth: 20,
+
+                    p: 0,
+
+                    /**
+                     * Remove layout margins that could visually separate the
+                     * controls.
+                     */
+                    m: 0,
+
+                    flex: "0 0 20px",
+                  },
+
+                  /**
+                   * Keep the actual glyph compact too.
+                   */
+                  "& .MuiIconButton-root .MuiSvgIcon-root": {
+                    fontSize: 16,
+                  },
+                }}
+              >
+                {canSort && (
+                  <DataTableSortIndicator
+                    direction={direction}
+                    sortIndex={sortIndex}
+                    showSortIndex={showSortIndex}
+                    onClick={
+                      sortHandler
+                        ? (event) => {
+                            event.stopPropagation();
+
+                            sortHandler(event);
+                          }
+                        : undefined
+                    }
+                  />
+                )}
+
+                {showFilterIndicator && <DataTableFilterIndicator active />}
+
+                {enableColumnMenu && (
+                  <DataTableColumnMenuButton table={table} column={column} />
+                )}
+              </Box>
+            </Box>
+          );
+        }
+
+        /**
          * ----------------------------------------------------------
          * Optical center compensation
          * ----------------------------------------------------------
@@ -192,15 +465,15 @@ export function DataTableHeaderContent<
          * Left/right aligned headers should naturally lay out from
          * their corresponding edge.
          */
-        const centerCompensationPx =
-          align === "center"
-            ? getDataTableHeaderCenterCompensationPx({
-                canSort,
-                showSortIndex,
-                showFilterIndicator,
-                showColumnMenu: enableColumnMenu,
-              })
-            : 0;
+        // const centerCompensationPx =
+        //   align === "center"
+        //     ? getDataTableHeaderCenterCompensationPx({
+        //         canSort,
+        //         showSortIndex,
+        //         showFilterIndicator,
+        //         showColumnMenu: enableColumnMenu,
+        //       })
+        //     : 0;
 
         return (
           <Box
@@ -244,66 +517,80 @@ export function DataTableHeaderContent<
             //    */
             //   minWidth: 0,
             // }}
+            // sx={{
+            //   /**
+            //    * IMPORTANT:
+            //    *
+            //    * This is intentionally an INLINE cluster.
+            //    *
+            //    * Do not use:
+            //    *
+            //    *   width: 100%
+            //    *
+            //    * because that would make the action region occupy the
+            //    * complete physical header cell again.
+            //    */
+            //   display: "inline-flex",
+            //   alignItems: "center",
+            //   gap: `${DATA_TABLE_HEADER_AFFORDANCE_GAP_PX}px`,
+
+            //   /**
+            //    * Critical for truncation inside a CSS grid track.
+            //    */
+            //   minWidth: 0,
+            //   maxWidth: "100%",
+
+            //   /**
+            //    * Header content should never create a second line.
+            //    */
+            //   whiteSpace: "nowrap",
+
+            //   /**
+            //    * ----------------------------------------------------
+            //    * THE IMPORTANT PART
+            //    * ----------------------------------------------------
+            //    *
+            //    * Everything following the label pulls the label left
+            //    * when the complete cluster is centered.
+            //    *
+            //    * Add the same amount of empty logical-start space to
+            //    * neutralize that displacement.
+            //    *
+            //    * Because paddingInlineStart is logical rather than
+            //    * paddingLeft, this automatically mirrors in RTL.
+            //    */
+            //   paddingInlineStart:
+            //     centerCompensationPx > 0 ? `${centerCompensationPx}px` : 0,
+
+            //   boxSizing: "border-box",
+
+            //   /**
+            //    * Menu stays discoverable but subordinate until the user
+            //    * interacts with the header.
+            //    */
+            //   "&:hover .DataTable-headerAction, &:focus-within .DataTable-headerAction":
+            //     {
+            //       opacity: 1,
+            //     },
+
+            //   // "&:hover .DataTable-sortIcon, &:focus-within .DataTable-sortIcon":
+            //   //   {
+            //   //     opacity: 0.8,
+            //   //   },
+            // }}
             sx={{
-              /**
-               * IMPORTANT:
-               *
-               * This is intentionally an INLINE cluster.
-               *
-               * Do not use:
-               *
-               *   width: 100%
-               *
-               * because that would make the action region occupy the
-               * complete physical header cell again.
-               */
-              display: "inline-flex",
-              alignItems: "center",
-              gap: `${DATA_TABLE_HEADER_AFFORDANCE_GAP_PX}px`,
-
-              /**
-               * Critical for truncation inside a CSS grid track.
-               */
+              width: "100%",
               minWidth: 0,
-              maxWidth: "100%",
-
-              /**
-               * Header content should never create a second line.
-               */
+              display: "flex",
+              alignItems: "center",
+              justifyContent: align === "right" ? "flex-end" : "flex-start",
+              gap: 0.25,
               whiteSpace: "nowrap",
 
-              /**
-               * ----------------------------------------------------
-               * THE IMPORTANT PART
-               * ----------------------------------------------------
-               *
-               * Everything following the label pulls the label left
-               * when the complete cluster is centered.
-               *
-               * Add the same amount of empty logical-start space to
-               * neutralize that displacement.
-               *
-               * Because paddingInlineStart is logical rather than
-               * paddingLeft, this automatically mirrors in RTL.
-               */
-              paddingInlineStart:
-                centerCompensationPx > 0 ? `${centerCompensationPx}px` : 0,
-
-              boxSizing: "border-box",
-
-              /**
-               * Menu stays discoverable but subordinate until the user
-               * interacts with the header.
-               */
-              "&:hover .DataTable-headerAction, &:focus-within .DataTable-headerAction":
+              "&:hover .DataTable-headerActions, &:focus-within .DataTable-headerActions":
                 {
                   opacity: 1,
                 },
-
-              // "&:hover .DataTable-sortIcon, &:focus-within .DataTable-sortIcon":
-              //   {
-              //     opacity: 0.8,
-              //   },
             }}
           >
             {/**
@@ -313,7 +600,7 @@ export function DataTableHeaderContent<
              *
              * This is the only flexible/shrinkable section.
              */}
-            <Box
+            {/* <Box
               className="DataTable-headerMain"
               sx={{
                 display: "inline-flex",
@@ -324,31 +611,69 @@ export function DataTableHeaderContent<
                 // flex: "1 1 auto",
                 overflow: "hidden",
               }}
-            >
-              <DataTableSortLabel
-                canSort={canSort}
-                direction={direction}
-                sortIndex={sortIndex}
-                showSortIndex={showSortIndex}
-                onClick={
-                  canSort
-                    ? (event) => {
-                        /**
-                         * Important:
-                         *
-                         * stopPropagation prevents future header-level
-                         * controls or menus from seeing the click.
-                         */
-                        event.stopPropagation();
+            > */}
+            <DataTableSortLabel
+              canSort={canSort}
+              direction={direction}
+              sortIndex={sortIndex}
+              showSortIndex={showSortIndex}
+              onClick={
+                canSort
+                  ? (event) => {
+                      /**
+                       * Important:
+                       *
+                       * stopPropagation prevents future header-level
+                       * controls or menus from seeing the click.
+                       */
+                      event.stopPropagation();
 
-                        sortHandler?.(event);
-                      }
-                    : undefined
-                }
-              >
-                <table.FlexRender header={header} />
-              </DataTableSortLabel>
-              {/* {canFilter && <DataTableFilterIndicator active={isFiltered} />} */}
+                      sortHandler?.(event);
+                    }
+                  : undefined
+              }
+            >
+              <table.FlexRender header={header} />
+            </DataTableSortLabel>
+            {/* </Box> */}
+
+            <Box
+              className="DataTable-headerActions"
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.25,
+                flex: "0 0 auto",
+                opacity: 0.4,
+
+                transition: (theme) =>
+                  theme.transitions.create("opacity", {
+                    duration: theme.transitions.duration.shortest,
+                  }),
+              }}
+            >
+              {canSort && (
+                <DataTableSortIndicator
+                  direction={direction}
+                  sortIndex={sortIndex}
+                  showSortIndex={showSortIndex}
+                  onClick={
+                    sortHandler
+                      ? (event) => {
+                          event.stopPropagation();
+
+                          sortHandler(event);
+                        }
+                      : undefined
+                  }
+                />
+              )}
+
+              {showFilterIndicator && <DataTableFilterIndicator active />}
+
+              {enableColumnMenu && (
+                <DataTableColumnMenuButton table={table} column={column} />
+              )}
             </Box>
 
             {/**

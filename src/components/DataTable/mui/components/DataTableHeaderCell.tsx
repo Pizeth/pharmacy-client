@@ -281,12 +281,13 @@ export function DataTableHeaderCell<
               sx={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent:
-                  align === "right"
-                    ? "flex-end"
-                    : align === "center"
-                      ? "center"
-                      : "flex-start",
+                width: "100%",
+                // justifyContent:
+                //   align === "right"
+                //     ? "flex-end"
+                //     : align === "center"
+                //       ? "center"
+                //       : "flex-start",
                 minWidth: 0,
 
                 /**
