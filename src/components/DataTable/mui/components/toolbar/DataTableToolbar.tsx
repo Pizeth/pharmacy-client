@@ -48,6 +48,7 @@ export function DataTableToolbar<TData extends RowData>(
     searchMode = "always",
     searchPosition = "center",
     searchPlaceholder = "Search…",
+    searchDebounceMs = 0,
     searchOpen: controlledSearchOpen,
     defaultSearchOpen = false,
     onSearchOpenChange,
@@ -111,7 +112,12 @@ export function DataTableToolbar<TData extends RowData>(
         flexShrink: 1,
       }}
     >
-      <DataTableGlobalFilter table={table} placeholder={searchPlaceholder} />
+      <DataTableGlobalFilter
+        table={table}
+        placeholder={searchPlaceholder}
+        debounceMs={searchDebounceMs}
+        fullWidth={narrow}
+      />
     </Box>
   ) : null;
 

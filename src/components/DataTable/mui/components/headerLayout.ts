@@ -20,6 +20,12 @@
  */
 
 /**
+ * ------------------------------------------------------------------
+ * Shared geometry for compact DataTable header affordances.
+ * ------------------------------------------------------------------
+ */
+
+/**
  * Gap between adjacent header affordances.
  *
  * 2 px corresponds to MUI spacing(0.25) with the default 8 px scale.

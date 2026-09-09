@@ -1,4 +1,6 @@
-import { HtmlHTMLAttributes } from "react";
+// src/interfaces/theme.interface.ts
+
+import { DataTableThemeProps } from "@/components/DataTable/mui/theme/types";
 import {
   AvatarProps,
   DividerProps,
@@ -29,6 +31,11 @@ export interface RazethComponentsPropsList {
   RazethFooter: Partial<FooterProps>;
   RazethTV: Partial<TVProps>;
   RazethNavToggle: Partial<DrawerToggleProps>;
+
+  /**
+   * Generic application-wide DataTable defaults.
+   */
+  RazethDataTable: Partial<DataTableThemeProps>;
 }
 
 export interface SideImage {

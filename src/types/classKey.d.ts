@@ -1,3 +1,5 @@
+// src/types/classKey.d.ts
+
 import { ComponentsPropsList } from "@/interfaces/theme.interface";
 import { ComponentsOverrides, Theme } from "@mui/material";
 

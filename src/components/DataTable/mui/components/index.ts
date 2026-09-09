@@ -22,4 +22,5 @@ export * from "./DataTableHeaderCell";
 export * from "./DataTableHeaderContent";
 export * from "./DataTableHeaderRow";
 export * from "./DataTableResizeHandle";
+export * from "./DataTableRowNumberCell";
 export * from "./DataTableShell";

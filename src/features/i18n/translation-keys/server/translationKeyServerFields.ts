@@ -16,7 +16,7 @@ export const TRANSLATION_KEY_COLUMN_IDS = {
   /**
    * Real scalar fields.
    */
-  id: "id",
+  rowNumber: "rowNumber",
   key: "key",
   description: "description",
 

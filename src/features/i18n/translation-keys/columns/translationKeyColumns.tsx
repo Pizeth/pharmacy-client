@@ -2,7 +2,10 @@
 
 import { Tooltip, Typography } from "@mui/material";
 
-import { createMuiDataTableColumnHelper } from "@/components/DataTable";
+import {
+  createMuiDataTableColumnHelper,
+  DataTableRowNumberCell,
+} from "@/components/DataTable";
 
 import type { TranslationKey } from "../schemas";
 
@@ -84,27 +87,78 @@ export const translationKeyColumns = columnHelper.columns([
    *   sorting  -> id
    *   filtering -> id equals number
    */
-  columnHelper.accessor("id", {
-    id: TRANSLATION_KEY_COLUMN_IDS.id,
-    header: "ID",
-    enableSorting: true,
-    enableColumnFilter: true,
-    size: 90,
-    minSize: 70,
-    maxSize: 140,
-    meta: { align: "center" },
-    cell: ({ getValue }) => (
-      <Typography
-        component="span"
-        variant="body2"
-        sx={{
-          fontVariantNumeric: "tabular-nums",
-        }}
-      >
-        {getValue()}
-      </Typography>
-    ),
+  columnHelper.display({
+    id: TRANSLATION_KEY_COLUMN_IDS.rowNumber,
+    header: "No.",
+    /**
+     * This is presentation only.
+     *
+     * It is NOT a database/API field, so the server must never receive:
+     *
+     * sorting:
+     *   rowNumber
+     *
+     * or:
+     *
+     * filtering:
+     *   rowNumber
+     */
+    enableSorting: false,
+    enableColumnFilter: false,
+
+    /**
+     * Structural table column.
+     *
+     * Normally users should not hide the sequential number.
+     */
+    enableHiding: false,
+
+    /**
+     * Keep it compact and stable.
+     */
+    enableResizing: false,
+
+    /**
+     * Its size is intentionally compact and stable.
+     */
+    size: 64,
+    minSize: 56,
+    maxSize: 72,
+    meta: { align: "center", headerAlign: "center", enableColumnMenu: false },
+
+    /**
+     * Sequential position across SERVER pages.
+     *
+     * Current page:
+     *
+     *   row.index = 0..24
+     *
+     * pageIndex 0:
+     *
+     *   0 * 25 + row.index + 1
+     *     ↓
+     *   1..25
+     *
+     * pageIndex 1:
+     *
+     *   1 * 25 + row.index + 1
+     *     ↓
+     *   26..50
+     */
+    cell: ({ row }) => <DataTableRowNumberCell rowIndex={row.index} />,
   }),
+  //     (
+  //     <Typography
+  //       component="span"
+  //       variant="body2"
+  //       sx={{
+  //         fontVariantNumeric: "tabular-nums",
+  //       }}
+  //     >
+  //       {getValue()}
+  //     </Typography>
+  //   ),
+  // }),
 
   /**
    * ==============================================================

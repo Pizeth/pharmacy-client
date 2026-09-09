@@ -26,9 +26,30 @@ export interface DataTableGlobalFilterConfig {
   readonly label?: string;
 
   /**
-   * Whether the clear button should be shown when a value exists.
+   * Whether the clear button should be shown while a value exists.
    *
    * Default: true
    */
   readonly clearable?: boolean;
+
+  /**
+   * Delay before visible typing is committed to TanStack's
+   * globalFilter state.
+   *
+   * This is particularly important for server-backed tables because
+   * globalFilter participates in the server query/request key.
+   *
+   * 0:
+   *   commit every edit immediately
+   *
+   * 250–400:
+   *   recommended range for server-backed search
+   *
+   * Default:
+   *
+   *   0
+   *
+   * The generic DataTable does not assume that a table is remote.
+   */
+  readonly debounceMs?: number;
 }

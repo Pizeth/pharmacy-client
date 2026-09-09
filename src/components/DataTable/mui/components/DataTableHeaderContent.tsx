@@ -2,19 +2,14 @@
 
 // src/components/DataTable/mui/components/DataTableHeaderContent.tsx
 
-import { Box, TableCellProps } from "@mui/material";
+import { Box } from "@mui/material";
+import type { TableCellProps } from "@mui/material/TableCell";
 import type { CellData, Header, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
 import { DataTableColumnMenuButton } from "./column-menu";
 import { DataTableFilterIndicator } from "./filtering";
-import { DataTableSortLabel } from "./sorting";
-// import {
-//   DATA_TABLE_HEADER_AFFORDANCE_GAP_PX,
-//   DATA_TABLE_HEADER_MENU_BUTTON_SIZE_PX,
-//   getDataTableHeaderCenterCompensationPx,
-// } from "./headerLayout";
-import { DataTableSortIndicator } from "./sorting/DataTableSortIndicator";
+import { DataTableSortIndicator, DataTableSortLabel } from "./sorting";
 
 export interface DataTableHeaderContentProps<
   TData extends RowData,
@@ -192,8 +187,9 @@ export function DataTableHeaderContent<
         const showFilterIndicator = canFilter && isFiltered;
 
         /**
-         * Center-aligned headers use the mathematically symmetric
-         * three-track layout.
+         * ==========================================================
+         * Center alignment
+         * ==========================================================
          */
         if (align === "center") {
           return (
@@ -213,9 +209,8 @@ export function DataTableHeaderContent<
                 display: "grid",
 
                 /**
-                 * The two 1fr tracks are always identical.
-                 *
-                 * Therefore the middle auto track is centered exactly.
+                 * Symmetric tracks guarantee that the middle label
+                 * track stays at the physical column center.
                  */
                 gridTemplateColumns: "minmax(0, 1fr) auto minmax(0, 1fr)",
 
@@ -233,7 +228,7 @@ export function DataTableHeaderContent<
             >
               {/**
                * ----------------------------------------------------
-               * Track 1 — symmetric empty space
+               * Track 1 —  Symmetric empty inline-start track.
                * ----------------------------------------------------
                *
                * It intentionally contains nothing.
@@ -247,7 +242,7 @@ export function DataTableHeaderContent<
 
               {/**
                * ----------------------------------------------------
-               * Track 2 — THE LABEL
+               * Track 2 — Exact center label
                * ----------------------------------------------------
                *
                * This track is mathematically centered.
@@ -357,10 +352,6 @@ export function DataTableHeaderContent<
                     flex: "0 0 18px",
                   },
 
-                  "& .DataTable-sortButton .MuiSvgIcon-root": {
-                    fontSize: 15,
-                  },
-
                   /**
                    * Column-menu affordance.
                    */
@@ -371,6 +362,13 @@ export function DataTableHeaderContent<
                     p: 0,
                     m: 0,
                     flex: "0 0 20px",
+                  },
+
+                  /**
+                   * Keep the actual icons compact.
+                   */
+                  "& .DataTable-sortButton .MuiSvgIcon-root": {
+                    fontSize: 15,
                   },
 
                   "& .DataTable-columnMenuButton .MuiSvgIcon-root": {
@@ -444,23 +442,12 @@ export function DataTableHeaderContent<
 
         /**
          * ----------------------------------------------------------
-         * Optical center compensation
+         * Explicit left/right alignment
          * ----------------------------------------------------------
-         *
-         * Apply only for centered headers.
          *
          * Left/right aligned headers should naturally lay out from
          * their corresponding edge.
          */
-        // const centerCompensationPx =
-        //   align === "center"
-        //     ? getDataTableHeaderCenterCompensationPx({
-        //         canSort,
-        //         showSortIndex,
-        //         showFilterIndicator,
-        //         showColumnMenu: enableColumnMenu,
-        //       })
-        //     : 0;
 
         return (
           <Box
@@ -587,18 +574,6 @@ export function DataTableHeaderContent<
              *
              * This is the only flexible/shrinkable section.
              */}
-            {/* <Box
-              className="DataTable-headerMain"
-              sx={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 0.5,
-                minWidth: 0,
-                maxWidth: "100%",
-                // flex: "1 1 auto",
-                overflow: "hidden",
-              }}
-            > */}
             <DataTableSortLabel
               canSort={canSort}
               direction={direction}
@@ -614,7 +589,6 @@ export function DataTableHeaderContent<
                        * controls or menus from seeing the click.
                        */
                       event.stopPropagation();
-
                       sortHandler?.(event);
                     }
                   : undefined
@@ -622,8 +596,6 @@ export function DataTableHeaderContent<
             >
               <table.FlexRender header={header} />
             </DataTableSortLabel>
-            {/* </Box> */}
-
             <Box
               className="DataTable-headerActions"
               sx={{

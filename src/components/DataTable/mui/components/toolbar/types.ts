@@ -78,6 +78,23 @@ export interface DataTableToolbarConfig<TData extends RowData> {
   readonly searchPlaceholder?: string;
 
   /**
+   * Debounce interval used by the standard global-search input.
+   *
+   * This controls presentation-to-TanStack commit timing only.
+   *
+   * It does NOT introduce another query state.
+   *
+   * Recommended for server-backed tables:
+   *
+   *   250–400ms
+   *
+   * Default:
+   *
+   *   0
+   */
+  readonly searchDebounceMs?: number;
+
+  /**
    * Controlled visibility of the global-search field when
    * searchMode === "collapsible".
    *

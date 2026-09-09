@@ -1,3 +1,5 @@
+// src/theme.d.ts
+
 import {
   CssVarsTheme,
   PaletteMode,
@@ -86,6 +88,10 @@ declare module "@mui/material/styles" {
     keyof RazethComponentsPropsList,
     ClassKey
   > {}
+
+  interface ComponentNameToClassKey {
+    RazethDataTable: DataTableClassKey;
+  }
 
   // ComponentsPropsList directly extends our map.
   interface ComponentsPropsList extends RazethComponentsPropsList {}

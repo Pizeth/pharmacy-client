@@ -164,7 +164,22 @@ export function TranslationKeyTable() {
            * We will customize its resource-specific controls in
            * Phase 1.7.10.5.
            */
-          toolbar
+          toolbar={{
+            search: true,
+
+            searchMode: "always",
+
+            searchPosition: "center",
+
+            searchPlaceholder: "Search translations…",
+
+            /**
+             * User sees every keystroke immediately.
+             *
+             * TanStack/global server query only changes after 300ms idle.
+             */
+            searchDebounceMs: 300,
+          }}
           /**
            * Real server-backed pagination.
            */
