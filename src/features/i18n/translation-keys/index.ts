@@ -1,3 +1,5 @@
+// src/features/i18n/translation-keys/index.ts
+
 export * from "./api";
 export * from "./columns";
 export * from "./schemas";

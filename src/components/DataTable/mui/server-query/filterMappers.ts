@@ -79,6 +79,49 @@ export function createDataTableTextServerFilter(
 }
 
 /**
+ * Exact text filter.
+ *
+ * Unlike createDataTableTextServerFilter(), this emits:
+ *
+ *   operator: "equals"
+ *
+ * rather than:
+ *
+ *   operator: "contains"
+ *
+ * Appropriate examples:
+ *
+ *   locale
+ *   status code
+ *   enum-like textual identifiers
+ *
+ * Empty/whitespace-only values produce no semantic filter.
+ */
+export function createDataTableExactTextServerFilter(
+  field: string,
+): DataTableServerFilterMapper {
+  return (value) => {
+    if (typeof value !== "string") {
+      return [];
+    }
+
+    const normalized = value.trim();
+
+    if (normalized.length === 0) {
+      return [];
+    }
+
+    return [
+      {
+        field,
+        operator: "equals",
+        value: normalized,
+      },
+    ];
+  };
+}
+
+/**
  * Exact numeric filter.
  */
 export function createDataTableNumberServerFilter(

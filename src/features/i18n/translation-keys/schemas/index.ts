@@ -1,3 +1,5 @@
+// src/features/i18n/translation-keys/schemas/index.ts
+
 export {
   createTranslationInputSchema,
   createTranslationKeyInputSchema,

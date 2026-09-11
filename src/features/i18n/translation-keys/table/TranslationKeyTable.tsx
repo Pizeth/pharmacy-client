@@ -41,7 +41,8 @@ function getTranslationKeyTableErrorMessage(error: unknown): string {
  * DataTable stack.
  */
 export function TranslationKeyTable() {
-  const { table, server, refresh } = useTranslationKeyDataTable();
+  const { table, server, filterOptions, refresh } =
+    useTranslationKeyDataTable();
 
   /**
    * ================================================================
@@ -148,6 +149,25 @@ export function TranslationKeyTable() {
           minWidth: 0,
         }}
       >
+        {filterOptions.error ? (
+          <Alert
+            severity="warning"
+            action={
+              <Button
+                color="inherit"
+                size="small"
+                startIcon={<Refresh />}
+                onClick={filterOptions.refresh}
+              >
+                Retry
+              </Button>
+            }
+          >
+            Category filter options could not be loaded. Other table filters
+            remain available.
+          </Alert>
+        ) : null}
+
         <DataTable
           table={table}
           /**
@@ -166,11 +186,8 @@ export function TranslationKeyTable() {
            */
           toolbar={{
             search: true,
-
             searchMode: "always",
-
             searchPosition: "center",
-
             searchPlaceholder: "Search translations…",
 
             /**
@@ -179,6 +196,11 @@ export function TranslationKeyTable() {
              * TanStack/global server query only changes after 300ms idle.
              */
             searchDebounceMs: 300,
+
+            /**
+             * Keep the standard filter-row visibility action.
+             */
+            enableFilterToggle: true,
           }}
           /**
            * Real server-backed pagination.
@@ -188,11 +210,28 @@ export function TranslationKeyTable() {
            * No row bulk-selection UX for TranslationKey yet.
            */
           selectionBar={false}
+          // /**
+          //  * We intentionally keep the filter row hidden until the
+          //  * resource-aware category/locale controls are implemented.
+          //  */
+          // showColumnFilters={false}
           /**
-           * We intentionally keep the filter row hidden until the
-           * resource-aware category/locale controls are implemented.
+           * Column filters render in the dedicated sticky filter row.
            */
-          showColumnFilters={false}
+          columnFilterDisplayMode="subheader"
+          /**
+           * Start closed while preserving toolbar ownership of subsequent
+           * show/hide interaction.
+           *
+           * Do NOT use:
+           *
+           *   showColumnFilters={false}
+           *
+           * here unless we intentionally want controlled visibility.
+           *
+           * Hidden initially, but uncontrolled afterward.
+           */
+          defaultShowColumnFilters={false}
           /**
            * Sticky headers are now safe to enable through the renderer's
            * forwarded MUI Table props.
@@ -206,6 +245,12 @@ export function TranslationKeyTable() {
            */
           containerProps={{
             sx: {
+              /**
+               * Existing page-level runtime/layout styling.
+               *
+               * We can move this toward the new slot-based styling convention
+               * during the visual audit.
+               */
               maxHeight: "calc(100vh - 240px)",
               minHeight: 320,
             },

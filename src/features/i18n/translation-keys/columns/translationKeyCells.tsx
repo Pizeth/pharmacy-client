@@ -9,7 +9,6 @@ import {
   Typography,
 } from "@mui/material";
 import type { TranslationValue } from "../schemas";
-import { CellContext } from "@tanstack/react-table";
 
 /**
  * ------------------------------------------------------------------

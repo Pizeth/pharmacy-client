@@ -4,6 +4,7 @@ export { createDataTableServerQueryMapper } from "./createDataTableServerQueryMa
 
 export {
   createDataTableBooleanServerFilter,
+  createDataTableExactTextServerFilter,
   createDataTableNumberRangeServerFilter,
   createDataTableNumberServerFilter,
   createDataTableScalarServerFilter,

@@ -1,10 +1,12 @@
+// src/features/i18n/translation-keys/types/translation-key.types.ts
+
 /**
  * Frontend representation of one TranslationCategory.
  *
  * This intentionally mirrors the HTTP resource contract rather than
  * importing generated Prisma types into the frontend.
  */
-export interface TranslationCategory {
+export interface TranslationCategory1 {
   readonly id: number;
   readonly name: string;
   readonly description: string | null;
@@ -19,7 +21,7 @@ export interface TranslationCategory {
  * We should only turn them into Date instances in presentation code
  * when formatting is actually required.
  */
-export interface TranslationValue {
+export interface TranslationValue1 {
   readonly id: number;
   readonly locale: string;
   readonly value: string;
@@ -37,15 +39,15 @@ export interface TranslationValue {
  *   POST /api/v1/i18n/keys
  *   PATCH /api/v1/i18n/keys/:id
  */
-export interface TranslationKey {
+export interface TranslationKey1 {
   readonly id: number;
   readonly key: string;
   readonly description: string | null;
   readonly categoryId: number;
   readonly createdAt: string;
   readonly updatedAt: string;
-  readonly translationCategory: TranslationCategory;
-  readonly translations: readonly TranslationValue[];
+  readonly translationCategory: TranslationCategory1;
+  readonly translations: readonly TranslationValue1[];
 }
 
 /**
@@ -53,7 +55,7 @@ export interface TranslationKey {
  *
  *   GET /api/v1/i18n/categories
  */
-export interface TranslationCategoryOption {
+export interface TranslationCategoryOption1 {
   readonly id: number;
   readonly name: string;
   readonly description: string | null;

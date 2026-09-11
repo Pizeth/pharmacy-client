@@ -96,12 +96,42 @@ export function createDataTableServerQueryMapper(
         filterDescriptors.push(...mapper(filter.value));
       }
 
+      /**
+       * Normalize TanStack's broad globalFilter boundary into the textual
+       * contract used by DataTable.
+       *
+       * Do NOT trim the value in the UI/server-state layer because that
+       * state also represents what the user is actively editing.
+       */
       const globalFilter = normalizeDataTableGlobalFilter(query.globalFilter);
 
+      /**
+       * The semantic server boundary is where presentation input becomes
+       * request intent.
+       *
+       * Leading/trailing whitespace has no search meaning and should never
+       * cross the transport boundary.
+       *
+       * This also ensures a whitespace-only value:
+       *
+       *   "     "
+       *
+       * behaves exactly like an absent search rather than producing:
+       *
+       *   search: {
+       *     term: "     "
+       *   }
+       *
+       * UI state may preserve whitespace while a person is typing, but the
+       * outgoing semantic query should never contain meaningless surrounding
+       * whitespace.
+       */
+      const searchTerm = globalFilter.trim();
+
       const search =
-        globalFilter.length > 0 && globalSearchFields.length > 0
+        searchTerm.length > 0 && globalSearchFields.length > 0
           ? {
-              term: globalFilter,
+              term: searchTerm,
               fields: globalSearchFields,
             }
           : undefined;

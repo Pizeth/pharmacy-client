@@ -1,4 +1,13 @@
-export { translationKeyColumns } from "./translationKeyColumns";
+// src/features/i18n/translation-keys/columns/index.ts
+
+export { createTranslationKeyColumns } from "./translationKeyColumns";
+
+export type { CreateTranslationKeyColumnsOptions } from "./translationKeyColumns";
+
+export {
+  createTranslationKeyCategoryFilterOptions,
+  TRANSLATION_KEY_LOCALE_FILTER_OPTIONS,
+} from "./translationKeyFilterOptions";
 
 export {
   TranslationKeyCategoryCell,

@@ -52,7 +52,7 @@ export const translationKeySemanticQueryAdapter =
      * expose those as sortable fields.
      */
     sorting: {
-      [TRANSLATION_KEY_COLUMN_IDS.id]: TRANSLATION_KEY_SORT_FIELDS.id,
+      // [TRANSLATION_KEY_COLUMN_IDS.id]: TRANSLATION_KEY_SORT_FIELDS.id,
       [TRANSLATION_KEY_COLUMN_IDS.key]: TRANSLATION_KEY_SORT_FIELDS.key,
       [TRANSLATION_KEY_COLUMN_IDS.category]:
         TRANSLATION_KEY_SORT_FIELDS.category,
@@ -85,9 +85,9 @@ export const translationKeySemanticQueryAdapter =
        *     value: 6
        *   }
        */
-      [TRANSLATION_KEY_COLUMN_IDS.id]: createDataTableNumberServerFilter(
-        TRANSLATION_KEY_FILTER_FIELDS.id,
-      ),
+      // [TRANSLATION_KEY_COLUMN_IDS.id]: createDataTableNumberServerFilter(
+      //   TRANSLATION_KEY_FILTER_FIELDS.id,
+      // ),
 
       /**
        * Text containment:

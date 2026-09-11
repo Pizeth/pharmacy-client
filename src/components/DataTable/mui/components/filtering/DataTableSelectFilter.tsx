@@ -4,50 +4,40 @@
 
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import type { MuiDataTableFilterOption } from "../../meta";
-export type DataTableSelectFilterValue = string | number | boolean;
+import {
+  decodeDataTableSelectFilterValue,
+  encodeDataTableSelectFilterValue,
+} from "./selectFilterValue";
+import type { DataTableSelectFilterValue } from "./selectFilterValue";
 
 export interface DataTableSelectFilterProps {
   readonly value: DataTableSelectFilterValue | undefined;
+
   readonly label: string;
+
   readonly options: readonly MuiDataTableFilterOption[];
+
   readonly onChange: (value: DataTableSelectFilterValue) => void;
+
   readonly onClear: () => void;
 }
 
 /**
- * Exact-value select filter.
+ * Exact scalar-value select filter.
+ *
+ * Supports:
+ *
+ *   string
+ *   number
+ *   boolean
+ *
+ * while MUI Select itself receives a stable encoded string.
  */
 export function DataTableSelectFilter(props: DataTableSelectFilterProps) {
   const { value, label, options, onChange, onClear } = props;
 
-  /**
-   * MUI Select handles string/number values most naturally.
-   *
-   * Boolean options are encoded through a stable string representation.
-   */
-  const encodeValue = (candidate: DataTableSelectFilterValue): string => {
-    if (typeof candidate === "boolean") {
-      return candidate ? "boolean:true" : "boolean:false";
-    }
-
-    if (typeof candidate === "number") {
-      return `number:${candidate}`;
-    }
-
-    return `string:${candidate}`;
-  };
-
-  const decodeValue = (candidate: string): DataTableSelectFilterValue => {
-    if (candidate.startsWith("boolean:")) {
-      return candidate === "boolean:true";
-    }
-
-    if (candidate.startsWith("number:")) {
-      return Number(candidate.slice("number:".length));
-    }
-
-    return candidate.slice("string:".length);
-  };
+  const selectedValue =
+    value === undefined ? "" : encodeDataTableSelectFilterValue(value);
 
   return (
     <FormControl fullWidth size="small">
@@ -55,7 +45,7 @@ export function DataTableSelectFilter(props: DataTableSelectFilterProps) {
 
       <Select
         label={label}
-        value={value === undefined ? "" : encodeValue(value)}
+        value={selectedValue}
         onChange={(event) => {
           const encoded = event.target.value;
 
@@ -65,19 +55,20 @@ export function DataTableSelectFilter(props: DataTableSelectFilterProps) {
             return;
           }
 
-          onChange(decodeValue(encoded));
+          onChange(decodeDataTableSelectFilterValue(encoded));
         }}
       >
         <MenuItem value="">All</MenuItem>
 
-        {options.map((option) => (
-          <MenuItem
-            key={encodeValue(option.value)}
-            value={encodeValue(option.value)}
-          >
-            {option.label}
-          </MenuItem>
-        ))}
+        {options.map((option) => {
+          const encodedValue = encodeDataTableSelectFilterValue(option.value);
+
+          return (
+            <MenuItem key={encodedValue} value={encodedValue}>
+              {option.label}
+            </MenuItem>
+          );
+        })}
       </Select>
     </FormControl>
   );
