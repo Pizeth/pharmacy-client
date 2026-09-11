@@ -12,3 +12,4 @@ export * from "./server-query";
 export * from "./server-state";
 export * from "./styles";
 export * from "./table";
+export * from "./theme";

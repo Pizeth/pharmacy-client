@@ -89,9 +89,9 @@ declare module "@mui/material/styles" {
     ClassKey
   > {}
 
-  interface ComponentNameToClassKey {
-    RazethDataTable: DataTableClassKey;
-  }
+  // interface ComponentNameToClassKey {
+  //   RazethDataTable: DataTableClassKey;
+  // }
 
   // ComponentsPropsList directly extends our map.
   interface ComponentsPropsList extends RazethComponentsPropsList {}

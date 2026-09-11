@@ -1,9 +1,15 @@
 import type { MuiDataTableDensity } from "../density";
-
 import type {
   DataTableToolbarSearchMode,
   DataTableToolbarSearchPosition,
 } from "../components/toolbar";
+import type {
+  DataTableBooleanFilterProps,
+  DataTableNumberFilterProps,
+  DataTableNumberRangeFilterProps,
+  DataTableSelectFilterProps,
+  DataTableTextFilterProps,
+} from "../components/filtering";
 
 /**
  * Theme-level defaults supported by RazethDataTable.
@@ -84,3 +90,24 @@ export type DataTableClassKey =
   | "bodyCell"
   | "pagination"
   | "selectionBar";
+
+/**
+ * ------------------------------------------------------------------
+ * DataTable-specific MUI ComponentsPropsList extension
+ * ------------------------------------------------------------------
+ *
+ * This interface is deliberately kept inside the DataTable package.
+ *
+ * The application-level RazethComponentsPropsList can extend it rather
+ * than importing every individual DataTable component prop type.
+ *
+ * That keeps theme augmentation scalable as more DataTable slots become
+ * theme-aware later.
+ */
+export interface DataTableComponentsPropsList {
+  RazethDataTableTextFilter: Partial<DataTableTextFilterProps>;
+  RazethDataTableNumberFilter: Partial<DataTableNumberFilterProps>;
+  RazethDataTableNumberRangeFilter: Partial<DataTableNumberRangeFilterProps>;
+  RazethDataTableBooleanFilter: Partial<DataTableBooleanFilterProps>;
+  RazethDataTableSelectFilter: Partial<DataTableSelectFilterProps>;
+}

@@ -2,17 +2,41 @@
 
 // src/components/DataTable/mui/components/filtering/DataTableBooleanFilter.tsx
 
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  styled,
+  useThemeProps,
+} from "@mui/material";
 import { useId } from "react";
+import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
 
 type BooleanSelectValue = "" | "true" | "false";
 
 export interface DataTableBooleanFilterProps {
   readonly value: boolean | undefined;
   readonly label: string;
+  readonly size?: "small" | "medium";
   readonly onChange: (value: boolean) => void;
   readonly onClear: () => void;
 }
+
+const COMPONENT_NAME = DATA_TABLE_THEME_COMPONENT_NAMES.booleanFilter;
+
+const Root = styled(FormControl, {
+  name: COMPONENT_NAME,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})(() => ({
+  width: "100%",
+  minWidth: 0,
+
+  "& .MuiInputBase-root": {
+    minWidth: 0,
+  },
+}));
 
 /**
  * Boolean filter editor.
@@ -26,8 +50,13 @@ export interface DataTableBooleanFilterProps {
  * The component translates that UI representation back into the
  * boolean value expected by the filter state.
  */
-export function DataTableBooleanFilter(props: DataTableBooleanFilterProps) {
-  const { value, label, onChange, onClear } = props;
+export function DataTableBooleanFilter(inProps: DataTableBooleanFilterProps) {
+  const props = useThemeProps({
+    props: inProps,
+    name: COMPONENT_NAME,
+  });
+
+  const { value, label, size = "small", onChange, onClear } = props;
 
   const labelId = useId();
 
@@ -35,7 +64,7 @@ export function DataTableBooleanFilter(props: DataTableBooleanFilterProps) {
     value === undefined ? "" : value ? "true" : "false";
 
   return (
-    <FormControl fullWidth size="small">
+    <Root fullWidth size={size}>
       <InputLabel id={labelId}>{label}</InputLabel>
 
       <Select<BooleanSelectValue>
@@ -58,6 +87,6 @@ export function DataTableBooleanFilter(props: DataTableBooleanFilterProps) {
         <MenuItem value="true">Yes</MenuItem>
         <MenuItem value="false">No</MenuItem>
       </Select>
-    </FormControl>
+    </Root>
   );
 }

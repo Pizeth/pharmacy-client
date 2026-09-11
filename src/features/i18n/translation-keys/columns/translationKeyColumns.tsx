@@ -3,10 +3,12 @@
 // src/features/i18n/translation-keys/columns/translationKeyColumns.tsx
 
 import { Tooltip, Typography } from "@mui/material";
-import {
-  createMuiDataTableColumnHelper,
-  DataTableRowNumberCell,
-} from "@/components/DataTable";
+// import {
+//   createMuiDataTableColumnHelper,
+//   DataTableRowNumberCell,
+// } from "@/components/DataTable";
+import { DataTableRowNumberCell } from "@/components/DataTable/mui/components";
+import { createMuiDataTableColumnHelper } from "@/components/DataTable/mui/table";
 import type { TranslationKey } from "../schemas";
 import type { MuiDataTableFilterOption } from "@/components/DataTable/mui/meta";
 import { TRANSLATION_KEY_COLUMN_IDS } from "../server";

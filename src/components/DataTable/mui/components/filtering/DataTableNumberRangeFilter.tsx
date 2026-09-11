@@ -2,20 +2,46 @@
 
 // src/components/DataTable/mui/components/filtering/DataTableNumberRangeFilter.tsx
 
-import { Stack, TextField } from "@mui/material";
+import { Stack, styled, TextField, useThemeProps } from "@mui/material";
 import type { DataTableNumberRangeValue } from "./types";
+import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
 
 export interface DataTableNumberRangeFilterProps {
   readonly value: DataTableNumberRangeValue;
   readonly label: string;
+  readonly size?: "small" | "medium";
   readonly onChange: (value: DataTableNumberRangeValue) => void;
   readonly onClear: () => void;
 }
 
+const COMPONENT_NAME = DATA_TABLE_THEME_COMPONENT_NAMES.numberRangeFilter;
+
+const Root = styled(Stack, {
+  name: COMPONENT_NAME,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})(() => ({
+  width: "100%",
+  minWidth: 0,
+
+  "& .MuiTextField-root": {
+    minWidth: 0,
+  },
+
+  "& .MuiInputBase-root": {
+    minWidth: 0,
+  },
+}));
+
 export function DataTableNumberRangeFilter(
-  props: DataTableNumberRangeFilterProps,
+  inProps: DataTableNumberRangeFilterProps,
 ) {
-  const { value, label, onChange, onClear } = props;
+  const props = useThemeProps({
+    props: inProps,
+    name: COMPONENT_NAME,
+  });
+
+  const { value, label, size = "small", onChange, onClear } = props;
 
   const [min, max] = value;
 
@@ -52,25 +78,10 @@ export function DataTableNumberRangeFilter(
   };
 
   return (
-    <Stack
-      direction="row"
-      spacing={1}
-      sx={{
-        width: "100%",
-        minWidth: 0,
-
-        "& .MuiTextField-root": {
-          minWidth: 0,
-        },
-
-        "& .MuiInputBase-root": {
-          minWidth: 0,
-        },
-      }}
-    >
+    <Root direction="row" spacing={1}>
       <TextField
         fullWidth
-        size="small"
+        size={size}
         type="number"
         label={`${label} minimum`}
         value={min ?? ""}
@@ -89,6 +100,6 @@ export function DataTableNumberRangeFilter(
           updateMax(event.target.value);
         }}
       />
-    </Stack>
+    </Root>
   );
 }

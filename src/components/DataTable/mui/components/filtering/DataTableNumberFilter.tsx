@@ -2,27 +2,50 @@
 
 // src/components/DataTable/mui/components/filtering/DataTableNumberFilter.tsx
 
-import { TextField } from "@mui/material";
+import { styled, TextField, useThemeProps } from "@mui/material";
+import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
 
 export interface DataTableNumberFilterProps {
   readonly value: number | undefined;
   readonly label: string;
+  readonly size?: "small" | "medium";
   readonly onChange: (value: number) => void;
   readonly onClear: () => void;
 }
 
+const COMPONENT_NAME = DATA_TABLE_THEME_COMPONENT_NAMES.numberFilter;
+
+const Root = styled(TextField, {
+  name: COMPONENT_NAME,
+  slot: "Root",
+
+  overridesResolver: (_props, styles) => styles.root,
+})(() => ({
+  width: "100%",
+  minWidth: 0,
+
+  "& .MuiInputBase-root": {
+    minWidth: 0,
+  },
+}));
+
 /**
  * Single numeric-value filter editor.
  *
- * Empty input removes the filter.
+ * Empty input removes the corresponding TanStack filter.
  */
-export function DataTableNumberFilter(props: DataTableNumberFilterProps) {
-  const { value, label, onChange, onClear } = props;
+export function DataTableNumberFilter(inProps: DataTableNumberFilterProps) {
+  const props = useThemeProps({
+    props: inProps,
+    name: COMPONENT_NAME,
+  });
+
+  const { value, label, size = "small", onChange, onClear } = props;
 
   return (
-    <TextField
+    <Root
       fullWidth
-      size="small"
+      size={size}
       type="number"
       label={label}
       value={value ?? ""}
@@ -37,7 +60,7 @@ export function DataTableNumberFilter(props: DataTableNumberFilterProps) {
 
         const parsed = Number(rawValue);
 
-        if (Number.isNaN(parsed)) {
+        if (!Number.isFinite(parsed)) {
           return;
         }
 

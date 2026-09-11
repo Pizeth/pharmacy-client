@@ -5,10 +5,13 @@
 import { Box } from "@mui/material";
 import { FilterAlt } from "@mui/icons-material";
 import { DATA_TABLE_HEADER_FILTER_INDICATOR_SIZE_PX } from "../headerLayout";
+import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
 
 export interface DataTableFilterIndicatorProps {
   readonly active: boolean;
 }
+
+const COMPONENT_NAME = DATA_TABLE_THEME_COMPONENT_NAMES.filterIndicator;
 
 /**
  * Small header indicator showing that a column currently has

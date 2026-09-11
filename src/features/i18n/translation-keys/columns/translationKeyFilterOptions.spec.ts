@@ -5,7 +5,7 @@ import {
 
 describe("TranslationKey filter options", () => {
   describe("createTranslationKeyCategoryFilterOptions", () => {
-    it("uses category name as label and category id as value", () => {
+    it("uses category name as label, category id as value, and sorts by label", () => {
       const options = createTranslationKeyCategoryFilterOptions([
         {
           id: 1,
@@ -21,12 +21,12 @@ describe("TranslationKey filter options", () => {
 
       expect(options).toEqual([
         {
-          label: "common",
-          value: 1,
-        },
-        {
           label: "auth",
           value: 2,
+        },
+        {
+          label: "common",
+          value: 1,
         },
       ]);
     });

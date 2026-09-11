@@ -201,6 +201,16 @@ export function TranslationKeyTable() {
              * Keep the standard filter-row visibility action.
              */
             enableFilterToggle: true,
+
+            /**
+             * Show:
+             *
+             *   "1 filter"
+             *   "2 filters"
+             *
+             * and expose the existing clear-all-filter action.
+             */
+            showFilterStatus: true,
           }}
           /**
            * Real server-backed pagination.

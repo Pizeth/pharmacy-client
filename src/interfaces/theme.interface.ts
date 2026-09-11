@@ -16,10 +16,11 @@ import {
   LoginFormProps,
   TVProps,
 } from "./component-props.interface";
+import type { DataTableComponentsPropsList } from "@/components/DataTable/mui/theme";
 
 // This interface maps each component's name to its specific props interface.
 // To add a new component, you only need to add a new line here.
-export interface RazethComponentsPropsList {
+export interface RazethComponentsPropsList extends DataTableComponentsPropsList {
   RazethLogin: Partial<LoginProps>;
   RazethSideImage: Partial<SideImageProps>;
   RazethAvatar: Partial<AvatarProps>;
@@ -31,11 +32,6 @@ export interface RazethComponentsPropsList {
   RazethFooter: Partial<FooterProps>;
   RazethTV: Partial<TVProps>;
   RazethNavToggle: Partial<DrawerToggleProps>;
-
-  /**
-   * Generic application-wide DataTable defaults.
-   */
-  RazethDataTable: Partial<DataTableThemeProps>;
 }
 
 export interface SideImage {
