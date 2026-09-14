@@ -1,15 +1,10 @@
+import { Table, TableHead } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-
 import { fireEvent, render, screen } from "@testing-library/react";
-
 import { DataTableDensityProvider } from "../density";
-
 import type { MuiDataTableDensity } from "../density";
-
 import { dataTableClasses } from "../styles";
-
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "../table";
-
 import { DataTableHeaderRow } from "./DataTableHeaderRow";
 
 type Row = {
@@ -50,95 +45,148 @@ const data: readonly Row[] = [
 
 function HeaderStructure(props: {
   readonly density?: MuiDataTableDensity;
-
   readonly headerRowIndex?: number;
 }) {
-  const {
-    density = "comfortable",
-
-    headerRowIndex = 0,
-  } = props;
+  const { density = "comfortable", headerRowIndex = 0 } = props;
 
   const table = useMuiDataTable({
     columns,
     data: [...data],
+    /**
+     * Resizing is deliberately disabled for this structural fixture.
+     *
+     * The fixture is testing:
+     *
+     * - header slots
+     * - sizing geometry
+     * - sticky geometry
+     * - logical pinning
+     * - density
+     *
+     * Interactive resize-handle behavior gets its own focused tests
+     * during Phase 6C.5.
+     */
     enableColumnResizing: false,
   });
 
   return (
-    <DataTableDensityProvider density={density}>
-      <button
-        onClick={() => {
-          table.setColumnSizing({
-            name: 240,
-            role: 80,
-          });
-        }}
-      >
-        Resize
-      </button>
+    /**
+     * REQUIRED TanStack v9 application-table context.
+     *
+     * Production DataTable installs this exact boundary before any
+     * renderer components.
+     *
+     * DataTableHeaderCell renders:
+     *
+     *   <table.AppHeader>
+     *     ...
+     *     <appHeader.ResizeHandle />
+     *   </table.AppHeader>
+     *
+     * DataTableResizeHandle consumes both:
+     *
+     *   useMuiDataTableContext()
+     *   useMuiDataTableHeaderContext()
+     *
+     * Therefore testing the real header renderer without AppTable is
+     * an invalid renderer hierarchy even when column resizing itself
+     * is disabled.
+     */
+    <table.AppTable>
+      <DataTableDensityProvider density={density}>
+        <button
+          onClick={() => {
+            table.setColumnSizing({
+              name: 240,
+              role: 80,
+            });
+          }}
+        >
+          Resize
+        </button>
 
-      <button
-        onClick={() => {
-          table.setColumnPinning({
-            start: ["name", "role"],
-            end: [],
-          });
-        }}
-      >
-        Pin start
-      </button>
+        <button
+          onClick={() => {
+            table.setColumnPinning({
+              start: ["name", "role"],
+              end: [],
+            });
+          }}
+        >
+          Pin start
+        </button>
 
-      <button
-        onClick={() => {
-          table.setColumnPinning({
-            start: [],
-            end: ["name", "role"],
-          });
-        }}
-      >
-        Pin end
-      </button>
+        <button
+          onClick={() => {
+            table.setColumnPinning({
+              start: [],
+              end: ["name", "role"],
+            });
+          }}
+        >
+          Pin end
+        </button>
 
-      <button
-        onClick={() => {
-          table.setColumnPinning({
-            start: [],
-            end: [],
-          });
-        }}
-      >
-        Unpin
-      </button>
+        <button
+          onClick={() => {
+            table.setColumnPinning({
+              start: [],
+              end: [],
+            });
+          }}
+        >
+          Unpin
+        </button>
 
-      <table>
-        <thead>
-          <table.Subscribe
-            selector={(state) => ({
-              columnVisibility: state.columnVisibility,
-              columnOrder: state.columnOrder,
-              columnPinning: state.columnPinning,
-            })}
-          >
-            {() => {
-              const headerGroup = table.getHeaderGroups()[0];
+        {/**
+         * Use MUI's Table + TableHead rather than native table/head elements.
+         *
+         * DataTableHeaderCell renders a styled MUI TableCell.
+         *
+         * MUI TableHead supplies the table-level variant context that tells
+         * TableCell:
+         *
+         *   this is a header cell
+         *
+         * which results in:
+         *
+         *   <th role="columnheader">
+         *
+         * rather than:
+         *
+         *   <td role="cell">
+         *
+         * This mirrors the real DataTableHead production hierarchy.
+         */}
+        <Table>
+          <TableHead>
+            <table.Subscribe
+              selector={(state) => ({
+                columnVisibility: state.columnVisibility,
+                columnOrder: state.columnOrder,
+                columnPinning: state.columnPinning,
+              })}
+            >
+              {() => {
+                const headerGroup = table.getHeaderGroups()[0];
 
-              if (!headerGroup) {
-                return null;
-              }
+                if (!headerGroup) {
+                  return null;
+                }
 
-              return (
-                <DataTableHeaderRow
-                  table={table}
-                  headerGroup={headerGroup}
-                  headerRowIndex={headerRowIndex}
-                />
-              );
-            }}
-          </table.Subscribe>
-        </thead>
-      </table>
-    </DataTableDensityProvider>
+                return (
+                  <DataTableHeaderRow
+                    table={table}
+                    headerGroup={headerGroup}
+                    headerRowIndex={headerRowIndex}
+                  />
+                );
+              }}
+            </table.Subscribe>
+          </TableHead>
+        </Table>
+      </DataTableDensityProvider>
+    </table.AppTable>
   );
 }
 

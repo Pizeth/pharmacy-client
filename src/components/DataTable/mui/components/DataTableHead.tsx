@@ -2,12 +2,20 @@
 
 // src/components/DataTable/mui/components/DataTableHead.tsx
 
-import { TableHead } from "@mui/material";
+import { styled, TableHead } from "@mui/material";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { RowData } from "@tanstack/table-core";
 import { useDataTableFilterDisplay } from "../filter-display";
 import type { MuiDataTableInstance } from "../table";
 import { DataTableFilterRow } from "./filter-row";
 import { DataTableHeaderRow } from "./DataTableHeaderRow";
+
+/** Outer header section; cells continue to own sticky geometry. */
+const HeadRoot = styled(TableHead, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "Head",
+  overridesResolver: (_props, styles) => styles.head,
+})({});
 
 export interface DataTableHeadProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -46,7 +54,7 @@ export function DataTableHead<TData extends RowData>(
           columnFilterDisplayMode === "subheader" && showColumnFilters;
 
         return (
-          <TableHead>
+          <HeadRoot className={dataTableClasses.head}>
             {headerGroups.map((headerGroup, headerRowIndex) => (
               <DataTableHeaderRow
                 key={headerGroup.id}
@@ -61,7 +69,7 @@ export function DataTableHead<TData extends RowData>(
                 headerRowCount={headerGroups.length}
               />
             )}
-          </TableHead>
+          </HeadRoot>
         );
       }}
     </table.Subscribe>

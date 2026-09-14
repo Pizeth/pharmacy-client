@@ -72,6 +72,7 @@ export const dataTableClasses = generateUtilityClasses(
      *
      *   slot: "HeaderRow"
      */
+    "head",
     "headerRow",
 
     /**
@@ -151,6 +152,14 @@ export const dataTableClasses = generateUtilityClasses(
      *   slot: "HeaderActions"
      */
     "headerActions",
+    "headerLabel",
+    "sortLabel",
+    "sortIndicator",
+    "sortButton",
+    "sortIcon",
+    "sortIndex",
+    "columnMenuButton",
+    "resizeHandle",
   ],
 );
 

@@ -1,324 +1,75 @@
 "use client";
 
-// src/components/DataTable/mui/components/sorting/DataTableSortLabel.tsx
-
-import { Box, ButtonBase } from "@mui/material";
-
+import { ButtonBase, styled } from "@mui/material";
 import type { MouseEvent, ReactNode } from "react";
-
-import { DataTableSortIndex } from "./DataTableSortIndex";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
 export type DataTableSortDirection = "asc" | "desc" | false;
 
 export interface DataTableSortLabelProps {
-  /**
-   * Rendered TanStack header content.
-   */
   readonly children: ReactNode;
-
-  /**
-   * Current TanStack sorting direction.
-   */
   readonly direction: DataTableSortDirection;
-
-  /**
-   * Whether the column is allowed to sort.
-   */
   readonly canSort: boolean;
-
-  /**
-   * Zero-based sort order in multi-sort mode.
-   */
+  /** Compatibility props: the separate indicator owns the badge. */
   readonly sortIndex?: number;
-
-  /**
-   * Whether to render the multi-sort order indicator.
-   */
   readonly showSortIndex?: boolean;
-
-  /**
-   * Handler supplied by the parent/TanStack.
-   */
-  readonly onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+  readonly onClick?: (event: MouseEvent<HTMLElement>) => void;
 }
 
-/**
- * Standard MUI presentation for DataTable
- * semantic/clickable LABEL of a sortable header.
- *
- * Important architectural distinction:
- *
- * This component no longer renders the sort icon.
- *
- * Why?
- *
- * If the icon participates in this box's width, then centering this box
- * centers:
- *
- *   label + icon
- *
- * rather than:
- *
- *   label
- *
- * UX policy:
- *
- * non-sortable
- *   label only
- *
- * sortable + inactive
- *   label + faint sort glyph
- *
- * sortable + active
- *   label + emphasized directional glyph
- *
- * hover/focus
- *   stronger glyph emphasis
- *
- * This component owns only MUI presentation.
- *
- * TanStack remains responsible for:
- *
- * - current sorting state
- * - ascending/descending transitions
- * - sorting removal
- * - multi-sort behavior
- * - modifier-key interpretation
- */
-export function DataTableSortLabel(props: DataTableSortLabelProps) {
-  const {
-    children,
-    direction,
-    canSort,
-    // sortIndex,
-    // showSortIndex = true,
-    onClick,
-  } = props;
+const HeaderLabelRoot = styled("span", {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "HeaderLabel",
+  overridesResolver: (_props, styles) => styles.headerLabel,
+})({
+  display: "block",
+  minWidth: 0,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+  fontWeight: 600,
+  lineHeight: 1.25,
+});
 
-  /**
-   * MUI TableSortLabel expects a direction even while inactive.
-   *
-   * The direction is visually relevant only when active=true.
-   */
-  // const muiDirection = direction === "desc" ? "desc" : "asc";
+const SortLabelRoot = styled(ButtonBase, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "SortLabel",
+  overridesResolver: (_props, styles) => styles.sortLabel,
+})(({ theme }) => ({
+  display: "inline-flex",
+  minWidth: 0,
+  maxWidth: "100%",
+  color: "inherit",
+  borderRadius: `calc(${typeof theme.shape.borderRadius === "number" ? `${theme.shape.borderRadius}px` : theme.shape.borderRadius} * 0.5)`,
+  padding: 0,
+  "&:hover": { color: (theme.vars ?? theme).palette.text.primary },
+  "&:focus-visible, &.Mui-focusVisible": {
+    outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`,
+    outlineOffset: 2,
+  },
+})) as typeof ButtonBase;
 
-  const active = direction !== false;
-
-  /**
-   * Reusable header-label wrapper.
-   *
-   * This is intentionally the ONLY place in the header chain where
-   * ordinary label content is truncated, so text never competes with:
-   *
-   * - filter indicator
-   * - sort icon
-   * - multi-sort index
-   * - column-menu button
-   */
+/** Only the label participates in the centered track's intrinsic width. */
+export function DataTableSortLabel({
+  children,
+  direction,
+  canSort,
+  onClick,
+}: DataTableSortLabelProps) {
   const label = (
-    <Box
-      component="span"
-      className="DataTable-headerLabel"
-      sx={{
-        display: "block",
-        minWidth: 0,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-        fontWeight: 600,
-        lineHeight: 1.25,
-      }}
-    >
+    <HeaderLabelRoot className={dataTableClasses.headerLabel}>
       {children}
-    </Box>
+    </HeaderLabelRoot>
   );
-
-  /**
-   * ================================================================
-   * Non-sortable header
-   * ================================================================
-   */
-  if (!canSort) {
-    return label;
-  }
-
-  /**
-   * ================================================================
-   * Sortable header
-   * ================================================================
-   */
-  // return (
-  //   <Box
-  //     component="span"
-  //     sx={{
-  //       display: "inline-flex",
-  //       alignItems: "center",
-  //       gap: 0.5,
-  //       // flex: "1 1 auto",
-  //       minWidth: 0,
-  //       maxWidth: "100%",
-  //       overflow: "hidden",
-  //     }}
-  //   >
-  //     <TableSortLabel
-  //       active={active}
-  //       direction={muiDirection}
-  //       // /**
-  //       //  * Keep dormant sort arrows hidden for now.
-  //       //  *
-  //       //  * During the visual-polish pass we can make them subtly visible
-  //       //  * on hover, similar to the reference table.
-  //       //  */
-  //       // hideSortIcon={!active}
-  //       /**
-  //        * IMPORTANT:
-  //        *
-  //        * Keep an inactive sort affordance mounted.
-  //        *
-  //        * This gives users discoverability and—equally important—stable
-  //        * geometry.
-  //        *
-  //        * We control emphasis ourselves through opacity rather than
-  //        * completely removing the affordance from inactive columns.
-  //        */
-  //       hideSortIcon={false}
-  //       onClick={onClick}
-  //       // sx={{
-  //       //   minWidth: 0,
-  //       //   maxWidth: "100%",
-  //       //   color: "inherit",
-
-  //       //   /**
-  //       //    * MUI's root needs to remain shrinkable instead of letting
-  //       //    * the header label force the complete cell wider.
-  //       //    */
-  //       //   overflow: "hidden",
-
-  //       //   "&.Mui-active": {
-  //       //     color: "inherit",
-  //       //   },
-  //       //   "&:hover": {
-  //       //     color: "text.primary",
-  //       //   },
-  //       //   "& .MuiTableSortLabel-icon": {
-  //       //     flexShrink: 0,
-  //       //   },
-  //       // }}
-  //       sx={{
-  //         display: "inline-flex",
-  //         alignItems: "center",
-  //         // flex: "1 1 auto",
-  //         minWidth: 0,
-  //         maxWidth: "100%",
-
-  //         /**
-  //          * MUI's root needs to remain shrinkable instead of letting
-  //          * the header label force the complete cell wider.
-  //          */
-  //         overflow: "hidden",
-  //         color: "inherit",
-
-  //         /**
-  //          * Keep label and icon close together like the MRT header.
-  //          */
-  //         "& .MuiTableSortLabel-icon": {
-  //           /**
-  //            * Remove MUI's implicit margins so our header geometry has one
-  //            * canonical definition.
-  //            */
-  //           margin: 0,
-
-  //           marginInlineStart: `${DATA_TABLE_HEADER_AFFORDANCE_GAP_PX}px`,
-  //           width: `${DATA_TABLE_HEADER_SORT_ICON_SIZE_PX}px`,
-  //           height: `${DATA_TABLE_HEADER_SORT_ICON_SIZE_PX}px`,
-
-  //           // mx: 0.25,
-  //           // flexShrink: 0,
-
-  //           flex: "0 0 auto",
-
-  //           /**
-  //            * Always visible, but subordinate when inactive.
-  //            */
-  //           opacity: active ? 0.95 : 0.28,
-
-  //           color: active ? "primary.main" : "text.secondary",
-  //           transition: (theme) =>
-  //             theme.transitions.create(["opacity", "color", "transform"], {
-  //               duration: theme.transitions.duration.shortest,
-  //             }),
-  //         },
-
-  //         "&:hover .MuiTableSortLabel-icon": {
-  //           opacity: active ? 1 : 0.7,
-  //           color: active ? "primary.main" : "text.primary",
-  //         },
-
-  //         "&.Mui-active": {
-  //           color: "inherit",
-  //         },
-
-  //         "&:hover": {
-  //           color: "text.primary",
-  //         },
-
-  //         /**
-  //          * Accessible keyboard focus.
-  //          */
-  //         "&:focus-visible": {
-  //           outline: "2px solid",
-  //           outlineColor: "primary.main",
-  //           outlineOffset: 2,
-  //           borderRadius: 0.5,
-  //         },
-
-  //         // "& .MuiTableSortLabel-icon": {
-  //         //   flexShrink: 0,
-  //         // },
-  //       }}
-  //     >
-  //       {label}
-  //     </TableSortLabel>
-
-  //     {showSortIndex && active && sortIndex !== undefined && (
-  //       <DataTableSortIndex index={sortIndex} />
-  //     )}
-  //   </Box>
-  // );
-
+  if (!canSort) return label;
   return (
-    <ButtonBase
+    <SortLabelRoot
       component="span"
+      className={dataTableClasses.sortLabel}
+      data-direction={direction || "none"}
       onClick={onClick}
-      aria-pressed={active ? true : undefined}
-      sx={{
-        display: "inline-flex",
-
-        minWidth: 0,
-        maxWidth: "100%",
-
-        color: "inherit",
-
-        borderRadius: 0.5,
-
-        /**
-         * Don't let ButtonBase introduce visual padding that would
-         * change the label's geometric center.
-         */
-        p: 0,
-
-        "&:hover": {
-          color: "text.primary",
-        },
-
-        "&:focus-visible": {
-          outline: "2px solid",
-          outlineColor: "primary.main",
-          outlineOffset: 2,
-        },
-      }}
+      aria-pressed={direction !== false ? true : undefined}
     >
       {label}
-    </ButtonBase>
+    </SortLabelRoot>
   );
 }

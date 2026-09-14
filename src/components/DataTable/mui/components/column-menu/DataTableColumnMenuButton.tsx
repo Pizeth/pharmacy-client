@@ -1,6 +1,6 @@
 "use client";
 
-import { IconButton, Tooltip } from "@mui/material";
+import { IconButton, Tooltip, styled } from "@mui/material";
 import { MoreVert } from "@mui/icons-material";
 import { useState, type MouseEvent } from "react";
 import type { CellData, Column, RowData } from "@tanstack/table-core";
@@ -8,6 +8,37 @@ import type { MuiDataTableFeatures } from "../../features";
 import type { MuiDataTableInstance } from "../../table";
 import { DataTableColumnFilterPopover } from "./DataTableColumnFilterPopover";
 import { DataTableColumnMenu } from "./DataTableColumnMenu";
+
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
+
+const ColumnMenuButtonRoot = styled(IconButton, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "ColumnMenuButton",
+  overridesResolver: (_props, styles) => styles.columnMenuButton,
+})(({ theme }) => ({
+  flexShrink: 0,
+  width: 28,
+  height: 28,
+  opacity: 0.3,
+  transition: theme.transitions.create("opacity", {
+    duration: theme.transitions.duration.shortest,
+  }),
+  '&[aria-expanded="true"], &:focus-visible, &.Mui-focusVisible': {
+    opacity: 1,
+  },
+  [`.${dataTableClasses.headerContent}:hover &, .${dataTableClasses.headerContent}:focus-within &`]:
+    { opacity: 1 },
+  [`.${dataTableClasses.headerActions}[data-align="center"] &`]: {
+    width: 20,
+    height: 20,
+    minWidth: 20,
+    padding: 0,
+    margin: 0,
+    flex: "0 0 20px",
+  },
+  [`.${dataTableClasses.headerActions}[data-align="center"] & .MuiSvgIcon-root`]:
+    { fontSize: 18, marginInline: "4px" },
+}));
 
 export interface DataTableColumnMenuButtonProps<
   TData extends RowData,
@@ -65,39 +96,16 @@ export function DataTableColumnMenuButton<
   return (
     <>
       <Tooltip title="Column options">
-        <IconButton
-          className="DataTable-columnMenuButton"
+        <ColumnMenuButtonRoot
+          className={dataTableClasses.columnMenuButton}
           size="small"
           aria-label={`Open options for column ${column.id}`}
           aria-haspopup="menu"
           aria-expanded={menuOpen ? "true" : undefined}
           onClick={handleOpenMenu}
-          sx={{
-            flexShrink: 0,
-            width: 28,
-            height: 28,
-            opacity: menuOpen ? 1 : 0.3,
-
-            transition: (theme) =>
-              theme.transitions.create("opacity", {
-                duration: theme.transitions.duration.shortest,
-              }),
-
-            /**
-             * The parent header-content container exposes the menu
-             * button on hover/focus.
-             */
-            ".DataTable-headerContent:hover &": {
-              opacity: 1,
-            },
-
-            "&:focus-visible": {
-              opacity: 1,
-            },
-          }}
         >
           <MoreVert fontSize="small" />
-        </IconButton>
+        </ColumnMenuButtonRoot>
       </Tooltip>
 
       <DataTableColumnMenu
