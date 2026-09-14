@@ -2,6 +2,7 @@
 
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../table";
+import { getDataTableVisibleColumnsInRenderOrder } from "./visibleColumnOrder";
 
 export interface DataTableColumnGroupProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -41,11 +42,12 @@ export function DataTableColumnGroup<TData extends RowData>(
         columnSizing: state.columnSizing,
         columnVisibility: state.columnVisibility,
         columnPinning: state.columnPinning,
+        columnOrder: state.columnOrder,
       })}
     >
       {() => (
         <colgroup>
-          {table.getVisibleLeafColumns().map((column) => (
+          {getDataTableVisibleColumnsInRenderOrder(table).map((column) => (
             <col
               key={column.id}
               data-column-id={column.id}

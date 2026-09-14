@@ -4,14 +4,9 @@
 
 import { styled, TextField, useThemeProps } from "@mui/material";
 import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
+import type { DataTableTextFilterProps } from "./types";
 
-export interface DataTableTextFilterProps {
-  readonly value: string;
-  readonly label: string;
-  readonly size?: "small" | "medium";
-  readonly onChange: (value: string) => void;
-  readonly onClear: () => void;
-}
+export type { DataTableTextFilterProps } from "./types";
 
 const COMPONENT_NAME = DATA_TABLE_THEME_COMPONENT_NAMES.textFilter;
 
@@ -36,7 +31,7 @@ const Root = styled(TextField, {
   name: COMPONENT_NAME,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})(() => ({
+})<{ ownerState: DataTableTextFilterProps }>(() => ({
   width: "100%",
   minWidth: 0,
 
@@ -62,14 +57,26 @@ export function DataTableTextFilter(inProps: DataTableTextFilterProps) {
     name: COMPONENT_NAME,
   });
 
-  const { value, label, size = "small", onChange, onClear } = props;
+  const {
+    value,
+    label,
+    size = "small",
+    className,
+    sx,
+    onChange,
+    onClear,
+  } = props;
 
   return (
     <Root
+          disabled={props.disabled}
+      ownerState={{ ...props, size }}
       fullWidth
       size={size}
       label={label}
       value={value}
+      className={className}
+      sx={sx}
       onChange={(event) => {
         const nextValue = event.target.value;
 

@@ -87,6 +87,13 @@ export interface MuiDataTableColumnMeta {
    */
   readonly filterOptions?: readonly MuiDataTableFilterOption[];
 
+  /** Disable this editor without changing TanStack filter capability or state. */
+  readonly filterDisabled?: boolean;
+  /** Select options are being fetched, including background refreshes. */
+  readonly filterOptionsLoading?: boolean;
+  /** Safe user-facing option error; only the select editor is disabled. */
+  readonly filterOptionsError?: string;
+
   /**
    * Optional UI label override for the filter input.
    *

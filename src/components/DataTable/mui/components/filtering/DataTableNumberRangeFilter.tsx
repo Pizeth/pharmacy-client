@@ -3,16 +3,10 @@
 // src/components/DataTable/mui/components/filtering/DataTableNumberRangeFilter.tsx
 
 import { Stack, styled, TextField, useThemeProps } from "@mui/material";
-import type { DataTableNumberRangeValue } from "./types";
 import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
+import type { DataTableNumberRangeFilterProps } from "./types";
 
-export interface DataTableNumberRangeFilterProps {
-  readonly value: DataTableNumberRangeValue;
-  readonly label: string;
-  readonly size?: "small" | "medium";
-  readonly onChange: (value: DataTableNumberRangeValue) => void;
-  readonly onClear: () => void;
-}
+export type { DataTableNumberRangeFilterProps } from "./types";
 
 const COMPONENT_NAME = DATA_TABLE_THEME_COMPONENT_NAMES.numberRangeFilter;
 
@@ -20,7 +14,7 @@ const Root = styled(Stack, {
   name: COMPONENT_NAME,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})(() => ({
+})<{ ownerState: DataTableNumberRangeFilterProps }>(() => ({
   width: "100%",
   minWidth: 0,
 
@@ -41,14 +35,22 @@ export function DataTableNumberRangeFilter(
     name: COMPONENT_NAME,
   });
 
-  const { value, label, size = "small", onChange, onClear } = props;
+  const {
+    value,
+    label,
+    size = "small",
+    className,
+    sx,
+    onChange,
+    onClear,
+  } = props;
 
   const [min, max] = value;
 
   const updateMin = (rawValue: string): void => {
     const nextMin = rawValue.length === 0 ? undefined : Number(rawValue);
 
-    if (nextMin !== undefined && Number.isNaN(nextMin)) {
+    if (nextMin !== undefined && !Number.isFinite(nextMin)) {
       return;
     }
 
@@ -64,7 +66,7 @@ export function DataTableNumberRangeFilter(
   const updateMax = (rawValue: string): void => {
     const nextMax = rawValue.length === 0 ? undefined : Number(rawValue);
 
-    if (nextMax !== undefined && Number.isNaN(nextMax)) {
+    if (nextMax !== undefined && !Number.isFinite(nextMax)) {
       return;
     }
 
@@ -78,21 +80,25 @@ export function DataTableNumberRangeFilter(
   };
 
   return (
-    <Root direction="row" spacing={1}>
+    <Root ownerState={{ ...props, size }} direction="row" spacing={1}>
       <TextField
+          disabled={props.disabled}
         fullWidth
         size={size}
         type="number"
         label={`${label} minimum`}
         value={min ?? ""}
+        className={className}
+        sx={sx}
         onChange={(event) => {
           updateMin(event.target.value);
         }}
       />
 
       <TextField
+          disabled={props.disabled}
         fullWidth
-        size="small"
+        size={size}
         type="number"
         label={`${label} maximum`}
         value={max ?? ""}

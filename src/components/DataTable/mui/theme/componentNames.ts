@@ -21,7 +21,6 @@ export const DATA_TABLE_THEME_COMPONENT_NAMES = {
   numberRangeFilter: "RazethDataTableNumberRangeFilter",
   booleanFilter: "RazethDataTableBooleanFilter",
   selectFilter: "RazethDataTableSelectFilter",
-  filterIndicator: "RazethDataTableFilterIndicator",
 } as const;
 
 export type DataTableThemeComponentName =

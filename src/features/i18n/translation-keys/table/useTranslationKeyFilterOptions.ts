@@ -78,7 +78,8 @@ export function useTranslationKeyFilterOptions(): TranslationKeyFilterOptionsSta
     [],
   );
 
-  const [fetching, setFetching] = useState(false);
+  // The initial render must not expose an enabled empty Category select.
+  const [fetching, setFetching] = useState(true);
 
   const [error, setError] = useState<unknown>(undefined);
 

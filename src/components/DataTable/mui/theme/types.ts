@@ -9,7 +9,7 @@ import type {
   DataTableNumberRangeFilterProps,
   DataTableSelectFilterProps,
   DataTableTextFilterProps,
-} from "../components/filtering";
+} from "../components/filtering/types";
 
 /**
  * Theme-level defaults supported by RazethDataTable.
@@ -67,29 +67,7 @@ export interface DataTableThemeProps {
  *
  *   theme.components.RazethDataTable.styleOverrides
  */
-export type DataTableClassKey =
-  | "root"
-  | "shell"
-  | "toolbar"
-  | "toolbarStart"
-  | "toolbarCenter"
-  | "toolbarEnd"
-  | "tableContainer"
-  | "table"
-  | "head"
-  | "headerRow"
-  | "headerCell"
-  | "headerCellContent"
-  | "headerLabel"
-  | "headerActions"
-  | "resizeHandle"
-  | "filterRow"
-  | "filterCell"
-  | "body"
-  | "bodyRow"
-  | "bodyCell"
-  | "pagination"
-  | "selectionBar";
+export type { DataTableClassKey, DataTableSlotKey } from "../styles/dataTableClasses";
 
 /**
  * ------------------------------------------------------------------

@@ -2,13 +2,15 @@
 
 "use client";
 
-import { Box, TableCell } from "@mui/material";
+import { styled, TableCell } from "@mui/material";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { CellData, Column, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../../features";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../../density";
 import type { MuiDataTableInstance } from "../../table";
-import { getDataTablePinnedLayout, getDataTablePinnedSx } from "../pinning";
+import { getDataTablePinnedLayout } from "../pinning";
 import { DataTableColumnFilter } from "../filtering";
+import type { DataTableFilterCellStyle } from "./types";
 
 export interface DataTableFilterCellProps<
   TData extends RowData,
@@ -24,6 +26,54 @@ export interface DataTableFilterCellProps<
    */
   readonly stickyTop: number;
 }
+
+const FilterCellRoot = styled(TableCell, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "FilterCell",
+  overridesResolver: (_props, styles) => styles.filterCell,
+})(({ theme }) => ({
+  position: "sticky",
+  top: "var(--DataTable-filter-sticky-top)",
+  zIndex: 3,
+  backgroundColor: (theme.vars ?? theme).palette.background.paper,
+  boxSizing: "border-box",
+  width: "var(--DataTable-column-size)",
+  minWidth: "var(--DataTable-column-size)",
+  maxWidth: "var(--DataTable-column-size)",
+  height: "var(--DataTable-filter-cell-height)",
+  paddingInline: theme.spacing(0.75),
+  paddingBlock: theme.spacing(0.5),
+  verticalAlign: "middle",
+  overflow: "visible",
+  "& .MuiFormControl-root, & .MuiInputBase-root": { minWidth: 0 },
+
+  // Pinning remains logical, so these rules work in both LTR and RTL.
+  '&[data-pinned="start"], &[data-pinned="end"]': {
+    zIndex: 4,
+    backgroundClip: "padding-box",
+  },
+  '&[data-pinned="start"]': {
+    insetInlineStart: "var(--DataTable-column-pinned-offset)",
+  },
+  '&[data-pinned="end"]': {
+    insetInlineEnd: "var(--DataTable-column-pinned-offset)",
+  },
+  '&[data-pinned="start"][data-pinned-boundary="true"]': {
+    borderInlineEnd: "1px solid",
+    borderInlineEndColor: (theme.vars ?? theme).palette.divider,
+  },
+  '&[data-pinned="end"][data-pinned-boundary="true"]': {
+    borderInlineStart: "1px solid",
+    borderInlineStartColor: (theme.vars ?? theme).palette.divider,
+  },
+}));
+
+// Structural blank content keeps non-filterable columns in the table grid.
+const FilterCellPlaceholder = styled("span")({
+  display: "block",
+  width: "100%",
+  minHeight: 32,
+});
 
 /**
  * Renders one leaf-column cell in the optional filter subheader row.
@@ -63,78 +113,25 @@ export function DataTableFilterCell<
         const size = column.getSize();
 
         const pinnedLayout = getDataTablePinnedLayout(table, column);
-
-        const pinnedSx = getDataTablePinnedSx(pinnedLayout, "header");
-
         const canFilter = column.getCanFilter();
 
+        const style: DataTableFilterCellStyle = {
+          "--DataTable-column-size": `${size}px`,
+          "--DataTable-filter-sticky-top": `${stickyTop}px`,
+          "--DataTable-filter-cell-height": `${Math.max(40, densityMetrics.headerHeight - 4)}px`,
+          "--DataTable-column-pinned-offset": pinnedLayout
+            ? `${pinnedLayout.offset}px`
+            : undefined,
+        };
+
         return (
-          <TableCell
+          <FilterCellRoot
+            className={dataTableClasses.filterCell}
             data-filter-column-id={column.id}
             data-pinned={pinnedLayout?.position}
             data-density={density}
-            sx={{
-              /**
-               * The entire filter row is part of the sticky header
-               * stack.
-               */
-              position: "sticky",
-              top: `${stickyTop}px`,
-              zIndex: 3,
-
-              /**
-               * Sticky cells require their own background.
-               */
-              backgroundColor: "background.paper",
-              boxSizing: "border-box",
-
-              /**
-               * Keep this cell synchronized with the exact committed
-               * TanStack column width.
-               */
-              width: `${size}px`,
-              minWidth: `${size}px`,
-              maxWidth: `${size}px`,
-
-              /**
-               * The subheader needs enough room for MUI small inputs.
-               *
-               * We don't force DataTableColumnFilter itself to know
-               * anything about density or header structure.
-               */
-              height: `${Math.max(40, densityMetrics.headerHeight - 4)}px`,
-              px: 0.75,
-              py: 0.5,
-              verticalAlign: "middle",
-
-              /**
-               * Some MUI controls, labels, and menus need to remain
-               * visually unrestricted by the table cell itself.
-               */
-              overflow: "visible",
-
-              /**
-               * Compact the existing standard filtering controls when
-               * they are hosted in the header filter row.
-               *
-               * This is presentation styling only.
-               * Filter behavior remains completely inside
-               * DataTableColumnFilter.
-               */
-              "& .MuiFormControl-root": {
-                minWidth: 0,
-              },
-
-              "& .MuiInputBase-root": {
-                minWidth: 0,
-              },
-
-              /**
-               * Pinned positioning must come last so pinned header
-               * behavior wins over the generic sticky cell rules.
-               */
-              ...pinnedSx,
-            }}
+            data-pinned-boundary={pinnedLayout?.isCenterBoundary || undefined}
+            style={style}
           >
             {canFilter ? (
               <DataTableColumnFilter column={column} />
@@ -147,15 +144,9 @@ export function DataTableFilterCell<
                * column with enableColumnFilter=false must still
                * occupy their normal table-grid position.
                */
-              <Box
-                aria-hidden="true"
-                sx={{
-                  width: "100%",
-                  minHeight: 32,
-                }}
-              />
+              <FilterCellPlaceholder aria-hidden="true" />
             )}
-          </TableCell>
+          </FilterCellRoot>
         );
       }}
     </table.Subscribe>

@@ -48,6 +48,8 @@ export interface CreateTranslationKeyColumnsOptions {
    *   ]
    */
   readonly categoryFilterOptions: readonly MuiDataTableFilterOption[];
+  readonly categoryFilterOptionsFetching?: boolean;
+  readonly categoryFilterOptionsError?: unknown;
 
   /**
    * Locale options remain overridable so the application's future
@@ -106,6 +108,8 @@ export function createTranslationKeyColumns(
 ) {
   const {
     categoryFilterOptions,
+    categoryFilterOptionsFetching = false,
+    categoryFilterOptionsError,
     localeFilterOptions = TRANSLATION_KEY_LOCALE_FILTER_OPTIONS,
   } = options;
 
@@ -377,6 +381,11 @@ export function createTranslationKeyColumns(
 
         filterLabel: "Category",
         filterOptions: categoryFilterOptions,
+        filterOptionsLoading: categoryFilterOptionsFetching,
+        filterDisabled: categoryFilterOptionsError != null,
+        filterOptionsError: categoryFilterOptionsError != null
+          ? "Category options could not be loaded."
+          : undefined,
       },
       cell: ({ getValue }) => <TranslationKeyCategoryCell name={getValue()} />,
     }),

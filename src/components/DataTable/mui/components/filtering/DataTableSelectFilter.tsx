@@ -4,29 +4,22 @@
 
 import {
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
   styled,
   useThemeProps,
 } from "@mui/material";
-import { useId } from "react";
-import type { MuiDataTableFilterOption } from "../../meta";
+import { useEffect, useId, useState } from "react";
 import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
 import {
   decodeDataTableSelectFilterValue,
   encodeDataTableSelectFilterValue,
 } from "./selectFilterValue";
-import type { DataTableSelectFilterValue } from "./selectFilterValue";
+import type { DataTableSelectFilterProps } from "./types";
 
-export interface DataTableSelectFilterProps {
-  readonly value: DataTableSelectFilterValue | undefined;
-  readonly label: string;
-  readonly size?: "small" | "medium";
-  readonly options: readonly MuiDataTableFilterOption[];
-  readonly onChange: (value: DataTableSelectFilterValue) => void;
-  readonly onClear: () => void;
-}
+export type { DataTableSelectFilterProps } from "./types";
 
 const COMPONENT_NAME = DATA_TABLE_THEME_COMPONENT_NAMES.selectFilter;
 
@@ -34,7 +27,7 @@ const Root = styled(FormControl, {
   name: COMPONENT_NAME,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})(() => ({
+})<{ ownerState: DataTableSelectFilterProps }>(() => ({
   width: "100%",
   minWidth: 0,
 
@@ -61,22 +54,68 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
     name: COMPONENT_NAME,
   });
 
-  const { value, label, size = "small", options, onChange, onClear } = props;
+  const {
+    value,
+    label,
+    size = "small",
+    disabled = false,
+    loading = false,
+    errorMessage,
+    className,
+    sx,
+    options,
+    onChange,
+    onClear,
+  } = props;
 
   const labelId = useId();
+  const statusId = useId();
+  const unavailable = disabled || loading || Boolean(errorMessage);
+  const statusText = loading ? "Loading options…" : errorMessage;
+  const [open, setOpen] = useState(false);
+
+  // A background refresh may begin while the menu is open. Close it and
+  // require a new user action after recovery, without changing filter state.
+  useEffect(() => {
+    if (unavailable) setOpen(false);
+  }, [unavailable]);
 
   const selectedValue =
     value === undefined ? "" : encodeDataTableSelectFilterValue(value);
+  // Keep committed values representable during loading and after option removal.
+  // Never clear TanStack state just because its option is temporarily absent.
+  const missingSelection =
+    value !== undefined && !options.some(
+      (option) => encodeDataTableSelectFilterValue(option.value) === selectedValue,
+    );
 
   return (
-    <Root fullWidth size={size}>
+    <Root
+      ownerState={{ ...props, size, disabled: unavailable, loading }}
+      fullWidth
+      size={size}
+      disabled={unavailable}
+      error={Boolean(errorMessage) && !loading}
+    >
       <InputLabel id={labelId}>{label}</InputLabel>
 
       <Select
+        open={open && !unavailable}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
         labelId={labelId}
         label={label}
         value={selectedValue}
+        inputProps={{
+          "aria-describedby": statusText ? statusId : undefined,
+          "aria-busy": loading,
+        }}
+        className={className}
+        sx={sx}
         onChange={(event) => {
+          if (unavailable) {
+            return;
+          }
           const encoded = event.target.value;
 
           if (encoded === "") {
@@ -89,6 +128,11 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
         }}
       >
         <MenuItem value="">All</MenuItem>
+        {missingSelection && (
+          <MenuItem value={selectedValue} disabled>
+            {String(value)}
+          </MenuItem>
+        )}
 
         {options.map((option) => {
           const encodedValue = encodeDataTableSelectFilterValue(option.value);
@@ -100,6 +144,11 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
           );
         })}
       </Select>
+      {statusText && (
+        <FormHelperText id={statusId} role={loading ? "status" : "alert"}>
+          {statusText}
+        </FormHelperText>
+      )}
     </Root>
   );
 }

@@ -105,10 +105,12 @@ export function useTranslationKeyDataTable(): UseTranslationKeyDataTableResult {
     () =>
       createTranslationKeyColumns({
         categoryFilterOptions: filterOptions.categoryOptions,
+        categoryFilterOptionsFetching: filterOptions.fetching,
+        categoryFilterOptionsError: filterOptions.error,
 
         localeFilterOptions: filterOptions.localeOptions,
       }),
-    [filterOptions.categoryOptions, filterOptions.localeOptions],
+    [filterOptions.categoryOptions, filterOptions.localeOptions, filterOptions.fetching, filterOptions.error],
   );
 
   /**

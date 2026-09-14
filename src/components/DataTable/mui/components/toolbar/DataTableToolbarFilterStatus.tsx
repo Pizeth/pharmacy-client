@@ -32,17 +32,8 @@ export function DataTableToolbarFilterStatus<TData extends RowData>(
         }
 
         const clearFilters = (): void => {
-          /**
-           * Clear only currently active column filters.
-           *
-           * We deliberately use the active filter IDs rather than
-           * maintaining another filter registry.
-           */
-          for (const filter of columnFilters) {
-            const column = table.getColumn(filter.id);
-
-            column?.setFilterValue(undefined);
-          }
+          // One update clears even stale column IDs without changing search.
+          table.setColumnFilters([]);
         };
 
         return (
@@ -50,11 +41,8 @@ export function DataTableToolbarFilterStatus<TData extends RowData>(
             size="small"
             variant="outlined"
             label={activeCount === 1 ? "1 filter" : `${activeCount} filters`}
-            aria-label={
-              activeCount === 1
-                ? "1 active column filter"
-                : `${activeCount} active column filters`
-            }
+            aria-label={`Clear all column filters (${activeCount} active)`}
+            onClick={clearFilters}
             deleteIcon={<FilterAltOffOutlined fontSize="small" />}
             onDelete={clearFilters}
             sx={{

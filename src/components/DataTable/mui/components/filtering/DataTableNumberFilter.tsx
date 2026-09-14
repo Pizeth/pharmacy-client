@@ -5,22 +5,17 @@
 import { styled, TextField, useThemeProps } from "@mui/material";
 import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
 
-export interface DataTableNumberFilterProps {
-  readonly value: number | undefined;
-  readonly label: string;
-  readonly size?: "small" | "medium";
-  readonly onChange: (value: number) => void;
-  readonly onClear: () => void;
-}
+import type { DataTableNumberFilterProps } from "./types";
+
+export type { DataTableNumberFilterProps } from "./types";
 
 const COMPONENT_NAME = DATA_TABLE_THEME_COMPONENT_NAMES.numberFilter;
 
 const Root = styled(TextField, {
   name: COMPONENT_NAME,
   slot: "Root",
-
   overridesResolver: (_props, styles) => styles.root,
-})(() => ({
+})<{ ownerState: DataTableNumberFilterProps }>(() => ({
   width: "100%",
   minWidth: 0,
 
@@ -40,15 +35,27 @@ export function DataTableNumberFilter(inProps: DataTableNumberFilterProps) {
     name: COMPONENT_NAME,
   });
 
-  const { value, label, size = "small", onChange, onClear } = props;
+  const {
+    value,
+    label,
+    size = "small",
+    className,
+    sx,
+    onChange,
+    onClear,
+  } = props;
 
   return (
     <Root
+          disabled={props.disabled}
+      ownerState={{ ...props, size }}
       fullWidth
       size={size}
       type="number"
       label={label}
       value={value ?? ""}
+      className={className}
+      sx={sx}
       onChange={(event) => {
         const rawValue = event.target.value;
 

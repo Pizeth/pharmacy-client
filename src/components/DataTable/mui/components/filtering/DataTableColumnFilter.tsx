@@ -54,6 +54,7 @@ export function DataTableColumnFilter<
 
       return (
         <DataTableTextFilter
+          disabled={meta?.filterDisabled}
           label={label}
           value={typeof value === "string" ? value : ""}
           onChange={(nextValue) => {
@@ -69,6 +70,7 @@ export function DataTableColumnFilter<
 
       return (
         <DataTableNumberFilter
+          disabled={meta?.filterDisabled}
           label={label}
           value={typeof value === "number" ? value : undefined}
           onChange={(nextValue) => {
@@ -88,6 +90,7 @@ export function DataTableColumnFilter<
 
       return (
         <DataTableNumberRangeFilter
+          disabled={meta?.filterDisabled}
           label={label}
           value={range}
           onChange={(nextValue) => {
@@ -103,6 +106,7 @@ export function DataTableColumnFilter<
 
       return (
         <DataTableBooleanFilter
+          disabled={meta?.filterDisabled}
           label={label}
           value={typeof value === "boolean" ? value : undefined}
           onChange={(nextValue) => {
@@ -122,6 +126,9 @@ export function DataTableColumnFilter<
 
       return (
         <DataTableSelectFilter
+          disabled={meta?.filterDisabled}
+          loading={meta?.filterOptionsLoading}
+          errorMessage={meta?.filterOptionsError}
           label={label}
           value={normalizedValue}
           options={options}

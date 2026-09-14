@@ -115,6 +115,32 @@ describe("TranslationKey columns", () => {
     expect(column.meta?.filterOptions).toEqual(localeFilterOptions);
   });
 
+  it.each([
+    { fetching: true, error: undefined, disabled: false, message: undefined },
+    { fetching: false, error: new Error("private transport details"), disabled: true, message: "Category options could not be loaded." },
+    { fetching: false, error: undefined, disabled: false, message: undefined },
+  ])("keeps option lifecycle local to Category ($fetching, $disabled)", ({ fetching, error, disabled, message }) => {
+    const current = createTranslationKeyColumns({
+      categoryFilterOptions,
+      localeFilterOptions,
+      categoryFilterOptionsFetching: fetching,
+      categoryFilterOptionsError: error,
+    });
+    const category = current.find((column) => column.id === TRANSLATION_KEY_COLUMN_IDS.category)!;
+    expect(category.meta).toMatchObject({
+      filterOptionsLoading: fetching,
+      filterDisabled: disabled,
+      filterOptionsError: message,
+      filterOptions: categoryFilterOptions,
+    });
+    expect(category.enableColumnFilter).toBe(true);
+    for (const column of current.filter((column) => column.id !== TRANSLATION_KEY_COLUMN_IDS.category)) {
+      expect(column.meta?.filterDisabled).toBeUndefined();
+      expect(column.meta?.filterOptionsLoading).toBeUndefined();
+      expect(column.meta?.filterOptionsError).toBeUndefined();
+    }
+  });
+
   it("keeps the Translations preview presentation-only", () => {
     const column = getColumn(TRANSLATION_KEY_COLUMN_IDS.translations);
 

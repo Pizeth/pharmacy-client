@@ -2,3 +2,4 @@
 
 export * from "./DataTableFilterCell";
 export * from "./DataTableFilterRow";
+export type { DataTableFilterCellStyle } from "./types";

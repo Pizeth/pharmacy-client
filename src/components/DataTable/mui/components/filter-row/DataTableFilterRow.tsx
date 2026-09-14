@@ -2,12 +2,14 @@
 
 "use client";
 
-import { TableRow } from "@mui/material";
+import { styled, TableRow } from "@mui/material";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../../density";
 import type { MuiDataTableInstance } from "../../table";
 import { DataTableFilterCell } from "./DataTableFilterCell";
 import { useDataTableAccessibility } from "../../accessibility";
+import { getDataTableVisibleColumnsInRenderOrder } from "../visibleColumnOrder";
 
 export interface DataTableFilterRowProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -17,6 +19,14 @@ export interface DataTableFilterRowProps<TData extends RowData> {
    */
   readonly headerRowCount: number;
 }
+
+const FilterRowRoot = styled(TableRow, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "FilterRow",
+  overridesResolver: (_props, styles) => styles.filterRow,
+})(({ theme }) => ({
+  backgroundColor: (theme.vars ?? theme).palette.background.paper,
+}));
 
 /**
  * Dedicated column-filter subheader row.
@@ -46,16 +56,14 @@ export function DataTableFilterRow<TData extends RowData>(
       })}
     >
       {() => {
-        const columns = table.getVisibleLeafColumns();
+        const columns = getDataTableVisibleColumnsInRenderOrder(table);
 
         return (
-          <TableRow
+          <FilterRowRoot
+            className={dataTableClasses.filterRow}
             id={filterRowId}
             data-filter-row="true"
             aria-label="Column filters"
-            sx={{
-              backgroundColor: "background.paper",
-            }}
           >
             {columns.map((column) => (
               <DataTableFilterCell
@@ -65,7 +73,7 @@ export function DataTableFilterRow<TData extends RowData>(
                 stickyTop={stickyTop}
               />
             ))}
-          </TableRow>
+          </FilterRowRoot>
         );
       }}
     </table.Subscribe>
