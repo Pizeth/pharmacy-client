@@ -1,4 +1,4 @@
-// mui/components/index.ts
+// src/components/DataTable/mui/components/index.ts
 
 export * from "./column-manager";
 export * from "./column-menu";
@@ -21,6 +21,9 @@ export * from "./DataTableHead";
 export * from "./DataTableHeaderCell";
 export * from "./DataTableHeaderContent";
 export * from "./DataTableHeaderRow";
+
+export type { DataTableHeaderCellStyle } from "./DataTableHeader.types";
+
 export * from "./DataTableResizeHandle";
 export * from "./DataTableRowNumberCell";
 export * from "./DataTableShell";

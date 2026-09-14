@@ -1,9 +1,30 @@
-import type { CSSProperties } from "react";
+import type {
+  DataTableColumnGeometryStyle,
+  DataTableCssPixelValue,
+} from "../../styles";
 
-/** Runtime measurements only; permanent presentation belongs to styled slots. */
-export interface DataTableFilterCellStyle extends CSSProperties {
-  "--DataTable-column-size": `${number}px`;
-  "--DataTable-filter-sticky-top": `${number}px`;
-  "--DataTable-filter-cell-height": `${number}px`;
-  "--DataTable-column-pinned-offset"?: `${number}px`;
+/**
+ * ------------------------------------------------------------------
+ * Runtime FilterCell measurements
+ * ------------------------------------------------------------------
+ *
+ * Permanent presentation belongs to:
+ *
+ *   RazethDataTable / FilterCell
+ *
+ * This type contains only values that genuinely depend on live
+ * DataTable/TanStack state.
+ */
+export interface DataTableFilterCellStyle extends DataTableColumnGeometryStyle {
+  /**
+   * Vertical sticky offset beneath all ordinary header rows.
+   */
+  "--DataTable-filter-sticky-top": DataTableCssPixelValue;
+
+  /**
+   * Resolved physical height of the filter cell.
+   *
+   * The value currently follows DataTable density metrics.
+   */
+  "--DataTable-filter-cell-height": DataTableCssPixelValue;
 }

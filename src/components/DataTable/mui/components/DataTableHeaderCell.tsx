@@ -2,14 +2,243 @@
 
 // src/components/DataTable/mui/components/DataTableHeaderCell.tsx
 
-import { Box, TableCell } from "@mui/material";
+import { Box, styled, TableCell } from "@mui/material";
 import type { CellData, Header, RowData } from "@tanstack/table-core";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
 import type { MuiDataTableFeatures } from "../features";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { MuiDataTableInstance } from "../table";
 import { resolveTableCellAlignment } from "./alignment";
-import { getDataTablePinnedLayout, getDataTablePinnedSx } from "./pinning";
+import type { DataTableHeaderCellStyle } from "./DataTableHeader.types";
 import { DataTableHeaderContent } from "./DataTableHeaderContent";
+import { getDataTablePinnedLayout } from "./pinning";
+
+/**
+ * ------------------------------------------------------------------
+ * Density presentation
+ * ------------------------------------------------------------------
+ *
+ * Density belongs to the finite DataTable presentation system.
+ *
+ * It is NOT arbitrary runtime geometry like:
+ *
+ * - resized width
+ * - pinned offset
+ * - stacked sticky-header offset
+ *
+ * Therefore density stays in styled slot rules rather than being
+ * converted into another family of CSS variables.
+ */
+const compactDensity = getDataTableDensityMetrics("compact");
+
+const comfortableDensity = getDataTableDensityMetrics("comfortable");
+
+const spaciousDensity = getDataTableDensityMetrics("spacious");
+
+/**
+ * ------------------------------------------------------------------
+ * HeaderCell structural slot
+ * ------------------------------------------------------------------
+ *
+ * Permanent presentation belongs here.
+ *
+ * Runtime values are supplied through typed CSS custom properties:
+ *
+ *   --DataTable-column-size
+ *   --DataTable-header-sticky-top
+ *   --DataTable-column-pinned-offset
+ *
+ * Pinning direction is communicated through:
+ *
+ *   data-pinned="start"
+ *   data-pinned="end"
+ *
+ * so logical CSS works in both LTR and RTL.
+ */
+const HeaderCellRoot = styled(TableCell, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "HeaderCell",
+  overridesResolver: (_props, styles) => styles.headerCell,
+})(({ theme }) => ({
+  /**
+   * --------------------------------------------------------------
+   * Sticky header structure
+   * --------------------------------------------------------------
+   */
+  position: "sticky",
+
+  top: "var(--DataTable-header-sticky-top)",
+  zIndex: 2,
+
+  /**
+   * Sticky cells must remain opaque or scrolling rows become visible
+   * underneath them.
+   */
+  backgroundColor: (theme.vars ?? theme).palette.background.paper,
+
+  /**
+   * --------------------------------------------------------------
+   * Header typography
+   * --------------------------------------------------------------
+   */
+  color: (theme.vars ?? theme).palette.text.primary,
+
+  fontWeight: 600,
+
+  /**
+   * --------------------------------------------------------------
+   * TanStack committed sizing
+   * --------------------------------------------------------------
+   */
+  boxSizing: "border-box",
+
+  width: "var(--DataTable-column-size)",
+  minWidth: "var(--DataTable-column-size)",
+  maxWidth: "var(--DataTable-column-size)",
+
+  /**
+   * Do NOT clip the complete physical header cell.
+   *
+   * Label truncation is owned farther down by the semantic label
+   * renderer.
+   *
+   * Keeping this visible also lets:
+   *
+   * - resize handles
+   * - menus
+   * - sort indicators
+   *
+   * render correctly.
+   */
+  overflow: "visible",
+
+  /**
+   * --------------------------------------------------------------
+   * Compact density
+   * --------------------------------------------------------------
+   */
+  '&[data-density="compact"]': {
+    height: `${compactDensity.headerHeight}px`,
+    minHeight: `${compactDensity.headerHeight}px`,
+    paddingInline: theme.spacing(compactDensity.cellPaddingInline),
+    paddingBlock: theme.spacing(compactDensity.cellPaddingBlock),
+    whiteSpace: compactDensity.nowrap ? "nowrap" : "normal",
+  },
+
+  /**
+   * --------------------------------------------------------------
+   * Comfortable density
+   * --------------------------------------------------------------
+   */
+  '&[data-density="comfortable"]': {
+    height: `${comfortableDensity.headerHeight}px`,
+    minHeight: `${comfortableDensity.headerHeight}px`,
+    paddingInline: theme.spacing(comfortableDensity.cellPaddingInline),
+    paddingBlock: theme.spacing(comfortableDensity.cellPaddingBlock),
+    whiteSpace: comfortableDensity.nowrap ? "nowrap" : "normal",
+  },
+
+  /**
+   * --------------------------------------------------------------
+   * Spacious density
+   * --------------------------------------------------------------
+   */
+  '&[data-density="spacious"]': {
+    height: `${spaciousDensity.headerHeight}px`,
+    minHeight: `${spaciousDensity.headerHeight}px`,
+    paddingInline: theme.spacing(spaciousDensity.cellPaddingInline),
+    paddingBlock: theme.spacing(spaciousDensity.cellPaddingBlock),
+    whiteSpace: spaciousDensity.nowrap ? "nowrap" : "normal",
+  },
+
+  /**
+   * --------------------------------------------------------------
+   * Pinned-header structure
+   * --------------------------------------------------------------
+   *
+   * getDataTablePinnedLayout() remains responsible for deriving:
+   *
+   * - logical position
+   * - offset
+   * - center-boundary membership
+   *
+   * The renderer converts that data into CSS here.
+   */
+  '&[data-pinned="start"], &[data-pinned="end"]': {
+    zIndex: 4,
+    backgroundColor: (theme.vars ?? theme).palette.background.paper,
+    backgroundClip: "padding-box",
+  },
+
+  /**
+   * Logical positioning automatically mirrors:
+   *
+   * LTR:
+   *   start -> left
+   *
+   * RTL:
+   *   start -> right
+   */
+  '&[data-pinned="start"]': {
+    insetInlineStart: "var(--DataTable-column-pinned-offset)",
+  },
+
+  /**
+   * LTR:
+   *   end -> right
+   *
+   * RTL:
+   *   end -> left
+   */
+  '&[data-pinned="end"]': {
+    insetInlineEnd: "var(--DataTable-column-pinned-offset)",
+  },
+
+  /**
+   * Draw the boundary only on the pinned edge adjacent to the
+   * scrolling center region.
+   */
+  '&[data-pinned="start"][data-pinned-boundary="true"]': {
+    borderInlineEnd: "1px solid",
+    borderInlineEndColor: (theme.vars ?? theme).palette.divider,
+  },
+
+  '&[data-pinned="end"][data-pinned-boundary="true"]': {
+    borderInlineStart: "1px solid",
+    borderInlineStartColor: (theme.vars ?? theme).palette.divider,
+  },
+}));
+
+/**
+ * ------------------------------------------------------------------
+ * HeaderCellContent structural slot
+ * ------------------------------------------------------------------
+ *
+ * This is the single width-owning content wrapper directly beneath
+ * the physical TableCell.
+ *
+ * Do not reintroduce nested 100%-height chains.
+ *
+ * TableCell owns physical dimensions.
+ * HeaderCellContent owns the inline content canvas.
+ * DataTableHeaderContent owns semantic/interactable layout.
+ */
+const HeaderCellContentRoot = styled(Box, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "HeaderCellContent",
+  overridesResolver: (_props, styles) => styles.headerCellContent,
+})({
+  display: "flex",
+  alignItems: "center",
+  width: "100%",
+  minWidth: 0,
+
+  /**
+   * Keep header text rhythm deterministic without globally modifying
+   * arbitrary Box/Stack descendants.
+   */
+  lineHeight: 1.25,
+});
 
 export interface DataTableHeaderCellProps<
   TData extends RowData,
@@ -31,13 +260,13 @@ export interface DataTableHeaderCellProps<
  *
  * Responsibilities:
  *
- * - physical cell sizing
- * - sticky positioning
- * - pinned positioning
+ * - committed TanStack width
+ * - vertical sticky offset
+ * - logical pinned offset
  * - density
  * - alignment
  * - AppHeader context
- * - resize handle
+ * - resize-handle placement
  *
  * Semantic/interactable header content remains delegated to:
  *
@@ -53,14 +282,20 @@ export function DataTableHeaderCell<
 
   const densityMetrics = getDataTableDensityMetrics(density);
 
+  /**
+   * Every normal header row has a deterministic height.
+   *
+   * Therefore stacked sticky headers can derive their top offset
+   * without reading DOM layout.
+   */
   const stickyTop = headerRowIndex * densityMetrics.headerHeight;
 
   const meta = header.column.columnDef.meta;
 
-  // const align = resolveTableCellAlignment(meta?.headerAlign ?? meta?.align);
-
   /**
-   * Header alignment policy.
+   * --------------------------------------------------------------
+   * Header alignment policy
+   * --------------------------------------------------------------
    *
    * Resource/column metadata may still explicitly override alignment:
    *
@@ -80,6 +315,10 @@ export function DataTableHeaderCell<
       ? "center"
       : (resolveTableCellAlignment(configuredHeaderAlign) ?? "center");
 
+  /**
+   * Only leaf headers correspond to one concrete pinnable/resizable
+   * column.
+   */
   const isLeafHeader = header.subHeaders.length === 0;
 
   /**
@@ -89,8 +328,8 @@ export function DataTableHeaderCell<
    *
    * TanStack creates placeholder headers for grouped-column layout.
    *
-   * They still require a physical TableCell so the grid remains
-   * aligned, but intentionally contain no semantic header content.
+   * They still require a physical TableCell so table-grid geometry
+   * remains intact.
    */
   if (header.isPlaceholder) {
     return (
@@ -104,42 +343,61 @@ export function DataTableHeaderCell<
         {() => {
           const size = header.getSize();
 
+          /**
+           * Group/placeholder structure itself is not pinned as one
+           * independent column.
+           *
+           * Only concrete leaf headers participate in pinning.
+           */
           const pinnedLayout = isLeafHeader
             ? getDataTablePinnedLayout(table, header.column)
             : undefined;
 
-          const pinnedSx = getDataTablePinnedSx(pinnedLayout, "header");
+          const style: DataTableHeaderCellStyle = {
+            "--DataTable-column-size": `${size}px`,
+            "--DataTable-header-sticky-top": `${stickyTop}px`,
+            "--DataTable-column-pinned-offset": pinnedLayout
+              ? `${pinnedLayout.offset}px`
+              : undefined,
+          };
+
+          // const pinnedSx = getDataTablePinnedSx(pinnedLayout, "header");
 
           return (
-            <TableCell
+            <HeaderCellRoot
+              className={dataTableClasses.headerCell}
               align={align}
               colSpan={header.colSpan}
               data-column-id={header.column.id}
+              data-header-placeholder="true"
+              data-header-leaf={isLeafHeader ? "true" : undefined}
               data-pinned={pinnedLayout?.position}
+              data-pinned-boundary={pinnedLayout?.isCenterBoundary || undefined}
               data-density={density}
-              sx={{
-                /**
-                 * All header cells own vertical stickiness.
-                 *
-                 * Pinned leaf headers additionally receive logical
-                 * inline positioning through pinnedSx.
-                 */
-                position: "sticky",
-                top: `${stickyTop}px`,
-                zIndex: 2,
-                backgroundColor: "background.paper",
-                boxSizing: "border-box",
-                width: `${size}px`,
-                minWidth: `${size}px`,
-                maxWidth: `${size}px`,
-                height: `${densityMetrics.headerHeight}px`,
-                minHeight: `${densityMetrics.headerHeight}px`,
-                px: densityMetrics.cellPaddingInline,
-                py: densityMetrics.cellPaddingBlock,
-                // whiteSpace: "nowrap",
-                // overflow: "hidden",
-                ...pinnedSx,
-              }}
+              style={style}
+              // sx={{
+              //   /**
+              //    * All header cells own vertical stickiness.
+              //    *
+              //    * Pinned leaf headers additionally receive logical
+              //    * inline positioning through pinnedSx.
+              //    */
+              //   position: "sticky",
+              //   top: `${stickyTop}px`,
+              //   zIndex: 2,
+              //   backgroundColor: "background.paper",
+              //   boxSizing: "border-box",
+              //   width: `${size}px`,
+              //   minWidth: `${size}px`,
+              //   maxWidth: `${size}px`,
+              //   height: `${densityMetrics.headerHeight}px`,
+              //   minHeight: `${densityMetrics.headerHeight}px`,
+              //   px: densityMetrics.cellPaddingInline,
+              //   py: densityMetrics.cellPaddingBlock,
+              //   // whiteSpace: "nowrap",
+              //   // overflow: "hidden",
+              //   ...pinnedSx,
+              // }}
             />
           );
         }}
@@ -165,9 +423,10 @@ export function DataTableHeaderCell<
     >
       {(appHeader) => {
         /**
-         * These values must be calculated inside the subscribed
-         * AppHeader render because table state may update independently
-         * of this outer React component.
+         * These reads stay inside the subscribed AppHeader render.
+         *
+         * TanStack table state may change independently of the outer
+         * React component..
          */
         const size = header.getSize();
 
@@ -175,14 +434,23 @@ export function DataTableHeaderCell<
           ? getDataTablePinnedLayout(table, header.column)
           : undefined;
 
-        const pinnedSx = getDataTablePinnedSx(pinnedLayout, "header");
+        // const pinnedSx = getDataTablePinnedSx(pinnedLayout, "header");
 
         const sortDirection = isLeafHeader
           ? header.column.getIsSorted()
           : false;
 
+        const style: DataTableHeaderCellStyle = {
+          "--DataTable-column-size": `${size}px`,
+          "--DataTable-header-sticky-top": `${stickyTop}px`,
+          "--DataTable-column-pinned-offset": pinnedLayout
+            ? `${pinnedLayout.offset}px`
+            : undefined,
+        };
+
         return (
-          <TableCell
+          <HeaderCellRoot
+            className={dataTableClasses.headerCell}
             align={align}
             colSpan={header.colSpan}
             /**
@@ -192,69 +460,72 @@ export function DataTableHeaderCell<
              */
             scope={isLeafHeader ? "col" : "colgroup"}
             data-column-id={header.column.id}
+            data-header-leaf={isLeafHeader ? "true" : undefined}
             data-pinned={pinnedLayout?.position}
+            data-pinned-boundary={pinnedLayout?.isCenterBoundary || undefined}
             data-density={density}
             sortDirection={sortDirection}
-            sx={{
-              /**
-               * Vertically sticky for every header.
-               *
-               * Pinned leaf headers additionally receive logical
-               * inline positioning through pinnedSx.
-               */
-              position: "sticky",
-              top: `${stickyTop}px`,
-              zIndex: 2,
-              backgroundColor: "background.paper",
+            style={style}
+            // sx={{
+            //   /**
+            //    * Vertically sticky for every header.
+            //    *
+            //    * Pinned leaf headers additionally receive logical
+            //    * inline positioning through pinnedSx.
+            //    */
+            //   position: "sticky",
+            //   top: `${stickyTop}px`,
+            //   zIndex: 2,
+            //   backgroundColor: "background.paper",
 
-              /**
-               * Give generic header content an explicit text color.
-               *
-               * Resource columns can still provide richer custom
-               * header components later.
-               */
-              color: "text.primary",
-              fontWeight: 600,
+            //   /**
+            //    * Give generic header content an explicit text color.
+            //    *
+            //    * Resource columns can still provide richer custom
+            //    * header components later.
+            //    */
+            //   color: "text.primary",
+            //   fontWeight: 600,
 
-              /**
-               * ----------------------------------------------------
-               * TanStack committed width
-               * ----------------------------------------------------
-               */
-              boxSizing: "border-box",
-              width: `${size}px`,
-              minWidth: `${size}px`,
-              maxWidth: `${size}px`,
-              height: `${densityMetrics.headerHeight}px`,
-              minHeight: `${densityMetrics.headerHeight}px`,
-              px: densityMetrics.cellPaddingInline,
-              py: densityMetrics.cellPaddingBlock,
-              whiteSpace: densityMetrics.nowrap ? "nowrap" : "normal",
+            //   /**
+            //    * ----------------------------------------------------
+            //    * TanStack committed width
+            //    * ----------------------------------------------------
+            //    */
+            //   boxSizing: "border-box",
+            //   width: `${size}px`,
+            //   minWidth: `${size}px`,
+            //   maxWidth: `${size}px`,
+            //   height: `${densityMetrics.headerHeight}px`,
+            //   minHeight: `${densityMetrics.headerHeight}px`,
+            //   px: densityMetrics.cellPaddingInline,
+            //   py: densityMetrics.cellPaddingBlock,
+            //   whiteSpace: densityMetrics.nowrap ? "nowrap" : "normal",
 
-              /**
-               * IMPORTANT
-               * ----------------------------------------------------
-               *
-               * Do NOT clip the complete physical cell.
-               *
-               * Header labels own their own text truncation.
-               *
-               * Leaving this visible also gives:
-               *
-               * - resize handles
-               * - menus
-               * - sort indicators
-               *
-               * enough room to render correctly.
-               */
-              overflow: "visible",
+            //   /**
+            //    * IMPORTANT
+            //    * ----------------------------------------------------
+            //    *
+            //    * Do NOT clip the complete physical cell.
+            //    *
+            //    * Header labels own their own text truncation.
+            //    *
+            //    * Leaving this visible also gives:
+            //    *
+            //    * - resize handles
+            //    * - menus
+            //    * - sort indicators
+            //    *
+            //    * enough room to render correctly.
+            //    */
+            //   overflow: "visible",
 
-              /**
-               * Pinned leaf headers override the inline sticky position and
-               * z-index while preserving the top offset above.
-               */
-              ...pinnedSx,
-            }}
+            //   /**
+            //    * Pinned leaf headers override the inline sticky position and
+            //    * z-index while preserving the top offset above.
+            //    */
+            //   ...pinnedSx,
+            // }}
           >
             {/**
              * ------------------------------------------------------
@@ -276,66 +547,24 @@ export function DataTableHeaderCell<
              * Percentage height through a table-cell is not a stable
              * layout contract.
              */}
-            <Box
-              className="DataTable-headerCellContent"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                width: "100%",
-                // justifyContent:
-                //   align === "right"
-                //     ? "flex-end"
-                //     : align === "center"
-                //       ? "center"
-                //       : "flex-start",
-                minWidth: 0,
-
-                /**
-                 * Let content establish natural header height.
-                 */
-                lineHeight: 1.25,
-              }}
+            <HeaderCellContentRoot
+              className={dataTableClasses.headerCellContent}
             >
-              {/* <Box
-                sx={{
-                  minWidth: 0,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                <appHeader.FlexRender />
-              </Box> */}
-              {/* <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent:
-                    align === "right"
-                      ? "flex-end"
-                      : align === "center"
-                        ? "center"
-                        : "flex-start",
-                  minWidth: 0,
-                  height: "100%",
-                  overflow: "hidden",
-                }}
-              > */}
               <DataTableHeaderContent
                 table={table}
                 header={header}
                 align={align}
               />
-              {/* </Box> */}
-            </Box>
+            </HeaderCellContentRoot>
+
             {/**
              * Only leaf headers should expose a resize handle.
              *
-             * A group header's getSize() is derived from its descendants,
-             * so resizing the group itself would be ambiguous.
+             * Group header width is derived from descendants and must
+             * not have an independent resizing lifecycle.
              */}
-            {/* {header.subHeaders.length === 0 && <appHeader.ResizeHandle />} */}
             {isLeafHeader && <appHeader.ResizeHandle />}
-          </TableCell>
+          </HeaderCellRoot>
         );
       }}
     </table.AppHeader>
