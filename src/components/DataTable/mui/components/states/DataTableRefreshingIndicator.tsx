@@ -2,9 +2,28 @@
 
 "use client";
 
-import { LinearProgress } from "@mui/material";
+import { LinearProgress, styled } from "@mui/material";
 
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import { useDataTableRefreshingProgress } from "./useDataTableRefreshingProgress";
+
+const RefreshingIndicatorRoot = styled(LinearProgress, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "RefreshingIndicator",
+  overridesResolver: (_props, styles) => styles.refreshingIndicator,
+})(({ theme }) => ({
+  height: 2,
+  flexShrink: 0,
+  opacity: 1,
+  visibility: "visible",
+  '&[aria-hidden="true"]': { opacity: 0, visibility: "hidden" },
+  transition: theme.transitions.create("opacity", {
+    duration: theme.transitions.duration.shortest,
+  }),
+  "& .MuiLinearProgress-bar": {
+    transition: "transform 280ms cubic-bezier(0.4, 0, 0.2, 1)",
+  },
+}));
 
 export interface DataTableRefreshingIndicatorProps {
   /**
@@ -59,7 +78,8 @@ export function DataTableRefreshingIndicator(
   });
 
   return (
-    <LinearProgress
+    <RefreshingIndicatorRoot
+      className={dataTableClasses.refreshingIndicator}
       variant="determinate"
       value={value}
       aria-label={determinate ? "Loading table data" : "Refreshing table data"}
@@ -71,32 +91,6 @@ export function DataTableRefreshingIndicator(
             : "Refreshing table data"
           : undefined
       }
-      sx={{
-        /**
-         * Reserve a stable 2px slot starting/stopping a refresh never
-         * shifts the table layout.
-         */
-        height: 2,
-        flexShrink: 0,
-        opacity: visible ? 1 : 0,
-        visibility: visible ? "visible" : "hidden",
-
-        transition: (theme) =>
-          theme.transitions.create("opacity", {
-            duration: theme.transitions.duration.shortest,
-          }),
-
-        /**
-         * MUI's determinate bar already uses a transform internally.
-         *
-         * Making that transform slightly smoother gives us the
-         * YouTube/NProgress-style trickle effect instead of abrupt
-         * percentage jumps.
-         */
-        "& .MuiLinearProgress-bar": {
-          transition: "transform 280ms cubic-bezier(0.4, 0, 0.2, 1)",
-        },
-      }}
     />
   );
 }

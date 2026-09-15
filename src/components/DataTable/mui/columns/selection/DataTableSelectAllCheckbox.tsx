@@ -1,6 +1,7 @@
 "use client";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
-import { Checkbox } from "@mui/material";
+import { styled, Checkbox } from "@mui/material";
 import {
   useMuiDataTableContext,
   //   useMuiDataTableHeaderContext,
@@ -35,6 +36,12 @@ import {
  * Therefore reactive subscription must come from
  * `useMuiDataTableContext()`.
  */
+const SelectAllCheckboxRoot = styled(Checkbox, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "SelectAllCheckbox",
+  overridesResolver: (_props, styles) => styles.selectAllCheckbox,
+})({});
+
 export function DataTableSelectAllCheckbox() {
   /**
    * Current enriched header context.
@@ -77,7 +84,8 @@ export function DataTableSelectAllCheckbox() {
         const indeterminate = !checked && table.getIsSomePageRowsSelected();
 
         return (
-          <Checkbox
+          <SelectAllCheckboxRoot
+            className={dataTableClasses.selectAllCheckbox}
             size="small"
             checked={checked}
             indeterminate={indeterminate}

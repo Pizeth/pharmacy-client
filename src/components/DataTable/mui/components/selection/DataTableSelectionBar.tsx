@@ -2,8 +2,9 @@
 
 "use client";
 
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, Stack, Typography, styled } from "@mui/material";
 import { CloseOutlined } from "@mui/icons-material";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
 import { DataTableBulkActions } from "./DataTableBulkActions";
@@ -17,6 +18,47 @@ import type {
   DataTableSelectionBarConfig,
   DataTableSelectionContext,
 } from "./types";
+
+const SelectionBarRoot = styled(Box, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "SelectionBar",
+  overridesResolver: (_props, styles) => styles.selectionBar,
+})(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: theme.spacing(1.5),
+  paddingInline: theme.spacing(2),
+  paddingBlock: theme.spacing(1),
+  minHeight: 52,
+  backgroundColor: (theme.vars ?? theme).palette.action.selected,
+  flexWrap: "wrap",
+}));
+const SelectionBarDividerRoot = styled(Divider, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "SelectionBarDivider",
+  overridesResolver: (_props, styles) => styles.selectionBarDivider,
+})({});
+const SelectionBarStartRoot = styled(Stack, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "SelectionBarStart",
+  overridesResolver: (_props, styles) => styles.selectionBarStart,
+})({ minWidth: 0, flex: "1 1 auto", flexWrap: "wrap" });
+const SelectionBarEndRoot = styled(Stack, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "SelectionBarEnd",
+  overridesResolver: (_props, styles) => styles.selectionBarEnd,
+})({ minWidth: 0, flexWrap: "wrap" });
+const SelectionBarStatusRoot = styled(Typography, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "SelectionBarStatus",
+  overridesResolver: (_props, styles) => styles.selectionBarStatus,
+})({ whiteSpace: "nowrap" });
+const SelectionClearButtonRoot = styled(Button, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "SelectionClearButton",
+  overridesResolver: (_props, styles) => styles.selectionClearButton,
+})({});
 
 export interface DataTableSelectionBarProps<
   TData extends RowData,
@@ -76,69 +118,52 @@ export function DataTableSelectionBar<TData extends RowData>(
 
         return (
           <>
-            <Divider />
+            <SelectionBarDividerRoot
+              className={dataTableClasses.selectionBarDivider}
+            />
 
-            <Box
+            <SelectionBarRoot
+              className={dataTableClasses.selectionBar}
               data-selection-bar="true"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 1.5,
-                px: 2,
-                py: 1,
-                minHeight: 52,
-                backgroundColor: "action.selected",
-                flexWrap: "wrap",
-              }}
             >
               {/**
                * LEFT SIDE
                *
                * selected status + application content
                */}
-              <Stack
+              <SelectionBarStartRoot
+                className={dataTableClasses.selectionBarStart}
                 direction="row"
                 alignItems="center"
                 spacing={1}
-                sx={{
-                  minWidth: 0,
-                  flex: "1 1 auto",
-                  flexWrap: "wrap",
-                }}
               >
-                <Typography
+                <SelectionBarStatusRoot
+                  className={dataTableClasses.selectionBarStatus}
                   variant="body2"
                   fontWeight={600}
                   role="status"
                   aria-live="polite"
                   aria-atomic="true"
-                  sx={{
-                    whiteSpace: "nowrap",
-                  }}
                 >
                   {selectedCount === 1
                     ? "1 row selected"
                     : `${selectedCount} rows selected`}
-                </Typography>
+                </SelectionBarStatusRoot>
 
                 {renderedStartContent}
-              </Stack>
+              </SelectionBarStartRoot>
 
               {/**
                * RIGHT SIDE
                *
                * custom content + application bulk actions + clear
                */}
-              <Stack
+              <SelectionBarEndRoot
+                className={dataTableClasses.selectionBarEnd}
                 direction="row"
                 alignItems="center"
                 justifyContent="flex-end"
                 spacing={0.5}
-                sx={{
-                  minWidth: 0,
-                  flexWrap: "wrap",
-                }}
               >
                 {renderedEndContent}
 
@@ -148,7 +173,8 @@ export function DataTableSelectionBar<TData extends RowData>(
                 />
 
                 {clearable && (
-                  <Button
+                  <SelectionClearButtonRoot
+                    className={dataTableClasses.selectionClearButton}
                     size="small"
                     color="inherit"
                     aria-label="Clear all selected rows"
@@ -161,10 +187,10 @@ export function DataTableSelectionBar<TData extends RowData>(
                     }}
                   >
                     Clear
-                  </Button>
+                  </SelectionClearButtonRoot>
                 )}
-              </Stack>
-            </Box>
+              </SelectionBarEndRoot>
+            </SelectionBarRoot>
           </>
         );
       }}

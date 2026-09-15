@@ -24,7 +24,8 @@ export interface DataTableSelectionContext<TData extends RowData> {
   readonly selectedRowIds: readonly string[];
 
   /**
-   * Concrete TanStack rows resolved from selectedRowIds.
+   * Selected rows present in the loaded core model. With manual pagination,
+   * this can be a subset of selectedRowIds. Use IDs for server bulk actions.
    */
   readonly selectedRows: readonly Row<MuiDataTableFeatures, TData>[];
 

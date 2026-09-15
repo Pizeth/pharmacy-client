@@ -34,7 +34,7 @@ export interface DataTableDensityConfig {
   /**
    * Initial density used in uncontrolled mode.
    *
-   * Default: "standard"
+   * Default: theme density, then "comfortable"
    */
   readonly defaultDensity?: MuiDataTableDensity;
 

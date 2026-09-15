@@ -2,9 +2,16 @@
 
 "use client";
 
-import { Button, Tooltip } from "@mui/material";
+import { styled, Button, Tooltip } from "@mui/material";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
 import type { DataTableBulkAction, DataTableSelectionContext } from "./types";
+
+const BulkActionButtonRoot = styled(Button, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "BulkActionButton",
+  overridesResolver: (_props, styles) => styles.bulkActionButton,
+})({ whiteSpace: "nowrap" });
 
 export interface DataTableBulkActionButtonProps<TData extends RowData> {
   readonly action: DataTableBulkAction<TData>;
@@ -27,7 +34,8 @@ export function DataTableBulkActionButton<TData extends RowData>(
   const icon = action.renderIcon?.(context);
 
   const button = (
-    <Button
+    <BulkActionButtonRoot
+      className={dataTableClasses.bulkActionButton}
       size="small"
       color={action.color ?? "primary"}
       variant={action.variant ?? "text"}
@@ -46,12 +54,9 @@ export function DataTableBulkActionButton<TData extends RowData>(
 
         action.onClick(context);
       }}
-      sx={{
-        whiteSpace: "nowrap",
-      }}
     >
       {action.label}
-    </Button>
+    </BulkActionButtonRoot>
   );
 
   /**

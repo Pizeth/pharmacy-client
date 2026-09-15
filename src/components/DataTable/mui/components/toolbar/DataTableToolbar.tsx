@@ -3,6 +3,7 @@
 import { Box, Stack, styled, useMediaQuery, useTheme } from "@mui/material";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
+import { useDataTableThemeDefaults } from "../../theme/useDataTableThemeDefaults";
 import { DataTableGlobalFilter } from "../global-filtering";
 import type { MuiDataTableInstance } from "../../table";
 import { DataTableSearchToggleButton } from "./actions";
@@ -98,11 +99,12 @@ export interface DataTableToolbarProps<
 export function DataTableToolbar<TData extends RowData>(
   props: DataTableToolbarProps<TData>,
 ) {
+  const themeDefaults = useDataTableThemeDefaults();
   const {
     table,
-    search = true,
-    searchMode = "always",
-    searchPosition = "center",
+    search = themeDefaults.enableGlobalSearch ?? true,
+    searchMode = themeDefaults.searchMode ?? "always",
+    searchPosition = themeDefaults.searchPosition ?? "center",
     searchPlaceholder = "Search…",
     searchDebounceMs = 0,
     searchOpen: controlledSearchOpen,
@@ -113,10 +115,10 @@ export function DataTableToolbar<TData extends RowData>(
     showSelectionSummary = true,
     enableFilterToggle = true,
     showFilterStatus = false,
-    enableColumnManager = true,
+    enableColumnManager = themeDefaults.enableColumnManager ?? true,
     columnManager,
-    enableDensity = true,
-    enableFullscreen = true,
+    enableDensity = themeDefaults.enableDensityToggle ?? true,
+    enableFullscreen = themeDefaults.enableFullscreen ?? true,
   } = props;
 
   const theme = useTheme();

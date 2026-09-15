@@ -1,8 +1,11 @@
 "use client";
 
-import { Box, Table, TableContainer } from "@mui/material";
+import { Box, Table, TableContainer, styled } from "@mui/material";
 import type { TableContainerProps, TableProps } from "@mui/material";
+import type { CSSProperties } from "react";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { RowData } from "@tanstack/table-core";
+import { useDataTableThemeDefaults } from "../theme/useDataTableThemeDefaults";
 import { DataTableDensityProvider } from "../density";
 import type { DataTableDensityConfig } from "../density";
 import { DataTableFullscreenProvider } from "../fullscreen";
@@ -23,6 +26,34 @@ import { DataTableFilterDisplayProvider } from "../filter-display";
 import type { DataTableFilterDisplayConfig } from "../filter-display";
 import { DataTableDetailPanelRenderer } from "./detail-panel";
 import { DataTableAccessibilityProvider } from "../accessibility";
+
+const ContentRoot = styled(Box, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "Content",
+  overridesResolver: (_props, styles) => styles.content,
+})({ display: "flex", flexDirection: "column", minWidth: 0 });
+
+const ContainerRoot = styled(TableContainer, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "Container",
+  overridesResolver: (_props, styles) => styles.container,
+})({ overflowX: "auto", position: "relative", flex: 1, minHeight: 0 });
+
+const TableRoot = styled(Table, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "Table",
+  overridesResolver: (_props, styles) => styles.table,
+})({
+  tableLayout: "fixed",
+  borderCollapse: "separate",
+  borderSpacing: 0,
+  width: "var(--DataTable-table-size)",
+  minWidth: "var(--DataTable-table-size)",
+});
+
+export interface DataTableTableStyle extends CSSProperties {
+  "--DataTable-table-size": string;
+}
 
 export interface DataTableProps<TData extends RowData>
   extends
@@ -132,11 +163,12 @@ export interface DataTableProps<TData extends RowData>
  * This component owns only the native/MUI rendering shell.
  */
 export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
+  const themeDefaults = useDataTableThemeDefaults();
   const {
     table,
     tableProps,
     containerProps,
-    toolbar = true,
+    toolbar = themeDefaults.enableToolbar ?? true,
     renderDetailPanel,
     refreshing = false,
     refreshProgress,
@@ -195,61 +227,19 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                 {toolbar !== false && (
                   <DataTableToolbar table={table} {...toolbarConfig} />
                 )}
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    minWidth: 0,
-                  }}
-                >
+                <ContentRoot className={dataTableClasses.content}>
                   <DataTableRefreshingIndicator
                     refreshing={refreshing}
                     progress={refreshProgress}
                   />
-                  <TableContainer
+                  <ContainerRoot
                     {...containerProps}
-                    // sx={[
-                    //   {
-                    //     overflowX: "auto",
-                    //   },
-
-                    //   ...(Array.isArray(containerProps?.sx)
-                    //     ? containerProps.sx
-                    //     : containerProps?.sx
-                    //       ? [containerProps.sx]
-                    //       : []),
-                    // ]}
-                    sx={[
-                      {
-                        /**
-                         * This element is the horizontal scrolling viewport against
-                         * which sticky inline positioning operates.
-                         */
-                        overflowX: "auto",
-
-                        /**
-                         * Prevent outer content from leaking through sticky cells
-                         * around rounded/contained table layouts.
-                         */
-                        position: "relative",
-
-                        /**
-                         * Critical for fullscreen:
-                         *
-                         * table area consumes remaining height between toolbar
-                         * and pagination.
-                         */
-                        flex: 1,
-
-                        minHeight: 0,
-                      },
-
-                      ...(Array.isArray(containerProps?.sx)
-                        ? containerProps.sx
-                        : containerProps?.sx
-                          ? [containerProps.sx]
-                          : []),
-                    ]}
+                    className={[
+                      dataTableClasses.container,
+                      containerProps?.className,
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                   >
                     <table.Subscribe
                       selector={(state) => ({
@@ -259,41 +249,21 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                     >
                       {() => {
                         const totalSize = table.getTotalSize();
+                        const tableStyle: DataTableTableStyle = {
+                          "--DataTable-table-size": `${totalSize}px`,
+                          ...tableProps?.style,
+                        };
 
                         return (
-                          <Table
-                            // stickyHeader
-                            // size="small"
+                          <TableRoot
                             {...tableProps}
-                            // data-direction={direction}
-                            sx={[
-                              {
-                                /**
-                                 * Required for predictable TanStack-controlled widths.
-                                 */
-                                tableLayout: "fixed",
-
-                                /**
-                                 * Separate borders behave much more predictably with
-                                 * sticky native table cells than collapsed borders.
-                                 */
-                                borderCollapse: "separate",
-
-                                borderSpacing: 0,
-
-                                /**
-                                 * Exact sum of visible leaf column sizes.
-                                 */
-                                width: `${totalSize}px`,
-
-                                minWidth: `${totalSize}px`,
-                              },
-                              ...(Array.isArray(tableProps?.sx)
-                                ? tableProps.sx
-                                : tableProps?.sx
-                                  ? [tableProps.sx]
-                                  : []),
-                            ]}
+                            className={[
+                              dataTableClasses.table,
+                              tableProps?.className,
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            style={tableStyle}
                           >
                             <DataTableColumnGroup table={table} />
                             <DataTableHead table={table} />
@@ -301,18 +271,18 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                               table={table}
                               renderDetailPanel={renderDetailPanel}
                             />
-                          </Table>
+                          </TableRoot>
                         );
                       }}
                     </table.Subscribe>
-                  </TableContainer>
+                  </ContainerRoot>
                   {selectionBar !== false && (
                     <DataTableSelectionBar table={table} {...selectionBar} />
                   )}
                   {pagination !== false && (
                     <DataTablePagination table={table} {...pagination} />
                   )}
-                </Box>
+                </ContentRoot>
               </DataTableShell>
             </DataTableFilterDisplayProvider>
           </DataTableFullscreenProvider>

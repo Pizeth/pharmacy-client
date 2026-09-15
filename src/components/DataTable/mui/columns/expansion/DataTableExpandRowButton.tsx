@@ -1,8 +1,9 @@
 // mui/columns/expansion/DataTableExpandRowButton.tsx
 
 "use client";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
-import { IconButton, Tooltip } from "@mui/material";
+import { styled, IconButton, Tooltip } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowRight } from "@mui/icons-material";
 import {
   useMuiDataTableCellContext,
@@ -17,6 +18,19 @@ import { useDataTableAccessibility } from "../../accessibility";
  * Row state comes from the cell context.
  * React subscriptions come from the table context.
  */
+const ExpandRowButtonRoot = styled(IconButton, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "ExpandRowButton",
+  overridesResolver: (_props, styles) => styles.expandRowButton,
+})(({ theme }) => ({
+  width: 28,
+  height: 28,
+  "&:focus-visible, &.Mui-focusVisible": {
+    outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`,
+    outlineOffset: 2,
+  },
+}));
+
 export function DataTableExpandRowButton() {
   const table = useMuiDataTableContext();
 
@@ -43,7 +57,8 @@ export function DataTableExpandRowButton() {
 
         return (
           <Tooltip title={expanded ? "Collapse row" : "Expand row"}>
-            <IconButton
+            <ExpandRowButtonRoot
+              className={dataTableClasses.expandRowButton}
               id={expandButtonId}
               size="small"
               aria-label={
@@ -59,23 +74,13 @@ export function DataTableExpandRowButton() {
 
                 row.toggleExpanded();
               }}
-              sx={{
-                width: 28,
-                height: 28,
-
-                "&:focus-visible": {
-                  outline: "2px solid",
-                  outlineColor: "primary.main",
-                  outlineOffset: 2,
-                },
-              }}
             >
               {expanded ? (
                 <KeyboardArrowDown fontSize="small" />
               ) : (
                 <KeyboardArrowRight fontSize="small" />
               )}
-            </IconButton>
+            </ExpandRowButtonRoot>
           </Tooltip>
         );
       }}

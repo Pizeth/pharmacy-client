@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useDataTableThemeDefaults } from "../theme/useDataTableThemeDefaults";
 import type { ReactNode } from "react";
 import type { MuiDataTableDensity } from "./types";
 
@@ -54,11 +55,12 @@ export interface DataTableDensityProviderProps {
  * does not own this visual concern.
  */
 export function DataTableDensityProvider(props: DataTableDensityProviderProps) {
+  const themeDefaults = useDataTableThemeDefaults();
   const {
     children,
     density: controlledDensity,
 
-    defaultDensity = "comfortable",
+    defaultDensity = themeDefaults.density ?? "comfortable",
 
     onDensityChange,
   } = props;

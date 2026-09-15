@@ -8,6 +8,7 @@ import {
   CssVarsThemeOptions,
   ComponentsOverrides,
 } from "@mui/material/styles";
+import type { DataTableThemeProps } from "@/components/DataTable/mui/theme/types";
 import type { DataTableSlotKey } from "@/components/DataTable/mui/styles/dataTableClasses";
 
 import { ClassKey, CustomComponents } from "@/types/classKey";
@@ -94,11 +95,14 @@ declare module "@mui/material/styles" {
   }
 
   // ComponentsPropsList directly extends our map.
-  interface ComponentsPropsList extends RazethComponentsPropsList {}
+  interface ComponentsPropsList extends RazethComponentsPropsList {
+    RazethDataTable: DataTableThemeProps;
+  }
 
   interface Components extends CustomComponents {
-    /** Structural slots share styles; whole-table defaults come in phase 6F. */
+    /** Shared structural slots and resource-independent presentation defaults. */
     RazethDataTable?: {
+      defaultProps?: Partial<DataTableThemeProps>;
       styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDataTable"];
     };
     // Your custom components are now automatically included

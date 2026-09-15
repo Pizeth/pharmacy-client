@@ -28,7 +28,9 @@ import type {
  */
 export interface DataTableThemeProps {
   /**
-   * Default density for DataTables.
+   * Initial uncontrolled density for DataTables.
+   * Explicit density/defaultDensity props take precedence.
+   * Changing this theme default does not reset mounted density state.
    */
   readonly density?: MuiDataTableDensity;
 
@@ -67,7 +69,10 @@ export interface DataTableThemeProps {
  *
  *   theme.components.RazethDataTable.styleOverrides
  */
-export type { DataTableClassKey, DataTableSlotKey } from "../styles/dataTableClasses";
+export type {
+  DataTableClassKey,
+  DataTableSlotKey,
+} from "../styles/dataTableClasses";
 
 /**
  * ------------------------------------------------------------------

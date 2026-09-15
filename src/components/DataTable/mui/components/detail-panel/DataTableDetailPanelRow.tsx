@@ -1,13 +1,102 @@
-// mui/components/detail-panel/DataTableDetailPanelRow.tsx
-
 "use client";
 
-import { Box, TableCell, TableRow } from "@mui/material";
+// src/components/DataTable/mui/components/detail-panel/DataTableDetailPanelRow.tsx
+
+import { Box, styled, TableCell, TableRow } from "@mui/material";
 import type { Row, RowData } from "@tanstack/table-core";
+import { useDataTableAccessibility } from "../../accessibility";
 import type { MuiDataTableFeatures } from "../../features";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { MuiDataTableInstance } from "../../table";
 import type { DataTableDetailPanelRenderer } from "./types";
-import { useDataTableAccessibility } from "../../accessibility";
+
+/**
+ * ------------------------------------------------------------------
+ * DetailPanelRow
+ * ------------------------------------------------------------------
+ *
+ * Physical table row containing one expanded detail panel.
+ *
+ * This is intentionally separate from BodyRow:
+ *
+ * - it does not represent one TanStack data-row presentation surface
+ * - it does not own row hover/selection styling
+ * - it does not participate in normal body-cell pinning
+ * - it spans the complete visible table width
+ */
+const DetailPanelRowRoot = styled(TableRow, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "DetailPanelRow",
+  overridesResolver: (_props, styles) => styles.detailPanelRow,
+})(({ theme }) => ({
+  /**
+   * Preserve the previous explicit row background.
+   *
+   * This prevents surrounding container/background presentation from
+   * leaking through custom detail content.
+   */
+  backgroundColor: (theme.vars ?? theme).palette.background.paper,
+}));
+
+/**
+ * ------------------------------------------------------------------
+ * DetailPanelCell
+ * ------------------------------------------------------------------
+ *
+ * One native table cell spanning every currently visible leaf column.
+ *
+ * Detail content deliberately does NOT inherit ordinary BodyCell:
+ *
+ * - nowrap
+ * - ellipsis
+ * - TanStack column width
+ * - pinned offsets
+ * - density cell padding
+ */
+const DetailPanelCellRoot = styled(TableCell, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "DetailPanelCell",
+  overridesResolver: (_props, styles) => styles.detailPanelCell,
+})(({ theme }) => ({
+  padding: 0,
+  borderBottom: `1px solid ${(theme.vars ?? theme).palette.divider}`,
+
+  /**
+   * Detail content must be allowed to wrap naturally and may
+   * contain arbitrary application UI.
+   */
+  whiteSpace: "normal",
+
+  overflow: "visible",
+}));
+
+/**
+ * ------------------------------------------------------------------
+ * DetailPanel
+ * ------------------------------------------------------------------
+ *
+ * Semantic region containing application-defined detail content.
+ *
+ * Accessibility:
+ *
+ *   expansion button
+ *       aria-controls
+ *            ↓
+ *       DetailPanel id
+ *
+ *   DetailPanel
+ *       aria-labelledby
+ *            ↓
+ *       expansion button id
+ */
+const DetailPanelRoot = styled(Box, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "DetailPanel",
+  overridesResolver: (_props, styles) => styles.detailPanel,
+})({
+  width: "100%",
+  minWidth: 0,
+});
 
 export interface DataTableDetailPanelRowProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -16,12 +105,24 @@ export interface DataTableDetailPanelRowProps<TData extends RowData> {
 }
 
 /**
- * Full-width table row containing application-defined detail content.
+ * Full-width renderer-owned detail panel beneath an expanded row.
  *
- * This is separate from TanStack subRows:
+ * This is distinct from TanStack subRows.
  *
- * - expanded state belongs to TanStack
- * - detail-panel content belongs to the MUI renderer
+ * Ownership remains:
+ *
+ * TanStack:
+ *   - expanded state
+ *   - row identity
+ *   - visible-column state
+ *
+ * MUI DataTable:
+ *   - native detail row/cell
+ *   - accessibility relationship
+ *   - presentation slots
+ *
+ * Application:
+ *   - detail-panel content
  */
 export function DataTableDetailPanelRow<TData extends RowData>(
   props: DataTableDetailPanelRowProps<TData>,
@@ -37,18 +138,45 @@ export function DataTableDetailPanelRow<TData extends RowData>(
   return (
     <table.Subscribe
       selector={(state) => ({
+        /**
+         * colSpan depends on currently visible leaf columns.
+         */
         columnVisibility: state.columnVisibility,
+
+        /**
+         * Keep the existing subscription contract intact in 6E.4.
+         *
+         * Pinning does not currently alter colSpan, but removing this
+         * dependency is an optimization/audit concern rather than part
+         * of the presentation migration.
+         */
         columnPinning: state.columnPinning,
+
+        /**
+         * The row exists only while TanStack considers it expanded.
+         */
         expanded: state.expanded,
       })}
     >
       {() => {
+        /**
+         * Important:
+         *
+         * Do not invoke application detail renderers for collapsed
+         * rows.
+         */
         if (!row.getIsExpanded()) {
           return null;
         }
 
         const visibleColumnCount = table.getVisibleLeafColumns().length;
 
+        /**
+         * Native colSpan must never be zero.
+         *
+         * This mirrors the same defensive invariant used by body-wide
+         * loading/error/empty states.
+         */
         const colSpan = Math.max(1, visibleColumnCount);
 
         const content = renderDetailPanel({
@@ -56,46 +184,43 @@ export function DataTableDetailPanelRow<TData extends RowData>(
           row,
         });
 
+        /**
+         * React renderers commonly use false/null/undefined to mean
+         * "render nothing".
+         *
+         * Preserve the existing contract exactly.
+         *
+         * Values such as:
+         *
+         *   0
+         *   ""
+         *
+         * remain valid renderable content.
+         */
         if (content === null || content === undefined || content === false) {
           return null;
         }
 
         return (
-          <TableRow
+          <DetailPanelRowRoot
+            className={dataTableClasses.detailPanelRow}
             data-detail-panel-row={row.id}
-            sx={{
-              backgroundColor: "background.paper",
-            }}
           >
-            <TableCell
+            <DetailPanelCellRoot
+              className={dataTableClasses.detailPanelCell}
               colSpan={colSpan}
-              sx={{
-                p: 0,
-                borderBottom: "1px solid",
-                borderBottomColor: "divider",
-
-                /**
-                 * Detail content must not inherit normal body-cell
-                 * nowrap/truncation behavior.
-                 */
-                whiteSpace: "normal",
-                overflow: "visible",
-              }}
             >
-              <Box
+              <DetailPanelRoot
+                className={dataTableClasses.detailPanel}
                 id={detailPanelId}
                 role="region"
                 aria-labelledby={expandButtonId}
                 data-detail-panel={row.id}
-                sx={{
-                  width: "100%",
-                  minWidth: 0,
-                }}
               >
                 {content}
-              </Box>
-            </TableCell>
-          </TableRow>
+              </DetailPanelRoot>
+            </DetailPanelCellRoot>
+          </DetailPanelRowRoot>
         );
       }}
     </table.Subscribe>

@@ -30,6 +30,10 @@ import { DATA_TABLE_COMPONENT_NAME } from "./constants";
 export const dataTableClasses = generateUtilityClasses(
   DATA_TABLE_COMPONENT_NAME,
   [
+    "root",
+    "content",
+    "container",
+    "table",
     /**
      * ============================================================
      * Global filtering
@@ -57,15 +61,9 @@ export const dataTableClasses = generateUtilityClasses(
 
     /**
      * ============================================================
-     * Header structure
+     * Toolbar / pagination
      * ============================================================
      *
-     * Phase 1.7.10.6C begins the migration of the physical header
-     * renderer to the same slot-based architecture already used by
-     * the filter row.
-     */
-
-    /**
      * One physical TanStack header-group row.
      *
      * Future styled slot:
@@ -75,12 +73,14 @@ export const dataTableClasses = generateUtilityClasses(
     "toolbarSearch",
     "toolbar",
     "toolbarSelection",
+
     "pagination",
     "paginationDivider",
     "paginationControls",
     "paginationStatus",
     "paginationActions",
     "paginationButton",
+
     "pageSize",
     "pageSizeLabel",
     "pageSizeSelect",
@@ -98,9 +98,71 @@ export const dataTableClasses = generateUtilityClasses(
     "toolbarCenter",
     "toolbarEnd",
     "toolbarSearchRow",
+
+    /**
+     * ============================================================
+     * Body structure
+     * ============================================================
+     */
+    "selectionBar",
+    "selectionBarDivider",
+    "selectionBarStart",
+    "selectionBarEnd",
+    "selectionBarStatus",
+    "selectionClearButton",
+    "bulkActions",
+    "bulkActionButton",
+    "selectAllCheckbox",
+    "selectRowCheckbox",
+    "expandRowButton",
+    "expandAllButton",
+    "refreshingIndicator",
     "body",
     "bodyRow",
     "bodyCell",
+
+    /**
+     * Body-wide loading/error/empty states.
+     *
+     * All three state renderers share:
+     *
+     *   BodyStateRow
+     *   BodyStateCell
+     *
+     * while their actual content surfaces remain independently
+     * themeable.
+     */
+    "bodyStateRow",
+    "bodyStateCell",
+    "emptyState",
+    "loadingState",
+    "errorState",
+
+    /**
+     * ============================================================
+     * Detail-panel structure
+     * ============================================================
+     *
+     * A detail panel is a renderer-owned full-width row attached to
+     * TanStack row-expansion state.
+     *
+     * It deliberately remains separate from ordinary:
+     *
+     *   bodyRow
+     *   bodyCell
+     *
+     * because application detail content does not participate in normal
+     * cell sizing, truncation, pinning or density policies.
+     */
+    "detailPanelRow",
+    "detailPanelCell",
+    "detailPanel",
+
+    /**
+     * ============================================================
+     * Header structure
+     * ============================================================
+     */
     "head",
     "headerRow",
 
@@ -181,6 +243,12 @@ export const dataTableClasses = generateUtilityClasses(
      *   slot: "HeaderActions"
      */
     "headerActions",
+
+    /**
+     * ============================================================
+     * Header affordances
+     * ============================================================
+     */
     "headerLabel",
     "sortLabel",
     "sortIndicator",
@@ -210,22 +278,12 @@ export type DataTableClassKey = keyof typeof dataTableClasses;
  *   theme.components.RazethDataTable.styleOverrides.<key>
  */
 export type DataTableNonSlotClassKey =
-  | "globalFilterFullWidth"
-  | "globalFilterClearButton";
+  "globalFilterFullWidth" | "globalFilterClearButton";
 
 /**
  * Named structural slots addressable through:
  *
  *   theme.components.RazethDataTable.styleOverrides
- *
- * Examples after 6C:
- *
- *   styleOverrides: {
- *     headerCell: { ... },
- *     headerContent: { ... },
- *     headerActions: { ... },
- *     filterCell: { ... },
- *   }
  */
 export type DataTableSlotKey = Exclude<
   DataTableClassKey,

@@ -30,13 +30,9 @@ export function getDataTableSelectedRowIds(
 }
 
 /**
- * Resolve selected IDs back to concrete TanStack rows.
- *
- * `true` requests lookup through the complete row model rather than
- * limiting lookup to the immediately visible page.
- *
- * This is important because rowSelection may preserve selected rows
- * across pagination/filtering.
+ * Resolve the selected rows available in the loaded core model.
+ * Manual pagination can retain IDs whose data is not loaded. Keep those
+ * IDs in the selection context, but do not invent rows or throw for them.
  */
 export function getDataTableSelectedRows<TData extends RowData>(
   table: MuiDataTableInstance<TData>,
@@ -45,8 +41,10 @@ export function getDataTableSelectedRows<TData extends RowData>(
 ): Row<MuiDataTableFeatures, TData>[] {
   const rows: Row<MuiDataTableFeatures, TData>[] = [];
 
+  const rowsById = table.getCoreRowModel().rowsById;
   for (const rowId of selectedRowIds) {
-    rows.push(table.getRow(rowId, true));
+    const row = rowsById[rowId];
+    if (row) rows.push(row);
   }
 
   return rows;

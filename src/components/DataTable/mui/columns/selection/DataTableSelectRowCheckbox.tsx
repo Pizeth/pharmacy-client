@@ -1,6 +1,7 @@
 "use client";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
-import { Checkbox } from "@mui/material";
+import { styled, Checkbox } from "@mui/material";
 import {
   useMuiDataTableCellContext,
   useMuiDataTableContext,
@@ -14,6 +15,12 @@ import {
  * The table-level AppTable context supplies the ReactTable required
  * for fine-grained subscriptions.
  */
+const SelectRowCheckboxRoot = styled(Checkbox, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "SelectRowCheckbox",
+  overridesResolver: (_props, styles) => styles.selectRowCheckbox,
+})({});
+
 export function DataTableSelectRowCheckbox() {
   /**
    * Enriched TanStack cell context.
@@ -67,7 +74,8 @@ export function DataTableSelectRowCheckbox() {
       })}
     >
       {({ checked, indeterminate, disabled }) => (
-        <Checkbox
+        <SelectRowCheckboxRoot
+          className={dataTableClasses.selectRowCheckbox}
           size="small"
           checked={checked}
           indeterminate={indeterminate}
