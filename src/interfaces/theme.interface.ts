@@ -1,6 +1,5 @@
 // src/interfaces/theme.interface.ts
 
-import { DataTableThemeProps } from "@/components/DataTable/mui/theme/types";
 import {
   AvatarProps,
   DividerProps,

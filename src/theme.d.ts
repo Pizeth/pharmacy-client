@@ -7,8 +7,10 @@ import {
   ThemeOptions as MuiThemeOptions,
   CssVarsThemeOptions,
   ComponentsOverrides,
+  ComponentsVariants,
 } from "@mui/material/styles";
 import type { DataTableThemeProps } from "@/components/DataTable/mui/theme/types";
+import type { DataTableVariantProps } from "@/components/DataTable/mui/theme/variants";
 import type { DataTableSlotKey } from "@/components/DataTable/mui/styles/dataTableClasses";
 
 import { ClassKey, CustomComponents } from "@/types/classKey";
@@ -94,17 +96,64 @@ declare module "@mui/material/styles" {
     RazethDataTable: DataTableSlotKey;
   }
 
-  // ComponentsPropsList directly extends our map.
+  /**
+   * MUI's component-prop map drives:
+   *
+   * - variant matching
+   * - styleOverrides ownerState typing
+   *
+   * It deliberately does NOT represent the complete DataTable renderer
+   * prop surface.
+   *
+   * Theme defaultProps are typed separately below.
+   */
   interface ComponentsPropsList extends RazethComponentsPropsList {
-    RazethDataTable: DataTableThemeProps;
+    RazethDataTable: DataTableVariantProps;
   }
 
   interface Components extends CustomComponents {
     /** Shared structural slots and resource-independent presentation defaults. */
     RazethDataTable?: {
+      /**
+       * Broader generic presentation defaults.
+       *
+       * This intentionally includes:
+       *
+       * - density
+       * - toolbar defaults
+       * - search defaults
+       * - action defaults
+       * - visual variant
+       */
       defaultProps?: Partial<DataTableThemeProps>;
+
+      /**
+       * MUI types styleOverride callbacks against the component-level
+       * ComponentsPropsList entry.
+       *
+       * RazethDataTable is a shared name used by many independently rendered
+       * slots, however, so callers must not assume Root-only variant
+       * ownerState exists inside every styleOverride callback.
+       *
+       * Use:
+       *
+       * - ordinary slot styleOverrides for slot styling
+       * - RazethDataTable.variants for variant matching
+       * - stable utility-class descendant selectors inside a Root variant
+       *   when a variant must affect child slots
+       */
       styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDataTable"];
+
+      /**
+       * Theme variants are intentionally matched against:
+       *
+       *   DataTableVariantProps
+       *
+       * rather than the full DataTableThemeProps contract.
+       */
+      variants?: ComponentsVariants<MuiTheme>["RazethDataTable"];
     };
+
     // Your custom components are now automatically included
     // You can still add standard MUI component overrides here if needed
   }

@@ -10,13 +10,21 @@ import type {
   DataTableSelectFilterProps,
   DataTableTextFilterProps,
 } from "../components/filtering/types";
+import type { DataTableVariantProps } from "./variants";
 
 /**
- * Theme-level defaults supported by RazethDataTable.
+ * ------------------------------------------------------------------
+ * Theme-level DataTable defaults
+ * ------------------------------------------------------------------
  *
- * Important:
+ * These values belong to:
  *
- * Do not put row/resource-specific values here.
+ *   theme.components.RazethDataTable.defaultProps
+ *
+ * This is NOT the structural ownerState type.
+ *
+ * Theme defaults describe generic presentation/behavior defaults.
+ * Resource-specific values never belong here.
  *
  * Theme defaults should describe presentation and generic behavior,
  * not:
@@ -26,11 +34,19 @@ import type {
  * - API adapters
  * - resource query mappings
  */
-export interface DataTableThemeProps {
+export interface DataTableThemeProps extends DataTableVariantProps {
   /**
    * Initial uncontrolled density for DataTables.
-   * Explicit density/defaultDensity props take precedence.
-   * Changing this theme default does not reset mounted density state.
+   *
+   * Explicit:
+   *
+   *   density
+   *   defaultDensity
+   *
+   * props take precedence.
+   *
+   * Changing this theme default does not reset mounted uncontrolled
+   * density state.
    */
   readonly density?: MuiDataTableDensity;
 
@@ -59,7 +75,13 @@ export interface DataTableThemeProps {
   readonly enableDensityToggle?: boolean;
 
   /**
-   * Default fullscreen action visibility.
+   * Default fullscreen-action visibility.
+   *
+   * Important:
+   *
+   * This controls the ACTION.
+   *
+   * It is not fullscreen state.
    */
   readonly enableFullscreen?: boolean;
 }
@@ -76,16 +98,25 @@ export type {
 
 /**
  * ------------------------------------------------------------------
- * DataTable-specific MUI ComponentsPropsList extension
+ * Leaf filter MUI component-prop extension
  * ------------------------------------------------------------------
  *
- * This interface is deliberately kept inside the DataTable package.
+ * These are independent named MUI components:
  *
- * The application-level RazethComponentsPropsList can extend it rather
- * than importing every individual DataTable component prop type.
+ *   RazethDataTableTextFilter
+ *   RazethDataTableNumberFilter
+ *   ...
  *
- * That keeps theme augmentation scalable as more DataTable slots become
- * theme-aware later.
+ * RazethDataTable itself is augmented separately in src/theme.d.ts
+ * because its:
+ *
+ *   defaultProps contract
+ *
+ * and:
+ *
+ *   variants / ownerState contract
+ *
+ * are intentionally different.
  */
 export interface DataTableComponentsPropsList {
   RazethDataTableTextFilter: Partial<DataTableTextFilterProps>;

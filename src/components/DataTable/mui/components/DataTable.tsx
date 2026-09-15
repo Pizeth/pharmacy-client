@@ -3,42 +3,68 @@
 import { Box, Table, TableContainer, styled } from "@mui/material";
 import type { TableContainerProps, TableProps } from "@mui/material";
 import type { CSSProperties } from "react";
-import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { RowData } from "@tanstack/table-core";
-import { useDataTableThemeDefaults } from "../theme/useDataTableThemeDefaults";
+import { DataTableAccessibilityProvider } from "../accessibility";
 import { DataTableDensityProvider } from "../density";
 import type { DataTableDensityConfig } from "../density";
+import { DataTableFilterDisplayProvider } from "../filter-display";
+import type { DataTableFilterDisplayConfig } from "../filter-display";
 import { DataTableFullscreenProvider } from "../fullscreen";
 import type { DataTableFullscreenConfig } from "../fullscreen";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { MuiDataTableInstance } from "../table";
+import { DATA_TABLE_DEFAULT_VARIANT } from "../theme";
+import type { DataTableOwnerState, DataTableVariantProps } from "../theme";
+import { useDataTableThemeDefaults } from "../theme/useDataTableThemeDefaults";
 import { DataTableBody } from "./DataTableBody";
 import { DataTableColumnGroup } from "./DataTableColumnGroup";
 import { DataTableHead } from "./DataTableHead";
-import { DataTableSelectionBar } from "./selection";
-import type { DataTableSelectionBarConfig } from "./selection";
+import type { DataTableDetailPanelRenderer } from "./detail-panel";
 import { DataTablePagination } from "./pagination";
 import type { DataTablePaginationConfig } from "./pagination";
+import { DataTableSelectionBar } from "./selection";
+import type { DataTableSelectionBarConfig } from "./selection";
 import { DataTableShell } from "./DataTableShell";
 import { DataTableRefreshingIndicator } from "./states";
 import { DataTableToolbar } from "./toolbar";
 import type { DataTableToolbarConfig } from "./toolbar";
-import { DataTableFilterDisplayProvider } from "../filter-display";
-import type { DataTableFilterDisplayConfig } from "../filter-display";
-import { DataTableDetailPanelRenderer } from "./detail-panel";
-import { DataTableAccessibilityProvider } from "../accessibility";
 
+/**
+ * ------------------------------------------------------------------
+ * Content
+ * ------------------------------------------------------------------
+ *
+ * Shared structural ownerState is passed even though the base style
+ * currently does not branch on variant.
+ *
+ * That makes:
+ *
+ *   styleOverrides.content
+ *
+ * callbacks variant-aware without passing resource objects.
+ */
 const ContentRoot = styled(Box, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
 })({ display: "flex", flexDirection: "column", minWidth: 0 });
 
+/**
+ * ------------------------------------------------------------------
+ * Container
+ * ------------------------------------------------------------------
+ */
 const ContainerRoot = styled(TableContainer, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Container",
   overridesResolver: (_props, styles) => styles.container,
 })({ overflowX: "auto", position: "relative", flex: 1, minHeight: 0 });
 
+/**
+ * ------------------------------------------------------------------
+ * Native Table
+ * ------------------------------------------------------------------
+ */
 const TableRoot = styled(Table, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Table",
@@ -51,27 +77,28 @@ const TableRoot = styled(Table, {
   minWidth: "var(--DataTable-table-size)",
 });
 
+/**
+ * Runtime width supplied by TanStack.
+ */
 export interface DataTableTableStyle extends CSSProperties {
   "--DataTable-table-size": string;
 }
 
 export interface DataTableProps<TData extends RowData>
   extends
+    DataTableVariantProps,
     DataTableDensityConfig,
     DataTableFullscreenConfig,
     DataTableFilterDisplayConfig {
   /**
    * Table instance created by useMuiDataTable().
    *
-   * We deliberately accept the completed table instance rather than
-   * data/columns here.
-   *
-   * Table creation and table rendering are separate responsibilities.
+   * Table creation and MUI rendering remain separate concerns.
    */
   readonly table: MuiDataTableInstance<TData>;
 
   /**
-   * Props forwarded to MUI's <Table>.
+   * Props forwarded to MUI's native <Table>.
    */
   readonly tableProps?: Omit<TableProps, "children">;
 
@@ -96,13 +123,13 @@ export interface DataTableProps<TData extends RowData>
 
   /**
    * false:
-   *   disable the selection status/bulk-action bar.
+   *   disable selection status/bulk-action bar.
    *
    * undefined:
    *   no selection bar by default.
    *
    * object:
-   *   render the configured selection bar whenever rows are selected.
+   *   configured selection bar when rows are selected.
    */
   readonly selectionBar?: false | DataTableSelectionBarConfig<TData>;
 
@@ -137,6 +164,8 @@ export interface DataTableProps<TData extends RowData>
 /**
  * MUI renderer for a fully-created MUI DataTable instance.
  *
+ * DataTable owns the high-level MUI rendering composition.
+ *
  * Responsibilities:
  *
  * - install TanStack's AppTable context
@@ -156,9 +185,12 @@ export interface DataTableProps<TData extends RowData>
  *
  * - table state
  * - row models
- * - column widths
- * - resize state
- * - column APIs
+ * - column sizing
+ * - sorting
+ * - filtering
+ * - pagination state
+ * - expansion
+ * - selection
  *
  * This component owns only the native/MUI rendering shell.
  */
@@ -168,25 +200,77 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     table,
     tableProps,
     containerProps,
+
+    /**
+     * Do not use theme defaultProps to merge the completed table
+     * instance or resource renderer props.
+     *
+     * 6F.2 intentionally keeps that boundary explicit.
+     */
     toolbar = themeDefaults.enableToolbar ?? true,
+
     renderDetailPanel,
     refreshing = false,
     refreshProgress,
     selectionBar = false,
     pagination = {},
+
+    /**
+     * Visual variant is presentation-only.
+     *
+     * Explicit prop wins.
+     *
+     * Theme default wins next.
+     *
+     * Built-in outlined fallback preserves existing appearance.
+     */
+    variant: variantProp,
+
     density,
     defaultDensity,
     onDensityChange,
+
     columnFilterDisplayMode,
     defaultColumnFilterDisplayMode,
     onColumnFilterDisplayModeChange,
+
     showColumnFilters,
     defaultShowColumnFilters,
     onShowColumnFiltersChange,
+
     fullscreen,
     defaultFullscreen,
     onFullscreenChange,
   } = props;
+
+  const variant =
+    variantProp ?? themeDefaults.variant ?? DATA_TABLE_DEFAULT_VARIANT;
+
+  /**
+   * ----------------------------------------------------------------
+   * Shared structural ownerState
+   * ----------------------------------------------------------------
+   *
+   * Keep this object intentionally small.
+   *
+   * Do NOT spread:
+   *
+   *   props
+   *
+   * into ownerState.
+   *
+   * Doing so would leak:
+   *
+   * - table instance
+   * - render functions
+   * - resource-specific configuration
+   * - controlled state callbacks
+   *
+   * into MUI styling machinery.
+   */
+  const ownerState: DataTableOwnerState = {
+    variant,
+  };
 
   const toolbarConfig = typeof toolbar === "object" ? toolbar : {};
 
@@ -200,8 +284,6 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
    * We do not mutate table options here because renderers should not become
    * table configuration owners.
    */
-  //   const direction = theme.direction;
-
   return (
     <table.AppTable>
       <DataTableAccessibilityProvider>
@@ -223,7 +305,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
               defaultShowColumnFilters={defaultShowColumnFilters}
               onShowColumnFiltersChange={onShowColumnFiltersChange}
             >
-              <DataTableShell>
+              <DataTableShell ownerState={ownerState}>
                 {toolbar !== false && (
                   <DataTableToolbar table={table} {...toolbarConfig} />
                 )}
@@ -249,6 +331,12 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                     >
                       {() => {
                         const totalSize = table.getTotalSize();
+
+                        /**
+                         * Caller inline table styles deliberately come
+                         * after the generated CSS variable, preserving
+                         * the 6F.1 precedence contract.
+                         */
                         const tableStyle: DataTableTableStyle = {
                           "--DataTable-table-size": `${totalSize}px`,
                           ...tableProps?.style,

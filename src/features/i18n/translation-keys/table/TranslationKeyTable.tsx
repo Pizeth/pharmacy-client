@@ -169,6 +169,7 @@ export function TranslationKeyTable() {
         ) : null}
 
         <DataTable
+          // variant="plain"
           table={table}
           /**
            * Use the renderer's built-in non-blocking refresh indicator.

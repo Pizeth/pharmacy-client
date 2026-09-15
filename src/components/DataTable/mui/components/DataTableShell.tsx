@@ -4,24 +4,77 @@ import { Box, styled } from "@mui/material";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { ReactNode } from "react";
 import { useDataTableFullscreen } from "../fullscreen";
+import type { DataTableOwnerState } from "../theme";
 
+/**
+ * ------------------------------------------------------------------
+ * Root structural slot
+ * ------------------------------------------------------------------
+ *
+ * The shared structural ownerState deliberately contains only stable
+ * visual variant state.
+ *
+ * Mutable fullscreen state remains represented through:
+ *
+ *   data-fullscreen
+ *
+ * rather than being duplicated into ownerState.
+ */
 const ShellRoot = styled(Box, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})(({ theme }) => ({
+})<{
+  readonly ownerState: DataTableOwnerState;
+}>(({ theme, ownerState }) => ({
   display: "flex",
   flexDirection: "column",
   minWidth: 0,
   minHeight: 0,
   backgroundColor: (theme.vars ?? theme).palette.background.paper,
-  border: "1px solid",
-  borderColor: (theme.vars ?? theme).palette.divider,
-  borderRadius:
-    typeof theme.shape.borderRadius === "number"
-      ? theme.shape.borderRadius * 2
-      : `calc(${theme.shape.borderRadius} * 2)`,
+
+  /**
+   * ============================================================
+   * Built-in visual variants
+   * ============================================================
+   *
+   * `outlined` preserves the exact pre-6F.3 shell appearance.
+   *
+   * `plain` removes only outer chrome.
+   *
+   * Neither variant modifies:
+   *
+   * - table state
+   * - toolbar behavior
+   * - header/body behavior
+   * - density
+   * - pagination
+   * - selection
+   */
+  ...(ownerState.variant === "outlined"
+    ? {
+        border: "1px solid",
+        borderColor: (theme.vars ?? theme).palette.divider,
+        borderRadius:
+          typeof theme.shape.borderRadius === "number"
+            ? theme.shape.borderRadius * 2
+            : `calc(${theme.shape.borderRadius} * 2)`,
+      }
+    : {
+        border: 0,
+        borderRadius: 0,
+      }),
+
   overflow: "hidden",
+
+  /**
+   * ============================================================
+   * Mutable fullscreen state
+   * ============================================================
+   *
+   * This remains provider-owned runtime state rather than variant
+   * ownerState.
+   */
   '&[data-fullscreen="true"]': {
     borderRadius: 0,
     position: "fixed",
@@ -36,22 +89,43 @@ const ShellRoot = styled(Box, {
 
 export interface DataTableShellProps {
   readonly children: ReactNode;
+
+  /**
+   * Shared styling state resolved by DataTable.
+   *
+   * This is intentionally not the full DataTable props object.
+   */
+  readonly ownerState: DataTableOwnerState;
 }
 
 /**
  * Outer visual shell for the high-level DataTable.
  *
- * Fullscreen applies here so toolbar, table body, and pagination
+ * Fullscreen applies here so:
+ *
+ * - toolbar
+ * - table body
+ * - selection bar
+ * - pagination
+ *
  * participate together.
  */
 export function DataTableShell(props: DataTableShellProps) {
-  const { children } = props;
+  const { children, ownerState } = props;
 
   const { fullscreen } = useDataTableFullscreen();
 
   return (
     <ShellRoot
+      ownerState={ownerState}
       className={dataTableClasses.root}
+      /**
+       * Stable debugging/theme selector for the resolved public
+       * visual variant.
+       *
+       * The actual `variant` prop itself is NOT forwarded to the DOM.
+       */
+      data-variant={ownerState.variant}
       data-fullscreen={fullscreen ? "true" : undefined}
     >
       {children}
