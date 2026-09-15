@@ -2,10 +2,17 @@
 
 // src/components/DataTable/mui/components/toolbar/DataTableToolbarSelection.tsx
 
-import { Chip } from "@mui/material";
+import { Chip, styled } from "@mui/material";
 import { CheckCircleOutline } from "@mui/icons-material";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
+
+const ToolbarSelectionRoot = styled(Chip, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "ToolbarSelection",
+  overridesResolver: (_props, styles) => styles.toolbarSelection,
+})({});
 
 export interface DataTableToolbarSelectionProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -33,7 +40,8 @@ export function DataTableToolbarSelection<TData extends RowData>(
         }
 
         return (
-          <Chip
+          <ToolbarSelectionRoot
+            className={dataTableClasses.toolbarSelection}
             size="small"
             icon={<CheckCircleOutline />}
             label={`${selectedCount} selected`}

@@ -1,8 +1,10 @@
 "use client";
 
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
+
 // src/components/DataTable/mui/components/toolbar/DataTableToolbarActions.tsx
 
-import { Stack } from "@mui/material";
+import { Stack, styled } from "@mui/material";
 import type { RowData } from "@tanstack/table-core";
 import { DataTableColumnManagerButton } from "../column-manager";
 import type { DataTableColumnManagerConfig } from "../column-manager";
@@ -12,6 +14,12 @@ import {
   DataTableFilterToggleButton,
   DataTableFullscreenButton,
 } from "./actions";
+
+const ToolbarActionsRoot = styled(Stack, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "ToolbarActions",
+  overridesResolver: (_props, styles) => styles.toolbarActions,
+})({ flexShrink: 0 });
 
 export interface DataTableToolbarActionsProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -42,13 +50,11 @@ export function DataTableToolbarActions<TData extends RowData>(
   } = props;
 
   return (
-    <Stack
+    <ToolbarActionsRoot
+      className={dataTableClasses.toolbarActions}
       direction="row"
       alignItems="center"
       spacing={0.25}
-      sx={{
-        flexShrink: 0,
-      }}
     >
       {enableFilterToggle && (
         <DataTableFilterToggleButton<TData> table={table} />
@@ -61,6 +67,6 @@ export function DataTableToolbarActions<TData extends RowData>(
       {enableDensity && <DataTableDensityButton />}
 
       {enableFullscreen && <DataTableFullscreenButton />}
-    </Stack>
+    </ToolbarActionsRoot>
   );
 }

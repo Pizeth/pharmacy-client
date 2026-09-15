@@ -72,6 +72,35 @@ export const dataTableClasses = generateUtilityClasses(
      *
      *   slot: "HeaderRow"
      */
+    "toolbarSearch",
+    "toolbar",
+    "toolbarSelection",
+    "pagination",
+    "paginationDivider",
+    "paginationControls",
+    "paginationStatus",
+    "paginationActions",
+    "paginationButton",
+    "pageSize",
+    "pageSizeLabel",
+    "pageSizeSelect",
+
+    "toolbarActions",
+    "toolbarFilterStatus",
+    "searchToggleButton",
+    "filterToggleButton",
+    "densityButton",
+    "fullscreenButton",
+    "columnManagerButton",
+
+    "toolbarRow",
+    "toolbarStart",
+    "toolbarCenter",
+    "toolbarEnd",
+    "toolbarSearchRow",
+    "body",
+    "bodyRow",
+    "bodyCell",
     "head",
     "headerRow",
 

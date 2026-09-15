@@ -1,12 +1,45 @@
 "use client";
 
-import { alpha, TableRow } from "@mui/material";
+import { alpha, styled, TableRow } from "@mui/material";
 
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { Row, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
 import { DataTableBodyCell } from "./DataTableBodyCell";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
+
+const BodyRowRoot = styled(TableRow, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "BodyRow",
+  overridesResolver: (_props, styles) => styles.bodyRow,
+})(({ theme }) => {
+  const selectedBackground = alpha(
+    theme.palette.primary.main,
+    theme.palette.action.selectedOpacity,
+  );
+  const selectedHoverBackground = alpha(
+    theme.palette.primary.main,
+    Math.min(
+      1,
+      theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity,
+    ),
+  );
+  return {
+    "--DataTable-row-background": theme.palette.background.paper,
+    "&:hover": { "--DataTable-row-background": theme.palette.action.hover },
+    '&[data-selected="true"]': {
+      "--DataTable-row-background": selectedBackground,
+      "&:hover": { "--DataTable-row-background": selectedHoverBackground },
+    },
+    ...Object.fromEntries(
+      (["compact", "comfortable", "spacious"] as const).map((density) => [
+        `&[data-density="${density}"]`,
+        { minHeight: `${getDataTableDensityMetrics(density).bodyRowHeight}px` },
+      ]),
+    ),
+  };
+});
 
 export interface DataTableBodyRowProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -34,72 +67,24 @@ export function DataTableBodyRow<TData extends RowData>(
 
   const { density } = useDataTableDensity();
 
-  const densityMetrics = getDataTableDensityMetrics(density);
-
   return (
     <table.Subscribe
       source={table.atoms.rowSelection}
       selector={(rowSelection) => Boolean(rowSelection?.[row.id])}
     >
       {(selected) => (
-        <TableRow
+        <BodyRowRoot
+          className={dataTableClasses.bodyRow}
           hover
           selected={selected}
           data-row-id={row.id}
           data-selected={selected ? "true" : undefined}
           data-density={density}
-          sx={(theme) => {
-            const baseBackground = theme.palette.background.paper;
-
-            const hoverBackground = theme.palette.action.hover;
-
-            // const selectedBackground = theme.palette.action.selected;
-
-            const selectedBackground = alpha(
-              theme.palette.primary.main,
-              theme.palette.action.selectedOpacity,
-            );
-
-            // const selectedHoverBackground = alpha(
-            //   theme.palette.primary.main,
-            //   theme.palette.action.selectedOpacity +
-            //     theme.palette.action.hoverOpacity,
-            // );
-
-            const selectedHoverBackground = alpha(
-              theme.palette.primary.main,
-              Math.min(
-                1,
-                theme.palette.action.selectedOpacity +
-                  theme.palette.action.hoverOpacity,
-              ),
-            );
-
-            return {
-              minHeight: `${densityMetrics.bodyRowHeight}px`,
-
-              /**
-               * Base background consumed by sticky body cells.
-               */
-              "--DataTable-row-background": selected
-                ? selectedBackground
-                : baseBackground,
-
-              /**
-               * Keep pinned cells visually synchronized with MUI's
-               * row hover state.
-               */
-              "&:hover": {
-                "--DataTable-row-background": selected
-                  ? selectedHoverBackground
-                  : hoverBackground,
-              },
-            };
-          }}
         >
           <table.Subscribe
             selector={(state) => ({
               columnVisibility: state.columnVisibility,
+              columnOrder: state.columnOrder,
               columnPinning: state.columnPinning,
             })}
           >
@@ -111,7 +96,7 @@ export function DataTableBodyRow<TData extends RowData>(
                 ))
             }
           </table.Subscribe>
-        </TableRow>
+        </BodyRowRoot>
       )}
     </table.Subscribe>
   );

@@ -1,8 +1,11 @@
 "use client";
 
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../../styles";
+
 // src/components/DataTable/mui/components/toolbar/actions/DataTableDensityButton.tsx
 
 import {
+  styled,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -48,6 +51,17 @@ const DENSITY_OPTIONS: readonly DensityOption[] = [
  * MRT cycles through densities using one button. We deliberately expose
  * a menu because the current state and destination are clearer to users.
  */
+const DensityButtonRoot = styled(IconButton, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "DensityButton",
+  overridesResolver: (_props, styles) => styles.densityButton,
+})(({ theme }) => ({
+  "&:focus-visible, &.Mui-focusVisible": {
+    outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`,
+    outlineOffset: 2,
+  },
+}));
+
 export function DataTableDensityButton() {
   const { density, setDensity } = useDataTableDensity();
 
@@ -74,7 +88,8 @@ export function DataTableDensityButton() {
   return (
     <>
       <Tooltip title={`Density: ${currentOption.label}`}>
-        <IconButton
+        <DensityButtonRoot
+          className={dataTableClasses.densityButton}
           size="small"
           aria-label="Change table density"
           aria-haspopup="menu"
@@ -82,7 +97,7 @@ export function DataTableDensityButton() {
           onClick={handleOpen}
         >
           <CurrentIcon fontSize="small" />
-        </IconButton>
+        </DensityButtonRoot>
       </Tooltip>
 
       <Menu

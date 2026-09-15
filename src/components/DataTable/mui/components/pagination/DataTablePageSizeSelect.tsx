@@ -1,12 +1,30 @@
 "use client";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
 import {
+  styled,
   FormControl,
   MenuItem,
   Select,
   Stack,
   Typography,
 } from "@mui/material";
+
+const PageSizeRoot = styled(Stack, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "PageSize",
+  overridesResolver: (_props, styles) => styles.pageSize,
+})({});
+const PageSizeLabelRoot = styled(Typography, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "PageSizeLabel",
+  overridesResolver: (_props, styles) => styles.pageSizeLabel,
+})({ whiteSpace: "nowrap" });
+const PageSizeSelectRoot = styled(Select<number>, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "PageSizeSelect",
+  overridesResolver: (_props, styles) => styles.pageSizeSelect,
+})({ minWidth: 72 });
 
 export interface DataTablePageSizeSelectProps {
   readonly pageSize: number;
@@ -18,19 +36,23 @@ export function DataTablePageSizeSelect(props: DataTablePageSizeSelectProps) {
   const { pageSize, options, onChange } = props;
 
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
-      <Typography
+    <PageSizeRoot
+      className={dataTableClasses.pageSize}
+      direction="row"
+      spacing={1}
+      alignItems="center"
+    >
+      <PageSizeLabelRoot
+        className={dataTableClasses.pageSizeLabel}
         variant="body2"
         color="text.secondary"
-        sx={{
-          whiteSpace: "nowrap",
-        }}
       >
         Rows per page
-      </Typography>
+      </PageSizeLabelRoot>
 
       <FormControl size="small">
-        <Select<number>
+        <PageSizeSelectRoot
+          className={dataTableClasses.pageSizeSelect}
           value={pageSize}
           onChange={(event) => {
             const nextPageSize = event.target.value;
@@ -44,17 +66,14 @@ export function DataTablePageSizeSelect(props: DataTablePageSizeSelectProps) {
           inputProps={{
             "aria-label": "Rows per page",
           }}
-          sx={{
-            minWidth: 72,
-          }}
         >
           {options.map((option) => (
             <MenuItem key={option} value={option}>
               {option}
             </MenuItem>
           ))}
-        </Select>
+        </PageSizeSelectRoot>
       </FormControl>
-    </Stack>
+    </PageSizeRoot>
   );
 }

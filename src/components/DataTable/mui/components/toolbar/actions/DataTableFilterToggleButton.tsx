@@ -1,13 +1,26 @@
 "use client";
 
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../../styles";
+
 // src/components/DataTable/mui/components/toolbar/actions/DataTableFilterToggleButton.tsx
 
-import { Badge, IconButton, Tooltip } from "@mui/material";
+import { styled, Badge, IconButton, Tooltip } from "@mui/material";
 import { FilterAltOutlined, FilterListOffOutlined } from "@mui/icons-material";
 import { useDataTableFilterDisplay } from "../../../filter-display";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../../table";
 import { useDataTableAccessibility } from "../../../accessibility";
+
+const FilterToggleButtonRoot = styled(IconButton, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "FilterToggleButton",
+  overridesResolver: (_props, styles) => styles.filterToggleButton,
+})(({ theme }) => ({
+  "&:focus-visible, &.Mui-focusVisible": {
+    outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`,
+    outlineOffset: 2,
+  },
+}));
 
 export interface DataTableFilterToggleButtonProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -48,7 +61,8 @@ export function DataTableFilterToggleButton<TData extends RowData>(
 
         return (
           <Tooltip title={showColumnFilters ? "Hide filters" : "Show filters"}>
-            <IconButton
+            <FilterToggleButtonRoot
+              className={dataTableClasses.filterToggleButton}
               size="small"
               aria-label={
                 showColumnFilters
@@ -59,13 +73,6 @@ export function DataTableFilterToggleButton<TData extends RowData>(
               aria-expanded={showColumnFilters}
               aria-controls={showColumnFilters ? filterRowId : undefined}
               onClick={toggleColumnFilters}
-              sx={{
-                "&:focus-visible": {
-                  outline: "2px solid",
-                  outlineColor: "primary.main",
-                  outlineOffset: 2,
-                },
-              }}
             >
               <Badge
                 color="primary"
@@ -75,7 +82,7 @@ export function DataTableFilterToggleButton<TData extends RowData>(
               >
                 <Icon fontSize="small" />
               </Badge>
-            </IconButton>
+            </FilterToggleButtonRoot>
           </Tooltip>
         );
       }}

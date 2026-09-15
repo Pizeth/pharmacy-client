@@ -63,8 +63,8 @@ it.each([false, true])(
     const cell = screen.getByRole("columnheader", { name: "Name" });
     expect(cell).toHaveStyle({ color: "rgb(44, 55, 66)" });
     const track = cell.querySelector(`.${dataTableClasses.headerLabelTrack}`)!;
-    // Explicit inheritance keeps the slot from hard-coding an error palette color.
-    expect(track).toHaveStyle({ color: "inherit" });
+    // The intentional header accent remains independent of the body/cell text.
+    expect(track).toHaveStyle({ color: theme.palette.error.main });
     expect(cell).toHaveAttribute("scope", "col");
   },
 );

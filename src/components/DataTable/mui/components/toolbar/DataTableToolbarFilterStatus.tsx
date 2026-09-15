@@ -2,10 +2,18 @@
 
 "use client";
 
-import { Chip } from "@mui/material";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
+
+import { Chip, styled } from "@mui/material";
 import { FilterAltOffOutlined } from "@mui/icons-material";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
+
+const ToolbarFilterStatusRoot = styled(Chip, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "ToolbarFilterStatus",
+  overridesResolver: (_props, styles) => styles.toolbarFilterStatus,
+})({ flexShrink: 0 });
 
 export interface DataTableToolbarFilterStatusProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -37,7 +45,8 @@ export function DataTableToolbarFilterStatus<TData extends RowData>(
         };
 
         return (
-          <Chip
+          <ToolbarFilterStatusRoot
+            className={dataTableClasses.toolbarFilterStatus}
             size="small"
             variant="outlined"
             label={activeCount === 1 ? "1 filter" : `${activeCount} filters`}
@@ -45,9 +54,6 @@ export function DataTableToolbarFilterStatus<TData extends RowData>(
             onClick={clearFilters}
             deleteIcon={<FilterAltOffOutlined fontSize="small" />}
             onDelete={clearFilters}
-            sx={{
-              flexShrink: 0,
-            }}
           />
         );
       }}

@@ -1,9 +1,9 @@
 "use client";
 
-import { TableBody } from "@mui/material";
+import { styled, TableBody } from "@mui/material";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../table";
-import { DataTableBodyRow } from "./DataTableBodyRow";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import {
   DataTableEmptyState,
   DataTableErrorState,
@@ -12,6 +12,12 @@ import {
 import { normalizeDataTableGlobalFilter } from "../utils";
 import { DataTableDetailPanelRenderer } from "./detail-panel";
 import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
+
+const BodyRoot = styled(TableBody, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "Body",
+  overridesResolver: (_props, styles) => styles.body,
+})({});
 
 export interface DataTableBodyProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -43,16 +49,6 @@ export function DataTableBody<TData extends RowData>(
   props: DataTableBodyProps<TData>,
 ) {
   const { table, renderDetailPanel } = props;
-
-  // const rows = table.getRowModel().rows;
-
-  // return (
-  //   <TableBody>
-  //     {rows.map((row) => (
-  //       <DataTableBodyRow key={row.id} table={table} row={row} />
-  //     ))}
-  //   </TableBody>
-  // );
 
   return (
     <table.Subscribe
@@ -92,39 +88,39 @@ export function DataTableBody<TData extends RowData>(
 
         if (meta?.error) {
           return (
-            <TableBody>
+            <BodyRoot className={dataTableClasses.body}>
               <DataTableErrorState colSpan={colSpan}>
                 {meta.error}
               </DataTableErrorState>
-            </TableBody>
+            </BodyRoot>
           );
         }
 
         if (meta?.loading) {
           return (
-            <TableBody>
+            <BodyRoot className={dataTableClasses.body}>
               <DataTableLoadingState colSpan={colSpan}>
                 {meta.loadingContent}
               </DataTableLoadingState>
-            </TableBody>
+            </BodyRoot>
           );
         }
 
         if (rows.length === 0) {
           return (
-            <TableBody>
+            <BodyRoot className={dataTableClasses.body}>
               <DataTableEmptyState
                 colSpan={colSpan}
                 filtered={hasActiveFilters}
               >
                 {hasActiveFilters ? meta?.noResultsContent : meta?.emptyContent}
               </DataTableEmptyState>
-            </TableBody>
+            </BodyRoot>
           );
         }
 
         return (
-          <TableBody>
+          <BodyRoot className={dataTableClasses.body}>
             {rows.map((row) => (
               <DataTableBodyRowGroup
                 key={row.id}
@@ -133,7 +129,7 @@ export function DataTableBody<TData extends RowData>(
                 renderDetailPanel={renderDetailPanel}
               />
             ))}
-          </TableBody>
+          </BodyRoot>
         );
       }}
     </table.Subscribe>

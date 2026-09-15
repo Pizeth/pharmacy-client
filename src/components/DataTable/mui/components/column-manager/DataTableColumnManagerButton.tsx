@@ -2,7 +2,9 @@
 
 "use client";
 
-import { IconButton, Tooltip } from "@mui/material";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
+
+import { styled, IconButton, Tooltip } from "@mui/material";
 import { ViewColumnOutlined } from "@mui/icons-material";
 import { useState } from "react";
 import type { MouseEvent } from "react";
@@ -10,6 +12,17 @@ import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
 import { DataTableColumnManager } from "./DataTableColumnManager";
 import type { DataTableColumnManagerConfig } from "./types";
+
+const ColumnManagerButtonRoot = styled(IconButton, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "ColumnManagerButton",
+  overridesResolver: (_props, styles) => styles.columnManagerButton,
+})(({ theme }) => ({
+  "&:focus-visible, &.Mui-focusVisible": {
+    outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`,
+    outlineOffset: 2,
+  },
+}));
 
 export interface DataTableColumnManagerButtonProps<
   TData extends RowData,
@@ -39,23 +52,16 @@ export function DataTableColumnManagerButton<TData extends RowData>(
   return (
     <>
       <Tooltip title="Manage columns">
-        <IconButton
-          className="DataTable-columnMenuButton"
+        <ColumnManagerButtonRoot
+          className={dataTableClasses.columnManagerButton}
           size="small"
           aria-label="Manage table columns"
           aria-haspopup="dialog"
           aria-expanded={open ? "true" : undefined}
           onClick={handleOpen}
-          sx={{
-            "&:focus-visible": {
-              outline: "2px solid",
-              outlineColor: "primary.main",
-              outlineOffset: 2,
-            },
-          }}
         >
           <ViewColumnOutlined fontSize="small" />
-        </IconButton>
+        </ColumnManagerButtonRoot>
       </Tooltip>
 
       <DataTableColumnManager

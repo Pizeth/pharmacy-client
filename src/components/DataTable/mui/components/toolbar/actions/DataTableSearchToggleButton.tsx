@@ -2,12 +2,25 @@
 
 "use client";
 
-import { Badge, IconButton, Tooltip } from "@mui/material";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../../styles";
+
+import { styled, Badge, IconButton, Tooltip } from "@mui/material";
 import { SearchOffOutlined, SearchOutlined } from "@mui/icons-material";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../../table";
 import { normalizeDataTableGlobalFilter } from "../../../utils/globalFilter";
 import { useDataTableAccessibility } from "../../../accessibility";
+
+const SearchToggleButtonRoot = styled(IconButton, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "SearchToggleButton",
+  overridesResolver: (_props, styles) => styles.searchToggleButton,
+})(({ theme }) => ({
+  "&:focus-visible, &.Mui-focusVisible": {
+    outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`,
+    outlineOffset: 2,
+  },
+}));
 
 export interface DataTableSearchToggleButtonProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -36,7 +49,8 @@ export function DataTableSearchToggleButton<TData extends RowData>(
 
         return (
           <Tooltip title={open ? "Hide search" : "Show search"}>
-            <IconButton
+            <SearchToggleButtonRoot
+              className={dataTableClasses.searchToggleButton}
               size="small"
               aria-label={open ? "Hide global search" : "Show global search"}
               //   aria-expanded={open}
@@ -49,13 +63,6 @@ export function DataTableSearchToggleButton<TData extends RowData>(
 
                 onToggle();
               }}
-              sx={{
-                "&:focus-visible": {
-                  outline: "2px solid",
-                  outlineColor: "primary.main",
-                  outlineOffset: 2,
-                },
-              }}
             >
               <Badge color="primary" variant="dot" invisible={!active}>
                 {open ? (
@@ -64,7 +71,7 @@ export function DataTableSearchToggleButton<TData extends RowData>(
                   <SearchOutlined fontSize="small" />
                 )}
               </Badge>
-            </IconButton>
+            </SearchToggleButtonRoot>
           </Tooltip>
         );
       }}

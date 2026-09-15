@@ -1,12 +1,53 @@
 "use client";
 
-import { Box, Divider, Stack, Typography } from "@mui/material";
+import { Box, Divider, Stack, Typography, styled } from "@mui/material";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
 import { DataTablePageSizeSelect } from "./DataTablePageSizeSelect";
 import { DataTablePaginationActions } from "./DataTablePaginationActions";
 import type { DataTablePaginationConfig } from "./types";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../../density";
+
+const PaginationRoot = styled("footer", {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "Pagination",
+  overridesResolver: (_props, styles) => styles.pagination,
+})(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: theme.spacing(2),
+  paddingInline: theme.spacing(2),
+  flexWrap: "wrap",
+  ...Object.fromEntries(
+    (["compact", "comfortable", "spacious"] as const).map((density) => {
+      const metrics = getDataTableDensityMetrics(density);
+      return [
+        `&[data-density="${density}"]`,
+        {
+          paddingBlock: theme.spacing(metrics.footerPaddingBlock),
+          minHeight: `${metrics.footerHeight}px`,
+        },
+      ];
+    }),
+  ),
+}));
+const PaginationDividerRoot = styled(Divider, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "PaginationDivider",
+  overridesResolver: (_props, styles) => styles.paginationDivider,
+})({});
+const PaginationControlsRoot = styled(Stack, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "PaginationControls",
+  overridesResolver: (_props, styles) => styles.paginationControls,
+})({});
+const PaginationStatusRoot = styled(Typography, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "PaginationStatus",
+  overridesResolver: (_props, styles) => styles.paginationStatus,
+})({ whiteSpace: "nowrap" });
 
 export interface DataTablePaginationProps<
   TData extends RowData,
@@ -40,8 +81,6 @@ export function DataTablePagination<TData extends RowData>(
 
   const { density } = useDataTableDensity();
 
-  const densityMetrics = getDataTableDensityMetrics(density);
-
   return (
     <table.Subscribe source={table.atoms.pagination}>
       {(pagination) => {
@@ -63,20 +102,12 @@ export function DataTablePagination<TData extends RowData>(
 
         return (
           <>
-            <Divider />
-            <Box
-              component="footer"
+            <PaginationDividerRoot
+              className={dataTableClasses.paginationDivider}
+            />
+            <PaginationRoot
+              className={dataTableClasses.pagination}
               data-density={density}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 2,
-                px: 2,
-                py: densityMetrics.footerPaddingBlock,
-                minHeight: `${densityMetrics.footerHeight}px`,
-                flexWrap: "wrap",
-              }}
             >
               {showPageSizeSelector ? (
                 <DataTablePageSizeSelect
@@ -90,13 +121,16 @@ export function DataTablePagination<TData extends RowData>(
                 <Box />
               )}
 
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Typography
+              <PaginationControlsRoot
+                className={dataTableClasses.paginationControls}
+                direction="row"
+                spacing={2}
+                alignItems="center"
+              >
+                <PaginationStatusRoot
+                  className={dataTableClasses.paginationStatus}
                   variant="body2"
                   color="text.secondary"
-                  sx={{
-                    whiteSpace: "nowrap",
-                  }}
                 >
                   {hasKnownPageCount ? (
                     <>
@@ -105,7 +139,7 @@ export function DataTablePagination<TData extends RowData>(
                   ) : (
                     <>Page {displayPage}</>
                   )}
-                </Typography>
+                </PaginationStatusRoot>
 
                 <DataTablePaginationActions
                   canPreviousPage={canPreviousPage}
@@ -126,8 +160,8 @@ export function DataTablePagination<TData extends RowData>(
                     table.lastPage();
                   }}
                 />
-              </Stack>
-            </Box>
+              </PaginationControlsRoot>
+            </PaginationRoot>
           </>
         );
       }}

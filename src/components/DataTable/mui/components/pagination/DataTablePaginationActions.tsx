@@ -1,6 +1,7 @@
 "use client";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
-import { IconButton, Stack, Tooltip } from "@mui/material";
+import { IconButton, Stack, Tooltip, styled } from "@mui/material";
 import {
   FirstPage,
   KeyboardArrowLeft,
@@ -8,6 +9,17 @@ import {
   LastPage,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
+
+const PaginationActionsRoot = styled(Stack, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "PaginationActions",
+  overridesResolver: (_props, styles) => styles.paginationActions,
+})({});
+const PaginationButtonRoot = styled(IconButton, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "PaginationButton",
+  overridesResolver: (_props, styles) => styles.paginationButton,
+})({});
 
 export interface DataTablePaginationActionsProps {
   readonly canPreviousPage: boolean;
@@ -37,62 +49,71 @@ export function DataTablePaginationActions(
   const rtl = theme.direction === "rtl";
 
   return (
-    <Stack direction="row" alignItems="center" spacing={0.25}>
+    <PaginationActionsRoot
+      className={dataTableClasses.paginationActions}
+      direction="row"
+      alignItems="center"
+      spacing={0.25}
+    >
       {showFirstLastButtons && (
         <Tooltip title="First page">
           <span>
-            <IconButton
+            <PaginationButtonRoot
+              className={dataTableClasses.paginationButton}
               size="small"
               disabled={!canPreviousPage}
               onClick={onFirstPage}
               aria-label="First page"
             >
               {rtl ? <LastPage /> : <FirstPage />}
-            </IconButton>
+            </PaginationButtonRoot>
           </span>
         </Tooltip>
       )}
 
       <Tooltip title="Previous page">
         <span>
-          <IconButton
+          <PaginationButtonRoot
+            className={dataTableClasses.paginationButton}
             size="small"
             disabled={!canPreviousPage}
             onClick={onPreviousPage}
             aria-label="Previous page"
           >
             {rtl ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-          </IconButton>
+          </PaginationButtonRoot>
         </span>
       </Tooltip>
 
       <Tooltip title="Next page">
         <span>
-          <IconButton
+          <PaginationButtonRoot
+            className={dataTableClasses.paginationButton}
             size="small"
             disabled={!canNextPage}
             onClick={onNextPage}
             aria-label="Next page"
           >
             {rtl ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-          </IconButton>
+          </PaginationButtonRoot>
         </span>
       </Tooltip>
 
       {showFirstLastButtons && (
         <Tooltip title="Last page">
           <span>
-            <IconButton
+            <PaginationButtonRoot
+              className={dataTableClasses.paginationButton}
               size="small"
               disabled={!canNextPage}
               onClick={onLastPage}
               aria-label="Last page"
             >
               {rtl ? <FirstPage /> : <LastPage />}
-            </IconButton>
+            </PaginationButtonRoot>
           </span>
         </Tooltip>
       )}
-    </Stack>
+    </PaginationActionsRoot>
   );
 }
