@@ -85,20 +85,118 @@ it("keeps the helper's default direction compatible with existing LTR callers", 
   expect(resolveTableCellAlignment("center", "rtl")).toBe("center");
 });
 
-it("passes RTL direction into portaled table menus", () => {
-  function Menus() {
-    const table = useMuiDataTable({ columns, data });
-    return <ThemeProvider theme={createTheme({ direction: "rtl" })}><DataTable table={table} /></ThemeProvider>;
-  }
-  render(<Menus />);
-  fireEvent.click(screen.getByRole("button", { name: "Change table density" }));
-  const density = screen.getByRole("menu", { name: "Table density" });
-  expect(density.closest('[dir="rtl"]')).not.toBeNull();
-  fireEvent.keyDown(density, { key: "Escape" });
-  fireEvent.click(screen.getByRole("button", { name: "Open options for column start" }));
-  const column = screen.getByRole("menu", { name: "Actions for column start" });
-  expect(column.closest('[dir="rtl"]')).not.toBeNull();
-  fireEvent.keyDown(column, { key: "Escape" });
-  fireEvent.click(screen.getByRole("button", { name: "Manage table columns" }));
-  expect(screen.getByRole("dialog", { name: "Columns" }).closest('[dir="rtl"]')).not.toBeNull();
+// it("passes RTL direction into portaled table menus", () => {
+//   function Menus() {
+//     const table = useMuiDataTable({ columns, data });
+//     return <ThemeProvider theme={createTheme({ direction: "rtl" })}><DataTable table={table} /></ThemeProvider>;
+//   }
+//   render(<Menus />);
+//   fireEvent.click(screen.getByRole("button", { name: "Change table density" }));
+//   const density = screen.getByRole("menu", { name: "Table density" });
+//   expect(density.closest('[dir="rtl"]')).not.toBeNull();
+//   fireEvent.keyDown(density, { key: "Escape" });
+//   fireEvent.click(screen.getByRole("button", { name: "Open options for column start" }));
+//   const column = screen.getByRole("menu", { name: "Actions for column start" });
+//   expect(column.closest('[dir="rtl"]')).not.toBeNull();
+//   fireEvent.keyDown(column, { key: "Escape" });
+//   fireEvent.click(screen.getByRole("button", { name: "Manage table columns" }));
+//   expect(screen.getByRole("dialog", { name: "Columns" }).closest('[dir="rtl"]')).not.toBeNull();
+// });
+
+function RtlPortalFixture() {
+  const table = useMuiDataTable({
+    columns,
+    data,
+  });
+
+  return (
+    <ThemeProvider
+      theme={createTheme({
+        direction: "rtl",
+      })}
+    >
+      <DataTable table={table} />
+    </ThemeProvider>
+  );
+}
+
+describe("DataTable RTL portals", () => {
+  it("passes RTL direction into the density menu", () => {
+    render(<RtlPortalFixture />);
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Change table density",
+      }),
+    );
+
+    const menu = screen.getByRole("menu", {
+      name: "Table density",
+    });
+
+    expect(menu.closest('[dir="rtl"]')).not.toBeNull();
+  });
+
+  it("passes RTL direction through the column menu and filter popover", () => {
+    render(<RtlPortalFixture />);
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Open options for column start",
+      }),
+    );
+
+    const menu = screen.getByRole("menu", {
+      name: "Actions for column start",
+    });
+
+    expect(menu.closest('[dir="rtl"]')).not.toBeNull();
+
+    fireEvent.click(
+      screen.getByRole("menuitem", {
+        name: "Filter",
+      }),
+    );
+
+    /**
+     * DataTableColumnFilterPopover now owns explicit dialog
+     * semantics, so the portal can be tested through its public
+     * accessibility contract rather than implementation classes.
+     */
+    const filterDialog = screen.getByRole("dialog", {
+      name: "Filter start",
+    });
+
+    expect(filterDialog.closest('[dir="rtl"]')).not.toBeNull();
+  });
+
+  it("passes RTL direction into the column manager popover", () => {
+    render(<RtlPortalFixture />);
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Manage table columns",
+      }),
+    );
+
+    const dialog = screen.getByRole("dialog", {
+      name: "Columns",
+    });
+
+    expect(dialog.closest('[dir="rtl"]')).not.toBeNull();
+  });
+
+  it("passes RTL direction into the page-size Select menu", async () => {
+    render(<RtlPortalFixture />);
+
+    fireEvent.mouseDown(
+      screen.getByRole("combobox", {
+        name: "Rows per page",
+      }),
+    );
+
+    const listbox = await screen.findByRole("listbox");
+
+    expect(listbox.closest('[dir="rtl"]')).not.toBeNull();
+  });
 });

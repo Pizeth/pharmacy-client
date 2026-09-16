@@ -8,6 +8,7 @@ import {
   MenuItem,
   Tooltip,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { MoreVert } from "@mui/icons-material";
 import { useState } from "react";
 import type { MouseEvent } from "react";
@@ -25,6 +26,8 @@ export function DataTableRowActionsMenu<TData extends RowData>(
   props: DataTableRowActionsMenuProps<TData>,
 ) {
   const { actions } = props;
+
+  const { direction } = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -72,6 +75,7 @@ export function DataTableRowActionsMenu<TData extends RowData>(
       </Tooltip>
 
       <Menu
+        dir={direction}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}

@@ -10,6 +10,7 @@ import {
   styled,
   useThemeProps,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { useId } from "react";
 import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
 import type { DataTableBooleanFilterProps } from "./types";
@@ -51,6 +52,8 @@ export function DataTableBooleanFilter(inProps: DataTableBooleanFilterProps) {
     name: COMPONENT_NAME,
   });
 
+  const { direction } = useTheme();
+
   const {
     value,
     label,
@@ -81,6 +84,16 @@ export function DataTableBooleanFilter(inProps: DataTableBooleanFilterProps) {
         labelId={labelId}
         label={label}
         value={selectValue}
+        MenuProps={{
+          /**
+           * Select renders its Menu through a portal.
+           *
+           * Explicit direction is therefore required when a DataTable is
+           * running under a nested RTL ThemeProvider while the surrounding
+           * page remains LTR.
+           */
+          dir: direction,
+        }}
         onChange={(event) => {
           const nextValue = event.target.value;
 

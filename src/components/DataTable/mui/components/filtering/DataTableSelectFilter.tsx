@@ -11,6 +11,7 @@ import {
   styled,
   useThemeProps,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { useEffect, useId, useState } from "react";
 import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
 import {
@@ -54,6 +55,8 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
     name: COMPONENT_NAME,
   });
 
+  const { direction } = useTheme();
+
   const {
     value,
     label,
@@ -85,8 +88,10 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
   // Keep committed values representable during loading and after option removal.
   // Never clear TanStack state just because its option is temporarily absent.
   const missingSelection =
-    value !== undefined && !options.some(
-      (option) => encodeDataTableSelectFilterValue(option.value) === selectedValue,
+    value !== undefined &&
+    !options.some(
+      (option) =>
+        encodeDataTableSelectFilterValue(option.value) === selectedValue,
     );
 
   return (
@@ -106,6 +111,12 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
         labelId={labelId}
         label={label}
         value={selectedValue}
+        MenuProps={{
+          /**
+           * MUI Select's listbox is portaled outside the DataTable root.
+           */
+          dir: direction,
+        }}
         inputProps={{
           "aria-describedby": statusText ? statusId : undefined,
           "aria-busy": loading,

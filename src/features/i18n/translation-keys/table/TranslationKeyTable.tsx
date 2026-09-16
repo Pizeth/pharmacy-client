@@ -1,6 +1,11 @@
 "use client";
 
+import { useState } from "react";
+import { TranslationKeyCreateForm } from "../forms/TranslationKeyCreateForm";
 import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
   Alert,
   Box,
   Button,
@@ -41,6 +46,9 @@ function getTranslationKeyTableErrorMessage(error: unknown): string {
  * DataTable stack.
  */
 export function TranslationKeyTable() {
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createdKey, setCreatedKey] = useState<string>();
   const { table, server, filterOptions, refresh } =
     useTranslationKeyDataTable();
 
@@ -126,6 +134,35 @@ export function TranslationKeyTable() {
         minWidth: 0,
       }}
     >
+      <Dialog
+        open={createOpen}
+        onClose={() => {
+          if (!creating) setCreateOpen(false);
+        }}
+        fullWidth
+        maxWidth="sm"
+        aria-labelledby="create-key-title"
+      >
+        <DialogTitle id="create-key-title">Create translation key</DialogTitle>
+        <DialogContent>
+          {createOpen && (
+            <TranslationKeyCreateForm
+              onPendingChange={setCreating}
+              onCancel={() => setCreateOpen(false)}
+              onCreated={(record) => {
+                setCreateOpen(false);
+                setCreatedKey(record.key);
+                refresh();
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+      {createdKey && (
+        <Alert severity="success" onClose={() => setCreatedKey(undefined)}>
+          Created translation key: {createdKey}
+        </Alert>
+      )}
       {server.refreshError ? (
         <Alert
           severity="warning"
@@ -186,6 +223,11 @@ export function TranslationKeyTable() {
            * Phase 1.7.10.5.
            */
           toolbar={{
+            startContent: (
+              <Button variant="contained" onClick={() => setCreateOpen(true)}>
+                Create key
+              </Button>
+            ),
             search: true,
             searchMode: "always",
             searchPosition: "center",

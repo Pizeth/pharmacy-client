@@ -104,7 +104,7 @@ export function DataTableDensityButton() {
       </Tooltip>
 
       <Menu
-            dir={direction}
+        dir={direction}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}

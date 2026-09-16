@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { DataTable } from "./DataTable";
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "../table";
 import { dataTableClasses } from "../styles";
@@ -56,7 +56,21 @@ it("exits uncontrolled fullscreen on Escape and keeps focus on the mounted actio
   const onChange = jest.fn();
   const { container } = render(<Fixture onChange={onChange} />);
   const button = screen.getByRole("button", { name: "Exit fullscreen table" });
-  button.focus();
+
+  /**
+   * Native HTMLElement.focus() dispatches focus events which update:
+   *
+   * - MUI ButtonBase
+   * - Tooltip
+   * - TouchRipple
+   *
+   * Wrap the imperative focus in React act() so those state updates are
+   * flushed as part of the interaction under test.
+   */
+  act(() => {
+    button.focus();
+  });
+
   fireEvent.keyDown(button, { key: "Escape" });
   expect(root(container)).not.toHaveAttribute("data-fullscreen");
   expect(onChange).toHaveBeenCalledWith(false);

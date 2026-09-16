@@ -8,8 +8,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
-import type { PopoverProps } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { useId } from "react";
 import type { CellData, Column, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../../features";
 import type { MuiDataTableInstance } from "../../table";
@@ -31,10 +31,23 @@ export interface DataTableColumnFilterPopoverProps<
  *
  * The filter value itself remains completely owned by TanStack.
  *
- * Local React state here is only UI state:
+ * Local React state here is only presentation state:
  *
  * - whether this popover is open
  * - where it is anchored
+ *
+ * ------------------------------------------------------------------
+ * RTL
+ * ------------------------------------------------------------------
+ *
+ * Popover is portaled outside the DataTable root. It therefore cannot
+ * inherit:
+ *
+ *   <RazethDataTableRoot dir="rtl">
+ *
+ * through the DOM.
+ *
+ * Explicitly pass the active MUI theme direction to the Popover.
  */
 export function DataTableColumnFilterPopover<
   TData extends RowData,
@@ -42,12 +55,27 @@ export function DataTableColumnFilterPopover<
 >(props: DataTableColumnFilterPopoverProps<TData, TValue>) {
   const { table, column, anchorEl, open, onClose } = props;
 
+  const { direction } = useTheme();
+
+  const titleId = useId();
+
   const meta = column.columnDef.meta;
 
   const label = meta?.filterLabel ?? column.id;
 
+  /**
+   * The filter surface opens from the logical start edge of its anchor.
+   *
+   * Logical start:
+   *
+   *   LTR -> left
+   *   RTL -> right
+   */
+  const horizontalOrigin = direction === "rtl" ? "right" : "left";
+
   return (
     <Popover
+      dir={direction}
       open={open}
       anchorEl={anchorEl}
       onClose={onClose}
@@ -57,10 +85,21 @@ export function DataTableColumnFilterPopover<
       }}
       transformOrigin={{
         vertical: "top",
-        horizontal: "left",
+        horizontal: horizontalOrigin,
       }}
       slotProps={{
         paper: {
+          /**
+           * Give the filter editor an explicit accessible surface.
+           *
+           * Popover itself does not otherwise give this editor a useful
+           * application-facing accessible name.
+           */
+          role: "dialog",
+
+          "aria-modal": false,
+          "aria-labelledby": titleId,
+
           sx: {
             width: 320,
             maxWidth: "calc(100vw - 32px)",
@@ -69,10 +108,10 @@ export function DataTableColumnFilterPopover<
       }}
     >
       {/**
-       * Subscribe only to the column-filter state.
+       * Subscribe only to column-filter state.
        *
-       * The editor itself uses column.getFilterValue(), therefore the
-       * value must be read from inside this reactive boundary.
+       * DataTableColumnFilter ultimately reads column.getFilterValue(),
+       * so that read must remain inside the reactive boundary.
        */}
       <table.Subscribe source={table.atoms.columnFilters}>
         {() => {
@@ -85,7 +124,7 @@ export function DataTableColumnFilterPopover<
               }}
             >
               <Stack spacing={2}>
-                <Typography variant="subtitle2" component="h3">
+                <Typography id={titleId} variant="subtitle2" component="h3">
                   Filter {label}
                 </Typography>
 

@@ -115,7 +115,9 @@ export function DataTableAcceptance() {
         </label>
         <p>
           Use the scroll viewport with arrow keys. Check both pinned edges,
-          selected and hovered rows, menus, and fullscreen.
+          selected and hovered rows, horizontal and vertical scrolling, density
+          and column menus, column filtering, column management, page-size
+          selection, and fullscreen in both directions and color modes.
         </p>
         <div style={{ width: narrow ? 420 : 900, maxWidth: "100%" }}>
           <ExampleTable direction={direction} />

@@ -1,29 +1,23 @@
-// src/app/(protected)/admin/translations/create/page.tsx
 "use client";
-// import { useForm } from "@refinedev/react-hook-form";
-import { Box, TextField, Button, MenuItem } from "@mui/material";
+
+import { useRouter } from "next/navigation";
+import { Paper, Typography } from "@mui/material";
+import { TranslationKeyCreateForm } from "@/features/i18n/translation-keys/forms/TranslationKeyCreateForm";
 
 export default function CreateTranslationPage() {
-  //   const {
-  //     refineCore: { onFinish },
-  //     register,
-  //     handleSubmit,
-  //   } = useForm({
-  //     refineCoreProps: { resource: "translations", action: "create" },
-  //   });
-
+  const router = useRouter();
   return (
-    <Box
-      component="form"
-      //   onSubmit={handleSubmit(onFinish)}
-      sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: 500 }}
-    >
-      {/* <TextField {...register("key", { required: true })} label="Key" />
-      <TextField {...register("description")} label="Description" />
-      <TextField {...register("category")} label="Category" /> */}
-      <Button type="submit" variant="contained">
-        Create Key
-      </Button>
-    </Box>
+    <Paper sx={{ p: 3, maxWidth: 600 }}>
+      <Typography variant="h5" component="h1" gutterBottom>
+        Create translation key
+      </Typography>
+      <TranslationKeyCreateForm
+        onCancel={() => router.push("/admin/i18n")}
+        onCreated={() => {
+          router.replace("/admin/i18n");
+          router.refresh();
+        }}
+      />
+    </Paper>
   );
 }

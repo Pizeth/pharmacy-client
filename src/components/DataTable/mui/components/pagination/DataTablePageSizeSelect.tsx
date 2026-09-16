@@ -1,6 +1,5 @@
 "use client";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
-
 import {
   styled,
   FormControl,
@@ -9,6 +8,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 const PageSizeRoot = styled(Stack, {
   name: DATA_TABLE_COMPONENT_NAME,
@@ -35,6 +35,8 @@ export interface DataTablePageSizeSelectProps {
 export function DataTablePageSizeSelect(props: DataTablePageSizeSelectProps) {
   const { pageSize, options, onChange } = props;
 
+  const { direction } = useTheme();
+
   return (
     <PageSizeRoot
       className={dataTableClasses.pageSize}
@@ -54,6 +56,9 @@ export function DataTablePageSizeSelect(props: DataTablePageSizeSelectProps) {
         <PageSizeSelectRoot
           className={dataTableClasses.pageSizeSelect}
           value={pageSize}
+          MenuProps={{
+            dir: direction,
+          }}
           onChange={(event) => {
             const nextPageSize = event.target.value;
 
