@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { TranslationKeyCreateForm } from "../forms/TranslationKeyCreateForm";
+// import { TranslationKeyCreateForm } from "../forms/TranslationKeyCreateForm";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
+  // Dialog,
+  // DialogTitle,
+  // DialogContent,
   Alert,
   Box,
   Button,
@@ -14,13 +14,11 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
-import { Refresh } from "@mui/icons-material";
-
+import { styled } from "@mui/material/styles";
+import { AddRounded, Refresh } from "@mui/icons-material";
 import { DataTable } from "@/components/DataTable";
-
 import { TranslationKeyApiError } from "../api";
-
+import { TranslationKeyCreateDialog } from "../forms";
 import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
 
 /**
@@ -41,13 +39,24 @@ function getTranslationKeyTableErrorMessage(error: unknown): string {
   return "Unable to load translation keys.";
 }
 
+const CreateKeyButton = styled(Button)(({ theme }) => ({
+  borderRadius: 999,
+  paddingInline: theme.spacing(2),
+  fontWeight: 700,
+  whiteSpace: "nowrap",
+  boxShadow: theme.shadows[2],
+}));
+
 /**
  * First real production resource using the custom TanStack v9 + MUI
  * DataTable stack.
  */
 export function TranslationKeyTable() {
+  // const [createOpen, setCreateOpen] = useState(false);
+  // const [creating, setCreating] = useState(false);
+  // const [createdKey, setCreatedKey] = useState<string>();
+
   const [createOpen, setCreateOpen] = useState(false);
-  const [creating, setCreating] = useState(false);
   const [createdKey, setCreatedKey] = useState<string>();
   const { table, server, filterOptions, refresh } =
     useTranslationKeyDataTable();
@@ -134,7 +143,7 @@ export function TranslationKeyTable() {
         minWidth: 0,
       }}
     >
-      <Dialog
+      {/* <Dialog
         open={createOpen}
         onClose={() => {
           if (!creating) setCreateOpen(false);
@@ -157,7 +166,29 @@ export function TranslationKeyTable() {
             />
           )}
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
+      <TranslationKeyCreateDialog
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreated={(record) => {
+          setCreateOpen(false);
+          setCreatedKey(record.key);
+
+          /**
+           * Refresh the current server query without remounting the table.
+           *
+           * Existing:
+           *
+           * - sorting
+           * - filters
+           * - global search
+           * - pagination
+           *
+           * remain intact.
+           */
+          refresh();
+        }}
+      />
       {createdKey && (
         <Alert severity="success" onClose={() => setCreatedKey(undefined)}>
           Created translation key: {createdKey}
@@ -223,13 +254,32 @@ export function TranslationKeyTable() {
            * Phase 1.7.10.5.
            */
           toolbar={{
+            // startContent: (
+            //   <Button variant="contained" onClick={() => setCreateOpen(true)}>
+            //     Create key
+            //   </Button>
+            // ),
             startContent: (
-              <Button variant="contained" onClick={() => setCreateOpen(true)}>
+              <CreateKeyButton
+                variant="contained"
+                color="warning"
+                startIcon={<AddRounded />}
+                onClick={() => {
+                  setCreateOpen(true);
+                }}
+              >
                 Create key
-              </Button>
+              </CreateKeyButton>
             ),
             search: true,
-            searchMode: "always",
+            /**
+             * MRT parity:
+             *
+             * - search is initially visible
+             * - toolbar exposes a Show/Hide search action
+             * - hiding search does NOT clear TanStack globalFilter
+             */
+            searchMode: "collapsible",
             searchPosition: "center",
             searchPlaceholder: "Search translations…",
 

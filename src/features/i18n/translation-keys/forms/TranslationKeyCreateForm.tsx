@@ -1,13 +1,19 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Alert, Button, MenuItem, Stack, TextField } from "@mui/material";
+import { Alert, Button, Stack } from "@mui/material";
+import { CloseRounded, SaveRounded } from "@mui/icons-material";
+import { FormProvider, useForm } from "react-hook-form";
 import { createTranslationKey } from "../api";
-import {
-  createTranslationKeyInputSchema,
-  type TranslationKey,
-} from "../schemas";
+import { createTranslationKeyInputSchema } from "../schemas";
+import type { TranslationKey } from "../schemas";
 import { useTranslationKeyFilterOptions } from "../table/useTranslationKeyFilterOptions";
+import {
+  EMPTY_TRANSLATION_KEY_FORM_VALUES,
+  TranslationKeyFormFields,
+} from "./TranslationKeyFormFields";
+
+import type { TranslationKeyFormValues } from "./TranslationKeyFormFields";
 
 export interface TranslationKeyCreateFormProps {
   readonly onCreated: (record: TranslationKey) => void;
@@ -15,144 +21,217 @@ export interface TranslationKeyCreateFormProps {
   readonly onPendingChange?: (pending: boolean) => void;
 }
 
-export function TranslationKeyCreateForm({
-  onCreated,
-  onCancel,
-  onPendingChange,
-}: TranslationKeyCreateFormProps) {
+/**
+ * TranslationKey creation form.
+ *
+ * Ownership:
+ *
+ * React Hook Form
+ *   - editable UI values
+ *   - field errors
+ *
+ * TranslationKey schema
+ *   - canonical client mutation validation
+ *   - trimming
+ *   - field limits
+ *   - numeric category contract
+ *
+ * Resource API
+ *   - HTTP mutation
+ *   - response validation
+ *
+ * Parent
+ *   - post-success navigation/dialog closure
+ *   - table refresh
+ */
+export function TranslationKeyCreateForm(props: TranslationKeyCreateFormProps) {
+  const { onCreated, onCancel, onPendingChange } = props;
+
   const options = useTranslationKeyFilterOptions();
-  const [key, setKey] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [error, setError] = useState<string>();
+
+  const form = useForm<TranslationKeyFormValues>({
+    defaultValues: EMPTY_TRANSLATION_KEY_FORM_VALUES,
+    mode: "onSubmit",
+  });
+
+  const { handleSubmit, clearErrors, setError } = form;
+
+  const [requestError, setRequestError] = useState<string>();
+
   const [pending, setPending] = useState(false);
+
+  /**
+   * React's disabled render happens after the event which begins the
+   * request.
+   *
+   * This synchronous guard prevents two submit events in the same
+   * render frame from creating duplicate requests.
+   */
   const inFlight = useRef(false);
-  const unavailable =
+
+  const categoryUnavailable =
     options.fetching ||
     Boolean(options.error) ||
     options.categoryOptions.length === 0;
 
-  return (
-    <Stack
-      component="form"
-      noValidate
-      spacing={2}
-      aria-busy={pending}
-      onSubmit={async (event) => {
-        event.preventDefault();
-        if (inFlight.current || unavailable) return;
-        const parsed = createTranslationKeyInputSchema.safeParse({
-          key,
-          description: description.trim() || null,
-          categoryId: Number(category),
-        });
-        if (!parsed.success) {
-          setErrors(
-            Object.fromEntries(
-              parsed.error.issues.map((issue) => [
-                String(issue.path[0]),
-                issue.message,
-              ]),
-            ),
-          );
-          return;
-        }
+  const submit = handleSubmit(async (values) => {
+    if (inFlight.current || categoryUnavailable) {
+      return;
+    }
+
+    clearErrors();
+
+    setRequestError(undefined);
+
+    /**
+     * UI values become the mutation candidate only here.
+     *
+     * Do not teach individual fields about HTTP DTO normalization.
+     */
+    const parsed = createTranslationKeyInputSchema.safeParse({
+      key: values.key,
+      description: values.description.trim() || null,
+      categoryId: Number(values.categoryId),
+    });
+
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        const field = issue.path[0];
+
         if (
-          !options.categoryOptions.some(
-            (option) => String(option.value) === category,
-          )
+          field === "key" ||
+          field === "description" ||
+          field === "categoryId"
         ) {
-          setErrors({ categoryId: "Choose an available category." });
-          return;
+          setError(field, {
+            type: "schema",
+            message: issue.message,
+          });
         }
-        setErrors({});
-        setError(undefined);
-        inFlight.current = true;
-        setPending(true);
-        onPendingChange?.(true);
-        let record: TranslationKey;
-        try {
-          record = (await createTranslationKey(parsed.data)).data;
-        } catch (failure) {
-          setError(
-            failure instanceof Error
-              ? failure.message
-              : "Unable to create translation key.",
-          );
-          return;
-        } finally {
-          inFlight.current = false;
-          setPending(false);
-          onPendingChange?.(false);
-        }
-        onCreated(record);
-      }}
-    >
-      {error && <Alert severity="error">{error}</Alert>}
-      {options.error ? (
-        <Alert
-          severity="error"
-          action={<Button onClick={options.refresh}>Retry categories</Button>}
-        >
-          Categories could not be loaded.
-        </Alert>
-      ) : options.fetching ? (
-        <Alert severity="info">Loading categories...</Alert>
-      ) : options.categoryOptions.length === 0 ? (
-        <Alert severity="warning">
-          No categories are available. Create a category before adding a key.
-        </Alert>
-      ) : null}
-      <TextField
-        autoFocus
-        label="Key"
-        value={key}
-        onChange={(event) => setKey(event.target.value)}
-        required
-        disabled={pending}
-        error={Boolean(errors.key)}
-        helperText={errors.key}
-      />
-      <TextField
-        label="Description"
-        value={description}
-        onChange={(event) => setDescription(event.target.value)}
-        multiline
-        minRows={2}
-        disabled={pending}
-        error={Boolean(errors.description)}
-        helperText={errors.description}
-      />
-      <TextField
-        select
-        label="Category"
-        value={category}
-        onChange={(event) => setCategory(event.target.value)}
-        required
-        disabled={pending || unavailable}
-        error={Boolean(errors.categoryId)}
-        helperText={errors.categoryId}
+      }
+
+      return;
+    }
+
+    /**
+     * Positive integer validation alone is not enough.
+     *
+     * A category ID must correspond to an option actually loaded
+     * from the canonical category endpoint.
+     */
+    const categoryExists = options.categoryOptions.some(
+      (option) => String(option.value) === values.categoryId,
+    );
+
+    if (!categoryExists) {
+      setError("categoryId", {
+        type: "validate",
+        message: "Choose an available category.",
+      });
+
+      return;
+    }
+
+    inFlight.current = true;
+
+    setPending(true);
+
+    onPendingChange?.(true);
+
+    let record: TranslationKey;
+
+    try {
+      record = (await createTranslationKey(parsed.data)).data;
+    } catch (failure: unknown) {
+      setRequestError(
+        failure instanceof Error
+          ? failure.message
+          : "Unable to create translation key.",
+      );
+
+      return;
+    } finally {
+      inFlight.current = false;
+      setPending(false);
+      onPendingChange?.(false);
+    }
+
+    onCreated(record);
+  });
+
+  return (
+    <FormProvider {...form}>
+      <Stack
+        component="form"
+        noValidate
+        spacing={3}
+        aria-busy={pending}
+        onSubmit={submit}
       >
-        <MenuItem value="">Choose a category</MenuItem>
-        {options.categoryOptions.map((option) => (
-          <MenuItem key={String(option.value)} value={String(option.value)}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </TextField>
-      <Stack direction="row" spacing={1}>
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={pending || unavailable}
+        {requestError && <Alert severity="error">{requestError}</Alert>}
+
+        {options.error ? (
+          <Alert
+            severity="error"
+            action={
+              <Button
+                type="button"
+                color="inherit"
+                disabled={pending}
+                onClick={options.refresh}
+              >
+                Retry categories
+              </Button>
+            }
+          >
+            Categories could not be loaded.
+          </Alert>
+        ) : options.fetching ? (
+          <Alert severity="info">Loading categories...</Alert>
+        ) : options.categoryOptions.length === 0 ? (
+          <Alert severity="warning">
+            No categories are available. Create a category before adding a key.
+          </Alert>
+        ) : null}
+
+        <TranslationKeyFormFields
+          autoFocusKey
+          disabled={pending}
+          categoryDisabled={categoryUnavailable}
+          categoryOptions={options.categoryOptions}
+        />
+
+        <Stack
+          direction={{
+            xs: "column-reverse",
+            sm: "row",
+          }}
+          spacing={1}
+          justifyContent="flex-end"
         >
-          {pending ? "Creating..." : "Create key"}
-        </Button>
-        <Button type="button" onClick={onCancel} disabled={pending}>
-          Cancel
-        </Button>
+          <Button
+            type="button"
+            variant="outlined"
+            startIcon={<CloseRounded />}
+            onClick={onCancel}
+            disabled={pending}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="success"
+            startIcon={<SaveRounded />}
+            loading={pending}
+            loadingPosition="start"
+            disabled={pending || categoryUnavailable}
+          >
+            {pending ? "Creating..." : "Create key"}
+          </Button>
+        </Stack>
       </Stack>
-    </Stack>
+    </FormProvider>
   );
 }

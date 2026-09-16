@@ -25,10 +25,7 @@ import {
   UseFormClearErrors,
   UseFormSetError,
 } from "react-hook-form";
-import { SaveHandler } from "ra-core";
-import { SaveButtonProps } from "react-admin";
 // import { AsyncRuleType, AuthAction } from "@/types";
-import { Circle } from "lucide-react";
 import { HtmlHTMLAttributes, ReactNode, Ref, RefObject } from "react";
 import { VirtualElement } from "@popperjs/core/lib/types";
 // import { IParticlesProps } from "@tsparticles/react/dist/IParticlesProps";
@@ -361,6 +358,8 @@ export interface ParticleProps extends IParticlesProps {
 //   behavior?: FieldBehavior;
 // }
 
+export type InputValidationState = "idle" | "validating" | "success" | "error";
+
 export interface IconInputProps<
   TFieldValues extends FieldValues = FieldValues,
 > extends Omit<BaseInputProps<TFieldValues>, "field" | "fieldState"> {
@@ -377,18 +376,38 @@ export interface IconInputProps<
    * This prop instead uses a useEffect side-effect channel (setError/clearErrors)
    * which works regardless of whether a resolver is present.
    */
+  /**
+   * Enables the existing debounced/abortable server-field validator.
+   *
+   * Validation is independent from a resolver because the controlled
+   * field performs it through the established side-effect channel.
+   */
   asyncValidate?: boolean;
+
+  /**
+   * Server validation endpoint field name.
+   *
+   * Defaults to `name`.
+   */
+  asyncValidationSource?: string;
+
+  /**
+   * Existing validation service defaults to 500ms.
+   */
+  asyncDebounceMs?: number;
 }
 
 export interface BaseInputProps<
   TFieldValues extends FieldValues = FieldValues,
-> extends Omit<TextFieldProps, "variant"> {
+> extends Omit<TextFieldProps, "slotProps" | "sx"> {
   field: UseControllerReturn<TFieldValues>["field"];
   fieldState: UseControllerReturn<TFieldValues>["fieldState"];
+
   /** Pass "password" to activate the built-in show/hide toggle */
   type?: string;
   iconStart?: ReactNode;
   iconEnd?: ReactNode;
+
   /**
    * Show a clear button when the field has a value.
    * Defaults to `true` so text fields always get a clear button unless
@@ -396,14 +415,20 @@ export interface BaseInputProps<
    */
   resettable?: boolean;
   clearAlwaysVisible?: boolean;
+
   isValidating?: boolean;
   isFocused?: boolean;
+
   // Explicitly add this to resolve the destructuring conflict
   readOnly?: boolean;
   helperText?: ReactNode;
-  ref?: Ref<HTMLDivElement>; // Standard prop in React 19
+
+  // ref?: Ref<HTMLDivElement>; // Standard prop in React 19
+
   rootRef?: React.RefObject<HTMLDivElement | null>;
-  inputRef?: React.Ref<HTMLInputElement>;
+  // inputRef?: React.Ref<HTMLInputElement>;
+
+  validationState?: InputValidationState;
 }
 
 export interface ControlledInputProps extends Omit<
