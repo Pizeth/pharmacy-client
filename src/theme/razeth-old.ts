@@ -1839,7 +1839,7 @@ const customBaseTheme = createTheme({
         }),
       },
     },
-    RazethSignUpLink: {
+    RazethAuthNavigation: {
       styleOverrides: {
         root: (props: { theme: Theme }) => ({
           display: "flex",

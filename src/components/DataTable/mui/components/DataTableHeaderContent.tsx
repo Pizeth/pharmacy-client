@@ -111,7 +111,7 @@ const HeaderContentRoot = styled(Box, {
    */
   '&[data-align="left"]': {
     display: "flex",
-    justifyContent: "flex-start",
+    justifyContent: theme.direction === "rtl" ? "flex-end" : "flex-start",
     gap: theme.spacing(0.25),
   },
 
@@ -122,7 +122,7 @@ const HeaderContentRoot = styled(Box, {
    */
   '&[data-align="right"]': {
     display: "flex",
-    justifyContent: "flex-end",
+    justifyContent: theme.direction === "rtl" ? "flex-start" : "flex-end",
     gap: theme.spacing(0.25),
   },
 
@@ -300,8 +300,6 @@ const HeaderActionsRoot = styled(Box, {
   '&[data-align="left"], &[data-align="right"]': {
     gap: theme.spacing(0.25),
   },
-
-
 }));
 
 /**

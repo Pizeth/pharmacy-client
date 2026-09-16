@@ -1,6 +1,6 @@
 "use client";
 
-import { styled, TableCell } from "@mui/material";
+import { styled, TableCell, useTheme } from "@mui/material";
 import type { CSSProperties } from "react";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { Cell, CellData, RowData } from "@tanstack/table-core";
@@ -44,7 +44,10 @@ const BodyCellRoot = styled(TableCell, {
   '&[data-pinned="start"], &[data-pinned="end"]': {
     position: "sticky",
     zIndex: 1,
-    backgroundColor: "var(--DataTable-row-background)",
+    // Paint the state tint over paper, never over scrolling cell content.
+    backgroundColor: (theme.vars ?? theme).palette.background.paper,
+    backgroundImage:
+      "linear-gradient(var(--DataTable-row-background), var(--DataTable-row-background))",
     backgroundClip: "padding-box",
   },
   '&[data-pinned="start"]': {
@@ -90,10 +93,11 @@ export function DataTableBodyCell<
   const { table, cell } = props;
 
   const { density } = useDataTableDensity();
+  const { direction } = useTheme();
 
   const meta = cell.column.columnDef.meta;
 
-  const align = resolveTableCellAlignment(meta?.align);
+  const align = resolveTableCellAlignment(meta?.align, direction);
 
   return (
     <table.AppCell

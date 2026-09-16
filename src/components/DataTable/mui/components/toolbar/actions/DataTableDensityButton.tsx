@@ -1,5 +1,7 @@
 "use client";
 
+import { useTheme } from "@mui/material/styles";
+
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../../styles";
 
 // src/components/DataTable/mui/components/toolbar/actions/DataTableDensityButton.tsx
@@ -63,6 +65,7 @@ const DensityButtonRoot = styled(IconButton, {
 }));
 
 export function DataTableDensityButton() {
+  const { direction } = useTheme();
   const { density, setDensity } = useDataTableDensity();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -101,6 +104,7 @@ export function DataTableDensityButton() {
       </Tooltip>
 
       <Menu
+            dir={direction}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}

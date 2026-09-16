@@ -840,7 +840,7 @@ export const RazethLoginOptimized = {
   // 👇 Variants
   variants: [
     {
-      props: { variant: "compact" },
+      props: { variant: "compact" as const },
       style: ({ theme }: { theme: Theme }) => ({
         // Target slots using their MUI-generated global class names
         // The format is '& .Mui[ComponentName]-[slotName]'
@@ -861,7 +861,7 @@ export const RazethLoginOptimized = {
       }),
     },
     {
-      props: { variant: "full" },
+      props: { variant: "full" as const },
       style: ({ theme }: { theme: Theme }) => ({
         "& .MuiRazethLogin-content": {
           [theme.breakpoints.up("md")]: {

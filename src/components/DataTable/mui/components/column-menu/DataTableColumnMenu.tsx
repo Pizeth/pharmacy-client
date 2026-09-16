@@ -1,5 +1,7 @@
 "use client";
 
+import { useTheme } from "@mui/material/styles";
+
 import {
   Divider,
   ListItemIcon,
@@ -40,6 +42,7 @@ export function DataTableColumnMenu<
   TData extends RowData,
   TValue extends CellData = CellData,
 >(props: DataTableColumnMenuProps<TData, TValue>) {
+  const { direction } = useTheme();
   const { table, column, anchorEl, open, onClose, onOpenFilter } = props;
 
   return (
@@ -64,6 +67,7 @@ export function DataTableColumnMenu<
 
         return (
           <Menu
+            dir={direction}
             anchorEl={anchorEl}
             open={open}
             onClose={onClose}

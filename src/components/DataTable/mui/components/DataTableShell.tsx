@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, styled } from "@mui/material";
+import { Box, styled, useTheme } from "@mui/material";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { ReactNode } from "react";
 import { useDataTableFullscreen } from "../fullscreen";
@@ -66,6 +66,7 @@ const ShellRoot = styled(Box, {
       }),
 
   overflow: "hidden",
+  boxSizing: "border-box",
 
   /**
    * ============================================================
@@ -83,7 +84,15 @@ const ShellRoot = styled(Box, {
     height: "100dvh",
     maxWidth: "100vw",
     maxHeight: "100dvh",
-    zIndex: theme.zIndex.modal + 1,
+    // Fullscreen is below portaled MUI menus, popovers, and dialogs.
+    zIndex: theme.zIndex.modal - 1,
+    [`& > .${dataTableClasses.content}`]: {
+      flex: "1 1 0%",
+      minHeight: 0,
+      overflow: "hidden",
+      [`& > :not(.${dataTableClasses.container})`]: { flexShrink: 0 },
+    },
+    [`& > .${dataTableClasses.toolbar}`]: { flexShrink: 0 },
   },
 }));
 
@@ -112,11 +121,13 @@ export interface DataTableShellProps {
  */
 export function DataTableShell(props: DataTableShellProps) {
   const { children, ownerState } = props;
+  const { direction } = useTheme();
 
-  const { fullscreen } = useDataTableFullscreen();
+  const { fullscreen, setFullscreen } = useDataTableFullscreen();
 
   return (
     <ShellRoot
+      dir={direction}
       ownerState={ownerState}
       className={dataTableClasses.root}
       /**
@@ -127,6 +138,20 @@ export function DataTableShell(props: DataTableShellProps) {
        */
       data-variant={ownerState.variant}
       data-fullscreen={fullscreen ? "true" : undefined}
+      onKeyDown={(event) => {
+        // Respect nested controls that consume Escape (menus, popovers, inputs).
+        // Ignore portal events: their DOM target is outside this shell.
+        if (
+          fullscreen &&
+          event.key === "Escape" &&
+          !event.defaultPrevented &&
+          event.currentTarget.contains(event.target as Node)
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+          setFullscreen(false);
+        }
+      }}
     >
       {children}
     </ShellRoot>

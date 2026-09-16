@@ -2,7 +2,7 @@
 
 // src/components/DataTable/mui/components/DataTableHeaderCell.tsx
 
-import { Box, styled, TableCell } from "@mui/material";
+import { Box, styled, TableCell, useTheme } from "@mui/material";
 import type { CellData, Header, RowData } from "@tanstack/table-core";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
 import type { MuiDataTableFeatures } from "../features";
@@ -279,6 +279,7 @@ export function DataTableHeaderCell<
   const { table, header, headerRowIndex } = props;
 
   const { density } = useDataTableDensity();
+  const { direction } = useTheme();
 
   const densityMetrics = getDataTableDensityMetrics(density);
 
@@ -313,7 +314,8 @@ export function DataTableHeaderCell<
   const align =
     configuredHeaderAlign === undefined
       ? "center"
-      : (resolveTableCellAlignment(configuredHeaderAlign) ?? "center");
+      : (resolveTableCellAlignment(configuredHeaderAlign, direction) ??
+        "center");
 
   /**
    * Only leaf headers correspond to one concrete pinnable/resizable

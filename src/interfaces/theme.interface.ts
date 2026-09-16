@@ -9,17 +9,44 @@ import {
   FooterProps,
   SocialLoginProps,
   SocialButtonProps,
+  MeteorShowerProps,
 } from "./auth.interface";
 import {
+  AuthFormProps,
   DrawerToggleProps,
   LoginFormProps,
+  ShootingStarProps,
+  TwinkleStarProps,
   TVProps,
+  ValidatedButtonProps,
 } from "./component-props.interface";
 import type { DataTableComponentsPropsList } from "@/components/DataTable/mui/theme";
 
 // This interface maps each component's name to its specific props interface.
 // To add a new component, you only need to add a new line here.
+/**
+ * ------------------------------------------------------------------
+ * Application MUI component-prop registry
+ * ------------------------------------------------------------------
+ *
+ * Every named custom MUI component that appears under:
+ *
+ *   theme.components
+ *
+ * must be represented here unless it has a dedicated augmentation
+ * contract of its own.
+ *
+ * RazethDataTable itself is intentionally NOT listed here.
+ *
+ * It has a dedicated contract in:
+ *
+ *   src/theme.d.ts
+ *
+ * because its defaultProps and variant/ownerState contracts are
+ * intentionally different.
+ */
 export interface RazethComponentsPropsList extends DataTableComponentsPropsList {
+  RazethAuthForm: Partial<AuthFormProps>;
   RazethLogin: Partial<LoginProps>;
   RazethSideImage: Partial<SideImageProps>;
   RazethAvatar: Partial<AvatarProps>;
@@ -31,6 +58,21 @@ export interface RazethComponentsPropsList extends DataTableComponentsPropsList 
   RazethFooter: Partial<FooterProps>;
   RazethTV: Partial<TVProps>;
   RazethNavToggle: Partial<DrawerToggleProps>;
+  RazethValidatedButton: Partial<ValidatedButtonProps>;
+
+  /**
+   * Existing visual-effect theme components.
+   *
+   * These names already appear in:
+   *
+   *   src/theme/razeth.ts
+   *   src/theme/razeth-old.ts
+   *
+   * but were missing from the central registry.
+   */
+  RazethShootingStar: Partial<ShootingStarProps>;
+  RazethTwinkleStar: Partial<TwinkleStarProps>;
+  RazethMeteor: Partial<MeteorShowerProps>;
 }
 
 export interface SideImage {

@@ -2,6 +2,8 @@
 
 "use client";
 
+import { useTheme } from "@mui/material/styles";
+
 import { useId, useState } from "react";
 import {
   Box,
@@ -52,6 +54,7 @@ export function DataTableColumnManager<TData extends RowData>(
     enableReset = true,
   } = props;
 
+  const { direction } = useTheme();
   const titleId = useId();
 
   const descriptionId = useId();
@@ -137,6 +140,7 @@ export function DataTableColumnManager<TData extends RowData>(
 
         return (
           <Popover
+            dir={direction}
             anchorEl={anchorEl}
             open={open}
             onClose={handleClose}

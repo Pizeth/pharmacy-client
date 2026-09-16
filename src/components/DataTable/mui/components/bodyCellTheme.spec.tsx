@@ -106,3 +106,15 @@ it("reacts to column ordering without remounting the row", () => {
     "B",
   ]);
 });
+
+it("paints pinned state tints over a solid paper base", () => {
+  const { getTable } = mount();
+  act(() => getTable().setColumnPinning({ start: ["a"], end: [] }));
+  expect(cell("A")).toHaveStyle({
+    backgroundColor: "rgb(255, 255, 255)",
+    backgroundImage:
+      "linear-gradient(var(--DataTable-row-background), var(--DataTable-row-background))",
+  });
+  act(() => getTable().setRowSelection({ "0": true }));
+  expect(cell("A")).toHaveStyle({ backgroundColor: "rgb(255, 255, 255)" });
+});

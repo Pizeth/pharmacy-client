@@ -521,7 +521,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           // }),
         },
       },
-      RazethSignUpForm: {
+      RazethAuthForm: {
         styleOverrides: {
           root: (props: { theme: Theme }) => ({
             // ["& .MuiCardContent-root"]: {
@@ -954,13 +954,13 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           },
         },
       },
-      MuiDateCalendar: {
-        styleOverrides: {
-          root: {
-            borderRadius: 50,
-          },
-        },
-      },
+      // MuiDateCalendar: {
+      //   styleOverrides: {
+      //     root: {
+      //       borderRadius: 50,
+      //     },
+      //   },
+      // },
       MuiButtonBase: {
         styleOverrides: {
           root: (props: { theme: Theme }) => ({

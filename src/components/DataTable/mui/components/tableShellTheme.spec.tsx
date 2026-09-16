@@ -92,6 +92,6 @@ it("applies fullscreen geometry to the shared outer root", () => {
     position: "fixed",
     width: "100vw",
     borderRadius: "0",
-    zIndex: String(theme.zIndex.modal + 1),
+    zIndex: String(theme.zIndex.modal - 1),
   });
 });

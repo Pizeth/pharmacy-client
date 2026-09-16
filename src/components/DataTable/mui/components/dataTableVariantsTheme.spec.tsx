@@ -248,7 +248,19 @@ describe("DataTable variants and ownerState", () => {
      */
     expect(computedRoot.borderTopWidth).toBe("0px");
 
-    expect(computedRoot.borderRadius).toBe("0px");
+    /**
+     * Zero-length CSS values may be serialized by different DOM
+     * implementations as either:
+     *
+     *   0
+     *
+     * or:
+     *
+     *   0px
+     *
+     * The contract being tested is zero radius, not a serialization unit.
+     */
+    expect(Number.parseFloat(computedRoot.borderRadius)).toBe(0);
   });
 
   it("lets an explicit component variant override the theme default", () => {
