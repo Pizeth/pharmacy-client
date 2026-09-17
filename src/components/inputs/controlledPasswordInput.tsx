@@ -15,7 +15,7 @@ import {
   validationLoadingAtom,
   setValidationLoadingAtom,
 } from "@/Stores/validationStore";
-import { InputHelper } from "../CustomComponents/InputHelper";
+import { InputHelperText } from "./helpers/inputHelperText";
 import { useFormContext } from "react-hook-form";
 // import { FieldValues, UseFormClearErrors } from "react-hook-form";
 
@@ -142,7 +142,7 @@ const ControlledPasswordInput = ({
   return (
     <Box width="100%">
       <BaseInput
-        ref={containerRef}
+        rootRef={containerRef}
         field={field}
         fieldState={fieldState}
         label={label}
@@ -157,15 +157,9 @@ const ControlledPasswordInput = ({
           //   : fieldState.isValidating) ??
           // helperText
           renderHelperText && (
-            <InputHelper
-              error={
-                // Show validation message only when NOT in validating state
-                fieldState.isValidating ? undefined : errMsg
-              }
-              // helperText={
-              //   // Show "Validating..." text during async validation
-              //   fieldState.isValidating ? "Validating..." : helperText
-              // }
+            <InputHelperText
+              helperText={helperText}
+              error={fieldState.isValidating ? undefined : errMsg}
             />
           )
         }

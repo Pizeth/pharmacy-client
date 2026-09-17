@@ -439,10 +439,12 @@ export interface ControlledInputProps extends Omit<
   fieldState: ControllerFieldState;
   name: string;
   asyncValidate?: boolean;
-  clearErrors?: (name: string) => void;
-  setError?: (name: string, error: ErrorOption) => void;
-  isFocused?: boolean;
-  onFocusChange?: (v: boolean) => void;
+  asyncValidationSource?: string;
+  asyncDebounceMs?: number;
+  // clearErrors?: (name: string) => void;
+  // setError?: (name: string, error: ErrorOption) => void;
+  // isFocused?: boolean;
+  // onFocusChange?: (v: boolean) => void;
 }
 
 export interface InputAdornmentProps {
@@ -454,9 +456,41 @@ export interface InputAdornmentProps {
   disabled?: boolean;
   readOnly?: boolean;
   isValidating?: boolean;
-  iconEnd: ReactNode;
+  iconEnd?: ReactNode;
   spinnerColor?: "primary" | "error" | "warning" | "success" | "inherit"; // ← add
   onClear: () => void;
+}
+
+export interface SelectFieldOption {
+  readonly value: string;
+  readonly label: ReactNode;
+  readonly disabled?: boolean;
+}
+
+export interface SelectFieldProps {
+  readonly name: string;
+  readonly label?: ReactNode;
+
+  readonly options: readonly SelectFieldOption[];
+
+  readonly placeholder?: ReactNode;
+  readonly helperText?: ReactNode;
+
+  readonly defaultValue?: string;
+
+  readonly required?: boolean;
+  readonly disabled?: boolean;
+
+  readonly fullWidth?: boolean;
+  readonly size?: "small" | "medium";
+  readonly variant?: "standard" | "outlined" | "filled";
+  readonly margin?: "none" | "dense" | "normal";
+
+  readonly iconStart?: ReactNode;
+
+  readonly rules?: UseControllerProps["rules"];
+
+  readonly className?: string;
 }
 
 // export interface PasswordFieldProps<

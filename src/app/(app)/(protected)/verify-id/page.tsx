@@ -220,12 +220,12 @@ export default function VerifyIdPage() {
             required
             iconStart={<AccountBoxIcon />}
             fullWidth
-            slotProps={{
-              htmlInput: {
-                inputMode: "numeric",
-                pattern: "[0-9]*",
-              },
-            }} // Brings up the numeric keypad on mobile devices
+            // slotProps={{
+            //   htmlInput: {
+            //     inputMode: "numeric",
+            //     pattern: "[0-9]*",
+            //   },
+            // }} // Brings up the numeric keypad on mobile devices
             onKeyDown={(e) => {
               if (!/[0-9]|Backspace|Delete|Arrow/.test(e.key)) {
                 e.preventDefault();

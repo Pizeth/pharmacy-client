@@ -19,6 +19,7 @@ export interface TranslationKeyCreateFormProps {
   readonly onCreated: (record: TranslationKey) => void;
   readonly onCancel: () => void;
   readonly onPendingChange?: (pending: boolean) => void;
+  readonly cancelLabel?: string;
 }
 
 /**
@@ -45,7 +46,12 @@ export interface TranslationKeyCreateFormProps {
  *   - table refresh
  */
 export function TranslationKeyCreateForm(props: TranslationKeyCreateFormProps) {
-  const { onCreated, onCancel, onPendingChange } = props;
+  const {
+    onCreated,
+    onCancel,
+    onPendingChange,
+    cancelLabel = "Cancel",
+  } = props;
 
   const options = useTranslationKeyFilterOptions();
 
@@ -216,7 +222,7 @@ export function TranslationKeyCreateForm(props: TranslationKeyCreateFormProps) {
             onClick={onCancel}
             disabled={pending}
           >
-            Cancel
+            {cancelLabel}
           </Button>
 
           <Button

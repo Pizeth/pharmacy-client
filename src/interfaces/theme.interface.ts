@@ -14,13 +14,19 @@ import {
 import {
   AuthFormProps,
   DrawerToggleProps,
+  IconInputProps,
   LoginFormProps,
+  PasswordFieldProps,
+  SelectFieldProps,
   ShootingStarProps,
   TwinkleStarProps,
   TVProps,
   ValidatedButtonProps,
 } from "./component-props.interface";
 import type { DataTableComponentsPropsList } from "@/components/DataTable/mui/theme";
+import type { FormDialogProps } from "@/components/forms/FormDialog";
+import type { ResourcePageProps } from "@/components/layouts/ResourcePage";
+import type { ResourceActionButtonProps } from "@/components/buttons/ResourceActionButton";
 
 // This interface maps each component's name to its specific props interface.
 // To add a new component, you only need to add a new line here.
@@ -73,6 +79,26 @@ export interface RazethComponentsPropsList extends DataTableComponentsPropsList 
   RazethShootingStar: Partial<ShootingStarProps>;
   RazethTwinkleStar: Partial<TwinkleStarProps>;
   RazethMeteor: Partial<MeteorShowerProps>;
+
+  RazethTextField: Partial<IconInputProps>;
+
+  RazethPasswordField: Partial<PasswordFieldProps>;
+
+  RazethSelectField: Partial<SelectFieldProps>;
+
+  RazethFormDialog: Partial<FormDialogProps>;
+
+  RazethResourcePage: Partial<ResourcePageProps>;
+
+  RazethResourceActionButton: Partial<ResourceActionButtonProps>;
+
+  /**
+   * Resource surfaces use no special public default props,
+   * but remain named MUI theme families.
+   */
+  RazethTranslationKeyForm: Record<string, never>;
+
+  RazethTranslationKeyTable: Record<string, never>;
 }
 
 export interface SideImage {

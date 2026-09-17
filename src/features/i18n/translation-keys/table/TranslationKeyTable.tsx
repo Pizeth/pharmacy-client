@@ -20,6 +20,33 @@ import { DataTable } from "@/components/DataTable";
 import { TranslationKeyApiError } from "../api";
 import { TranslationKeyCreateDialog } from "../forms";
 import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
+import { ResourceActionButton } from "@/components/buttons";
+
+const PREFIX = "RazethTranslationKeyTable";
+
+const Root = styled("section", {
+  name: PREFIX,
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})({});
+
+const LoadingRoot = styled(Paper, {
+  name: PREFIX,
+  slot: "Card",
+  overridesResolver: (_props, styles) => styles.card,
+})({});
+
+const LoadingContentRoot = styled("div", {
+  name: PREFIX,
+  slot: "Content",
+  overridesResolver: (_props, styles) => styles.content,
+})({});
+
+const TableRegionRoot = styled("div", {
+  name: PREFIX,
+  slot: "Main",
+  overridesResolver: (_props, styles) => styles.main,
+})({});
 
 /**
  * Convert an erased request/runtime error into appropriate UI text.
@@ -72,24 +99,35 @@ export function TranslationKeyTable() {
    * DataTable and use its non-blocking refresh indicator instead.
    */
   if (server.isInitialLoading) {
-    return (
-      <Paper
-        variant="outlined"
-        sx={{
-          minHeight: 360,
-          display: "grid",
-          placeItems: "center",
-          p: 4,
-        }}
-      >
-        <Stack spacing={2} alignItems="center">
-          <CircularProgress />
+    // return (
+    //   <Paper
+    //     variant="outlined"
+    //     sx={{
+    //       minHeight: 360,
+    //       display: "grid",
+    //       placeItems: "center",
+    //       p: 4,
+    //     }}
+    //   >
+    //     <Stack spacing={2} alignItems="center">
+    //       <CircularProgress />
 
+    //       <Typography variant="body2" color="text.secondary">
+    //         Loading translation keys…
+    //       </Typography>
+    //     </Stack>
+    //   </Paper>
+    // );
+
+    return (
+      <LoadingRoot variant="outlined">
+        <LoadingContentRoot>
+          <CircularProgress />
           <Typography variant="body2" color="text.secondary">
             Loading translation keys…
           </Typography>
-        </Stack>
-      </Paper>
+        </LoadingContentRoot>
+      </LoadingRoot>
     );
   }
 
@@ -137,12 +175,7 @@ export function TranslationKeyTable() {
    * The renderer remains unaware of HTTP and query execution details.
    */
   return (
-    <Stack
-      spacing={1}
-      sx={{
-        minWidth: 0,
-      }}
-    >
+    <Root>
       {/* <Dialog
         open={createOpen}
         onClose={() => {
@@ -189,12 +222,14 @@ export function TranslationKeyTable() {
           refresh();
         }}
       />
+
       {createdKey && (
         <Alert severity="success" onClose={() => setCreatedKey(undefined)}>
           Created translation key: {createdKey}
         </Alert>
       )}
-      {server.refreshError ? (
+
+      {/* {server.refreshError ? (
         <Alert
           severity="warning"
           action={
@@ -210,14 +245,28 @@ export function TranslationKeyTable() {
         >
           {getTranslationKeyTableErrorMessage(server.refreshError)}
         </Alert>
-      ) : null}
+      ) : null} */}
 
-      <Box
-        sx={{
-          minWidth: 0,
-        }}
-      >
-        {filterOptions.error ? (
+      {!!server.refreshError && (
+        <Alert
+          severity="warning"
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              startIcon={<Refresh />}
+              onClick={refresh}
+            >
+              Retry
+            </Button>
+          }
+        >
+          {getTranslationKeyTableErrorMessage(server.refreshError)}
+        </Alert>
+      )}
+
+      <TableRegionRoot>
+        {!!filterOptions.error && (
           <Alert
             severity="warning"
             action={
@@ -234,10 +283,28 @@ export function TranslationKeyTable() {
             Category filter options could not be loaded. Other table filters
             remain available.
           </Alert>
-        ) : null}
+        )}
+
+        {/* {filterOptions.error ? (
+          <Alert
+            severity="warning"
+            action={
+              <Button
+                color="inherit"
+                size="small"
+                startIcon={<Refresh />}
+                onClick={filterOptions.refresh}
+              >
+                Retry
+              </Button>
+            }
+          >
+            Category filter options could not be loaded. Other table filters
+            remain available.
+          </Alert>
+        ) : null} */}
 
         <DataTable
-          // variant="plain"
           table={table}
           /**
            * Use the renderer's built-in non-blocking refresh indicator.
@@ -260,7 +327,7 @@ export function TranslationKeyTable() {
             //   </Button>
             // ),
             startContent: (
-              <CreateKeyButton
+              <ResourceActionButton
                 variant="contained"
                 color="warning"
                 startIcon={<AddRounded />}
@@ -269,7 +336,7 @@ export function TranslationKeyTable() {
                 }}
               >
                 Create key
-              </CreateKeyButton>
+              </ResourceActionButton>
             ),
             search: true,
             /**
@@ -278,8 +345,11 @@ export function TranslationKeyTable() {
              * - search is initially visible
              * - toolbar exposes a Show/Hide search action
              * - hiding search does NOT clear TanStack globalFilter
+             *
+             * search is shown initially but the toolbar action can collapse it.
              */
             searchMode: "collapsible",
+            defaultSearchOpen: true,
             searchPosition: "center",
             searchPlaceholder: "Search translations…",
 
@@ -342,24 +412,24 @@ export function TranslationKeyTable() {
           tableProps={{
             stickyHeader: true,
           }}
-          /**
-           * Give the scrolling viewport useful vertical room without
-           * forcing page-specific dimensions into the generic renderer.
-           */
-          containerProps={{
-            sx: {
-              /**
-               * Existing page-level runtime/layout styling.
-               *
-               * We can move this toward the new slot-based styling convention
-               * during the visual audit.
-               */
-              maxHeight: "calc(100vh - 240px)",
-              minHeight: 320,
-            },
-          }}
+          // /**
+          //  * Give the scrolling viewport useful vertical room without
+          //  * forcing page-specific dimensions into the generic renderer.
+          //  */
+          // containerProps={{
+          //   sx: {
+          //     /**
+          //      * Existing page-level runtime/layout styling.
+          //      *
+          //      * We can move this toward the new slot-based styling convention
+          //      * during the visual audit.
+          //      */
+          //     maxHeight: "calc(100vh - 240px)",
+          //     minHeight: 320,
+          //   },
+          // }}
         />
-      </Box>
-    </Stack>
+      </TableRegionRoot>
+    </Root>
   );
 }

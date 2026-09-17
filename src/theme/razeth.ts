@@ -23,6 +23,7 @@ import {
   RazethSideImageOptimized,
   RazethTwinkleStarOptimized,
 } from "@/theme/components";
+import { dataTableClasses } from "@/components/DataTable/mui/styles";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"; // Optional
@@ -113,6 +114,265 @@ const globalStyles = (theme: Theme) => ({
   },
 });
 
+const standardizedFormComponents = {
+  /**
+   * ================================================================
+   * Standard text input
+   * ================================================================
+   */
+  RazethTextField: {
+    defaultProps: {
+      variant: "outlined" as const,
+      margin: "dense" as const,
+      size: "small" as const,
+      fullWidth: true,
+      resettable: true,
+    },
+
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        /**
+         * Label/adornment runtime geometry.
+         *
+         * Component logic consumes these values through CSS vars.
+         */
+        "--RazethTextField-label-offset-x":
+          theme.direction === "rtl" ? "-45px" : "45px",
+        "--RazethTextField-label-offset-y-small": "9px",
+        "--RazethTextField-label-offset-y-medium": "16px",
+        "& .MuiOutlinedInput-root": { borderRadius: 999 },
+
+        /**
+         * Multiline fields should be rounded panels rather than
+         * enormous capsules.
+         */
+        '&[data-multiline="true"] .MuiOutlinedInput-root': {
+          borderRadius: theme.spacing(3),
+        },
+
+        '&[data-validation-state="validating"] .MuiFormHelperText-root': {
+          color: theme.vars.palette.primary.main,
+        },
+
+        '&[data-validation-state="success"] .MuiFormHelperText-root': {
+          color: theme.vars.palette.success.main,
+          fontWeight: 700,
+        },
+      }),
+
+      icon: ({ theme }: { theme: Theme }) => ({
+        color: theme.vars.palette.text.primary,
+      }),
+
+      button: ({ theme }: { theme: Theme }) => ({
+        padding: theme.spacing(0.5),
+      }),
+    },
+  },
+
+  /**
+   * ================================================================
+   * Standard select input
+   * ================================================================
+   */
+  RazethSelectField: {
+    defaultProps: {
+      variant: "outlined" as const,
+      margin: "dense" as const,
+      size: "small" as const,
+      fullWidth: true,
+    },
+
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        "--RazethSelectField-label-offset-x":
+          theme.direction === "rtl" ? "-45px" : "45px",
+        "--RazethSelectField-label-offset-y-small": "9px",
+        "--RazethSelectField-label-offset-y-medium": "16px",
+        "& .MuiOutlinedInput-root": { borderRadius: 999 },
+      }),
+
+      icon: ({ theme }: { theme: Theme }) => ({
+        color: theme.vars.palette.text.secondary,
+      }),
+    },
+  },
+
+  /**
+   * ================================================================
+   * Form dialog
+   * ================================================================
+   */
+  RazethFormDialog: {
+    defaultProps: {
+      maxWidth: "md" as const,
+      fullWidth: true,
+    },
+
+    styleOverrides: {
+      card: ({ theme }: { theme: Theme }) => ({
+        borderRadius: theme.spacing(2.5),
+        overflow: "hidden",
+        backgroundImage: "none",
+        backgroundColor: (theme.vars ?? theme).palette.background.paper,
+      }),
+
+      heading: ({ theme }: { theme: Theme }) => ({
+        padding: theme.spacing(2, 3),
+        borderBottom: `1px solid ${theme.vars.palette.warning.main}`,
+      }),
+
+      wrapper: ({ theme }: { theme: Theme }) => ({
+        gap: theme.spacing(2),
+      }),
+
+      main: ({ theme }: { theme: Theme }) => ({
+        gap: theme.spacing(1.5),
+      }),
+
+      icon: ({ theme }: { theme: Theme }) => ({
+        width: 40,
+        height: 40,
+        borderRadius: "50%",
+        color: theme.palette.warning.contrastText,
+        backgroundColor: theme.vars.palette.warning.main,
+      }),
+
+      caption: ({ theme }: { theme: Theme }) => ({
+        color: (theme.vars ?? theme).palette.text.secondary,
+      }),
+
+      footer: ({ theme }: { theme: Theme }) => ({
+        padding: theme.spacing(3),
+      }),
+    },
+  },
+
+  /**
+   * ================================================================
+   * Resource page
+   * ================================================================
+   */
+  RazethResourcePage: {
+    defaultProps: {
+      maxWidth: "xl" as const,
+    },
+
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        paddingBlock: theme.spacing(3),
+      }),
+
+      wrapper: ({ theme }: { theme: Theme }) => ({
+        marginBottom: theme.spacing(2.5),
+        textAlign: "center",
+      }),
+
+      heading: {
+        textAlign: "center",
+      },
+
+      caption: ({ theme }: { theme: Theme }) => ({
+        marginTop: theme.spacing(0.5),
+        color: (theme.vars ?? theme).palette.text.secondary,
+        textAlign: "center",
+      }),
+
+      card: ({ theme }: { theme: Theme }) => ({
+        padding: theme.spacing(3),
+        borderRadius: theme.spacing(2.5),
+        backgroundImage: "none",
+      }),
+    },
+  },
+
+  /**
+   * ================================================================
+   * Primary resource toolbar action
+   * ================================================================
+   */
+  RazethResourceActionButton: {
+    defaultProps: {
+      variant: "contained" as const,
+    },
+
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        borderRadius: 999,
+        paddingInline: theme.spacing(2),
+        fontWeight: 700,
+        whiteSpace: "nowrap",
+      }),
+    },
+  },
+
+  /**
+   * ================================================================
+   * TranslationKey create/edit form layout
+   * ================================================================
+   */
+  RazethTranslationKeyForm: {
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        display: "flex",
+        flexDirection: "column",
+        gap: theme.spacing(3),
+      }),
+
+      footer: ({ theme }: { theme: Theme }) => ({
+        display: "flex",
+        justifyContent: "flex-end",
+        gap: theme.spacing(1),
+        [theme.breakpoints.down("sm")]: {
+          flexDirection: "column-reverse",
+        },
+      }),
+    },
+  },
+
+  /**
+   * ================================================================
+   * TranslationKey table resource shell
+   * ================================================================
+   */
+  RazethTranslationKeyTable: {
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        display: "flex",
+        flexDirection: "column",
+        gap: theme.spacing(1),
+        minWidth: 0,
+      }),
+
+      card: ({ theme }: { theme: Theme }) => ({
+        minHeight: 360,
+        display: "grid",
+        placeItems: "center",
+        padding: theme.spacing(4),
+      }),
+
+      content: ({ theme }: { theme: Theme }) => ({
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: theme.spacing(2),
+      }),
+
+      main: {
+        minWidth: 0,
+
+        /**
+         * Resource-specific viewport geometry without caller sx.
+         */
+        [`& .${dataTableClasses.container}`]: {
+          maxHeight: "calc(100vh - 290px)",
+          minHeight: 320,
+        },
+      },
+    },
+  },
+} as const;
+
 const defaultThemeInvariants = {
   typography: {
     // fontFamily: "var(--font-siemreap)",
@@ -138,6 +398,7 @@ const defaultThemeInvariants = {
     closedWidth: 50,
   },
   components: {
+    ...standardizedFormComponents,
     MuiAutocomplete: {
       defaultProps: {
         fullWidth: true,
@@ -1160,6 +1421,7 @@ export const lightTheme = deepmerge(defaultTheme, {
   },
 
   components: {
+    ...standardizedFormComponents,
     MuiTextField: {
       defaultProps: {
         variant: "outlined",

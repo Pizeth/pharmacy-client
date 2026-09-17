@@ -1,42 +1,118 @@
 // RHFTextField.tsx
+// import { Controller, useFormContext } from "react-hook-form";
+// import { useThemeProps } from "@mui/material";
+// import { IconInputProps } from "@/interfaces/component-props.interface";
+// import { useMemo, useState } from "react";
+// import ControlledInput from "./controlledInput";
+// import { useAsyncFieldRule } from "@/lib/hooks/useFieldValidation";
+// import FieldTitle from "./fieldTitle";
+
+// const PREFIX = "RazethTextField";
+// export const TextField = (inProps: IconInputProps) => {
+//   const props = useThemeProps({ props: inProps, name: PREFIX });
+//   const {
+//     name,
+//     type,
+//     label,
+//     rules,
+//     defaultValue,
+//     asyncValidate,
+//     required,
+//     behavior,
+//     ...rest
+//   } = props;
+//   const { control } = useFormContext();
+//   // const [focused, setFocused] = useState(false);
+
+//   // 🔥 Async rule (safe hook usage)
+//   // const async = behavior?.asyncValidate
+//   //   ? useAsyncFieldRule(behavior.asyncValidate)
+//   //   : null;
+
+//   // const mergedRules = useMemo(() => {
+//   //   if (!async) return rules;
+
+//   //   return {
+//   //     ...rules,
+//   //     validate: async.validate,
+//   //   };
+//   // }, [rules, behavior]);
+
+//   return (
+//     <Controller
+//       name={name}
+//       control={control}
+//       defaultValue={defaultValue}
+//       rules={rules}
+//       render={({ field, fieldState }) => (
+//         // ✅ No hooks here — render prop is a plain JSX expression
+//         <ControlledInput
+//           field={field}
+//           fieldState={fieldState}
+//           label={
+//             label !== "" && label !== false ? (
+//               <FieldTitle
+//                 label={label}
+//                 // source={source}
+//                 isRequired={required}
+//               />
+//             ) : null
+//           }
+//           name={name}
+//           asyncValidate={asyncValidate}
+//           // clearErrors={clearErrors}
+//           // setError={setError}
+//           // isFocused={focused}
+//           // onFocusChange={setFocused}
+//           // isValidating={fieldState.isValidating}
+//           // isValidating={async?.status === "validating"}
+//           resettable={behavior?.clearable}
+//           type={behavior?.passwordToggle ? "password" : type}
+//           {...rest}
+//         />
+//       )}
+//     />
+//   );
+// };
+
+// export default TextField;
+
 import { Controller, useFormContext } from "react-hook-form";
-import { useThemeProps } from "@mui/material";
-import { IconInputProps } from "@/interfaces/component-props.interface";
-import { useMemo, useState } from "react";
+import { useThemeProps } from "@mui/material/styles";
+import type { IconInputProps } from "@/interfaces/component-props.interface";
 import ControlledInput from "./controlledInput";
-import { useAsyncFieldRule } from "@/lib/hooks/useFieldValidation";
-import FieldTitle from "./fieldTitle";
 
 const PREFIX = "RazethTextField";
-export const TextField = (inProps: IconInputProps) => {
+
+/**
+ * Standard application text input.
+ *
+ * React Hook Form owns field state.
+ *
+ * BaseInput owns MUI behavior/presentation.
+ *
+ * Optional server validation stays behind:
+ *
+ *   asyncValidate
+ *
+ * so ordinary resource forms do not perform unexpected requests.
+ */
+export function TextField(inProps: IconInputProps) {
   const props = useThemeProps({ props: inProps, name: PREFIX });
+
   const {
     name,
-    type,
     label,
     rules,
     defaultValue,
-    asyncValidate,
     required,
-    behavior,
+    asyncValidate,
+    asyncValidationSource,
+    asyncDebounceMs,
     ...rest
   } = props;
+
   const { control } = useFormContext();
-  // const [focused, setFocused] = useState(false);
-
-  // 🔥 Async rule (safe hook usage)
-  // const async = behavior?.asyncValidate
-  //   ? useAsyncFieldRule(behavior.asyncValidate)
-  //   : null;
-
-  // const mergedRules = useMemo(() => {
-  //   if (!async) return rules;
-
-  //   return {
-  //     ...rules,
-  //     validate: async.validate,
-  //   };
-  // }, [rules, behavior]);
 
   return (
     <Controller
@@ -49,31 +125,27 @@ export const TextField = (inProps: IconInputProps) => {
         <ControlledInput
           field={field}
           fieldState={fieldState}
-          label={
-            label !== "" && label !== false ? (
-              <FieldTitle
-                label={label}
-                // source={source}
-                isRequired={required}
-              />
-            ) : null
-          }
           name={name}
+          label={label}
+          // label={
+          //   label !== "" && label !== false ? (
+          //     <FieldTitle
+          //       label={label}
+          //       // source={source}
+          //       isRequired={required}
+          //     />
+          //   ) : null
+          // }
+          required={required}
           asyncValidate={asyncValidate}
-          // clearErrors={clearErrors}
-          // setError={setError}
-          // isFocused={focused}
-          // onFocusChange={setFocused}
-          // isValidating={fieldState.isValidating}
-          // isValidating={async?.status === "validating"}
-          resettable={behavior?.clearable}
-          type={behavior?.passwordToggle ? "password" : type}
+          asyncValidationSource={asyncValidationSource}
+          asyncDebounceMs={asyncDebounceMs}
           {...rest}
         />
       )}
     />
   );
-};
+}
 
 export default TextField;
 
