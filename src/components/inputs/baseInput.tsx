@@ -211,6 +211,7 @@
 // };
 
 import { InputAdornment, TextField as MuiTextField } from "@mui/material";
+import { mergeSlotProps } from "@mui/material/utils";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import type { FieldValues } from "react-hook-form";
@@ -244,6 +245,11 @@ const Root = styled(MuiTextField, {
    *
    * Offset values live in theme CSS variables so changing the visual
    * geometry does not require editing this component.
+   *
+   * A start adornment must NOT by itself force our custom label to float.
+   *
+   * When the field is empty and unfocused, shift the label after the icon.
+   * Once focused or populated, normal MUI shrink positioning resumes.
    */
   '&[data-start-icon="true"][data-label-shrunk="false"][data-size="small"] .MuiInputLabel-root':
     {
@@ -263,19 +269,23 @@ const StartAdornmentRoot = styled(InputAdornment, {
 })({});
 
 /**
- * Standard RHF/MUI input primitive.
+ * Low-level RHF/MUI input primitive.
+ *
+ * Responsibilities:
+ *
+ * - end-adornment logic (spinner / password toggle / clear / icon)
+ * - label shrink based on focus / value
+ * - RHF field & fieldState binding
+ * - install standard start/end adornments
+ * - merge caller MUI slotProps
+ *
+ * It does not own resource/business validation policy.
  *
  * Brand/visual styling belongs in:
  *
  *   theme.components.RazethTextField
  *
  * This component owns only runtime behavior.
- */
-/**
- * Thin wrapper around MUI TextField that wires up:
- *  – end-adornment logic (spinner / password toggle / clear / icon)
- *  – label shrink based on focus / value
- *  – RHF field & fieldState binding
  *
  * Pass `type="password"` to activate the built-in show/hide toggle.
  * The `isPassword` prop is intentionally removed — `type` is the single
@@ -294,13 +304,14 @@ export function BaseInput<TFieldValues extends FieldValues>(
     iconEnd,
     resettable = true,
     clearAlwaysVisible,
-    isValidating,
+    isValidating = false,
     disabled,
     readOnly,
     helperText,
     size = "medium",
     multiline,
     validationState = "idle",
+    slotProps,
     onFocus,
     onBlur,
     ...rest
@@ -318,6 +329,10 @@ export function BaseInput<TFieldValues extends FieldValues>(
    * iconStart is NOT part of this expression.
    *
    * This preserves the desirable legacy behavior:
+   *
+   *   icon only          -> inline label
+   *   focus              -> floating label
+   *   non-empty value    -> floating label
    *
    *   start icon alone does not force the label to float.
    */
@@ -338,6 +353,50 @@ export function BaseInput<TFieldValues extends FieldValues>(
     spinnerColor,
     onClear: () => field.onChange(""),
   });
+
+  /**
+   * MUI mergeSlotProps supports object AND function slot props.
+   *
+   * Our internal argument is intentionally first because MUI gives the
+   * first argument precedence on conflicting ordinary properties.
+   *
+   * Therefore callers can add:
+   *
+   * - className
+   * - events
+   * - data attributes
+   * - component configuration
+   *
+   * without replacing structural behavior owned by BaseInput:
+   *
+   * - readOnly
+   * - startAdornment
+   * - endAdornment
+   */
+  const mergedInputSlotProps = mergeSlotProps(
+    {
+      readOnly,
+      startAdornment: iconStart ? (
+        <StartAdornmentRoot position="start">{iconStart}</StartAdornmentRoot>
+      ) : undefined,
+      endAdornment,
+    },
+    slotProps?.input,
+  );
+
+  /**
+   * The same contract applies to the label.
+   *
+   * Callers may add label configuration, but our shrink behavior remains
+   * authoritative because it is part of RazethTextField's interaction
+   * contract rather than per-call visual styling.
+   */
+  const mergedInputLabelSlotProps = mergeSlotProps(
+    {
+      shrink: shouldShrink,
+    },
+    slotProps?.inputLabel,
+  );
 
   return (
     <Root
@@ -360,18 +419,19 @@ export function BaseInput<TFieldValues extends FieldValues>(
       data-multiline={multiline ? "true" : "false"}
       data-validation-state={validationState}
       slotProps={{
-        input: {
-          readOnly,
-          startAdornment: iconStart ? (
-            <StartAdornmentRoot position="start">
-              {iconStart}
-            </StartAdornmentRoot>
-          ) : undefined,
-          endAdornment,
-        },
-        inputLabel: {
-          shrink: shouldShrink,
-        },
+        /**
+         * Preserve every caller slot we do not structurally own.
+         *
+         * In particular:
+         *
+         *   slotProps.htmlInput
+         *
+         * reaches the native <input>.
+         */
+        ...slotProps,
+
+        input: mergedInputSlotProps,
+        inputLabel: mergedInputLabelSlotProps,
         // formHelperText: {
         //   sx: {
         //     fontWeight: !fieldState.error && !isValidating ? "bold" : undefined,

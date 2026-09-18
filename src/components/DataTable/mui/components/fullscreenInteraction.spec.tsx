@@ -52,32 +52,42 @@ function Fixture({
 function root(container: HTMLElement) {
   return container.querySelector(`.${dataTableClasses.root}`)!;
 }
-it("exits uncontrolled fullscreen on Escape and keeps focus on the mounted action", () => {
+it("exits uncontrolled fullscreen on Escape and keeps focus on the mounted action", async () => {
   const onChange = jest.fn();
-  const { container } = render(<Fixture onChange={onChange} />);
-  const button = screen.getByRole("button", { name: "Exit fullscreen table" });
 
-  /**
-   * Native HTMLElement.focus() dispatches focus events which update:
-   *
-   * - MUI ButtonBase
-   * - Tooltip
-   * - TouchRipple
-   *
-   * Wrap the imperative focus in React act() so those state updates are
-   * flushed as part of the interaction under test.
-   */
-  act(() => {
-    button.focus();
+  const { container } = render(<Fixture onChange={onChange} />);
+
+  const button = screen.getByRole("button", {
+    name: "Exit fullscreen table",
   });
 
-  fireEvent.keyDown(button, { key: "Escape" });
+  await act(async () => {
+    button.focus();
+    await Promise.resolve();
+  });
+
+  await act(async () => {
+    fireEvent.keyDown(button, {
+      key: "Escape",
+    });
+
+    await Promise.resolve();
+  });
+
   expect(root(container)).not.toHaveAttribute("data-fullscreen");
+
   expect(onChange).toHaveBeenCalledWith(false);
+
   expect(
-    screen.getByRole("button", { name: "Enter fullscreen table" }),
+    screen.getByRole("button", {
+      name: "Enter fullscreen table",
+    }),
   ).toHaveFocus();
-  fireEvent.keyDown(button, { key: "Escape" });
+
+  fireEvent.keyDown(button, {
+    key: "Escape",
+  });
+
   expect(onChange).toHaveBeenCalledTimes(1);
 });
 it("requests a controlled exit without changing owner-controlled state", () => {

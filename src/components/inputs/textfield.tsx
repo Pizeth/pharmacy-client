@@ -87,15 +87,13 @@ const PREFIX = "RazethTextField";
 /**
  * Standard application text input.
  *
- * React Hook Form owns field state.
+ * Responsibilities:
  *
- * BaseInput owns MUI behavior/presentation.
+ * - obtain theme defaults
+ * - connect to RHF Controller
+ * - forward the complete non-sx MUI TextField API
  *
- * Optional server validation stays behind:
- *
- *   asyncValidate
- *
- * so ordinary resource forms do not perform unexpected requests.
+ * Validation policy belongs to the enclosing form/resolver.
  */
 export function TextField(inProps: IconInputProps) {
   const props = useThemeProps({ props: inProps, name: PREFIX });
@@ -106,9 +104,9 @@ export function TextField(inProps: IconInputProps) {
     rules,
     defaultValue,
     required,
-    asyncValidate,
-    asyncValidationSource,
-    asyncDebounceMs,
+    // asyncValidate,
+    // asyncValidationSource,
+    // asyncDebounceMs,
     ...rest
   } = props;
 
@@ -137,9 +135,9 @@ export function TextField(inProps: IconInputProps) {
           //   ) : null
           // }
           required={required}
-          asyncValidate={asyncValidate}
-          asyncValidationSource={asyncValidationSource}
-          asyncDebounceMs={asyncDebounceMs}
+          // asyncValidate={asyncValidate}
+          // asyncValidationSource={asyncValidationSource}
+          // asyncDebounceMs={asyncDebounceMs}
           {...rest}
         />
       )}

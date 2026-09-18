@@ -97,7 +97,7 @@ export default async () => {
      * Do not broadly transpile all node_modules.
      */
     transformIgnorePatterns: [
-      "/node_modules/(?!@tanstack/(?:table-core|react-table)/)",
+      "/node_modules/(?!(@tanstack/(?:table-core|react-table)|jotai)/)",
 
       ...remainingTransformIgnorePatterns,
     ],

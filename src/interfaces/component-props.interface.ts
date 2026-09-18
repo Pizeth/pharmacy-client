@@ -368,43 +368,17 @@ export interface IconInputProps<
   defaultValue?: unknown;
   behavior?: FieldBehavior;
   required?: boolean;
-  /**
-   * Set true to run async uniqueness validation for this field.
-   *
-   * Why a separate prop and not rules.validate:
-   * RHF silently skips rules.validate on all fields when useForm has a resolver.
-   * This prop instead uses a useEffect side-effect channel (setError/clearErrors)
-   * which works regardless of whether a resolver is present.
-   */
-  /**
-   * Enables the existing debounced/abortable server-field validator.
-   *
-   * Validation is independent from a resolver because the controlled
-   * field performs it through the established side-effect channel.
-   */
-  asyncValidate?: boolean;
-
-  /**
-   * Server validation endpoint field name.
-   *
-   * Defaults to `name`.
-   */
-  asyncValidationSource?: string;
-
-  /**
-   * Existing validation service defaults to 500ms.
-   */
-  asyncDebounceMs?: number;
 }
 
 export interface BaseInputProps<
   TFieldValues extends FieldValues = FieldValues,
-> extends Omit<TextFieldProps, "slotProps" | "sx"> {
+> extends Omit<TextFieldProps, "sx"> {
   field: UseControllerReturn<TFieldValues>["field"];
   fieldState: UseControllerReturn<TFieldValues>["fieldState"];
 
   /** Pass "password" to activate the built-in show/hide toggle */
   type?: string;
+
   iconStart?: ReactNode;
   iconEnd?: ReactNode;
 
@@ -416,8 +390,12 @@ export interface BaseInputProps<
   resettable?: boolean;
   clearAlwaysVisible?: boolean;
 
+  /**
+   * Presentation state supplied by RHF/specialized inputs.
+   */
   isValidating?: boolean;
-  isFocused?: boolean;
+
+  // isFocused?: boolean;
 
   // Explicitly add this to resolve the destructuring conflict
   readOnly?: boolean;
@@ -438,9 +416,9 @@ export interface ControlledInputProps extends Omit<
   field: ControllerRenderProps<FieldValues, string>;
   fieldState: ControllerFieldState;
   name: string;
-  asyncValidate?: boolean;
-  asyncValidationSource?: string;
-  asyncDebounceMs?: number;
+  // asyncValidate?: boolean;
+  // asyncValidationSource?: string;
+  // asyncDebounceMs?: number;
   // clearErrors?: (name: string) => void;
   // setError?: (name: string, error: ErrorOption) => void;
   // isFocused?: boolean;
@@ -509,10 +487,7 @@ export interface SelectFieldProps {
 //   matchPassword?: string;
 // }
 
-export interface PasswordFieldProps extends Omit<
-  IconInputProps,
-  "asyncValidate" | "type"
-> {
+export interface PasswordFieldProps extends Omit<IconInputProps, "type"> {
   /** Show the zxcvbn strength meter and wire up strength validation */
   strengthMeter?: boolean;
   /**
@@ -524,7 +499,7 @@ export interface PasswordFieldProps extends Omit<
 
 export interface ControlledPasswordInputProps extends Omit<
   ControlledInputProps,
-  "type" | "asyncValidate"
+  "type"
 > {
   // score?: number;
   // message?: string;

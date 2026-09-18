@@ -166,22 +166,22 @@
 //   );
 // };
 
-// export default ControlledInput;
+// // export default ControlledInput;
 
-// interface ControlledInputProps extends Omit<
-//   BaseInputProps,
-//   "field" | "fieldState"
-// > {
-//   field: ControllerRenderProps<FieldValues, string>;
-//   fieldState: ControllerFieldState;
-//   name: string;
-//   clearErrors: (name: string) => void;
-//   isFocused: boolean;
-//   onFocusChange: (focused: boolean) => void;
-// }
+// // interface ControlledInputProps extends Omit<
+// //   BaseInputProps,
+// //   "field" | "fieldState"
+// // > {
+// //   field: ControllerRenderProps<FieldValues, string>;
+// //   fieldState: ControllerFieldState;
+// //   name: string;
+// //   clearErrors: (name: string) => void;
+// //   isFocused: boolean;
+// //   onFocusChange: (focused: boolean) => void;
+// // }
 
 import { useEffect, useRef } from "react";
-import { useFormContext } from "react-hook-form";
+// import { useFormContext } from "react-hook-form";
 import { useAtomValue, useSetAtom } from "jotai";
 import type { ControlledInputProps } from "@/interfaces/component-props.interface";
 import {
@@ -190,24 +190,22 @@ import {
   validationMessagesAtom,
 } from "@/Stores/validationStore";
 
-import { useAsyncFieldRule } from "@/lib/hooks/useFieldValidation";
+// import { useAsyncFieldRule } from "@/lib/hooks/useFieldValidation";
 import BaseInput from "./baseInput";
 import { InputHelperText } from "./helpers/inputHelperText";
 
 /**
  * RHF-controlled standard text input.
  *
- * Server validation is opt-in and uses the application's existing:
+ * This layer is deliberately validation-policy agnostic.
  *
- * - debouncing
- * - cancellation
- * - cache
- * - loading state
- * - success/error message state
+ * RHF's resolver / form owns:
  *
- * It runs through a side-effect channel rather than relying on
- * Controller.rules.validate, so it continues to work with forms which
- * use a resolver.
+ * - schema validation
+ * - async server validation
+ * - business/resource validation policy
+ *
+ * This component only presents RHF's resulting field state.
  */
 const ControlledInput = (props: ControlledInputProps) => {
   const {
@@ -216,116 +214,114 @@ const ControlledInput = (props: ControlledInputProps) => {
     name,
     label,
     helperText,
-    asyncValidate = false,
-    asyncValidationSource,
-    asyncDebounceMs = 500,
+    // asyncValidate = false,
+    // asyncValidationSource,
+    // asyncDebounceMs = 500,
     ...rest
   } = props;
 
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const validationKey = asyncValidationSource ?? name;
+  // const validationKey = asyncValidationSource ?? name;
 
   const loadings = useAtomValue(validationLoadingAtom);
-
   const messages = useAtomValue(validationMessagesAtom);
-
   const setLoading = useSetAtom(setValidationLoadingAtom);
 
-  const isFieldValidating = loadings[validationKey] ?? false;
+  // const isFieldValidating = loadings[validationKey] ?? false;
 
-  const validationMessage = messages[validationKey];
+  // const validationMessage = messages[validationKey];
 
-  const { setError, clearErrors, getFieldState } = useFormContext();
+  // const { setError, clearErrors, getFieldState } = useFormContext();
 
-  const asyncRule = useAsyncFieldRule(validationKey, asyncDebounceMs);
+  // const asyncRule = useAsyncFieldRule(validationKey, asyncDebounceMs);
+
+  // /**
+  //  * Resolver-independent server validation.
+  //  *
+  //  * Initial untouched values do not trigger a request.
+  //  *
+  //  * Once touched, subsequent changes are validated through the
+  //  * debounced service.
+  //  */
+  // useEffect(() => {
+  //   if (!asyncValidate || !fieldState.isTouched) {
+  //     return;
+  //   }
+
+  //   const value = field.value;
+
+  //   if (typeof value !== "string") {
+  //     return;
+  //   }
+
+  //   if (value.trim().length === 0) {
+  //     const currentError = getFieldState(name).error;
+
+  //     if (currentError?.type === "async") {
+  //       clearErrors(name);
+  //     }
+
+  //     return;
+  //   }
+
+  //   const existingError = getFieldState(name).error;
+
+  //   /**
+  //    * Do not overwrite a synchronous/schema error with an async one.
+  //    */
+  //   if (existingError && existingError.type !== "async") {
+  //     return;
+  //   }
+
+  //   let active = true;
+
+  //   void asyncRule.validate(value).then((result) => {
+  //     if (!active) {
+  //       return;
+  //     }
+
+  //     const currentError = getFieldState(name).error;
+
+  //     if (result === true) {
+  //       if (currentError?.type === "async") {
+  //         clearErrors(name);
+  //       }
+
+  //       return;
+  //     }
+
+  //     /**
+  //      * A synchronous/schema error which appeared while the
+  //      * request was running keeps precedence.
+  //      */
+  //     if (currentError && currentError.type !== "async") {
+  //       return;
+  //     }
+
+  //     setError(name, {
+  //       type: "async",
+  //       message: String(result),
+  //     });
+  //   });
+
+  //   return () => {
+  //     active = false;
+  //   };
+  // }, [
+  //   asyncDebounceMs,
+  //   asyncRule,
+  //   asyncValidate,
+  //   clearErrors,
+  //   field.value,
+  //   fieldState.isTouched,
+  //   getFieldState,
+  //   name,
+  //   setError,
+  // ]);
 
   /**
-   * Resolver-independent server validation.
-   *
-   * Initial untouched values do not trigger a request.
-   *
-   * Once touched, subsequent changes are validated through the
-   * debounced service.
-   */
-  useEffect(() => {
-    if (!asyncValidate || !fieldState.isTouched) {
-      return;
-    }
-
-    const value = field.value;
-
-    if (typeof value !== "string") {
-      return;
-    }
-
-    if (value.trim().length === 0) {
-      const currentError = getFieldState(name).error;
-
-      if (currentError?.type === "async") {
-        clearErrors(name);
-      }
-
-      return;
-    }
-
-    const existingError = getFieldState(name).error;
-
-    /**
-     * Do not overwrite a synchronous/schema error with an async one.
-     */
-    if (existingError && existingError.type !== "async") {
-      return;
-    }
-
-    let active = true;
-
-    void asyncRule.validate(value).then((result) => {
-      if (!active) {
-        return;
-      }
-
-      const currentError = getFieldState(name).error;
-
-      if (result === true) {
-        if (currentError?.type === "async") {
-          clearErrors(name);
-        }
-
-        return;
-      }
-
-      /**
-       * A synchronous/schema error which appeared while the
-       * request was running keeps precedence.
-       */
-      if (currentError && currentError.type !== "async") {
-        return;
-      }
-
-      setError(name, {
-        type: "async",
-        message: String(result),
-      });
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [
-    asyncDebounceMs,
-    asyncRule,
-    asyncValidate,
-    clearErrors,
-    field.value,
-    fieldState.isTouched,
-    getFieldState,
-    name,
-    setError,
-  ]);
-
-  /**
-   * Preserve the existing shake behavior as a behavioral affordance.
+   * Preserve the existing invalid-label animation behavior.
    *
    * Permanent animation styling remains a theme/global concern.
    */
@@ -349,20 +345,22 @@ const ControlledInput = (props: ControlledInputProps) => {
     }
   }, [fieldState.invalid, fieldState.isValidating]);
 
-  useEffect(() => {
-    return () => {
-      setLoading({ source: validationKey, loading: false });
-    };
-  }, [setLoading, validationKey]);
+  // useEffect(() => {
+  //   return () => {
+  //     setLoading({ source: validationKey, loading: false });
+  //   };
+  // }, [setLoading, validationKey]);
 
-  const errorMessage = isFieldValidating
+  const errorMessage = fieldState.isValidating
     ? undefined
     : fieldState.error?.message;
 
   const successMessage =
-    !fieldState.invalid && !isFieldValidating ? validationMessage : undefined;
+    !fieldState.invalid && !fieldState.isValidating
+      ? messages[name]
+      : undefined;
 
-  const validationState = isFieldValidating
+  const validationState = fieldState.isValidating
     ? "validating"
     : fieldState.invalid
       ? "error"
@@ -384,7 +382,7 @@ const ControlledInput = (props: ControlledInputProps) => {
       fieldState={fieldState}
       name={name}
       label={label}
-      isValidating={isFieldValidating}
+      isValidating={fieldState.isValidating}
       validationState={validationState}
       helperText={
         renderHelperText && (

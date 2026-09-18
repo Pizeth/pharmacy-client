@@ -172,6 +172,29 @@ const standardizedFormComponents = {
 
   /**
    * ================================================================
+   * Standard password input
+   * ================================================================
+   *
+   * PasswordField ultimately renders through the same BaseInput
+   * surface as RazethTextField, but it resolves theme defaultProps
+   * under its own component name:
+   *
+   *   RazethPasswordField
+   *
+   * Keep geometry defaults aligned so switching from a text field to
+   * a password field never changes row height/padding.
+   */
+  RazethPasswordField: {
+    defaultProps: {
+      variant: "outlined" as const,
+      margin: "dense" as const,
+      size: "small" as const,
+      fullWidth: true,
+    },
+  },
+
+  /**
+   * ================================================================
    * Standard select input
    * ================================================================
    */
