@@ -48,6 +48,8 @@ import RadioButtonUnchecked from "@mui/icons-material/RadioButtonUnchecked";
 import { ParticleHexBackground } from "@/components/effect/backgrounds/particleHex";
 import { Turnstile } from "@/components/securities/Turnstile";
 import { useRouter } from "next/navigation";
+import { useSetAtom } from "jotai";
+import { resetAllValidationsAtom } from "@/Stores/validationStore";
 
 // ─── Styled slots ─────────────────────────────────────────────────────────────
 
@@ -210,6 +212,7 @@ const AuthForm = (inProps: AuthFormProps) => {
   } = props;
 
   const isLogin = mode === "signin";
+  const resetAllValidations = useSetAtom(resetAllValidationsAtom);
   const router = useRouter();
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -381,7 +384,8 @@ const AuthForm = (inProps: AuthFormProps) => {
   // ✅ CRITICAL: reset when mode changes
   useEffect(() => {
     form.reset(getDefaults(mode));
-  }, [mode, form]);
+    resetAllValidations();
+  }, [mode, form, resetAllValidations]);
 
   const { mutate: login, isPending } = useLogin();
   const { mutate: register, isPending: isRegisterPending } = useRegister<

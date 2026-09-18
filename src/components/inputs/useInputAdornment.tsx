@@ -220,9 +220,16 @@ export function useInputAdornment(
   const isPassword = type === "password";
 
   return useMemo(() => {
+    const effectiveInputType = isPassword
+      ? visible
+        ? "text"
+        : "password"
+      : type;
+
     if (isValidating) {
       return {
-        effectiveType: isPassword && !visible ? "password" : "text",
+        // effectiveType: isPassword && !visible ? "password" : "text",
+        effectiveType: effectiveInputType,
         endAdornment: (
           <EndAdornmentRoot position="end" disablePointerEvents>
             <CircularProgress size={18} color={spinnerColor ?? "primary"} />

@@ -373,6 +373,25 @@ export function BaseInput<TFieldValues extends FieldValues>(
    * - startAdornment
    * - endAdornment
    */
+  /**
+   * MUI's second mergeSlotProps argument must always resolve to a
+   * concrete slot-props value.
+   *
+   * BaseInput's structural props are deliberately the first argument
+   * because the first argument wins ordinary conflicts. This prevents
+   * callers from replacing behavior owned by the standardized input:
+   *
+   * - readOnly
+   * - startAdornment
+   * - endAdornment
+   *
+   * Callers can still extend the slot with:
+   *
+   * - event handlers
+   * - className
+   * - data attributes
+   * - other MUI input-slot configuration
+   */
   const mergedInputSlotProps = mergeSlotProps(
     {
       readOnly,
@@ -381,7 +400,7 @@ export function BaseInput<TFieldValues extends FieldValues>(
       ) : undefined,
       endAdornment,
     },
-    slotProps?.input,
+    slotProps?.input ?? {},
   );
 
   /**
@@ -391,11 +410,20 @@ export function BaseInput<TFieldValues extends FieldValues>(
    * authoritative because it is part of RazethTextField's interaction
    * contract rather than per-call visual styling.
    */
+  /**
+   * The standardized focus/value shrink behavior is likewise owned by
+   * BaseInput.
+   *
+   * Normalize the optional caller slot to an empty object so a normal
+   * TextField with no slotProps never reaches MUI as:
+   *
+   *   mergeSlotProps(internalProps, undefined)
+   */
   const mergedInputLabelSlotProps = mergeSlotProps(
     {
       shrink: shouldShrink,
     },
-    slotProps?.inputLabel,
+    slotProps?.inputLabel ?? {},
   );
 
   return (
@@ -411,8 +439,8 @@ export function BaseInput<TFieldValues extends FieldValues>(
       multiline={multiline}
       disabled={disabled}
       error={Boolean(fieldState.error)}
-      helperText={helperText}
-      // helperText={(isValidating ? "Validating..." : helperText) ?? helperText}
+      // helperText={helperText}
+      helperText={(isValidating ? "Validating..." : helperText) ?? helperText}
       data-start-icon={iconStart ? "true" : "false"}
       data-label-shrunk={shouldShrink ? "true" : "false"}
       data-size={size}
