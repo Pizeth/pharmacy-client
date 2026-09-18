@@ -345,9 +345,7 @@ const ControlledInput = (props: ControlledInputProps) => {
         fieldLabel.classList.remove("shake");
       }, 500);
 
-      return () => {
-        clearTimeout(timer);
-      };
+      return () => clearTimeout(timer);
     }
   }, [fieldState.invalid, fieldState.isValidating]);
 

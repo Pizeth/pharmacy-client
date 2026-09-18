@@ -17,6 +17,7 @@ export const PasswordField = (inProps: PasswordFieldProps) => {
   const props = useThemeProps({ props: inProps, name: PREFIX });
   const {
     name,
+    label,
     rules,
     defaultValue,
     strengthMeter = false,
@@ -38,6 +39,7 @@ export const PasswordField = (inProps: PasswordFieldProps) => {
           field={field}
           fieldState={fieldState}
           name={name}
+          label={label}
           strengthMeter={strengthMeter}
           matchPassword={matchPassword}
           // clearErrors={clearErrors}

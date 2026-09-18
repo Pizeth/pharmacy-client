@@ -24,6 +24,8 @@ const nextConfig: NextConfig = {
     "*.local-hr.razeth.com",
     "asus-hr.razeth.com",
     "*.asus-hr.razeth.com",
+    "hades-hr.razeth.com",
+    "*.hades-hr.razeth.com",
   ],
   images: {
     remotePatterns: [

@@ -19,24 +19,26 @@ import { InputHelperText } from "./helpers/inputHelperText";
 import { useFormContext } from "react-hook-form";
 // import { FieldValues, UseFormClearErrors } from "react-hook-form";
 
-const ControlledPasswordInput = ({
-  field,
-  fieldState,
-  name,
-  label,
-  helperText,
-  strengthMeter,
-  // score = 0,
-  // message = "",
-  matchPassword,
-  // clearErrors,
-  // setError,
-  // isFocused,
-  // onFocusChange,
-  // onFocus,
-  // onBlur,
-  ...rest
-}: ControlledPasswordInputProps) => {
+const ControlledPasswordInput = (props: ControlledPasswordInputProps) => {
+  const {
+    field,
+    fieldState,
+    name,
+    label,
+    helperText,
+    strengthMeter,
+    // score = 0,
+    // message = "",
+    matchPassword,
+    // clearErrors,
+    // setError,
+    // isFocused,
+    // onFocusChange,
+    // onFocus,
+    // onBlur,
+    ...rest
+  } = props;
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   const scores = useAtomValue(validationScoreAtom);
@@ -112,8 +114,11 @@ const ControlledPasswordInput = ({
       const label = containerRef.current?.querySelector<HTMLLabelElement>(
         ".MuiInputLabel-root",
       );
+
       if (!label) return;
+
       label.classList.add("shake");
+
       const t = setTimeout(() => label.classList.remove("shake"), 500);
       return () => clearTimeout(t);
     }
@@ -123,10 +128,20 @@ const ControlledPasswordInput = ({
     ? undefined
     : fieldState.error?.message || message;
 
+  const successMessage =
+    !fieldState.invalid && !isPasswordValidating ? message : undefined;
+
+  const validationState = isPasswordValidating
+    ? "validating"
+    : fieldState.invalid
+      ? "error"
+      : successMessage
+        ? "success"
+        : "idle";
+
   const renderHelperText = !!(
     helperText ||
     errMsg ||
-    // successMessage ||
     fieldState.invalid ||
     isPasswordValidating
   );
