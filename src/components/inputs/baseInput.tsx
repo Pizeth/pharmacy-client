@@ -381,7 +381,7 @@ export function BaseInput<TFieldValues extends FieldValues>(
       ) : undefined,
       endAdornment,
     },
-    slotProps?.input,
+    slotProps?.input ?? {},
   );
 
   /**
@@ -395,7 +395,7 @@ export function BaseInput<TFieldValues extends FieldValues>(
     {
       shrink: shouldShrink,
     },
-    slotProps?.inputLabel,
+    slotProps?.inputLabel ?? {},
   );
 
   return (
