@@ -2,11 +2,17 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { FormProvider, useForm } from "react-hook-form";
 import { AccountBox, KeyOutlined } from "@mui/icons-material";
 import { TextField } from "./textfield";
+// import ControlledInput from "./controlledInput";
+// import userEvent from "@testing-library/user-event";
 
 interface Values {
   key: string;
   officialId: string;
 }
+
+// interface TestFormValues {
+//   email: string;
+// }
 
 function Fixture() {
   const form = useForm<Values>({
@@ -81,3 +87,55 @@ it("forwards caller htmlInput slot props to the native input", () => {
   expect(input).toHaveAttribute("inputmode", "numeric");
   expect(input).toHaveAttribute("pattern", "[0-9]*");
 });
+
+// function ControlledEmailHarness(): React.JSX.Element {
+//   const { control } = useForm<TestFormValues>({
+//     defaultValues: {
+//       email: "",
+//     },
+//   });
+
+//   return (
+//     <ControlledInput
+//       control={control}
+//       name="email"
+//       type="email"
+//       label="Email"
+//       slotProps={{
+//         htmlInput: {
+//           dir: "ltr",
+//         },
+//       }}
+//     />
+//   );
+// }
+
+// it("preserves character order in an RHF-controlled email input", async () => {
+//   const user = userEvent.setup();
+
+//   render(<ControlledEmailHarness />);
+
+//   const input = screen.getByRole("textbox", {
+//     name: "Email",
+//   });
+
+//   await user.type(input, "Apple");
+
+//   expect(input).toHaveValue("Apple");
+// });
+
+// it("keeps the caret after the inserted text", async () => {
+//   const user = userEvent.setup();
+
+//   render(<ControlledEmailHarness />);
+
+//   const input = screen.getByRole("textbox", {
+//     name: "Email",
+//   }) as HTMLInputElement;
+
+//   await user.type(input, "Apple");
+
+//   expect(input.value).toBe("Apple");
+//   expect(input.selectionStart).toBe(5);
+//   expect(input.selectionEnd).toBe(5);
+// });
