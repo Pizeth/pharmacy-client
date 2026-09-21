@@ -116,6 +116,18 @@ export const dataTableClasses = generateUtilityClasses(
     "selectRowCheckbox",
     "expandRowButton",
     "expandAllButton",
+
+    /**
+     * ============================================================
+     * Row actions
+     * ============================================================
+     */
+    "rowActions",
+    "rowActionButton",
+    "rowActionsMenuButton",
+    "rowActionsMenuItem",
+    "rowActionsMenuItemIcon",
+
     "refreshingIndicator",
     "body",
     "bodyRow",
@@ -278,7 +290,8 @@ export type DataTableClassKey = keyof typeof dataTableClasses;
  *   theme.components.RazethDataTable.styleOverrides.<key>
  */
 export type DataTableNonSlotClassKey =
-  "globalFilterFullWidth" | "globalFilterClearButton";
+  | "globalFilterFullWidth"
+  | "globalFilterClearButton";
 
 /**
  * Named structural slots addressable through:

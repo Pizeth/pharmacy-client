@@ -1,49 +1,54 @@
 "use client";
 
-import { useState } from "react";
-// import { TranslationKeyCreateForm } from "../forms/TranslationKeyCreateForm";
+import { useMemo, useState } from "react";
 import {
-  // Dialog,
-  // DialogTitle,
-  // DialogContent,
   Alert,
-  Box,
   Button,
   CircularProgress,
   Paper,
-  Stack,
   Typography,
 } from "@mui/material";
+import {
+  AddRounded,
+  DeleteOutline,
+  EditOutlined,
+  Refresh,
+} from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
-import { AddRounded, Refresh } from "@mui/icons-material";
 import { DataTable } from "@/components/DataTable";
-import { TranslationKeyApiError } from "../api";
-import { TranslationKeyCreateDialog } from "../forms";
-import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
+import type { DataTableRowAction } from "@/components/DataTable";
 import { ResourceActionButton } from "@/components/buttons";
+import { TranslationKeyApiError } from "../api";
+import {
+  TranslationKeyCreateDialog,
+  TranslationKeyDeleteDialog,
+  TranslationKeyEditDialog,
+} from "../forms";
+import type { TranslationKey } from "../schemas";
+import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
 
-const PREFIX = "RazethTranslationKeyTable";
+const COMPONENT_NAME = "RazethTranslationKeyTable";
 
 const Root = styled("section", {
-  name: PREFIX,
+  name: COMPONENT_NAME,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
 })({});
 
 const LoadingRoot = styled(Paper, {
-  name: PREFIX,
+  name: COMPONENT_NAME,
   slot: "Card",
   overridesResolver: (_props, styles) => styles.card,
 })({});
 
 const LoadingContentRoot = styled("div", {
-  name: PREFIX,
+  name: COMPONENT_NAME,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
 })({});
 
 const TableRegionRoot = styled("div", {
-  name: PREFIX,
+  name: COMPONENT_NAME,
   slot: "Main",
   overridesResolver: (_props, styles) => styles.main,
 })({});
@@ -66,27 +71,48 @@ function getTranslationKeyTableErrorMessage(error: unknown): string {
   return "Unable to load translation keys.";
 }
 
-const CreateKeyButton = styled(Button)(({ theme }) => ({
-  borderRadius: 999,
-  paddingInline: theme.spacing(2),
-  fontWeight: 700,
-  whiteSpace: "nowrap",
-  boxShadow: theme.shadows[2],
-}));
-
 /**
  * First real production resource using the custom TanStack v9 + MUI
  * DataTable stack.
  */
 export function TranslationKeyTable() {
-  // const [createOpen, setCreateOpen] = useState(false);
-  // const [creating, setCreating] = useState(false);
-  // const [createdKey, setCreatedKey] = useState<string>();
-
   const [createOpen, setCreateOpen] = useState(false);
-  const [createdKey, setCreatedKey] = useState<string>();
-  const { table, server, filterOptions, refresh } =
-    useTranslationKeyDataTable();
+  const [editingRecord, setEditingRecord] = useState<TranslationKey | null>(
+    null,
+  );
+  const [successMessage, setSuccessMessage] = useState<string>();
+  const [deletingRecord, setDeletingRecord] = useState<TranslationKey | null>(
+    null,
+  );
+
+  const rowActions = useMemo<readonly DataTableRowAction<TranslationKey>[]>(
+    () => [
+      {
+        id: "edit",
+        label: "Edit",
+        inline: true,
+        color: "primary",
+        renderIcon: () => <EditOutlined fontSize="small" />,
+        onClick: ({ row }) => {
+          setEditingRecord(row.original);
+        },
+      },
+      {
+        id: "delete",
+        label: "Delete",
+        color: "error",
+        renderIcon: () => <DeleteOutline fontSize="small" />,
+        onClick: ({ row }) => setDeletingRecord(row.original),
+      },
+    ],
+    [],
+  );
+
+  // const [createdKey, setCreatedKey] = useState<string>();
+  const { table, query, server, filterOptions, refresh } =
+    useTranslationKeyDataTable({
+      rowActions,
+    });
 
   /**
    * ================================================================
@@ -99,26 +125,6 @@ export function TranslationKeyTable() {
    * DataTable and use its non-blocking refresh indicator instead.
    */
   if (server.isInitialLoading) {
-    // return (
-    //   <Paper
-    //     variant="outlined"
-    //     sx={{
-    //       minHeight: 360,
-    //       display: "grid",
-    //       placeItems: "center",
-    //       p: 4,
-    //     }}
-    //   >
-    //     <Stack spacing={2} alignItems="center">
-    //       <CircularProgress />
-
-    //       <Typography variant="body2" color="text.secondary">
-    //         Loading translation keys…
-    //       </Typography>
-    //     </Stack>
-    //   </Paper>
-    // );
-
     return (
       <LoadingRoot variant="outlined">
         <LoadingContentRoot>
@@ -176,36 +182,12 @@ export function TranslationKeyTable() {
    */
   return (
     <Root>
-      {/* <Dialog
-        open={createOpen}
-        onClose={() => {
-          if (!creating) setCreateOpen(false);
-        }}
-        fullWidth
-        maxWidth="sm"
-        aria-labelledby="create-key-title"
-      >
-        <DialogTitle id="create-key-title">Create translation key</DialogTitle>
-        <DialogContent>
-          {createOpen && (
-            <TranslationKeyCreateForm
-              onPendingChange={setCreating}
-              onCancel={() => setCreateOpen(false)}
-              onCreated={(record) => {
-                setCreateOpen(false);
-                setCreatedKey(record.key);
-                refresh();
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog> */}
       <TranslationKeyCreateDialog
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         onCreated={(record) => {
           setCreateOpen(false);
-          setCreatedKey(record.key);
+          setSuccessMessage(`Created translation key: ${record.key}`);
 
           /**
            * Refresh the current server query without remounting the table.
@@ -223,31 +205,48 @@ export function TranslationKeyTable() {
         }}
       />
 
-      {createdKey && (
-        <Alert severity="success" onClose={() => setCreatedKey(undefined)}>
-          Created translation key: {createdKey}
+      <TranslationKeyEditDialog
+        record={editingRecord}
+        onClose={() => {
+          setEditingRecord(null);
+        }}
+        onUpdated={(record) => {
+          setEditingRecord(null);
+          setSuccessMessage(`Updated translation key: ${record.key}`);
+          refresh();
+        }}
+      />
+
+      <TranslationKeyDeleteDialog
+        record={deletingRecord}
+        onClose={() => setDeletingRecord(null)}
+        onDeleted={(record) => {
+          setDeletingRecord(null);
+          setSuccessMessage(`Deleted translation key: ${record.key}`);
+          const { pageIndex } = query.state.pagination;
+          if (
+            pageIndex > 0 &&
+            server.rows.length === 1 &&
+            server.rows[0].id === record.id
+          ) {
+            // Changing the resource query triggers its replacement request.
+            query.onPaginationChange((previous) => ({
+              ...previous,
+              pageIndex: Math.max(0, previous.pageIndex - 1),
+            }));
+          } else {
+            refresh();
+          }
+        }}
+      />
+
+      {successMessage && (
+        <Alert severity="success" onClose={() => setSuccessMessage(undefined)}>
+          {successMessage}
         </Alert>
       )}
 
-      {/* {server.refreshError ? (
-        <Alert
-          severity="warning"
-          action={
-            <Button
-              color="inherit"
-              size="small"
-              startIcon={<Refresh />}
-              onClick={refresh}
-            >
-              Retry
-            </Button>
-          }
-        >
-          {getTranslationKeyTableErrorMessage(server.refreshError)}
-        </Alert>
-      ) : null} */}
-
-      {!!server.refreshError && (
+      {Boolean(server.refreshError) && (
         <Alert
           severity="warning"
           action={
@@ -266,7 +265,7 @@ export function TranslationKeyTable() {
       )}
 
       <TableRegionRoot>
-        {!!filterOptions.error && (
+        {Boolean(filterOptions.error) && (
           <Alert
             severity="warning"
             action={
@@ -284,25 +283,6 @@ export function TranslationKeyTable() {
             remain available.
           </Alert>
         )}
-
-        {/* {filterOptions.error ? (
-          <Alert
-            severity="warning"
-            action={
-              <Button
-                color="inherit"
-                size="small"
-                startIcon={<Refresh />}
-                onClick={filterOptions.refresh}
-              >
-                Retry
-              </Button>
-            }
-          >
-            Category filter options could not be loaded. Other table filters
-            remain available.
-          </Alert>
-        ) : null} */}
 
         <DataTable
           table={table}

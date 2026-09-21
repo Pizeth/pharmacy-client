@@ -14,6 +14,7 @@ import {
 } from "./TranslationKeyFormFields";
 
 import type { TranslationKeyFormValues } from "./TranslationKeyFormFields";
+import { TranslationKeyFormShell } from "./TranslationKeyFormShell";
 
 export interface TranslationKeyCreateFormProps {
   readonly onCreated: (record: TranslationKey) => void;
@@ -86,7 +87,6 @@ export function TranslationKeyCreateForm(props: TranslationKeyCreateFormProps) {
     }
 
     clearErrors();
-
     setRequestError(undefined);
 
     /**
@@ -167,11 +167,20 @@ export function TranslationKeyCreateForm(props: TranslationKeyCreateFormProps) {
 
   return (
     <FormProvider {...form}>
-      <Stack
+      {/* <Stack
         component="form"
         noValidate
         spacing={3}
         aria-busy={pending}
+        onSubmit={submit}
+      > */}
+      <TranslationKeyFormShell
+        pending={pending}
+        submitDisabled={categoryUnavailable}
+        cancelLabel={cancelLabel}
+        submitLabel="Create key"
+        pendingLabel="Creating..."
+        onCancel={onCancel}
         onSubmit={submit}
       >
         {requestError && <Alert severity="error">{requestError}</Alert>}
@@ -207,7 +216,7 @@ export function TranslationKeyCreateForm(props: TranslationKeyCreateFormProps) {
           categoryOptions={options.categoryOptions}
         />
 
-        <Stack
+        {/* <Stack
           direction={{
             xs: "column-reverse",
             sm: "row",
@@ -236,8 +245,10 @@ export function TranslationKeyCreateForm(props: TranslationKeyCreateFormProps) {
           >
             {pending ? "Creating..." : "Create key"}
           </Button>
-        </Stack>
-      </Stack>
+        </Stack> */}
+      </TranslationKeyFormShell>
+
+      {/* </Stack> */}
     </FormProvider>
   );
 }

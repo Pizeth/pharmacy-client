@@ -403,6 +403,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme, open }) => ({
   flexGrow: 1,
+  minWidth: 0,
   [theme.breakpoints.up("xs")]: {
     paddingTop: theme.spacing(5),
   },

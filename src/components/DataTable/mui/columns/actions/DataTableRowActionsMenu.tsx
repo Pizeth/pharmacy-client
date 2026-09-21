@@ -8,12 +8,48 @@ import {
   MenuItem,
   Tooltip,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import { MoreVert } from "@mui/icons-material";
 import { useState } from "react";
 import type { MouseEvent } from "react";
 import type { RowData } from "@tanstack/table-core";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { ResolvedDataTableRowAction } from "./resolvedTypes";
+
+const MenuButtonRoot = styled(IconButton, {
+  name: DATA_TABLE_COMPONENT_NAME,
+
+  slot: "RowActionsMenuButton",
+
+  overridesResolver: (_props, styles) => styles.rowActionsMenuButton,
+})(({ theme }) => ({
+  width: 28,
+  height: 28,
+  "&:focus-visible": {
+    outline: `2px solid ${theme.palette.primary.main}`,
+    outlineOffset: 2,
+  },
+}));
+
+const MenuItemRoot = styled(MenuItem, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "RowActionsMenuItem",
+  overridesResolver: (_props, styles) => styles.rowActionsMenuItem,
+})(({ theme }) => ({
+  '&[data-color="error"]': {
+    color: theme.palette.error.main,
+  },
+}));
+
+const MenuItemIconRoot = styled(ListItemIcon, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "RowActionsMenuItemIcon",
+  overridesResolver: (_props, styles) => styles.rowActionsMenuItemIcon,
+})(({ theme }) => ({
+  '[data-color="error"] &': {
+    color: theme.palette.error.main,
+  },
+}));
 
 export interface DataTableRowActionsMenuProps<TData extends RowData> {
   readonly actions: readonly ResolvedDataTableRowAction<TData>[];
@@ -53,7 +89,8 @@ export function DataTableRowActionsMenu<TData extends RowData>(
   return (
     <>
       <Tooltip title="More actions">
-        <IconButton
+        <MenuButtonRoot
+          className={dataTableClasses.rowActionsMenuButton}
           size="small"
           aria-label={`More actions for row ${rowId}`}
           aria-haspopup="menu"
@@ -71,7 +108,7 @@ export function DataTableRowActionsMenu<TData extends RowData>(
           }}
         >
           <MoreVert fontSize="small" />
-        </IconButton>
+        </MenuButtonRoot>
       </Tooltip>
 
       <Menu
@@ -85,18 +122,15 @@ export function DataTableRowActionsMenu<TData extends RowData>(
             "aria-label": `Actions for row ${rowId}`,
           },
         }}
-        // MenuListProps={{
-        //   dense: true,
-
-        //   "aria-label": `Actions for row ${rowId}`,
-        // }}
       >
         {actions.map((action) => {
           const { definition, context, icon, disabled, color } = action;
 
           return (
-            <MenuItem
+            <MenuItemRoot
               key={definition.id}
+              className={dataTableClasses.rowActionsMenuItem}
+              data-color={color === "error" ? "error" : undefined}
               disabled={disabled}
               onClick={(event) => {
                 event.preventDefault();
@@ -115,17 +149,15 @@ export function DataTableRowActionsMenu<TData extends RowData>(
               }}
             >
               {icon !== null && (
-                <ListItemIcon
-                  sx={{
-                    color: color === "error" ? "error.main" : undefined,
-                  }}
+                <MenuItemIconRoot
+                  className={dataTableClasses.rowActionsMenuItemIcon}
                 >
                   {icon}
-                </ListItemIcon>
+                </MenuItemIconRoot>
               )}
 
               <ListItemText>{definition.label}</ListItemText>
-            </MenuItem>
+            </MenuItemRoot>
           );
         })}
       </Menu>

@@ -381,6 +381,11 @@ const standardizedFormComponents = {
         gap: theme.spacing(2),
       }),
 
+      keyCell: {
+        fontFamily: "monospace",
+        fontWeight: 600,
+      },
+
       main: {
         minWidth: 0,
 

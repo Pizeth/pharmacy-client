@@ -2,7 +2,7 @@
 
 // src/features/i18n/translation-keys/columns/translationKeyColumns.tsx
 
-import { Tooltip, Typography } from "@mui/material";
+import { Tooltip, Typography, TypographyProps } from "@mui/material";
 // import {
 //   createMuiDataTableColumnHelper,
 //   DataTableRowNumberCell,
@@ -20,6 +20,15 @@ import {
   TranslationKeyValuesCell,
 } from "./translationKeyCells";
 import { TRANSLATION_KEY_LOCALE_FILTER_OPTIONS } from "./translationKeyFilterOptions";
+import { createActionsColumn } from "@/components/DataTable/mui/columns/actions";
+import type { DataTableRowAction } from "@/components/DataTable/mui/columns/actions";
+import { styled } from "@mui/material/styles";
+
+const KeyCellRoot = styled(Typography, {
+  name: "RazethTranslationKeyTable",
+  slot: "KeyCell",
+  overridesResolver: (_props, styles) => styles.keyCell,
+})<TypographyProps>({});
 
 /**
  * ------------------------------------------------------------------
@@ -57,6 +66,12 @@ export interface CreateTranslationKeyColumnsOptions {
    * another column refactor.
    */
   readonly localeFilterOptions?: readonly MuiDataTableFilterOption[];
+
+  /**
+   * Resource-owned commands rendered through the generic actions
+   * display column.
+   */
+  readonly rowActions?: readonly DataTableRowAction<TranslationKey>[];
 }
 
 /**
@@ -111,6 +126,7 @@ export function createTranslationKeyColumns(
     categoryFilterOptionsFetching = false,
     categoryFilterOptionsError,
     localeFilterOptions = TRANSLATION_KEY_LOCALE_FILTER_OPTIONS,
+    rowActions = [],
   } = options;
 
   /**
@@ -252,23 +268,9 @@ export function createTranslationKeyColumns(
       },
       cell: ({ getValue }) => (
         <Tooltip title={getValue()}>
-          <Typography
-            component="span"
-            variant="body2"
-            noWrap
-            sx={{
-              /**
-               * Existing styling retained for now.
-               *
-               * This moves into a resource/MUI slot during the later
-               * styling audit.
-               */
-              fontFamily: "monospace",
-              fontWeight: 600,
-            }}
-          >
+          <KeyCellRoot component="span" variant="body2" noWrap>
             {getValue()}
-          </Typography>
+          </KeyCellRoot>
         </Tooltip>
       ),
     }),
@@ -383,9 +385,10 @@ export function createTranslationKeyColumns(
         filterOptions: categoryFilterOptions,
         filterOptionsLoading: categoryFilterOptionsFetching,
         filterDisabled: categoryFilterOptionsError != null,
-        filterOptionsError: categoryFilterOptionsError != null
-          ? "Category options could not be loaded."
-          : undefined,
+        filterOptionsError:
+          categoryFilterOptionsError != null
+            ? "Category options could not be loaded."
+            : undefined,
       },
       cell: ({ getValue }) => <TranslationKeyCategoryCell name={getValue()} />,
     }),
@@ -535,5 +538,18 @@ export function createTranslationKeyColumns(
       maxSize: 260,
       cell: ({ getValue }) => <TranslationKeyDateTimeCell value={getValue()} />,
     }),
+    ...(rowActions.length > 0
+      ? [
+          createActionsColumn<TranslationKey>({
+            actions: rowActions,
+
+            size: 96,
+
+            maxInlineActions: 1,
+
+            enablePinning: true,
+          }),
+        ]
+      : []),
   ]);
 }

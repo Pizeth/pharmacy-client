@@ -17,6 +17,12 @@ import type { TranslationKey } from "../schemas";
 import { useTranslationKeyDataTableRequest } from "./useTranslationKeyDataTableRequest";
 import { useTranslationKeyFilterOptions } from "./useTranslationKeyFilterOptions";
 import type { TranslationKeyFilterOptionsState } from "./useTranslationKeyFilterOptions";
+import type { DataTableRowAction } from "@/components/DataTable/mui/columns/actions";
+import { DATA_TABLE_ACTIONS_COLUMN_ID } from "@/components/DataTable/mui/columns/actions";
+
+export interface UseTranslationKeyDataTableOptions {
+  readonly rowActions?: readonly DataTableRowAction<TranslationKey>[];
+}
 
 /**
  * Complete TranslationKey DataTable controller result.
@@ -79,7 +85,10 @@ export interface UseTranslationKeyDataTableResult {
  *         ↓
  *   useMuiDataTable()
  */
-export function useTranslationKeyDataTable(): UseTranslationKeyDataTableResult {
+export function useTranslationKeyDataTable(
+  options: UseTranslationKeyDataTableOptions = {},
+): UseTranslationKeyDataTableResult {
+  const { rowActions = [] } = options;
   const theme = useTheme();
 
   /**
@@ -107,10 +116,16 @@ export function useTranslationKeyDataTable(): UseTranslationKeyDataTableResult {
         categoryFilterOptions: filterOptions.categoryOptions,
         categoryFilterOptionsFetching: filterOptions.fetching,
         categoryFilterOptionsError: filterOptions.error,
-
         localeFilterOptions: filterOptions.localeOptions,
+        rowActions,
       }),
-    [filterOptions.categoryOptions, filterOptions.localeOptions, filterOptions.fetching, filterOptions.error],
+    [
+      filterOptions.categoryOptions,
+      filterOptions.localeOptions,
+      filterOptions.fetching,
+      filterOptions.error,
+      rowActions,
+    ],
   );
 
   /**
@@ -316,6 +331,18 @@ export function useTranslationKeyDataTable(): UseTranslationKeyDataTableResult {
      * creation time rather than being mutated by the renderer.
      */
     columnResizeDirection: theme.direction,
+
+    enableColumnPinning: true,
+
+    initialState:
+      rowActions.length > 0
+        ? {
+            columnPinning: {
+              start: [],
+              end: [DATA_TABLE_ACTIONS_COLUMN_ID],
+            },
+          }
+        : undefined,
 
     /**
      * ------------------------------------------------------------

@@ -38,6 +38,14 @@ const DETAIL_PANEL_STRUCTURAL_SLOTS = [
   "detailPanel",
 ] as const satisfies readonly DataTableClassKey[];
 
+const ROW_ACTION_STRUCTURAL_SLOTS = [
+  "rowActions",
+  "rowActionButton",
+  "rowActionsMenuButton",
+  "rowActionsMenuItem",
+  "rowActionsMenuItemIcon",
+] as const satisfies readonly DataTableClassKey[];
+
 /**
  * Compile-time assertion helper.
  *
@@ -118,5 +126,26 @@ describe("RazethDataTable utility classes", () => {
     expect(dataTableClasses.globalFilterClearButton).toBe(
       `${DATA_TABLE_COMPONENT_NAME}-globalFilterClearButton`,
     );
+  });
+
+  it.each(ROW_ACTION_STRUCTURAL_SLOTS)(
+    "registers %s as a stable row-action utility class",
+    (slot) => {
+      expect(dataTableClasses[slot]).toBe(
+        `${DATA_TABLE_COMPONENT_NAME}-${slot}`,
+      );
+
+      expect(getDataTableUtilityClass(slot)).toBe(
+        `${DATA_TABLE_COMPONENT_NAME}-${slot}`,
+      );
+    },
+  );
+
+  it("exposes row-action structural classes as theme slots", () => {
+    const slots = ROW_ACTION_STRUCTURAL_SLOTS.map((slot) =>
+      asDataTableSlot(slot),
+    );
+
+    expect(slots).toEqual(ROW_ACTION_STRUCTURAL_SLOTS);
   });
 });
