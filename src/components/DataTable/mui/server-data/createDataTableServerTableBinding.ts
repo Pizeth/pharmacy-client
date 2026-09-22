@@ -57,6 +57,14 @@ export function createDataTableServerTableBinding<TData extends RowData>(
     manualFiltering: true,
 
     /**
+     * Exact row count comes from the same normalized server boundary.
+     *
+     * TanStack can now expose the true result range to generic
+     * pagination presentation.
+     */
+    rowCount: result.pagination.rowCount,
+
+    /**
      * Page count comes from the normalized server metadata.
      *
      * Before the first result this may be -1.
