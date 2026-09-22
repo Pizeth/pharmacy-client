@@ -123,7 +123,7 @@ export function DataTablePagination<TData extends RowData>(
         const knownRowCount =
           table.options.rowCount ??
           (!table.options.manualPagination
-            ? table.getPrePaginationRowModel().rows.length
+            ? table.options.data.length
             : undefined);
 
         /**
