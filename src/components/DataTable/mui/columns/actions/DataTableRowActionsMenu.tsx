@@ -96,16 +96,6 @@ export function DataTableRowActionsMenu<TData extends RowData>(
           aria-haspopup="menu"
           aria-expanded={open ? "true" : undefined}
           onClick={handleOpen}
-          sx={{
-            width: 28,
-            height: 28,
-
-            "&:focus-visible": {
-              outline: "2px solid",
-              outlineColor: "primary.main",
-              outlineOffset: 2,
-            },
-          }}
         >
           <MoreVert fontSize="small" />
         </MenuButtonRoot>
@@ -143,9 +133,6 @@ export function DataTableRowActionsMenu<TData extends RowData>(
                 handleClose();
 
                 definition.onClick(context);
-              }}
-              sx={{
-                color: color === "error" ? "error.main" : undefined,
               }}
             >
               {icon !== null && (
