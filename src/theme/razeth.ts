@@ -399,6 +399,87 @@ const standardizedFormComponents = {
       },
     },
   },
+
+  /**
+   * ================================================================
+   * TranslationValue detail panel
+   * ================================================================
+   *
+   * This is application/resource presentation rendered inside the
+   * generic DataTable detail-panel region.
+   *
+   * No row/translation resource data is placed into ownerState.
+   */
+  RazethTranslationValuesPanel: {
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        padding: theme.spacing(2, 3),
+        minWidth: 0,
+        backgroundColor: theme.vars.palette.background.paper,
+      }),
+
+      heading: ({ theme }: { theme: Theme }) => ({
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: theme.spacing(2),
+        minWidth: 0,
+        marginBottom: theme.spacing(2),
+        color: theme.vars.palette.text.primary,
+        [theme.breakpoints.down("sm")]: {
+          alignItems: "stretch",
+          flexDirection: "column",
+        },
+      }),
+
+      main: {
+        minWidth: 0,
+        whiteSpace: "pre-wrap",
+        overflowWrap: "anywhere",
+      },
+
+      content: ({ theme }: { theme: Theme }) => ({
+        display: "grid",
+        gap: theme.spacing(1),
+        marginTop: theme.spacing(1.5),
+      }),
+
+      item: ({ theme }: { theme: Theme }) => ({
+        display: "grid",
+        gridTemplateColumns: "auto minmax(0, 1fr)",
+        alignItems: "start",
+        gap: theme.spacing(2),
+        padding: theme.spacing(1.5, 2),
+        border: `1px solid ${theme.vars.palette.divider}`,
+        borderRadius: theme.spacing(1.5),
+        backgroundColor: theme.alpha(
+          theme.vars.palette.background.default,
+          0.4,
+        ),
+
+        [theme.breakpoints.down("sm")]: {
+          gridTemplateColumns: "1fr",
+          gap: theme.spacing(1),
+        },
+      }),
+
+      wrapper: {
+        minWidth: 0,
+        // overflowWrap: "anywhere",
+      },
+
+      caption: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        padding: theme.spacing(2),
+        textAlign: "center",
+        color: theme.vars.palette.text.secondary,
+      }),
+
+      label: {
+        justifySelf: "start",
+      },
+    },
+  },
 } as const;
 
 const defaultThemeInvariants = {

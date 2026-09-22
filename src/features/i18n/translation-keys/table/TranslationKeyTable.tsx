@@ -23,9 +23,11 @@ import {
   TranslationKeyCreateDialog,
   TranslationKeyDeleteDialog,
   TranslationKeyEditDialog,
+  TranslationValueCreateDialog,
 } from "../forms";
 import type { TranslationKey } from "../schemas";
 import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
+import { TranslationKeyTranslationsPanel } from "./TranslationKeyTranslationsPanel";
 
 const COMPONENT_NAME = "RazethTranslationKeyTable";
 
@@ -84,6 +86,8 @@ export function TranslationKeyTable() {
   const [deletingRecord, setDeletingRecord] = useState<TranslationKey | null>(
     null,
   );
+  const [creatingTranslationFor, setCreatingTranslationFor] =
+    useState<TranslationKey | null>(null);
 
   const rowActions = useMemo<readonly DataTableRowAction<TranslationKey>[]>(
     () => [
@@ -108,10 +112,15 @@ export function TranslationKeyTable() {
     [],
   );
 
-  // const [createdKey, setCreatedKey] = useState<string>();
   const { table, query, server, filterOptions, refresh } =
     useTranslationKeyDataTable({
       rowActions,
+
+      /**
+       * TranslationKey is the first production resource to consume the
+       * already-finished generic detail-panel architecture.
+       */
+      enableTranslationDetails: true,
     });
 
   /**
@@ -240,6 +249,38 @@ export function TranslationKeyTable() {
         }}
       />
 
+      <TranslationValueCreateDialog
+        record={creatingTranslationFor}
+        onClose={() => {
+          setCreatingTranslationFor(null);
+        }}
+        onCreated={(translation) => {
+          const key = creatingTranslationFor?.key;
+
+          setCreatingTranslationFor(null);
+
+          setSuccessMessage(
+            key
+              ? `Added ${translation.locale.toLocaleUpperCase()} translation for: ${key}`
+              : `Added ${translation.locale.toLocaleUpperCase()} translation.`,
+          );
+
+          /**
+           * Preserve:
+           *
+           * - global search
+           * - column filters
+           * - sorting
+           * - page size
+           * - current page
+           *
+           * while refreshing the canonical TranslationKey row that
+           * contains the new nested TranslationValue.
+           */
+          refresh();
+        }}
+      />
+
       {successMessage && (
         <Alert severity="success" onClose={() => setSuccessMessage(undefined)}>
           {successMessage}
@@ -286,6 +327,27 @@ export function TranslationKeyTable() {
 
         <DataTable
           table={table}
+          /**
+           * ----------------------------------------------------------
+           * Nested translation values
+           * ----------------------------------------------------------
+           *
+           * The current server row already contains:
+           *
+           *   row.original.translations
+           *
+           * so expansion is a pure presentation interaction.
+           *
+           * No detail HTTP request is manufactured here.
+           */
+          renderDetailPanel={({ row }) => (
+            <TranslationKeyTranslationsPanel
+              record={row.original}
+              onCreate={(record) => {
+                setCreatingTranslationFor(record);
+              }}
+            />
+          )}
           /**
            * Use the renderer's built-in non-blocking refresh indicator.
            *

@@ -1,38 +1,21 @@
 import type { MuiDataTableFilterOption } from "@/components/DataTable/mui/meta";
 import type { TranslationCategory } from "../schemas";
+import { TRANSLATION_KEY_LOCALE_OPTIONS } from "../locales";
 
 /**
  * ------------------------------------------------------------------
  * TranslationKey locale filter options
  * ------------------------------------------------------------------
  *
- * These are resource/application values rather than generic DataTable
- * knowledge.
- *
- * The generic select filter only knows:
+ * DataTable gets its generic:
  *
  *   label
  *   value
  *
- * TranslationKey decides that:
- *
- *   English -> "en"
- *   Khmer   -> "km"
- *
- * Later, when the application's supported-locale configuration becomes
- * the canonical source, this constant can be replaced without changing
- * the generic DataTable filter implementation.
+ * representation from the resource-level locale registry.
  */
-export const TRANSLATION_KEY_LOCALE_FILTER_OPTIONS = [
-  {
-    label: "English",
-    value: "en",
-  },
-  {
-    label: "Khmer",
-    value: "km",
-  },
-] as const satisfies readonly MuiDataTableFilterOption[];
+export const TRANSLATION_KEY_LOCALE_FILTER_OPTIONS =
+  TRANSLATION_KEY_LOCALE_OPTIONS satisfies readonly MuiDataTableFilterOption[];
 
 /**
  * Convert TranslationCategory resources into the generic option shape

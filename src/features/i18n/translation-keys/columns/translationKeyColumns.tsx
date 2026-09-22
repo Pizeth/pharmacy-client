@@ -23,6 +23,7 @@ import { TRANSLATION_KEY_LOCALE_FILTER_OPTIONS } from "./translationKeyFilterOpt
 import { createActionsColumn } from "@/components/DataTable/mui/columns/actions";
 import type { DataTableRowAction } from "@/components/DataTable/mui/columns/actions";
 import { styled } from "@mui/material/styles";
+import { createExpansionColumn } from "@/components/DataTable/mui/columns/expansion";
 
 const KeyCellRoot = styled(Typography, {
   name: "RazethTranslationKeyTable",
@@ -72,6 +73,15 @@ export interface CreateTranslationKeyColumnsOptions {
    * display column.
    */
   readonly rowActions?: readonly DataTableRowAction<TranslationKey>[];
+
+  /**
+   * Add the generic DataTable expansion utility column.
+   *
+   * False by default so callers which only need the query/table
+   * controller do not accidentally render an expansion affordance
+   * without a detail-panel renderer.
+   */
+  readonly enableTranslationDetails?: boolean;
 }
 
 /**
@@ -127,6 +137,7 @@ export function createTranslationKeyColumns(
     categoryFilterOptionsError,
     localeFilterOptions = TRANSLATION_KEY_LOCALE_FILTER_OPTIONS,
     rowActions = [],
+    enableTranslationDetails = false,
   } = options;
 
   /**
@@ -158,6 +169,34 @@ export function createTranslationKeyColumns(
    *   "throw"
    */
   return columnHelper.columns([
+    /**
+     * ==============================================================
+     * Translation detail expansion
+     * ==============================================================
+     *
+     * Generic DataTable owns the expansion mechanism.
+     *
+     * TranslationKey merely opts into it.
+     *
+     * It has no:
+     *
+     * - API field
+     * - server sort
+     * - server filter
+     * - persistence meaning
+     *
+     * Expand-all is intentionally hidden for this resource.
+     *
+     * Translation detail panels contain resource-management UI in
+     * later 7.4 slices, so expanding an entire server page at once
+     * would create unnecessary visual noise.
+     */
+    createExpansionColumn<TranslationKey>({
+      size: 44,
+      enablePinning: true,
+      showExpandAll: true,
+    }),
+
     /**
      * ==============================================================
      * Sequential row number

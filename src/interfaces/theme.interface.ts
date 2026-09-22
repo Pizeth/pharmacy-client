@@ -99,6 +99,16 @@ export interface RazethComponentsPropsList extends DataTableComponentsPropsList 
   RazethTranslationKeyForm: Record<string, never>;
 
   RazethTranslationKeyTable: Record<string, never>;
+
+  /**
+   * TranslationValue detail-panel surface.
+   *
+   * No public styling props are required.
+   *
+   * Runtime data remains in the resource component rather than being
+   * exposed through theme ownerState.
+   */
+  RazethTranslationValuesPanel: Record<string, never>;
 }
 
 export interface SideImage {

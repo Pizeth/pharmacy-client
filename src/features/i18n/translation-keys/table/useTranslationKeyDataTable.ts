@@ -19,9 +19,18 @@ import { useTranslationKeyFilterOptions } from "./useTranslationKeyFilterOptions
 import type { TranslationKeyFilterOptionsState } from "./useTranslationKeyFilterOptions";
 import type { DataTableRowAction } from "@/components/DataTable/mui/columns/actions";
 import { DATA_TABLE_ACTIONS_COLUMN_ID } from "@/components/DataTable/mui/columns/actions";
+import { DATA_TABLE_EXPANSION_COLUMN_ID } from "@/components/DataTable/mui/columns/expansion";
 
 export interface UseTranslationKeyDataTableOptions {
   readonly rowActions?: readonly DataTableRowAction<TranslationKey>[];
+
+  /**
+   * Enables TranslationKey's production detail-panel surface.
+   *
+   * Generic row-expansion infrastructure already belongs to the MUI
+   * DataTable family.
+   */
+  readonly enableTranslationDetails?: boolean;
 }
 
 /**
@@ -88,7 +97,7 @@ export interface UseTranslationKeyDataTableResult {
 export function useTranslationKeyDataTable(
   options: UseTranslationKeyDataTableOptions = {},
 ): UseTranslationKeyDataTableResult {
-  const { rowActions = [] } = options;
+  const { rowActions = [], enableTranslationDetails = false } = options;
   const theme = useTheme();
 
   /**
@@ -118,6 +127,7 @@ export function useTranslationKeyDataTable(
         categoryFilterOptionsError: filterOptions.error,
         localeFilterOptions: filterOptions.localeOptions,
         rowActions,
+        enableTranslationDetails,
       }),
     [
       filterOptions.categoryOptions,
@@ -125,6 +135,7 @@ export function useTranslationKeyDataTable(
       filterOptions.fetching,
       filterOptions.error,
       rowActions,
+      enableTranslationDetails,
     ],
   );
 
@@ -259,6 +270,20 @@ export function useTranslationKeyDataTable(
 
     /**
      * ------------------------------------------------------------
+     * Translation detail panel
+     * ------------------------------------------------------------
+     *
+     * Every TranslationKey can expose its nested translations.
+     *
+     * This remains TanStack expansion state.
+     *
+     * It does NOT imply hierarchical subRows and does not issue
+     * another request merely because a row expands.
+     */
+    getRowCanExpand: enableTranslationDetails ? () => true : undefined,
+
+    /**
+     * ------------------------------------------------------------
      * Sorting
      * ------------------------------------------------------------
      * Resource capabilities.
@@ -334,12 +359,34 @@ export function useTranslationKeyDataTable(
 
     enableColumnPinning: true,
 
+    /**
+     * ------------------------------------------------------------
+     * Utility-column logical pinning
+     * ------------------------------------------------------------
+     *
+     * Utility columns use logical start/end rather than physical positions.
+     *
+     * LTR:
+     *
+     *   expansion -> left
+     *   actions   -> right
+     *
+     * RTL:
+     *
+     *   expansion -> right
+     *   actions   -> left
+     *
+     * No physical left/right assumptions enter the resource.
+     */
     initialState:
-      rowActions.length > 0
+      enableTranslationDetails || rowActions.length > 0
         ? {
             columnPinning: {
-              start: [],
-              end: [DATA_TABLE_ACTIONS_COLUMN_ID],
+              start: enableTranslationDetails
+                ? [DATA_TABLE_EXPANSION_COLUMN_ID]
+                : [],
+
+              end: rowActions.length > 0 ? [DATA_TABLE_ACTIONS_COLUMN_ID] : [],
             },
           }
         : undefined,

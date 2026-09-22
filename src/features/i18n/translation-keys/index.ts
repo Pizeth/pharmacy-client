@@ -2,9 +2,11 @@
 
 export * from "./api";
 export * from "./columns";
+export * from "./locales";
 export * from "./schemas";
 export * from "./server";
 export * from "./table";
+// export * from "./translation-values";
 
 export type {
   DeleteTranslationKeyResponse,

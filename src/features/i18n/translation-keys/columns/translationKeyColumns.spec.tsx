@@ -1,6 +1,6 @@
 import { createTranslationKeyColumns } from "./translationKeyColumns";
-
 import { TRANSLATION_KEY_COLUMN_IDS } from "../server";
+import { DATA_TABLE_EXPANSION_COLUMN_ID } from "@/components/DataTable/mui/columns/expansion";
 
 describe("TranslationKey columns", () => {
   const categoryFilterOptions = [
@@ -56,6 +56,38 @@ describe("TranslationKey columns", () => {
     expect(column.meta?.align).toBe("center");
 
     expect(column.meta?.headerAlign).toBe("center");
+  });
+
+  it("adds the generic expansion utility column only when translation details are enabled", () => {
+    expect(
+      columns.find((column) => column.id === DATA_TABLE_EXPANSION_COLUMN_ID),
+    ).toBeUndefined();
+
+    const withDetails = createTranslationKeyColumns({
+      categoryFilterOptions,
+      localeFilterOptions,
+      enableTranslationDetails: true,
+    });
+
+    const expansion = withDetails.find(
+      (column) => column.id === DATA_TABLE_EXPANSION_COLUMN_ID,
+    );
+
+    expect(expansion).toBeDefined();
+
+    expect(expansion?.enableSorting).toBe(false);
+
+    expect(expansion?.enableColumnFilter).toBe(false);
+
+    expect(expansion?.enableGlobalFilter).toBe(false);
+
+    expect(expansion?.enableHiding).toBe(false);
+
+    expect(expansion?.enableResizing).toBe(false);
+
+    expect(expansion?.meta?.enableColumnMenu).toBe(false);
+
+    expect(expansion?.meta?.align).toBe("center");
   });
 
   it("configures Key as sortable text filtering", () => {
@@ -117,29 +149,41 @@ describe("TranslationKey columns", () => {
 
   it.each([
     { fetching: true, error: undefined, disabled: false, message: undefined },
-    { fetching: false, error: new Error("private transport details"), disabled: true, message: "Category options could not be loaded." },
+    {
+      fetching: false,
+      error: new Error("private transport details"),
+      disabled: true,
+      message: "Category options could not be loaded.",
+    },
     { fetching: false, error: undefined, disabled: false, message: undefined },
-  ])("keeps option lifecycle local to Category ($fetching, $disabled)", ({ fetching, error, disabled, message }) => {
-    const current = createTranslationKeyColumns({
-      categoryFilterOptions,
-      localeFilterOptions,
-      categoryFilterOptionsFetching: fetching,
-      categoryFilterOptionsError: error,
-    });
-    const category = current.find((column) => column.id === TRANSLATION_KEY_COLUMN_IDS.category)!;
-    expect(category.meta).toMatchObject({
-      filterOptionsLoading: fetching,
-      filterDisabled: disabled,
-      filterOptionsError: message,
-      filterOptions: categoryFilterOptions,
-    });
-    expect(category.enableColumnFilter).toBe(true);
-    for (const column of current.filter((column) => column.id !== TRANSLATION_KEY_COLUMN_IDS.category)) {
-      expect(column.meta?.filterDisabled).toBeUndefined();
-      expect(column.meta?.filterOptionsLoading).toBeUndefined();
-      expect(column.meta?.filterOptionsError).toBeUndefined();
-    }
-  });
+  ])(
+    "keeps option lifecycle local to Category ($fetching, $disabled)",
+    ({ fetching, error, disabled, message }) => {
+      const current = createTranslationKeyColumns({
+        categoryFilterOptions,
+        localeFilterOptions,
+        categoryFilterOptionsFetching: fetching,
+        categoryFilterOptionsError: error,
+      });
+      const category = current.find(
+        (column) => column.id === TRANSLATION_KEY_COLUMN_IDS.category,
+      )!;
+      expect(category.meta).toMatchObject({
+        filterOptionsLoading: fetching,
+        filterDisabled: disabled,
+        filterOptionsError: message,
+        filterOptions: categoryFilterOptions,
+      });
+      expect(category.enableColumnFilter).toBe(true);
+      for (const column of current.filter(
+        (column) => column.id !== TRANSLATION_KEY_COLUMN_IDS.category,
+      )) {
+        expect(column.meta?.filterDisabled).toBeUndefined();
+        expect(column.meta?.filterOptionsLoading).toBeUndefined();
+        expect(column.meta?.filterOptionsError).toBeUndefined();
+      }
+    },
+  );
 
   it("keeps the Translations preview presentation-only", () => {
     const column = getColumn(TRANSLATION_KEY_COLUMN_IDS.translations);
