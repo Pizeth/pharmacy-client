@@ -76,6 +76,7 @@ export const dataTableClasses = generateUtilityClasses(
 
     "pagination",
     "paginationDivider",
+    "paginationStart",
     "paginationControls",
     "paginationStatus",
     "paginationActions",
