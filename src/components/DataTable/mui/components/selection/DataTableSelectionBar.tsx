@@ -42,7 +42,7 @@ const SelectionBarRoot = styled(Box, {
    * status and bulk commands.
    */
   '&[data-embedded="true"]': {
-    flex: "1 1 auto",
+    flex: "0 1 auto",
     justifyContent: "flex-start",
     minHeight: 0,
     padding: 0,
