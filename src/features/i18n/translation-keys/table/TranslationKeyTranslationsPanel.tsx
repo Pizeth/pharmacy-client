@@ -8,9 +8,9 @@ import {
   TypographyProps,
   styled,
 } from "@mui/material";
-import { TranslateOutlined, AddRounded } from "@mui/icons-material";
+import { TranslateOutlined, AddRounded, EditOutlined } from "@mui/icons-material";
 import { ResourceActionButton } from "@/components/buttons";
-import type { TranslationKey } from "../schemas";
+import type { TranslationKey, TranslationValue } from "../schemas";
 
 import {
   getTranslationKeyLocaleLabel,
@@ -126,6 +126,12 @@ const ItemValueRoot = styled("div", {
   overridesResolver: (_props, styles) => styles.main,
 })({});
 
+const ItemActionsRoot = styled("div", {
+  name: COMPONENT_NAME,
+  slot: "Button",
+  overridesResolver: (_props, styles) => styles.button,
+})({});
+
 /**
  * ================================================================
  * Secondary metadata
@@ -145,6 +151,10 @@ const translationDateTimeFormatter = new Intl.DateTimeFormat(undefined, {
 export interface TranslationKeyTranslationsPanelProps {
   readonly record: TranslationKey;
   readonly onCreate: (record: TranslationKey) => void;
+  readonly onEdit: (
+    record: TranslationKey,
+    translation: TranslationValue,
+  ) => void;
 }
 
 function formatUpdatedAt(value: string): string {
@@ -183,7 +193,7 @@ function formatUpdatedAt(value: string): string {
 export function TranslationKeyTranslationsPanel(
   props: TranslationKeyTranslationsPanelProps,
 ) {
-  const { record, onCreate } = props;
+  const { record, onCreate, onEdit } = props;
 
   const translations = [...record.translations].sort((left, right) =>
     left.locale.localeCompare(right.locale),
@@ -261,6 +271,20 @@ export function TranslationKeyTranslationsPanel(
                   Updated {formatUpdatedAt(translation.updatedAt)}
                 </CaptionRoot>
               </ItemValueRoot>
+
+              <ItemActionsRoot>
+                <ResourceActionButton
+                  size="small"
+                  variant="text"
+                  color="primary"
+                  startIcon={<EditOutlined />}
+                  onClick={() => {
+                    onEdit(record, translation);
+                  }}
+                >
+                  Edit
+                </ResourceActionButton>
+              </ItemActionsRoot>
             </ItemRoot>
           ))}
         </ContentRoot>
