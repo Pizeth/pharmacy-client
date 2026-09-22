@@ -171,24 +171,18 @@ function formatUpdatedAt(value: string): string {
  * TranslationValue management surface belonging to one expanded
  * TranslationKey row.
  *
- * 7.4A is intentionally READ-ONLY.
+ * Current resource responsibilities:
  *
- * Mutations arrive in later bounded slices:
+ * - render canonical nested values from row.original.translations
+ * - delegate creation to the TranslationKey resource parent
+ * - delegate editing to the TranslationKey resource parent
  *
- *   7.4B Create
- *   7.4C Edit
- *   7.4D Delete
+ * The generic DataTable continues to own only expansion/detail-panel
+ * mechanics. TranslationValue mutation state never enters DataTable.
  *
- * Keeping 7.4A presentation-only lets us first prove:
- *
- * - real row expansion
- * - real TranslationKey data
- * - logical pinning
- * - detail-panel geometry
- * - responsive wrapping
- * - accessibility
- *
- * without mixing nested-resource mutation state into the first slice.
+ * Delete remains a separate bounded slice so its destructive
+ * confirmation, retry, and live-acceptance contract can be proved
+ * independently.
  */
 export function TranslationKeyTranslationsPanel(
   props: TranslationKeyTranslationsPanelProps,
