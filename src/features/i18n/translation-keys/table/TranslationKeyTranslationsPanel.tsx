@@ -213,13 +213,10 @@ export function TranslationKeyTranslationsPanel(
             Translations
           </Typography>
 
-          <CaptionRoot component="p" variant="caption" color="text.secondary">
-            {/* {count === 1
-              ? "1 translation value"
-              : `${count} translation values`} */}
+          <Typography component="p" variant="caption" color="text.secondary">
             {count} of {TRANSLATION_KEY_LOCALE_OPTIONS.length} supported locales
             for <strong>{record.key}</strong>
-          </CaptionRoot>
+          </Typography>
         </HeaderTextRoot>
 
         <ResourceActionButton
@@ -237,7 +234,12 @@ export function TranslationKeyTranslationsPanel(
       </HeadingRoot>
 
       {count === 0 ? (
-        <CaptionRoot component="p" variant="body2" color="text.secondary">
+        <CaptionRoot
+          component="p"
+          variant="body2"
+          color="text.secondary"
+          data-empty="true"
+        >
           No translation values yet.
         </CaptionRoot>
       ) : (
@@ -260,11 +262,11 @@ export function TranslationKeyTranslationsPanel(
                 <Typography component="p" variant="body2">
                   {translation.value}
                 </Typography>
-
-                <CaptionRoot component="p" variant="caption">
-                  Updated {formatUpdatedAt(translation.updatedAt)}
-                </CaptionRoot>
               </ItemValueRoot>
+
+              <CaptionRoot component="p" variant="caption">
+                Updated {formatUpdatedAt(translation.updatedAt)}
+              </CaptionRoot>
 
               <ItemActionsRoot>
                 <ResourceActionButton
