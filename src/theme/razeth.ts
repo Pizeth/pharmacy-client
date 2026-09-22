@@ -513,6 +513,72 @@ const defaultThemeInvariants = {
   },
   components: {
     ...standardizedFormComponents,
+
+    /**
+     * ==============================================================
+     * DataTable application presentation
+     * ==============================================================
+     *
+     * Renderer components expose structure and live TanStack state.
+     * Product-level visual tuning belongs here so hover strength,
+     * utility controls and footer layout can change without editing
+     * table renderers.
+     */
+    RazethDataTable: {
+      styleOverrides: {
+        bodyRow: ({ theme }: { theme: Theme }) => ({
+          "--DataTable-row-hover-background": theme.alpha(
+            theme.vars.palette.text.primary,
+            0.1,
+          ),
+          "--DataTable-row-selected-background": theme.alpha(
+            theme.vars.palette.primary.main,
+            0.16,
+          ),
+          "--DataTable-row-selected-hover-background": theme.alpha(
+            theme.vars.palette.primary.main,
+            0.24,
+          ),
+        }),
+
+        expandRowButton: ({ theme }: { theme: Theme }) => ({
+          opacity: 1,
+          color: theme.vars.palette.text.primary,
+          "&:hover": {
+            color: theme.vars.palette.primary.main,
+            backgroundColor: theme.alpha(
+              theme.vars.palette.primary.main,
+              0.12,
+            ),
+          },
+        }),
+
+        expandAllButton: ({ theme }: { theme: Theme }) => ({
+          opacity: 1,
+          color: theme.vars.palette.text.primary,
+          "&:hover": {
+            color: theme.vars.palette.primary.main,
+            backgroundColor: theme.alpha(
+              theme.vars.palette.primary.main,
+              0.12,
+            ),
+          },
+        }),
+
+        paginationStart: {
+          minWidth: 0,
+          flex: "1 1 auto",
+        },
+
+        paginationControls: ({ theme }: { theme: Theme }) => ({
+          marginInlineStart: "auto",
+          flexWrap: "wrap",
+          justifyContent: "flex-end",
+          rowGap: theme.spacing(0.5),
+        }),
+      },
+    },
+
     MuiAutocomplete: {
       defaultProps: {
         fullWidth: true,
