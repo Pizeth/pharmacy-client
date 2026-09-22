@@ -19,6 +19,7 @@ export function createActionsColumn<TData extends RowData>(
 ) {
   const {
     actions,
+    header = "Actions",
     size = 120,
     maxInlineActions = 2,
     enablePinning = true,
@@ -43,9 +44,12 @@ export function createActionsColumn<TData extends RowData>(
     enablePinning,
 
     /**
-     * Empty header intentionally keeps the action area visually quiet.
+     * A utility column should still explain itself.
+     *
+     * The visible header is independently configurable while the
+     * stable meta label remains available to column-management UI.
      */
-    header: undefined,
+    header,
 
     cell: ({ row }) => (
       <DataTableRowActions<TData>
