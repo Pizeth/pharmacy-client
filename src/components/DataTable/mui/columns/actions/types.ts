@@ -1,6 +1,5 @@
 // src/components/DataTable/mui/columns/actions/types.ts
 
-import type { ReactNode } from "react";
 import type { Row, RowData } from "@tanstack/table-core";
 import type { IconButtonProps } from "@mui/material";
 import type { MuiDataTableFeatures } from "../../features";
@@ -161,7 +160,7 @@ export interface CreateActionsColumnOptions<TData extends RowData> {
    * readable header keeps the table understandable instead of
    * presenting an unexplained strip of icon buttons.
    */
-  readonly header?: ReactNode;
+  readonly header?: string;
 
   /**
    * Width of the utility column.
