@@ -38,6 +38,7 @@ function Fixture({
 const slots = [
   "pagination",
   "paginationDivider",
+  "paginationStart",
   "paginationControls",
   "paginationStatus",
   "paginationActions",
