@@ -1,5 +1,5 @@
 import { Table } from "@mui/material";
-import { alpha, createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { act, render, screen } from "@testing-library/react";
 import {
   DataTableDensityProvider,
@@ -97,9 +97,13 @@ it("derives selected row appearance from TanStack without replacing cell renderi
   expect(row).toHaveClass("Mui-selected");
   expect(
     getComputedStyle(row).getPropertyValue("--DataTable-row-background"),
-  ).toBe(
-    alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity),
-  );
+  ).toBe("var(--DataTable-row-selected-background)");
+
+  expect(
+    getComputedStyle(row).getPropertyValue(
+      "--DataTable-row-selected-background",
+    ),
+  ).not.toBe("");
   expect(screen.getByRole("cell", { name: "Cell: alpha" })).toBeVisible();
   act(() => getTable().setRowSelection({}));
   expect(row).not.toHaveAttribute("data-selected");
