@@ -17,7 +17,7 @@ import {
   TRANSLATION_KEY_LOCALE_OPTIONS,
 } from "../locales";
 
-const COMPONENT_NAME = "RazethTranslationValuePanel";
+const COMPONENT_NAME = "RazethTranslationValuesPanel";
 
 /**
  * ================================================================
@@ -123,7 +123,7 @@ const LocaleRoot = styled(Chip, {
 const ItemValueRoot = styled("div", {
   name: COMPONENT_NAME,
   slot: "Main",
-  overridesResolver: (_props, styles) => styles.wrapper,
+  overridesResolver: (_props, styles) => styles.main,
 })({});
 
 /**
