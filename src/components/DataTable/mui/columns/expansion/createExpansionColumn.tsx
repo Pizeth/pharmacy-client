@@ -2,6 +2,7 @@
 
 "use client";
 
+import type { ReactNode } from "react";
 import type { RowData } from "@tanstack/table-core";
 import { createMuiDataTableColumnHelper } from "../../table";
 import { DataTableExpandAllButton } from "./DataTableExpandAllButton";
@@ -10,6 +11,17 @@ import { DataTableExpandRowButton } from "./DataTableExpandRowButton";
 export const DATA_TABLE_EXPANSION_COLUMN_ID = "__dataTableExpansion";
 
 export interface CreateExpansionColumnOptions {
+  /**
+   * Visible header content when expand-all is not used or when the
+   * caller wants an explicit resource label.
+   *
+   * Default:
+   *
+   * - expand-all control when showExpandAll=true
+   * - "Details" when showExpandAll=false
+   */
+  readonly header?: ReactNode;
+
   /**
    * Width of the expansion utility column.
    *
@@ -41,7 +53,12 @@ export interface CreateExpansionColumnOptions {
 export function createExpansionColumn<TData extends RowData>(
   options: CreateExpansionColumnOptions = {},
 ) {
-  const { size = 44, enablePinning = true, showExpandAll = true } = options;
+  const {
+    header,
+    size = 44,
+    enablePinning = true,
+    showExpandAll = true,
+  } = options;
 
   const columnHelper = createMuiDataTableColumnHelper<TData>();
 
@@ -57,12 +74,17 @@ export function createExpansionColumn<TData extends RowData>(
     enableResizing: false,
     enablePinning,
 
-    header: showExpandAll ? () => <DataTableExpandAllButton /> : undefined,
+    header:
+      header !== undefined
+        ? header
+        : showExpandAll
+          ? () => <DataTableExpandAllButton />
+          : "Details",
 
     cell: () => <DataTableExpandRowButton />,
 
     meta: {
-      label: "Expand",
+      label: "Details",
       align: "center",
       headerAlign: "center",
       enableColumnMenu: false,
