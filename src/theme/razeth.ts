@@ -466,23 +466,11 @@ const standardizedFormComponents = {
 
         [theme.breakpoints.down("md")]: {
           gridTemplateColumns: "auto minmax(0, 1fr) auto",
-          "& > .RazethTranslationValuesPanel-caption": {
-            gridColumn: "2 / -1",
-          },
         },
 
         [theme.breakpoints.down("sm")]: {
           gridTemplateColumns: "auto minmax(0, 1fr)",
           gap: theme.spacing(0.75, 1.25),
-
-          "& > .RazethTranslationValuesPanel-caption": {
-            gridColumn: "2",
-          },
-
-          "& > .RazethTranslationValuesPanel-button": {
-            gridColumn: "2",
-            justifyContent: "flex-start",
-          },
         },
       }),
 
@@ -497,7 +485,16 @@ const standardizedFormComponents = {
         whiteSpace: "nowrap",
         color: theme.vars.palette.text.secondary,
 
+        [theme.breakpoints.down("md")]: {
+          gridColumn: "2 / -1",
+        },
+
+        [theme.breakpoints.down("sm")]: {
+          gridColumn: "2",
+        },
+
         '&[data-empty="true"]': {
+          gridColumn: "auto",
           padding: theme.spacing(2),
           textAlign: "center",
           whiteSpace: "normal",
@@ -508,11 +505,16 @@ const standardizedFormComponents = {
         justifySelf: "start",
       },
 
-      button: {
+      button: ({ theme }: { theme: Theme }) => ({
         display: "flex",
         justifyContent: "flex-end",
         alignItems: "center",
-      },
+
+        [theme.breakpoints.down("sm")]: {
+          gridColumn: "2",
+          justifyContent: "flex-start",
+        },
+      }),
     },
   },
 } as const;
