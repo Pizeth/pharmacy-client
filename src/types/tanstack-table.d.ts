@@ -33,5 +33,7 @@ export interface DataTableOptions<TData extends RowData> {
 
   pageCount?: number;
 
+  rowCount?: number;
+
   initialState?: TableOptions<TData>["initialState"];
 }
