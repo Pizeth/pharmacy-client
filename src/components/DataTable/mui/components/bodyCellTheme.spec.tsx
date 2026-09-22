@@ -107,14 +107,34 @@ it("reacts to column ordering without remounting the row", () => {
   ]);
 });
 
-it("paints pinned state tints over a solid paper base", () => {
+it("paints every cell from the shared row-state layer", () => {
   const { getTable } = mount();
-  act(() => getTable().setColumnPinning({ start: ["a"], end: [] }));
-  expect(cell("A")).toHaveStyle({
-    backgroundColor: "rgb(255, 255, 255)",
-    backgroundImage:
-      "linear-gradient(var(--DataTable-row-background), var(--DataTable-row-background))",
-  });
+
+  /**
+   * Ordinary scrolling cells and pinned cells use the same opaque
+   * compositing contract. Pinning adds positioning, not a different
+   * visual surface.
+   */
+  for (const name of ["A", "B", "C"]) {
+    expect(cell(name)).toHaveStyle({
+      backgroundColor: "rgb(255, 255, 255)",
+      backgroundImage:
+        "linear-gradient(var(--DataTable-row-background), var(--DataTable-row-background))",
+    });
+  }
+
+  act(() => getTable().setColumnPinning({ start: ["a"], end: ["c"] }));
+
+  expect(cell("A")).toHaveStyle({ position: "sticky" });
+  expect(cell("C")).toHaveStyle({ position: "sticky" });
+
   act(() => getTable().setRowSelection({ "0": true }));
-  expect(cell("A")).toHaveStyle({ backgroundColor: "rgb(255, 255, 255)" });
+
+  for (const name of ["A", "B", "C"]) {
+    expect(cell(name)).toHaveStyle({
+      backgroundColor: "rgb(255, 255, 255)",
+      backgroundImage:
+        "linear-gradient(var(--DataTable-row-background), var(--DataTable-row-background))",
+    });
+  }
 });
