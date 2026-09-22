@@ -240,6 +240,7 @@ export function useTranslationKeyDataTable(
    *   manualSorting: true
    *   manualFiltering: true
    *
+   *   rowCount
    *   pageCount
    */
   const binding = createDataTableServerTableBinding<TranslationKey>({
