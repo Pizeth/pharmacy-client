@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Divider, Stack, Typography, styled } from "@mui/material";
+import type { ReactNode } from "react";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
@@ -38,6 +39,15 @@ const PaginationDividerRoot = styled(Divider, {
   slot: "PaginationDivider",
   overridesResolver: (_props, styles) => styles.paginationDivider,
 })({});
+const PaginationStartRoot = styled(Box, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "PaginationStart",
+  overridesResolver: (_props, styles) => styles.paginationStart,
+})({
+  minWidth: 0,
+  flex: "1 1 auto",
+});
+
 const PaginationControlsRoot = styled(Stack, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "PaginationControls",
@@ -53,6 +63,14 @@ export interface DataTablePaginationProps<
   TData extends RowData,
 > extends DataTablePaginationConfig {
   readonly table: MuiDataTableInstance<TData>;
+
+  /**
+   * Optional left-side footer content.
+   *
+   * DataTable uses this for live row-selection status and bulk
+   * commands, matching MRT's bottom-alert/pagination composition.
+   */
+  readonly startContent?: ReactNode;
 }
 
 /**
@@ -77,6 +95,7 @@ export function DataTablePagination<TData extends RowData>(
     pageSizeOptions = [10, 25, 50, 100, 200],
     showFirstLastButtons = true,
     showPageSizeSelector = true,
+    startContent,
   } = props;
 
   const { density } = useDataTableDensity();
@@ -109,17 +128,11 @@ export function DataTablePagination<TData extends RowData>(
               className={dataTableClasses.pagination}
               data-density={density}
             >
-              {showPageSizeSelector ? (
-                <DataTablePageSizeSelect
-                  pageSize={pageSize}
-                  options={pageSizeOptions}
-                  onChange={(nextPageSize) => {
-                    table.setPageSize(nextPageSize);
-                  }}
-                />
-              ) : (
-                <Box />
-              )}
+              <PaginationStartRoot
+                className={dataTableClasses.paginationStart}
+              >
+                {startContent}
+              </PaginationStartRoot>
 
               <PaginationControlsRoot
                 className={dataTableClasses.paginationControls}
@@ -127,6 +140,16 @@ export function DataTablePagination<TData extends RowData>(
                 spacing={2}
                 alignItems="center"
               >
+                {showPageSizeSelector && (
+                  <DataTablePageSizeSelect
+                    pageSize={pageSize}
+                    options={pageSizeOptions}
+                    onChange={(nextPageSize) => {
+                      table.setPageSize(nextPageSize);
+                    }}
+                  />
+                )}
+
                 <PaginationStatusRoot
                   className={dataTableClasses.paginationStatus}
                   variant="body2"
