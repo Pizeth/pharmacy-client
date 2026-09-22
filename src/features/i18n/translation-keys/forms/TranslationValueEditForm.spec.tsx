@@ -140,6 +140,7 @@ it("updates the current locale through the nested PATCH endpoint contract", asyn
 
 it("blocks duplicate submission while the PATCH is pending", async () => {
   let resolve!: (value: Awaited<ReturnType<typeof updateTranslation>>) => void;
+  const onUpdated = jest.fn();
 
   update.mockReturnValue(
     new Promise((done) => {
@@ -151,7 +152,7 @@ it("blocks duplicate submission while the PATCH is pending", async () => {
     <TranslationValueEditForm
       record={record}
       translation={translation}
-      onUpdated={jest.fn()}
+      onUpdated={onUpdated}
       onCancel={jest.fn()}
     />,
   );
@@ -171,8 +172,14 @@ it("blocks duplicate submission while the PATCH is pending", async () => {
     name: "Save translation",
   });
 
-  fireEvent.click(save);
-  fireEvent.click(save);
+  expect(save).toBeEnabled();
+
+  // Keep both activations in the same turn, then flush RHF's async submission.
+  // The deferred PATCH stays pending throughout this act boundary.
+  await act(async () => {
+    fireEvent.click(save);
+    fireEvent.click(save);
+  });
 
   expect(update).toHaveBeenCalledTimes(1);
 
@@ -184,6 +191,9 @@ it("blocks duplicate submission while the PATCH is pending", async () => {
     ).toBeDisabled();
   });
 
+  expect(screen.getByRole("button", { name: "Close" })).toBeDisabled();
+  expect(onUpdated).not.toHaveBeenCalled();
+
   await act(async () => {
     resolve({
       requestStatus: "SUCCESS",
@@ -194,6 +204,13 @@ it("blocks duplicate submission while the PATCH is pending", async () => {
         value: "Email address",
       },
     });
+  });
+
+  expect(update).toHaveBeenCalledTimes(1);
+  expect(onUpdated).toHaveBeenCalledTimes(1);
+  expect(onUpdated).toHaveBeenCalledWith({
+    ...translation,
+    value: "Email address",
   });
 });
 
