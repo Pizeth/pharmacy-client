@@ -33,6 +33,21 @@ const SelectionBarRoot = styled(Box, {
   minHeight: 52,
   backgroundColor: (theme.vars ?? theme).palette.action.selected,
   flexWrap: "wrap",
+
+  /**
+   * Embedded mode is used by the shared bottom footer.
+   *
+   * The pagination/footer shell owns padding, divider and minimum
+   * height there. Selection remains responsible only for its live
+   * status and bulk commands.
+   */
+  '&[data-embedded="true"]': {
+    flex: "1 1 auto",
+    justifyContent: "flex-start",
+    minHeight: 0,
+    padding: 0,
+    backgroundColor: "transparent",
+  },
 }));
 const SelectionBarDividerRoot = styled(Divider, {
   name: DATA_TABLE_COMPONENT_NAME,
@@ -64,6 +79,15 @@ export interface DataTableSelectionBarProps<
   TData extends RowData,
 > extends DataTableSelectionBarConfig<TData> {
   readonly table: MuiDataTableInstance<TData>;
+
+  /**
+   * Internal layout mode used when selection content shares the
+   * pagination/footer row.
+   *
+   * This is intentionally not part of DataTableSelectionBarConfig:
+   * consumers configure behavior, while DataTable owns composition.
+   */
+  readonly embedded?: boolean;
 }
 
 /**
@@ -82,6 +106,7 @@ export function DataTableSelectionBar<TData extends RowData>(
     renderStartContent,
     endContent,
     renderEndContent,
+    embedded = false,
   } = props;
 
   return (
@@ -118,13 +143,16 @@ export function DataTableSelectionBar<TData extends RowData>(
 
         return (
           <>
-            <SelectionBarDividerRoot
-              className={dataTableClasses.selectionBarDivider}
-            />
+            {!embedded && (
+              <SelectionBarDividerRoot
+                className={dataTableClasses.selectionBarDivider}
+              />
+            )}
 
             <SelectionBarRoot
               className={dataTableClasses.selectionBar}
               data-selection-bar="true"
+              data-embedded={embedded ? "true" : undefined}
             >
               {/**
                * LEFT SIDE
