@@ -194,7 +194,8 @@ export function createTranslationKeyColumns(
     ...(enableTranslationDetails
       ? [
           createExpansionColumn<TranslationKey>({
-            size: 44,
+            header: "Details",
+            size: 72,
             enablePinning: true,
             showExpandAll: false,
           }),
@@ -585,11 +586,9 @@ export function createTranslationKeyColumns(
       ? [
           createActionsColumn<TranslationKey>({
             actions: rowActions,
-
-            size: 96,
-
-            maxInlineActions: 1,
-
+            header: "Actions",
+            size: 104,
+            maxInlineActions: 2,
             enablePinning: true,
           }),
         ]
