@@ -1,6 +1,6 @@
 "use client";
 
-import { alpha, styled, TableRow } from "@mui/material";
+import { styled, TableRow } from "@mui/material";
 
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { Row, RowData } from "@tanstack/table-core";
@@ -14,12 +14,15 @@ const BodyRowRoot = styled(TableRow, {
   slot: "BodyRow",
   overridesResolver: (_props, styles) => styles.bodyRow,
 })(({ theme }) => {
-  const selectedBackground = alpha(
-    theme.palette.primary.main,
+  const palette = (theme.vars ?? theme).palette;
+
+  const selectedBackground = theme.alpha(
+    palette.primary.main,
     theme.palette.action.selectedOpacity,
   );
-  const selectedHoverBackground = alpha(
-    theme.palette.primary.main,
+
+  const selectedHoverBackground = theme.alpha(
+    palette.primary.main,
     Math.min(
       1,
       theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity,
@@ -36,8 +39,8 @@ const BodyRowRoot = styled(TableRow, {
      * Applications can tune the three state colors through the
      * BodyRow theme slot without modifying renderer code.
      */
-    "--DataTable-row-background": theme.palette.background.paper,
-    "--DataTable-row-hover-background": theme.palette.action.hover,
+    "--DataTable-row-background": palette.background.paper,
+    "--DataTable-row-hover-background": palette.action.hover,
     "--DataTable-row-selected-background": selectedBackground,
     "--DataTable-row-selected-hover-background": selectedHoverBackground,
 
