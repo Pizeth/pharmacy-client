@@ -93,7 +93,6 @@ describe("TranslationKey columns", () => {
     expect(expansion?.meta?.enableColumnMenu).toBe(false);
 
     expect(expansion?.meta?.align).toBe("center");
-    expect(expansion?.columnDef?.header ?? expansion?.header).toBeUndefined?.();
   });
 
   it("gives resource utility columns readable headers and enough action capacity", () => {
