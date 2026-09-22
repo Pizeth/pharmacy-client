@@ -153,6 +153,17 @@ export interface CreateActionsColumnOptions<TData extends RowData> {
   readonly actions: readonly DataTableRowAction<TData>[];
 
   /**
+   * Visible header content for the utility column.
+   *
+   * Default: "Actions".
+   *
+   * Utility columns are still real table columns. Giving them a
+   * readable header keeps the table understandable instead of
+   * presenting an unexplained strip of icon buttons.
+   */
+  readonly header?: ReactNode;
+
+  /**
    * Width of the utility column.
    *
    * Default: 120.
