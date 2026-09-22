@@ -25,6 +25,24 @@ const BodyCellRoot = styled(TableCell, {
   minWidth: "var(--DataTable-column-size)",
   maxWidth: "var(--DataTable-column-size)",
   overflow: "hidden",
+
+  /**
+   * Paint every cell from the exact same row-state layer.
+   *
+   * Previously this was applied only to pinned cells, which made the
+   * expansion/actions columns look like permanently highlighted
+   * vertical strips. Keeping a solid paper base plus one shared state
+   * layer preserves sticky-cell opacity without visually separating
+   * pinned utility columns from the row.
+   */
+  backgroundColor: (theme.vars ?? theme).palette.background.paper,
+  backgroundImage:
+    "linear-gradient(var(--DataTable-row-background), var(--DataTable-row-background))",
+  backgroundClip: "padding-box",
+  transition: theme.transitions.create(["background-color"], {
+    duration: theme.transitions.duration.shortest,
+  }),
+
   ...Object.fromEntries(
     (["compact", "comfortable", "spacious"] as const).map((density) => {
       const metrics = getDataTableDensityMetrics(density);
@@ -44,11 +62,6 @@ const BodyCellRoot = styled(TableCell, {
   '&[data-pinned="start"], &[data-pinned="end"]': {
     position: "sticky",
     zIndex: 1,
-    // Paint the state tint over paper, never over scrolling cell content.
-    backgroundColor: (theme.vars ?? theme).palette.background.paper,
-    backgroundImage:
-      "linear-gradient(var(--DataTable-row-background), var(--DataTable-row-background))",
-    backgroundClip: "padding-box",
   },
   '&[data-pinned="start"]': {
     insetInlineStart: "var(--DataTable-column-pinned-offset)",
