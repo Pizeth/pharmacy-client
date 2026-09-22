@@ -316,7 +316,6 @@ import {
 import { styled, useTheme, useThemeProps } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import Image from "next/image";
-import placeholder from "../../../public/static/images/placeholder-mcs-orange.svg";
 import IconInput from "../CustomInputs/IconInput";
 import { PermIdentity, Password, Login } from "@mui/icons-material";
 import { useRequired } from "@/utils/validator";
