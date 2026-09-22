@@ -364,11 +364,24 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                       }}
                     </table.Subscribe>
                   </ContainerRoot>
-                  {selectionBar !== false && (
-                    <DataTableSelectionBar table={table} {...selectionBar} />
-                  )}
-                  {pagination !== false && (
-                    <DataTablePagination table={table} {...pagination} />
+                  {pagination !== false ? (
+                    <DataTablePagination
+                      table={table}
+                      {...pagination}
+                      startContent={
+                        selectionBar !== false ? (
+                          <DataTableSelectionBar
+                            table={table}
+                            {...selectionBar}
+                            embedded
+                          />
+                        ) : undefined
+                      }
+                    />
+                  ) : (
+                    selectionBar !== false && (
+                      <DataTableSelectionBar table={table} {...selectionBar} />
+                    )
                   )}
                 </ContentRoot>
               </DataTableShell>
