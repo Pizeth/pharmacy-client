@@ -336,6 +336,17 @@ export interface DataTableServerTableBinding<TData extends RowData> {
   readonly manualFiltering: true;
 
   /**
+   * Exact total matching row count from normalized server metadata.
+   *
+   * This enables renderer-level range text such as:
+   *
+   *   1–25 of 137
+   *
+   * without leaking any resource API contract into pagination UI.
+   */
+  readonly rowCount: number;
+
+  /**
    * May temporarily be -1 before the server returns its first
    * pagination result.
    */
