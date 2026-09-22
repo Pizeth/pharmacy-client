@@ -14,15 +14,18 @@ const data = [{ name: "A" }];
 function Fixture({
   count = 3,
   showSize = true,
+  rowCount,
 }: {
   count?: number;
   showSize?: boolean;
+  rowCount?: number;
 }) {
   const table = useMuiDataTable({
     columns,
     data,
     manualPagination: true,
     pageCount: count,
+    rowCount,
     initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
   });
   return (
@@ -104,6 +107,26 @@ it("navigates known pages and disables boundary controls", () => {
   fireEvent.click(screen.getByRole("button", { name: "First page" }));
   expect(screen.getByText("Page 1 of 3")).toBeVisible();
 });
+it("renders an MRT-style row range when the exact total is known", () => {
+  render(
+    <ThemeProvider theme={theme}>
+      <DataTableDensityProvider density="comfortable">
+        <Fixture count={3} rowCount={26} />
+      </DataTableDensityProvider>
+    </ThemeProvider>,
+  );
+
+  expect(screen.getByText("1–10 of 26")).toBeVisible();
+
+  fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+
+  expect(screen.getByText("11–20 of 26")).toBeVisible();
+
+  fireEvent.click(screen.getByRole("button", { name: "Last page" }));
+
+  expect(screen.getByText("21–26 of 26")).toBeVisible();
+});
+
 it("keeps unknown totals open-ended and hides first/last controls", () => {
   mount(-1);
   expect(screen.getByText("Page 1")).toBeVisible();
