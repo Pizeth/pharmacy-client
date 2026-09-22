@@ -41,3 +41,14 @@ export type {
   TranslationValueCreateFormProps,
   TranslationValueCreateFormValues,
 } from "./TranslationValueCreateForm";
+
+export { TranslationValueEditDialog } from "./TranslationValueEditDialog";
+
+export type { TranslationValueEditDialogProps } from "./TranslationValueEditDialog";
+
+export { TranslationValueEditForm } from "./TranslationValueEditForm";
+
+export type {
+  TranslationValueEditFormProps,
+  TranslationValueEditFormValues,
+} from "./TranslationValueEditForm";
