@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 // src/components/DataTable/mui/columns/actions/types.ts
 
 import type { Row, RowData } from "@tanstack/table-core";
