@@ -24,8 +24,9 @@ import {
   TranslationKeyDeleteDialog,
   TranslationKeyEditDialog,
   TranslationValueCreateDialog,
+  TranslationValueEditDialog,
 } from "../forms";
-import type { TranslationKey } from "../schemas";
+import type { TranslationKey, TranslationValue } from "../schemas";
 import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
 import { TranslationKeyTranslationsPanel } from "./TranslationKeyTranslationsPanel";
 
@@ -88,6 +89,11 @@ export function TranslationKeyTable() {
   );
   const [creatingTranslationFor, setCreatingTranslationFor] =
     useState<TranslationKey | null>(null);
+
+  const [editingTranslation, setEditingTranslation] = useState<{
+    readonly record: TranslationKey;
+    readonly translation: TranslationValue;
+  } | null>(null);
 
   const rowActions = useMemo<readonly DataTableRowAction<TranslationKey>[]>(
     () => [
@@ -281,6 +287,27 @@ export function TranslationKeyTable() {
         }}
       />
 
+      <TranslationValueEditDialog
+        record={editingTranslation?.record ?? null}
+        translation={editingTranslation?.translation ?? null}
+        onClose={() => {
+          setEditingTranslation(null);
+        }}
+        onUpdated={(translation) => {
+          const key = editingTranslation?.record.key;
+
+          setEditingTranslation(null);
+
+          setSuccessMessage(
+            key
+              ? `Updated ${translation.locale.toLocaleUpperCase()} translation for: ${key}`
+              : `Updated ${translation.locale.toLocaleUpperCase()} translation.`,
+          );
+
+          refresh();
+        }}
+      />
+
       {successMessage && (
         <Alert severity="success" onClose={() => setSuccessMessage(undefined)}>
           {successMessage}
@@ -345,6 +372,12 @@ export function TranslationKeyTable() {
               record={row.original}
               onCreate={(record) => {
                 setCreatingTranslationFor(record);
+              }}
+              onEdit={(record, translation) => {
+                setEditingTranslation({
+                  record,
+                  translation,
+                });
               }}
             />
           )}
