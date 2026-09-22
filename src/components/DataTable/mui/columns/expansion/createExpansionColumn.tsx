@@ -2,7 +2,6 @@
 
 "use client";
 
-import type { ReactNode } from "react";
 import type { RowData } from "@tanstack/table-core";
 import { createMuiDataTableColumnHelper } from "../../table";
 import { DataTableExpandAllButton } from "./DataTableExpandAllButton";
@@ -20,7 +19,7 @@ export interface CreateExpansionColumnOptions {
    * - expand-all control when showExpandAll=true
    * - "Details" when showExpandAll=false
    */
-  readonly header?: ReactNode;
+  readonly header?: string;
 
   /**
    * Width of the expansion utility column.
