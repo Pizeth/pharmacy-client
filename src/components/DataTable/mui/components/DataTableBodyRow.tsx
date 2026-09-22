@@ -26,11 +26,34 @@ const BodyRowRoot = styled(TableRow, {
     ),
   );
   return {
+    /**
+     * Row-state paint is expressed through overridable CSS variables.
+     *
+     * Every body cell consumes --DataTable-row-background, so pinned
+     * utility columns and scrolling data columns always share one
+     * visual row state.
+     *
+     * Applications can tune the three state colors through the
+     * BodyRow theme slot without modifying renderer code.
+     */
     "--DataTable-row-background": theme.palette.background.paper,
-    "&:hover": { "--DataTable-row-background": theme.palette.action.hover },
+    "--DataTable-row-hover-background": theme.palette.action.hover,
+    "--DataTable-row-selected-background": selectedBackground,
+    "--DataTable-row-selected-hover-background": selectedHoverBackground,
+
+    "&:hover": {
+      "--DataTable-row-background":
+        "var(--DataTable-row-hover-background)",
+    },
+
     '&[data-selected="true"]': {
-      "--DataTable-row-background": selectedBackground,
-      "&:hover": { "--DataTable-row-background": selectedHoverBackground },
+      "--DataTable-row-background":
+        "var(--DataTable-row-selected-background)",
+
+      "&:hover": {
+        "--DataTable-row-background":
+          "var(--DataTable-row-selected-hover-background)",
+      },
     },
     ...Object.fromEntries(
       (["compact", "comfortable", "spacious"] as const).map((density) => [
