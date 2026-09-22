@@ -446,7 +446,7 @@ const standardizedFormComponents = {
 
       item: ({ theme }: { theme: Theme }) => ({
         display: "grid",
-        gridTemplateColumns: "auto minmax(0, 1fr)",
+        gridTemplateColumns: "auto minmax(0, 1fr) auto",
         alignItems: "start",
         gap: theme.spacing(2),
         padding: theme.spacing(1.5, 2),
@@ -477,6 +477,11 @@ const standardizedFormComponents = {
 
       label: {
         justifySelf: "start",
+      },
+
+      button: {
+        display: "flex",
+        justifyContent: "flex-end",
       },
     },
   },
