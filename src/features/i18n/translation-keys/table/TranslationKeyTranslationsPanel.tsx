@@ -3,7 +3,6 @@
 import {
   Box,
   Chip,
-  Paper,
   Typography,
   TypographyProps,
   styled,
@@ -91,7 +90,7 @@ const ContentRoot = styled(Box, {
  * Individual locale item
  * ================================================================
  */
-const ItemRoot = styled(Paper, {
+const ItemRoot = styled("div", {
   name: COMPONENT_NAME,
   slot: "Item",
   overridesResolver: (_props, styles) => styles.item,
@@ -219,18 +218,20 @@ export function TranslationKeyTranslationsPanel(
           </Typography>
         </HeaderTextRoot>
 
-        <ResourceActionButton
-          size="small"
-          variant="outlined"
-          color="warning"
-          startIcon={<AddRounded />}
-          disabled={!canCreate}
-          onClick={() => {
-            onCreate(record);
-          }}
-        >
-          Add translation
-        </ResourceActionButton>
+        <ItemActionsRoot>
+          <ResourceActionButton
+            size="small"
+            variant="outlined"
+            color="warning"
+            startIcon={<AddRounded />}
+            disabled={!canCreate}
+            onClick={() => {
+              onCreate(record);
+            }}
+          >
+            Add translation
+          </ResourceActionButton>
+        </ItemActionsRoot>
       </HeadingRoot>
 
       {count === 0 ? (
@@ -249,7 +250,6 @@ export function TranslationKeyTranslationsPanel(
               key={translation.id}
               data-translation-locale={translation.locale}
               role="listitem"
-              variant="outlined"
             >
               <LocaleRoot
                 size="small"
