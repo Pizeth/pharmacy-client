@@ -112,12 +112,37 @@ export function DataTablePagination<TData extends RowData>(
         const pageCount = table.getPageCount();
 
         /**
+         * Server tables explicitly provide rowCount through the
+         * generic server-data binding. Client-side tables can derive
+         * the total from their pre-pagination row model.
+         *
+         * A manual table that supplies only pageCount retains the
+         * older Page X of Y fallback because its exact total is not
+         * knowable.
+         */
+        const knownRowCount =
+          table.options.rowCount ??
+          (!table.options.manualPagination
+            ? table.getPrePaginationRowModel().rows.length
+            : undefined);
+
+        /**
          * TanStack uses -1 to represent unknown page count in
          * manual/server pagination.
          */
         const hasKnownPageCount = pageCount >= 0;
 
         const displayPage = pageIndex + 1;
+
+        const rangeStart =
+          knownRowCount === undefined || knownRowCount === 0
+            ? 0
+            : pageIndex * pageSize + 1;
+
+        const rangeEnd =
+          knownRowCount === undefined
+            ? undefined
+            : Math.min(knownRowCount, (pageIndex + 1) * pageSize);
 
         return (
           <>
@@ -155,7 +180,11 @@ export function DataTablePagination<TData extends RowData>(
                   variant="body2"
                   color="text.secondary"
                 >
-                  {hasKnownPageCount ? (
+                  {knownRowCount !== undefined ? (
+                    <>
+                      {rangeStart}–{rangeEnd} of {knownRowCount}
+                    </>
+                  ) : hasKnownPageCount ? (
                     <>
                       Page {displayPage} of {Math.max(1, pageCount)}
                     </>
