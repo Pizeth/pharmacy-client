@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 
 import { DataTable } from "@/components/DataTable";
 import { DATA_TABLE_EXPANSION_COLUMN_ID } from "@/components/DataTable/mui/columns/expansion";
@@ -90,8 +90,14 @@ describe("TranslationKey translation detail panel", () => {
       name: "Expand details for row 31",
     });
 
+    /**
+     * The main table already previews translation values in its
+     * presentation-only Translations column, so "Detail value" is
+     * expected to exist before expansion.
+     *
+     * What expansion owns is the semantic detail-panel region.
+     */
     expect(screen.queryByRole("region")).not.toBeInTheDocument();
-    expect(screen.queryByText("Detail value")).not.toBeInTheDocument();
 
     fireEvent.click(expand);
 
@@ -101,7 +107,7 @@ describe("TranslationKey translation detail panel", () => {
     expect(region).toHaveTextContent("Translations");
     expect(region).toHaveTextContent("1 of 2 supported locales");
     expect(region).toHaveTextContent("detail_panel_test");
-    expect(region).toHaveTextContent("Detail value");
+    expect(within(region).getByText("Detail value")).toBeInTheDocument();
 
     const collapse = screen.getByRole("button", {
       name: "Collapse details for row 31",
