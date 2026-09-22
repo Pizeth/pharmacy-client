@@ -52,10 +52,47 @@ All paths above are under `src/features/i18n/translation-keys`.
   to follow the closing menu's focus restoration. Cleanup cancels the frame.
   Both new test suites passed again after the correction (10/10).
 - `git diff --check`: PASS.
-- No live permanent deletion is claimed. Mutation success, failure, pending,
-  duplicate-submit and last-row behavior were verified with mocked API responses.
+- Approved live permanent deletion: PASS on 2026-09-22 for disposable key
+  `zz_acceptance_delete_20260922` (id 32). Pending controls were disabled,
+  success closed the dialog, and the refreshed table showed no matching rows
+  with the exact search and page size preserved.
+- Failure, duplicate-submit and later-page last-row behavior remain covered by
+  mocked API tests; those cases are not claimed as live destructive checks.
+- **7.3 acceptance is complete.** The live success result closes the remaining
+  acceptance item; no subsequent CRUD slice was started.
 
 ## Complete implementation and tests
+
+### API acceptance follow-up (2026-09-22)
+
+Added `api/translationKeyDeleteApi.spec.ts` to exercise the real API helper with
+only the HTTP transport mocked. All nine tests pass; typecheck also passes.
+Coverage includes the exact DELETE URL, cookie credentials, validated response,
+structured backend rejection, malformed success envelopes, empty 204 responses,
+non-JSON HTTP errors, signal forwarding, and no automatic transport retry.
+
+No production behavior changed in this follow-up. The user approved the specific
+permanent deletion before the final browser action.
+
+Prepared live fixture: id **32**, key **zz_acceptance_delete_20260922**, category
+**common**, description "Disposable key for TranslationKey 7.3 DELETE acceptance;
+no translation values." Creation succeeded and the filtered table showed one row.
+The matching confirmation was verified before clicking Delete key once.
+
+Live result on `http://localhost:8080/admin/i18n` (2026-09-22):
+
+- During the request, X, Cancel and the `Deleting…` button were disabled, with
+  the loading progress indicator visible.
+- The confirmation closed and the alert read
+  `Deleted translation key: zz_acceptance_delete_20260922`.
+- The refreshed table displayed `No matching rows`.
+- Search remained `zz_acceptance_delete_20260922`, page remained 1 of 1, and
+  page size remained 25.
+- Only approved disposable record 32 was submitted for deletion. The fixture
+  no longer appears in the refreshed query; no other record was deleted.
+
+This verifies real success and page-zero refresh. Later-page recovery and failure
+paths retain their automated coverage rather than being represented as live tests.
 
 The following code is a snapshot of the completed resource files. Existing
 create/edit code within the table is included so the integration is reviewable.
@@ -957,6 +994,113 @@ it("does not refresh or navigate on a failed deletion", async () => {
   expect(refresh).not.toHaveBeenCalled();
   expect(paginate).not.toHaveBeenCalled();
   expect(screen.getByRole("dialog")).toBeInTheDocument();
+});
+
+```
+
+### src/features/i18n/translation-keys/api/translationKeyDeleteApi.spec.ts
+
+```ts
+import {
+  deleteTranslationKey,
+  TranslationKeyApiError,
+} from "./translationKeyApi";
+
+jest.mock("@/types/constants", () => ({
+  API_URL: "https://api.example.test/",
+}));
+
+const originalFetch = globalThis.fetch;
+const fetchMock = jest.fn();
+const deleted = {
+  requestStatus: "SUCCESS",
+  statusCode: 200,
+  statusText: "OK",
+  data: { id: 31, key: "acceptance_delete_test" },
+};
+
+function respond(
+  payload: unknown,
+  status = 200,
+  contentType = "application/json",
+) {
+  fetchMock.mockResolvedValue({
+    ok: status >= 200 && status < 300,
+    status,
+    statusText: status === 200 ? "OK" : "Forbidden",
+    headers: { get: () => contentType },
+    json: async () => payload,
+  });
+}
+
+beforeEach(() => {
+  fetchMock.mockReset();
+  globalThis.fetch = fetchMock;
+});
+
+afterAll(() => {
+  globalThis.fetch = originalFetch;
+});
+
+it("uses the exact DELETE endpoint with credentials and validates the returned identity", async () => {
+  respond(deleted);
+  await expect(deleteTranslationKey(31)).resolves.toEqual(deleted);
+  expect(fetchMock).toHaveBeenCalledWith(
+    "https://api.example.test/api/v1/i18n/keys/31",
+    {
+      method: "DELETE",
+      credentials: "include",
+      signal: undefined,
+      headers: { Accept: "application/json" },
+    },
+  );
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+});
+
+it("preserves structured backend rejection rather than treating it as success", async () => {
+  const payload = {
+    message: "Deletion is not allowed",
+    statusCode: 403,
+    code: "FORBIDDEN",
+  };
+  respond(payload, 403);
+  await expect(deleteTranslationKey(31)).rejects.toMatchObject({
+    name: "TranslationKeyApiError",
+    status: 403,
+    message: payload.message,
+    payload,
+  });
+});
+
+it.each([
+  { ...deleted, requestStatus: "FAILED" },
+  { ...deleted, data: { id: "31", key: "acceptance_delete_test" } },
+  { ...deleted, data: { id: 31 } },
+  undefined,
+])("rejects a malformed success response (%#)", async (payload) => {
+  respond(payload);
+  await expect(deleteTranslationKey(31)).rejects.toThrow();
+});
+
+it("does not claim success when the server returns an empty 204 response", async () => {
+  respond(undefined, 204, "");
+  await expect(deleteTranslationKey(31)).rejects.toThrow();
+});
+
+it("reports non-JSON HTTP errors as API failures", async () => {
+  respond("<html>Forbidden</html>", 403, "text/html");
+  await expect(deleteTranslationKey(31)).rejects.toBeInstanceOf(
+    TranslationKeyApiError,
+  );
+});
+
+it("forwards cancellation and does not retry a rejected transport request", async () => {
+  const controller = new AbortController();
+  const error = new Error("Connection lost");
+  fetchMock.mockRejectedValue(error);
+  await expect(deleteTranslationKey(31, controller.signal)).rejects.toBe(error);
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+  expect(fetchMock.mock.calls[0][1].signal).toBe(controller.signal);
 });
 
 ```
