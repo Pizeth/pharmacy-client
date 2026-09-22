@@ -76,6 +76,7 @@ function Fixture() {
         <TranslationKeyTranslationsPanel
           record={row.original}
           onCreate={jest.fn()}
+          onEdit={jest.fn()}
         />
       )}
     />
