@@ -1,6 +1,11 @@
 import { createTranslationKeyColumns } from "./translationKeyColumns";
 import { TRANSLATION_KEY_COLUMN_IDS } from "../server";
 import { DATA_TABLE_EXPANSION_COLUMN_ID } from "@/components/DataTable/mui/columns/expansion";
+import {
+  DATA_TABLE_ACTIONS_COLUMN_ID,
+  type DataTableRowAction,
+} from "@/components/DataTable/mui/columns/actions";
+import type { TranslationKey } from "../schemas";
 
 describe("TranslationKey columns", () => {
   const categoryFilterOptions = [
@@ -88,6 +93,46 @@ describe("TranslationKey columns", () => {
     expect(expansion?.meta?.enableColumnMenu).toBe(false);
 
     expect(expansion?.meta?.align).toBe("center");
+    expect(expansion?.columnDef?.header ?? expansion?.header).toBeUndefined?.();
+  });
+
+  it("gives resource utility columns readable headers and enough action capacity", () => {
+    const rowActions: readonly DataTableRowAction<TranslationKey>[] = [
+      {
+        id: "edit",
+        label: "Edit",
+        inline: true,
+        onClick: () => undefined,
+      },
+      {
+        id: "delete",
+        label: "Delete",
+        onClick: () => undefined,
+      },
+    ];
+
+    const current = createTranslationKeyColumns({
+      categoryFilterOptions,
+      localeFilterOptions,
+      rowActions,
+      enableTranslationDetails: true,
+    });
+
+    const expansion = current.find(
+      (column) => column.id === DATA_TABLE_EXPANSION_COLUMN_ID,
+    );
+
+    const actions = current.find(
+      (column) => column.id === DATA_TABLE_ACTIONS_COLUMN_ID,
+    );
+
+    expect(expansion?.header).toBe("Details");
+    expect(expansion?.size).toBe(72);
+    expect(expansion?.meta?.label).toBe("Details");
+
+    expect(actions?.header).toBe("Actions");
+    expect(actions?.size).toBe(104);
+    expect(actions?.meta?.label).toBe("Actions");
   });
 
   it("configures Key as sortable text filtering", () => {
