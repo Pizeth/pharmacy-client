@@ -413,22 +413,23 @@ const standardizedFormComponents = {
   RazethTranslationValuesPanel: {
     styleOverrides: {
       root: ({ theme }: { theme: Theme }) => ({
-        padding: theme.spacing(2, 3),
+        padding: theme.spacing(1.5, 2),
         minWidth: 0,
         backgroundColor: theme.vars.palette.background.paper,
       }),
 
       heading: ({ theme }: { theme: Theme }) => ({
-        display: "flex",
+        display: "grid",
+        gridTemplateColumns: "auto minmax(0, 1fr) auto",
         alignItems: "center",
-        justifyContent: "space-between",
-        gap: theme.spacing(2),
+        gap: theme.spacing(1.25),
         minWidth: 0,
-        marginBottom: theme.spacing(2),
+        paddingBottom: theme.spacing(1.25),
+        borderBottom: `1px solid ${theme.vars.palette.divider}`,
         color: theme.vars.palette.text.primary,
+
         [theme.breakpoints.down("sm")]: {
-          alignItems: "stretch",
-          flexDirection: "column",
+          gridTemplateColumns: "auto minmax(0, 1fr)",
         },
       }),
 
@@ -438,28 +439,50 @@ const standardizedFormComponents = {
         overflowWrap: "anywhere",
       },
 
-      content: ({ theme }: { theme: Theme }) => ({
+      content: {
         display: "grid",
-        gap: theme.spacing(1),
-        marginTop: theme.spacing(1.5),
-      }),
+        gap: 0,
+      },
 
       item: ({ theme }: { theme: Theme }) => ({
         display: "grid",
-        gridTemplateColumns: "auto minmax(0, 1fr) auto",
-        alignItems: "start",
+        gridTemplateColumns:
+          "minmax(96px, auto) minmax(0, 1fr) minmax(170px, auto) auto",
+        alignItems: "center",
         gap: theme.spacing(2),
-        padding: theme.spacing(1.5, 2),
-        border: `1px solid ${theme.vars.palette.divider}`,
-        borderRadius: theme.spacing(1.5),
-        backgroundColor: theme.alpha(
-          theme.vars.palette.background.default,
-          0.4,
-        ),
+        padding: theme.spacing(1.25, 1),
+        border: 0,
+        borderBottom: `1px solid ${theme.vars.palette.divider}`,
+        borderRadius: 0,
+        backgroundImage: "none",
+        backgroundColor: "transparent",
+
+        "&:hover": {
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.06,
+          ),
+        },
+
+        [theme.breakpoints.down("md")]: {
+          gridTemplateColumns: "auto minmax(0, 1fr) auto",
+          "& > .RazethTranslationValuesPanel-caption": {
+            gridColumn: "2 / -1",
+          },
+        },
 
         [theme.breakpoints.down("sm")]: {
-          gridTemplateColumns: "1fr",
-          gap: theme.spacing(1),
+          gridTemplateColumns: "auto minmax(0, 1fr)",
+          gap: theme.spacing(0.75, 1.25),
+
+          "& > .RazethTranslationValuesPanel-caption": {
+            gridColumn: "2",
+          },
+
+          "& > .RazethTranslationValuesPanel-button": {
+            gridColumn: "2",
+            justifyContent: "flex-start",
+          },
         },
       }),
 
@@ -470,9 +493,15 @@ const standardizedFormComponents = {
 
       caption: ({ theme }: { theme: Theme }) => ({
         margin: 0,
-        padding: theme.spacing(2),
-        textAlign: "center",
+        padding: 0,
+        whiteSpace: "nowrap",
         color: theme.vars.palette.text.secondary,
+
+        '&[data-empty="true"]': {
+          padding: theme.spacing(2),
+          textAlign: "center",
+          whiteSpace: "normal",
+        },
       }),
 
       label: {
@@ -482,6 +511,7 @@ const standardizedFormComponents = {
       button: {
         display: "flex",
         justifyContent: "flex-end",
+        alignItems: "center",
       },
     },
   },
