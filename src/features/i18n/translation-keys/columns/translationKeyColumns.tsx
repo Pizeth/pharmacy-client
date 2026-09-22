@@ -191,11 +191,15 @@ export function createTranslationKeyColumns(
      * later 7.4 slices, so expanding an entire server page at once
      * would create unnecessary visual noise.
      */
-    createExpansionColumn<TranslationKey>({
-      size: 44,
-      enablePinning: true,
-      showExpandAll: true,
-    }),
+    ...(enableTranslationDetails
+      ? [
+          createExpansionColumn<TranslationKey>({
+            size: 44,
+            enablePinning: true,
+            showExpandAll: false,
+          }),
+        ]
+      : []),
 
     /**
      * ==============================================================
