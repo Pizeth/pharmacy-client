@@ -143,3 +143,64 @@ it("exposes row-action surfaces as named RazethDataTable theme slots", () => {
     minHeight: "41px",
   });
 });
+
+
+it("renders two available actions inline without an unnecessary overflow menu", () => {
+  function InlineFixture() {
+    const inlineColumns = helper.columns([
+      helper.accessor("name", {
+        header: "Name",
+      }),
+      createActionsColumn<Row>({
+        actions,
+        header: "Actions",
+        maxInlineActions: 2,
+      }),
+    ]);
+
+    const table = useMuiDataTable({
+      columns: inlineColumns,
+      data: [
+        {
+          id: "alpha",
+          name: "Alpha",
+        },
+      ],
+      getRowId: (row) => row.id,
+    });
+
+    return (
+      <DataTable
+        table={table}
+        toolbar={false}
+        pagination={false}
+      />
+    );
+  }
+
+  render(<InlineFixture />);
+
+  expect(
+    screen.getByRole("columnheader", {
+      name: "Actions",
+    }),
+  ).toBeVisible();
+
+  expect(
+    screen.getByRole("button", {
+      name: "Edit for row alpha",
+    }),
+  ).toBeVisible();
+
+  expect(
+    screen.getByRole("button", {
+      name: "Archive for row alpha",
+    }),
+  ).toBeVisible();
+
+  expect(
+    screen.queryByRole("button", {
+      name: "More actions for row alpha",
+    }),
+  ).toBeNull();
+});
