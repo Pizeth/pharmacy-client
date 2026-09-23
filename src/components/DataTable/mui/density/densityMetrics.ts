@@ -57,15 +57,19 @@ const DATA_TABLE_DENSITY_METRICS: Readonly<
   Record<MuiDataTableDensity, DataTableDensityMetrics>
 > = {
   /**
-   * Closely follows MRT's compact ~37px row footprint.
+   * MRT-style compact geometry.
+   *
+   * Keep the body-row minimum near MRT's dense footprint, but reduce
+   * physical cell padding and header/footer chrome. Multi-line cells
+   * may still grow naturally when their content requires it.
    */
   compact: {
-    headerHeight: 40,
+    headerHeight: 36,
     bodyRowHeight: 37,
-    cellPaddingInline: 1,
-    cellPaddingBlock: 0.5,
-    footerHeight: 44,
-    footerPaddingBlock: 0.5,
+    cellPaddingInline: 0.75,
+    cellPaddingBlock: 0.25,
+    footerHeight: 40,
+    footerPaddingBlock: 0.25,
     nowrap: true,
   },
 
