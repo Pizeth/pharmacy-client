@@ -299,7 +299,7 @@ describe("DataTable header structure theme", () => {
       );
 
       expect(roleCell.style.getPropertyValue("--DataTable-column-size")).toBe(
-        "80px",
+        "72px",
       );
 
       /**
@@ -403,7 +403,7 @@ describe("DataTable header structure theme", () => {
     /**
      * compact header:
      *
-     *   40px
+     *   36px
      *
      * row index:
      *
@@ -411,7 +411,7 @@ describe("DataTable header structure theme", () => {
      *
      * top:
      *
-     *   2 × 40 = 80px
+     *   2 × 36 = 72px
      */
     expect(cell.style.getPropertyValue("--DataTable-header-sticky-top")).toBe(
       "80px",
@@ -420,8 +420,8 @@ describe("DataTable header structure theme", () => {
     expect(cell).toHaveAttribute("data-density", "compact");
 
     expect(cell).toHaveStyle({
-      height: "40px",
-      minHeight: "40px",
+      height: "36px",
+      minHeight: "36px",
     });
 
     rerender(<HeaderStructure density="spacious" headerRowIndex={3} />);
