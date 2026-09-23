@@ -557,6 +557,17 @@ const defaultThemeInvariants = {
      * table renderers.
      */
     RazethDataTable: {
+      /**
+       * Keep the application default aligned with the MRT table.
+       *
+       * DataTableDensityProvider still has its own compact fallback so
+       * isolated/test themes behave consistently, while this remains
+       * the public application-level default.
+       */
+      defaultProps: {
+        density: "compact",
+      },
+
       styleOverrides: {
         bodyRow: ({ theme }: { theme: Theme }) => ({
           /**
