@@ -299,7 +299,7 @@ describe("DataTable header structure theme", () => {
       );
 
       expect(roleCell.style.getPropertyValue("--DataTable-column-size")).toBe(
-        "72px",
+        "80px",
       );
 
       /**
@@ -414,7 +414,7 @@ describe("DataTable header structure theme", () => {
      *   2 × 36 = 72px
      */
     expect(cell.style.getPropertyValue("--DataTable-header-sticky-top")).toBe(
-      "80px",
+      "72px",
     );
 
     expect(cell).toHaveAttribute("data-density", "compact");
