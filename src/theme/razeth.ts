@@ -559,10 +559,14 @@ const defaultThemeInvariants = {
     RazethDataTable: {
       styleOverrides: {
         bodyRow: ({ theme }: { theme: Theme }) => ({
-          "--DataTable-row-hover-background": theme.alpha(
-            theme.vars.palette.text.primary,
-            0.1,
-          ),
+          /**
+           * Keep hover parity with the existing MRT /fts table.
+           *
+           * Because DataTable body cells composite this value over the
+           * opaque paper surface, the alpha behaves exactly as a row
+           * hover tint rather than replacing the cell background.
+           */
+          "--DataTable-row-hover-background": "rgba(0, 0, 0, 0.04)",
           "--DataTable-row-selected-background": theme.alpha(
             theme.vars.palette.primary.main,
             0.16,
