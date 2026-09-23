@@ -60,7 +60,7 @@ export function DataTableDensityProvider(props: DataTableDensityProviderProps) {
     children,
     density: controlledDensity,
 
-    defaultDensity = themeDefaults.density ?? "comfortable",
+    defaultDensity = themeDefaults.density ?? "compact",
 
     onDensityChange,
   } = props;
