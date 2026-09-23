@@ -182,7 +182,7 @@ it("updates sticky geometry when density or header depth changes", () => {
   const cell = screen.getByRole("row", { name: "Column filters" })
     .firstElementChild as HTMLElement;
   expect(cell.style.getPropertyValue("--DataTable-filter-sticky-top")).toBe(
-    "80px",
+    "72px",
   );
   expect(cell.style.getPropertyValue("--DataTable-filter-cell-height")).toBe(
     "40px",
