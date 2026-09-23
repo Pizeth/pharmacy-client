@@ -74,7 +74,7 @@ const HeaderCellRoot = styled(TableCell, {
    * Sticky cells must remain opaque or scrolling rows become visible
    * underneath them.
    */
-  backgroundColor: (theme.vars ?? theme).palette.background.paper,
+  backgroundColor: (theme.vars ?? theme).palette.background.default,
 
   /**
    * --------------------------------------------------------------
@@ -166,7 +166,15 @@ const HeaderCellRoot = styled(TableCell, {
    */
   '&[data-pinned="start"], &[data-pinned="end"]': {
     zIndex: 4,
-    backgroundColor: (theme.vars ?? theme).palette.background.paper,
+
+    /**
+     * Pinning must not create a second header surface.
+     *
+     * The base HeaderCell background is already opaque. Re-declaring
+     * backgroundColor here used to beat MuiTableCell-head/theme
+     * styling through selector specificity, which is why Details and
+     * Actions looked lighter than the scrolling header columns.
+     */
     backgroundClip: "padding-box",
   },
 
