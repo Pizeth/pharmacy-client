@@ -162,7 +162,7 @@ export function DataTablePagination<TData extends RowData>(
               <PaginationControlsRoot
                 className={dataTableClasses.paginationControls}
                 direction="row"
-                spacing={2}
+                spacing={1}
                 alignItems="center"
               >
                 {showPageSizeSelector && (
