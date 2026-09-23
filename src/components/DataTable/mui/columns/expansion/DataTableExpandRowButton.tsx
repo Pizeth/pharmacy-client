@@ -4,7 +4,7 @@
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
 import { styled, IconButton, Tooltip } from "@mui/material";
-import { KeyboardArrowDown, KeyboardArrowRight } from "@mui/icons-material";
+import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import {
   useMuiDataTableCellContext,
   useMuiDataTableContext,
@@ -76,9 +76,9 @@ export function DataTableExpandRowButton() {
               }}
             >
               {expanded ? (
-                <KeyboardArrowDown fontSize="small" />
+                <KeyboardArrowUp fontSize="small" />
               ) : (
-                <KeyboardArrowRight fontSize="small" />
+                <KeyboardArrowDown fontSize="small" />
               )}
             </ExpandRowButtonRoot>
           </Tooltip>
