@@ -24,6 +24,7 @@ import { createActionsColumn } from "@/components/DataTable/mui/columns/actions"
 import type { DataTableRowAction } from "@/components/DataTable/mui/columns/actions";
 import { styled } from "@mui/material/styles";
 import { createExpansionColumn } from "@/components/DataTable/mui/columns/expansion";
+import { createSelectionColumn } from "@/components/DataTable/mui/columns/selection";
 
 const KeyCellRoot = styled(Typography, {
   name: "RazethTranslationKeyTable",
@@ -82,6 +83,14 @@ export interface CreateTranslationKeyColumnsOptions {
    * without a detail-panel renderer.
    */
   readonly enableTranslationDetails?: boolean;
+
+  /**
+   * Add the generic DataTable row-selection utility column.
+   *
+   * Selection remains TanStack state. TranslationKey only opts into
+   * the existing generic checkbox presentation.
+   */
+  readonly enableRowSelection?: boolean;
 }
 
 /**
@@ -138,6 +147,7 @@ export function createTranslationKeyColumns(
     localeFilterOptions = TRANSLATION_KEY_LOCALE_FILTER_OPTIONS,
     rowActions = [],
     enableTranslationDetails = false,
+    enableRowSelection = false,
   } = options;
 
   /**
@@ -198,6 +208,25 @@ export function createTranslationKeyColumns(
             size: 72,
             enablePinning: true,
             showExpandAll: false,
+          }),
+        ]
+      : []),
+
+    /**
+     * ==============================================================
+     * Row selection
+     * ==============================================================
+     *
+     * Generic DataTable owns checkbox rendering and TanStack selection
+     * behavior. TranslationKey merely opts into the utility column.
+     *
+     * Selection has no API/server-query meaning.
+     */
+    ...(enableRowSelection
+      ? [
+          createSelectionColumn<TranslationKey>({
+            size: 48,
+            enablePinning: true,
           }),
         ]
       : []),
