@@ -52,3 +52,7 @@ export type {
   TranslationValueEditFormProps,
   TranslationValueEditFormValues,
 } from "./TranslationValueEditForm";
+
+export { TranslationValueDeleteDialog } from "./TranslationValueDeleteDialog";
+
+export type { TranslationValueDeleteDialogProps } from "./TranslationValueDeleteDialog";
