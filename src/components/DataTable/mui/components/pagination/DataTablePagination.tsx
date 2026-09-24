@@ -52,12 +52,20 @@ const PaginationControlsRoot = styled(Stack, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "PaginationControls",
   overridesResolver: (_props, styles) => styles.paginationControls,
-})({});
+})({
+  minHeight: 28,
+});
 const PaginationStatusRoot = styled(Typography, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "PaginationStatus",
   overridesResolver: (_props, styles) => styles.paginationStatus,
-})({ whiteSpace: "nowrap" });
+})({
+  whiteSpace: "nowrap",
+  display: "flex",
+  alignItems: "center",
+  height: 28,
+  lineHeight: "28px",
+});
 
 export interface DataTablePaginationProps<
   TData extends RowData,
