@@ -14,12 +14,18 @@ const PaginationActionsRoot = styled(Stack, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "PaginationActions",
   overridesResolver: (_props, styles) => styles.paginationActions,
-})({});
+})({
+  height: 28,
+});
 const PaginationButtonRoot = styled(IconButton, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "PaginationButton",
   overridesResolver: (_props, styles) => styles.paginationButton,
-})({});
+})({
+  width: 28,
+  height: 28,
+  padding: 0.5,
+});
 
 export interface DataTablePaginationActionsProps {
   readonly canPreviousPage: boolean;
