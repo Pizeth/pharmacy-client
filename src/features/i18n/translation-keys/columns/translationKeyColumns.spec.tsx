@@ -1,6 +1,7 @@
 import { createTranslationKeyColumns } from "./translationKeyColumns";
 import { TRANSLATION_KEY_COLUMN_IDS } from "../server";
 import { DATA_TABLE_EXPANSION_COLUMN_ID } from "@/components/DataTable/mui/columns/expansion";
+import { DATA_TABLE_SELECTION_COLUMN_ID } from "@/components/DataTable/mui/columns/selection";
 import {
   DATA_TABLE_ACTIONS_COLUMN_ID,
   type DataTableRowAction,
@@ -93,6 +94,34 @@ describe("TranslationKey columns", () => {
     expect(expansion?.meta?.enableColumnMenu).toBe(false);
 
     expect(expansion?.meta?.align).toBe("center");
+  });
+
+  it("adds the generic selection utility column only when row selection is enabled", () => {
+    expect(
+      columns.find((column) => column.id === DATA_TABLE_SELECTION_COLUMN_ID),
+    ).toBeUndefined();
+
+    const selectable = createTranslationKeyColumns({
+      categoryFilterOptions,
+      localeFilterOptions,
+      enableRowSelection: true,
+    });
+
+    const selection = selectable.find(
+      (column) => column.id === DATA_TABLE_SELECTION_COLUMN_ID,
+    );
+
+    expect(selection).toBeDefined();
+    expect(selection?.size).toBe(48);
+    expect(selection?.enableSorting).toBe(false);
+    expect(selection?.enableColumnFilter).toBe(false);
+    expect(selection?.enableGlobalFilter).toBe(false);
+    expect(selection?.enableHiding).toBe(false);
+    expect(selection?.enableResizing).toBe(false);
+    expect(selection?.enablePinning).toBe(true);
+    expect(selection?.meta?.enableColumnMenu).toBe(false);
+    expect(selection?.meta?.align).toBe("center");
+    expect(selection?.meta?.headerAlign).toBe("center");
   });
 
   it("gives resource utility columns readable headers and enough action capacity", () => {
