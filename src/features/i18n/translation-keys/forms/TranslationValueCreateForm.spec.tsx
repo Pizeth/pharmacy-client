@@ -174,6 +174,37 @@ it("blocks creation when every supported locale already exists", () => {
   ).toBeDisabled();
 });
 
+it("shows a friendly required locale error without sending a mutation", async () => {
+  render(
+    <TranslationValueCreateForm
+      record={record}
+      onCreated={jest.fn()}
+      onCancel={jest.fn()}
+    />,
+  );
+
+  fireEvent.change(
+    screen.getByRole("textbox", {
+      name: /Translation value/i,
+    }),
+    {
+      target: {
+        value: "Email",
+      },
+    },
+  );
+
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: "Add translation",
+    }),
+  );
+
+  expect(await screen.findByText("Choose a locale.")).toBeInTheDocument();
+
+  expect(create).not.toHaveBeenCalled();
+});
+
 it("preserves a rejected request in the form for correction or retry", async () => {
   create.mockRejectedValue(new Error("Translation already exists."));
 
