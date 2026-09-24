@@ -18,20 +18,54 @@ const PageSizeRoot = styled(Stack, {
   alignItems: "center",
   gap: theme.spacing(0.75),
   flex: "0 0 auto",
+  height: 28,
 }));
 const PageSizeLabelRoot = styled(Typography, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "PageSizeLabel",
   overridesResolver: (_props, styles) => styles.pageSizeLabel,
-})({ whiteSpace: "nowrap" });
+})({
+  whiteSpace: "nowrap",
+  display: "flex",
+  alignItems: "center",
+  height: 28,
+  lineHeight: "28px",
+});
 const PageSizeSelectRoot = styled(Select<number>, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "PageSizeSelect",
   overridesResolver: (_props, styles) => styles.pageSizeSelect,
-})({
+})(({ theme }) => ({
   minWidth: 52,
+  height: 28,
   flex: "0 0 auto",
-});
+
+  /**
+   * MUI's standard Select keeps text on an input-style baseline with
+   * its own vertical padding. In the pagination footer that made the
+   * page-size value sit visibly lower than the adjacent range text.
+   *
+   * Give the select the same 28px visual line box as the footer text
+   * and navigation controls while preserving the standard underline.
+   */
+  "& .MuiSelect-select": {
+    boxSizing: "border-box",
+    display: "flex",
+    alignItems: "center",
+    height: 28,
+    minHeight: "0 !important",
+    paddingTop: 0,
+    paddingBottom: 0,
+    paddingInlineStart: theme.spacing(0.5),
+    paddingInlineEnd: `${theme.spacing(3)} !important`,
+    lineHeight: "28px",
+  },
+
+  "& .MuiSelect-icon": {
+    top: "50%",
+    transform: "translateY(-50%)",
+  },
+}));
 
 export interface DataTablePageSizeSelectProps {
   readonly pageSize: number;
