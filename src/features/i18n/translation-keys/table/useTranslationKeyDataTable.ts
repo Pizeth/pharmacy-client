@@ -280,6 +280,53 @@ export function useTranslationKeyDataTable(
   });
 
   /**
+   * Reconcile selection only after the current query has a canonical
+   * server result.
+   *
+   * Same-query mutation refreshes intentionally preserve selection
+   * while the previous result is displayed. Once the replacement
+   * result arrives, IDs no longer present on the loaded server page are
+   * removed.
+   *
+   * This prevents a successful edit which changes filter/sort/page
+   * membership from leaving an off-page ID selected and appearing to
+   * authorize a mutation command for data no longer loaded.
+   */
+  useEffect(() => {
+    if (
+      !enableRowSelection ||
+      !server.hasResult ||
+      server.isPreviousResult ||
+      server.isFetching
+    ) {
+      return;
+    }
+
+    const loadedRowIds = new Set(server.rows.map((row) => String(row.id)));
+
+    setRowSelection((previous) => {
+      let changed = false;
+      const next: RowSelectionState = {};
+
+      for (const [rowId, selected] of Object.entries(previous)) {
+        if (selected && loadedRowIds.has(rowId)) {
+          next[rowId] = true;
+        } else if (selected) {
+          changed = true;
+        }
+      }
+
+      return changed ? next : previous;
+    });
+  }, [
+    enableRowSelection,
+    server.hasResult,
+    server.isPreviousResult,
+    server.isFetching,
+    server.rows,
+  ]);
+
+  /**
    * ================================================================
    * 6. Generic server -> TanStack binding
    * ================================================================
