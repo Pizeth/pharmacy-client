@@ -30,7 +30,8 @@ const record: TranslationKey = {
 
 it("renders the key's existing translation values", () => {
   render(
-    <TranslationKeyTranslationsPanel record={record} onCreate={jest.fn()} onEdit={jest.fn()} />,
+    <TranslationKeyTranslationsPanel record={record} onCreate={jest.fn()} onEdit={jest.fn()}
+      onDelete={jest.fn()} />,
   );
 
   expect(screen.getByText("English")).toBeInTheDocument();
@@ -44,7 +45,8 @@ it("delegates nested creation to the resource parent", () => {
   const onCreate = jest.fn();
 
   render(
-    <TranslationKeyTranslationsPanel record={record} onCreate={onCreate} onEdit={jest.fn()} />,
+    <TranslationKeyTranslationsPanel record={record} onCreate={onCreate} onEdit={jest.fn()}
+      onDelete={jest.fn()} />,
   );
 
   fireEvent.click(
@@ -79,6 +81,7 @@ it("disables creation when all supported locales are populated", () => {
       }}
       onCreate={jest.fn()}
       onEdit={jest.fn()}
+      onDelete={jest.fn()}
     />,
   );
 
@@ -98,6 +101,7 @@ it("delegates nested editing with the owning key and translation", () => {
       record={record}
       onCreate={jest.fn()}
       onEdit={onEdit}
+      onDelete={jest.fn()}
     />,
   );
 
@@ -109,6 +113,33 @@ it("delegates nested editing with the owning key and translation", () => {
 
   expect(onEdit).toHaveBeenCalledTimes(1);
   expect(onEdit).toHaveBeenCalledWith(
+    record,
+    record.translations[0],
+  );
+});
+
+
+it("delegates nested deletion with the owning key and translation", () => {
+  const onDelete = jest.fn();
+
+  render(
+    <TranslationKeyTranslationsPanel
+      record={record}
+      onCreate={jest.fn()}
+      onEdit={jest.fn()}
+      onDelete={onDelete}
+    />,
+  );
+
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: "Delete",
+    }),
+  );
+
+  expect(onDelete).toHaveBeenCalledTimes(1);
+
+  expect(onDelete).toHaveBeenCalledWith(
     record,
     record.translations[0],
   );
