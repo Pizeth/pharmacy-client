@@ -77,6 +77,7 @@ function Fixture() {
           record={row.original}
           onCreate={jest.fn()}
           onEdit={jest.fn()}
+          onDelete={jest.fn()}
         />
       )}
     />
