@@ -571,13 +571,13 @@ const defaultThemeInvariants = {
       styleOverrides: {
         bodyRow: ({ theme }: { theme: Theme }) => ({
           /**
-           * Keep hover parity with the existing MRT /fts table.
-           *
-           * Because DataTable body cells composite this value over the
-           * opaque paper surface, the alpha behaves exactly as a row
-           * hover tint rather than replacing the cell background.
+           * Keep the stronger application hover until the MRT color is
+           * inspected directly and tuned from the real rendered value.
            */
-          "--DataTable-row-hover-background": "rgba(0, 0, 0, 0.04)",
+          "--DataTable-row-hover-background": theme.alpha(
+            theme.vars.palette.text.primary,
+            0.1,
+          ),
           "--DataTable-row-selected-background": theme.alpha(
             theme.vars.palette.primary.main,
             0.16,
