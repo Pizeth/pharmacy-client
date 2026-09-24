@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { ExpandedState } from "@tanstack/table-core";
+import type { ExpandedState, RowSelectionState } from "@tanstack/table-core";
 import { useTheme } from "@mui/material";
 import {
   createDataTableServerTableBinding,
@@ -21,6 +21,7 @@ import type { TranslationKeyFilterOptionsState } from "./useTranslationKeyFilter
 import type { DataTableRowAction } from "@/components/DataTable/mui/columns/actions";
 import { DATA_TABLE_ACTIONS_COLUMN_ID } from "@/components/DataTable/mui/columns/actions";
 import { DATA_TABLE_EXPANSION_COLUMN_ID } from "@/components/DataTable/mui/columns/expansion";
+import { DATA_TABLE_SELECTION_COLUMN_ID } from "@/components/DataTable/mui/columns/selection";
 
 export interface UseTranslationKeyDataTableOptions {
   readonly rowActions?: readonly DataTableRowAction<TranslationKey>[];
@@ -32,6 +33,14 @@ export interface UseTranslationKeyDataTableOptions {
    * DataTable family.
    */
   readonly enableTranslationDetails?: boolean;
+
+  /**
+   * Enables TranslationKey row selection.
+   *
+   * Selection is presentation/application command state. It remains
+   * outside DataTableServerQueryState and never enters the HTTP query.
+   */
+  readonly enableRowSelection?: boolean;
 }
 
 /**
@@ -98,7 +107,11 @@ export interface UseTranslationKeyDataTableResult {
 export function useTranslationKeyDataTable(
   options: UseTranslationKeyDataTableOptions = {},
 ): UseTranslationKeyDataTableResult {
-  const { rowActions = [], enableTranslationDetails = false } = options;
+  const {
+    rowActions = [],
+    enableTranslationDetails = false,
+    enableRowSelection = false,
+  } = options;
   const theme = useTheme();
 
   /**
@@ -110,6 +123,17 @@ export function useTranslationKeyDataTable(
    * - a semantic table-query transition should clear stale expansion
    */
   const [expanded, setExpanded] = useState<ExpandedState>({});
+
+  /**
+   * Server-backed row selection is page/query-context local.
+   *
+   * A same-query mutation refresh preserves the selected record so an
+   * edit can refresh canonical data without surprising deselection.
+   *
+   * A semantic query transition clears selection so stale/off-page IDs
+   * cannot accidentally authorize resource mutation commands.
+   */
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   /**
    * ================================================================
@@ -139,6 +163,7 @@ export function useTranslationKeyDataTable(
         localeFilterOptions: filterOptions.localeOptions,
         rowActions,
         enableTranslationDetails,
+        enableRowSelection,
       }),
     [
       filterOptions.categoryOptions,
@@ -147,6 +172,7 @@ export function useTranslationKeyDataTable(
       filterOptions.error,
       rowActions,
       enableTranslationDetails,
+      enableRowSelection,
     ],
   );
 
@@ -214,6 +240,7 @@ export function useTranslationKeyDataTable(
    */
   useEffect(() => {
     setExpanded({});
+    setRowSelection({});
   }, [query.state]);
 
   const request = useTranslationKeyDataTableRequest(query.state);
@@ -297,9 +324,12 @@ export function useTranslationKeyDataTable(
     state: {
       ...binding.state,
       expanded,
+      rowSelection,
     },
 
     onExpandedChange: setExpanded,
+
+    onRowSelectionChange: setRowSelection,
 
     /**
      * Same-query server-result replacement must not close the detail
@@ -315,6 +345,17 @@ export function useTranslationKeyDataTable(
      * Never use the current row index as server-backed row identity.
      */
     getRowId: (row) => String(row.id),
+
+    /**
+     * ------------------------------------------------------------
+     * Row selection
+     * ------------------------------------------------------------
+     *
+     * Selection is opt-in for this resource slice. Multiple rows may
+     * be selected for status/inspection, while mutation commands may
+     * further narrow themselves to exactly one selected row.
+     */
+    enableRowSelection,
 
     /**
      * ------------------------------------------------------------
@@ -427,12 +468,25 @@ export function useTranslationKeyDataTable(
      * No physical left/right assumptions enter the resource.
      */
     initialState:
-      enableTranslationDetails || rowActions.length > 0
+      enableTranslationDetails || enableRowSelection || rowActions.length > 0
         ? {
             columnPinning: {
-              start: enableTranslationDetails
-                ? [DATA_TABLE_EXPANSION_COLUMN_ID]
-                : [],
+              /**
+               * Keep utility columns in the same logical order as the
+               * established MRT reference:
+               *
+               *   expansion -> selection
+               *
+               * Logical start automatically mirrors in RTL.
+               */
+              start: [
+                ...(enableTranslationDetails
+                  ? [DATA_TABLE_EXPANSION_COLUMN_ID]
+                  : []),
+                ...(enableRowSelection
+                  ? [DATA_TABLE_SELECTION_COLUMN_ID]
+                  : []),
+              ],
 
               end: rowActions.length > 0 ? [DATA_TABLE_ACTIONS_COLUMN_ID] : [],
             },
