@@ -85,12 +85,28 @@ export const updateTranslationKeyInputSchema = z
     error: "At least one field must be provided.",
   });
 
+const translationLocaleInputSchema = z
+  .string()
+  .trim()
+  .min(1, {
+    error: "Choose a locale.",
+  })
+  .pipe(
+    z
+      .string()
+      .min(2, {
+        error: "Choose a valid locale.",
+      })
+      .max(35, {
+        error: "Choose a valid locale.",
+      })
+      .regex(/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/, {
+        error: "Choose a valid locale.",
+      }),
+  );
+
 export const createTranslationInputSchema = z.strictObject({
-  locale: z
-    .string()
-    .min(2)
-    .max(35)
-    .regex(/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/),
+  locale: translationLocaleInputSchema,
   value: z
     .string()
     .min(1)
