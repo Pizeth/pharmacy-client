@@ -7,7 +7,12 @@ import {
   TypographyProps,
   styled,
 } from "@mui/material";
-import { TranslateOutlined, AddRounded, EditOutlined } from "@mui/icons-material";
+import {
+  AddRounded,
+  DeleteOutline,
+  EditOutlined,
+  TranslateOutlined,
+} from "@mui/icons-material";
 import { ResourceActionButton } from "@/components/buttons";
 import type { TranslationKey, TranslationValue } from "../schemas";
 
@@ -154,6 +159,11 @@ export interface TranslationKeyTranslationsPanelProps {
     record: TranslationKey,
     translation: TranslationValue,
   ) => void;
+
+  readonly onDelete: (
+    record: TranslationKey,
+    translation: TranslationValue,
+  ) => void;
 }
 
 function formatUpdatedAt(value: string): string {
@@ -175,18 +185,24 @@ function formatUpdatedAt(value: string): string {
  * - render canonical nested values from row.original.translations
  * - delegate creation to the TranslationKey resource parent
  * - delegate editing to the TranslationKey resource parent
+ * - delegate destructive deletion to the TranslationKey resource parent
  *
  * The generic DataTable continues to own only expansion/detail-panel
  * mechanics. TranslationValue mutation state never enters DataTable.
  *
- * Delete remains a separate bounded slice so its destructive
- * confirmation, retry, and live-acceptance contract can be proved
- * independently.
+ * The panel therefore remains a presentation/command surface. Dialog
+ * ownership, request state, retry behavior, and refresh policy stay at
+ * the resource boundary.
  */
 export function TranslationKeyTranslationsPanel(
   props: TranslationKeyTranslationsPanelProps,
 ) {
-  const { record, onCreate, onEdit } = props;
+  const {
+    record,
+    onCreate,
+    onEdit,
+    onDelete,
+  } = props;
 
   const translations = [...record.translations].sort((left, right) =>
     left.locale.localeCompare(right.locale),
@@ -279,6 +295,21 @@ export function TranslationKeyTranslationsPanel(
                   }}
                 >
                   Edit
+                </ResourceActionButton>
+
+                <ResourceActionButton
+                  size="small"
+                  variant="text"
+                  color="error"
+                  startIcon={<DeleteOutline />}
+                  onClick={() => {
+                    onDelete(
+                      record,
+                      translation,
+                    );
+                  }}
+                >
+                  Delete
                 </ResourceActionButton>
               </ItemActionsRoot>
             </ItemRoot>
