@@ -26,6 +26,7 @@ jest.mock("@/components/DataTable", () => ({
     table: {
       actions: readonly DataTableRowAction<TranslationKey>[];
       record: TranslationKey;
+      setRowSelection: jest.Mock;
     };
   }) => (
     <button
@@ -54,6 +55,7 @@ const remove = deleteTranslationKey as jest.Mock;
 const controller = useTranslationKeyDataTable as jest.Mock;
 const refresh = jest.fn();
 const paginate = jest.fn();
+const setRowSelection = jest.fn();
 const queryState = {
   pagination: { pageIndex: 2, pageSize: 10 },
   sorting: [{ id: "key", desc: true }],
@@ -63,7 +65,11 @@ const queryState = {
 
 function setup(rows: TranslationKey[], pageIndex = 2) {
   controller.mockImplementation(({ rowActions }) => ({
-    table: { actions: rowActions, record },
+    table: {
+      actions: rowActions,
+      record,
+      setRowSelection,
+    },
     query: {
       state: {
         ...queryState,
@@ -79,7 +85,9 @@ function setup(rows: TranslationKey[], pageIndex = 2) {
   render(<TranslationKeyTable />);
 }
 
-beforeEach(() => jest.resetAllMocks());
+beforeEach(() => {
+  jest.resetAllMocks();
+});
 
 it("only opens confirmation from the row action and refreshes after successful deletion", async () => {
   setup([record, { ...record, id: 32 }]);
@@ -88,6 +96,21 @@ it("only opens confirmation from the row action and refreshes after successful d
   expect(refresh).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Delete key" }));
   await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1));
+  expect(setRowSelection).toHaveBeenCalledTimes(1);
+
+  const selectionUpdater = setRowSelection.mock.calls[0][0] as (
+    previous: Record<string, boolean>,
+  ) => Record<string, boolean>;
+
+  expect(
+    selectionUpdater({
+      [String(record.id)]: true,
+      "99": true,
+    }),
+  ).toEqual({
+    "99": true,
+  });
+
   expect(paginate).not.toHaveBeenCalled();
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(screen.getByRole("alert")).toHaveTextContent(
