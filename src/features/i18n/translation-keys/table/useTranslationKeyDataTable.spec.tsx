@@ -1,6 +1,12 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 
-import type { DataTableServerResult } from "@/components/DataTable";
+import type {
+  DataTableRowAction,
+  DataTableServerResult,
+} from "@/components/DataTable";
+import { DATA_TABLE_ACTIONS_COLUMN_ID } from "@/components/DataTable/mui/columns/actions";
+import { DATA_TABLE_EXPANSION_COLUMN_ID } from "@/components/DataTable/mui/columns/expansion";
+import { DATA_TABLE_SELECTION_COLUMN_ID } from "@/components/DataTable/mui/columns/selection";
 
 import type { TranslationKey } from "../schemas";
 
@@ -219,5 +225,142 @@ describe("TranslationKey DataTable expansion continuity", () => {
     await waitFor(() => {
       expect(result.current.table.state.expanded).toEqual({});
     });
+  });
+});
+
+
+describe("TranslationKey DataTable row-selection continuity", () => {
+  it("preserves selection across a same-query canonical result replacement", () => {
+    const { result, rerender } = renderHook(() =>
+      useTranslationKeyDataTable({
+        enableRowSelection: true,
+      }),
+    );
+
+    act(() => {
+      result.current.table.setRowSelection({
+        [String(record.id)]: true,
+      });
+    });
+
+    expect(result.current.table.state.rowSelection).toEqual({
+      [String(record.id)]: true,
+    });
+
+    currentResult = createResult([
+      {
+        ...record,
+        description: "Refreshed canonical record",
+      },
+    ]);
+
+    rerender();
+
+    expect(result.current.table.state.rowSelection).toEqual({
+      [String(record.id)]: true,
+    });
+  });
+
+  it("clears selection when the semantic server query changes", async () => {
+    const { result } = renderHook(() =>
+      useTranslationKeyDataTable({
+        enableRowSelection: true,
+      }),
+    );
+
+    const selectRecord = () => {
+      act(() => {
+        result.current.table.setRowSelection({
+          [String(record.id)]: true,
+        });
+      });
+
+      expect(result.current.table.state.rowSelection).toEqual({
+        [String(record.id)]: true,
+      });
+    };
+
+    selectRecord();
+
+    act(() => {
+      result.current.query.onGlobalFilterChange("auth");
+    });
+
+    await waitFor(() => {
+      expect(result.current.table.state.rowSelection).toEqual({});
+    });
+
+    selectRecord();
+
+    act(() => {
+      result.current.query.onColumnFiltersChange([
+        {
+          id: "category",
+          value: 1,
+        },
+      ]);
+    });
+
+    await waitFor(() => {
+      expect(result.current.table.state.rowSelection).toEqual({});
+    });
+
+    selectRecord();
+
+    act(() => {
+      result.current.query.onSortingChange([
+        {
+          id: "key",
+          desc: true,
+        },
+      ]);
+    });
+
+    await waitFor(() => {
+      expect(result.current.table.state.rowSelection).toEqual({});
+    });
+
+    selectRecord();
+
+    act(() => {
+      result.current.query.onPaginationChange((previous) => ({
+        ...previous,
+        pageIndex: 1,
+      }));
+    });
+
+    await waitFor(() => {
+      expect(result.current.table.state.rowSelection).toEqual({});
+    });
+  });
+
+  it("pins expansion then selection to logical start and actions to logical end", () => {
+    const rowActions: readonly DataTableRowAction<TranslationKey>[] = [
+      {
+        id: "edit",
+        label: "Edit",
+        onClick: () => undefined,
+      },
+    ];
+
+    const { result } = renderHook(() =>
+      useTranslationKeyDataTable({
+        rowActions,
+        enableTranslationDetails: true,
+        enableRowSelection: true,
+      }),
+    );
+
+    expect(result.current.table.state.columnPinning).toEqual({
+      start: [
+        DATA_TABLE_EXPANSION_COLUMN_ID,
+        DATA_TABLE_SELECTION_COLUMN_ID,
+      ],
+      end: [DATA_TABLE_ACTIONS_COLUMN_ID],
+    });
+
+    expect(result.current.table.getRow(String(record.id)).getCanSelect()).toBe(
+      true,
+    );
   });
 });
