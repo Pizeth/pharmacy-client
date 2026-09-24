@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { ExpandedState } from "@tanstack/table-core";
 import { useTheme } from "@mui/material";
 import {
   createDataTableServerTableBinding,
@@ -101,6 +102,16 @@ export function useTranslationKeyDataTable(
   const theme = useTheme();
 
   /**
+   * Translation detail expansion is resource-local presentation state.
+   *
+   * It must not become part of DataTableServerQueryState:
+   *
+   * - a same-query mutation refresh should preserve the open detail panel
+   * - a semantic table-query transition should clear stale expansion
+   */
+  const [expanded, setExpanded] = useState<ExpandedState>({});
+
+  /**
    * ================================================================
    * 1. Resource filter-option data
    * ================================================================
@@ -186,6 +197,25 @@ export function useTranslationKeyDataTable(
    * 4. Execute TranslationKey resource query
    * --------------------------------------------------------------
    */
+  /**
+   * Query state changes establish a different server-result context.
+   *
+   * Reset expansion for:
+   *
+   * - pagination
+   * - sorting
+   * - column filtering
+   * - global search
+   * - explicit query replacement/reset
+   *
+   * request.refresh() deliberately leaves query.state unchanged, so
+   * nested TranslationValue mutations preserve the expanded key while
+   * canonical server data replaces row.original.translations.
+   */
+  useEffect(() => {
+    setExpanded({});
+  }, [query.state]);
+
   const request = useTranslationKeyDataTableRequest(query.state);
 
   /**
@@ -259,6 +289,23 @@ export function useTranslationKeyDataTable(
    */
   const table = useMuiDataTable({
     ...binding,
+
+    /**
+     * Layer resource-owned expansion over the query-owned state slices
+     * supplied by the generic server binding.
+     */
+    state: {
+      ...binding.state,
+      expanded,
+    },
+
+    onExpandedChange: setExpanded,
+
+    /**
+     * Same-query server-result replacement must not close the detail
+     * panel. Semantic query transitions reset it explicitly above.
+     */
+    autoResetExpanded: false,
 
     columns,
 
