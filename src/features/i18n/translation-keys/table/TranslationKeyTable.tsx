@@ -24,6 +24,7 @@ import {
   TranslationKeyDeleteDialog,
   TranslationKeyEditDialog,
   TranslationValueCreateDialog,
+  TranslationValueDeleteDialog,
   TranslationValueEditDialog,
 } from "../forms";
 import type { TranslationKey, TranslationValue } from "../schemas";
@@ -91,6 +92,11 @@ export function TranslationKeyTable() {
     useState<TranslationKey | null>(null);
 
   const [editingTranslation, setEditingTranslation] = useState<{
+    readonly record: TranslationKey;
+    readonly translation: TranslationValue;
+  } | null>(null);
+
+  const [deletingTranslation, setDeletingTranslation] = useState<{
     readonly record: TranslationKey;
     readonly translation: TranslationValue;
   } | null>(null);
@@ -308,6 +314,36 @@ export function TranslationKeyTable() {
         }}
       />
 
+      <TranslationValueDeleteDialog
+        record={deletingTranslation?.record ?? null}
+        translation={deletingTranslation?.translation ?? null}
+        onClose={() => {
+          setDeletingTranslation(null);
+        }}
+        onDeleted={(translation) => {
+          const key =
+            deletingTranslation?.record.key;
+
+          setDeletingTranslation(null);
+
+          setSuccessMessage(
+            key
+              ? `Deleted ${translation.locale.toLocaleUpperCase()} translation for: ${key}`
+              : `Deleted ${translation.locale.toLocaleUpperCase()} translation.`,
+          );
+
+          /**
+           * Nested deletion never changes the number of TranslationKey
+           * rows in the current server page, so unlike TranslationKey
+           * deletion there is no last-row/page-recovery branch here.
+           *
+           * Refresh only the current query and let canonical server data
+           * replace row.original.translations.
+           */
+          refresh();
+        }}
+      />
+
       {successMessage && (
         <Alert severity="success" onClose={() => setSuccessMessage(undefined)}>
           {successMessage}
@@ -375,6 +411,12 @@ export function TranslationKeyTable() {
               }}
               onEdit={(record, translation) => {
                 setEditingTranslation({
+                  record,
+                  translation,
+                });
+              }}
+              onDelete={(record, translation) => {
+                setDeletingTranslation({
                   record,
                   translation,
                 });
