@@ -16,7 +16,10 @@ import {
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { DataTable } from "@/components/DataTable";
-import type { DataTableRowAction } from "@/components/DataTable";
+import type {
+  DataTableBulkAction,
+  DataTableRowAction,
+} from "@/components/DataTable";
 import { ResourceActionButton } from "@/components/buttons";
 import { TranslationKeyApiError } from "../api";
 import {
@@ -109,6 +112,15 @@ export function TranslationKeyTable() {
         inline: true,
         color: "primary",
         renderIcon: () => <EditOutlined fontSize="small" />,
+
+        /**
+         * Mutation safety:
+         *
+         * a row command is not authorized merely because the action
+         * column is visible. The row must be explicitly selected.
+         */
+        isDisabled: ({ row }) => !row.getIsSelected(),
+
         onClick: ({ row }) => {
           setEditingRecord(row.original);
         },
@@ -118,6 +130,13 @@ export function TranslationKeyTable() {
         label: "Delete",
         color: "error",
         renderIcon: () => <DeleteOutline fontSize="small" />,
+
+        /**
+         * Keep destructive row commands aligned with the same explicit
+         * selection contract as Edit.
+         */
+        isDisabled: ({ row }) => !row.getIsSelected(),
+
         onClick: ({ row }) => setDeletingRecord(row.original),
       },
     ],
@@ -133,7 +152,61 @@ export function TranslationKeyTable() {
        * already-finished generic detail-panel architecture.
        */
       enableTranslationDetails: true,
+
+      /**
+       * Phase 1.7.10.7.5:
+       *
+       * opt into the generic TanStack selection feature/column without
+       * moving any resource mutation behavior into DataTable.
+       */
+      enableRowSelection: true,
     });
+
+  /**
+   * Footer commands deliberately support exactly one selected loaded row.
+   *
+   * Multi-selection is still useful for status and future bulk workflows,
+   * but 7.5 does not manufacture a bulk TranslationKey mutation API.
+   */
+  const selectionActions = useMemo<
+    readonly DataTableBulkAction<TranslationKey>[]
+  >(
+    () => [
+      {
+        id: "edit-selected",
+        label: "Edit selected",
+        color: "primary",
+        variant: "text",
+        renderIcon: () => <EditOutlined fontSize="small" />,
+        isDisabled: ({ selectedCount, selectedRows }) =>
+          selectedCount !== 1 || selectedRows.length !== 1,
+        onClick: ({ selectedRows }) => {
+          const selected = selectedRows[0];
+
+          if (selected) {
+            setEditingRecord(selected.original);
+          }
+        },
+      },
+      {
+        id: "delete-selected",
+        label: "Delete selected",
+        color: "error",
+        variant: "text",
+        renderIcon: () => <DeleteOutline fontSize="small" />,
+        isDisabled: ({ selectedCount, selectedRows }) =>
+          selectedCount !== 1 || selectedRows.length !== 1,
+        onClick: ({ selectedRows }) => {
+          const selected = selectedRows[0];
+
+          if (selected) {
+            setDeletingRecord(selected.original);
+          }
+        },
+      },
+    ],
+    [],
+  );
 
   /**
    * ================================================================
@@ -244,6 +317,24 @@ export function TranslationKeyTable() {
         onDeleted={(record) => {
           setDeletingRecord(null);
           setSuccessMessage(`Deleted translation key: ${record.key}`);
+
+          /**
+           * A deleted entity can no longer remain selected.
+           *
+           * Remove only that stable server row ID so the cleanup is
+           * correct even if future selection policy allows more than one
+           * selected row at mutation time.
+           */
+          table.setRowSelection((previous) => {
+            const next = {
+              ...previous,
+            };
+
+            delete next[String(record.id)];
+
+            return next;
+          });
+
           const { pageIndex } = query.state.pagination;
           if (
             pageIndex > 0 &&
@@ -497,9 +588,21 @@ export function TranslationKeyTable() {
            */
           pagination={{}}
           /**
-           * No row bulk-selection UX for TranslationKey yet.
+           * Reuse the generic footer selection surface.
+           *
+           * It renders inside the left side of the existing pagination
+           * footer, matching MRT's bottom selected-row status behavior.
+           *
+           * Resource mutation policy remains here:
+           *
+           * - status supports one or many selected rows
+           * - Edit/Delete require exactly one loaded selected row
+           * - Clear delegates to TanStack rowSelection state
            */
-          selectionBar={false}
+          selectionBar={{
+            actions: selectionActions,
+            clearable: true,
+          }}
           // /**
           //  * We intentionally keep the filter row hidden until the
           //  * resource-aware category/locale controls are implemented.
