@@ -39,6 +39,7 @@ const PageSizeSelectRoot = styled(Select<number>, {
   minWidth: 52,
   height: 28,
   flex: "0 0 auto",
+  fontSize: theme.typography.body2.fontSize,
 
   /**
    * MUI's standard Select keeps text on an input-style baseline with
@@ -91,6 +92,11 @@ export function DataTablePageSizeSelect(props: DataTablePageSizeSelectProps) {
       <PageSizeSelectRoot
         className={dataTableClasses.pageSizeSelect}
         value={pageSize}
+        renderValue={(value) => (
+          <Typography component="span" variant="body2">
+            {value}
+          </Typography>
+        )}
         size="small"
         variant="standard"
         MenuProps={{
@@ -111,7 +117,9 @@ export function DataTablePageSizeSelect(props: DataTablePageSizeSelectProps) {
       >
         {options.map((option) => (
           <MenuItem key={option} value={option}>
-            {option}
+            <Typography component="span" variant="body2">
+              {option}
+            </Typography>
           </MenuItem>
         ))}
       </PageSizeSelectRoot>
