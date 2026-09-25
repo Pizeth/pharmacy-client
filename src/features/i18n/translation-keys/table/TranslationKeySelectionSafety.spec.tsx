@@ -53,6 +53,9 @@ jest.mock("@/components/DataTable", () => ({
     };
     selectionBar: {
       actions: readonly DataTableBulkAction<TranslationKey>[];
+      renderStartContent?: (
+        context: DataTableSelectionContext<TranslationKey>,
+      ) => React.ReactNode;
     };
   }) => {
     const selectedRow = {
@@ -103,8 +106,22 @@ jest.mock("@/components/DataTable", () => ({
       selectedCount: 2,
     };
 
+    const oneSelectedStart =
+      selectionBar.renderStartContent?.(oneSelectedContext);
+
+    const manySelectedStart =
+      selectionBar.renderStartContent?.(manySelectedContext);
+
     return (
       <>
+        <div data-testid="one-selected-start">
+          {oneSelectedStart}
+        </div>
+
+        <div data-testid="many-selected-start">
+          {manySelectedStart}
+        </div>
+
         {table.actions.map((action) => (
           <div key={action.id}>
             <button
@@ -258,6 +275,18 @@ describe("TranslationKey row-selection mutation safety", () => {
         name: "Edit translation key",
       }),
     ).toHaveTextContent(record.key);
+  });
+
+  it("shows the selected TranslationKey identity only for a single loaded selection", () => {
+    render(<TranslationKeyTable />);
+
+    expect(
+      screen.getByTestId("one-selected-start"),
+    ).toHaveTextContent(record.key);
+
+    expect(
+      screen.getByTestId("many-selected-start"),
+    ).toBeEmptyDOMElement();
   });
 
   it("reuses the footer selection surface and allows mutations only for exactly one loaded row", () => {
