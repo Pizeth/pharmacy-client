@@ -3,6 +3,11 @@
 import { styled, TableBody } from "@mui/material";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../table";
+import {
+  getDataTableRowsForPinningDisplay,
+  isDataTableStickyRowPinningMode,
+  type DataTableRowPinningDisplayMode,
+} from "../row-pinning";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import {
   DataTableEmptyState,
@@ -23,6 +28,7 @@ const BodyRoot = styled(TableBody, {
 
 export interface DataTableBodyProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
+  readonly rowPinningDisplayMode: DataTableRowPinningDisplayMode;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
 }
 
@@ -50,7 +56,7 @@ export interface DataTableBodyProps<TData extends RowData> {
 export function DataTableBody<TData extends RowData>(
   props: DataTableBodyProps<TData>,
 ) {
-  const { table, renderDetailPanel } = props;
+  const { table, rowPinningDisplayMode, renderDetailPanel } = props;
 
   const { density } = useDataTableDensity();
   const filterDisplay = useOptionalDataTableFilterDisplay();
@@ -93,7 +99,14 @@ export function DataTableBody<TData extends RowData>(
       })}
     >
       {(selected) => {
-        const rows = table.getRowModel().rows;
+        const rows = getDataTableRowsForPinningDisplay(
+          table,
+          rowPinningDisplayMode,
+        );
+
+        const stickyRowPinning = isDataTableStickyRowPinningMode(
+          rowPinningDisplayMode,
+        );
 
         const visibleColumnCount = table.getVisibleLeafColumns().length;
 
@@ -157,6 +170,7 @@ export function DataTableBody<TData extends RowData>(
                 table={table}
                 row={row}
                 pinnedRowStickyTop={pinnedRowStickyTop}
+                stickyRowPinning={stickyRowPinning}
                 renderDetailPanel={renderDetailPanel}
               />
             ))}
