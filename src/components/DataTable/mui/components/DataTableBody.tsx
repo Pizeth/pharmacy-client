@@ -11,7 +11,7 @@ import {
 } from "./states";
 import { normalizeDataTableGlobalFilter } from "../utils";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
-import { useDataTableFilterDisplay } from "../filter-display";
+import { useOptionalDataTableFilterDisplay } from "../filter-display";
 import { DataTableDetailPanelRenderer } from "./detail-panel";
 import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
 
@@ -53,8 +53,12 @@ export function DataTableBody<TData extends RowData>(
   const { table, renderDetailPanel } = props;
 
   const { density } = useDataTableDensity();
-  const { columnFilterDisplayMode, showColumnFilters } =
-    useDataTableFilterDisplay();
+  const filterDisplay = useOptionalDataTableFilterDisplay();
+
+  const columnFilterDisplayMode =
+    filterDisplay?.columnFilterDisplayMode ?? "popover";
+
+  const showColumnFilters = filterDisplay?.showColumnFilters ?? false;
 
   const densityMetrics = getDataTableDensityMetrics(density);
 
