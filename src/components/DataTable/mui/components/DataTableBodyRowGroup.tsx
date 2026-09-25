@@ -11,6 +11,7 @@ import type { DataTableDetailPanelRenderer } from "./detail-panel";
 export interface DataTableBodyRowGroupProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
   readonly row: Row<MuiDataTableFeatures, TData>;
+  readonly pinnedRowStickyTop: number;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
 }
 
@@ -26,11 +27,15 @@ export interface DataTableBodyRowGroupProps<TData extends RowData> {
 export function DataTableBodyRowGroup<TData extends RowData>(
   props: DataTableBodyRowGroupProps<TData>,
 ) {
-  const { table, row, renderDetailPanel } = props;
+  const { table, row, pinnedRowStickyTop, renderDetailPanel } = props;
 
   return (
     <Fragment>
-      <DataTableBodyRow table={table} row={row} />
+      <DataTableBodyRow
+        table={table}
+        row={row}
+        pinnedRowStickyTop={pinnedRowStickyTop}
+      />
 
       {renderDetailPanel && (
         <DataTableDetailPanelRow
