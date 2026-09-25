@@ -612,6 +612,21 @@ const defaultThemeInvariants = {
           },
         }),
 
+        /**
+         * Match MRT's bottom selection alert information color.
+         *
+         * Both the generic selected-count Typography and any resource-owned
+         * leading identity content live under SelectionBarStart, so one
+         * inherited color keeps the complete information cluster coherent.
+         *
+         * Keep this in the application theme rather than the DataTable
+         * renderer: the renderer owns structure, while product presentation
+         * remains configurable through the public RazethDataTable slots.
+         */
+        selectionBarStart: {
+          color: "var(--app-palette-Alert-infoColor)",
+        },
+
         paginationStart: {
           minWidth: 0,
           flex: "1 1 auto",
