@@ -8,6 +8,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
+import type { TypographyProps } from "@mui/material";
 import {
   AddRounded,
   DeleteOutline,
@@ -64,7 +65,7 @@ const SelectionInfoRoot = styled(Typography, {
   name: COMPONENT_NAME,
   slot: "Caption",
   overridesResolver: (_props, styles) => styles.caption,
-})({});
+})<TypographyProps>({});
 
 /**
  * Convert an erased request/runtime error into appropriate UI text.
