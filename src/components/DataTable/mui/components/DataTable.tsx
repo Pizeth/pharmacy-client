@@ -13,6 +13,10 @@ import { DataTableFullscreenProvider } from "../fullscreen";
 import type { DataTableFullscreenConfig } from "../fullscreen";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { MuiDataTableInstance } from "../table";
+import {
+  DATA_TABLE_DEFAULT_ROW_PINNING_DISPLAY_MODE,
+  type DataTableRowPinningConfig,
+} from "../row-pinning";
 import { DATA_TABLE_DEFAULT_VARIANT } from "../theme";
 import type { DataTableOwnerState, DataTableVariantProps } from "../theme";
 import { useDataTableThemeDefaults } from "../theme/useDataTableThemeDefaults";
@@ -122,6 +126,14 @@ export interface DataTableProps<TData extends RowData>
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
 
   /**
+   * Row-pinning presentation policy.
+   *
+   * TanStack owns rowPinning state and row APIs. This renderer config controls
+   * only how already-pinned rows are physically presented.
+   */
+  readonly rowPinning?: DataTableRowPinningConfig;
+
+  /**
    * false:
    *   disable selection status/bulk-action bar.
    *
@@ -210,6 +222,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     toolbar = themeDefaults.enableToolbar ?? true,
 
     renderDetailPanel,
+    rowPinning,
     refreshing = false,
     refreshProgress,
     selectionBar = false,
@@ -357,6 +370,10 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                             <DataTableHead table={table} />
                             <DataTableBody
                               table={table}
+                              rowPinningDisplayMode={
+                                rowPinning?.displayMode ??
+                                DATA_TABLE_DEFAULT_ROW_PINNING_DISPLAY_MODE
+                              }
                               renderDetailPanel={renderDetailPanel}
                             />
                           </TableRoot>

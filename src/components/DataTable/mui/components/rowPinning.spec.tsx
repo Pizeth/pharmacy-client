@@ -1,8 +1,9 @@
-import { render } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import { DataTable } from "./DataTable";
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "../table";
+import { createRowPinningColumn } from "../columns/row-pinning";
 
 type Row = {
   id: string;
@@ -26,7 +27,18 @@ const data: Row[] = [
 
 const theme = createTheme();
 
-function Fixture() {
+function Fixture({
+  displayMode = "sticky",
+}: {
+  displayMode?:
+    | "sticky"
+    | "top"
+    | "bottom"
+    | "top-and-bottom"
+    | "select-sticky"
+    | "select-top"
+    | "select-bottom";
+}) {
   const table = useMuiDataTable({
     columns,
     data,
@@ -57,6 +69,7 @@ function Fixture() {
         toolbar={false}
         pagination={false}
         defaultDensity="compact"
+        rowPinning={{ displayMode }}
       />
     </>
   );
@@ -113,4 +126,111 @@ it("renders pinned rows with deterministic sticky offsets", () => {
   expect(bottom).toHaveStyle({
     "--DataTable-row-pinned-offset": "0px",
   });
+});
+
+
+it("physically groups pinned rows in static modes without sticky positioning", () => {
+  const { container } = render(
+    <ThemeProvider theme={theme}>
+      <Fixture displayMode="top-and-bottom" />
+    </ThemeProvider>,
+  );
+
+  const renderedRowIds = Array.from(
+    container.querySelectorAll("[data-row-id]"),
+  ).map((row) => row.getAttribute("data-row-id"));
+
+  expect(renderedRowIds).toEqual(["b", "c", "a", "d"]);
+
+  const top = container.querySelector('[data-row-id="b"]');
+  const bottom = container.querySelector('[data-row-id="d"]');
+
+  expect(top).toHaveAttribute("data-row-pinned", "top");
+  expect(bottom).toHaveAttribute("data-row-pinned", "bottom");
+
+  expect(top).not.toHaveAttribute("data-row-pinning-sticky");
+  expect(bottom).not.toHaveAttribute("data-row-pinning-sticky");
+});
+
+it("preserves final row-model order in sticky mode", () => {
+  const { container } = render(
+    <ThemeProvider theme={theme}>
+      <Fixture displayMode="sticky" />
+    </ThemeProvider>,
+  );
+
+  const renderedRowIds = Array.from(
+    container.querySelectorAll("[data-row-id]"),
+  ).map((row) => row.getAttribute("data-row-id"));
+
+  expect(renderedRowIds).toEqual(["a", "b", "c", "d"]);
+
+  expect(container.querySelector('[data-row-id="b"]')).toHaveAttribute(
+    "data-row-pinning-sticky",
+    "true",
+  );
+});
+
+function PinningControlsFixture() {
+  const pinningColumns = helper.columns([
+    createRowPinningColumn<Row>({
+      displayMode: "top-and-bottom",
+    }),
+    helper.accessor("name", {
+      header: "Name",
+    }),
+  ]);
+
+  const table = useMuiDataTable({
+    columns: pinningColumns,
+    data,
+    getRowId: (row) => row.id,
+    enableRowPinning: true,
+  });
+
+  return (
+    <DataTable
+      table={table}
+      toolbar={false}
+      pagination={false}
+      defaultDensity="compact"
+      rowPinning={{ displayMode: "top-and-bottom" }}
+    />
+  );
+}
+
+it("delegates explicit pin and unpin commands to TanStack row APIs", () => {
+  const { container } = render(
+    <ThemeProvider theme={theme}>
+      <PinningControlsFixture />
+    </ThemeProvider>,
+  );
+
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: "Pin row b to bottom",
+    }),
+  );
+
+  const renderedAfterPin = Array.from(
+    container.querySelectorAll("[data-row-id]"),
+  ).map((row) => row.getAttribute("data-row-id"));
+
+  expect(renderedAfterPin).toEqual(["a", "c", "d", "b"]);
+  expect(container.querySelector('[data-row-id="b"]')).toHaveAttribute(
+    "data-row-pinned",
+    "bottom",
+  );
+
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: "Unpin row b",
+    }),
+  );
+
+  const renderedAfterUnpin = Array.from(
+    container.querySelectorAll("[data-row-id]"),
+  ).map((row) => row.getAttribute("data-row-id"));
+
+  expect(renderedAfterUnpin).toEqual(["a", "b", "c", "d"]);
 });

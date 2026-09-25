@@ -2,6 +2,7 @@
 
 export * from "./actions";
 export * from "./expansion";
+export * from "./row-pinning";
 export * from "./selection";
 
 export * from "./muiDataTableColumns";

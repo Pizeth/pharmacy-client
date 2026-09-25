@@ -117,6 +117,8 @@ export const dataTableClasses = generateUtilityClasses(
     "selectRowCheckbox",
     "expandRowButton",
     "expandAllButton",
+    "rowPinningControls",
+    "rowPinButton",
 
     /**
      * ============================================================
