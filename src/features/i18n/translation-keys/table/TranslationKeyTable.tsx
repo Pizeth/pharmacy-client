@@ -595,6 +595,15 @@ export function TranslationKeyTable() {
            */
           pagination={{}}
           /**
+           * Preserve the legacy MRT interaction contract explicitly:
+           *
+           * selection checkbox -> TanStack rowPinning -> sticky row.
+           *
+           * The resource owns selection lifecycle; DataTable owns only
+           * presentation of the resulting TanStack pinning state.
+           */
+          rowPinning={{ displayMode: "select-sticky" }}
+          /**
            * Reuse the generic footer selection surface.
            *
            * It renders inside the left side of the existing pagination
