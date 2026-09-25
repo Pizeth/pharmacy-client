@@ -108,7 +108,15 @@ export function SelectField(inProps: SelectFieldProps) {
               name={field.name}
               inputRef={field.ref}
               labelId={labelId}
-              label={label}
+              /**
+               * OutlinedInput uses Select's label prop to size the notch.
+               *
+               * Keep the outline closed while our visible InputLabel is
+               * unshrunk; otherwise a start icon plus an empty value leaves
+               * a large blank gap in the fieldset even though the label is
+               * still sitting inside the control.
+               */
+              label={shouldShrink ? label : undefined}
               value={value}
               startAdornment={
                 iconStart ? (
