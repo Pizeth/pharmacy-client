@@ -44,9 +44,27 @@ const SelectionBarRoot = styled(Box, {
   '&[data-embedded="true"]': {
     flex: "0 1 auto",
     justifyContent: "flex-start",
+    gap: theme.spacing(0.5),
     minHeight: 0,
     padding: 0,
     backgroundColor: "transparent",
+
+    /**
+     * MRT keeps the selected-row information and mutation commands as one
+     * compact inline cluster in its bottom toolbar.
+     *
+     * SelectionBarStart normally grows in standalone mode so the status can
+     * separate from trailing content. Inside PaginationStart that growth is
+     * counterproductive: it consumes the remaining footer width and pushes
+     * Edit/Delete/Clear away from the selected-row information.
+     *
+     * Embedded mode therefore keeps the start group content-sized while the
+     * outer PaginationStart remains responsible for occupying the available
+     * footer space and keeping pagination controls at the logical end.
+     */
+    [`& .${dataTableClasses.selectionBarStart}`]: {
+      flex: "0 1 auto",
+    },
   },
 }));
 const SelectionBarDividerRoot = styled(Divider, {
