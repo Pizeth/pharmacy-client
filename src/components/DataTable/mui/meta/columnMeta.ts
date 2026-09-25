@@ -130,6 +130,17 @@ export interface MuiDataTableColumnMeta {
   readonly enableColumnOrdering?: boolean;
 
   /**
+   * Whether compact-mode body content should use ellipsis truncation.
+   *
+   * Defaults to true for ordinary data columns.
+   *
+   * Utility columns whose content is a fixed control (selection,
+   * expansion, actions) should set this to false so a narrow control
+   * column never renders a stray ellipsis beside the control.
+   */
+  readonly truncate?: boolean;
+
+  /**
    * Human-readable column label used outside the rendered header.
    *
    * Useful for:
