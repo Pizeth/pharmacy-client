@@ -15,6 +15,7 @@ import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { MuiDataTableInstance } from "../table";
 import {
   DATA_TABLE_DEFAULT_ROW_PINNING_DISPLAY_MODE,
+  DataTableRowPinningProvider,
   type DataTableRowPinningConfig,
 } from "../row-pinning";
 import { DATA_TABLE_DEFAULT_VARIANT } from "../theme";
@@ -288,6 +289,16 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
   const toolbarConfig = typeof toolbar === "object" ? toolbar : {};
 
   /**
+   * Resolve row-pinning presentation exactly once.
+   *
+   * Descendant renderer controls use the same value through
+   * DataTableRowPinningProvider, while DataTableBody receives the resolved
+   * mode explicitly for physical row layout.
+   */
+  const rowPinningDisplayMode =
+    rowPinning?.displayMode ?? DATA_TABLE_DEFAULT_ROW_PINNING_DISPLAY_MODE;
+
+  /**
    * Keep TanStack's resize-direction calculation aligned with the MUI theme.
    *
    * Ideally this option is supplied while creating the table:
@@ -310,7 +321,8 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
             defaultFullscreen={defaultFullscreen}
             onFullscreenChange={onFullscreenChange}
           >
-            <DataTableFilterDisplayProvider
+            <DataTableRowPinningProvider displayMode={rowPinningDisplayMode}>
+              <DataTableFilterDisplayProvider
               columnFilterDisplayMode={columnFilterDisplayMode}
               defaultColumnFilterDisplayMode={defaultColumnFilterDisplayMode}
               onColumnFilterDisplayModeChange={onColumnFilterDisplayModeChange}
@@ -370,10 +382,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                             <DataTableHead table={table} />
                             <DataTableBody
                               table={table}
-                              rowPinningDisplayMode={
-                                rowPinning?.displayMode ??
-                                DATA_TABLE_DEFAULT_ROW_PINNING_DISPLAY_MODE
-                              }
+                              rowPinningDisplayMode={rowPinningDisplayMode}
                               renderDetailPanel={renderDetailPanel}
                             />
                           </TableRoot>
@@ -402,7 +411,8 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                   )}
                 </ContentRoot>
               </DataTableShell>
-            </DataTableFilterDisplayProvider>
+              </DataTableFilterDisplayProvider>
+            </DataTableRowPinningProvider>
           </DataTableFullscreenProvider>
         </DataTableDensityProvider>
       </DataTableAccessibilityProvider>
