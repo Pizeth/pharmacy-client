@@ -26,6 +26,7 @@ import {
   globalFilteringFeature,
   rowExpandingFeature,
   rowPaginationFeature,
+  rowPinningFeature,
   rowSelectionFeature,
   rowSortingFeature,
 } from "@tanstack/table-core";
@@ -72,6 +73,11 @@ export const featureMap = {
   expanding: {
     slot: "rowExpandingFeature",
     feature: rowExpandingFeature,
+  },
+
+  rowPinning: {
+    slot: "rowPinningFeature",
+    feature: rowPinningFeature,
   },
 
   visibility: {
