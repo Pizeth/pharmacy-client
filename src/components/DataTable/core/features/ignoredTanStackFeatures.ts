@@ -54,9 +54,8 @@ export const ignoredTanStackFeatures = [
   /**
    * Advanced row processing not yet exposed.
    *
-   * rowExpandingFeature will move out of this list when we begin
-   * Phase 1.6.3.
+   * rowPinningFeature is now exposed through the stable "rowPinning"
+   * alias and therefore no longer belongs to this ignored set.
    */
   "rowAggregationFeature",
-  "rowPinningFeature",
 ] as const satisfies readonly TanStackStockFeatureSlot[];
