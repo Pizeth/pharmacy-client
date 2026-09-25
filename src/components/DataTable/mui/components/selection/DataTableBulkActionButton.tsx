@@ -2,7 +2,7 @@
 
 "use client";
 
-import { styled, Button, Tooltip } from "@mui/material";
+import { styled, Button, Tooltip, Typography } from "@mui/material";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
 import type { DataTableBulkAction, DataTableSelectionContext } from "./types";
@@ -55,7 +55,9 @@ export function DataTableBulkActionButton<TData extends RowData>(
         action.onClick(context);
       }}
     >
-      {action.label}
+      <Typography component="span" variant="body2" fontWeight="inherit">
+        {action.label}
+      </Typography>
     </BulkActionButtonRoot>
   );
 
