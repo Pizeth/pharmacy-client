@@ -88,6 +88,7 @@ export function createExpansionColumn<TData extends RowData>(
       headerAlign: "center",
       enableColumnMenu: false,
       enableColumnOrdering: false,
+      truncate: false,
     },
   });
 }
