@@ -1,6 +1,7 @@
 "use client";
 
 import { styled, TableRow } from "@mui/material";
+import type { CSSProperties } from "react";
 
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { Row, RowData } from "@tanstack/table-core";
@@ -8,6 +9,10 @@ import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
 import { DataTableBodyCell } from "./DataTableBodyCell";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
+
+export interface DataTableBodyRowStyle extends CSSProperties {
+  readonly "--DataTable-row-pinned-offset"?: string;
+}
 
 const BodyRowRoot = styled(TableRow, {
   name: DATA_TABLE_COMPONENT_NAME,
@@ -64,12 +69,35 @@ const BodyRowRoot = styled(TableRow, {
         { minHeight: `${getDataTableDensityMetrics(density).bodyRowHeight}px` },
       ]),
     ),
+
+    /**
+     * TanStack owns which rows are pinned and in which region.
+     *
+     * The MUI renderer owns only the sticky presentation. Logical row
+     * identity and pinning state never get duplicated into component state.
+     */
+    '&[data-row-pinned="top"]': {
+      position: "sticky",
+      top: "var(--DataTable-row-pinned-offset)",
+      zIndex: 2,
+    },
+
+    '&[data-row-pinned="bottom"]': {
+      position: "sticky",
+      bottom: "var(--DataTable-row-pinned-offset)",
+      zIndex: 2,
+    },
   };
 });
 
 export interface DataTableBodyRowProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
   readonly row: Row<MuiDataTableFeatures, TData>;
+
+  /**
+   * Sticky origin below renderer-owned header/filter rows.
+   */
+  readonly pinnedRowStickyTop: number;
 }
 
 /**
@@ -89,16 +117,53 @@ export interface DataTableBodyRowProps<TData extends RowData> {
 export function DataTableBodyRow<TData extends RowData>(
   props: DataTableBodyRowProps<TData>,
 ) {
-  const { table, row } = props;
+  const { table, row, pinnedRowStickyTop } = props;
 
   const { density } = useDataTableDensity();
 
+  const rowHeight = getDataTableDensityMetrics(density).bodyRowHeight;
+
   return (
     <table.Subscribe
-      source={table.atoms.rowSelection}
-      selector={(rowSelection) => Boolean(rowSelection?.[row.id])}
+      selector={(state) => ({
+        rowSelection: state.rowSelection,
+        rowPinning: state.rowPinning,
+      })}
     >
-      {(selected) => (
+      {(state) => {
+        const selected = Boolean(state.rowSelection?.[row.id]);
+
+        const pinnedPosition = row.getIsPinned();
+
+        const pinnedIndex = pinnedPosition ? row.getPinnedIndex() : -1;
+
+        const bottomRows =
+          pinnedPosition === "bottom" ? table.getBottomRows() : [];
+
+        /**
+         * Top rows stack downward beneath sticky headers.
+         *
+         * Bottom rows stack upward from the bottom edge. TanStack's pinned
+         * index is array order, so bottom rows need their edge index reversed.
+         */
+        const edgeIndex =
+          pinnedPosition === "bottom"
+            ? Math.max(0, bottomRows.length - 1 - pinnedIndex)
+            : Math.max(0, pinnedIndex);
+
+        const pinnedOffset =
+          pinnedPosition === "top"
+            ? pinnedRowStickyTop + edgeIndex * rowHeight
+            : pinnedPosition === "bottom"
+              ? edgeIndex * rowHeight
+              : undefined;
+
+        const style: DataTableBodyRowStyle = {
+          "--DataTable-row-pinned-offset":
+            pinnedOffset === undefined ? undefined : `${pinnedOffset}px`,
+        };
+
+        return (
         <BodyRowRoot
           className={dataTableClasses.bodyRow}
           hover
@@ -106,6 +171,8 @@ export function DataTableBodyRow<TData extends RowData>(
           data-row-id={row.id}
           data-selected={selected ? "true" : undefined}
           data-density={density}
+          data-row-pinned={pinnedPosition || undefined}
+          style={style}
         >
           <table.Subscribe
             selector={(state) => ({
@@ -123,7 +190,8 @@ export function DataTableBodyRow<TData extends RowData>(
             }
           </table.Subscribe>
         </BodyRowRoot>
-      )}
+        );
+      }}
     </table.Subscribe>
   );
 }
