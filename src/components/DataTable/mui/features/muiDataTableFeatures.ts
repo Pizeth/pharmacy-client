@@ -20,6 +20,7 @@ import {
   globalFilteringFeature,
   rowExpandingFeature,
   rowPaginationFeature,
+  rowPinningFeature,
   rowSelectionFeature,
   rowSortingFeature,
   sortFn_alphanumeric,
@@ -102,6 +103,23 @@ export const muiDataTableFeatures = tableFeatures({
    * Checkbox/single/multi/range row selection APIs.
    */
   rowSelectionFeature,
+
+  /**
+   * Row pinning state and APIs.
+   *
+   * This provides:
+   *
+   * - state.rowPinning
+   * - row.pin()
+   * - row.getIsPinned()
+   * - table.getTopRows()
+   * - table.getCenterRows()
+   * - table.getBottomRows()
+   *
+   * Sticky presentation is owned by the MUI body-row renderer below this
+   * feature layer; TanStack remains the state/API authority.
+   */
+  rowPinningFeature,
 
   /**
    * Column visibility state and APIs.
