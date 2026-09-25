@@ -102,6 +102,14 @@ const HeaderCellRoot = styled(TableCell, {
    */
   boxSizing: "border-box",
 
+  /**
+   * Header and body utility controls share one vertical alignment contract.
+   *
+   * This matters most for the Selection column, whose header and row
+   * checkboxes should occupy the same optical center.
+   */
+  verticalAlign: "middle",
+
   width: "var(--DataTable-column-size)",
   minWidth: "var(--DataTable-column-size)",
   maxWidth: "var(--DataTable-column-size)",
