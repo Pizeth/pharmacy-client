@@ -7,6 +7,14 @@ import { LANDING_PAGE } from "@/types/constants";
  */
 const INTERNAL_REDIRECT_ORIGIN = "https://redirect.razeth.invalid";
 
+/**
+ * Refine and this application use these query keys only to transport an
+ * authentication destination.
+ *
+ * They must not become durable application state after authentication.
+ */
+const AUTH_REDIRECT_QUERY_KEYS = ["to", "callbackUrl"] as const;
+
 export const LOGIN_PATH = "/login";
 
 export interface AuthSearchParams {
@@ -82,6 +90,42 @@ export function normalizeInternalRedirectTarget(
 }
 
 /**
+ * Remove authentication-only transport parameters from a destination.
+ *
+ * Why this is separate from normalizeInternalRedirectTarget():
+ *
+ * - normalizeInternalRedirectTarget is a generic internal-URL safety helper
+ *   and must preserve ordinary query state exactly.
+ * - this helper is used only at authentication boundaries, where Refine's
+ *   "to" and our "callbackUrl" are transport metadata rather than page state.
+ *
+ * This also repairs stale URLs produced by an older flow, for example:
+ *
+ *   /admin/i18n?to=/admin/i18n
+ *
+ * becomes:
+ *
+ *   /admin/i18n
+ *
+ * before it is captured as the next callback destination.
+ */
+function normalizeAuthRedirectTarget(
+  value: string | null | undefined,
+  fallback: string = LANDING_PAGE,
+): string {
+  const normalized = normalizeInternalRedirectTarget(value, fallback);
+  const url = new URL(normalized, INTERNAL_REDIRECT_ORIGIN);
+
+  for (const key of AUTH_REDIRECT_QUERY_KEYS) {
+    url.searchParams.delete(key);
+  }
+
+  const search = url.searchParams.toString();
+
+  return `${url.pathname}${search ? `?${search}` : ""}${url.hash}`;
+}
+
+/**
  * Resolve the destination carried by a login/auth URL.
  *
  * Preserve the existing Refine compatibility policy:
@@ -91,6 +135,9 @@ export function normalizeInternalRedirectTarget(
  *   callbackUrl
  *      ↓
  *   LANDING_PAGE
+ *
+ * The resolved target is then canonicalized so auth transport parameters
+ * never leak into the protected route after a successful login.
  */
 export function getAuthRedirectTarget(
   searchParams: AuthSearchParams | null | undefined,
@@ -98,7 +145,7 @@ export function getAuthRedirectTarget(
 ): string {
   const candidate = searchParams?.get("to") ?? searchParams?.get("callbackUrl");
 
-  return normalizeInternalRedirectTarget(candidate, fallback);
+  return normalizeAuthRedirectTarget(candidate, fallback);
 }
 
 /**
@@ -108,7 +155,7 @@ export function getBrowserAuthRedirectTarget(
   fallback: string = LANDING_PAGE,
 ): string {
   if (typeof window === "undefined") {
-    return normalizeInternalRedirectTarget(undefined, fallback);
+    return normalizeAuthRedirectTarget(undefined, fallback);
   }
 
   return getAuthRedirectTarget(
@@ -120,20 +167,22 @@ export function getBrowserAuthRedirectTarget(
 /**
  * Current application location before authentication redirects away.
  *
- * Preserve:
+ * Preserve real application state:
  *
  * - pathname
- * - query string
+ * - non-auth query string
  * - hash
+ *
+ * Auth-only "to" and "callbackUrl" parameters are intentionally removed.
  */
 export function getCurrentBrowserTarget(
   fallback: string = LANDING_PAGE,
 ): string {
   if (typeof window === "undefined") {
-    return normalizeInternalRedirectTarget(undefined, fallback);
+    return normalizeAuthRedirectTarget(undefined, fallback);
   }
 
-  return normalizeInternalRedirectTarget(
+  return normalizeAuthRedirectTarget(
     `${window.location.pathname}${window.location.search}${window.location.hash}`,
     fallback,
   );
@@ -141,12 +190,16 @@ export function getCurrentBrowserTarget(
 
 /**
  * Build the login URL carrying one exact internal callback target.
+ *
+ * The login URL itself owns the single callbackUrl transport parameter.
+ * Protected-page query state is nested inside that value only after auth
+ * transport parameters have been stripped.
  */
 export function createLoginRedirect(
   target: string,
   fallback: string = LANDING_PAGE,
 ): string {
-  const callbackUrl = normalizeInternalRedirectTarget(target, fallback);
+  const callbackUrl = normalizeAuthRedirectTarget(target, fallback);
 
   const params = new URLSearchParams({
     callbackUrl,

@@ -3,7 +3,6 @@ import PulseLoader from "@/components/effect/loaders/loader";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
 import { VERIFY_ID_PATH } from "@/types/constants";
 import { Authenticated, useGetIdentity } from "@refinedev/core";
-// import { NavigateToResource } from "@refinedev/nextjs-router";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 
@@ -23,12 +22,6 @@ function ProfileGate({ children }: { children: React.ReactNode }) {
 
   const isOnVerifyPage =
     !!VERIFY_ID_PATH && pathname?.startsWith(VERIFY_ID_PATH);
-
-  console.log("loading", isLoading);
-  console.log("identity", identity);
-  console.log("pathname:", JSON.stringify(pathname));
-  console.log("VERIFY_ID_PATH:", VERIFY_ID_PATH);
-  console.log("isOnVerifyPage:", isOnVerifyPage);
 
   useEffect(() => {
     if (isLoading || !identity) return;
@@ -94,18 +87,21 @@ export default function ProtectedLayout({
   return (
     <Authenticated
       key="protected-layout"
-      loading={<PulseLoader />} // 👈 shown while authProvider.check() is pending
-      // If not authenticated, redirect to /login
-      // fallback={<NavigateToResource resource="login" />}
+      loading={<PulseLoader />}
       /**
-       * Keep fallback absent so Refine performs the redirect itself and
-       * appends the current route as its native "to" query parameter.
+       * Keep fallback absent so Refine performs the redirect requested by
+       * authProvider.check().
        *
-       * The login flow already prefers "to" over "callbackUrl", so the
-       * original protected destination survives a successful sign-in.
+       * authProvider.check() already returns:
+       *
+       *   /login?callbackUrl=<clean protected destination>
+       *
+       * Therefore do not let <Authenticated> append Refine's additional "to"
+       * parameter. Carrying both values makes the login URL ambiguous and can
+       * leak auth transport metadata back into the protected route.
        */
       redirectOnFail
-      appendCurrentPathToQuery
+      appendCurrentPathToQuery={false}
     >
       <ProfileGate>
         <DrawerAppBar>{children}</DrawerAppBar>

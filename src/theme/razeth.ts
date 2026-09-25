@@ -627,6 +627,47 @@ const defaultThemeInvariants = {
           color: "var(--app-palette-Alert-infoColor)",
         },
 
+        /**
+         * Footer command geometry.
+         *
+         * MUI buttons already use inline-flex, but custom fonts can make the
+         * label's line box sit perceptibly higher than a start icon. Keep the
+         * complete control on one centered 28px row so selected-count text,
+         * resource identity, icons, and command labels share one visual axis.
+         */
+        selectionBarStatus: {
+          minHeight: 28,
+          display: "flex",
+          alignItems: "center",
+          lineHeight: 1,
+        },
+
+        bulkActionButton: {
+          minHeight: 28,
+          alignItems: "center",
+          lineHeight: 1,
+
+          "& .MuiButton-startIcon": {
+            display: "flex",
+            alignItems: "center",
+            alignSelf: "center",
+            marginBlock: 0,
+          },
+        },
+
+        selectionClearButton: {
+          minHeight: 28,
+          alignItems: "center",
+          lineHeight: 1,
+
+          "& .MuiButton-startIcon": {
+            display: "flex",
+            alignItems: "center",
+            alignSelf: "center",
+            marginBlock: 0,
+          },
+        },
+
         paginationStart: {
           minWidth: 0,
           flex: "1 1 auto",
@@ -1452,8 +1493,13 @@ export const RazethBaseTheme = (): RaThemeOptions =>
             },
           }),
           notchedOutline: {
-            // Target the border element for the outlined variant
-            borderRadius: 50,
+            /**
+             * Keep the physical fieldset radius consistent even when a
+             * specialized input changes the root radius. In particular,
+             * multiline description fields should read as rounded panels,
+             * not oversized capsules.
+             */
+            borderRadius: "calc(3 * var(--app-spacing))",
           },
         },
       },
