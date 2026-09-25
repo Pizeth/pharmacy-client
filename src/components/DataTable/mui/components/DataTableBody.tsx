@@ -10,6 +10,8 @@ import {
   DataTableLoadingState,
 } from "./states";
 import { normalizeDataTableGlobalFilter } from "../utils";
+import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
+import { useDataTableFilterDisplay } from "../filter-display";
 import { DataTableDetailPanelRenderer } from "./detail-panel";
 import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
 
@@ -50,6 +52,29 @@ export function DataTableBody<TData extends RowData>(
 ) {
   const { table, renderDetailPanel } = props;
 
+  const { density } = useDataTableDensity();
+  const { columnFilterDisplayMode, showColumnFilters } =
+    useDataTableFilterDisplay();
+
+  const densityMetrics = getDataTableDensityMetrics(density);
+
+  /**
+   * Top-pinned rows live inside the same scroll container as sticky
+   * headers and the optional filter subheader.
+   *
+   * Their sticky origin therefore begins below those renderer-owned
+   * surfaces rather than at viewport top.
+   */
+  const normalHeaderHeight =
+    table.getHeaderGroups().length * densityMetrics.headerHeight;
+
+  const filterSubheaderHeight =
+    columnFilterDisplayMode === "subheader" && showColumnFilters
+      ? Math.max(40, densityMetrics.headerHeight - 4)
+      : 0;
+
+  const pinnedRowStickyTop = normalHeaderHeight + filterSubheaderHeight;
+
   return (
     <table.Subscribe
       selector={(state) => ({
@@ -60,6 +85,7 @@ export function DataTableBody<TData extends RowData>(
         columnFilters: state.columnFilters,
         globalFilter: state.globalFilter,
         expanded: state.expanded,
+        rowPinning: state.rowPinning,
       })}
     >
       {(selected) => {
@@ -126,6 +152,7 @@ export function DataTableBody<TData extends RowData>(
                 key={row.id}
                 table={table}
                 row={row}
+                pinnedRowStickyTop={pinnedRowStickyTop}
                 renderDetailPanel={renderDetailPanel}
               />
             ))}
