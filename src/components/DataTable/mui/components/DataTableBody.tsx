@@ -28,7 +28,7 @@ const BodyRoot = styled(TableBody, {
 
 export interface DataTableBodyProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
-  readonly rowPinningDisplayMode: DataTableRowPinningDisplayMode;
+  readonly rowPinningDisplayMode?: DataTableRowPinningDisplayMode;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
 }
 
@@ -56,7 +56,11 @@ export interface DataTableBodyProps<TData extends RowData> {
 export function DataTableBody<TData extends RowData>(
   props: DataTableBodyProps<TData>,
 ) {
-  const { table, rowPinningDisplayMode, renderDetailPanel } = props;
+  const {
+    table,
+    rowPinningDisplayMode = "sticky",
+    renderDetailPanel,
+  } = props;
 
   const { density } = useDataTableDensity();
   const filterDisplay = useOptionalDataTableFilterDisplay();
