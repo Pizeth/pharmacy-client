@@ -55,10 +55,32 @@ describe("auth redirect target", () => {
     );
   });
 
+  it("removes nested auth transport params from the resolved destination", () => {
+    const params = new URLSearchParams();
+
+    params.set(
+      "callbackUrl",
+      "/admin/i18n?category=auth&to=%2Fadmin%2Fi18n&callbackUrl=%2Ffts",
+    );
+
+    expect(getAuthRedirectTarget(params, "/dashboard")).toBe(
+      "/admin/i18n?category=auth",
+    );
+  });
+
   it("builds a login URL which carries the complete protected destination", () => {
     expect(
       createLoginRedirect("/admin/i18n?category=auth&page=2", "/dashboard"),
     ).toBe("/login?callbackUrl=%2Fadmin%2Fi18n%3Fcategory%3Dauth%26page%3D2");
+  });
+
+  it("builds exactly one clean callbackUrl even from a stale protected URL", () => {
+    expect(
+      createLoginRedirect(
+        "/admin/i18n?category=auth&to=%2Fadmin%2Fi18n&callbackUrl=%2Ffts",
+        "/dashboard",
+      ),
+    ).toBe("/login?callbackUrl=%2Fadmin%2Fi18n%3Fcategory%3Dauth");
   });
 
   it("captures the complete current browser target", () => {
@@ -70,6 +92,18 @@ describe("auth redirect target", () => {
 
     expect(getCurrentBrowserTarget("/dashboard")).toBe(
       "/admin/i18n?category=auth&page=2#translations",
+    );
+  });
+
+  it("removes stale auth transport params while preserving real page state", () => {
+    window.history.replaceState(
+      {},
+      "",
+      "/admin/i18n?category=auth&to=%2Fadmin%2Fi18n&callbackUrl=%2Ffts#translations",
+    );
+
+    expect(getCurrentBrowserTarget("/dashboard")).toBe(
+      "/admin/i18n?category=auth#translations",
     );
   });
 
