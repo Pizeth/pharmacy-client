@@ -85,6 +85,16 @@ it("applies utility control overrides without changing expansion geometry", () =
   expect(
     screen.getByRole("button", { name: "Expand details for row a" }),
   ).toHaveStyle({ width: "28px", height: "28px" });
+
+  const selectionCell = container.querySelector(
+    `.${dataTableClasses.bodyCell}[data-column-id="__dataTableSelection"]`,
+  );
+
+  expect(selectionCell).not.toBeNull();
+  expect(selectionCell).toHaveAttribute("data-truncate", "false");
+  expect(selectionCell).toHaveStyle({
+    textOverflow: "clip",
+  });
 });
 it("preserves individual, indeterminate and select-all page behavior", () => {
   mount();
