@@ -234,7 +234,13 @@ export function DataTableSelectionBar<TData extends RowData>(
                       table.setRowSelection({});
                     }}
                   >
-                    Clear
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      fontWeight="inherit"
+                    >
+                      Clear
+                    </Typography>
                   </SelectionClearButtonRoot>
                 )}
               </SelectionBarEndRoot>

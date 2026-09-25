@@ -79,6 +79,8 @@ export function createSelectionColumn<TData extends RowData>(
       align: "center",
       headerAlign: "center",
       enableColumnMenu: false,
+      enableColumnOrdering: false,
+      truncate: false,
     },
   });
 }

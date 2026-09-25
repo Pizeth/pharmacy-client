@@ -72,6 +72,11 @@ export const featureAliases = {
   expanding: "rowExpandingFeature",
 
   /**
+   * Row pinning state and top/center/bottom row APIs.
+   */
+  rowPinning: "rowPinningFeature",
+
+  /**
    * Column visibility.
    */
   visibility: "columnVisibilityFeature",

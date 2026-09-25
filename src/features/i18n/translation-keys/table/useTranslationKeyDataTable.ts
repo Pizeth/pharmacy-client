@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { ExpandedState, RowSelectionState } from "@tanstack/table-core";
+import type {
+  ExpandedState,
+  RowPinningState,
+  RowSelectionState,
+} from "@tanstack/table-core";
 import { useTheme } from "@mui/material";
 import {
   createDataTableServerTableBinding,
@@ -134,6 +138,30 @@ export function useTranslationKeyDataTable(
    * cannot accidentally authorize resource mutation commands.
    */
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  /**
+   * MRT parity for this resource uses "select-sticky":
+   *
+   * selected row IDs
+   *      ↓
+   * TanStack rowPinning.top
+   *
+   * There is intentionally no second independently mutable pinning state
+   * here. Selection remains the resource command state, while TanStack's
+   * row-pinning feature supplies the canonical pinned-row APIs consumed by
+   * the renderer.
+   */
+  const rowPinning = useMemo<RowPinningState>(
+    () => ({
+      top: enableRowSelection
+        ? Object.entries(rowSelection)
+            .filter(([, selected]) => selected)
+            .map(([rowId]) => rowId)
+        : [],
+      bottom: [],
+    }),
+    [enableRowSelection, rowSelection],
+  );
 
   /**
    * ================================================================
@@ -372,6 +400,7 @@ export function useTranslationKeyDataTable(
       ...binding.state,
       expanded,
       rowSelection,
+      rowPinning,
     },
 
     onExpandedChange: setExpanded,
@@ -403,6 +432,22 @@ export function useTranslationKeyDataTable(
      * further narrow themselves to exactly one selected row.
      */
     enableRowSelection,
+
+    /**
+     * ------------------------------------------------------------
+     * Row pinning — legacy MRT "select-sticky" parity
+     * ------------------------------------------------------------
+     *
+     * The row pinning feature is now installed in the shared MUI table
+     * family. TranslationKey opts into it by deriving pinned top rows from
+     * its controlled selection state.
+     *
+     * keepPinnedRows=false is important for a manual/server table: a row
+     * from another server page must never be resurrected into the current
+     * render merely because an old ID was pinned.
+     */
+    enableRowPinning: enableRowSelection,
+    keepPinnedRows: false,
 
     /**
      * ------------------------------------------------------------

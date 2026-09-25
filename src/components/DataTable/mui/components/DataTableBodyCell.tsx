@@ -59,6 +59,17 @@ const BodyCellRoot = styled(TableCell, {
       ];
     }),
   ),
+  /**
+   * Fixed-control utility columns do not contain truncatable text.
+   *
+   * Keep overflow clipping from the physical cell, but opt out of the
+   * ellipsis marker itself. This avoids the tiny trailing dot that can
+   * otherwise appear beside a checkbox in compact density.
+   */
+  '&[data-truncate="false"]': {
+    textOverflow: "clip",
+  },
+
   '&[data-pinned="start"], &[data-pinned="end"]': {
     position: "sticky",
     zIndex: 1,
@@ -145,6 +156,7 @@ export function DataTableBodyCell<
             data-pinned={pinnedLayout?.position}
             data-pinned-boundary={pinnedLayout?.isCenterBoundary || undefined}
             data-density={density}
+            data-truncate={meta?.truncate === false ? "false" : undefined}
             style={style}
           >
             <appCell.FlexRender />

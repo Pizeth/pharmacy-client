@@ -90,6 +90,20 @@ it("themes all selection surfaces and preserves live status and custom content",
   expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
   expect(screen.getByText("a,b")).toBeVisible();
   expect(screen.getByText("Custom end")).toBeVisible();
+
+  /**
+   * Button labels use an explicit MUI typography box so custom application
+   * fonts share the same line-box geometry as their start icons.
+   */
+  const actionButton = screen.getByRole("button", {
+    name: "Inspect for 2 selected rows",
+  });
+  const clearButton = screen.getByRole("button", {
+    name: "Clear all selected rows",
+  });
+
+  expect(actionButton.querySelector(".MuiTypography-body2")).not.toBeNull();
+  expect(clearButton.querySelector(".MuiTypography-body2")).not.toBeNull();
 });
 it("passes the current selection context to a bulk action", () => {
   const { onAction } = mount();

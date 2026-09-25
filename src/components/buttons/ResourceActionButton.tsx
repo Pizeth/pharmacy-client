@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import type { ButtonProps } from "@mui/material";
 import { styled, useThemeProps } from "@mui/material/styles";
 
@@ -20,11 +20,31 @@ const Root = styled(Button, {
 
 export interface ResourceActionButtonProps extends Omit<ButtonProps, "sx"> {}
 
+/**
+ * Resource-level action button.
+ *
+ * Keep the actual label inside MUI Typography rather than relying on the
+ * Button's raw text line box. Our Khmer/Latin font stack has different ascent
+ * metrics, and Typography gives the text the same body2 geometry everywhere:
+ *
+ *   icon  +  body2 label
+ *
+ * This is especially important in compact toolbars where a raw string can
+ * appear a few pixels above the icon even though Button itself is centered.
+ */
 export function ResourceActionButton(inProps: ResourceActionButtonProps) {
   const props = useThemeProps({
     props: inProps,
     name: PREFIX,
   });
 
-  return <Root {...props} />;
+  const { children, ...rest } = props;
+
+  return (
+    <Root {...rest}>
+      <Typography component="span" variant="body2">
+        <strong>{children}</strong>
+      </Typography>
+    </Root>
+  );
 }

@@ -128,8 +128,18 @@ export function DataTableFilterDisplayProvider(
   );
 }
 
+/**
+ * Optional context reader for lower-level renderer pieces that are also
+ * intentionally usable in isolation by focused tests/fixtures.
+ */
+export function useOptionalDataTableFilterDisplay():
+  | DataTableFilterDisplayContextValue
+  | undefined {
+  return useContext(DataTableFilterDisplayContext);
+}
+
 export function useDataTableFilterDisplay(): DataTableFilterDisplayContextValue {
-  const context = useContext(DataTableFilterDisplayContext);
+  const context = useOptionalDataTableFilterDisplay();
 
   if (context === undefined) {
     throw new Error(

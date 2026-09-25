@@ -65,6 +65,7 @@ export function createActionsColumn<TData extends RowData>(
       headerAlign: "center",
       enableColumnMenu: false,
       enableColumnOrdering: false,
+      truncate: false,
     },
   });
 }
