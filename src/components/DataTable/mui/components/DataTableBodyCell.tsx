@@ -21,6 +21,7 @@ const BodyCellRoot = styled(TableCell, {
   overridesResolver: (_props, styles) => styles.bodyCell,
 })(({ theme }) => ({
   boxSizing: "border-box",
+  verticalAlign: "middle",
   width: "var(--DataTable-column-size)",
   minWidth: "var(--DataTable-column-size)",
   maxWidth: "var(--DataTable-column-size)",

@@ -1,5 +1,10 @@
 "use client";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
+import {
+  isDataTableSelectionRowPinningMode,
+  useDataTableRowPinningDisplayMode,
+} from "../../row-pinning";
+import { dataTableSelectionCheckboxStyles } from "./selectionGeometry";
 
 import { styled, Checkbox } from "@mui/material";
 import {
@@ -40,7 +45,7 @@ const SelectAllCheckboxRoot = styled(Checkbox, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "SelectAllCheckbox",
   overridesResolver: (_props, styles) => styles.selectAllCheckbox,
-})({});
+})(dataTableSelectionCheckboxStyles);
 
 export function DataTableSelectAllCheckbox() {
   /**
@@ -64,6 +69,7 @@ export function DataTableSelectAllCheckbox() {
    * while still exposing the normal TanStack table APIs.
    */
   const table = useMuiDataTableContext();
+  const rowPinningDisplayMode = useDataTableRowPinningDisplayMode();
 
   return (
     <table.Subscribe source={table.atoms.rowSelection}>
@@ -92,7 +98,29 @@ export function DataTableSelectAllCheckbox() {
             inputProps={{
               "aria-label": "Select all rows on current page",
             }}
-            onChange={table.getToggleAllPageRowsSelectedHandler()}
+            onChange={(event) => {
+              /**
+               * Match the established select-pinning interaction contract:
+               *
+               * select-all controls selection only.
+               *
+               * It must NOT pin every selected row, otherwise selecting a full
+               * page creates a tall stack of sticky rows that consumes most of
+               * the scroll viewport.
+               *
+               * Any existing selection-driven pins are cleared before the
+               * page-level selection change. Individual row checkbox changes
+               * remain responsible for pinning/unpinning one row at a time.
+               */
+              if (isDataTableSelectionRowPinningMode(rowPinningDisplayMode)) {
+                table.setRowPinning({
+                  top: [],
+                  bottom: [],
+                });
+              }
+
+              table.getToggleAllPageRowsSelectedHandler()(event);
+            }}
             onClick={(event) => {
               /**
                * Prevent future sortable-header / column-menu click

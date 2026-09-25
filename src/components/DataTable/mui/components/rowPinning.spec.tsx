@@ -4,6 +4,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { DataTable } from "./DataTable";
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "../table";
 import { createRowPinningColumn } from "../columns/row-pinning";
+import { createSelectionColumn } from "../columns/selection";
 
 type Row = {
   id: string;
@@ -233,4 +234,90 @@ it("delegates explicit pin and unpin commands to TanStack row APIs", () => {
   ).map((row) => row.getAttribute("data-row-id"));
 
   expect(renderedAfterUnpin).toEqual(["a", "b", "c", "d"]);
+});
+
+
+function SelectStickyFixture() {
+  const selectStickyColumns = helper.columns([
+    createSelectionColumn<Row>(),
+    helper.accessor("name", {
+      header: "Name",
+    }),
+  ]);
+
+  const table = useMuiDataTable({
+    columns: selectStickyColumns,
+    data,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    enableRowPinning: true,
+  });
+
+  return (
+    <>
+      <output data-testid="select-sticky-top-rows">
+        {table.getTopRows().map((row) => row.id).join(",")}
+      </output>
+
+      <DataTable
+        table={table}
+        toolbar={false}
+        pagination={false}
+        defaultDensity="compact"
+        rowPinning={{ displayMode: "select-sticky" }}
+      />
+    </>
+  );
+}
+
+it("pins individual selections but select-all clears sticky pins", () => {
+  const { container } = render(
+    <ThemeProvider theme={theme}>
+      <SelectStickyFixture />
+    </ThemeProvider>,
+  );
+
+  /**
+   * Individual selection owns one sticky pin.
+   */
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select row a",
+    }),
+  );
+
+  expect(screen.getByTestId("select-sticky-top-rows")).toHaveTextContent("a");
+  expect(container.querySelector('[data-row-id="a"]')).toHaveAttribute(
+    "data-row-pinned",
+    "top",
+  );
+
+  /**
+   * Page-level select-all must not turn every selected row into a sticky row.
+   *
+   * All rows remain selected, but the pinning state is intentionally empty.
+   * This prevents the selected page from stacking into a viewport-sized sticky
+   * block above the remaining scrolling content.
+   */
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select all rows on current page",
+    }),
+  );
+
+  for (const row of data) {
+    expect(
+      screen.getByRole("checkbox", {
+        name: `Select row ${row.id}`,
+      }),
+    ).toBeChecked();
+  }
+
+  expect(screen.getByTestId("select-sticky-top-rows")).toBeEmptyDOMElement();
+
+  for (const row of data) {
+    expect(
+      container.querySelector(`[data-row-id="${row.id}"]`),
+    ).not.toHaveAttribute("data-row-pinned");
+  }
 });
