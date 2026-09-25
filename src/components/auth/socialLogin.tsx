@@ -24,6 +24,8 @@ import {
   RegisteredProviderId,
 } from "@/lib/providers/socialProvider";
 import { useSearchParams } from "next/navigation";
+import { LANDING_PAGE } from "@/types/constants";
+import { getAuthRedirectTarget } from "@/lib/auth/redirectTarget";
 
 const PREFIX = "RazethSocialLogin";
 
@@ -115,8 +117,9 @@ const SocialLogin = (inProps: SocialLoginProps) => {
 
   const { children, className, sx, ...rest } = props;
   const searchParams = useSearchParams();
-  const destination =
-    searchParams?.get("to") ?? searchParams?.get("callbackUrl") ?? "/fts";
+  // const destination =
+  //   searchParams?.get("to") ?? searchParams?.get("callbackUrl") ?? "/fts";
+  const destination = getAuthRedirectTarget(searchParams, LANDING_PAGE);
 
   // const notify = useNotify();
 

@@ -5,8 +5,8 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { setupAxiosAuth } from "@/lib/providers/dataProvider";
-import { API_URL, COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
-
+import { LANDING_PAGE, TOKEN_KEY } from "@/types/constants";
+import { getAuthRedirectTarget } from "@/lib/auth/redirectTarget";
 // const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.razeth.com";
 
 export default function OAuthCallbackPage() {
@@ -96,8 +96,10 @@ export default function OAuthCallbackPage() {
       if (session?.user) {
         const token = sessionStorage.getItem(TOKEN_KEY);
         if (token) setupAxiosAuth(token);
+        // const params = new URLSearchParams(window.location.search);
+        // router.replace(params.get("callbackUrl") ?? "/fts");
         const params = new URLSearchParams(window.location.search);
-        router.replace(params.get("callbackUrl") ?? "/fts");
+        router.replace(getAuthRedirectTarget(params, LANDING_PAGE));
       } else {
         router.replace("/login?error=oauth_failed");
       }

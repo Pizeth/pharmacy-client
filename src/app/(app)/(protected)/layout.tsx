@@ -3,7 +3,7 @@ import PulseLoader from "@/components/effect/loaders/loader";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
 import { VERIFY_ID_PATH } from "@/types/constants";
 import { Authenticated, useGetIdentity } from "@refinedev/core";
-import { NavigateToResource } from "@refinedev/nextjs-router";
+// import { NavigateToResource } from "@refinedev/nextjs-router";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 
@@ -55,7 +55,8 @@ function ProfileGate({ children }: { children: React.ReactNode }) {
       // router.replace("/fts");
       redirectedFromPath.current = pathname;
       const callbackUrl = searchParams.get("callbackUrl");
-      router.replace(callbackUrl ? decodeURIComponent(callbackUrl) : "/fts");
+      // router.replace(callbackUrl ? decodeURIComponent(callbackUrl) : "/fts");
+      router.replace(callbackUrl || "/fts");
       return;
     }
 
@@ -69,11 +70,6 @@ function ProfileGate({ children }: { children: React.ReactNode }) {
   const willRedirectAway =
     (identity?.isLinked === false && !isOnVerifyPage) ||
     (identity?.isLinked === true && isOnVerifyPage);
-
-  console.log("willRedirectAway", willRedirectAway);
-  console.log("redirected.current", redirectedFromPath.current);
-  console.log("identity", identity);
-  console.log("isLoading", isLoading);
 
   // if (isLoading) return <PulseLoader />;
   if (isLoading || !identity || willRedirectAway) {
@@ -100,7 +96,16 @@ export default function ProtectedLayout({
       key="protected-layout"
       loading={<PulseLoader />} // 👈 shown while authProvider.check() is pending
       // If not authenticated, redirect to /login
-      fallback={<NavigateToResource resource="login" />}
+      // fallback={<NavigateToResource resource="login" />}
+      /**
+       * Keep fallback absent so Refine performs the redirect itself and
+       * appends the current route as its native "to" query parameter.
+       *
+       * The login flow already prefers "to" over "callbackUrl", so the
+       * original protected destination survives a successful sign-in.
+       */
+      redirectOnFail
+      appendCurrentPathToQuery
     >
       <ProfileGate>
         <DrawerAppBar>{children}</DrawerAppBar>

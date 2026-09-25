@@ -16,17 +16,21 @@ import {
   LANDING_PAGE,
   TOKEN_KEY,
 } from "@/types/constants";
+import {
+  getBrowserAuthRedirectTarget,
+  getUnauthenticatedLoginRedirect,
+} from "@/lib/auth/redirectTarget";
 // import { fetchSessionDirect } from "../auth/sessionFetch";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const getCallbackUrl = (fallback: string): string => {
-  if (typeof window === "undefined") return fallback;
-  const params = new URLSearchParams(window.location.search);
-  // return params.get("callbackUrl") ?? fallback;
-  // Check for Refine's native "to" parameter first
-  return params.get("to") ?? params.get("callbackUrl") ?? fallback;
-};
+// const getCallbackUrl = (fallback: string): string => {
+//   if (typeof window === "undefined") return fallback;
+//   const params = new URLSearchParams(window.location.search);
+//   // return params.get("callbackUrl") ?? fallback;
+//   // Check for Refine's native "to" parameter first
+//   return params.get("to") ?? params.get("callbackUrl") ?? fallback;
+// };
 
 // ── Auth Provider ─────────────────────────────────────────────────────────────
 
@@ -37,6 +41,14 @@ export const authProvider: AuthProvider = {
       ? { "x-captcha-response": captchaToken }
       : undefined;
 
+    /**
+     * Capture the destination once for this login attempt.
+     *
+     * Both the Better Auth callback contract and Refine's post-login
+     * redirect use the exact same normalized target.
+     */
+    const redirectTo = getBrowserAuthRedirectTarget(LANDING_PAGE);
+
     // Try username first, fall back to email
     let result: SignInResult = await authClient.signIn.username({
       username: identifier,
@@ -45,7 +57,8 @@ export const authProvider: AuthProvider = {
       /**
        * A URL to redirect to after the user verifies their email (optional)
        */
-      callbackURL: getCallbackUrl(LANDING_PAGE),
+      callbackURL: redirectTo,
+      // callbackURL: getCallbackUrl(LANDING_PAGE),
       /**
        * remember the user session after the browser is closed.
        * @default true
@@ -64,7 +77,8 @@ export const authProvider: AuthProvider = {
         /**
          * A URL to redirect to after the user verifies their email (optional)
          */
-        callbackURL: getCallbackUrl(LANDING_PAGE),
+        // callbackURL: getCallbackUrl(LANDING_PAGE),
+        callbackURL: redirectTo,
         /**
          * remember the user session after the browser is closed.
          * @default true
@@ -112,9 +126,28 @@ export const authProvider: AuthProvider = {
     // }
 
     // Get the correct redirect path based on the URL query params
-    const redirectTo = getCallbackUrl(LANDING_PAGE);
+    // const redirectTo = getCallbackUrl(LANDING_PAGE);
 
-    return { success: true, redirectTo };
+    // return { success: true, redirectTo };
+
+    /**
+     * Refine owns the final application navigation.
+     *
+     * Example:
+     *
+     *   /admin/i18n?category=auth
+     *        ↓
+     *   /login?callbackUrl=%2Fadmin%2Fi18n%3Fcategory%3Dauth
+     *        ↓
+     *   successful login
+     *        ↓
+     *   /admin/i18n?category=auth
+     */
+    return {
+      success: true,
+
+      redirectTo,
+    };
   },
 
   // ── Sign out ───────────────────────────────────────────────────────────────
@@ -212,7 +245,13 @@ export const authProvider: AuthProvider = {
         sessionStorage.removeItem(TOKEN_KEY);
         return {
           authenticated: false,
-          redirectTo: "/login",
+          /**
+           * Preserve the exact protected location.
+           *
+           * On /login itself this deliberately resolves to undefined so
+           * Auth/useIsAuthenticated cannot create a redirect loop.
+           */
+          redirectTo: getUnauthenticatedLoginRedirect(LANDING_PAGE),
           error: {
             name: "Unauthorized",
             message: "Check failed: No active session found.",
@@ -225,7 +264,7 @@ export const authProvider: AuthProvider = {
     } catch (error) {
       return {
         authenticated: false,
-        redirectTo: "/login",
+        redirectTo: getUnauthenticatedLoginRedirect(LANDING_PAGE),
         error: {
           name: "SessionError",
           message: "Session check failed",

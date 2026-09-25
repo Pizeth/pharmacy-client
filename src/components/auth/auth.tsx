@@ -59,6 +59,7 @@ import PulseLoader from "../effect/loaders/loader";
 import { LANDING_PAGE } from "@/types/constants";
 import { useSetAtom } from "jotai";
 import { resetAllValidationsAtom } from "@/Stores/validationStore";
+import { getAuthRedirectTarget } from "@/lib/auth/redirectTarget";
 
 const PREFIX = "RazethAuth";
 
@@ -856,9 +857,10 @@ export const Auth = (inProps: AuthProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   // 1. Get the correct destination path (falling back to your default)
-  const destination =
-    searchParams.get("to") ?? searchParams.get("callbackUrl") ?? "/fts"; // or LANDING_PAGE
+  // const destination =
+  //   searchParams.get("to") ?? searchParams.get("callbackUrl") ?? "/fts"; // or LANDING_PAGE
 
+  const destination = getAuthRedirectTarget(searchParams, LANDING_PAGE);
   // State to track current mode (login or signup)
   const [currentMode, setCurrentMode] = useState<AuthAction>(defaultMode);
   // const isLogin = defaultMode === "signin";
