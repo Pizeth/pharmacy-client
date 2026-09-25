@@ -68,7 +68,17 @@ const HeaderCellRoot = styled(TableCell, {
   position: "sticky",
 
   top: "var(--DataTable-header-sticky-top)",
-  zIndex: 2,
+
+  /**
+   * Sticky body rows use z-index: 2.
+   *
+   * Header cells must therefore sit one layer above EVERY sticky body row,
+   * not only when the header column itself is horizontally pinned. Otherwise
+   * a selected sticky row can paint over ordinary center headers while the
+   * Details/Selection/Actions pinned headers remain visible at z-index: 4,
+   * producing an apparent header-height mismatch during vertical scrolling.
+   */
+  zIndex: 3,
 
   /**
    * Sticky cells must remain opaque or scrolling rows become visible
