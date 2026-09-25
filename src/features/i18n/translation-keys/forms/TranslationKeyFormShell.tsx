@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode, SubmitEventHandler } from "react";
-import { Box, Button, styled } from "@mui/material";
+import { Box, Button, styled, Typography } from "@mui/material";
 import { CloseRounded, SaveRounded } from "@mui/icons-material";
 
 const COMPONENT_NAME = "RazethTranslationKeyForm";
@@ -78,7 +78,9 @@ export function TranslationKeyFormShell(props: TranslationKeyFormShellProps) {
           loadingPosition="start"
           disabled={pending || submitDisabled}
         >
-          {pending ? pendingLabel : submitLabel}
+          <Typography variant="body2">
+            <strong>{pending ? pendingLabel : submitLabel}</strong>
+          </Typography>
         </Button>
       </FooterRoot>
     </FormRoot>
