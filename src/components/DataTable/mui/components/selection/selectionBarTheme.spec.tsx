@@ -32,6 +32,7 @@ function mount({
   clearable = true,
   hidden = false,
   disabled = false,
+  embedded = false,
 } = {}) {
   const onAction = jest.fn();
   function Fixture() {
@@ -51,6 +52,7 @@ function mount({
       <table.AppTable>
         <DataTableSelectionBar
           table={table}
+          embedded={embedded}
           clearable={clearable}
           renderStartContent={(context) => (
             <span>
@@ -145,4 +147,44 @@ it("preserves off-page IDs and supplies only loaded rows to actions", () => {
     "a",
   ]);
   expect(context.selectedCount).toBe(2);
+});
+
+it("keeps embedded selection information and commands in one compact cluster", () => {
+  const { container } = mount({ embedded: true });
+
+  const selectionBar = container.querySelector(
+    `.${dataTableClasses.selectionBar}`,
+  );
+  const selectionStart = container.querySelector(
+    `.${dataTableClasses.selectionBarStart}`,
+  );
+
+  expect(selectionBar).not.toBeNull();
+  expect(selectionStart).not.toBeNull();
+
+  expect(selectionBar).toHaveAttribute("data-embedded", "true");
+
+  /**
+   * Embedded selection information must not consume PaginationStart's
+   * remaining width and push its actions away from the status.
+   */
+  expect(selectionStart).toHaveStyle({
+    flex: "0 1 auto",
+  });
+
+  /**
+   * Compact geometry must not remove any selection capability.
+   */
+  expect(screen.getByRole("status")).toHaveTextContent("2 rows selected");
+  expect(screen.getByText("a,b")).toBeVisible();
+  expect(
+    screen.getByRole("button", {
+      name: "Inspect for 2 selected rows",
+    }),
+  ).toBeVisible();
+  expect(
+    screen.getByRole("button", {
+      name: "Clear all selected rows",
+    }),
+  ).toBeVisible();
 });

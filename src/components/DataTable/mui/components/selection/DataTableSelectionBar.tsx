@@ -44,9 +44,11 @@ const SelectionBarRoot = styled(Box, {
   '&[data-embedded="true"]': {
     flex: "0 1 auto",
     justifyContent: "flex-start",
+    gap: theme.spacing(0.5),
     minHeight: 0,
     padding: 0,
     backgroundColor: "transparent",
+
   },
 }));
 const SelectionBarDividerRoot = styled(Divider, {
@@ -58,7 +60,24 @@ const SelectionBarStartRoot = styled(Stack, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "SelectionBarStart",
   overridesResolver: (_props, styles) => styles.selectionBarStart,
-})({ minWidth: 0, flex: "1 1 auto", flexWrap: "wrap" });
+})({
+  minWidth: 0,
+  flex: "1 1 auto",
+  flexWrap: "wrap",
+
+  /**
+   * In the shared pagination footer this start group must remain
+   * content-sized so it cannot push selection commands away from the
+   * selected-row information.
+   *
+   * Keep the rule on the SelectionBarStart slot itself rather than relying
+   * on a parent descendant selector. That gives the embedded state enough
+   * specificity to win over this slot's normal standalone flex behavior.
+   */
+  '&[data-embedded="true"]': {
+    flex: "0 1 auto",
+  },
+});
 const SelectionBarEndRoot = styled(Stack, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "SelectionBarEnd",
@@ -161,6 +180,7 @@ export function DataTableSelectionBar<TData extends RowData>(
                */}
               <SelectionBarStartRoot
                 className={dataTableClasses.selectionBarStart}
+                data-embedded={embedded ? "true" : undefined}
                 direction="row"
                 alignItems="center"
                 spacing={1}
