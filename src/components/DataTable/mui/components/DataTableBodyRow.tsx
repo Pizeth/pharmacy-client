@@ -76,13 +76,13 @@ const BodyRowRoot = styled(TableRow, {
      * The MUI renderer owns only the sticky presentation. Logical row
      * identity and pinning state never get duplicated into component state.
      */
-    '&[data-row-pinned="top"]': {
+    '&[data-row-pinning-sticky="true"][data-row-pinned="top"]': {
       position: "sticky",
       top: "var(--DataTable-row-pinned-offset)",
       zIndex: 2,
     },
 
-    '&[data-row-pinned="bottom"]': {
+    '&[data-row-pinning-sticky="true"][data-row-pinned="bottom"]': {
       position: "sticky",
       bottom: "var(--DataTable-row-pinned-offset)",
       zIndex: 2,
@@ -98,6 +98,12 @@ export interface DataTableBodyRowProps<TData extends RowData> {
    * Sticky origin below renderer-owned header/filter rows.
    */
   readonly pinnedRowStickyTop: number;
+
+  /**
+   * Sticky modes keep the row in normal body order and apply sticky CSS.
+   * Static modes physically regroup rows and leave normal table positioning.
+   */
+  readonly stickyRowPinning: boolean;
 }
 
 /**
@@ -117,7 +123,7 @@ export interface DataTableBodyRowProps<TData extends RowData> {
 export function DataTableBodyRow<TData extends RowData>(
   props: DataTableBodyRowProps<TData>,
 ) {
-  const { table, row, pinnedRowStickyTop } = props;
+  const { table, row, pinnedRowStickyTop, stickyRowPinning } = props;
 
   const { density } = useDataTableDensity();
 
@@ -172,6 +178,9 @@ export function DataTableBodyRow<TData extends RowData>(
           data-selected={selected ? "true" : undefined}
           data-density={density}
           data-row-pinned={pinnedPosition || undefined}
+          data-row-pinning-sticky={
+            stickyRowPinning && pinnedPosition ? "true" : undefined
+          }
           style={style}
         >
           <table.Subscribe
