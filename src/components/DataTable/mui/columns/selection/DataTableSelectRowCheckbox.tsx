@@ -1,5 +1,10 @@
 "use client";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
+import {
+  isDataTableSelectionRowPinningMode,
+  useDataTableRowPinningDisplayMode,
+} from "../../row-pinning";
+import { dataTableSelectionCheckboxStyles } from "./selectionGeometry";
 
 import { styled, Checkbox } from "@mui/material";
 import {
@@ -19,7 +24,7 @@ const SelectRowCheckboxRoot = styled(Checkbox, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "SelectRowCheckbox",
   overridesResolver: (_props, styles) => styles.selectRowCheckbox,
-})({});
+})(dataTableSelectionCheckboxStyles);
 
 export function DataTableSelectRowCheckbox() {
   /**
@@ -41,6 +46,7 @@ export function DataTableSelectRowCheckbox() {
    * because CellContext.table is the core Table rather than ReactTable.
    */
   const table = useMuiDataTableContext();
+  const rowPinningDisplayMode = useDataTableRowPinningDisplayMode();
 
   return (
     <table.Subscribe
@@ -93,7 +99,33 @@ export function DataTableSelectRowCheckbox() {
            * - range selection handling
            * - conditional selection
            */
-          onChange={row.getToggleSelectedHandler()}
+          onChange={(event) => {
+            const nextSelected = event.target.checked;
+
+            /**
+             * Selection-driven row pinning is an interaction policy, not a
+             * second source of truth for selection.
+             *
+             * TanStack still owns both state machines:
+             *
+             *   row.toggleSelected(...)
+             *   row.pin(...)
+             *
+             * The DataTable renderer only coordinates them for the
+             * select-* display modes.
+             */
+            if (isDataTableSelectionRowPinningMode(rowPinningDisplayMode)) {
+              row.pin(
+                nextSelected
+                  ? rowPinningDisplayMode === "select-bottom"
+                    ? "bottom"
+                    : "top"
+                  : false,
+              );
+            }
+
+            row.getToggleSelectedHandler()(event);
+          }}
           onClick={(event) => {
             /**
              * Prevent future row-click navigation/selection handlers
