@@ -143,3 +143,34 @@ it("respects non-selectable and non-expandable rows", () => {
     screen.getByRole("button", { name: "Expand all expandable rows" }),
   ).toBeDisabled();
 });
+
+
+it("keeps selection header and row checkboxes on identical geometry", () => {
+  const { container } = mount();
+
+  const selectAll = container.querySelector(
+    `.${dataTableClasses.selectAllCheckbox}`,
+  );
+
+  const selectRow = container.querySelector(
+    `.${dataTableClasses.selectRowCheckbox}`,
+  );
+
+  expect(selectAll).not.toBeNull();
+  expect(selectRow).not.toBeNull();
+
+  /**
+   * Both controls use the same fixed 28px interaction box with no root
+   * padding/margin. The surrounding centered TableCells can therefore align
+   * them on the exact same column axis.
+   */
+  for (const checkbox of [selectAll, selectRow]) {
+    expect(checkbox).toHaveStyle({
+      width: "28px",
+      height: "28px",
+      padding: "0px",
+      margin: "0px",
+      flex: "0 0 28px",
+    });
+  }
+});
