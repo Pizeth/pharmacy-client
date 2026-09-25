@@ -9,6 +9,7 @@ import type {
 import { useTheme } from "@mui/material";
 import {
   createDataTableServerTableBinding,
+  getDataTableSelectionRowPinningState,
   useDataTableServerResult,
   useDataTableServerState,
   useMuiDataTable,
@@ -152,14 +153,16 @@ export function useTranslationKeyDataTable(
    * the renderer.
    */
   const rowPinning = useMemo<RowPinningState>(
-    () => ({
-      top: enableRowSelection
-        ? Object.entries(rowSelection)
-            .filter(([, selected]) => selected)
-            .map(([rowId]) => rowId)
-        : [],
-      bottom: [],
-    }),
+    () =>
+      enableRowSelection
+        ? getDataTableSelectionRowPinningState(
+            rowSelection,
+            "select-sticky",
+          )
+        : {
+            top: [],
+            bottom: [],
+          },
     [enableRowSelection, rowSelection],
   );
 
