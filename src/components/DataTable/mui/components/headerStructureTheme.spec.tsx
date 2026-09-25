@@ -388,7 +388,7 @@ describe("DataTable header structure theme", () => {
       ).toBe("");
 
       expect(nameCell).toHaveStyle({
-        zIndex: "2",
+        zIndex: "3",
       });
     },
   );
