@@ -9,7 +9,6 @@ import type {
 import { useTheme } from "@mui/material";
 import {
   createDataTableServerTableBinding,
-  getDataTableSelectionRowPinningState,
   useDataTableServerResult,
   useDataTableServerState,
   useMuiDataTable,
@@ -141,30 +140,27 @@ export function useTranslationKeyDataTable(
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   /**
-   * MRT parity for this resource uses "select-sticky":
+   * Row pinning is controlled independently from row selection.
    *
-   * selected row IDs
-   *      ↓
-   * TanStack rowPinning.top
+   * This distinction is required by the "select-sticky" interaction model:
    *
-   * There is intentionally no second independently mutable pinning state
-   * here. Selection remains the resource command state, while TanStack's
-   * row-pinning feature supplies the canonical pinned-row APIs consumed by
-   * the renderer.
+   * - selecting ONE row through its row checkbox pins that row
+   * - deselecting that row unpins it
+   * - selecting the whole page selects every row but intentionally clears
+   *   pinning instead of stacking 25 sticky rows at the top of the viewport
+   *
+   * The generic selection controls coordinate TanStack's own:
+   *
+   *   row.toggleSelected(...)
+   *   row.pin(...)
+   *   table.setRowPinning(...)
+   *
+   * so this resource only owns the controlled state lifecycle.
    */
-  const rowPinning = useMemo<RowPinningState>(
-    () =>
-      enableRowSelection
-        ? getDataTableSelectionRowPinningState(
-            rowSelection,
-            "select-sticky",
-          )
-        : {
-            top: [],
-            bottom: [],
-          },
-    [enableRowSelection, rowSelection],
-  );
+  const [rowPinning, setRowPinning] = useState<RowPinningState>({
+    top: [],
+    bottom: [],
+  });
 
   /**
    * ================================================================
@@ -272,6 +268,10 @@ export function useTranslationKeyDataTable(
   useEffect(() => {
     setExpanded({});
     setRowSelection({});
+    setRowPinning({
+      top: [],
+      bottom: [],
+    });
   }, [query.state]);
 
   const request = useTranslationKeyDataTableRequest(query.state);
@@ -358,6 +358,56 @@ export function useTranslationKeyDataTable(
   ]);
 
   /**
+   * Reconcile row pinning against the canonical loaded server page.
+   *
+   * keepPinnedRows=false prevents off-page rows from being resurrected by
+   * TanStack, but controlled pinning state should still discard stale IDs once
+   * the replacement result settles.
+   *
+   * This mirrors the selection cleanup above while keeping both state machines
+   * independently correct.
+   */
+  useEffect(() => {
+    if (
+      !enableRowSelection ||
+      !server.hasResult ||
+      server.isPreviousResult ||
+      server.isFetching
+    ) {
+      return;
+    }
+
+    const loadedRowIds = new Set(server.rows.map((row) => String(row.id)));
+
+    setRowPinning((previous) => {
+      const top = (previous.top ?? []).filter((rowId) =>
+        loadedRowIds.has(rowId),
+      );
+
+      const bottom = (previous.bottom ?? []).filter((rowId) =>
+        loadedRowIds.has(rowId),
+      );
+
+      const unchanged =
+        top.length === (previous.top?.length ?? 0) &&
+        bottom.length === (previous.bottom?.length ?? 0);
+
+      return unchanged
+        ? previous
+        : {
+            top,
+            bottom,
+          };
+    });
+  }, [
+    enableRowSelection,
+    server.hasResult,
+    server.isPreviousResult,
+    server.isFetching,
+    server.rows,
+  ]);
+
+  /**
    * ================================================================
    * 6. Generic server -> TanStack binding
    * ================================================================
@@ -409,6 +459,12 @@ export function useTranslationKeyDataTable(
     onExpandedChange: setExpanded,
 
     onRowSelectionChange: setRowSelection,
+
+    /**
+     * TanStack row.pin()/table.setRowPinning() must flow back into the
+     * resource-owned controlled state.
+     */
+    onRowPinningChange: setRowPinning,
 
     /**
      * Same-query server-result replacement must not close the detail
