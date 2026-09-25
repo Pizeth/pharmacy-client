@@ -66,7 +66,9 @@ export function TranslationKeyFormShell(props: TranslationKeyFormShellProps) {
           disabled={pending}
           onClick={onCancel}
         >
-          {cancelLabel}
+          <Typography variant="body2">
+            <strong>{cancelLabel}</strong>
+          </Typography>
         </Button>
 
         <Button
