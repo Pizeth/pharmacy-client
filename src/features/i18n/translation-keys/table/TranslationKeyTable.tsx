@@ -60,6 +60,12 @@ const TableRegionRoot = styled("div", {
   overridesResolver: (_props, styles) => styles.main,
 })({});
 
+const SelectionInfoRoot = styled(Typography, {
+  name: COMPONENT_NAME,
+  slot: "Caption",
+  overridesResolver: (_props, styles) => styles.caption,
+})({});
+
 /**
  * Convert an erased request/runtime error into appropriate UI text.
  *
@@ -602,6 +608,31 @@ export function TranslationKeyTable() {
           selectionBar={{
             actions: selectionActions,
             clearable: true,
+
+            /**
+             * The generic selection bar owns the selected-count status.
+             *
+             * TranslationKey contributes resource identity only when
+             * exactly one loaded row is selected, so the left footer
+             * reads like:
+             *
+             *   1 row selected   auth_email   Edit selected   Delete selected
+             *
+             * Multi-selection intentionally falls back to count-only
+             * status because 7.5 introduces no bulk mutation contract.
+             */
+            renderStartContent: ({ selectedCount, selectedRows }) => {
+              const selected =
+                selectedCount === 1 && selectedRows.length === 1
+                  ? selectedRows[0]
+                  : undefined;
+
+              return selected ? (
+                <SelectionInfoRoot component="span" variant="body2" noWrap>
+                  {selected.original.key}
+                </SelectionInfoRoot>
+              ) : null;
+            },
           }}
           // /**
           //  * We intentionally keep the filter row hidden until the
