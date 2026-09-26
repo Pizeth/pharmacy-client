@@ -1,4 +1,4 @@
-import type { BaseRecord } from "@refinedev/core";
+import type { BaseRecord, GetListResponse } from "@refinedev/core";
 import type { RowData } from "@tanstack/table-core";
 
 import { adaptRefineGetListResponse } from "./adaptRefineGetListResponse";
