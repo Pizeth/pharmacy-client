@@ -1,5 +1,3 @@
-import type { RowPinningState, RowSelectionState } from "@tanstack/table-core";
-
 /**
  * Row-pinning presentation modes supported by the MUI DataTable renderer.
  *
@@ -56,33 +54,4 @@ export function isDataTableSelectionRowPinningMode(
   displayMode: DataTableRowPinningDisplayMode,
 ): boolean {
   return displayMode.startsWith("select-");
-}
-
-/**
- * Convert controlled TanStack rowSelection state into rowPinning state for
- * the selection-driven display modes.
- *
- * This helper contains no React state. Resources remain free to own the
- * selection lifecycle while sharing one deterministic pinning policy.
- */
-export function getDataTableSelectionRowPinningState(
-  rowSelection: RowSelectionState,
-  displayMode:
-    | "select-sticky"
-    | "select-top"
-    | "select-bottom",
-): RowPinningState {
-  const selectedRowIds = Object.entries(rowSelection)
-    .filter(([, selected]) => selected)
-    .map(([rowId]) => rowId);
-
-  return displayMode === "select-bottom"
-    ? {
-        top: [],
-        bottom: selectedRowIds,
-      }
-    : {
-        top: selectedRowIds,
-        bottom: [],
-      };
 }
