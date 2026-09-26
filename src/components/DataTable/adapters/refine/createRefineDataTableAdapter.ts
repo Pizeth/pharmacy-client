@@ -1,4 +1,4 @@
-import type { GetListResponse } from "@refinedev/core";
+import type { BaseRecord } from "@refinedev/core";
 import type { RowData } from "@tanstack/table-core";
 
 import { adaptRefineGetListResponse } from "./adaptRefineGetListResponse";
@@ -22,7 +22,9 @@ import type {
  *
  * Keeping execution separate preserves DataTable's existing layering.
  */
-export function createRefineDataTableAdapter<TData extends RowData>(
+export function createRefineDataTableAdapter<
+  TData extends RowData & BaseRecord,
+>(
   options: CreateRefineDataTableAdapterOptions,
 ): RefineDataTableAdapter<TData> {
   const { semanticAdapter, ...queryOptions } = options;
