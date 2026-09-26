@@ -200,7 +200,7 @@ provides:
 
 ## 1.8.2 — Refine pure adapter foundation
 
-**Status: in progress**
+**Status: complete**
 
 Target:
 
@@ -213,7 +213,7 @@ This is the currently active implementation slice.
 
 ## 1.8.3 — Refine request lifecycle integration
 
-**Status: planned**
+**Status: complete**
 
 Add a reusable hook/controller bridge that can execute a DataTable server query
 through Refine while preserving the existing generic lifecycle:
@@ -234,19 +234,21 @@ useDataTableServerResult()
 createDataTableServerTableBinding()
 ```
 
-Acceptance criteria:
+Implemented guarantees:
 
-- initial loading,
-- background fetching,
-- retry,
-- previous-result preservation,
-- error separation,
-- pagination totals,
-- sorting,
-- filtering,
-- global search,
-- abort/query replacement semantics where supported,
+- Refine `useList()` executes the adapted request,
+- Refine response normalization feeds the existing DataTable lifecycle,
+- initial loading and background fetching remain distinct,
+- explicit refresh delegates to Refine without mutating DataTable query state,
+- previous-result preservation remains owned by `useDataTableServerResult()`,
+- Refine/React Query placeholder rows are not mislabeled as canonical new-query
+  results,
+- replacement errors remain refresh errors while prior rows stay usable,
+- pagination totals remain normalized for TanStack,
 - no renderer dependency on Refine.
+
+The next proof is resource-level adoption rather than additional generic hook
+machinery.
 
 ## 1.8.4 — second-resource Refine proof
 
