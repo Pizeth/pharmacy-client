@@ -1,4 +1,4 @@
-import type { GetListResponse } from "@refinedev/core";
+import type { BaseRecord, GetListResponse } from "@refinedev/core";
 import type { RowData } from "@tanstack/table-core";
 
 import type {
@@ -20,7 +20,9 @@ import type {
  * but does not require a provider to echo the requested page. The current
  * DataTable query is therefore intentionally part of this adapter boundary.
  */
-export function adaptRefineGetListResponse<TData extends RowData>(
+export function adaptRefineGetListResponse<
+  TData extends RowData & BaseRecord,
+>(
   response: GetListResponse<TData>,
   query: DataTableServerQueryState,
 ): DataTableServerResult<TData> {
