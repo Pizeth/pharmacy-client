@@ -1,3 +1,4 @@
+import type { DataTableServerQueryState } from "../../mui/server-state";
 import {
   createDataTableServerQueryMapper,
   createDataTableTextServerFilter,
@@ -24,7 +25,7 @@ describe("createRefineDataTableAdapter", () => {
       resource: "users",
     });
 
-    const query = {
+    const query: DataTableServerQueryState = {
       pagination: {
         pageIndex: 1,
         pageSize: 10,
@@ -42,7 +43,7 @@ describe("createRefineDataTableAdapter", () => {
         },
       ],
       globalFilter: "",
-    } as const;
+    };
 
     expect(adapter.createRequest(query)).toEqual({
       resource: "users",
