@@ -1,4 +1,5 @@
 import type {
+  BaseRecord,
   CrudFilter,
   GetListParams,
   GetListResponse,
@@ -86,7 +87,9 @@ export interface CreateRefineDataTableQueryAdapterOptions {
  * page that produced the response. Normalizing the response therefore also
  * requires the current DataTable query state.
  */
-export interface RefineDataTableAdapter<TData extends RowData> {
+export interface RefineDataTableAdapter<
+  TData extends RowData & BaseRecord,
+> {
   readonly createRequest: (query: DataTableServerQueryState) => GetListParams;
 
   readonly readResponse: (
