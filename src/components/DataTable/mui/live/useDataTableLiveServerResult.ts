@@ -13,6 +13,7 @@ import type { RowData } from "@tanstack/table-core";
 
 import type {
   DataTableServerResult,
+  DataTableServerResultLifecycle,
 } from "../server-data";
 
 import {
