@@ -1,4 +1,5 @@
 import type { MuiDataTableDensity } from "../density";
+import type { DataTableDisplayMode } from "../presentation/types";
 import type {
   DataTableToolbarSearchMode,
   DataTableToolbarSearchPosition,
@@ -49,6 +50,14 @@ export interface DataTableThemeProps extends DataTableVariantProps {
    * density state.
    */
   readonly density?: MuiDataTableDensity;
+
+  /**
+   * Initial uncontrolled presentation mode.
+   *
+   * "auto" remains unresolved until Phase 1.9.4 and currently renders the
+   * established table presentation.
+   */
+  readonly defaultDisplayMode?: DataTableDisplayMode;
 
   /**
    * Whether the standard toolbar is rendered.

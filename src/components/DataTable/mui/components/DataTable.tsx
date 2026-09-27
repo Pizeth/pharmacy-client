@@ -18,6 +18,15 @@ import {
   DataTableRowPinningProvider,
   type DataTableRowPinningConfig,
 } from "../row-pinning";
+import {
+  DataTableCardView,
+  DataTableDisplayModeProvider,
+  useDataTableDisplayMode,
+} from "../presentation";
+import type {
+  DataTableCardConfig,
+  DataTableDisplayModeConfig,
+} from "../presentation";
 import { DATA_TABLE_DEFAULT_VARIANT } from "../theme";
 import type { DataTableOwnerState, DataTableVariantProps } from "../theme";
 import { useDataTableThemeDefaults } from "../theme/useDataTableThemeDefaults";
@@ -94,7 +103,8 @@ export interface DataTableProps<TData extends RowData>
     DataTableVariantProps,
     DataTableDensityConfig,
     DataTableFullscreenConfig,
-    DataTableFilterDisplayConfig {
+    DataTableFilterDisplayConfig,
+    DataTableDisplayModeConfig {
   /**
    * Table instance created by useMuiDataTable().
    *
@@ -125,6 +135,15 @@ export interface DataTableProps<TData extends RowData>
   readonly toolbar?: boolean | DataTableToolbarConfig<TData>;
 
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
+
+  /**
+   * Resource-owned card composition.
+   *
+   * Required whenever the resolved presentation mode is "card".
+   * The generic renderer owns card structure/theme slots; resources own
+   * record-specific content.
+   */
+  readonly card?: DataTableCardConfig<TData>;
 
   /**
    * Row-pinning presentation policy.
@@ -207,6 +226,104 @@ export interface DataTableProps<TData extends RowData>
  *
  * This component owns only the native/MUI rendering shell.
  */
+interface DataTablePresentationRegionProps<TData extends RowData> {
+  readonly table: MuiDataTableInstance<TData>;
+  readonly tableProps?: Omit<TableProps, "children">;
+  readonly containerProps?: Omit<TableContainerProps, "children">;
+  readonly card?: DataTableCardConfig<TData>;
+  readonly rowPinningDisplayMode: NonNullable<
+    DataTableRowPinningConfig["displayMode"]
+  >;
+  readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
+}
+
+/**
+ * Resolve physical presentation without touching query/controller state.
+ *
+ * Phase 1.9.4 owns responsive "auto" resolution. Until then, "auto" preserves
+ * the established table presentation.
+ */
+function DataTablePresentationRegion<TData extends RowData>(
+  props: DataTablePresentationRegionProps<TData>,
+) {
+  const {
+    table,
+    tableProps,
+    containerProps,
+    card,
+    rowPinningDisplayMode,
+    renderDetailPanel,
+  } = props;
+
+  const { displayMode } = useDataTableDisplayMode();
+
+  if (displayMode === "card") {
+    if (!card) {
+      throw new Error(
+        'DataTable card presentation requires a "card" configuration.',
+      );
+    }
+
+    return (
+      <DataTableCardView
+        table={table}
+        config={card}
+        rowPinningDisplayMode={rowPinningDisplayMode}
+        renderDetailPanel={renderDetailPanel}
+      />
+    );
+  }
+
+  return (
+    <ContainerRoot
+      {...containerProps}
+      className={[
+        dataTableClasses.container,
+        containerProps?.className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <table.Subscribe
+        selector={(state) => ({
+          columnSizing: state.columnSizing,
+          columnVisibility: state.columnVisibility,
+        })}
+      >
+        {() => {
+          const totalSize = table.getTotalSize();
+
+          const tableStyle: DataTableTableStyle = {
+            "--DataTable-table-size": `${totalSize}px`,
+            ...tableProps?.style,
+          };
+
+          return (
+            <TableRoot
+              {...tableProps}
+              className={[
+                dataTableClasses.table,
+                tableProps?.className,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              style={tableStyle}
+            >
+              <DataTableColumnGroup table={table} />
+              <DataTableHead table={table} />
+              <DataTableBody
+                table={table}
+                rowPinningDisplayMode={rowPinningDisplayMode}
+                renderDetailPanel={renderDetailPanel}
+              />
+            </TableRoot>
+          );
+        }}
+      </table.Subscribe>
+    </ContainerRoot>
+  );
+}
+
 export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
   const themeDefaults = useDataTableThemeDefaults();
   const {
@@ -223,6 +340,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     toolbar = themeDefaults.enableToolbar ?? true,
 
     renderDetailPanel,
+    card,
     rowPinning,
     refreshing = false,
     refreshProgress,
@@ -255,6 +373,10 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     fullscreen,
     defaultFullscreen,
     onFullscreenChange,
+
+    displayMode,
+    defaultDisplayMode: defaultDisplayModeProp,
+    onDisplayModeChange,
   } = props;
 
   const variant =
@@ -310,7 +432,14 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
    */
   return (
     <table.AppTable>
-      <DataTableAccessibilityProvider>
+      <DataTableDisplayModeProvider
+        displayMode={displayMode}
+        defaultDisplayMode={
+          defaultDisplayModeProp ?? themeDefaults.defaultDisplayMode
+        }
+        onDisplayModeChange={onDisplayModeChange}
+      >
+        <DataTableAccessibilityProvider>
         <DataTableDensityProvider
           density={density}
           defaultDensity={defaultDensity}
@@ -339,57 +468,14 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                     refreshing={refreshing}
                     progress={refreshProgress}
                   />
-                  <ContainerRoot
-                    {...containerProps}
-                    className={[
-                      dataTableClasses.container,
-                      containerProps?.className,
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    <table.Subscribe
-                      selector={(state) => ({
-                        columnSizing: state.columnSizing,
-                        columnVisibility: state.columnVisibility,
-                      })}
-                    >
-                      {() => {
-                        const totalSize = table.getTotalSize();
-
-                        /**
-                         * Caller inline table styles deliberately come
-                         * after the generated CSS variable, preserving
-                         * the 6F.1 precedence contract.
-                         */
-                        const tableStyle: DataTableTableStyle = {
-                          "--DataTable-table-size": `${totalSize}px`,
-                          ...tableProps?.style,
-                        };
-
-                        return (
-                          <TableRoot
-                            {...tableProps}
-                            className={[
-                              dataTableClasses.table,
-                              tableProps?.className,
-                            ]
-                              .filter(Boolean)
-                              .join(" ")}
-                            style={tableStyle}
-                          >
-                            <DataTableColumnGroup table={table} />
-                            <DataTableHead table={table} />
-                            <DataTableBody
-                              table={table}
-                              rowPinningDisplayMode={rowPinningDisplayMode}
-                              renderDetailPanel={renderDetailPanel}
-                            />
-                          </TableRoot>
-                        );
-                      }}
-                    </table.Subscribe>
-                  </ContainerRoot>
+                  <DataTablePresentationRegion
+                    table={table}
+                    tableProps={tableProps}
+                    containerProps={containerProps}
+                    card={card}
+                    rowPinningDisplayMode={rowPinningDisplayMode}
+                    renderDetailPanel={renderDetailPanel}
+                  />
                   {pagination !== false ? (
                     <DataTablePagination
                       table={table}
@@ -415,7 +501,8 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
             </DataTableRowPinningProvider>
           </DataTableFullscreenProvider>
         </DataTableDensityProvider>
-      </DataTableAccessibilityProvider>
+        </DataTableAccessibilityProvider>
+      </DataTableDisplayModeProvider>
     </table.AppTable>
   );
 }

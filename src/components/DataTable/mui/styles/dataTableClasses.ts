@@ -137,6 +137,22 @@ export const dataTableClasses = generateUtilityClasses(
     "bodyCell",
 
     /**
+     * ============================================================
+     * Card presentation
+     * ============================================================
+     */
+    "cardContainer",
+    "cardItem",
+    "cardHeader",
+    "cardSelection",
+    "cardBody",
+    "cardMetadata",
+    "cardActions",
+    "cardExpansion",
+    "cardDetail",
+    "cardState",
+
+    /**
      * Body-wide loading/error/empty states.
      *
      * All three state renderers share:
