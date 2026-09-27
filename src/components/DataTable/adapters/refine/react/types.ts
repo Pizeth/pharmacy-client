@@ -48,9 +48,14 @@ export interface RefineDataTableRequestState<
  * Query execution tuning belongs here; resource/query semantics continue to be
  * owned by the DataTable semantic adapter.
  *
- * LiveProvider options are deliberately not exposed in 1.8.3. Realtime has its
- * own later phase and should be introduced through a generic live-data
- * contract rather than accidentally becoming Refine-defined behavior.
+ * Refine's automatic LiveProvider behavior is deliberately not exposed here.
+ *
+ * DataTable list requests force liveMode="off" so Refine cannot bypass the
+ * generic realtime decision boundary by invalidating/refetching on its own.
+ *
+ * Realtime subscription is handled separately by the 2.0.4
+ * useRefineDataTableLiveSubscription() bridge, which normalizes Refine events
+ * into DataTableLiveEvent before any reconciliation policy executes.
  */
 export type RefineDataTableUseListQueryOptions<
   TData extends RowData & BaseRecord,

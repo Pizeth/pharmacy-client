@@ -71,6 +71,21 @@ export function useRefineDataTableRequest<
   const list = useList<TData, TError, TData>({
     ...request,
     queryOptions,
+
+    /**
+     * DataTable owns realtime policy through its generic live-event contract.
+     *
+     * Refine's automatic live mode can invalidate/refetch list queries before
+     * DataTable has a chance to choose between:
+     *
+     *   refetch
+     *   reconcile
+     *
+     * so the request bridge explicitly keeps Refine's integrated subscription
+     * disabled. A dedicated Refine live bridge subscribes separately and
+     * normalizes events into DataTableLiveEvent.
+     */
+    liveMode: "off",
   });
 
   /**

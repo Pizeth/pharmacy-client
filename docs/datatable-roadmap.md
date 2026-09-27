@@ -571,14 +571,49 @@ contract as well.
 
 ## 2.0.4 — Refine LiveProvider bridge
 
-**Status: next**
+**Status: complete**
 
-Add a Refine-specific live adapter only after the generic live contract exists.
+Refine LiveProvider is now one transport implementation behind the generic live
+boundary.
 
-Refine LiveProvider must be one implementation of the generic contract, not the
+The bridge has two layers:
+
+1. `adaptRefineDataTableLiveEvent()`
+   - maps recognized Refine `created` / `updated` / `deleted` events,
+   - supports explicit provider-specific event-name mapping,
+   - requires provider/resource-owned extraction of stable event/record IDs,
+   - optionally decodes a canonical row payload,
+   - optionally carries revision metadata,
+   - normalizes Refine `date` into generic `occurredAt`.
+
+2. `useRefineDataTableLiveSubscription()`
+   - subscribes through Refine `useSubscription()`,
+   - defaults to Refine's `resources/<resource>` list channel convention,
+   - emits only normalized `DataTableLiveEvent<TData>` values,
+   - performs no reconciliation, cache mutation or request execution.
+
+The existing Refine list request bridge now forces `liveMode: "off"`.
+This is intentional: Refine's integrated automatic live invalidation must not
+bypass DataTable's generic decision layer. Realtime events flow instead through:
+
+```text
+Refine LiveProvider
+        ↓
+useRefineDataTableLiveSubscription()
+        ↓
+adaptRefineDataTableLiveEvent()
+        ↓
+DataTableLiveEvent
+        ↓
+generic reconciliation/state-safety policy
+```
+
+Refine therefore remains a replaceable event transport rather than the
 definition of realtime behavior.
 
 ## 2.0.5 — realtime resource proof
+
+**Status: next**
 
 Prove realtime on a real resource with:
 
