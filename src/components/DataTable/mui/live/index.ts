@@ -39,3 +39,30 @@ export type {
   DataTableLiveUpdateReconciliationContext,
   ReconcileDataTableLiveEventOptions,
 } from "./reconciliationTypes";
+
+export {
+  createDataTableLiveVisibleRowIdSet,
+  reconcileDataTableLiveExpanded,
+  reconcileDataTableLiveRowPinning,
+  reconcileDataTableLiveRowSelection,
+  reconcileDataTableLiveTableState,
+  removeDataTableLiveRecordFromExpanded,
+  removeDataTableLiveRecordFromRowPinning,
+  removeDataTableLiveRecordFromRowSelection,
+  resolveDataTableLiveSafePageIndex,
+} from "./tableStateSafety";
+
+export {
+  removeDataTableLiveRecordFromTableState,
+} from "./removeDataTableLiveRecordFromTableState";
+
+export {
+  useDataTableLiveTableStateSafety,
+} from "./useDataTableLiveTableStateSafety";
+
+export type {
+  DataTableLiveTableStateSafetyResult,
+  DataTableLiveTableStateSnapshot,
+  RemoveDataTableLiveRecordFromTableStateOptions,
+  UseDataTableLiveTableStateSafetyOptions,
+} from "./tableStateSafetyTypes";

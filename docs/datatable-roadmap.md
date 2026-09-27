@@ -529,20 +529,49 @@ semantics are ambiguous.
 
 ## 2.0.3 — table-state safety
 
-**Status: next**
+**Status: complete**
 
-Realtime updates must preserve or correctly reconcile:
+The generic live/server safety layer now reconciles every TanStack state family
+that carries stable row identity after a canonical current-query result settles:
 
-- row selection,
-- row pinning,
-- expansion,
-- current page,
-- background-refresh presentation.
+- `rowSelection`,
+- `rowPinning.top`,
+- `rowPinning.bottom`,
+- keyed `expanded` state.
 
-Deleted or no-longer-visible row IDs must not remain as stale authorization
-state for resource mutations.
+The policy deliberately waits while:
+
+- a background request is fetching,
+- a preserved previous result is being displayed.
+
+This keeps the established non-blocking refresh UX intact. Once the replacement
+result is canonical, row IDs no longer present on the loaded server page are
+removed so stale IDs cannot remain as resource-mutation authorization state.
+
+TanStack `expanded === true` is preserved because that state contains no stale
+record identity.
+
+The safety layer also resolves out-of-range pagination after realtime changes to
+total/page counts:
+
+- a still-valid current page is preserved,
+- unknown pageCount (`-1`) is preserved,
+- an empty result recovers to page zero,
+- an index beyond the last page is clamped to the last valid page.
+
+A separate `removeDataTableLiveRecordFromTableState()` executor can remove a
+known deleted record immediately from selection, pinning and keyed expansion
+before the refetch completes. This closes the stale-selection window for the
+future live transport bridge without coupling state cleanup to any transport.
+
+TranslationKey now consumes the generic safety hook instead of maintaining
+resource-local canonical selection/pinning cleanup effects. Expansion cleanup
+and out-of-range page recovery are therefore covered by the same generic
+contract as well.
 
 ## 2.0.4 — Refine LiveProvider bridge
+
+**Status: next**
 
 Add a Refine-specific live adapter only after the generic live contract exists.
 

@@ -9,6 +9,7 @@ import type {
 import { useTheme } from "@mui/material";
 import {
   createDataTableServerTableBinding,
+  useDataTableLiveTableStateSafety,
   useDataTableServerResult,
   useDataTableServerState,
   useMuiDataTable,
@@ -311,103 +312,6 @@ export function useTranslationKeyDataTable(
   });
 
   /**
-   * Reconcile selection only after the current query has a canonical
-   * server result.
-   *
-   * Same-query mutation refreshes intentionally preserve selection
-   * while the previous result is displayed. Once the replacement
-   * result arrives, IDs no longer present on the loaded server page are
-   * removed.
-   *
-   * This prevents a successful edit which changes filter/sort/page
-   * membership from leaving an off-page ID selected and appearing to
-   * authorize a mutation command for data no longer loaded.
-   */
-  useEffect(() => {
-    if (
-      !enableRowSelection ||
-      !server.hasResult ||
-      server.isPreviousResult ||
-      server.isFetching
-    ) {
-      return;
-    }
-
-    const loadedRowIds = new Set(server.rows.map((row) => String(row.id)));
-
-    setRowSelection((previous) => {
-      let changed = false;
-      const next: RowSelectionState = {};
-
-      for (const [rowId, selected] of Object.entries(previous)) {
-        if (selected && loadedRowIds.has(rowId)) {
-          next[rowId] = true;
-        } else if (selected) {
-          changed = true;
-        }
-      }
-
-      return changed ? next : previous;
-    });
-  }, [
-    enableRowSelection,
-    server.hasResult,
-    server.isPreviousResult,
-    server.isFetching,
-    server.rows,
-  ]);
-
-  /**
-   * Reconcile row pinning against the canonical loaded server page.
-   *
-   * keepPinnedRows=false prevents off-page rows from being resurrected by
-   * TanStack, but controlled pinning state should still discard stale IDs once
-   * the replacement result settles.
-   *
-   * This mirrors the selection cleanup above while keeping both state machines
-   * independently correct.
-   */
-  useEffect(() => {
-    if (
-      !enableRowSelection ||
-      !server.hasResult ||
-      server.isPreviousResult ||
-      server.isFetching
-    ) {
-      return;
-    }
-
-    const loadedRowIds = new Set(server.rows.map((row) => String(row.id)));
-
-    setRowPinning((previous) => {
-      const top = (previous.top ?? []).filter((rowId) =>
-        loadedRowIds.has(rowId),
-      );
-
-      const bottom = (previous.bottom ?? []).filter((rowId) =>
-        loadedRowIds.has(rowId),
-      );
-
-      const unchanged =
-        top.length === (previous.top?.length ?? 0) &&
-        bottom.length === (previous.bottom?.length ?? 0);
-
-      return unchanged
-        ? previous
-        : {
-            top,
-            bottom,
-          };
-    });
-  }, [
-    enableRowSelection,
-    server.hasResult,
-    server.isPreviousResult,
-    server.isFetching,
-    server.rows,
-  ]);
-
-  /**
    * ================================================================
    * 6. Generic server -> TanStack binding
    * ================================================================
@@ -663,6 +567,34 @@ export function useTranslationKeyDataTable(
     manualSorting: true,
 
     manualFiltering: true,
+  });
+
+  /**
+   * ================================================================
+   * 8. Canonical server/live row-state safety
+   * ================================================================
+   *
+   * The generic safety layer replaces the resource-local selection/pinning
+   * cleanup previously implemented above.
+   *
+   * It reconciles only after a canonical current-query result settles, so
+   * background refresh keeps prior rows and their interactions intact.
+   *
+   * Once canonical rows are known it removes no-longer-visible IDs from:
+   *
+   * - rowSelection,
+   * - rowPinning,
+   * - expanded.
+   *
+   * It also recovers pageIndex only when live/server count changes leave the
+   * current page outside the returned pageCount.
+   */
+  useDataTableLiveTableStateSafety({
+    table,
+    query,
+    server,
+    getRowId: (row) => row.id,
+    enabled: true,
   });
 
   return {
