@@ -2,6 +2,8 @@
 
 import { Refine } from "@refinedev/core";
 
+import type { DataTableDisplayMode } from "@/components/DataTable";
+
 import { DocumentTable } from "../table";
 
 import { documentFixtureDataProvider } from "./documentFixtureDataProvider";
@@ -16,7 +18,14 @@ import { documentFixtureDataProvider } from "./documentFixtureDataProvider";
  * A nested Refine boundary is intentional: only this preview subtree receives
  * the fixture provider. The application-wide provider remains unchanged.
  */
-export function DocumentTableFixturePreview() {
+export interface DocumentTableFixturePreviewProps {
+  readonly displayMode?: DataTableDisplayMode;
+}
+
+export function DocumentTableFixturePreview(
+  props: DocumentTableFixturePreviewProps,
+) {
+  const { displayMode } = props;
   return (
     <Refine
       dataProvider={documentFixtureDataProvider}
@@ -24,7 +33,7 @@ export function DocumentTableFixturePreview() {
         disableTelemetry: true,
       }}
     >
-      <DocumentTable />
+      <DocumentTable displayMode={displayMode} />
     </Refine>
   );
 }

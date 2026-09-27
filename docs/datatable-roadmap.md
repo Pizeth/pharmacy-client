@@ -347,24 +347,45 @@ viewport policy into the base state contract.
 
 ## 1.9.2 — card renderer and slots
 
-**Status: next**
+**Status: complete**
 
-Create themeable DataTable card slots, for example:
+The generic MUI renderer now supports a card presentation that consumes the
+same TanStack table instance and resolved row model as table presentation.
 
-- card container,
-- card item,
-- card header,
-- card body,
-- card metadata,
-- card actions,
-- card selection surface,
-- card expansion/detail surface.
+Established theme slots:
 
-The application supplies the resource-specific card content.
+- `cardContainer`,
+- `cardItem`,
+- `cardHeader`,
+- `cardSelection`,
+- `cardBody`,
+- `cardMetadata`,
+- `cardActions`,
+- `cardExpansion`,
+- `cardDetail`,
+- `cardState`.
 
-No inline resource styling should be required for normal customization.
+Resource content is supplied through `DataTableCardConfig<TData>`. The generic
+renderer owns only card structure, state surfaces and theme hooks.
+
+Important boundaries:
+
+- no resource field names enter the generic card renderer,
+- no card-specific server query exists,
+- pagination/search/filtering continue to use the same table/controller state,
+- `auto` still resolves to table until 1.9.4,
+- card rendering requires an explicit resource card configuration,
+- collapsed rows do not invoke card detail renderers,
+- false/null/undefined omit optional card surfaces while values such as 0 and
+  empty strings remain valid renderable content.
+
+The Document proof now supplies resource-specific card content, and
+`/admin/documents` defaults to card mode for visual acceptance. Use
+`?display=table` to compare the same resource/controller in table mode.
 
 ## 1.9.3 — feature parity
+
+**Status: next**
 
 Card view should preserve the applicable state contracts:
 
