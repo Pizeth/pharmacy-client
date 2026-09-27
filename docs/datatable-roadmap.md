@@ -385,23 +385,36 @@ The Document proof now supplies resource-specific card content, and
 
 ## 1.9.3 — feature parity
 
-**Status: next**
+**Status: complete**
 
-Card view should preserve the applicable state contracts:
+Card presentation now preserves the applicable shared state and interaction
+contracts:
 
-- row identity,
-- selection,
-- row actions,
-- expansion/detail content,
-- pagination,
-- global search,
-- resource filters,
-- loading/empty/error states,
-- realtime refresh state.
+- row identity comes from the same TanStack Row objects,
+- optional generic selection controls delegate to TanStack row selection and
+  preserve selection-driven row-pinning policy,
+- card actions reuse the existing `DataTableRowAction<TData>` contract and
+  `DataTableRowActions` renderer,
+- optional generic expansion controls delegate to TanStack expansion and keep
+  the established detail-panel accessibility IDs/relationships,
+- pagination remains the shared outer DataTable pagination,
+- global search and resource filters remain the same table/controller state,
+- loading/empty/error states reuse the established DataTable state slots,
+- refresh indication remains the shared non-blocking DataTable refresh surface.
 
-Column-only concepts such as resize widths do not need fake card equivalents.
+Resource render callbacks still take precedence over generic card controls, so
+applications can replace selection/actions/expansion composition without
+forking the renderer.
+
+No card-only copies of query state, selection state, expansion state, or row
+actions were introduced.
+
+Column-only concepts such as resize widths deliberately have no fake card
+equivalent.
 
 ## 1.9.4 — responsive/auto mode
+
+**Status: next**
 
 Allow narrow screens to use card presentation while wider layouts use the table
 renderer.
