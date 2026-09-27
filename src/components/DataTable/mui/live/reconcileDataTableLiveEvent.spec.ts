@@ -295,16 +295,18 @@ describe("reconcileDataTableLiveEvent", () => {
   });
 
   it("refetches when the resource proof cannot guarantee query/order stability", () => {
+    const nextRow: Row = {
+      id: 1,
+      name: "Updated Alpha",
+      status: "inactive",
+    };
+
     const event = createDataTableLiveEvent<Row>({
       type: "updated",
       eventId: "evt-1",
       resource: "documents",
       recordId: 1,
-      record: {
-        id: 1,
-        name: "Updated Alpha",
-        status: "inactive",
-      },
+      record: nextRow,
     });
 
     const proof = jest.fn(() => false);
@@ -329,7 +331,7 @@ describe("reconcileDataTableLiveEvent", () => {
       query,
       result,
       currentRow: result.rows[0],
-      nextRow: event.record,
+      nextRow,
       rowIndex: 0,
     });
   });
