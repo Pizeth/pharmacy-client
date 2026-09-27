@@ -1,5 +1,7 @@
 // src/components/DataTable/mui/presentation/types.ts
 
+import type { Breakpoint } from "@mui/material/styles";
+
 /**
  * Requested DataTable presentation mode.
  *
@@ -34,6 +36,16 @@ export interface DataTableDisplayModeConfig {
    * Default: "table".
    */
   readonly defaultDisplayMode?: DataTableDisplayMode;
+
+  /**
+   * Breakpoint used when the requested mode is "auto".
+   *
+   * At or below this breakpoint the physical renderer is "card".
+   * Above it the physical renderer is "table".
+   *
+   * Default: "sm".
+   */
+  readonly autoCardBreakpoint?: Breakpoint;
 
   /**
    * Fired whenever a display-mode change is requested.

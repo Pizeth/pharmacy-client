@@ -21,7 +21,7 @@ import {
 import {
   DataTableCardView,
   DataTableDisplayModeProvider,
-  useDataTableDisplayMode,
+  useDataTableResolvedDisplayMode,
 } from "../presentation";
 import type {
   DataTableCardConfig,
@@ -235,13 +235,15 @@ interface DataTablePresentationRegionProps<TData extends RowData> {
     DataTableRowPinningConfig["displayMode"]
   >;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
+  readonly autoCardBreakpoint: NonNullable<
+    DataTableDisplayModeConfig["autoCardBreakpoint"]
+  >;
 }
 
 /**
  * Resolve physical presentation without touching query/controller state.
  *
- * Phase 1.9.4 owns responsive "auto" resolution. Until then, "auto" preserves
- * the established table presentation.
+ * "auto" resolves responsively without mutating table/query state.
  */
 function DataTablePresentationRegion<TData extends RowData>(
   props: DataTablePresentationRegionProps<TData>,
@@ -253,11 +255,13 @@ function DataTablePresentationRegion<TData extends RowData>(
     card,
     rowPinningDisplayMode,
     renderDetailPanel,
+    autoCardBreakpoint,
   } = props;
 
-  const { displayMode } = useDataTableDisplayMode();
+  const resolvedDisplayMode =
+    useDataTableResolvedDisplayMode(autoCardBreakpoint);
 
-  if (displayMode === "card") {
+  if (resolvedDisplayMode === "card") {
     if (!card) {
       throw new Error(
         'DataTable card presentation requires a "card" configuration.',
@@ -377,10 +381,17 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     displayMode,
     defaultDisplayMode: defaultDisplayModeProp,
     onDisplayModeChange,
+    autoCardBreakpoint:
+      autoCardBreakpointProp,
   } = props;
 
   const variant =
     variantProp ?? themeDefaults.variant ?? DATA_TABLE_DEFAULT_VARIANT;
+
+  const autoCardBreakpoint =
+    autoCardBreakpointProp ??
+    themeDefaults.autoCardBreakpoint ??
+    "sm";
 
   /**
    * ----------------------------------------------------------------
@@ -475,6 +486,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                     card={card}
                     rowPinningDisplayMode={rowPinningDisplayMode}
                     renderDetailPanel={renderDetailPanel}
+                    autoCardBreakpoint={autoCardBreakpoint}
                   />
                   {pagination !== false ? (
                     <DataTablePagination

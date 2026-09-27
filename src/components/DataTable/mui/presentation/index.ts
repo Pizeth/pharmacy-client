@@ -15,3 +15,12 @@ export type {
 } from "./DataTableDisplayModeProvider";
 
 export * from "./card";
+
+export {
+  DATA_TABLE_DEFAULT_AUTO_CARD_BREAKPOINT,
+  useDataTableResolvedDisplayMode,
+} from "./useDataTableResolvedDisplayMode";
+
+export type {
+  ResolvedDataTableDisplayMode,
+} from "./useDataTableResolvedDisplayMode";
