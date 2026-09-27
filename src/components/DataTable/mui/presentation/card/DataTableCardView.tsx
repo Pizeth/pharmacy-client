@@ -12,7 +12,7 @@ import type { ReactNode } from "react";
 import type { RowData } from "@tanstack/table-core";
 
 import type { DataTableDetailPanelRenderer } from "../../components/detail-panel";
-import { normalizeDataTableGlobalFilter } from "../../components/utils";
+import { normalizeDataTableGlobalFilter } from "../../utils";
 import { useDataTableDensity } from "../../density";
 import {
   getDataTableRowsForPinningDisplay,
@@ -312,7 +312,6 @@ export function DataTableCardView<TData extends RowData>(
               return (
                 <CardItemRoot
                   key={row.id}
-                  component="article"
                   variant="outlined"
                   className={dataTableClasses.cardItem}
                   role="listitem"
