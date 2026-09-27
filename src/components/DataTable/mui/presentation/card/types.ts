@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Row, RowData } from "@tanstack/table-core";
 
 import type { MuiDataTableFeatures } from "../../features";
+import type { DataTableRowAction } from "../../columns/actions";
 import type { MuiDataTableInstance } from "../../table";
 
 export interface DataTableCardRenderContext<TData extends RowData> {
@@ -29,8 +30,25 @@ export interface DataTableCardConfig<TData extends RowData> {
   readonly renderBody: DataTableCardRenderer<TData>;
 
   readonly renderMetadata?: DataTableCardRenderer<TData>;
+
+  /**
+   * Reuse the standard row-action contract in card presentation.
+   *
+   * renderActions remains an escape hatch for resource-specific composition.
+   */
+  readonly actions?: readonly DataTableRowAction<TData>[];
+  readonly maxInlineActions?: number;
   readonly renderActions?: DataTableCardRenderer<TData>;
+
+  /**
+   * Generic TanStack-backed row controls.
+   *
+   * Custom renderers take precedence when supplied.
+   */
+  readonly enableSelection?: boolean;
   readonly renderSelection?: DataTableCardRenderer<TData>;
+
+  readonly enableExpansion?: boolean;
   readonly renderExpansion?: DataTableCardRenderer<TData>;
 
   /**

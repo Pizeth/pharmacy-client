@@ -12,6 +12,8 @@ import type { ReactNode } from "react";
 import type { RowData } from "@tanstack/table-core";
 
 import type { DataTableDetailPanelRenderer } from "../../components/detail-panel";
+import { DataTableRowActions } from "../../columns/actions";
+import { useDataTableAccessibility } from "../../accessibility";
 import { normalizeDataTableGlobalFilter } from "../../utils";
 import { useDataTableDensity } from "../../density";
 import {
@@ -24,6 +26,8 @@ import {
 } from "../../styles";
 import type { MuiDataTableInstance } from "../../table";
 
+import { DataTableCardExpandRowButton } from "./DataTableCardExpandRowButton";
+import { DataTableCardSelectRowCheckbox } from "./DataTableCardSelectRowCheckbox";
 import type {
   DataTableCardConfig,
   DataTableCardRenderContext,
@@ -202,6 +206,11 @@ export function DataTableCardView<TData extends RowData>(
 
   const { density } = useDataTableDensity();
 
+  const {
+    getExpandButtonId,
+    getDetailPanelId,
+  } = useDataTableAccessibility();
+
   return (
     <table.Subscribe
       selector={(state) => ({
@@ -290,12 +299,41 @@ export function DataTableCardView<TData extends RowData>(
 
               const selected = Boolean(state.rowSelection?.[row.id]);
 
-              const selection = config.renderSelection?.(context);
+              const selection =
+                config.renderSelection?.(context) ??
+                (config.enableSelection ? (
+                  <DataTableCardSelectRowCheckbox
+                    row={row}
+                  />
+                ) : undefined);
+
               const header = config.renderHeader?.(context);
               const body = config.renderBody(context);
               const metadata = config.renderMetadata?.(context);
-              const actions = config.renderActions?.(context);
-              const expansion = config.renderExpansion?.(context);
+
+              const actions =
+                config.renderActions?.(context) ??
+                (config.actions?.length ? (
+                  <DataTableRowActions
+                    row={row}
+                    actions={config.actions}
+                    maxInlineActions={
+                      config.maxInlineActions ?? 2
+                    }
+                  />
+                ) : undefined);
+
+              const usingDefaultExpansion =
+                !config.renderExpansion &&
+                Boolean(config.enableExpansion);
+
+              const expansion =
+                config.renderExpansion?.(context) ??
+                (config.enableExpansion ? (
+                  <DataTableCardExpandRowButton
+                    row={row}
+                  />
+                ) : undefined);
 
               const detailRenderer =
                 config.renderDetail ?? renderDetailPanel;
@@ -360,7 +398,17 @@ export function DataTableCardView<TData extends RowData>(
                   {hasRenderableContent(detail) && (
                     <CardDetailRoot
                       className={dataTableClasses.cardDetail}
+                      id={
+                        usingDefaultExpansion
+                          ? getDetailPanelId(row.id)
+                          : undefined
+                      }
                       role="region"
+                      aria-labelledby={
+                        usingDefaultExpansion
+                          ? getExpandButtonId(row.id)
+                          : undefined
+                      }
                       data-detail-panel={row.id}
                     >
                       {detail}
