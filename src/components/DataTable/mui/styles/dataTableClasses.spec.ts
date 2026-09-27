@@ -38,6 +38,19 @@ const DETAIL_PANEL_STRUCTURAL_SLOTS = [
   "detailPanel",
 ] as const satisfies readonly DataTableClassKey[];
 
+const CARD_STRUCTURAL_SLOTS = [
+  "cardContainer",
+  "cardItem",
+  "cardHeader",
+  "cardSelection",
+  "cardBody",
+  "cardMetadata",
+  "cardActions",
+  "cardExpansion",
+  "cardDetail",
+  "cardState",
+] as const satisfies readonly DataTableClassKey[];
+
 const ROW_ACTION_STRUCTURAL_SLOTS = [
   "rowActions",
   "rowActionButton",
@@ -116,6 +129,27 @@ describe("RazethDataTable utility classes", () => {
     );
 
     expect(slots).toEqual(DETAIL_PANEL_STRUCTURAL_SLOTS);
+  });
+
+  it.each(CARD_STRUCTURAL_SLOTS)(
+    "registers %s as a stable card structural utility class",
+    (slot) => {
+      expect(dataTableClasses[slot]).toBe(
+        `${DATA_TABLE_COMPONENT_NAME}-${slot}`,
+      );
+
+      expect(getDataTableUtilityClass(slot)).toBe(
+        `${DATA_TABLE_COMPONENT_NAME}-${slot}`,
+      );
+    },
+  );
+
+  it("exposes card structural classes as theme slots", () => {
+    const slots = CARD_STRUCTURAL_SLOTS.map((slot) =>
+      asDataTableSlot(slot),
+    );
+
+    expect(slots).toEqual(CARD_STRUCTURAL_SLOTS);
   });
 
   it("keeps utility-only global-filter classes registered separately", () => {
