@@ -38,10 +38,15 @@ export const RefineContext = ({ children }: { children: React.ReactNode }) => {
         },
         {
           name: "translations",
-          list: "/admin/translations",
-          create: "/admin/translations/create",
-          edit: "/admin/translations/edit/:id",
+          list: "/admin/i18n",
+          create: "/admin/i18n/create",
+          edit: "/admin/i18n/edit/:id",
           meta: { label: "Translations" },
+        },
+        {
+          name: "documents",
+          list: "/admin/documents",
+          meta: { label: "Documents" },
         },
       ]}
     >
