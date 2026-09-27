@@ -455,7 +455,9 @@ The generic table must not know whether updates originate from:
 
 ## 2.0.1 — generic live-event contract
 
-Define backend-independent events such as:
+**Status: complete**
+
+The generic live boundary now defines transport-independent:
 
 ```text
 created
@@ -464,9 +466,26 @@ deleted
 invalidate
 ```
 
-with stable resource/record identity.
+events with normalized stable:
+
+- event identity,
+- resource identity,
+- record identity.
+
+Created/updated events may carry a normalized row payload, but payloads are
+optional so identity-only transports can safely fall back to refetch.
+`invalidate` may target one record or the whole resource.
+
+Optional revision/timestamp metadata is retained as a hint only; the generic
+contract does not assume transport ordering semantics.
+
+`getDataTableLiveEventDeduplicationKey()` establishes a stable
+resource-scoped event key for later duplicate-event protection without coupling
+the contract to WebSocket, SSE, Refine LiveProvider, or another transport.
 
 ## 2.0.2 — reconciliation policy
+
+**Status: next**
 
 Support two safe strategies:
 
