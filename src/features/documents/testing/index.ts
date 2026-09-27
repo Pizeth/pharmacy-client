@@ -6,3 +6,5 @@ export {
 } from "./documentFixtureDataProvider";
 
 export { DocumentTableFixturePreview } from "./DocumentTableFixturePreview";
+
+export * from "./documentFixtureLiveProvider";

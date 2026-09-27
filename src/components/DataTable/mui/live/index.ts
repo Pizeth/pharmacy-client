@@ -66,3 +66,23 @@ export type {
   RemoveDataTableLiveRecordFromTableStateOptions,
   UseDataTableLiveTableStateSafetyOptions,
 } from "./tableStateSafetyTypes";
+
+export {
+  createDataTableLiveEventDeduplicator,
+} from "./createDataTableLiveEventDeduplicator";
+
+export {
+  useDataTableLiveServerResult,
+} from "./useDataTableLiveServerResult";
+
+export type {
+  CreateDataTableLiveEventDeduplicatorOptions,
+  DataTableLiveEventDeduplicator,
+  DataTableLiveEventHandlingResult,
+  DataTableLiveEventIgnoreReason,
+  DataTableLiveIgnoredEventResult,
+  DataTableLiveReconciledEventResult,
+  DataTableLiveRefetchEventResult,
+  UseDataTableLiveServerResultOptions,
+  UseDataTableLiveServerResultValue,
+} from "./liveServerResultTypes";

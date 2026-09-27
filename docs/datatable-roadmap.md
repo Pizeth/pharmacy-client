@@ -613,17 +613,59 @@ definition of realtime behavior.
 
 ## 2.0.5 — realtime resource proof
 
-**Status: next**
+**Status: complete**
 
-Prove realtime on a real resource with:
+The Document Refine resource now composes the complete realtime stack:
 
-- create event,
-- update event,
-- delete event,
-- reconnect,
-- duplicate-event protection,
-- active filter/search interaction,
-- selected/pinned row reconciliation.
+```text
+Refine LiveProvider
+        ↓
+Refine live bridge
+        ↓
+DataTableLiveEvent
+        ↓
+bounded event deduplication
+        ↓
+generic reconcile/refetch decision
+        ↓
+live normalized-result overlay OR Refine refresh
+        ↓
+generic table-state safety
+```
+
+A new generic `useDataTableLiveServerResult()` executor owns:
+
+- resource routing,
+- bounded FIFO duplicate-event protection,
+- execution of the pure 2.0.2 decision,
+- immutable proven-safe row overlays,
+- conservative refresh execution,
+- canonical-result replacement of local overlays.
+
+Local reconciliation is refused while another server replacement is already in
+flight, avoiding an in-flight stale-response race.
+
+The Document resource supplies an explicit update-stability proof. It allows
+local replacement only when no sort, column filter, or global search is active.
+Any semantic query transformation falls back to canonical refetch.
+
+The fixture-backed Refine LiveProvider acceptance proof covers:
+
+- visible update with zero extra server requests,
+- duplicate update delivery,
+- active-search update forcing refetch while preserving the search query,
+- create forcing refetch,
+- duplicate create protection,
+- delete forcing refetch while immediately removing stale selected/pinned IDs,
+- unsubscribe/resubscribe reconnect behavior,
+- reconnect invalidation,
+- duplicate reconnect-event protection across the transport reconnect.
+
+Deduplication history is bounded and intentionally survives normal reconnects
+while the resource controller remains mounted.
+
+This completes the planned 2.0 realtime architecture without coupling the
+generic table to WebSocket, SSE, Refine, or another event transport.
 
 ---
 
