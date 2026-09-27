@@ -1,3 +1,4 @@
+import type { Breakpoint } from "@mui/material/styles";
 import type { MuiDataTableDensity } from "../density";
 import type { DataTableDisplayMode } from "../presentation/types";
 import type {
@@ -58,6 +59,13 @@ export interface DataTableThemeProps extends DataTableVariantProps {
    * established table presentation.
    */
   readonly defaultDisplayMode?: DataTableDisplayMode;
+
+  /**
+   * Responsive threshold used when default/requested display mode is "auto".
+   *
+   * Default: "sm".
+   */
+  readonly autoCardBreakpoint?: Breakpoint;
 
   /**
    * Whether the standard toolbar is rendered.

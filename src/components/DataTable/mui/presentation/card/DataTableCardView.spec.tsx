@@ -183,7 +183,21 @@ describe("DataTable card presentation", () => {
     );
   });
 
-  it("keeps auto on the table renderer until responsive resolution exists", () => {
+  it("resolves auto to table above the configured card breakpoint", () => {
+    const original = window.matchMedia;
+
+    window.matchMedia = (query: string) =>
+      ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      }) as MediaQueryList;
+
     function AutoFixture() {
       const table = useMuiDataTable({
         columns,
@@ -210,6 +224,55 @@ describe("DataTable card presentation", () => {
     expect(
       container.querySelector(`.${dataTableClasses.cardContainer}`),
     ).toBeNull();
+
+    window.matchMedia = original;
+  });
+
+  it("resolves auto to cards at or below the configured breakpoint", () => {
+    const original = window.matchMedia;
+
+    window.matchMedia = (query: string) =>
+      ({
+        matches: true,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      }) as MediaQueryList;
+
+    function AutoCardFixture() {
+      const table = useMuiDataTable({
+        columns,
+        data: [{ id: 1, name: "Alpha" }],
+        getRowId: (row) => String(row.id),
+      });
+
+      return (
+        <DataTable
+          table={table}
+          toolbar={false}
+          pagination={false}
+          displayMode="auto"
+          autoCardBreakpoint="md"
+          card={{
+            renderBody: ({ row }) => `Auto ${row.original.name}`,
+          }}
+        />
+      );
+    }
+
+    const { container } = render(<AutoCardFixture />);
+
+    expect(screen.getByText("Auto Alpha")).toBeInTheDocument();
+    expect(
+      container.querySelector(`.${dataTableClasses.cardContainer}`),
+    ).not.toBeNull();
+    expect(container.querySelector("table")).toBeNull();
+
+    window.matchMedia = original;
   });
 
   it("fails clearly when card mode has no resource card composition", () => {

@@ -414,17 +414,28 @@ equivalent.
 
 ## 1.9.4 — responsive/auto mode
 
-**Status: next**
+**Status: complete**
 
-Allow narrow screens to use card presentation while wider layouts use the table
-renderer.
+`auto` now resolves presentation responsively without changing the requested
+mode or mutating TanStack/server state:
 
-The responsive switch must preserve:
+- at or below `autoCardBreakpoint`: card renderer,
+- above `autoCardBreakpoint`: table renderer,
+- default breakpoint: `sm`.
 
-- query state,
-- selection where still valid,
-- expansion identity where still valid,
+`autoCardBreakpoint` is a generic presentation option and can also be supplied
+through `theme.components.RazethDataTable.defaultProps`.
+
+The resolver reads only MUI theme/viewport state. It does not read or write
+query state, resource adapters or transport execution. Both physical renderers
+continue consuming the same table instance, so viewport transitions preserve:
+
+- pagination/sorting/filter/search state,
+- row selection,
+- row expansion identity,
 - mutations and refresh lifecycle.
+
+This completes the first responsive card/table presentation loop.
 
 ---
 
