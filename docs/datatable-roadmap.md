@@ -313,7 +313,9 @@ The key architectural rule is:
 
 ## 1.9.1 — presentation-mode contract
 
-Add a generic display mode such as:
+**Status: complete**
+
+The generic presentation contract is now established as:
 
 ```text
 table
@@ -321,12 +323,29 @@ card
 auto
 ```
 
-The mode belongs to the presentation layer, not server query state.
+It lives in the MUI presentation layer as controlled/uncontrolled state through
+`DataTableDisplayModeProvider`.
 
-Changing table/card view must not issue a different semantic request solely
-because the renderer changed.
+The provider owns only the requested presentation mode. It does not read or
+write:
+
+- pagination,
+- sorting,
+- column filters,
+- global search,
+- resource adapters,
+- transport state.
+
+Therefore changing the requested display mode cannot manufacture a semantic
+server request by itself.
+
+`auto` is intentionally preserved as a requested mode rather than resolved in
+this phase. Responsive resolution belongs to 1.9.4 so 1.9.1 does not smuggle
+viewport policy into the base state contract.
 
 ## 1.9.2 — card renderer and slots
+
+**Status: next**
 
 Create themeable DataTable card slots, for example:
 
