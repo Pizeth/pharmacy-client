@@ -485,18 +485,51 @@ the contract to WebSocket, SSE, Refine LiveProvider, or another transport.
 
 ## 2.0.2 — reconciliation policy
 
-**Status: next**
+**Status: complete**
 
-Support two safe strategies:
+The generic live layer now exposes one pure reconciliation decision function:
 
-1. invalidate/refetch the current server query,
-2. reconcile a known row into the current normalized result when correctness can
-   be proven.
+`reconcileDataTableLiveEvent()`
 
-Refetch remains the fallback when sorting, filtering, pagination or total-count
-changes make local patching ambiguous.
+For a matching resource event it returns exactly one of two strategies:
+
+1. `refetch` when the current normalized server result may be stale,
+2. `reconcile` when one visible updated row can be replaced in place and
+   correctness has been explicitly proven.
+
+The generic policy is intentionally conservative:
+
+- `invalidate` always refetches,
+- `created` refetches because membership/order/totals may change,
+- `deleted` refetches because page fill and pagination totals may change,
+- identity-only updates refetch,
+- payload/envelope identity mismatches refetch,
+- updates for rows not on the current page refetch because the row may now enter
+  the query/page,
+- duplicate current-page row IDs refetch,
+- visible updates still refetch unless the resource supplies an explicit
+  `canReconcileUpdatedRecord` proof.
+
+A positive update-stability proof asserts that replacement preserves:
+
+- active filter/global-search membership,
+- current sort/default-server ordering position,
+- current-page membership,
+- row count and page count.
+
+When proven, the policy returns a new immutable
+`DataTableServerResult<TData>` with exactly that row replaced and the existing
+pagination metadata preserved.
+
+The function performs no request, React-state, cache, or transport side effects.
+Later bridges own execution of the returned strategy.
+
+Refetch therefore remains the correctness fallback whenever server-query
+semantics are ambiguous.
 
 ## 2.0.3 — table-state safety
+
+**Status: next**
 
 Realtime updates must preserve or correctly reconcile:
 

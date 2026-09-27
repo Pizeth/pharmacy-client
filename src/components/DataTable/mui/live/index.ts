@@ -23,3 +23,19 @@ export type {
   DataTableLiveResourceId,
   DataTableLiveUpdatedEvent,
 } from "./types";
+
+export {
+  reconcileDataTableLiveEvent,
+} from "./reconcileDataTableLiveEvent";
+
+export type {
+  DataTableLiveReconcileDecision,
+  DataTableLiveReconcileReason,
+  DataTableLiveReconciliationDecision,
+  DataTableLiveReconciliationStrategy,
+  DataTableLiveRefetchDecision,
+  DataTableLiveRefetchReason,
+  DataTableLiveUpdatedRecordStabilityProof,
+  DataTableLiveUpdateReconciliationContext,
+  ReconcileDataTableLiveEventOptions,
+} from "./reconciliationTypes";
