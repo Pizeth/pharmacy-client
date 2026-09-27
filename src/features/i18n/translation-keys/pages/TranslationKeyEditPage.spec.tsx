@@ -57,6 +57,7 @@ const record: TranslationKey = {
   translationCategory: {
     id: 3,
     name: "auth",
+    description: null,
   },
   translations: [],
 };
@@ -68,6 +69,9 @@ describe("TranslationKeyEditPage", () => {
 
   it("loads the canonical record and delegates mutation to the existing edit form", async () => {
     mockedGetTranslationKey.mockResolvedValue({
+      requestStatus: "SUCCESS",
+      statusCode: 200,
+      statusText: "OK",
       data: record,
     });
 
@@ -116,6 +120,9 @@ describe("TranslationKeyEditPage", () => {
     mockedGetTranslationKey
       .mockRejectedValueOnce(new Error("Translation key not found."))
       .mockResolvedValueOnce({
+        requestStatus: "SUCCESS",
+        statusCode: 200,
+        statusText: "OK",
         data: record,
       });
 
