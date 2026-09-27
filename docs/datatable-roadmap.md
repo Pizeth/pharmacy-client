@@ -252,19 +252,51 @@ machinery.
 
 ## 1.8.4 — second-resource Refine proof
 
-**Status: planned**
+**Status: complete for the list/query transport proof**
 
-Use a non-TranslationKey resource, preferably the document/FTS resource, to
-prove that the Refine adapter is genuinely reusable.
+Document/FTS is now the second resource proving that the Refine integration is
+not TranslationKey-specific.
 
-The proof should reuse:
+The completed path is:
 
-- semantic field mapping,
-- generic filters,
-- generic server lifecycle,
-- existing resource actions.
+```text
+Document DataTable state
+        ↓
+documentTableSemanticQuery
+        ↓
+documentRefineDataTableAdapter
+        ↓
+useRefineDataTableServerResult()
+        ↓
+createDataTableServerTableBinding()
+        ↓
+useMuiDataTable()
+        ↓
+DocumentTable
+```
 
-It should not duplicate TranslationKey infrastructure.
+Implemented guarantees:
+
+- stable Document row and column IDs,
+- resource-owned semantic sorting/filter/search mappings,
+- explicit Refine OR/contains global-search encoding,
+- normalized Refine pagination/result handling,
+- a complete Document controller built on the generic Refine lifecycle,
+- the generic MUI DataTable renderer remains unaware of Refine,
+- initial loading/error/empty/no-results states reuse generic DataTable slots,
+- background refresh preserves usable rows,
+- deterministic fixture-provider coverage proves server pagination, filtering,
+  global search and the rendered table path,
+- the DataTable test command now includes the Document feature family.
+
+The fixture provider intentionally supports list/query only. The production
+backend does not yet expose a canonical documents endpoint, so this phase does
+not invent API schemas or mutation contracts and does not replace the existing
+legacy /fts screen yet. When that backend endpoint exists, the provider can be
+swapped without changing the Document table/controller or generic renderer.
+
+The legacy MRT FTS code remains a behavior/UI reference only; it is not a
+dependency of the modern Document architecture.
 
 ---
 

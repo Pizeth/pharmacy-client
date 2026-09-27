@@ -15,7 +15,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:datatable": "jest src/components/DataTable src/features/i18n/translation-keys",
+    "test:datatable": "jest src/components/DataTable src/features/i18n/translation-keys src/features/documents",
     "test:translation-keys": "jest src/features/i18n/translation-keys"
   },
   "dependencies": {
