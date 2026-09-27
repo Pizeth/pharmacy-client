@@ -4,3 +4,5 @@ export {
   createDocumentFixtureRows,
   documentFixtureDataProvider,
 } from "./documentFixtureDataProvider";
+
+export { DocumentTableFixturePreview } from "./DocumentTableFixturePreview";

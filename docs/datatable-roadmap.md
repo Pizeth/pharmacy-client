@@ -287,6 +287,8 @@ Implemented guarantees:
 - background refresh preserves usable rows,
 - deterministic fixture-provider coverage proves server pagination, filtering,
   global search and the rendered table path,
+- a protected `/admin/documents` fixture-backed route exists for visual
+  acceptance without pretending the production Document API already exists,
 - the DataTable test command now includes the Document feature family.
 
 The fixture provider intentionally supports list/query only. The production
