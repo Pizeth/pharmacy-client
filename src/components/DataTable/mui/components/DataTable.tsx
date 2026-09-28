@@ -545,6 +545,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                       (displayMode === undefined ||
                         onDisplayModeChange !== undefined)
                     }
+                    cardPresentationAvailable={card !== undefined}
                     autoCardBreakpoint={autoCardBreakpoint}
                     {...toolbarConfig}
                   />

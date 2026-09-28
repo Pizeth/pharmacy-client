@@ -1,6 +1,7 @@
 // mui/components/toolbar/actions/index.ts
 
 // export * from "./DataTableColumnVisibilityButtonUnused";
+export * from "./DataTableCardSortButton";
 export * from "./DataTableDensityButton";
 export * from "./DataTableDisplayModeButton";
 export * from "./DataTableFilterToggleButton";

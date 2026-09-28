@@ -88,8 +88,12 @@ export const dataTableClasses = generateUtilityClasses(
 
     "toolbarActions",
     "toolbarFilterStatus",
+    "toolbarCardFilters",
+    "toolbarCardFilterGrid",
+    "toolbarCardFilterField",
     "searchToggleButton",
     "filterToggleButton",
+    "cardSortButton",
     "densityButton",
     "displayModeButton",
     "fullscreenButton",

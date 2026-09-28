@@ -11,6 +11,7 @@ import { DataTableColumnManagerButton } from "../column-manager";
 import type { DataTableColumnManagerConfig } from "../column-manager";
 import type { MuiDataTableInstance } from "../../table";
 import {
+  DataTableCardSortButton,
   DataTableDensityButton,
   DataTableDisplayModeButton,
   DataTableFilterToggleButton,
@@ -30,6 +31,7 @@ export interface DataTableToolbarActionsProps<TData extends RowData> {
   readonly columnManager?: DataTableColumnManagerConfig;
   readonly enableDensity: boolean;
   readonly enableDisplayModeToggle: boolean;
+  readonly enableCardSorting: boolean;
   readonly autoCardBreakpoint?: Breakpoint;
   readonly enableFullscreen: boolean;
 }
@@ -51,6 +53,7 @@ export function DataTableToolbarActions<TData extends RowData>(
     columnManager,
     enableDensity,
     enableDisplayModeToggle,
+    enableCardSorting,
     autoCardBreakpoint,
     enableFullscreen,
   } = props;
@@ -71,6 +74,13 @@ export function DataTableToolbarActions<TData extends RowData>(
       )}
 
       {enableDensity && <DataTableDensityButton />}
+
+      {enableCardSorting && (
+        <DataTableCardSortButton
+          table={table}
+          autoCardBreakpoint={autoCardBreakpoint}
+        />
+      )}
 
       {enableDisplayModeToggle && (
         <DataTableDisplayModeButton

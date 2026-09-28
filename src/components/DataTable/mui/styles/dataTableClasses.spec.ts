@@ -51,6 +51,13 @@ const CARD_STRUCTURAL_SLOTS = [
   "cardState",
 ] as const satisfies readonly DataTableClassKey[];
 
+const TOOLBAR_CARD_PARITY_SLOTS = [
+  "toolbarCardFilters",
+  "toolbarCardFilterGrid",
+  "toolbarCardFilterField",
+  "cardSortButton",
+] as const satisfies readonly DataTableClassKey[];
+
 const ROW_ACTION_STRUCTURAL_SLOTS = [
   "rowActions",
   "rowActionButton",
@@ -150,6 +157,27 @@ describe("RazethDataTable utility classes", () => {
     );
 
     expect(slots).toEqual(CARD_STRUCTURAL_SLOTS);
+  });
+
+  it.each(TOOLBAR_CARD_PARITY_SLOTS)(
+    "registers %s as a stable card-toolbar utility class",
+    (slot) => {
+      expect(dataTableClasses[slot]).toBe(
+        `${DATA_TABLE_COMPONENT_NAME}-${slot}`,
+      );
+
+      expect(getDataTableUtilityClass(slot)).toBe(
+        `${DATA_TABLE_COMPONENT_NAME}-${slot}`,
+      );
+    },
+  );
+
+  it("exposes card-toolbar structural classes as theme slots", () => {
+    const slots = TOOLBAR_CARD_PARITY_SLOTS.map((slot) =>
+      asDataTableSlot(slot),
+    );
+
+    expect(slots).toEqual(TOOLBAR_CARD_PARITY_SLOTS);
   });
 
   it("keeps utility-only global-filter classes registered separately", () => {

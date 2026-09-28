@@ -9,6 +9,7 @@ import { DataTableGlobalFilter } from "../global-filtering";
 import type { MuiDataTableInstance } from "../../table";
 import { DataTableSearchToggleButton } from "./actions";
 import { DataTableToolbarActions } from "./DataTableToolbarActions";
+import { DataTableToolbarCardFilterPanel } from "./DataTableToolbarCardFilterPanel";
 import { DataTableToolbarFilterStatus } from "./DataTableToolbarFilterStatus";
 import { DataTableToolbarSelection } from "./DataTableToolbarSelection";
 import { renderDataTableToolbarContent } from "./renderToolbarContent";
@@ -89,6 +90,8 @@ export interface DataTableToolbarProps<
    */
   readonly displayModeToggleAvailable?: boolean;
 
+  readonly cardPresentationAvailable?: boolean;
+
   readonly autoCardBreakpoint?: Breakpoint;
 }
 
@@ -131,7 +134,9 @@ export function DataTableToolbar<TData extends RowData>(
     enableDensity = themeDefaults.enableDensityToggle ?? true,
     enableDisplayModeToggle =
       themeDefaults.enableDisplayModeToggle ?? true,
+    enableCardSorting = true,
     displayModeToggleAvailable = false,
+    cardPresentationAvailable = false,
     autoCardBreakpoint,
     enableFullscreen = themeDefaults.enableFullscreen ?? true,
   } = props;
@@ -276,6 +281,9 @@ export function DataTableToolbar<TData extends RowData>(
             enableDisplayModeToggle={
               displayModeToggleAvailable && enableDisplayModeToggle
             }
+            enableCardSorting={
+              cardPresentationAvailable && enableCardSorting
+            }
             autoCardBreakpoint={autoCardBreakpoint}
             enableFullscreen={enableFullscreen}
           />
@@ -293,6 +301,13 @@ export function DataTableToolbar<TData extends RowData>(
         <ToolbarSearchRowRoot className={dataTableClasses.toolbarSearchRow}>
           {searchField}
         </ToolbarSearchRowRoot>
+      )}
+
+      {cardPresentationAvailable && (
+        <DataTableToolbarCardFilterPanel
+          table={table}
+          autoCardBreakpoint={autoCardBreakpoint}
+        />
       )}
     </ToolbarRoot>
   );
