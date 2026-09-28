@@ -437,6 +437,31 @@ continue consuming the same table instance, so viewport transitions preserve:
 
 This completes the first responsive card/table presentation loop.
 
+## 1.9.5 — production view switching proof
+
+**Status: complete**
+
+The card/table boundary is now exercised by production/resource surfaces rather
+than only by fixture configuration:
+
+- TranslationKey supplies a resource-owned card composition while retaining the
+  same Standard API query controller,
+- the shared toolbar exposes a generic table/card toggle only when a card
+  renderer exists,
+- display-mode switching preserves TanStack query/row state and saved visual
+  preferences,
+- TranslationKey card mode reuses generic selection, row actions, expansion,
+  detail-panel, pagination, search/filter and refresh behavior,
+- the Refine-backed Document proof uses the same toolbar toggle and verifies
+  that switching physical renderers does not issue another Refine list request,
+- a controlled display mode without an update callback does not expose an inert
+  toolbar toggle.
+
+The browser acceptance handoff for production parity and the subsequent
+performance matrix is maintained in:
+
+`docs/datatable-browser-matrix.md`
+
 ---
 
 # 2.0 — realtime/live data
@@ -967,7 +992,11 @@ The repeatable manual protocol is documented in:
 
 **Status: next**
 
-Run the baseline matrix in one controlled browser environment and record:
+Run `Matrix A` in `docs/datatable-browser-matrix.md` first so the production
+TranslationKey and Refine-backed Document presentation paths are green before
+profiling.
+
+Then run the baseline matrix in one controlled browser environment and record:
 
 - mount cost,
 - interactive update cost,
