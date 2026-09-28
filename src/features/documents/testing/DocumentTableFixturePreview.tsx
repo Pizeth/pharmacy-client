@@ -19,13 +19,13 @@ import { documentFixtureDataProvider } from "./documentFixtureDataProvider";
  * the fixture provider. The application-wide provider remains unchanged.
  */
 export interface DocumentTableFixturePreviewProps {
-  readonly displayMode?: DataTableDisplayMode;
+  readonly defaultDisplayMode?: DataTableDisplayMode;
 }
 
 export function DocumentTableFixturePreview(
   props: DocumentTableFixturePreviewProps,
 ) {
-  const { displayMode } = props;
+  const { defaultDisplayMode } = props;
   return (
     <Refine
       dataProvider={documentFixtureDataProvider}
@@ -33,7 +33,7 @@ export function DocumentTableFixturePreview(
         disableTelemetry: true,
       }}
     >
-      <DocumentTable displayMode={displayMode} />
+      <DocumentTable defaultDisplayMode={defaultDisplayMode} />
     </Refine>
   );
 }
