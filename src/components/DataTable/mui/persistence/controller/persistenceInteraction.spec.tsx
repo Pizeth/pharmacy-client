@@ -225,8 +225,12 @@ describe(
                 node.textContent,
             ),
         ).toEqual([
-          "Name",
+          /**
+           * Column pinning owns physical region order. ID is persisted at the
+           * logical start, so it renders before the center-ordered Name column.
+           */
           "ID",
+          "Name",
         ]);
 
         expect(
@@ -247,6 +251,39 @@ describe(
             ?.getIsPinned(),
         ).toBe(
           "start",
+        );
+
+        /**
+         * Once pinning is removed, the persisted center column order becomes
+         * directly visible.
+         */
+        act(
+          () => {
+            table!.setColumnPinning({
+              start: [],
+              end: [],
+            });
+          },
+        );
+
+        await waitFor(
+          () => {
+            expect(
+              screen
+                .getAllByRole(
+                  "columnheader",
+                )
+                .map(
+                  (
+                    node,
+                  ) =>
+                    node.textContent,
+                ),
+            ).toEqual([
+              "Name",
+              "ID",
+            ]);
+          },
         );
 
         fireEvent.click(
@@ -357,6 +394,11 @@ describe(
         const onDensityChange =
           jest.fn();
 
+        let controlledTable:
+          ReturnType<
+            typeof useMuiDataTable<Row>
+          >;
+
         function Fixture() {
           const [
             columnVisibility,
@@ -367,7 +409,7 @@ describe(
                 true,
             });
 
-          const table =
+          controlledTable =
             useMuiDataTable({
               columns,
               data,
@@ -381,7 +423,7 @@ describe(
           return (
             <DataTable
               table={
-                table
+                controlledTable
               }
               density="compact"
               onDensityChange={
@@ -405,14 +447,14 @@ describe(
         await waitFor(
           () => {
             expect(
-              screen.getByRole(
-                "columnheader",
-                {
-                  name:
-                    "Role",
-                },
-              ),
-            ).toBeInTheDocument();
+              controlledTable!
+                .atoms
+                .columnVisibility
+                .get(),
+            ).toEqual({
+              role:
+                true,
+            });
           },
         );
 
