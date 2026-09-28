@@ -488,6 +488,15 @@ export function TranslationKeyTable() {
 
         <DataTable
           table={table}
+          persistence={{
+            /**
+             * Saved visual preferences are scoped to this resource surface.
+             *
+             * Query/search/filter/pagination state is intentionally excluded
+             * by the generic persistence schema and remains server-query state.
+             */
+            storageId: "admin/i18n/translation-keys",
+          }}
           /**
            * ----------------------------------------------------------
            * Nested translation values

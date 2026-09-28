@@ -10,6 +10,13 @@ import type { DataTableDensityConfig } from "../density";
 import { DataTableFilterDisplayProvider } from "../filter-display";
 import type { DataTableFilterDisplayConfig } from "../filter-display";
 import { DataTableFullscreenProvider } from "../fullscreen";
+import {
+  DataTablePersistedVisualStateBridge,
+  useDataTablePersistedVisualStateController,
+} from "../persistence";
+import type {
+  DataTablePersistedVisualStateConfig,
+} from "../persistence";
 import type { DataTableFullscreenConfig } from "../fullscreen";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { MuiDataTableInstance } from "../table";
@@ -191,6 +198,23 @@ export interface DataTableProps<TData extends RowData>
    * table state.
    */
   readonly refreshProgress?: number;
+
+  /**
+   * Optional persisted visual-preference boundary.
+   *
+   * Persisted state is deliberately limited to visual state:
+   *
+   * - density
+   * - display mode
+   * - column visibility
+   * - column order
+   * - column sizing
+   * - column pinning
+   *
+   * Server query state, row state, fullscreen and transient UI state are never
+   * stored through this key.
+   */
+  readonly persistence?: false | DataTablePersistedVisualStateConfig;
 }
 
 /**
@@ -383,6 +407,8 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     onDisplayModeChange,
     autoCardBreakpoint:
       autoCardBreakpointProp,
+
+    persistence = false,
   } = props;
 
   const variant =
@@ -392,6 +418,26 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     autoCardBreakpointProp ??
     themeDefaults.autoCardBreakpoint ??
     "sm";
+
+  const persistenceController =
+    useDataTablePersistedVisualStateController({
+      table,
+      persistence,
+      density,
+      defaultDensity:
+        defaultDensity ??
+        themeDefaults.density ??
+        "compact",
+      onDensityChange,
+      displayMode,
+      defaultDisplayMode:
+        defaultDisplayModeProp ??
+        themeDefaults.defaultDisplayMode ??
+        "table",
+      onDisplayModeChange,
+      cardAvailable:
+        card !== undefined,
+    });
 
   /**
    * ----------------------------------------------------------------
@@ -444,18 +490,38 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
   return (
     <table.AppTable>
       <DataTableDisplayModeProvider
-        displayMode={displayMode}
+        displayMode={
+          persistenceController.enabled
+            ? persistenceController.displayMode
+            : displayMode
+        }
         defaultDisplayMode={
           defaultDisplayModeProp ?? themeDefaults.defaultDisplayMode
         }
-        onDisplayModeChange={onDisplayModeChange}
+        onDisplayModeChange={
+          persistenceController.enabled
+            ? persistenceController.setDisplayMode
+            : onDisplayModeChange
+        }
       >
         <DataTableAccessibilityProvider>
         <DataTableDensityProvider
-          density={density}
+          density={
+            persistenceController.enabled
+              ? persistenceController.density
+              : density
+          }
           defaultDensity={defaultDensity}
-          onDensityChange={onDensityChange}
+          onDensityChange={
+            persistenceController.enabled
+              ? persistenceController.setDensity
+              : onDensityChange
+          }
         >
+          <DataTablePersistedVisualStateBridge
+            table={table}
+            controller={persistenceController}
+          />
           <DataTableFullscreenProvider
             fullscreen={fullscreen}
             defaultFullscreen={defaultFullscreen}
