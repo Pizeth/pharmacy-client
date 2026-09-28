@@ -7,21 +7,13 @@ import type {
 } from "../../meta";
 import type { DataTableSelectFilterValue } from "./selectFilterValue";
 
-/**
- * Number-range value used by our MUI filter controls.
- *
- * `undefined` means that edge of the range is not constrained.
- *
- * Examples:
- *
- *   [18, 65]
- *   [18, undefined]
- *   [undefined, 65]
- */
-export type DataTableNumberRangeValue = readonly [
-  min: number | undefined,
-  max: number | undefined,
-];
+export type {
+  DataTableNumberRangeValue,
+} from "../../../core/filtering";
+
+import type {
+  DataTableNumberRangeValue,
+} from "../../../core/filtering";
 
 /**
  * Boolean filter state.
