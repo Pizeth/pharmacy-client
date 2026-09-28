@@ -1,4 +1,7 @@
 export { TranslationKeyTable } from "./TranslationKeyTable";
+export type { TranslationKeyTableProps } from "./TranslationKeyTable";
+
+export { TranslationKeyShareableTable } from "./TranslationKeyShareableTable";
 
 export { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
 
