@@ -22,3 +22,5 @@ export type {
 } from "./types";
 
 export * from "./storage";
+
+export * from "./controller";

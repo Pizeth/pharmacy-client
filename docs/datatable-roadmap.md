@@ -771,23 +771,71 @@ Implementation:
 
 ## 2.1.3 — DataTable visual-state controller integration
 
-**Status: next**
+**Status: complete**
 
-Connect the storage boundary to the existing controlled/uncontrolled visual
-state families without creating a second owner of TanStack state.
+The renderer now accepts an opt-in visual persistence configuration:
 
-The integration must preserve:
+```tsx
+<DataTable
+  table={table}
+  persistence={{
+    storageId: "admin/i18n/translation-keys",
+  }}
+/>
+```
 
-- explicit controlled props as highest priority,
-- resource/table defaults when no persisted value exists,
-- theme defaults,
-- column compatibility sanitation before hydration,
-- card/table display mode continuity,
-- density and column state updates written back through one persistence owner.
+The persistence controller integrates the 2.1.1 schema and 2.1.2 storage boundary
+without becoming a second owner of TanStack state.
+
+Established precedence and ownership:
+
+1. explicit controlled state remains authoritative,
+2. persisted values hydrate only uncontrolled visual state,
+3. existing table/resource defaults remain untouched when no persisted value
+   exists,
+4. existing MUI theme defaults remain the fallback for density/display mode.
+
+TanStack visual state is handled through the existing table APIs:
+
+- uncontrolled persisted column state hydrates through
+  `table.setColumnVisibility()`,
+  `table.setColumnOrder()`,
+  `table.setColumnSizing()` and
+  `table.setColumnPinning()`,
+- controlled TanStack state is never overwritten during hydration,
+- live column state is observed through `table.Subscribe`/TanStack atoms,
+- no `table.getState()` compatibility layer was introduced.
+
+MUI-only state follows the existing controlled/uncontrolled semantics:
+
+- density,
+- requested display mode.
+
+When persistence is enabled, the persistence controller owns only their
+uncontrolled values and delegates every requested change through the existing
+callbacks. Explicit controlled props still win immediately.
+
+Persistence writes occur only after hydration and include only uncontrolled
+visual-state families. Controlled state is not silently copied into user
+preferences.
+
+Additional safety:
+
+- browser storage is still resolved only through the storage adapter,
+- renderer code contains no direct `localStorage` access,
+- persisted `card`/`auto` presentation values are ignored when the current
+  DataTable has no card renderer,
+- current leaf-column IDs are used for compatibility normalization,
+- TranslationKey is the first production resource to opt into the generic
+  visual-preference controller.
+
+Implementation:
+
+`src/components/DataTable/mui/persistence/controller`
 
 ## 2.1.4 — shareable server-query URL state
 
-**Status: planned**
+**Status: next**
 
 Handle semantic query state separately from saved visual preferences.
 
