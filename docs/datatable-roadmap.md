@@ -797,6 +797,8 @@ Established precedence and ownership:
 
 TanStack visual state is handled through the existing table APIs:
 
+- v9 external atoms and classic `state.<slice>` ownership are both detected
+  as externally controlled and are never hydrated over,
 - uncontrolled persisted column state hydrates through
   `table.setColumnVisibility()`,
   `table.setColumnOrder()`,
