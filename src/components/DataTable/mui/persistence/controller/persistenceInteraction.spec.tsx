@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   act,
   fireEvent,
@@ -353,18 +355,24 @@ describe(
           jest.fn();
 
         function Fixture() {
+          const [
+            columnVisibility,
+            setColumnVisibility,
+          ] =
+            useState({
+              role:
+                true,
+            });
+
           const table =
             useMuiDataTable({
               columns,
               data,
               state: {
-                columnVisibility: {
-                  role:
-                    true,
-                },
+                columnVisibility,
               },
               onColumnVisibilityChange:
-                jest.fn(),
+                setColumnVisibility,
             });
 
           return (
