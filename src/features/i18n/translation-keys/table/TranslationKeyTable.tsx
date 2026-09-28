@@ -20,6 +20,7 @@ import { DataTable } from "@/components/DataTable";
 import type {
   DataTableBulkAction,
   DataTableRowAction,
+  DataTableServerStateController,
 } from "@/components/DataTable";
 import { ResourceActionButton } from "@/components/buttons";
 import { TranslationKeyApiError } from "../api";
@@ -85,11 +86,25 @@ function getTranslationKeyTableErrorMessage(error: unknown): string {
   return "Unable to load translation keys.";
 }
 
+export interface TranslationKeyTableProps {
+  /**
+   * Optional host-owned semantic query controller.
+   *
+   * The route-level shareable-query wrapper supplies this in production.
+   */
+  readonly queryController?: DataTableServerStateController;
+}
+
 /**
  * First real production resource using the custom TanStack v9 + MUI
  * DataTable stack.
  */
-export function TranslationKeyTable() {
+export function TranslationKeyTable(
+  props: TranslationKeyTableProps = {},
+) {
+  const {
+    queryController,
+  } = props;
   const [createOpen, setCreateOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<TranslationKey | null>(
     null,
@@ -153,6 +168,7 @@ export function TranslationKeyTable() {
   const { table, query, server, filterOptions, refresh } =
     useTranslationKeyDataTable({
       rowActions,
+      queryController,
 
       /**
        * TranslationKey is the first production resource to consume the
