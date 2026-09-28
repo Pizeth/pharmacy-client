@@ -1,0 +1,311 @@
+import {
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
+
+import {
+  DataTable,
+} from "@/components/DataTable";
+import type {
+  DataTableRowAction,
+} from "@/components/DataTable";
+import {
+  createMuiDataTableColumnHelper,
+  useMuiDataTable,
+} from "@/components/DataTable/mui/table";
+
+import type {
+  TranslationKey,
+} from "../schemas";
+import {
+  createTranslationKeyCardConfig,
+} from "./translationKeyCardConfig";
+
+const record: TranslationKey = {
+  id:
+    31,
+  key:
+    "auth.login.title",
+  description:
+    "Login heading",
+  categoryId:
+    1,
+  createdAt:
+    "2026-09-01T00:00:00.000Z",
+  updatedAt:
+    "2026-09-02T00:00:00.000Z",
+  translationCategory: {
+    id:
+      1,
+    name:
+      "auth",
+    description:
+      null,
+  },
+  translations: [
+    {
+      id:
+        301,
+      keyId:
+        31,
+      locale:
+        "en",
+      value:
+        "Sign in",
+      createdAt:
+        "2026-09-01T00:00:00.000Z",
+      updatedAt:
+        "2026-09-02T00:00:00.000Z",
+    },
+    {
+      id:
+        302,
+      keyId:
+        31,
+      locale:
+        "km",
+      value:
+        "ចូល",
+      createdAt:
+        "2026-09-01T00:00:00.000Z",
+      updatedAt:
+        "2026-09-02T00:00:00.000Z",
+    },
+  ],
+};
+
+const helper =
+  createMuiDataTableColumnHelper<TranslationKey>();
+
+const columns =
+  helper.columns([
+    helper.accessor(
+      "key",
+      {
+        header:
+          "Key",
+      },
+    ),
+  ]);
+
+const onEdit =
+  jest.fn();
+
+const rowActions:
+  readonly DataTableRowAction<TranslationKey>[] =
+  [
+    {
+      id:
+        "edit",
+      label:
+        "Edit",
+      inline:
+        true,
+      isDisabled:
+        ({
+          row,
+        }) =>
+          !row.getIsSelected(),
+      onClick:
+        ({
+          row,
+        }) => {
+          onEdit(
+            row.original,
+          );
+        },
+    },
+  ];
+
+const card =
+  createTranslationKeyCardConfig({
+    rowActions,
+  });
+
+function Fixture() {
+  const table =
+    useMuiDataTable({
+      data: [
+        record,
+      ],
+      columns,
+      getRowId:
+        (
+          row,
+        ) =>
+          String(
+            row.id,
+          ),
+      enableRowSelection:
+        true,
+      enableRowPinning:
+        true,
+      keepPinnedRows:
+        false,
+      getRowCanExpand:
+        () =>
+          true,
+    });
+
+  return (
+    <DataTable
+      table={
+        table
+      }
+      card={
+        card
+      }
+      defaultDisplayMode="card"
+      toolbar={
+        false
+      }
+      pagination={
+        false
+      }
+      rowPinning={{
+        displayMode:
+          "select-sticky",
+      }}
+      renderDetailPanel={({
+        row,
+      }) => (
+        <div>
+          Details for{" "}
+          {
+            row.original
+              .key
+          }
+        </div>
+      )}
+    />
+  );
+}
+
+describe(
+  "TranslationKey card presentation",
+  () => {
+    beforeEach(() => {
+      onEdit.mockClear();
+    });
+
+    it(
+      "renders resource content and shares selection/action state",
+      () => {
+        render(
+          <Fixture />,
+        );
+
+        expect(
+          screen.getByText(
+            "auth.login.title",
+          ),
+        ).toBeVisible();
+
+        expect(
+          screen.getByText(
+            "Login heading",
+          ),
+        ).toBeVisible();
+
+        expect(
+          screen.getByText(
+            "Sign in",
+          ),
+        ).toBeVisible();
+
+        expect(
+          screen.getByText(
+            "ចូល",
+          ),
+        ).toBeVisible();
+
+        const edit =
+          screen.getByRole(
+            "button",
+            {
+              name:
+                "Edit",
+            },
+          );
+
+        expect(
+          edit,
+        ).toBeDisabled();
+
+        fireEvent.click(
+          screen.getByRole(
+            "checkbox",
+            {
+              name:
+                "Select row 31",
+            },
+          ),
+        );
+
+        expect(
+          edit,
+        ).not.toBeDisabled();
+
+        fireEvent.click(
+          edit,
+        );
+
+        expect(
+          onEdit,
+        ).toHaveBeenCalledWith(
+          record,
+        );
+      },
+    );
+
+    it(
+      "shares expansion/detail state with the generic card controls",
+      () => {
+        render(
+          <Fixture />,
+        );
+
+        expect(
+          screen.queryByRole(
+            "region",
+          ),
+        ).toBeNull();
+
+        fireEvent.click(
+          screen.getByRole(
+            "button",
+            {
+              name:
+                "Expand details for row 31",
+            },
+          ),
+        );
+
+        expect(
+          screen.getByRole(
+            "region",
+          ),
+        ).toHaveTextContent(
+          "Details for auth.login.title",
+        );
+
+        fireEvent.click(
+          screen.getByRole(
+            "button",
+            {
+              name:
+                "Collapse details for row 31",
+            },
+          ),
+        );
+
+        expect(
+          screen.queryByRole(
+            "region",
+          ),
+        ).toBeNull();
+      },
+    );
+  },
+);
