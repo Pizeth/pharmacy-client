@@ -79,6 +79,60 @@ export interface DataTableQueryUrlFieldMap {
   >;
 }
 
+export interface DataTableQueryUrlLimits {
+  /**
+   * Optional exact page-size allow-list.
+   *
+   * When present this takes precedence over maxPageSize.
+   */
+  readonly pageSizes?: readonly number[];
+
+  /**
+   * Maximum page size accepted when no exact allow-list is supplied.
+   *
+   * Default: 200.
+   */
+  readonly maxPageSize?: number;
+
+  /**
+   * Maximum one-based page number accepted from the URL.
+   *
+   * Default: 100_000.
+   */
+  readonly maxPage?: number;
+
+  /**
+   * Maximum global-search string length.
+   *
+   * Default: 256.
+   */
+  readonly maxSearchLength?: number;
+
+  /**
+   * Maximum string length for one scalar filter value.
+   *
+   * Default: 256.
+   */
+  readonly maxFilterStringLength?: number;
+
+  /**
+   * Maximum number of scalar values in one array filter.
+   *
+   * Default: 50.
+   */
+  readonly maxFilterArrayLength?: number;
+
+  /**
+   * Maximum decoded character length of one JSON-backed URL parameter before
+   * JSON.parse() is attempted.
+   *
+   * Applies independently to sorting and filter parameters.
+   *
+   * Default: 16_384.
+   */
+  readonly maxJsonParameterLength?: number;
+}
+
 export interface CreateDataTableQueryUrlCodecOptions {
   /**
    * Query-parameter namespace.
@@ -99,6 +153,14 @@ export interface CreateDataTableQueryUrlCodecOptions {
    * semantic field IDs.
    */
   readonly fields: DataTableQueryUrlFieldMap;
+
+  /**
+   * Defensive browser-input limits.
+   *
+   * Invalid/out-of-range values fall back to the corresponding default-state
+   * family rather than being silently clamped into a different shared query.
+   */
+  readonly limits?: DataTableQueryUrlLimits;
 }
 
 export interface DataTableQueryUrlCodec {
