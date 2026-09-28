@@ -10,7 +10,6 @@ import { useTheme } from "@mui/material";
 import {
   createDataTableServerTableBinding,
   useDataTableLiveTableStateSafety,
-  useDataTableServerResult,
   useDataTableServerState,
   useMuiDataTable,
 } from "@/components/DataTable";
@@ -20,7 +19,9 @@ import type {
 } from "@/components/DataTable";
 import { createTranslationKeyColumns } from "../columns";
 import type { TranslationKey } from "../schemas";
-import { useTranslationKeyDataTableRequest } from "./useTranslationKeyDataTableRequest";
+import {
+  useTranslationKeyRefineDataTableServerResult,
+} from "../refine";
 import { useTranslationKeyFilterOptions } from "./useTranslationKeyFilterOptions";
 import type { TranslationKeyFilterOptionsState } from "./useTranslationKeyFilterOptions";
 import type { DataTableRowAction } from "@/components/DataTable/mui/columns/actions";
@@ -270,7 +271,7 @@ export function useTranslationKeyDataTable(
    * - global search
    * - explicit query replacement/reset
    *
-   * request.refresh() deliberately leaves query.state unchanged, so
+   * Refine refresh deliberately leaves query.state unchanged, so
    * nested TranslationValue mutations preserve the expanded key while
    * canonical server data replaces row.original.translations.
    */
@@ -283,14 +284,19 @@ export function useTranslationKeyDataTable(
     });
   }, [query.state]);
 
-  const request = useTranslationKeyDataTableRequest(query.state);
-
   /**
    * ================================================================
-   * 5. Generic server-result lifecycle
+   * 5. Production Refine request + generic server-result lifecycle
    * ================================================================
    *
-   * This gives us:
+   * TranslationKey keeps its established Standard API backend contract:
+   *
+   *   POST /api/v1/i18n/keys/query
+   *
+   * while Refine/TanStack Query now owns list-request execution/caching through
+   * the resource's named provider.
+   *
+   * The generic bridge still returns DataTable's normalized lifecycle:
    *
    *   rows
    *   pagination
@@ -300,24 +306,13 @@ export function useTranslationKeyDataTable(
    *   blocking error
    *   refresh error
    */
-  const server = useDataTableServerResult<TranslationKey>({
-    query: query.state,
-    result: request.result,
-    loading: request.loading,
-    fetching: request.fetching,
-    error: request.error,
+  const refine =
+    useTranslationKeyRefineDataTableServerResult(
+      query.state,
+    );
 
-    /**
-     * Preserve current rows while:
-     *
-     * - sorting
-     * - filtering
-     * - searching
-     * - paginating
-     * - refreshing
-     */
-    keepPreviousResult: true,
-  });
+  const server =
+    refine.server;
 
   /**
    * ================================================================
@@ -631,6 +626,7 @@ export function useTranslationKeyDataTable(
     /**
      * Explicit reload without changing query state.
      */
-    refresh: request.refresh,
+    refresh:
+      refine.request.refresh,
   };
 }

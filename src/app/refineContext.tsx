@@ -2,6 +2,10 @@
 
 import authProvider from "@/lib/providers/authProvider";
 import { i18nProvider } from "@/lib/providers/i18nProvider";
+import {
+  TRANSLATION_KEY_REFINE_DATA_PROVIDER_NAME,
+  translationKeyRefineDataProvider,
+} from "@/features/i18n/translation-keys/refine";
 import { API_URL } from "@/types/constants";
 import { Refine } from "@refinedev/core";
 import dataProvider from "@refinedev/nestjsx-crud";
@@ -14,8 +18,18 @@ export const RefineContext = ({ children }: { children: React.ReactNode }) => {
     <Refine
       i18nProvider={i18nProvider}
       routerProvider={routerProvider}
-      /* Replace with your actual API URL */
-      dataProvider={dataProvider(API_URL)}
+      /**
+       * Keep the existing NestJS CRUD provider as the application default.
+       *
+       * TranslationKey's production DataTable uses a named provider which
+       * executes its established POST /i18n/keys/query Standard API contract
+       * through Refine's useList/TanStack Query lifecycle.
+       */
+      dataProvider={{
+        default: dataProvider(API_URL),
+        [TRANSLATION_KEY_REFINE_DATA_PROVIDER_NAME]:
+          translationKeyRefineDataProvider,
+      }}
       authProvider={authProvider}
       options={{
         syncWithLocation: true,

@@ -63,15 +63,19 @@ Route:
 http://localhost:8080/admin/i18n
 ```
 
-TranslationKey remains the primary production proof. It uses the Standard API
-resource query lifecycle while consuming the same generic DataTable renderer as
-other adapters.
+TranslationKey remains the primary production proof. Its list request now runs
+through Refine's `useList`/TanStack Query lifecycle using the named
+`translationKeyStandardApi` provider, while the provider executes the
+established Standard API `POST /api/v1/i18n/keys/query` wire contract.
 
 Required checks:
 
 | Check | Table | Card | Result / notes |
 | --- | :---: | :---: | --- |
 | Initial rows load | ☐ | ☐ | |
+| Named TranslationKey Refine provider handles list query | ☐ | ☐ | |
+| POST /api/v1/i18n/keys/query remains the network wire contract | ☐ | ☐ | |
+| Refine query does not send global-search field names over HTTP | ☐ | ☐ | |
 | Table/card toolbar toggle works | ☐ | ☐ | |
 | Switching view does not reset page | ☐ | ☐ | |
 | Switching view does not reset global search | ☐ | ☐ | |
@@ -107,11 +111,19 @@ Important boundary:
 
 - display mode is a saved visual preference,
 - pagination/sorting/filter/search are shareable semantic query state,
-- switching table/card must not manufacture a semantic server request by itself.
+- switching table/card must not manufacture a semantic server request by itself,
+- Refine is the production list execution/cache layer,
+- the Standard API request body remains the backend wire contract.
 
-When checking request behavior, use the Network panel and record whether a view
-switch issued any TranslationKey query request. Expected: **no request caused
-only by the renderer switch**.
+When checking request behavior, use the Network panel and record:
+
+1. the initial list request is still `POST /api/v1/i18n/keys/query`,
+2. its global-search payload contains only `search.term`,
+3. a view switch issues no TranslationKey query request,
+4. an explicit Refresh/refetch still uses the named Refine lifecycle and the
+   same Standard API endpoint.
+
+Expected: **no request caused only by the renderer switch**.
 
 ### A2 — Refine-backed Document proof
 
