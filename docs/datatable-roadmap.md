@@ -912,20 +912,97 @@ This completes the planned 2.1 persistence/shareable-state architecture.
 
 # 2.2 — large-data performance and virtualization
 
-**Status: planned / evidence-driven**
+**Status: active / evidence-driven**
 
-Virtualization should be introduced only after profiling proves that normal
-rendering is the bottleneck.
+Virtualization remains conditional. The project first establishes repeatable
+browser evidence for the existing non-virtualized renderer.
 
-If required, it must preserve:
+## 2.2.1 — reproducible performance baseline
+
+**Status: complete**
+
+A development-only baseline fixture now exists at:
+
+```text
+/dev/datatable/performance
+```
+
+It measures the current renderer before any virtualization dependency or
+production behavior is introduced.
+
+Controlled dimensions:
+
+- rows: 25, 100, 200, 500, 1000,
+- columns: 8, 16, 32,
+- presentation: table or card.
+
+The table fixture intentionally places all configured rows on one TanStack page
+and keeps logical start/end columns pinned. This makes DOM/render cost visible
+instead of hiding it behind normal server pagination.
+
+React Profiler measurements include:
+
+- commit count,
+- last actual duration,
+- average actual duration,
+- maximum actual duration,
+- last base duration.
+
+The fixture also reports physical DOM row/cell/card counts and exposes repeatable
+interaction probes for:
+
+- row selection,
+- expansion/detail rendering,
+- sorting.
+
+No CI timing threshold is introduced. Development-mode React timing varies with
+hardware/browser/background load, so the baseline is comparative evidence rather
+than a machine-specific pass/fail contract.
+
+The repeatable manual protocol is documented in:
+
+`docs/datatable-performance-baseline-2-2-1.md`
+
+## 2.2.2 — browser measurement and virtualization decision gate
+
+**Status: next**
+
+Run the baseline matrix in one controlled browser environment and record:
+
+- mount cost,
+- interactive update cost,
+- DOM growth,
+- scrolling behavior,
+- table/card differences.
+
+The decision must explicitly compare expected real-resource page sizes with the
+synthetic stress cases.
+
+If normal resource densities remain responsive, virtualization should be
+deferred and 2.2 can close without adding another rendering subsystem.
+
+If profiling demonstrates a material user-visible renderer bottleneck at a
+realistic density, proceed to 2.2.3.
+
+## 2.2.3 — virtualization architecture
+
+**Status: conditional**
+
+Implement only if 2.2.2 supplies evidence that virtualization is justified.
+
+Any implementation must preserve:
 
 - sticky headers,
-- column pinning,
+- logical start/end column pinning,
 - row pinning,
 - selection,
-- expansion,
+- expansion/detail panels,
 - keyboard accessibility,
+- RTL,
+- density,
 - card/table mode boundaries.
+
+The 2.2.1 fixture remains the before/after acceptance surface.
 
 Do not add virtualization merely for feature parity with another grid library.
 
