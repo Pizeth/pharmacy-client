@@ -177,5 +177,37 @@ describe(
         });
       },
     );
+    it(
+      "falls back from a page size outside the production pagination options",
+      () => {
+        const params =
+          new URLSearchParams();
+
+        params.set(
+          "dt.v",
+          "1",
+        );
+        params.set(
+          "dt.page",
+          "2",
+        );
+        params.set(
+          "dt.pageSize",
+          "999",
+        );
+
+        expect(
+          translationKeyQueryUrlCodec.parse(
+            params,
+          ).pagination,
+        ).toEqual({
+          pageIndex:
+            1,
+          pageSize:
+            25,
+        });
+      },
+    );
+
   },
 );

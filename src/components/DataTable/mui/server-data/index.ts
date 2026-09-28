@@ -8,7 +8,10 @@ export { createDataTableOffsetPaginationRequest } from "./offsetPagination";
 
 export { useDataTableServerResult } from "./useDataTableServerResult";
 
-export type { DataTableOffsetPaginationRequest } from "./offsetPagination";
+export type {
+  DataTableOffsetPaginationLimits,
+  DataTableOffsetPaginationRequest,
+} from "./offsetPagination";
 
 export type {
   CreateDataTableServerTableBindingOptions,

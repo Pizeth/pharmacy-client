@@ -44,6 +44,7 @@ export function createDataTableServerQueryMapper(
     sorting = {},
     filtering = {},
     globalSearchFields = [],
+    paginationLimits,
     unknownSortingColumnPolicy = "throw",
     unknownFilterColumnPolicy = "throw",
   } = config;
@@ -137,7 +138,11 @@ export function createDataTableServerQueryMapper(
           : undefined;
 
       return {
-        pagination: createDataTableOffsetPaginationRequest(query),
+        pagination:
+          createDataTableOffsetPaginationRequest(
+            query,
+            paginationLimits,
+          ),
         sorting: sortingDescriptors,
         filters: filterDescriptors,
         search,

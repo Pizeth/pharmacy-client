@@ -16,5 +16,6 @@ export type {
   DataTableQueryUrlFilterScalar,
   DataTableQueryUrlFilterValue,
   DataTableQueryUrlHistoryMode,
+  DataTableQueryUrlLimits,
   DataTableQueryUrlStateVersion,
 } from "./types";

@@ -11,6 +11,7 @@ import {
   type DataTableQueryUrlCodec,
   type DataTableQueryUrlFilterFieldConfig,
   type DataTableQueryUrlFilterValue,
+  type DataTableQueryUrlLimits,
 } from "./types";
 
 interface DataTableQueryUrlSortEntry {
@@ -50,43 +51,232 @@ function isRecord(
   );
 }
 
-function isPositiveInteger(
+interface ResolvedDataTableQueryUrlLimits {
+  readonly pageSizes?: readonly number[];
+  readonly maxPageSize: number;
+  readonly maxPage: number;
+  readonly maxSearchLength: number;
+  readonly maxFilterStringLength: number;
+  readonly maxFilterArrayLength: number;
+  readonly maxStructuredParamLength: number;
+}
+
+const DEFAULT_DATA_TABLE_QUERY_URL_LIMITS:
+  ResolvedDataTableQueryUrlLimits = {
+    maxPageSize: 200,
+    maxPage: 100_000,
+    maxSearchLength: 256,
+    maxFilterStringLength: 256,
+    maxFilterArrayLength: 50,
+    maxStructuredParamLength: 8_192,
+  };
+
+function resolveLimits(
+  limits:
+    DataTableQueryUrlLimits | undefined,
+): ResolvedDataTableQueryUrlLimits {
+  const pageSizes =
+    limits?.pageSizes?.filter(
+      (
+        value,
+      ) =>
+        Number.isSafeInteger(
+          value,
+        ) &&
+        value > 0,
+    );
+
+  return {
+    pageSizes:
+      pageSizes &&
+      pageSizes.length > 0
+        ? [
+            ...new Set(
+              pageSizes,
+            ),
+          ]
+        : undefined,
+
+    maxPageSize:
+      Number.isSafeInteger(
+        limits?.maxPageSize,
+      ) &&
+      (
+        limits?.maxPageSize ??
+        0
+      ) > 0
+        ? limits?.maxPageSize as number
+        : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxPageSize,
+
+    maxPage:
+      Number.isSafeInteger(
+        limits?.maxPage,
+      ) &&
+      (
+        limits?.maxPage ??
+        0
+      ) > 0
+        ? limits?.maxPage as number
+        : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxPage,
+
+    maxSearchLength:
+      Number.isSafeInteger(
+        limits?.maxSearchLength,
+      ) &&
+      (
+        limits?.maxSearchLength ??
+        -1
+      ) >= 0
+        ? limits?.maxSearchLength as number
+        : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxSearchLength,
+
+    maxFilterStringLength:
+      Number.isSafeInteger(
+        limits?.maxFilterStringLength,
+      ) &&
+      (
+        limits?.maxFilterStringLength ??
+        -1
+      ) >= 0
+        ? limits?.maxFilterStringLength as number
+        : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxFilterStringLength,
+
+    maxFilterArrayLength:
+      Number.isSafeInteger(
+        limits?.maxFilterArrayLength,
+      ) &&
+      (
+        limits?.maxFilterArrayLength ??
+        -1
+      ) >= 0
+        ? (limits?.maxFilterArrayLength as number)
+        : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxFilterArrayLength,
+
+    maxStructuredParamLength:
+      Number.isSafeInteger(
+        limits?.maxStructuredParamLength,
+      ) &&
+      (
+        limits?.maxStructuredParamLength ??
+        -1
+      ) >= 0
+        ? (limits?.maxStructuredParamLength as number)
+        : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxStructuredParamLength,
+  };
+}
+
+function isBoundedPositiveInteger(
   value: unknown,
+  max: number,
 ): value is number {
   return (
     typeof value === "number" &&
-    Number.isInteger(value) &&
-    value > 0
+    Number.isSafeInteger(value) &&
+    value > 0 &&
+    value <= max
   );
 }
 
-function isFilterScalar(
+function isAllowedPageSize(
   value: unknown,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
+): value is number {
+  if (
+    typeof value !==
+      "number" ||
+    !Number.isSafeInteger(
+      value,
+    ) ||
+    value <= 0
+  ) {
+    return false;
+  }
+
+  if (
+    limits.pageSizes
+  ) {
+    return limits.pageSizes.includes(
+      value,
+    );
+  }
+
+  return (
+    value <=
+    limits.maxPageSize
+  );
+}
+
+function isBoundedFilterScalar(
+  value: unknown,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ): value is
   | string
   | number
   | boolean {
+  if (
+    typeof value ===
+    "string"
+  ) {
+    return (
+      value.length <=
+      limits.maxFilterStringLength
+    );
+  }
+
   return (
-    typeof value === "string" ||
-    typeof value === "boolean" ||
+    typeof value ===
+      "boolean" ||
     (
-      typeof value === "number" &&
-      Number.isFinite(value)
+      typeof value ===
+        "number" &&
+      Number.isFinite(
+        value,
+      )
     )
   );
 }
 
-function isFilterValue(
+function isBoundedFilterValue(
   value: unknown,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ): value is DataTableQueryUrlFilterValue {
-  if (isFilterScalar(value)) {
+  if (
+    isBoundedFilterScalar(
+      value,
+      limits,
+    )
+  ) {
     return true;
   }
 
   return (
     Array.isArray(value) &&
-    value.every(isFilterScalar)
+    value.length <=
+      limits.maxFilterArrayLength &&
+    value.every(
+      (
+        item,
+      ) =>
+        isBoundedFilterScalar(
+          item,
+          limits,
+        ),
+    )
   );
+}
+
+function safeCall<T>(
+  callback: () =>
+    T | undefined,
+): T | undefined {
+  try {
+    return callback();
+  } catch {
+    return undefined;
+  }
 }
 
 function cloneFilterValue(
@@ -254,8 +444,13 @@ function createFilterMaps(
 
 function parseJson(
   value: string | null,
+  maxLength: number,
 ): unknown {
-  if (value === null) {
+  if (
+    value === null ||
+    value.length >
+      maxLength
+  ) {
     return undefined;
   }
 
@@ -270,11 +465,16 @@ function parseSorting(
   value: string | null,
   reverseSorting:
     ReadonlyMap<string, string>,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ):
   | DataTableServerSortingState
   | undefined {
   const parsed =
-    parseJson(value);
+    parseJson(
+      value,
+      limits.maxStructuredParamLength,
+    );
 
   if (!Array.isArray(parsed)) {
     return undefined;
@@ -335,11 +535,16 @@ function parseFilters(
       string,
       ResolvedFilterField
     >,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ):
   | DataTableServerColumnFiltersState
   | undefined {
   const parsed =
-    parseJson(value);
+    parseJson(
+      value,
+      limits.maxStructuredParamLength,
+    );
 
   if (!Array.isArray(parsed)) {
     return undefined;
@@ -357,8 +562,9 @@ function parseFilters(
       !isRecord(entry) ||
       typeof entry.field !==
         "string" ||
-      !isFilterValue(
+      !isBoundedFilterValue(
         entry.value,
+        limits,
       )
     ) {
       continue;
@@ -378,16 +584,20 @@ function parseFilters(
       continue;
     }
 
+    const encodedValue =
+      cloneFilterValue(
+        entry.value,
+      );
+
     const decoded =
       resolved.config.decode
-        ? resolved.config.decode(
-            cloneFilterValue(
-              entry.value,
-            ),
+        ? safeCall(
+            () =>
+              resolved.config.decode!(
+                encodedValue,
+              ),
           )
-        : cloneFilterValue(
-            entry.value,
-          );
+        : encodedValue;
 
     if (decoded === undefined) {
       continue;
@@ -450,6 +660,8 @@ function serializeFilters(
       string,
       DataTableQueryUrlFilterFieldConfig
     >,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ): readonly DataTableQueryUrlFilterEntry[] {
   const serialized:
     DataTableQueryUrlFilterEntry[] =
@@ -467,18 +679,28 @@ function serializeFilters(
 
     const encoded =
       config.encode
-        ? config.encode(
-            filter.value,
+        ? safeCall(
+            () =>
+              config.encode!(
+                filter.value,
+              ),
           )
-        : isFilterValue(
+        : isBoundedFilterValue(
               filter.value,
+              limits,
             )
           ? cloneFilterValue(
               filter.value,
             )
           : undefined;
 
-    if (encoded === undefined) {
+    if (
+      encoded === undefined ||
+      !isBoundedFilterValue(
+        encoded,
+        limits,
+      )
+    ) {
       continue;
     }
 
@@ -498,6 +720,8 @@ function serializeFilters(
 function createEnvelope(
   state:
     DataTableServerQueryState,
+  fallbackState:
+    DataTableServerQueryState,
   sortingMap:
     Readonly<Record<string, string>>,
   filteringMap:
@@ -505,17 +729,41 @@ function createEnvelope(
       string,
       DataTableQueryUrlFilterFieldConfig
     >,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ): DataTableQueryUrlEnvelope {
+  const requestedPage =
+    state.pagination.pageIndex +
+    1;
+
+  const page =
+    isBoundedPositiveInteger(
+      requestedPage,
+      limits.maxPage,
+    )
+      ? requestedPage
+      : fallbackState.pagination.pageIndex +
+        1;
+
+  const pageSize =
+    isAllowedPageSize(
+      state.pagination.pageSize,
+      limits,
+    )
+      ? state.pagination.pageSize
+      : fallbackState.pagination.pageSize;
+
+  const search =
+    state.globalFilter.length <=
+    limits.maxSearchLength
+      ? state.globalFilter
+      : fallbackState.globalFilter;
+
   return {
     version:
       DATA_TABLE_QUERY_URL_STATE_VERSION,
-    page:
-      state.pagination
-        .pageIndex +
-      1,
-    pageSize:
-      state.pagination
-        .pageSize,
+    page,
+    pageSize,
     sorting:
       serializeSorting(
         state.sorting,
@@ -525,9 +773,9 @@ function createEnvelope(
       serializeFilters(
         state.columnFilters,
         filteringMap,
+        limits,
       ),
-    search:
-      state.globalFilter,
+    search,
   };
 }
 
@@ -558,7 +806,14 @@ export function createDataTableQueryUrlCodec(
       "dt",
     defaultState,
     fields,
+    limits:
+      configuredLimits,
   } = options;
+
+  const limits =
+    resolveLimits(
+      configuredLimits,
+    );
 
   if (
     namespace.length ===
@@ -617,8 +872,10 @@ export function createDataTableQueryUrlCodec(
   const defaultEnvelope =
     createEnvelope(
       canonicalDefault,
+      canonicalDefault,
       sortingMap,
       filteringByColumn,
+      limits,
     );
 
   const parse = (
@@ -659,6 +916,7 @@ export function createDataTableQueryUrlCodec(
           keys.sorting,
         ),
         reverseSorting,
+        limits,
       );
 
     const filters =
@@ -667,6 +925,7 @@ export function createDataTableQueryUrlCodec(
           keys.filters,
         ),
         filteringByPublicField,
+        limits,
       );
 
     const search =
@@ -677,8 +936,9 @@ export function createDataTableQueryUrlCodec(
     return {
       pagination: {
         pageIndex:
-          isPositiveInteger(
+          isBoundedPositiveInteger(
             parsedPage,
+            limits.maxPage,
           )
             ? parsedPage -
               1
@@ -687,8 +947,9 @@ export function createDataTableQueryUrlCodec(
                 .pageIndex,
 
         pageSize:
-          isPositiveInteger(
+          isAllowedPageSize(
             parsedPageSize,
+            limits,
           )
             ? parsedPageSize
             : canonicalDefault
@@ -713,8 +974,11 @@ export function createDataTableQueryUrlCodec(
         ),
 
       globalFilter:
-        search ??
-        canonicalDefault.globalFilter,
+        search !== null &&
+        search.length <=
+          limits.maxSearchLength
+          ? search
+          : canonicalDefault.globalFilter,
     };
   };
 
@@ -739,8 +1003,10 @@ export function createDataTableQueryUrlCodec(
     const envelope =
       createEnvelope(
         state,
+        canonicalDefault,
         sortingMap,
         filteringByColumn,
+        limits,
       );
 
     /**

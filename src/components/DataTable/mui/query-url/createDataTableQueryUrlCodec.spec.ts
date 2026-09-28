@@ -441,6 +441,333 @@ describe(
       },
     );
 
+    it.each([
+      ["zero", "0"],
+      ["negative", "-1"],
+      ["fractional", "1.5"],
+      ["unsafe", "1e21"],
+      ["too large", "999999"],
+      ["non-numeric", "abc"],
+    ])(
+      "falls back from %s pageSize input",
+      (
+        _label,
+        rawPageSize,
+      ) => {
+        const params =
+          new URLSearchParams();
+
+        params.set(
+          "dt.v",
+          "1",
+        );
+        params.set(
+          "dt.page",
+          "2",
+        );
+        params.set(
+          "dt.pageSize",
+          rawPageSize,
+        );
+        params.set(
+          "dt.search",
+          "valid",
+        );
+
+        expect(
+          codec.parse(
+            params,
+          ),
+        ).toMatchObject({
+          pagination: {
+            pageIndex:
+              1,
+            pageSize:
+              25,
+          },
+          globalFilter:
+            "valid",
+        });
+      },
+    );
+
+    it(
+      "supports a page-size allow-list",
+      () => {
+        const allowListed =
+          createDataTableQueryUrlCodec({
+            defaultState,
+            fields: {
+              sorting: {},
+              filtering: {},
+            },
+            limits: {
+              pageSizes: [
+                25,
+                50,
+              ],
+            },
+          });
+
+        const params =
+          new URLSearchParams(
+            "dt.v=1&dt.page=1&dt.pageSize=100",
+          );
+
+        expect(
+          allowListed.parse(
+            params,
+          ).pagination.pageSize,
+        ).toBe(
+          25,
+        );
+      },
+    );
+
+    it(
+      "falls back from an oversized page and oversized search independently",
+      () => {
+        const params =
+          new URLSearchParams();
+
+        params.set(
+          "dt.v",
+          "1",
+        );
+        params.set(
+          "dt.page",
+          "100001",
+        );
+        params.set(
+          "dt.pageSize",
+          "50",
+        );
+        params.set(
+          "dt.search",
+          "x".repeat(
+            10_000,
+          ),
+        );
+
+        expect(
+          codec.parse(
+            params,
+          ),
+        ).toMatchObject({
+          pagination: {
+            pageIndex:
+              0,
+            pageSize:
+              50,
+          },
+          globalFilter:
+            "",
+        });
+      },
+    );
+
+    it(
+      "ignores oversized filter arrays and structured payloads",
+      () => {
+        const bounded =
+          createDataTableQueryUrlCodec({
+            defaultState,
+            fields: {
+              filtering: {
+                name:
+                  "name",
+              },
+            },
+            limits: {
+              maxFilterArrayLength:
+                2,
+              maxStructuredParamLength:
+                100,
+            },
+          });
+
+        const oversizedArray =
+          new URLSearchParams();
+
+        oversizedArray.set(
+          "dt.v",
+          "1",
+        );
+        oversizedArray.set(
+          "dt.filters",
+          JSON.stringify([
+            {
+              field:
+                "name",
+              value: [
+                "a",
+                "b",
+                "c",
+              ],
+            },
+          ]),
+        );
+
+        expect(
+          bounded.parse(
+            oversizedArray,
+          ).columnFilters,
+        ).toEqual(
+          [],
+        );
+
+        const oversizedPayload =
+          new URLSearchParams();
+
+        oversizedPayload.set(
+          "dt.v",
+          "1",
+        );
+        oversizedPayload.set(
+          "dt.filters",
+          JSON.stringify([
+            {
+              field:
+                "name",
+              value:
+                "x".repeat(
+                  500,
+                ),
+            },
+          ]),
+        );
+
+        expect(
+          bounded.parse(
+            oversizedPayload,
+          ).columnFilters,
+        ).toEqual(
+          [],
+        );
+      },
+    );
+
+    it(
+      "contains throwing resource encoders and decoders",
+      () => {
+        const throwing =
+          createDataTableQueryUrlCodec({
+            defaultState,
+            fields: {
+              filtering: {
+                encodeThrows: {
+                  field:
+                    "encodeThrows",
+                  encode: () => {
+                    throw new Error(
+                      "encode",
+                    );
+                  },
+                },
+                decodeThrows: {
+                  field:
+                    "decodeThrows",
+                  decode: () => {
+                    throw new Error(
+                      "decode",
+                    );
+                  },
+                },
+              },
+            },
+          });
+
+        expect(
+          () =>
+            throwing.serialize({
+              ...defaultState,
+              columnFilters: [
+                {
+                  id:
+                    "encodeThrows",
+                  value:
+                    "safe",
+                },
+              ],
+            }),
+        ).not.toThrow();
+
+        const params =
+          new URLSearchParams();
+
+        params.set(
+          "dt.v",
+          "1",
+        );
+        params.set(
+          "dt.filters",
+          JSON.stringify([
+            {
+              field:
+                "decodeThrows",
+              value:
+                "safe",
+            },
+          ]),
+        );
+
+        expect(
+          () =>
+            throwing.parse(
+              params,
+            ),
+        ).not.toThrow();
+
+        expect(
+          throwing.parse(
+            params,
+          ).columnFilters,
+        ).toEqual(
+          [],
+        );
+      },
+    );
+
+    it(
+      "does not serialize oversized search or filter values",
+      () => {
+        const params =
+          codec.serialize({
+            ...defaultState,
+            globalFilter:
+              "x".repeat(
+                10_000,
+              ),
+            columnFilters: [
+              {
+                id:
+                  "name",
+                value:
+                  "x".repeat(
+                    10_000,
+                  ),
+              },
+            ],
+          });
+
+        expect(
+          params.get(
+            "dt.search",
+          ),
+        ).toBe(
+          null,
+        );
+
+        expect(
+          params.toString(),
+        ).not.toContain(
+          "x".repeat(
+            300,
+          ),
+        );
+      },
+    );
+
     it(
       "rejects duplicate public semantic field mappings",
       () => {
