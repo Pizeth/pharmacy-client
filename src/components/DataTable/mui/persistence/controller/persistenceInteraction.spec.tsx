@@ -1,4 +1,7 @@
 import { useState } from "react";
+import type {
+  ColumnVisibilityState,
+} from "@tanstack/table-core";
 
 import {
   act,
@@ -359,7 +362,7 @@ describe(
             columnVisibility,
             setColumnVisibility,
           ] =
-            useState({
+            useState<ColumnVisibilityState>({
               role:
                 true,
             });
