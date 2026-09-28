@@ -113,6 +113,27 @@ export const translationKeyQueryUrlCodec =
     defaultState:
       TRANSLATION_KEY_DEFAULT_SERVER_QUERY_STATE,
 
+    limits: {
+      pageSizes:
+        [
+          10,
+          25,
+          50,
+          100,
+          200,
+        ],
+      maxPage:
+        100_000,
+      maxSearchLength:
+        256,
+      maxFilterStringLength:
+        256,
+      maxFilterArrayLength:
+        50,
+      maxStructuredParamLength:
+        8_192,
+    },
+
     fields: {
       sorting:
         TRANSLATION_KEY_SORT_COLUMN_FIELDS,
