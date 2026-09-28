@@ -1,12 +1,12 @@
 // src/components/DataTable/adapters/standard-api/query/createStandardApiDataTableQueryAdapter.ts
 
-import type { DataTableServerQueryAdapter } from "../../../mui/server-data";
+import type { DataTableServerQueryAdapter } from "../../../core/server-data";
 import type {
   DataTableSemanticServerQueryAdapter,
   DataTableServerFilterDescriptor,
   DataTableServerSemanticQuery,
   DataTableServerSortDescriptor,
-} from "../../../mui/server-query";
+} from "../../../core/server-query";
 import type {
   StandardApiDataTableFilter,
   StandardApiDataTableQueryRequest,
