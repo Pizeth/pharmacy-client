@@ -13,10 +13,10 @@ import type { ReactNode } from "react";
 
 import {
   createDataTableServerQueryMapper,
-} from "../../../mui/server-query";
+} from "../../../core/server-query";
 import type {
   DataTableServerQueryState,
-} from "../../../mui/server-state";
+} from "../../../core/server-state";
 import {
   createRefineDataTableAdapter,
 } from "../createRefineDataTableAdapter";
