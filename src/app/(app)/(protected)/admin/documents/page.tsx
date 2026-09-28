@@ -25,14 +25,10 @@ export default async function DocumentsVisualTestPage(
   return (
     <ResourcePage
       title="Document DataTable visual proof"
-      subtitle={
-        displayMode === "card"
-          ? "Fixture-backed card presentation. Use ?display=table to compare the shared table presentation."
-          : "Fixture-backed table presentation. Use ?display=card to compare the shared card presentation."
-      }
+      subtitle="Fixture-backed Refine proof with runtime table/card switching through the shared DataTable toolbar."
       maxWidth="xl"
     >
-      <DocumentTableFixturePreview displayMode={displayMode} />
+      <DocumentTableFixturePreview defaultDisplayMode={displayMode} />
     </ResourcePage>
   );
 }

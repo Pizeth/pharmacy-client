@@ -35,6 +35,7 @@ import {
 import type { TranslationKey, TranslationValue } from "../schemas";
 import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
 import { TranslationKeyTranslationsPanel } from "./TranslationKeyTranslationsPanel";
+import { createTranslationKeyCardConfig } from "./translationKeyCardConfig";
 
 const COMPONENT_NAME = "RazethTranslationKeyTable";
 
@@ -163,6 +164,14 @@ export function TranslationKeyTable(
       },
     ],
     [],
+  );
+
+  const card = useMemo(
+    () =>
+      createTranslationKeyCardConfig({
+        rowActions,
+      }),
+    [rowActions],
   );
 
   const { table, query, server, filterOptions, refresh } =
@@ -504,6 +513,7 @@ export function TranslationKeyTable(
 
         <DataTable
           table={table}
+          card={card}
           persistence={{
             /**
              * Saved visual preferences are scoped to this resource surface.
@@ -614,6 +624,16 @@ export function TranslationKeyTable(
              * and expose the existing clear-all-filter action.
              */
             showFilterStatus: true,
+
+            /**
+             * TranslationKey is the production proof for switching between
+             * the semantic table and card renderers at runtime.
+             *
+             * The generic toolbar action updates only presentation state.
+             * Persistence remembers the user's choice; semantic query state
+             * stays in the separate URL/server-query controller.
+             */
+            enableDisplayModeToggle: true,
           }}
           /**
            * Real server-backed pagination.

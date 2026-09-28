@@ -187,6 +187,16 @@ export interface DataTableToolbarConfig<TData extends RowData> {
   readonly enableDensity?: boolean;
 
   /**
+   * Enable the table/card presentation toggle.
+   *
+   * The DataTable renderer only exposes this action when a card renderer is
+   * available for the current resource.
+   *
+   * Default: true when card presentation is available.
+   */
+  readonly enableDisplayModeToggle?: boolean;
+
+  /**
    * Enable fullscreen control.
    *
    * Default: true.

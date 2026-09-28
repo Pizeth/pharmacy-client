@@ -91,6 +91,7 @@ export const dataTableClasses = generateUtilityClasses(
     "searchToggleButton",
     "filterToggleButton",
     "densityButton",
+    "displayModeButton",
     "fullscreenButton",
     "columnManagerButton",
 

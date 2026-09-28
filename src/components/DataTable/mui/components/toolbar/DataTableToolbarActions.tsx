@@ -5,12 +5,14 @@ import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 // src/components/DataTable/mui/components/toolbar/DataTableToolbarActions.tsx
 
 import { Stack, styled } from "@mui/material";
+import type { Breakpoint } from "@mui/material/styles";
 import type { RowData } from "@tanstack/table-core";
 import { DataTableColumnManagerButton } from "../column-manager";
 import type { DataTableColumnManagerConfig } from "../column-manager";
 import type { MuiDataTableInstance } from "../../table";
 import {
   DataTableDensityButton,
+  DataTableDisplayModeButton,
   DataTableFilterToggleButton,
   DataTableFullscreenButton,
 } from "./actions";
@@ -27,6 +29,8 @@ export interface DataTableToolbarActionsProps<TData extends RowData> {
   readonly enableColumnManager: boolean;
   readonly columnManager?: DataTableColumnManagerConfig;
   readonly enableDensity: boolean;
+  readonly enableDisplayModeToggle: boolean;
+  readonly autoCardBreakpoint?: Breakpoint;
   readonly enableFullscreen: boolean;
 }
 
@@ -46,6 +50,8 @@ export function DataTableToolbarActions<TData extends RowData>(
     enableColumnManager,
     columnManager,
     enableDensity,
+    enableDisplayModeToggle,
+    autoCardBreakpoint,
     enableFullscreen,
   } = props;
 
@@ -65,6 +71,12 @@ export function DataTableToolbarActions<TData extends RowData>(
       )}
 
       {enableDensity && <DataTableDensityButton />}
+
+      {enableDisplayModeToggle && (
+        <DataTableDisplayModeButton
+          autoCardBreakpoint={autoCardBreakpoint}
+        />
+      )}
 
       {enableFullscreen && <DataTableFullscreenButton />}
     </ToolbarActionsRoot>

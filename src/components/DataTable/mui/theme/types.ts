@@ -92,6 +92,14 @@ export interface DataTableThemeProps extends DataTableVariantProps {
   readonly enableDensityToggle?: boolean;
 
   /**
+   * Default table/card presentation-toggle visibility.
+   *
+   * The action still renders only when the current DataTable supplies a card
+   * presentation.
+   */
+  readonly enableDisplayModeToggle?: boolean;
+
+  /**
    * Default fullscreen-action visibility.
    *
    * Important:

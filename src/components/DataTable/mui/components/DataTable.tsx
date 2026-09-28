@@ -538,7 +538,16 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
             >
               <DataTableShell ownerState={ownerState}>
                 {toolbar !== false && (
-                  <DataTableToolbar table={table} {...toolbarConfig} />
+                  <DataTableToolbar
+                    table={table}
+                    displayModeToggleAvailable={
+                      card !== undefined &&
+                      (displayMode === undefined ||
+                        onDisplayModeChange !== undefined)
+                    }
+                    autoCardBreakpoint={autoCardBreakpoint}
+                    {...toolbarConfig}
+                  />
                 )}
                 <ContentRoot className={dataTableClasses.content}>
                   <DataTableRefreshingIndicator
