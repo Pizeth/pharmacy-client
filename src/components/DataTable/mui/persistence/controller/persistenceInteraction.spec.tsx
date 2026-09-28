@@ -265,9 +265,8 @@ describe(
 
         expect(
           spacious,
-        ).toHaveAttribute(
-          "aria-checked",
-          "true",
+        ).toHaveClass(
+          "Mui-selected",
         );
 
         act(
@@ -427,9 +426,8 @@ describe(
 
         expect(
           compact,
-        ).toHaveAttribute(
-          "aria-checked",
-          "true",
+        ).toHaveClass(
+          "Mui-selected",
         );
 
         const persisted =
