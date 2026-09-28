@@ -671,7 +671,7 @@ generic table to WebSocket, SSE, Refine, or another event transport.
 
 # 2.1 — persistence and shareable table state
 
-**Status: active**
+**Status: complete**
 
 Persistence is split into two deliberately separate concerns:
 
@@ -837,25 +837,76 @@ Implementation:
 
 ## 2.1.4 — shareable server-query URL state
 
-**Status: next**
+**Status: complete**
 
-Handle semantic query state separately from saved visual preferences.
+Semantic server-query state can now be shared through a versioned URL contract
+without entering the saved visual-preference system.
 
-Candidate query families:
+The generic pure codec:
+
+`createDataTableQueryUrlCodec()`
+
+supports:
 
 - pagination,
 - sorting,
 - column filters,
 - global search.
 
-Requirements:
+Established boundaries:
 
-- resource semantic mapping remains authoritative,
-- URLs contain public semantic field IDs rather than backend/private field names,
-- parsing is versioned/defensive,
-- invalid query values fall back safely,
-- URL hydration must not overwrite saved visual preferences,
-- navigation/back-forward semantics remain predictable.
+- URL state stores public semantic field IDs, not TanStack-only IDs or
+  backend/private database paths,
+- each resource explicitly maps UI column IDs to public sorting/filter fields,
+- resource-owned filter codecs validate erased TanStack filter values before
+  they enter or leave the URL,
+- unsupported schema versions fall back to the resource default query,
+- malformed pagination/sort/filter values are sanitized independently,
+- unmapped or removed semantic fields are ignored safely,
+- unrelated application query parameters are preserved,
+- serializing the canonical resource default removes DataTable-managed URL
+  parameters so clean routes remain clean,
+- saved visual preferences remain under the separate 2.1.1–2.1.3 persistence
+  boundary and are never read or written by the query URL codec.
+
+Next.js integration is isolated in the replaceable adapter:
+
+`src/components/DataTable/adapters/next-query-url`
+
+rather than the generic MUI renderer.
+
+The adapter:
+
+- hydrates the initial semantic query from App Router search params,
+- mirrors DataTable query changes with configurable `replace` or `push`
+  history behavior,
+- defaults to `replace` so debounced search/filter edits do not create a
+  history entry per keystroke,
+- reapplies browser back/forward navigation to the existing
+  `useDataTableServerState()` controller,
+- guards against echoing browser navigation back into another router update,
+- keeps URL routing outside resource request/response adapters.
+
+TranslationKey is the production proof. Its route-level wrapper uses the URL
+adapter while the reusable TranslationKey table/controller can still operate
+with the ordinary internal server-query controller.
+
+The TranslationKey URL mapping reuses the same public semantic field maps used
+by its server query mapper, including the asymmetric Category contract:
+
+```text
+UI column       URL/public field
+--------------------------------
+key             key
+description     description
+category        categoryId
+locale          locale
+```
+
+Therefore a shared TranslationKey URL cannot expose Prisma relation paths or
+choose private backend fields.
+
+This completes the planned 2.1 persistence/shareable-state architecture.
 
 ---
 
