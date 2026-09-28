@@ -108,21 +108,36 @@ export function useDataTablePersistedVisualStateController<
   const displayModeControlled =
     controlledDisplayMode !== undefined;
 
+  /**
+   * TanStack v9 has two supported external ownership channels:
+   *
+   *   atoms.<slice>  >  state.<slice>  >  internal base atom
+   *
+   * Persistence may hydrate only the final internally-owned case.
+   */
   const columnVisibilityControlled =
+    table.options.atoms?.columnVisibility !==
+      undefined ||
     table.options.state?.columnVisibility !==
-    undefined;
+      undefined;
 
   const columnOrderControlled =
+    table.options.atoms?.columnOrder !==
+      undefined ||
     table.options.state?.columnOrder !==
-    undefined;
+      undefined;
 
   const columnSizingControlled =
+    table.options.atoms?.columnSizing !==
+      undefined ||
     table.options.state?.columnSizing !==
-    undefined;
+      undefined;
 
   const columnPinningControlled =
+    table.options.atoms?.columnPinning !==
+      undefined ||
     table.options.state?.columnPinning !==
-    undefined;
+      undefined;
 
   const [
     uncontrolledDensity,
