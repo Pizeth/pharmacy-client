@@ -8,10 +8,10 @@ import type { RowData } from "@tanstack/table-core";
 import type {
   DataTableServerResult,
   DataTableServerResultLifecycle,
-} from "../../../mui/server-data";
+} from "../../../core/server-data";
 import type {
   DataTableServerQueryState,
-} from "../../../mui/server-state";
+} from "../../../core/server-state";
 import type {
   RefineDataTableAdapter,
 } from "../types";
