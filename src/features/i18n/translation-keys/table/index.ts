@@ -16,3 +16,6 @@ export type { TranslationKeyFilterOptionsState } from "./useTranslationKeyFilter
 export { TranslationKeyTranslationsPanel } from "./TranslationKeyTranslationsPanel";
 
 export type { TranslationKeyTranslationsPanelProps } from "./TranslationKeyTranslationsPanel";
+
+export { createTranslationKeyCardConfig } from "./translationKeyCardConfig";
+export type { CreateTranslationKeyCardConfigOptions } from "./translationKeyCardConfig";
