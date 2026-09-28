@@ -1,5 +1,9 @@
 # DataTable 2.2.1 — performance baseline
 
+> Living browser acceptance status is tracked in
+> `docs/datatable-browser-matrix.md`. Update that file after each completed
+> matrix so the next Codex/ChatGPT session can continue from the recorded gate.
+
 Phase 2.2 is evidence-driven. This checkpoint deliberately adds **no
 virtualization**.
 
