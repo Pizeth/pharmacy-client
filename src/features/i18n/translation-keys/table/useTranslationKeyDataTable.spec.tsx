@@ -10,21 +10,24 @@ import { DATA_TABLE_SELECTION_COLUMN_ID } from "@/components/DataTable/mui/colum
 
 import type { TranslationKey } from "../schemas";
 
+import {
+  useTranslationKeyRefineDataTableServerResult,
+} from "../refine";
 import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
-import { useTranslationKeyDataTableRequest } from "./useTranslationKeyDataTableRequest";
 import { useTranslationKeyFilterOptions } from "./useTranslationKeyFilterOptions";
 
-jest.mock("./useTranslationKeyDataTableRequest", () => ({
-  useTranslationKeyDataTableRequest: jest.fn(),
+jest.mock("../refine", () => ({
+  useTranslationKeyRefineDataTableServerResult: jest.fn(),
 }));
 
 jest.mock("./useTranslationKeyFilterOptions", () => ({
   useTranslationKeyFilterOptions: jest.fn(),
 }));
 
-const requestHook = useTranslationKeyDataTableRequest as jest.MockedFunction<
-  typeof useTranslationKeyDataTableRequest
->;
+const refineHook =
+  useTranslationKeyRefineDataTableServerResult as jest.MockedFunction<
+    typeof useTranslationKeyRefineDataTableServerResult
+  >;
 
 const filterOptionsHook = useTranslationKeyFilterOptions as jest.MockedFunction<
   typeof useTranslationKeyFilterOptions
@@ -80,12 +83,46 @@ beforeEach(() => {
 
   currentResult = createResult([record]);
 
-  requestHook.mockImplementation(() => ({
-    result: currentResult,
-    loading: false,
-    fetching: false,
-    error: undefined,
-    refresh,
+  refineHook.mockImplementation(() => ({
+    request: {
+      result:
+        currentResult,
+      loading:
+        false,
+      fetching:
+        false,
+      error:
+        undefined,
+      refresh,
+    },
+    server: {
+      rows:
+        currentResult.rows,
+      pagination:
+        currentResult.pagination,
+      hasResult:
+        true,
+      isPreviousResult:
+        false,
+      hasRows:
+        currentResult.rows.length >
+        0,
+      isEmpty:
+        currentResult.rows.length ===
+        0,
+      isInitialLoading:
+        false,
+      isFetching:
+        false,
+      isRefreshing:
+        false,
+      error:
+        undefined,
+      blockingError:
+        undefined,
+      refreshError:
+        undefined,
+    },
   }));
 
   filterOptionsHook.mockReturnValue({
