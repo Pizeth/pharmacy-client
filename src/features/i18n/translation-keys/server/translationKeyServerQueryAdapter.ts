@@ -9,9 +9,9 @@ import {
 import { createStandardApiDataTableQueryAdapter } from "@/components/DataTable/adapters";
 import {
   TRANSLATION_KEY_COLUMN_IDS,
-  TRANSLATION_KEY_FILTER_FIELDS,
+  TRANSLATION_KEY_FILTER_COLUMN_FIELDS,
   TRANSLATION_KEY_GLOBAL_SEARCH_FIELDS,
-  TRANSLATION_KEY_SORT_FIELDS,
+  TRANSLATION_KEY_SORT_COLUMN_FIELDS,
 } from "./translationKeyServerFields";
 
 /**
@@ -51,16 +51,7 @@ export const translationKeySemanticQueryAdapter =
      * because the current backend TranslationKey policy does not
      * expose those as sortable fields.
      */
-    sorting: {
-      // [TRANSLATION_KEY_COLUMN_IDS.id]: TRANSLATION_KEY_SORT_FIELDS.id,
-      [TRANSLATION_KEY_COLUMN_IDS.key]: TRANSLATION_KEY_SORT_FIELDS.key,
-      [TRANSLATION_KEY_COLUMN_IDS.category]:
-        TRANSLATION_KEY_SORT_FIELDS.category,
-      [TRANSLATION_KEY_COLUMN_IDS.createdAt]:
-        TRANSLATION_KEY_SORT_FIELDS.createdAt,
-      [TRANSLATION_KEY_COLUMN_IDS.updatedAt]:
-        TRANSLATION_KEY_SORT_FIELDS.updatedAt,
-    },
+    sorting: TRANSLATION_KEY_SORT_COLUMN_FIELDS,
 
     /**
      * --------------------------------------------------------------
@@ -95,7 +86,9 @@ export const translationKeySemanticQueryAdapter =
        *   key contains "auth"
        */
       [TRANSLATION_KEY_COLUMN_IDS.key]: createDataTableTextServerFilter(
-        TRANSLATION_KEY_FILTER_FIELDS.key,
+        TRANSLATION_KEY_FILTER_COLUMN_FIELDS[
+          TRANSLATION_KEY_COLUMN_IDS.key
+        ],
       ),
 
       /**
@@ -104,7 +97,9 @@ export const translationKeySemanticQueryAdapter =
        *   description contains "login"
        */
       [TRANSLATION_KEY_COLUMN_IDS.description]: createDataTableTextServerFilter(
-        TRANSLATION_KEY_FILTER_FIELDS.description,
+        TRANSLATION_KEY_FILTER_COLUMN_FIELDS[
+          TRANSLATION_KEY_COLUMN_IDS.description
+        ],
       ),
 
       /**
@@ -150,7 +145,9 @@ export const translationKeySemanticQueryAdapter =
        *   }
        */
       [TRANSLATION_KEY_COLUMN_IDS.category]: createDataTableNumberServerFilter(
-        TRANSLATION_KEY_FILTER_FIELDS.categoryId,
+        TRANSLATION_KEY_FILTER_COLUMN_FIELDS[
+          TRANSLATION_KEY_COLUMN_IDS.category
+        ],
       ),
 
       /**
@@ -170,7 +167,9 @@ export const translationKeySemanticQueryAdapter =
        *   translations.some.locale
        */
       [TRANSLATION_KEY_COLUMN_IDS.locale]: createDataTableSelectServerFilter(
-        TRANSLATION_KEY_FILTER_FIELDS.locale,
+        TRANSLATION_KEY_FILTER_COLUMN_FIELDS[
+          TRANSLATION_KEY_COLUMN_IDS.locale
+        ],
       ),
     },
 

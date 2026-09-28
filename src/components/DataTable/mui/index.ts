@@ -9,6 +9,7 @@ export * from "./fullscreen";
 export * from "./meta";
 export * from "./live";
 export * from "./presentation";
+export * from "./query-url";
 export * from "./persistence";
 export * from "./row-pinning";
 export * from "./server-data";

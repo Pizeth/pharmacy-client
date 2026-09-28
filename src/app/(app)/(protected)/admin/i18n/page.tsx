@@ -1,5 +1,5 @@
 import { ResourcePage } from "@/components/layouts/ResourcePage";
-import { TranslationKeyTable } from "@/features/i18n/translation-keys";
+import { TranslationKeyShareableTable } from "@/features/i18n/translation-keys";
 
 export default function TranslationKeysPage() {
   return (
@@ -8,7 +8,7 @@ export default function TranslationKeysPage() {
       subtitle="Manage application translation keys, categories, locales, and values."
       maxWidth="xl"
     >
-      <TranslationKeyTable />
+      <TranslationKeyShareableTable />
     </ResourcePage>
   );
 }
