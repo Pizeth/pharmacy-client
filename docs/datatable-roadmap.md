@@ -1037,11 +1037,23 @@ The repeatable manual protocol is documented in:
 
 ## 2.2.2 — browser measurement and virtualization decision gate
 
-**Status: next**
+**Status: next — gated by Matrix A browser recheck**
 
 Run `Matrix A` in `docs/datatable-browser-matrix.md` first so the production
 TranslationKey named-Refine path and the independent Refine-backed Document
 presentation path are green before profiling.
+
+The authenticated Matrix A run on 2026-09-28 found two real renderer-parity
+gaps in card mode: the subheader filter editors had no physical card surface and
+sorting had no card-mode control. Commit
+`9c01a2ca0c5db336250c27e700a8541740b96798` fixes both generically by reusing
+the existing TanStack column-filter state/editors and sorting state from the
+shared toolbar. CI passed typecheck, the complete Jest suite, and
+`git diff --check`.
+
+Those Matrix A cells still require browser re-verification before 2.2.2 starts.
+The remaining runtime-observability, pinning, history/rate-limit and final
+console checks also remain Matrix A gates.
 
 Then run the baseline matrix in one controlled browser environment and record:
 
