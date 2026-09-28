@@ -2,7 +2,7 @@
 
 import {
   useDataTableServerQueryUrlState,
-} from "@/components/DataTable";
+} from "@/components/DataTable/adapters/next-query-url";
 import {
   translationKeyQueryUrlCodec,
 } from "../server/translationKeyQueryUrlState";
