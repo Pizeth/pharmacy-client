@@ -34,7 +34,7 @@ remains a chronological acceptance record.
 
 ## Matrix A — production presentation parity before performance profiling
 
-**Status: IN PROGRESS — card filter/sort parity and request instrumentation gates remain (2026-09-28)**
+**Status: IN PROGRESS — card filter/sort fix landed; browser recheck and remaining acceptance gates still required (2026-09-28)**
 
 Purpose:
 
@@ -94,11 +94,11 @@ Required checks:
 | Pagination works | PASS | PASS | Table 11–20 of 31 at size 10; card 26–31 of 31 at size 25. |
 | Page-size change works | PARTIAL | PASS | Card changed 25 to 10; size 10 retained in table. Independent table change pending. |
 | Global search works | PASS | PASS | `auth` returns five keys; test-key prefix returns isolated CRUD rows. |
-| Key filter works | PASS | BLOCKED | `email` returns auth_email and validation_invalid_email. A-CARD-FILTER: card has no inputs. |
-| Description filter works | PASS | BLOCKED | `Password field` returns auth_password. A-CARD-FILTER. |
-| Category filter works | PASS | BLOCKED | `auth` returns five auth keys. A-CARD-FILTER. |
-| Locale filter works | PARTIAL | BLOCKED | English selected and serialized as `locale=en`; combined with auth returns five bilingual keys. Exclusion case pending. A-CARD-FILTER. |
-| Sort changes work | PASS | BLOCKED | Table Key descending reverses auth keys; cards preserve order but expose no sort control (A-CARD-SORT). |
+| Key filter works | PASS | PENDING RECHECK | `email` passed in table. Generic card filter surface landed in `9c01a2c`; rerun in card view. |
+| Description filter works | PASS | PENDING RECHECK | `Password field` passed in table. Generic card filter surface landed in `9c01a2c`; rerun in card view. |
+| Category filter works | PASS | PENDING RECHECK | `auth` passed in table. Generic card filter surface landed in `9c01a2c`; rerun in card view. |
+| Locale filter works | PARTIAL | PENDING RECHECK | English serialization passed; exclusion case remains. Generic card filter surface landed in `9c01a2c`; rerun both inclusion/exclusion in card view. |
+| Sort changes work | PASS | PENDING RECHECK | Table Key descending passed. Generic card sorting menu landed in `9c01a2c`; rerun ascending/descending/clear in card view. |
 | Density control | PASS | PASS | Spacious selected in table, Compact in card; card tooltip confirms Compact. |
 | Fullscreen enter/exit | PASS | PASS | Enter and Exit control states verified in each renderer. |
 | Saved display preference restores after reload | PASS | PASS | Each display restored on its own reload. |
@@ -231,8 +231,39 @@ When Matrix A passes, promote **Matrix B** below to current.
   and cleanup. Both translations and keys were deleted successfully; the exact
   test prefix returned No matching rows, 0–0 of 0. No pre-existing record was
   edited or deleted.
-- No application code changes or architectural extraction were made. Matrix B
-  is not started because Matrix A has not passed.
+- No application code changes or architectural extraction were made during the
+  browser run itself. Matrix B was not started because Matrix A had not passed.
+
+### Card parity follow-up — 2026-09-28
+
+- Commit: `9c01a2ca0c5db336250c27e700a8541740b96798`.
+- A-CARD-FILTER implementation gap addressed generically:
+  - card mode now renders a toolbar filter panel when the existing subheader
+    filter presentation is open,
+  - it reuses the existing `DataTableColumnFilter` editors over visible,
+    filterable leaf columns,
+  - it writes the same TanStack `columnFilters` state; no card-only query or
+    duplicated resource state was introduced.
+- A-CARD-SORT implementation gap addressed generically:
+  - card mode now exposes a toolbar sorting menu for visible sortable columns,
+  - ascending, descending and clear operations write the existing TanStack
+    sorting state,
+  - table mode keeps its existing header-owned sorting interaction.
+- New theme slots were registered for the card filter/sort toolbar surfaces;
+  no resource-local `sx` styling was introduced.
+- New Jest regression coverage exercises card filtering, card sorting and the
+  absence of duplicate card controls in table mode.
+- GitHub Actions CI run `36412062765` passed:
+  - dependency install,
+  - typecheck,
+  - complete Jest suite,
+  - `git diff --check`.
+- Browser status remains **PENDING RECHECK** rather than PASS. Rerun the
+  TranslationKey Key/Description/Category/Locale card filters and card sorting
+  controls before promoting Matrix A.
+- PR #31 (`chatgpt/datatable-core-layering`) remains intentionally separate
+  and draft. Do not merge the architectural extraction into Matrix A before the
+  acceptance/performance gate is complete.
 
 ---
 
