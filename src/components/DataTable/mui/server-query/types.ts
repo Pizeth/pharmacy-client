@@ -1,6 +1,7 @@
 // src/components/DataTable/mui/server-query/types.ts
 
 import type {
+  DataTableOffsetPaginationLimits,
   DataTableOffsetPaginationRequest,
   DataTableServerQueryAdapter,
 } from "../server-data";
@@ -165,6 +166,12 @@ export interface DataTableServerQueryMapperConfig {
    * Backend/API fields participating in global search.
    */
   readonly globalSearchFields?: readonly string[];
+
+  /**
+   * Defensive offset-pagination limits applied before semantic query state
+   * crosses into a transport adapter.
+   */
+  readonly paginationLimits?: DataTableOffsetPaginationLimits;
 
   /**
    * Policy for an active sorting column with no mapping.
