@@ -116,6 +116,14 @@ describe(
                 value:
                   "Save",
               },
+              {
+                field:
+                  "translationValue",
+                operator:
+                  "contains",
+                value:
+                  "Save",
+              },
             ],
           },
         ]);
