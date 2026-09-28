@@ -225,7 +225,7 @@ describe(
             "button",
             {
               name:
-                "Edit",
+                "Edit for row 31",
             },
           );
 
