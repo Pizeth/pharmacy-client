@@ -192,6 +192,22 @@ export const translationKeySemanticQueryAdapter =
     globalSearchFields: TRANSLATION_KEY_GLOBAL_SEARCH_FIELDS,
 
     /**
+     * Keep transport pagination aligned with the production pagination UI even
+     * if query state is created programmatically rather than from the URL.
+     */
+    paginationLimits: {
+      pageSizes: [
+        10,
+        25,
+        50,
+        100,
+        200,
+      ],
+      defaultPageSize: 25,
+      maxPage: 100_000,
+    },
+
+    /**
      * Resource configuration mistakes should fail loudly during
      * development.
      *
