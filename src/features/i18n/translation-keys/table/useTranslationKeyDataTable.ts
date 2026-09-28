@@ -24,12 +24,24 @@ import { useTranslationKeyDataTableRequest } from "./useTranslationKeyDataTableR
 import { useTranslationKeyFilterOptions } from "./useTranslationKeyFilterOptions";
 import type { TranslationKeyFilterOptionsState } from "./useTranslationKeyFilterOptions";
 import type { DataTableRowAction } from "@/components/DataTable/mui/columns/actions";
+import {
+  TRANSLATION_KEY_DEFAULT_SERVER_QUERY_STATE,
+} from "../server/translationKeyQueryUrlState";
 import { DATA_TABLE_ACTIONS_COLUMN_ID } from "@/components/DataTable/mui/columns/actions";
 import { DATA_TABLE_EXPANSION_COLUMN_ID } from "@/components/DataTable/mui/columns/expansion";
 import { DATA_TABLE_SELECTION_COLUMN_ID } from "@/components/DataTable/mui/columns/selection";
 
 export interface UseTranslationKeyDataTableOptions {
   readonly rowActions?: readonly DataTableRowAction<TranslationKey>[];
+
+  /**
+   * Optional externally owned semantic server-query controller.
+   *
+   * The production /admin/i18n route supplies the Next.js URL-synchronized
+   * controller. Tests and non-route consumers may keep using the normal
+   * internal controller.
+   */
+  readonly queryController?: DataTableServerStateController;
 
   /**
    * Enables TranslationKey's production detail-panel surface.
@@ -114,6 +126,7 @@ export function useTranslationKeyDataTable(
 ): UseTranslationKeyDataTableResult {
   const {
     rowActions = [],
+    queryController,
     enableTranslationDetails = false,
     enableRowSelection = false,
   } = options;
@@ -217,25 +230,11 @@ export function useTranslationKeyDataTable(
    *
    *   page: 1
    */
-  const query = useDataTableServerState({
-    defaultPageSize: 25,
-    defaultState: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: 25,
-      },
-      sorting: [
-        /**
-         * Optional initial table sort.
-         *
-         * The backend itself already provides deterministic default
-         * ordering when sorting is empty, so we do not need to
-         * manufacture a client sort here.
-         */
-      ],
-      columnFilters: [],
-      globalFilter: "",
-    },
+  const internalQuery = useDataTableServerState({
+    defaultPageSize:
+      TRANSLATION_KEY_DEFAULT_SERVER_QUERY_STATE.pagination.pageSize,
+    defaultState:
+      TRANSLATION_KEY_DEFAULT_SERVER_QUERY_STATE,
 
     /**
      * These are already true by default, but listing them here makes
@@ -245,6 +244,15 @@ export function useTranslationKeyDataTable(
     resetPageOnColumnFiltersChange: true,
     resetPageOnGlobalFilterChange: true,
   });
+
+  /**
+   * A host route may own semantic query state (for example through the
+   * shareable URL adapter) without changing the resource's request/binding
+   * architecture.
+   */
+  const query =
+    queryController ??
+    internalQuery;
 
   /**
    * --------------------------------------------------------------
