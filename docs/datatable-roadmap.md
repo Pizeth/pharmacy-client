@@ -300,6 +300,52 @@ swapped without changing the Document table/controller or generic renderer.
 The legacy MRT FTS code remains a behavior/UI reference only; it is not a
 dependency of the modern Document architecture.
 
+## 1.8.5 — TranslationKey production Refine execution
+
+**Status: complete**
+
+TranslationKey now exercises the Refine request/query lifecycle in the primary
+production resource without replacing its established backend contract.
+
+The production path is:
+
+```text
+DataTableServerQueryState
+        ↓
+translationKeySemanticQueryAdapter
+        ↓
+TranslationKey Refine adapter
+        ↓
+named Refine DataProvider
+        ↓
+existing Standard API request metadata
+        ↓
+POST /api/v1/i18n/keys/query
+        ↓
+Refine GetListResponse
+        ↓
+generic DataTable server-result lifecycle
+```
+
+Important boundaries:
+
+- the application default NestJS CRUD provider remains unchanged,
+- TranslationKey uses the named `translationKeyStandardApi` provider,
+- Refine receives public semantic sort/filter/search descriptors for query/cache
+  identity,
+- the actual Standard API wire request remains authoritative,
+- global-search fields do not cross the HTTP boundary; the request still sends
+  only `search.term`,
+- TranslationKey CRUD/TranslationValue mutation APIs remain explicit
+  resource commands and refresh the Refine-backed list lifecycle afterward,
+- the old direct Standard API loader remains available as a lower-level
+  transport proof/fallback,
+- no Refine type or hook enters the generic MUI renderer.
+
+This makes TranslationKey the production proof for both the Standard API wire
+contract and Refine execution while Document remains the independent
+second-resource Refine proof.
+
 ---
 
 # 1.9 — alternate card presentation
@@ -444,8 +490,9 @@ This completes the first responsive card/table presentation loop.
 The card/table boundary is now exercised by production/resource surfaces rather
 than only by fixture configuration:
 
-- TranslationKey supplies a resource-owned card composition while retaining the
-  same Standard API query controller,
+- TranslationKey supplies a resource-owned card composition while its
+  production list request runs through the named Refine provider over the same
+  Standard API wire contract,
 - the shared toolbar exposes a generic table/card toggle only when a card
   renderer exists,
 - display-mode switching preserves TanStack query/row state and saved visual
@@ -993,8 +1040,8 @@ The repeatable manual protocol is documented in:
 **Status: next**
 
 Run `Matrix A` in `docs/datatable-browser-matrix.md` first so the production
-TranslationKey and Refine-backed Document presentation paths are green before
-profiling.
+TranslationKey named-Refine path and the independent Refine-backed Document
+presentation path are green before profiling.
 
 Then run the baseline matrix in one controlled browser environment and record:
 
