@@ -172,9 +172,7 @@ export function useDataTablePersistedVisualStateController<
   useEffect(
     () => {
       if (
-        !enabled ||
-        persistence ===
-          false
+        !enabled
       ) {
         setStore(
           undefined,
