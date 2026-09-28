@@ -11,6 +11,7 @@ import {
   type DataTableQueryUrlCodec,
   type DataTableQueryUrlFilterFieldConfig,
   type DataTableQueryUrlFilterValue,
+  type DataTableQueryUrlLimits,
 } from "./types";
 
 interface DataTableQueryUrlSortEntry {
@@ -40,6 +41,34 @@ interface ResolvedFilterField {
   readonly config: DataTableQueryUrlFilterFieldConfig;
 }
 
+interface ResolvedDataTableQueryUrlLimits {
+  readonly pageSizes?: readonly number[];
+  readonly maxPageSize: number;
+  readonly maxPage: number;
+  readonly maxSearchLength: number;
+  readonly maxFilterStringLength: number;
+  readonly maxFilterArrayLength: number;
+  readonly maxJsonParameterLength: number;
+}
+
+const DEFAULT_MAX_PAGE_SIZE =
+  200;
+
+const DEFAULT_MAX_PAGE =
+  100_000;
+
+const DEFAULT_MAX_SEARCH_LENGTH =
+  256;
+
+const DEFAULT_MAX_FILTER_STRING_LENGTH =
+  256;
+
+const DEFAULT_MAX_FILTER_ARRAY_LENGTH =
+  50;
+
+const DEFAULT_MAX_JSON_PARAMETER_LENGTH =
+  16_384;
+
 function isRecord(
   value: unknown,
 ): value is Record<string, unknown> {
@@ -50,43 +79,280 @@ function isRecord(
   );
 }
 
-function isPositiveInteger(
+function assertPositiveSafeInteger(
+  name: string,
+  value: number,
+): void {
+  if (
+    !Number.isSafeInteger(
+      value,
+    ) ||
+    value <= 0
+  ) {
+    throw new Error(
+      `DataTable query URL limit "${name}" must be a positive safe integer.`,
+    );
+  }
+}
+
+function assertNonNegativeSafeInteger(
+  name: string,
+  value: number,
+): void {
+  if (
+    !Number.isSafeInteger(
+      value,
+    ) ||
+    value < 0
+  ) {
+    throw new Error(
+      `DataTable query URL limit "${name}" must be a non-negative safe integer.`,
+    );
+  }
+}
+
+function resolveLimits(
+  limits:
+    DataTableQueryUrlLimits | undefined,
+): ResolvedDataTableQueryUrlLimits {
+  const maxPageSize =
+    limits?.maxPageSize ??
+    DEFAULT_MAX_PAGE_SIZE;
+
+  const maxPage =
+    limits?.maxPage ??
+    DEFAULT_MAX_PAGE;
+
+  const maxSearchLength =
+    limits?.maxSearchLength ??
+    DEFAULT_MAX_SEARCH_LENGTH;
+
+  const maxFilterStringLength =
+    limits?.maxFilterStringLength ??
+    DEFAULT_MAX_FILTER_STRING_LENGTH;
+
+  const maxFilterArrayLength =
+    limits?.maxFilterArrayLength ??
+    DEFAULT_MAX_FILTER_ARRAY_LENGTH;
+
+  const maxJsonParameterLength =
+    limits?.maxJsonParameterLength ??
+    DEFAULT_MAX_JSON_PARAMETER_LENGTH;
+
+  assertPositiveSafeInteger(
+    "maxPageSize",
+    maxPageSize,
+  );
+
+  assertPositiveSafeInteger(
+    "maxPage",
+    maxPage,
+  );
+
+  assertNonNegativeSafeInteger(
+    "maxSearchLength",
+    maxSearchLength,
+  );
+
+  assertNonNegativeSafeInteger(
+    "maxFilterStringLength",
+    maxFilterStringLength,
+  );
+
+  assertNonNegativeSafeInteger(
+    "maxFilterArrayLength",
+    maxFilterArrayLength,
+  );
+
+  assertPositiveSafeInteger(
+    "maxJsonParameterLength",
+    maxJsonParameterLength,
+  );
+
+  const pageSizes =
+    limits?.pageSizes ===
+    undefined
+      ? undefined
+      : [
+          ...limits.pageSizes,
+        ];
+
+  if (
+    pageSizes !==
+    undefined
+  ) {
+    if (
+      pageSizes.length ===
+      0
+    ) {
+      throw new Error(
+        'DataTable query URL limit "pageSizes" must contain at least one value when provided.',
+      );
+    }
+
+    const seen =
+      new Set<number>();
+
+    for (
+      const pageSize of
+      pageSizes
+    ) {
+      assertPositiveSafeInteger(
+        "pageSizes",
+        pageSize,
+      );
+
+      if (
+        seen.has(
+          pageSize,
+        )
+      ) {
+        throw new Error(
+          `DataTable query URL limit "pageSizes" contains duplicate value ${pageSize}.`,
+        );
+      }
+
+      seen.add(
+        pageSize,
+      );
+    }
+  }
+
+  return {
+    pageSizes,
+    maxPageSize,
+    maxPage,
+    maxSearchLength,
+    maxFilterStringLength,
+    maxFilterArrayLength,
+    maxJsonParameterLength,
+  };
+}
+
+function isBoundedPositiveSafeInteger(
   value: unknown,
+  max: number,
 ): value is number {
   return (
-    typeof value === "number" &&
-    Number.isInteger(value) &&
-    value > 0
+    typeof value ===
+      "number" &&
+    Number.isSafeInteger(
+      value,
+    ) &&
+    value > 0 &&
+    value <= max
   );
+}
+
+function isValidPageIndex(
+  value: unknown,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
+): value is number {
+  return (
+    typeof value ===
+      "number" &&
+    Number.isSafeInteger(
+      value,
+    ) &&
+    value >= 0 &&
+    value <
+      limits.maxPage
+  );
+}
+
+function isValidPageSize(
+  value: unknown,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
+): value is number {
+  if (
+    typeof value !==
+      "number" ||
+    !Number.isSafeInteger(
+      value,
+    ) ||
+    value <= 0
+  ) {
+    return false;
+  }
+
+  return limits.pageSizes
+    ? limits.pageSizes.includes(
+        value,
+      )
+    : value <=
+        limits.maxPageSize;
 }
 
 function isFilterScalar(
   value: unknown,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ): value is
   | string
   | number
   | boolean {
   return (
-    typeof value === "string" ||
-    typeof value === "boolean" ||
     (
-      typeof value === "number" &&
-      Number.isFinite(value)
+      typeof value ===
+        "string" &&
+      value.length <=
+        limits.maxFilterStringLength
+    ) ||
+    typeof value ===
+      "boolean" ||
+    (
+      typeof value ===
+        "number" &&
+      Number.isFinite(
+        value,
+      )
     )
   );
 }
 
 function isFilterValue(
   value: unknown,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ): value is DataTableQueryUrlFilterValue {
-  if (isFilterScalar(value)) {
+  if (
+    isFilterScalar(
+      value,
+      limits,
+    )
+  ) {
     return true;
   }
 
   return (
-    Array.isArray(value) &&
-    value.every(isFilterScalar)
+    Array.isArray(
+      value,
+    ) &&
+    value.length <=
+      limits.maxFilterArrayLength &&
+    value.every(
+      (
+        item,
+      ) =>
+        isFilterScalar(
+          item,
+          limits,
+        ),
+    )
   );
+}
+
+function safeCall<T>(
+  callback:
+    () => T | undefined,
+): T | undefined {
+  try {
+    return callback();
+  } catch {
+    return undefined;
+  }
 }
 
 function cloneFilterValue(
@@ -254,13 +520,20 @@ function createFilterMaps(
 
 function parseJson(
   value: string | null,
+  maxLength: number,
 ): unknown {
-  if (value === null) {
+  if (
+    value === null ||
+    value.length >
+      maxLength
+  ) {
     return undefined;
   }
 
   try {
-    return JSON.parse(value);
+    return JSON.parse(
+      value,
+    );
   } catch {
     return undefined;
   }
@@ -270,11 +543,16 @@ function parseSorting(
   value: string | null,
   reverseSorting:
     ReadonlyMap<string, string>,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ):
   | DataTableServerSortingState
   | undefined {
   const parsed =
-    parseJson(value);
+    parseJson(
+      value,
+      limits.maxJsonParameterLength,
+    );
 
   if (!Array.isArray(parsed)) {
     return undefined;
@@ -335,11 +613,16 @@ function parseFilters(
       string,
       ResolvedFilterField
     >,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ):
   | DataTableServerColumnFiltersState
   | undefined {
   const parsed =
-    parseJson(value);
+    parseJson(
+      value,
+      limits.maxJsonParameterLength,
+    );
 
   if (!Array.isArray(parsed)) {
     return undefined;
@@ -359,6 +642,7 @@ function parseFilters(
         "string" ||
       !isFilterValue(
         entry.value,
+        limits,
       )
     ) {
       continue;
@@ -380,10 +664,13 @@ function parseFilters(
 
     const decoded =
       resolved.config.decode
-        ? resolved.config.decode(
-            cloneFilterValue(
-              entry.value,
-            ),
+        ? safeCall(
+            () =>
+              resolved.config.decode?.(
+                cloneFilterValue(
+                  entry.value,
+                ),
+              ),
           )
         : cloneFilterValue(
             entry.value,
@@ -450,6 +737,8 @@ function serializeFilters(
       string,
       DataTableQueryUrlFilterFieldConfig
     >,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ): readonly DataTableQueryUrlFilterEntry[] {
   const serialized:
     DataTableQueryUrlFilterEntry[] =
@@ -467,18 +756,29 @@ function serializeFilters(
 
     const encoded =
       config.encode
-        ? config.encode(
-            filter.value,
+        ? safeCall(
+            () =>
+              config.encode?.(
+                filter.value,
+              ),
           )
         : isFilterValue(
               filter.value,
+              limits,
             )
           ? cloneFilterValue(
               filter.value,
             )
           : undefined;
 
-    if (encoded === undefined) {
+    if (
+      encoded ===
+        undefined ||
+      !isFilterValue(
+        encoded,
+        limits,
+      )
+    ) {
       continue;
     }
 
@@ -505,17 +805,51 @@ function createEnvelope(
       string,
       DataTableQueryUrlFilterFieldConfig
     >,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
+  fallbackState:
+    DataTableServerQueryState,
 ): DataTableQueryUrlEnvelope {
+  const pageIndex =
+    isValidPageIndex(
+      state.pagination
+        .pageIndex,
+      limits,
+    )
+      ? state.pagination
+          .pageIndex
+      : fallbackState
+          .pagination
+          .pageIndex;
+
+  const pageSize =
+    isValidPageSize(
+      state.pagination
+        .pageSize,
+      limits,
+    )
+      ? state.pagination
+          .pageSize
+      : fallbackState
+          .pagination
+          .pageSize;
+
+  const search =
+    typeof state.globalFilter ===
+      "string" &&
+    state.globalFilter.length <=
+      limits.maxSearchLength
+      ? state.globalFilter
+      : fallbackState
+          .globalFilter;
+
   return {
     version:
       DATA_TABLE_QUERY_URL_STATE_VERSION,
     page:
-      state.pagination
-        .pageIndex +
+      pageIndex +
       1,
-    pageSize:
-      state.pagination
-        .pageSize,
+    pageSize,
     sorting:
       serializeSorting(
         state.sorting,
@@ -525,9 +859,9 @@ function createEnvelope(
       serializeFilters(
         state.columnFilters,
         filteringMap,
+        limits,
       ),
-    search:
-      state.globalFilter,
+    search,
   };
 }
 
@@ -558,6 +892,8 @@ export function createDataTableQueryUrlCodec(
       "dt",
     defaultState,
     fields,
+    limits:
+      rawLimits,
   } = options;
 
   if (
@@ -568,6 +904,11 @@ export function createDataTableQueryUrlCodec(
       "DataTable query URL namespace cannot be empty.",
     );
   }
+
+  const limits =
+    resolveLimits(
+      rawLimits,
+    );
 
   const sortingMap =
     fields.sorting ?? {};
@@ -614,11 +955,53 @@ export function createDataTableQueryUrlCodec(
       defaultState,
     );
 
+  if (
+    !isValidPageIndex(
+      canonicalDefault
+        .pagination
+        .pageIndex,
+      limits,
+    )
+  ) {
+    throw new Error(
+      "DataTable query URL default pageIndex exceeds the configured page limit.",
+    );
+  }
+
+  if (
+    !isValidPageSize(
+      canonicalDefault
+        .pagination
+        .pageSize,
+      limits,
+    )
+  ) {
+    throw new Error(
+      "DataTable query URL default pageSize is not allowed by the configured limits.",
+    );
+  }
+
+  if (
+    typeof canonicalDefault
+      .globalFilter !==
+      "string" ||
+    canonicalDefault
+      .globalFilter
+      .length >
+      limits.maxSearchLength
+  ) {
+    throw new Error(
+      "DataTable query URL default globalFilter exceeds the configured search limit.",
+    );
+  }
+
   const defaultEnvelope =
     createEnvelope(
       canonicalDefault,
       sortingMap,
       filteringByColumn,
+      limits,
+      canonicalDefault,
     );
 
   const parse = (
@@ -659,6 +1042,7 @@ export function createDataTableQueryUrlCodec(
           keys.sorting,
         ),
         reverseSorting,
+        limits,
       );
 
     const filters =
@@ -667,6 +1051,7 @@ export function createDataTableQueryUrlCodec(
           keys.filters,
         ),
         filteringByPublicField,
+        limits,
       );
 
     const search =
@@ -677,8 +1062,9 @@ export function createDataTableQueryUrlCodec(
     return {
       pagination: {
         pageIndex:
-          isPositiveInteger(
+          isBoundedPositiveSafeInteger(
             parsedPage,
+            limits.maxPage,
           )
             ? parsedPage -
               1
@@ -687,8 +1073,9 @@ export function createDataTableQueryUrlCodec(
                 .pageIndex,
 
         pageSize:
-          isPositiveInteger(
+          isValidPageSize(
             parsedPageSize,
+            limits,
           )
             ? parsedPageSize
             : canonicalDefault
@@ -713,8 +1100,13 @@ export function createDataTableQueryUrlCodec(
         ),
 
       globalFilter:
-        search ??
-        canonicalDefault.globalFilter,
+        search !==
+          null &&
+        search.length <=
+          limits.maxSearchLength
+          ? search
+          : canonicalDefault
+              .globalFilter,
     };
   };
 
@@ -741,6 +1133,8 @@ export function createDataTableQueryUrlCodec(
         state,
         sortingMap,
         filteringByColumn,
+        limits,
+        canonicalDefault,
       );
 
     /**
