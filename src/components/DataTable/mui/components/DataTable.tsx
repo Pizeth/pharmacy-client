@@ -540,7 +540,11 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                 {toolbar !== false && (
                   <DataTableToolbar
                     table={table}
-                    displayModeToggleAvailable={card !== undefined}
+                    displayModeToggleAvailable={
+                      card !== undefined &&
+                      (displayMode === undefined ||
+                        onDisplayModeChange !== undefined)
+                    }
                     autoCardBreakpoint={autoCardBreakpoint}
                     {...toolbarConfig}
                   />
