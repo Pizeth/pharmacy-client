@@ -725,22 +725,53 @@ Implementation:
 
 ## 2.1.2 — persistence storage boundary
 
-**Status: next**
+**Status: complete**
 
-Add a replaceable storage contract for the visual-state envelope.
+The persisted visual-state schema now sits behind a replaceable synchronous
+storage boundary.
 
-Required properties:
+Established contracts:
 
-- browser storage is one adapter, not part of the schema,
-- SSR-safe reads,
-- explicit storage key/version ownership,
-- graceful malformed JSON/storage failures,
-- no query state in the visual-preference key,
-- no renderer knowledge of localStorage.
+- `DataTablePersistenceStorage` is the minimal string-storage adapter:
+  - `getItem()`,
+  - `setItem()`,
+  - `removeItem()`.
+- `getBrowserDataTablePersistenceStorage()` is the browser/Web Storage adapter
+  and performs no module-load access to `window` or `localStorage`.
+- `createDataTablePersistedVisualStateStore()` owns:
+  - JSON decode/encode,
+  - schema normalization,
+  - current-column compatibility sanitization,
+  - safe read/write/remove failure handling.
+- `createDataTablePersistedVisualStateStorageKey()` owns a stable namespace and
+  embeds the visual-state schema version into the storage key.
+
+The current key shape is:
+
+```text
+razeth:data-table:visual-state:v1:<encoded storage id>
+```
+
+The boundary is intentionally defensive:
+
+- SSR/unavailable storage resolves to an empty preference state instead of
+  touching browser globals,
+- malformed JSON returns no persisted preference,
+- storage getter/setter/remover exceptions are contained,
+- writes are normalized before serialization so extra runtime properties such as
+  pagination, sorting, filters, search or row state cannot leak into the visual
+  preference payload,
+- stale/removed column IDs are sanitized through the same 2.1.1 schema used for
+  hydration,
+- the renderer still has no dependency on `localStorage`.
+
+Implementation:
+
+`src/components/DataTable/mui/persistence/storage`
 
 ## 2.1.3 — DataTable visual-state controller integration
 
-**Status: planned**
+**Status: next**
 
 Connect the storage boundary to the existing controlled/uncontrolled visual
 state families without creating a second owner of TanStack state.

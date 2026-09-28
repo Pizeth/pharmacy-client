@@ -20,3 +20,5 @@ export type {
   DataTablePersistedVisualStateParseResult,
   DataTablePersistedVisualStateVersion,
 } from "./types";
+
+export * from "./storage";
