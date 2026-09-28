@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import type {
@@ -85,6 +86,21 @@ export function useDataTablePersistedVisualStateController<
   const enabled =
     persistence !== false &&
     persistence.enabled !== false;
+
+  /**
+   * createTableHook() may return a render-scoped extended table wrapper.
+   *
+   * Hydration is keyed by persistence identity + column universe, not by the
+   * wrapper object's referential identity. Keep the latest table available to
+   * the effect without turning that wrapper into an effect dependency.
+   */
+  const tableRef =
+    useRef(
+      table,
+    );
+
+  tableRef.current =
+    table;
 
   const densityControlled =
     controlledDensity !== undefined;
@@ -234,7 +250,7 @@ export function useDataTablePersistedVisualStateController<
           undefined &&
         !columnVisibilityControlled
       ) {
-        table.setColumnVisibility(
+        tableRef.current.setColumnVisibility(
           persisted.columnVisibility,
         );
       }
@@ -245,7 +261,7 @@ export function useDataTablePersistedVisualStateController<
           undefined &&
         !columnOrderControlled
       ) {
-        table.setColumnOrder(
+        tableRef.current.setColumnOrder(
           persisted.columnOrder,
         );
       }
@@ -256,7 +272,7 @@ export function useDataTablePersistedVisualStateController<
           undefined &&
         !columnSizingControlled
       ) {
-        table.setColumnSizing(
+        tableRef.current.setColumnSizing(
           persisted.columnSizing,
         );
       }
@@ -267,7 +283,7 @@ export function useDataTablePersistedVisualStateController<
           undefined &&
         !columnPinningControlled
       ) {
-        table.setColumnPinning(
+        tableRef.current.setColumnPinning(
           persisted.columnPinning,
         );
       }
@@ -317,7 +333,6 @@ export function useDataTablePersistedVisualStateController<
       persistenceColumnIds,
       persistenceStorage,
       persistenceStorageId,
-      table,
     ],
   );
 
