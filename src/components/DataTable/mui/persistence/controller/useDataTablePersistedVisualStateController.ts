@@ -72,6 +72,16 @@ export function useDataTablePersistedVisualStateController<
     cardAvailable,
   } = options;
 
+  const persistenceStorageId =
+    persistence === false
+      ? undefined
+      : persistence.storageId;
+
+  const persistenceStorage =
+    persistence === false
+      ? undefined
+      : persistence.storage;
+
   const enabled =
     persistence !== false &&
     persistence.enabled !== false;
@@ -182,15 +192,30 @@ export function useDataTablePersistedVisualStateController<
       );
 
       const storage =
-        persistence.storage ??
+        persistenceStorage ??
         getBrowserDataTablePersistenceStorage();
+
+      if (
+        persistenceStorageId ===
+        undefined
+      ) {
+        setStore(
+          undefined,
+        );
+
+        setHydrated(
+          true,
+        );
+
+        return;
+      }
 
       const nextStore =
         createDataTablePersistedVisualStateStore(
           {
             storage,
             storageId:
-              persistence.storageId,
+              persistenceStorageId,
             columnIds:
               persistenceColumnIds,
           },
@@ -291,8 +316,9 @@ export function useDataTablePersistedVisualStateController<
       densityControlled,
       displayModeControlled,
       enabled,
-      persistence,
       persistenceColumnIds,
+      persistenceStorage,
+      persistenceStorageId,
       table,
     ],
   );
