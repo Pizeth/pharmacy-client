@@ -2,13 +2,19 @@
 
 import {
   createDataTableQueryUrlCodec,
-  createDataTableServerQueryState,
-} from "@/components/DataTable";
+} from "@/components/DataTable/mui/query-url";
 
 import type {
   DataTableQueryUrlFilterValue,
+} from "@/components/DataTable/mui/query-url";
+
+import {
+  createDataTableServerQueryState,
+} from "@/components/DataTable/mui/server-state";
+
+import type {
   DataTableServerQueryState,
-} from "@/components/DataTable";
+} from "@/components/DataTable/mui/server-state";
 
 import {
   TRANSLATION_KEY_COLUMN_IDS,
