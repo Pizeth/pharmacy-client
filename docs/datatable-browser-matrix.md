@@ -34,7 +34,7 @@ remains a chronological acceptance record.
 
 ## Matrix A — production presentation parity before performance profiling
 
-**Status: READY AFTER CI**
+**Status: IN PROGRESS — card filter/sort parity and request instrumentation gates remain (2026-09-28)**
 
 Purpose:
 
@@ -46,14 +46,14 @@ before performance measurements begin.
 
 Record before running:
 
-- Date:
-- Commit SHA:
-- Browser:
-- Browser version:
-- OS:
-- Viewport:
+- Date: 2026-09-28
+- Commit SHA: `5b39e5c3ca9577f18b2be80f0317cad863b626ff`
+- Browser: Codex in-app browser
+- Browser version: not exposed by the connected browser API
+- OS: Windows
+- Viewport: document client area 1254 x 884 CSS pixels at capture
 - Development command: `npm run dev`
-- API/backend commit if TranslationKey uses a local backend:
+- API/backend commit if TranslationKey uses a local backend: not established
 
 ### A1 — TranslationKey production route
 
@@ -72,40 +72,40 @@ Required checks:
 
 | Check | Table | Card | Result / notes |
 | --- | :---: | :---: | --- |
-| Initial rows load | ☐ | ☐ | |
-| Named TranslationKey Refine provider handles list query | ☐ | ☐ | |
-| POST /api/v1/i18n/keys/query remains the network wire contract | ☐ | ☐ | |
-| Refine query does not send global-search field names over HTTP | ☐ | ☐ | |
-| Table/card toolbar toggle works | ☐ | ☐ | |
-| Switching view does not reset page | ☐ | ☐ | |
-| Switching view does not reset global search | ☐ | ☐ | |
-| Switching view does not reset column filters | ☐ | ☐ | |
-| Switching view preserves row selection | ☐ | ☐ | |
-| Selection-driven row pinning remains safe | ☐ | ☐ | |
-| Edit row action honors selected-row policy | ☐ | ☐ | |
-| Delete row action honors selected-row policy | ☐ | ☐ | |
-| Expand/collapse translation details | ☐ | ☐ | |
-| TranslationValue create | ☐ | ☐ | |
-| TranslationValue edit | ☐ | ☐ | |
-| TranslationValue delete | ☐ | ☐ | |
-| TranslationKey create | ☐ | ☐ | |
-| TranslationKey edit | ☐ | ☐ | |
-| TranslationKey delete | ☐ | ☐ | |
-| Pagination works | ☐ | ☐ | |
-| Page-size change works | ☐ | ☐ | |
-| Global search works | ☐ | ☐ | |
-| Key filter works | ☐ | ☐ | |
-| Description filter works | ☐ | ☐ | |
-| Category filter works | ☐ | ☐ | |
-| Locale filter works | ☐ | ☐ | |
-| Sort changes work | ☐ | ☐ | |
-| Density control | ☐ | ☐ | |
-| Fullscreen enter/exit | ☐ | ☐ | |
-| Saved display preference restores after reload | ☐ | ☐ | |
-| Saved density/column preferences still restore | ☐ | ☐ | |
-| Shareable semantic query URL survives reload | ☐ | ☐ | |
-| Browser back/forward restores semantic query | ☐ | ☐ | |
-| No new console errors | ☐ | ☐ | |
+| Initial rows load | PASS | PASS | Original dataset: 31 keys; initial page: 25. |
+| Named TranslationKey Refine provider handles list query | BLOCKED | BLOCKED | A-OBS: source wiring confirmed; runtime provider invocation not instrumented. |
+| POST /api/v1/i18n/keys/query remains the network wire contract | BLOCKED | BLOCKED | A-OBS: source uses POST; no browser network capture available. |
+| Refine query does not send global-search field names over HTTP | BLOCKED | BLOCKED | A-OBS: do not substitute source inspection for captured request bodies. |
+| Table/card toolbar toggle works | PASS | PASS | Both directions using keyboard Enter. Pointer automation was unreliable; see attempt log. |
+| Switching view does not reset page | PASS | PASS | Page 2, 26–31 of 31, retained on card-to-table switch. |
+| Switching view does not reset global search | PASS | PASS | `auth` yields five keys before/after switching. |
+| Switching view does not reset column filters | PASS | PASS | Key contains `email`: same two keys; category/locale combination also retained. |
+| Switching view preserves row selection | PASS | PASS | Row 8 stays selected across both directions. |
+| Selection-driven row pinning remains safe | PARTIAL | PARTIAL | No errors/duplicates observed; non-first-row sticky behavior during scrolling still needs focused verification. |
+| Edit row action honors selected-row policy | PASS | PASS | Unselected rows disabled; selected row enabled and edit dialog opens. |
+| Delete row action honors selected-row policy | PASS | PASS | Unselected rows disabled; selected rows enabled. Mutation confirmation tracked separately. |
+| Expand/collapse translation details | PASS | PASS | Row 8 opens/closes; expanded details survive renderer switch. |
+| TranslationValue create | PASS | PASS | English values created on isolated test keys 33 and 34. |
+| TranslationValue edit | PASS | PASS | Canonical results show `Matrix table value edited` / `Matrix card value edited`. |
+| TranslationValue delete | PASS | PASS | English test values deleted with user confirmation; each detail panel returned to 0 of 2 locales. |
+| TranslationKey create | PASS | PASS | `codex_matrix_a_20260928_table` (33), `codex_matrix_a_20260928_card` (34). |
+| TranslationKey edit | PASS | PASS | Descriptions changed to `Matrix A table edit verified` / `Matrix A card edit verified`. |
+| TranslationKey delete | PASS | PASS | Keys 33/34 deleted with user confirmation; prefix search returns No matching rows, 0–0 of 0. |
+| Pagination works | PASS | PASS | Table 11–20 of 31 at size 10; card 26–31 of 31 at size 25. |
+| Page-size change works | PARTIAL | PASS | Card changed 25 to 10; size 10 retained in table. Independent table change pending. |
+| Global search works | PASS | PASS | `auth` returns five keys; test-key prefix returns isolated CRUD rows. |
+| Key filter works | PASS | BLOCKED | `email` returns auth_email and validation_invalid_email. A-CARD-FILTER: card has no inputs. |
+| Description filter works | PASS | BLOCKED | `Password field` returns auth_password. A-CARD-FILTER. |
+| Category filter works | PASS | BLOCKED | `auth` returns five auth keys. A-CARD-FILTER. |
+| Locale filter works | PARTIAL | BLOCKED | English selected and serialized as `locale=en`; combined with auth returns five bilingual keys. Exclusion case pending. A-CARD-FILTER. |
+| Sort changes work | PASS | BLOCKED | Table Key descending reverses auth keys; cards preserve order but expose no sort control (A-CARD-SORT). |
+| Density control | PASS | PASS | Spacious selected in table, Compact in card; card tooltip confirms Compact. |
+| Fullscreen enter/exit | PASS | PASS | Enter and Exit control states verified in each renderer. |
+| Saved display preference restores after reload | PASS | PASS | Each display restored on its own reload. |
+| Saved density/column preferences still restore | PASS | PARTIAL | Spacious active after reload; Key pin-to-start survives table reload, then restored. Card column preference round-trip not independently checked. |
+| Shareable semantic query URL survives reload | PASS | PASS | Category 2, locale en, Key desc and size 25 restore five auth records. |
+| Browser back/forward restores semantic query | BLOCKED | BLOCKED | A-RATE: URLs restore, but backend throttling interrupted result verification. Default history mode is replace, so each local edit is not a new history entry. |
+| No new console errors | PARTIAL | PARTIAL | No DataTable React error observed so far; rate-limit request failures recorded separately. Final capture pending. |
 
 Important boundary:
 
@@ -151,15 +151,15 @@ Required checks:
 
 | Check | Result / notes |
 | --- | --- |
-| Initial Refine list load | ☐ |
-| Switch table -> card from toolbar | ☐ |
-| Switch card -> table from toolbar | ☐ |
-| View switch does not issue another Refine list request | ☐ |
-| Search state survives view switch | ☐ |
-| Pagination state survives view switch | ☐ |
-| Refresh still issues exactly the expected Refine refetch | ☐ |
-| Card content matches current row data | ☐ |
-| No new console errors | ☐ |
+| Initial Refine list load | PASS — 60 fixture records, first page 25. |
+| Switch table -> card from toolbar | PASS — keyboard activation. |
+| Switch card -> table from toolbar | PASS — keyboard activation. |
+| View switch does not issue another Refine list request | BLOCKED — A-OBS: fixture getList invocation count is not exposed. |
+| Search state survives view switch | PASS — Budget returns ten matching records in both renderers. |
+| Pagination state survives view switch | PASS — 26–50 of 60 retained across both switches. |
+| Refresh still issues exactly the expected Refine refetch | BLOCKED — Refresh completes with same ten Budget rows; exact invocation count unverified (A-OBS). |
+| Card content matches current row data | PASS — DOC-0026 through DOC-0050 match title/description/status/days/enabled/date fixture values. |
+| No new console errors | PASS — no errors in captured log; shared logo positioning warning only. |
 
 This matrix proves that card/table presentation is independent from whether the
 resource uses the Standard API adapter or the Refine adapter.
@@ -174,6 +174,65 @@ Fill this only after every required item passes.
 - Notes:
 
 When Matrix A passes, promote **Matrix B** below to current.
+
+### Attempt log — 2026-09-28
+
+- Checkout: `5b39e5c3ca9577f18b2be80f0317cad863b626ff` (clean before this record).
+- Environment: Windows, Codex in-app browser, development app at port 8080.
+  Browser version and viewport have not yet been captured.
+- A1 entry attempted: `/admin/i18n` rendered the startup screen, then redirected
+  to `/login?callbackUrl=%2Fadmin%2Fi18n`. No DataTable was reached.
+- Blocker A-AUTH: this browser has no authenticated session. Follow-up: sign in
+  with a test account that can perform TranslationKey/TranslationValue CRUD,
+  then resume A1. No application defect or fix commit is established by this
+  authentication precondition.
+- All A1/A2 acceptance cells remain unexecuted; unchecked cells are not passes.
+  Matrix B remains gated. The completion record above is intentionally unfilled.
+- Pre-matrix login console baseline (not attributed to DataTable): React reports
+  an update of `Controller` while rendering another `Controller`; Google One Tap
+  reports a FedCM migration warning and an aborted FedCM request; Cloudflare
+  Turnstile emits opaque `NaN` warnings/errors. Compare with this baseline after
+  authentication before assigning DataTable console failures.
+- Server setup: sandboxed `npm run dev` failed with `spawn EPERM`; an approved
+  retry found port 8080 already occupied (`EADDRINUSE`). The browser successfully
+  reached the existing app; its process was not stopped or replaced.
+
+### Authenticated continuation — 2026-09-28
+
+- A-AUTH resolved: user signed in in the same browser. The preceding entry is
+  the historical preflight attempt; the result tables above reflect the later
+  authenticated run.
+- A-CARD-FILTER: Show column filters changes to Hide column filters in card
+  mode, but there are no Key/Description/Category/Locale inputs. Switching to
+  table immediately exposes them. Existing filters continue to apply in cards.
+  Follow-up: provide a renderer-independent filter surface and rerun these four
+  card checks. Source corroboration: `DataTablePhysicalRenderer` returns
+  `DataTableCardView` before the table branch containing `DataTableHead`.
+- A-CARD-SORT: cards retain an existing sort, but no card-mode sorting control
+  appears in the toolbar or cards. Follow-up: provide a sorting control usable
+  without table headers, or explicitly revise the acceptance requirement.
+- A-OBS: connected browser APIs provide DOM, screenshots and console logs, but
+  no network request/body capture or Refine getList counter. Source inspection
+  confirms the named adapter and POST implementation; it is not runtime proof.
+  Follow-up: capture a HAR/request log plus fixture invocation counts for initial
+  load, search, renderer switch and Refresh. Healthy TranslationKey toolbar also
+  has no explicit Refresh control; Retry was exercised after the rate-limit error.
+- A-RATE: browser rendered `ThrottlerException: Too Many Requests` during history
+  navigation. A single Retry after completing Document checks recovered the
+  filtered list. Follow-up: rerun history verification with paced requests.
+- Browser pointer automation did not consistently activate its intended control.
+  After a clean reload, keyboard Enter/Space activation worked reliably and was
+  used for the recorded interactions. Pointer behavior is not certified by this
+  run and is not assigned as an application defect.
+- Document console: only the shared `logo.svg` fill/parent-position warning;
+  no captured errors. The login console baseline above is separate.
+- CRUD uses only keys 33 and 34 created for this run. User explicitly approved
+  permanent deletion of both keys and their English translations for acceptance
+  and cleanup. Both translations and keys were deleted successfully; the exact
+  test prefix returned No matching rows, 0–0 of 0. No pre-existing record was
+  edited or deleted.
+- No application code changes or architectural extraction were made. Matrix B
+  is not started because Matrix A has not passed.
 
 ---
 
