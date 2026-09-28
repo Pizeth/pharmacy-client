@@ -96,6 +96,42 @@ export const TRANSLATION_KEY_FILTER_FIELDS = {
 export type TranslationKeyFilterField =
   (typeof TRANSLATION_KEY_FILTER_FIELDS)[keyof typeof TRANSLATION_KEY_FILTER_FIELDS];
 
+
+/**
+ * ------------------------------------------------------------------
+ * Shared UI-column -> public semantic field maps
+ * ------------------------------------------------------------------
+ *
+ * These maps are intentionally shared by:
+ *
+ * - the server semantic query mapper,
+ * - the shareable URL-state codec.
+ *
+ * This keeps browser URLs, TanStack state, and transport mapping aligned
+ * without exposing backend/private field paths.
+ */
+export const TRANSLATION_KEY_SORT_COLUMN_FIELDS = {
+  [TRANSLATION_KEY_COLUMN_IDS.key]:
+    TRANSLATION_KEY_SORT_FIELDS.key,
+  [TRANSLATION_KEY_COLUMN_IDS.category]:
+    TRANSLATION_KEY_SORT_FIELDS.category,
+  [TRANSLATION_KEY_COLUMN_IDS.createdAt]:
+    TRANSLATION_KEY_SORT_FIELDS.createdAt,
+  [TRANSLATION_KEY_COLUMN_IDS.updatedAt]:
+    TRANSLATION_KEY_SORT_FIELDS.updatedAt,
+} as const;
+
+export const TRANSLATION_KEY_FILTER_COLUMN_FIELDS = {
+  [TRANSLATION_KEY_COLUMN_IDS.key]:
+    TRANSLATION_KEY_FILTER_FIELDS.key,
+  [TRANSLATION_KEY_COLUMN_IDS.description]:
+    TRANSLATION_KEY_FILTER_FIELDS.description,
+  [TRANSLATION_KEY_COLUMN_IDS.category]:
+    TRANSLATION_KEY_FILTER_FIELDS.categoryId,
+  [TRANSLATION_KEY_COLUMN_IDS.locale]:
+    TRANSLATION_KEY_FILTER_FIELDS.locale,
+} as const;
+
 /**
  * ------------------------------------------------------------------
  * Semantic global-search fields
