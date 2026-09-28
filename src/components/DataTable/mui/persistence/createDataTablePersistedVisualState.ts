@@ -4,7 +4,7 @@ import type {
   ColumnOrderState,
   ColumnPinningState,
   ColumnSizingState,
-  VisibilityState,
+  ColumnVisibilityState,
 } from "@tanstack/table-core";
 
 import type { MuiDataTableDensity } from "../density";
@@ -22,7 +22,7 @@ export interface CreateDataTablePersistedVisualStateOptions
   extends DataTablePersistedVisualStateContext {
   readonly density?: MuiDataTableDensity;
   readonly displayMode?: DataTableDisplayMode;
-  readonly columnVisibility?: VisibilityState;
+  readonly columnVisibility?: ColumnVisibilityState;
   readonly columnOrder?: ColumnOrderState;
   readonly columnSizing?: ColumnSizingState;
   readonly columnPinning?: ColumnPinningState;
