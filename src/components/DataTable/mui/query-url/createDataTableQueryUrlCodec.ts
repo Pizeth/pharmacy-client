@@ -584,19 +584,20 @@ function parseFilters(
       continue;
     }
 
+    const encodedValue =
+      cloneFilterValue(
+        entry.value,
+      );
+
     const decoded =
       resolved.config.decode
         ? safeCall(
             () =>
               resolved.config.decode!(
-                cloneFilterValue(
-                  entry.value,
-                ),
+                encodedValue,
               ),
           )
-        : cloneFilterValue(
-            entry.value,
-          );
+        : encodedValue;
 
     if (decoded === undefined) {
       continue;
