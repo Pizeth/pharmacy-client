@@ -121,6 +121,14 @@ export interface DataTableQueryUrlLimits {
    * Default: 50.
    */
   readonly maxFilterArrayLength?: number;
+
+  /**
+   * Maximum encoded length of one structured JSON query parameter
+   * (sorting or filters) before JSON.parse is attempted.
+   *
+   * Default: 8_192.
+   */
+  readonly maxStructuredParamLength?: number;
 }
 
 export interface CreateDataTableQueryUrlCodecOptions {
