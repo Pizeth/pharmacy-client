@@ -4,7 +4,7 @@ import type {
   ColumnOrderState,
   ColumnPinningState,
   ColumnSizingState,
-  VisibilityState,
+  ColumnVisibilityState,
 } from "@tanstack/table-core";
 
 import type { MuiDataTableDensity } from "../density";
@@ -63,12 +63,12 @@ function normalizeColumnIds(
 function normalizeVisibility(
   value: unknown,
   allowedIds: ReadonlySet<string>,
-): VisibilityState | undefined {
+): ColumnVisibilityState | undefined {
   if (!isRecord(value)) {
     return undefined;
   }
 
-  const result: VisibilityState = {};
+  const result: ColumnVisibilityState = {};
 
   for (const [id, visible] of Object.entries(value)) {
     if (
