@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Stack, styled, useMediaQuery, useTheme } from "@mui/material";
+import type { Breakpoint } from "@mui/material/styles";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
 import { useDataTableThemeDefaults } from "../../theme/useDataTableThemeDefaults";
@@ -79,6 +80,16 @@ export interface DataTableToolbarProps<
   TData extends RowData,
 > extends DataTableToolbarConfig<TData> {
   readonly table: MuiDataTableInstance<TData>;
+
+  /**
+   * Internal renderer capability flag.
+   *
+   * A standalone toolbar or a table without DataTable.card must not expose a
+   * control that can switch to a renderer which does not exist.
+   */
+  readonly displayModeToggleAvailable?: boolean;
+
+  readonly autoCardBreakpoint?: Breakpoint;
 }
 
 /**
@@ -118,6 +129,10 @@ export function DataTableToolbar<TData extends RowData>(
     enableColumnManager = themeDefaults.enableColumnManager ?? true,
     columnManager,
     enableDensity = themeDefaults.enableDensityToggle ?? true,
+    enableDisplayModeToggle =
+      themeDefaults.enableDisplayModeToggle ?? true,
+    displayModeToggleAvailable = false,
+    autoCardBreakpoint,
     enableFullscreen = themeDefaults.enableFullscreen ?? true,
   } = props;
 
@@ -258,6 +273,10 @@ export function DataTableToolbar<TData extends RowData>(
             enableColumnManager={enableColumnManager}
             columnManager={columnManager}
             enableDensity={enableDensity}
+            enableDisplayModeToggle={
+              displayModeToggleAvailable && enableDisplayModeToggle
+            }
+            autoCardBreakpoint={autoCardBreakpoint}
             enableFullscreen={enableFullscreen}
           />
         </ToolbarEndRoot>
