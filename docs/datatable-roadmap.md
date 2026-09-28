@@ -671,25 +671,110 @@ generic table to WebSocket, SSE, Refine, or another event transport.
 
 # 2.1 — persistence and shareable table state
 
-**Status: planned**
+**Status: active**
 
-Persist only state that is safe and useful.
+Persistence is split into two deliberately separate concerns:
 
-Candidate state families:
+1. saved visual preferences,
+2. shareable semantic server-query state.
+
+Visual preferences must never silently become query semantics.
+
+## 2.1.1 — versioned persisted visual-state schema
+
+**Status: complete**
+
+The generic MUI layer now defines a versioned, transport/storage-independent
+visual-state envelope for:
 
 - density,
+- display mode,
 - column visibility,
 - column order,
 - column sizing,
-- column pinning,
-- display mode,
-- optionally query state.
+- column pinning.
 
-Server-query URL synchronization and saved visual preferences should remain
-separate concerns.
+The schema deliberately excludes:
 
-Persisted state must tolerate columns being added/removed between application
-versions.
+- pagination,
+- sorting,
+- column filters,
+- global search,
+- row selection,
+- row pinning,
+- expansion,
+- fullscreen/open-menu state.
+
+Hydration is defensive:
+
+- unknown schema versions are rejected,
+- malformed optional fields are ignored independently,
+- removed column IDs are discarded,
+- newly introduced columns are appended to persisted order in the current
+  resource-definition order,
+- duplicate column-order/pinning IDs are removed,
+- a column cannot hydrate into both logical pin regions,
+- invalid/non-positive column sizes are discarded.
+
+The implementation is pure and does not read/write localStorage, URLs, table
+instances, or resource-specific fields.
+
+Implementation:
+
+`src/components/DataTable/mui/persistence`
+
+## 2.1.2 — persistence storage boundary
+
+**Status: next**
+
+Add a replaceable storage contract for the visual-state envelope.
+
+Required properties:
+
+- browser storage is one adapter, not part of the schema,
+- SSR-safe reads,
+- explicit storage key/version ownership,
+- graceful malformed JSON/storage failures,
+- no query state in the visual-preference key,
+- no renderer knowledge of localStorage.
+
+## 2.1.3 — DataTable visual-state controller integration
+
+**Status: planned**
+
+Connect the storage boundary to the existing controlled/uncontrolled visual
+state families without creating a second owner of TanStack state.
+
+The integration must preserve:
+
+- explicit controlled props as highest priority,
+- resource/table defaults when no persisted value exists,
+- theme defaults,
+- column compatibility sanitation before hydration,
+- card/table display mode continuity,
+- density and column state updates written back through one persistence owner.
+
+## 2.1.4 — shareable server-query URL state
+
+**Status: planned**
+
+Handle semantic query state separately from saved visual preferences.
+
+Candidate query families:
+
+- pagination,
+- sorting,
+- column filters,
+- global search.
+
+Requirements:
+
+- resource semantic mapping remains authoritative,
+- URLs contain public semantic field IDs rather than backend/private field names,
+- parsing is versioned/defensive,
+- invalid query values fall back safely,
+- URL hydration must not overwrite saved visual preferences,
+- navigation/back-forward semantics remain predictable.
 
 ---
 
