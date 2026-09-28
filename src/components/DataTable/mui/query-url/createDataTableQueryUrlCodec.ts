@@ -58,6 +58,7 @@ interface ResolvedDataTableQueryUrlLimits {
   readonly maxSearchLength: number;
   readonly maxFilterStringLength: number;
   readonly maxFilterArrayLength: number;
+  readonly maxStructuredParamLength: number;
 }
 
 const DEFAULT_DATA_TABLE_QUERY_URL_LIMITS:
@@ -67,6 +68,7 @@ const DEFAULT_DATA_TABLE_QUERY_URL_LIMITS:
     maxSearchLength: 256,
     maxFilterStringLength: 256,
     maxFilterArrayLength: 50,
+    maxStructuredParamLength: 8_192,
   };
 
 function resolveLimits(
@@ -103,7 +105,7 @@ function resolveLimits(
         limits?.maxPageSize ??
         0
       ) > 0
-        ? limits!.maxPageSize!
+        ? limits?.maxPageSize as number
         : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxPageSize,
 
     maxPage:
@@ -114,7 +116,7 @@ function resolveLimits(
         limits?.maxPage ??
         0
       ) > 0
-        ? limits!.maxPage!
+        ? limits?.maxPage as number
         : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxPage,
 
     maxSearchLength:
@@ -125,7 +127,7 @@ function resolveLimits(
         limits?.maxSearchLength ??
         -1
       ) >= 0
-        ? limits!.maxSearchLength!
+        ? limits?.maxSearchLength as number
         : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxSearchLength,
 
     maxFilterStringLength:
@@ -136,7 +138,7 @@ function resolveLimits(
         limits?.maxFilterStringLength ??
         -1
       ) >= 0
-        ? limits!.maxFilterStringLength!
+        ? limits?.maxFilterStringLength as number
         : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxFilterStringLength,
 
     maxFilterArrayLength:
@@ -147,8 +149,19 @@ function resolveLimits(
         limits?.maxFilterArrayLength ??
         -1
       ) >= 0
-        ? limits!.maxFilterArrayLength!
+        ? (limits?.maxFilterArrayLength as number)
         : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxFilterArrayLength,
+
+    maxStructuredParamLength:
+      Number.isSafeInteger(
+        limits?.maxStructuredParamLength,
+      ) &&
+      (
+        limits?.maxStructuredParamLength ??
+        -1
+      ) >= 0
+        ? (limits?.maxStructuredParamLength as number)
+        : DEFAULT_DATA_TABLE_QUERY_URL_LIMITS.maxStructuredParamLength,
   };
 }
 
@@ -431,8 +444,13 @@ function createFilterMaps(
 
 function parseJson(
   value: string | null,
+  maxLength: number,
 ): unknown {
-  if (value === null) {
+  if (
+    value === null ||
+    value.length >
+      maxLength
+  ) {
     return undefined;
   }
 
@@ -447,11 +465,16 @@ function parseSorting(
   value: string | null,
   reverseSorting:
     ReadonlyMap<string, string>,
+  limits:
+    ResolvedDataTableQueryUrlLimits,
 ):
   | DataTableServerSortingState
   | undefined {
   const parsed =
-    parseJson(value);
+    parseJson(
+      value,
+      limits.maxStructuredParamLength,
+    );
 
   if (!Array.isArray(parsed)) {
     return undefined;
@@ -518,7 +541,10 @@ function parseFilters(
   | DataTableServerColumnFiltersState
   | undefined {
   const parsed =
-    parseJson(value);
+    parseJson(
+      value,
+      limits.maxStructuredParamLength,
+    );
 
   if (!Array.isArray(parsed)) {
     return undefined;
@@ -690,21 +716,10 @@ function serializeFilters(
   return serialized;
 }
 
-function canonicalizeSearchFallback(
-  _value: string,
-  _limits:
-    ResolvedDataTableQueryUrlLimits,
-): string {
-  /**
-   * Serialization must never emit an oversized search term. Returning an empty
-   * string keeps this pure helper resource-agnostic; resource defaults are
-   * handled by the envelope/default comparison at the codec boundary.
-   */
-  return "";
-}
-
 function createEnvelope(
   state:
+    DataTableServerQueryState,
+  fallbackState:
     DataTableServerQueryState,
   sortingMap:
     Readonly<Record<string, string>>,
@@ -716,16 +731,38 @@ function createEnvelope(
   limits:
     ResolvedDataTableQueryUrlLimits,
 ): DataTableQueryUrlEnvelope {
+  const requestedPage =
+    state.pagination.pageIndex +
+    1;
+
+  const page =
+    isBoundedPositiveInteger(
+      requestedPage,
+      limits.maxPage,
+    )
+      ? requestedPage
+      : fallbackState.pagination.pageIndex +
+        1;
+
+  const pageSize =
+    isAllowedPageSize(
+      state.pagination.pageSize,
+      limits,
+    )
+      ? state.pagination.pageSize
+      : fallbackState.pagination.pageSize;
+
+  const search =
+    state.globalFilter.length <=
+    limits.maxSearchLength
+      ? state.globalFilter
+      : fallbackState.globalFilter;
+
   return {
     version:
       DATA_TABLE_QUERY_URL_STATE_VERSION,
-    page:
-      state.pagination
-        .pageIndex +
-      1,
-    pageSize:
-      state.pagination
-        .pageSize,
+    page,
+    pageSize,
     sorting:
       serializeSorting(
         state.sorting,
@@ -737,14 +774,7 @@ function createEnvelope(
         filteringMap,
         limits,
       ),
-    search:
-      state.globalFilter.length <=
-      limits.maxSearchLength
-        ? state.globalFilter
-        : canonicalizeSearchFallback(
-            state.globalFilter,
-            limits,
-          ),
+    search,
   };
 }
 
@@ -841,6 +871,7 @@ export function createDataTableQueryUrlCodec(
   const defaultEnvelope =
     createEnvelope(
       canonicalDefault,
+      canonicalDefault,
       sortingMap,
       filteringByColumn,
       limits,
@@ -884,6 +915,7 @@ export function createDataTableQueryUrlCodec(
           keys.sorting,
         ),
         reverseSorting,
+        limits,
       );
 
     const filters =
@@ -970,6 +1002,7 @@ export function createDataTableQueryUrlCodec(
     const envelope =
       createEnvelope(
         state,
+        canonicalDefault,
         sortingMap,
         filteringByColumn,
         limits,
