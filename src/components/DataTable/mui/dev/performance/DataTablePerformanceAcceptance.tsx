@@ -10,6 +10,7 @@ import {
 } from "react";
 import type {
   ProfilerOnRenderCallback,
+  RefObject,
 } from "react";
 
 import {
@@ -33,6 +34,9 @@ import type {
   DataTableCardConfig,
   DataTableDisplayMode,
 } from "../../presentation";
+import {
+  dataTableClasses,
+} from "../../styles";
 import {
   createMuiDataTableColumnHelper,
   useMuiDataTable,
@@ -346,7 +350,7 @@ export interface PerformanceTableProps {
   readonly displayMode: DataTableDisplayMode;
   readonly onProfile: ProfilerOnRenderCallback;
   readonly surfaceRef:
-    React.RefObject<HTMLElement | null>;
+    RefObject<HTMLElement | null>;
 }
 
 const PerformanceTable =
@@ -463,21 +467,23 @@ const PerformanceTable =
 
       const toggleSort =
         (): void => {
-          const current =
-            table.state
-              .sorting[0];
-
-          table.setSorting([
-            {
-              id:
-                "name",
-              desc:
-                current?.id ===
+          table.setSorting(
+            (
+              current,
+            ) => [
+              {
+                id:
+                  "name",
+                desc:
+                  current[0]
+                    ?.id ===
                   "name"
-                  ? !current.desc
-                  : false,
-            },
-          ]);
+                    ? !current[0]
+                        .desc
+                    : false,
+              },
+            ],
+          );
         };
 
       return (
@@ -678,7 +684,7 @@ export function DataTablePerformanceAcceptance() {
             ).length,
           cards:
             root.querySelectorAll(
-              '[data-row-id]',
+              `.${dataTableClasses.cardItem}`,
             ).length,
         });
       },
