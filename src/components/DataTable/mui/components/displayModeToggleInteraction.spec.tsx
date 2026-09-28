@@ -9,6 +9,9 @@ import {
 } from "@testing-library/react";
 
 import {
+  createSelectionColumn,
+} from "../columns/selection";
+import {
   dataTableClasses,
 } from "../styles";
 import {
@@ -29,6 +32,10 @@ const helper =
 
 const columns =
   helper.columns([
+    createSelectionColumn<Row>({
+      size:
+        48,
+    }),
     helper.accessor(
       "name",
       {
