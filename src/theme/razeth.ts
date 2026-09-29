@@ -868,11 +868,9 @@ const defaultThemeInvariants = {
          * Card presentation — premium neumorphic surface
          * ==============================================================
          *
-         * Reuses the app's existing soft-UI shadow tokens
-         * (customShadows.neumorphic / inset / circleWell) so light/dark
-         * parity comes for free through CSS variables, matching the
-         * treatment already used for the auth divider, social buttons,
-         * day/night switch and avatar frame.
+         * Uses dedicated DataTable shell and inset shadows so the dark
+         * surfaces stay crisp while retaining the application's soft-UI
+         * design language. Chip accents retain the shared theme treatment.
          */
         cardContainer: ({ theme }: { theme: Theme }) => ({
           gap: theme.spacing(2.5),
@@ -883,7 +881,7 @@ const defaultThemeInvariants = {
           border: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.06)}`,
           borderRadius: 20,
           backgroundColor: theme.vars.palette.background.paper,
-          boxShadow: theme.vars.palette.customShadows.neumorphic,
+          boxShadow: theme.vars.palette.customShadows.dataTableCard,
           transition: theme.transitions.create(
             ["transform", "box-shadow", "background-color"],
             { duration: theme.transitions.duration.short },
@@ -896,14 +894,14 @@ const defaultThemeInvariants = {
 
           "&:active": {
             transform: "translateY(-1px) scale(0.995)",
-            boxShadow: theme.vars.palette.customShadows.inset,
+            boxShadow: theme.vars.palette.customShadows.dataTableInset,
           },
 
           '&[data-selected="true"]': {
             outline: `2px solid ${theme.vars.palette.primary.main}`,
             outlineOffset: 0,
             backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.04),
-            boxShadow: `${theme.vars.palette.customShadows.inset}, 0 0 0 4px ${theme.alpha(
+            boxShadow: `${theme.vars.palette.customShadows.dataTableInset}, 0 0 0 4px ${theme.alpha(
               theme.vars.palette.primary.main,
               0.14,
             )}`,

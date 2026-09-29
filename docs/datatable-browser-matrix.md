@@ -390,6 +390,97 @@ Completion:
 
 ### Visual parity follow-up — 2026-09-29
 
+Continuation checkpoint (same Matrix A): checkout `6060a85` includes the
+requested 5px filled filters, dedicated card/inset shadow tokens, and removal
+of the TranslationValue panel width cap. The latest visual commit comments
+out the card-shell override; its rendered appearance still needs inspection.
+All visual rows below remain PENDING RECHECK.
+
+Latest-master browser observation: recovered the existing authenticated run
+after a development-server restart. In dark card view (1265px screenshot),
+selected `navigation_dashboard` has a clear red outline; row Edit/Delete
+appear before its inset detail. Add Translation and the first value's
+Edit/Delete are visible; text wraps normally rather than into single-character
+columns. Full detail scrolling, light mode and narrow widths are still pending.
+Typecheck passed after regenerating the feature map (line-ending-only
+normalization; no semantic Git diff). Full Jest is in progress.
+
+Scrolling the expanded dark card exposed the second (Khmer) value's Edit/Delete
+controls fully, with no horizontal scrolling needed. Desktop card detail
+action visibility and normal text wrapping are verified; light/narrow checks
+remain pending.
+
+Latest-master desktop table screenshot: expanded `navigation_dashboard`
+detail spans the table width; Add Translation and both locales' Edit/Delete
+are visible without horizontal scrolling. Key/Description/Category/Locale
+filters are filled, compact and vertically aligned. Expansion header displays
+only a compact double-chevron (no Details text); the row remains expanded
+after switching from card view. Accessibility inspection confirms the
+`Expand all rows unavailable` button is disabled; individual expansion works.
+The expansion-header check passes on latest master.
+
+Automated recheck: typecheck PASS; full Jest PASS (93 suites, 489 tests).
+Focused DataTable Jest also passed (88 suites, 470 tests). Inspection then
+found the active cardItem override still referenced global shadows despite
+the dedicated tokens being defined. The shell and selected/pressed states
+now use dataTableCard/dataTableInset; layout and shared chip accents are
+preserved. Card shadow appearance is PENDING RECHECK after this final edit,
+and the required automated commands are being rerun on the final state.
+Final-theme dark card screenshot confirms distinct shell elevation, clear
+selected outline and clean inset detail without collapsed text or displaced
+row actions. Light-mode verification is currently blocked: activating the
+navigation account-menu theme checkbox closes the popover without changing
+the dark appearance (keyboard, accessible click and visible-coordinate click
+attempts). This is not recorded as a light-mode PASS.
+At a 390×844 viewport (375px content width excluding scrollbar), the card
+remains a single readable column, selected outline is clear, and row actions
+precede the inset detail. Document scrollWidth equals clientWidth (375px),
+so there is no document-level horizontal overflow. Lower detail action
+scrolling is being checked separately.
+Mobile card scrolling exposes Add Translation and both locales' Edit/Delete
+fully within the card; all remain readable without horizontal scrolling.
+Mobile card action visibility passes in dark mode.
+Mobile table screenshot also shows Add Translation and both English/Khmer
+Edit/Delete within the detail pane at 390×844. The data row uses horizontal
+table scrolling/pinned utility columns, but the detail actions remain
+accessible without horizontal scrolling. Mobile table action visibility passes.
+Latest-master runtime recheck: named provider sends page 2 / size 10 through
+POST `/api/v1/i18n/keys/query`, returning HTTP 200. After the theme HMR reload,
+a table-to-card switch held wire-request count at 4→4 and results at
+11–20 of 31. Initial development/remount pairs are separate from mode changes.
+Temporary viewport override was reset after mobile checks.
+Latest card search `auth` resets page 2 to page 1, preserves page size 10,
+updates the semantic URL, and renders 1–5 of 5 matching keys.
+History setup note: editing search in this recovered tab replaced its initial
+history entry; Back reached about:blank rather than a prior query. This is
+not evidence of result-restoration failure. The paced query-history check
+requires two explicitly established URL entries, as in the earlier table run.
+Explicit page-2 URL entry renders 11–20 of 31 in card mode at size 10.
+
+Runtime evidence captured earlier in this same run, before PR #32, at
+`4cbec523d4226edbd5659d51e244cbd71b3d7132`:
+
+- Card Key `email`: 2 matching keys; Description `Password field`: 1;
+  Category `auth`: 5. English locale: 30 of 31 keys; combining English with
+  `sequence_test` excludes the untranslated key (0 results).
+- Card Key ascending and descending produced opposite ordered auth lists;
+  clear sorting restored an empty sorting request.
+- Independent table page size 25 to 10 produced 1–10 of 31; next page
+  produced 11–20 of 31.
+- Paced table history restored page 2 / size 10 / 11–20 of 31 on Back and
+  `auth` / 1–5 of 5 on Forward. Card history remains to be finished.
+- `[matrix-a]` captured `translationKeyStandardApi.getList`, POST
+  `/api/v1/i18n/keys/query`, and HTTP 200. Search body used
+  `search: { term: "auth" }` without client-selected search fields.
+- TranslationKey table/card switches held wire-request count at 2;
+  Document table/card/table held getList count at 2. Document Refresh
+  increased count exactly once, from 2 to 3. The two initial development
+  calls are recorded separately from switch-triggered calls.
+
+These observations do not certify the new visual surfaces. Temporary runtime
+logging remains until the remaining runtime checks are captured. Matrix B
+and the virtualization decision remain gated by Matrix A.
+
 Implementation branch / PR:
 
 - branch: `chatgpt/datatable-visual-parity-2-2-2`
