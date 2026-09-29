@@ -49,23 +49,38 @@ export interface DataTableColumnFilterUiConfig {
 }
 
 /**
+ * Shared MUI presentation contract for DataTable leaf filter editors.
+ *
+ * These props deliberately flow through useThemeProps(), allowing:
+ *
+ *   theme.components.RazethDataTable*Filter.defaultProps
+ *
+ * to choose compact/filled table-filter presentation independently from
+ * application form fields.
+ */
+export interface DataTableFilterPresentationProps {
+  readonly size?: "small" | "medium";
+  readonly variant?: "standard" | "outlined" | "filled";
+  readonly margin?: "none" | "dense" | "normal";
+  readonly disabled?: boolean;
+  readonly className?: string;
+  readonly sx?: SxProps<Theme>;
+}
+
+/**
  * Shared leaf-control contracts.
  *
  * Components and theme registration import these types directly from this
  * module, so the theme contract does not depend on React implementations.
  */
-export interface DataTableTextFilterProps {
+export interface DataTableTextFilterProps extends DataTableFilterPresentationProps {
   readonly value: string;
   readonly label: string;
-  readonly size?: "small" | "medium";
-  readonly disabled?: boolean;
-  readonly className?: string;
-  readonly sx?: SxProps<Theme>;
   readonly onChange: (value: string) => void;
   readonly onClear: () => void;
 }
 
-export interface DataTableSelectFilterProps {
+export interface DataTableSelectFilterProps extends DataTableFilterPresentationProps {
   readonly loading?: boolean;
   /** Safe presentation text supplied by the caller; never a raw transport error. */
   readonly errorMessage?: string;
@@ -80,35 +95,23 @@ export interface DataTableSelectFilterProps {
   readonly onClear: () => void;
 }
 
-export interface DataTableBooleanFilterProps {
+export interface DataTableBooleanFilterProps extends DataTableFilterPresentationProps {
   readonly value: boolean | undefined;
   readonly label: string;
-  readonly size?: "small" | "medium";
-  readonly disabled?: boolean;
-  readonly className?: string;
-  readonly sx?: SxProps<Theme>;
   readonly onChange: (value: boolean) => void;
   readonly onClear: () => void;
 }
 
-export interface DataTableNumberFilterProps {
+export interface DataTableNumberFilterProps extends DataTableFilterPresentationProps {
   readonly value: number | undefined;
   readonly label: string;
-  readonly size?: "small" | "medium";
-  readonly disabled?: boolean;
-  readonly className?: string;
-  readonly sx?: SxProps<Theme>;
   readonly onChange: (value: number) => void;
   readonly onClear: () => void;
 }
 
-export interface DataTableNumberRangeFilterProps {
+export interface DataTableNumberRangeFilterProps extends DataTableFilterPresentationProps {
   readonly value: DataTableNumberRangeValue;
   readonly label: string;
-  readonly size?: "small" | "medium";
-  readonly disabled?: boolean;
-  readonly className?: string;
-  readonly sx?: SxProps<Theme>;
   readonly onChange: (value: DataTableNumberRangeValue) => void;
   readonly onClear: () => void;
 }
