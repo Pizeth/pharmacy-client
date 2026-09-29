@@ -149,6 +149,10 @@ async function requestJson(
   // const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
   // const url = `${baseUrl}${cleanEndpoint}`;
 
+  // Temporary Matrix A runtime evidence; removed after acceptance capture.
+  if (process.env.NODE_ENV === "development" && endpoint.endsWith("/keys/query")) {
+    console.info("[matrix-a] wire-request " + JSON.stringify({ endpoint, method: init.method, body: init.body }));
+  }
   const response = await fetch(createApiUrl(endpoint), {
     ...init,
 
@@ -169,6 +173,9 @@ async function requestJson(
   //   ? await response.json()
   //   : undefined;
 
+  if (process.env.NODE_ENV === "development" && endpoint.endsWith("/keys/query")) {
+    console.info("[matrix-a] wire-response " + JSON.stringify({ endpoint, status: response.status }));
+  }
   const payload = await readJsonPayload(response);
 
   if (!response.ok) {

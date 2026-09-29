@@ -253,6 +253,10 @@ export function createTranslationKeyRefineDataProvider(): DataProvider {
           params,
         );
 
+      // Temporary Matrix A runtime evidence; removed after acceptance capture.
+      if (process.env.NODE_ENV === "development") {
+        console.info("[matrix-a] translationKeyStandardApi.getList " + JSON.stringify(request));
+      }
       const response =
         await queryTranslationKeys(
           request,

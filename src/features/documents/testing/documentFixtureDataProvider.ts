@@ -185,6 +185,10 @@ export function createDocumentFixtureDataProvider(
   const getList = async (
     params: GetListParams,
   ): Promise<GetListResponse<DocumentRecord>> => {
+    // Temporary Matrix A runtime evidence; removed after acceptance capture.
+    if (process.env.NODE_ENV === "development") {
+      console.info("[matrix-a] document.getList " + JSON.stringify({ resource: params.resource, pagination: params.pagination, filters: params.filters, sorters: params.sorters }));
+    }
     if (params.resource !== DOCUMENT_REFINE_RESOURCE) {
       throw new Error(
         `Document fixture provider cannot serve resource "${params.resource}".`,
