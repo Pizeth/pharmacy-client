@@ -32,6 +32,12 @@ declare module "@mui/material/styles" {
       neumorphic: string;
       inset: string;
       circleWell: string;
+      /**
+       * Data-dense surfaces need crisper elevation than the broader
+       * application neumorphism language, especially in dark mode.
+       */
+      dataTableCard: string;
+      dataTableInset: string;
     };
     dynamic: {
       background: string;
@@ -47,6 +53,8 @@ declare module "@mui/material/styles" {
       neumorphic: string;
       inset: string;
       circleWell: string;
+      dataTableCard: string;
+      dataTableInset: string;
     };
     dynamic?: {
       background: string;

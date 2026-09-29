@@ -349,6 +349,7 @@ const standardizedFormComponents = {
         margin: 0,
         "& .MuiFilledInput-root": {
           minHeight: 36,
+          borderRadius: 5,
           backgroundColor: theme.alpha(
             theme.vars.palette.text.primary,
             0.035,
@@ -382,6 +383,7 @@ const standardizedFormComponents = {
         margin: 0,
         "& .MuiFilledInput-root": {
           minHeight: 36,
+          borderRadius: 5,
           backgroundColor: theme.alpha(
             theme.vars.palette.text.primary,
             0.035,
@@ -410,6 +412,7 @@ const standardizedFormComponents = {
         gap: theme.spacing(0.5),
         "& .MuiFilledInput-root": {
           minHeight: 36,
+          borderRadius: 5,
           backgroundColor: theme.alpha(
             theme.vars.palette.text.primary,
             0.035,
@@ -437,6 +440,7 @@ const standardizedFormComponents = {
         margin: 0,
         "& .MuiFilledInput-root": {
           minHeight: 36,
+          borderRadius: 5,
           backgroundColor: theme.alpha(
             theme.vars.palette.text.primary,
             0.035,
@@ -464,6 +468,7 @@ const standardizedFormComponents = {
         margin: 0,
         "& .MuiFilledInput-root": {
           minHeight: 36,
+          borderRadius: 5,
           backgroundColor: theme.alpha(
             theme.vars.palette.text.primary,
             0.035,
@@ -575,7 +580,7 @@ const standardizedFormComponents = {
     styleOverrides: {
       root: ({ theme }: { theme: Theme }) => ({
         width: "100%",
-        maxWidth: 960,
+        maxWidth: "none",
         boxSizing: "border-box",
         padding: theme.spacing(1.5, 2),
         minWidth: 0,
@@ -748,7 +753,7 @@ const defaultThemeInvariants = {
             theme.vars.palette.background.paper,
             0.96,
           ),
-          boxShadow: theme.vars.palette.customShadows.neumorphic,
+          boxShadow: theme.vars.palette.customShadows.dataTableCard,
           transition: theme.transitions.create(
             ["transform", "box-shadow", "background-color"],
             { duration: theme.transitions.duration.shortest },
@@ -802,7 +807,7 @@ const defaultThemeInvariants = {
             theme.vars.palette.background.default,
             0.35,
           ),
-          boxShadow: theme.vars.palette.customShadows.inset,
+          boxShadow: theme.vars.palette.customShadows.dataTableInset,
         }),
 
         expandRowButton: ({ theme }: { theme: Theme }) => ({
@@ -1018,6 +1023,10 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       customShadows: {
         neumorphic: `-7px -7px 15px rgba(255, 255, 255, 1), 7px 7px 15px rgba(174, 174, 192, 0.4)`,
         inset: `inset -5px -5px 10px rgba(255, 255, 255, 1), inset 5px 5px 10px rgba(174, 174, 192, 0.4)`,
+        dataTableCard:
+          "0 8px 20px rgba(61, 76, 105, 0.18), 0 1px 2px rgba(255, 255, 255, 0.9)",
+        dataTableInset:
+          "inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 0 0 1px rgba(104, 120, 148, 0.12), inset 0 6px 14px rgba(94, 109, 137, 0.08)",
         circleWell:
           // "inset 6px 6px 15px rgba(163, 177, 198, 0.5), inset -6px -6px 15px rgba(255, 255, 255, 1)",
           "-7px -7px 15px rgba(255,255,255,1), 7px 7px 15px rgba(174, 174, 192, 0.75)",
@@ -1117,6 +1126,10 @@ export const RazethBaseTheme = (): RaThemeOptions =>
               "-7px -7px 15px rgba(255, 255, 255, 0.05), 7px 7px 15px rgba(0, 0, 0, 0.5)",
             inset:
               "inset -5px -5px 10px rgba(255, 255, 255, 0.05), inset 5px 5px 10px rgba(0, 0, 0, 0.5)",
+            dataTableCard:
+              "0 10px 24px rgba(0, 0, 0, 0.38), 0 1px 0 rgba(255, 255, 255, 0.05)",
+            dataTableInset:
+              "inset 0 1px 0 rgba(255, 255, 255, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 8px 18px rgba(0, 0, 0, 0.20)",
             circleWell:
               // "inset 6px 6px 15px rgba(0, 0, 0, 0.6), inset -6px -6px 15px rgba(255, 255, 255, 0.05)",
               "-7px -7px 15px rgba(255,255,255,0.125), 7px 7px 15px rgba(0, 0, 0, 0.75)",
@@ -1155,6 +1168,10 @@ export const RazethBaseTheme = (): RaThemeOptions =>
               "-7px -7px 15px rgba(255, 255, 255, 1), 7px 7px 15px rgba(174, 174, 192, 0.4)",
             inset:
               "inset -5px -5px 10px rgba(255, 255, 255, 1), inset 5px 5px 10px rgba(174, 174, 192, 0.4)",
+            dataTableCard:
+              "0 8px 20px rgba(61, 76, 105, 0.18), 0 1px 2px rgba(255, 255, 255, 0.9)",
+            dataTableInset:
+              "inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 0 0 1px rgba(104, 120, 148, 0.12), inset 0 6px 14px rgba(94, 109, 137, 0.08)",
             circleWell: `
               inset 7px 7px 15px rgba(0, 0, 0, 0.6), 
               inset -7px -7px 15px rgba(255, 255, 255, 0.05)

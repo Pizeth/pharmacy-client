@@ -409,10 +409,11 @@ Changes requiring focused recheck:
 | --- | :---: | :---: | --- |
 | Expanded TranslationValue Add/Edit/Delete controls remain visible at desktop width | PENDING RECHECK | PENDING RECHECK | Detail layout is now intrinsic-width/two-column rather than viewport-breakpoint dependent. |
 | Row action footer remains visible when card detail is expanded | N/A | PENDING RECHECK | Generic card renderer now places actions before expanded detail content. |
-| Card visual hierarchy matches application neumorphic language | N/A | PENDING RECHECK | Uses existing `customShadows.neumorphic` / `customShadows.inset` through DataTable theme slots. Verify light and dark schemes. |
-| Column filters use compact filled presentation | PENDING RECHECK | PENDING RECHECK | DataTable filter component families now theme `variant="filled"`, `margin="none"`, `size="small"`; table filter-cell padding was tightened. |
+| Card visual hierarchy matches application neumorphic language | N/A | PENDING RECHECK | Card/detail surfaces now use dedicated `customShadows.dataTableCard` / `customShadows.dataTableInset` tokens so dark mode can stay crisp without changing global neumorphism. Verify light and dark schemes. |
+| Column filters use compact filled presentation | PENDING RECHECK | PENDING RECHECK | DataTable filter component families use `variant="filled"`, `margin="none"`, `size="small"`; filled roots now use a compact 5px radius rather than application-form pill geometry. |
 | Expansion header has no visible "Details" text | PENDING RECHECK | N/A | TranslationKey uses a 44px disabled double-chevron expand-all affordance while preserving per-row expansion. |
 | Narrow/mobile TranslationValue actions remain usable | PENDING RECHECK | PENDING RECHECK | Recheck the prior mobile behavior after removing viewport-dependent action placement. |
+| TranslationValue detail panel consumes the complete expanded table row | PENDING RECHECK | N/A | Removed the resource-level 960px width cap; the generic detail row/cell already spans all visible columns. |
 | Existing CRUD/filter/sort/persistence behavior remains intact | PENDING RECHECK | PENDING RECHECK | No semantic query, Refine, transport, persistence, or server-state code changed in this follow-up. |
 
 Do not start Matrix B from automated CI alone. Complete the pending Matrix A
