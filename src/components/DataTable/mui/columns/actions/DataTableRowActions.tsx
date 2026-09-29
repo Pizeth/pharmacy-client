@@ -15,10 +15,11 @@ const RowActionsRoot = styled(Stack, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "RowActions",
   overridesResolver: (_props, styles) => styles.rowActions,
-})({
+})(({ theme }) => ({
   width: "100%",
   minWidth: 0,
-});
+  gap: theme.spacing(1.75),
+}));
 
 export interface DataTableRowActionsProps<TData extends RowData> {
   /**

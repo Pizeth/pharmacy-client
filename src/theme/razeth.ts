@@ -350,15 +350,9 @@ const standardizedFormComponents = {
         "& .MuiFilledInput-root": {
           minHeight: 36,
           borderRadius: 5,
-          backgroundColor: theme.alpha(
-            theme.vars.palette.text.primary,
-            0.035,
-          ),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.035),
           "&:hover, &.Mui-focused": {
-            backgroundColor: theme.alpha(
-              theme.vars.palette.text.primary,
-              0.06,
-            ),
+            backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.06),
           },
         },
         "& .MuiFilledInput-input": {
@@ -384,10 +378,7 @@ const standardizedFormComponents = {
         "& .MuiFilledInput-root": {
           minHeight: 36,
           borderRadius: 5,
-          backgroundColor: theme.alpha(
-            theme.vars.palette.text.primary,
-            0.035,
-          ),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.035),
         },
         "& .MuiFilledInput-input": {
           paddingTop: theme.spacing(1.75),
@@ -413,10 +404,7 @@ const standardizedFormComponents = {
         "& .MuiFilledInput-root": {
           minHeight: 36,
           borderRadius: 5,
-          backgroundColor: theme.alpha(
-            theme.vars.palette.text.primary,
-            0.035,
-          ),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.035),
         },
         "& .MuiFilledInput-input": {
           paddingTop: theme.spacing(1.75),
@@ -441,10 +429,7 @@ const standardizedFormComponents = {
         "& .MuiFilledInput-root": {
           minHeight: 36,
           borderRadius: 5,
-          backgroundColor: theme.alpha(
-            theme.vars.palette.text.primary,
-            0.035,
-          ),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.035),
         },
         "& .MuiSelect-select": {
           paddingTop: theme.spacing(1.75),
@@ -469,15 +454,9 @@ const standardizedFormComponents = {
         "& .MuiFilledInput-root": {
           minHeight: 36,
           borderRadius: 5,
-          backgroundColor: theme.alpha(
-            theme.vars.palette.text.primary,
-            0.035,
-          ),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.035),
           "&:hover, &.Mui-focused": {
-            backgroundColor: theme.alpha(
-              theme.vars.palette.text.primary,
-              0.06,
-            ),
+            backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.06),
           },
         },
         "& .MuiSelect-select": {
@@ -627,10 +606,7 @@ const standardizedFormComponents = {
         backgroundImage: "none",
         backgroundColor: "transparent",
         "&:hover": {
-          backgroundColor: theme.alpha(
-            theme.vars.palette.text.primary,
-            0.06,
-          ),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.06),
         },
       }),
 
@@ -661,7 +637,7 @@ const standardizedFormComponents = {
         flexWrap: "wrap",
         justifyContent: "flex-start",
         alignItems: "center",
-        gap: theme.spacing(0.5),
+        gap: theme.spacing(1.25),
         minWidth: 0,
       }),
     },
@@ -737,66 +713,57 @@ const defaultThemeInvariants = {
           ),
         }),
 
-        cardContainer: ({ theme }: { theme: Theme }) => ({
-          gap: theme.spacing(2.25),
-          padding: theme.spacing(2.25),
-        }),
+        // cardContainer: ({ theme }: { theme: Theme }) => ({
+        //   gap: theme.spacing(2.25),
+        //   padding: theme.spacing(2.25),
+        // }),
 
-        cardItem: ({ theme }: { theme: Theme }) => ({
-          border: `1px solid ${theme.alpha(
-            theme.vars.palette.text.primary,
-            0.06,
-          )}`,
-          borderRadius: theme.spacing(2),
-          backgroundImage: "none",
-          backgroundColor: theme.alpha(
-            theme.vars.palette.background.paper,
-            0.96,
-          ),
-          boxShadow: theme.vars.palette.customShadows.dataTableCard,
-          transition: theme.transitions.create(
-            ["transform", "box-shadow", "background-color"],
-            { duration: theme.transitions.duration.shortest },
-          ),
-          "&:hover": {
-            transform: "translateY(-1px)",
-          },
-          '&[data-selected="true"]': {
-            backgroundColor: theme.alpha(
-              theme.vars.palette.primary.main,
-              0.08,
-            ),
-          },
-        }),
+        // cardItem: ({ theme }: { theme: Theme }) => ({
+        //   border: `1px solid ${theme.alpha(
+        //     theme.vars.palette.text.primary,
+        //     0.06,
+        //   )}`,
+        //   borderRadius: theme.spacing(2),
+        //   backgroundImage: "none",
+        //   backgroundColor: theme.alpha(
+        //     theme.vars.palette.background.paper,
+        //     0.96,
+        //   ),
+        //   boxShadow: theme.vars.palette.customShadows.dataTableCard,
+        //   transition: theme.transitions.create(
+        //     ["transform", "box-shadow", "background-color"],
+        //     { duration: theme.transitions.duration.shortest },
+        //   ),
+        //   "&:hover": {
+        //     transform: "translateY(-1px)",
+        //   },
+        //   '&[data-selected="true"]': {
+        //     backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.08),
+        //   },
+        // }),
 
-        cardHeader: ({ theme }: { theme: Theme }) => ({
-          padding: theme.spacing(1.25, 1.5),
-          backgroundColor: theme.alpha(
-            theme.vars.palette.text.primary,
-            0.025,
-          ),
-        }),
+        // cardHeader: ({ theme }: { theme: Theme }) => ({
+        //   padding: theme.spacing(1.25, 1.5),
+        //   backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.025),
+        // }),
 
-        cardBody: ({ theme }: { theme: Theme }) => ({
-          padding: theme.spacing(1.5),
-        }),
+        // cardBody: ({ theme }: { theme: Theme }) => ({
+        //   padding: theme.spacing(1.5),
+        // }),
 
-        cardMetadata: ({ theme }: { theme: Theme }) => ({
-          padding: theme.spacing(0, 1.5, 1.25),
-        }),
+        // cardMetadata: ({ theme }: { theme: Theme }) => ({
+        //   padding: theme.spacing(0, 1.5, 1.25),
+        // }),
 
-        cardExpansion: ({ theme }: { theme: Theme }) => ({
-          padding: theme.spacing(0, 1.25, 0.75),
-        }),
+        // cardExpansion: ({ theme }: { theme: Theme }) => ({
+        //   padding: theme.spacing(0, 1.25, 0.75),
+        // }),
 
-        cardActions: ({ theme }: { theme: Theme }) => ({
-          minHeight: 40,
-          padding: theme.spacing(0.75, 1.25),
-          backgroundColor: theme.alpha(
-            theme.vars.palette.text.primary,
-            0.025,
-          ),
-        }),
+        // cardActions: ({ theme }: { theme: Theme }) => ({
+        //   minHeight: 40,
+        //   padding: theme.spacing(0.75, 1.25),
+        //   backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.025),
+        // }),
 
         cardDetail: ({ theme }: { theme: Theme }) => ({
           margin: theme.spacing(0, 1.25, 1.25),
@@ -815,10 +782,7 @@ const defaultThemeInvariants = {
           color: theme.vars.palette.text.primary,
           "&:hover": {
             color: theme.vars.palette.primary.main,
-            backgroundColor: theme.alpha(
-              theme.vars.palette.primary.main,
-              0.12,
-            ),
+            backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.12),
           },
         }),
 
@@ -827,10 +791,7 @@ const defaultThemeInvariants = {
           color: theme.vars.palette.text.primary,
           "&:hover": {
             color: theme.vars.palette.primary.main,
-            backgroundColor: theme.alpha(
-              theme.vars.palette.primary.main,
-              0.12,
-            ),
+            backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.12),
           },
         }),
 
@@ -900,6 +861,153 @@ const defaultThemeInvariants = {
           flexWrap: "wrap",
           justifyContent: "flex-end",
           rowGap: theme.spacing(0.5),
+        }),
+
+        /**
+         * ==============================================================
+         * Card presentation — premium neumorphic surface
+         * ==============================================================
+         *
+         * Reuses the app's existing soft-UI shadow tokens
+         * (customShadows.neumorphic / inset / circleWell) so light/dark
+         * parity comes for free through CSS variables, matching the
+         * treatment already used for the auth divider, social buttons,
+         * day/night switch and avatar frame.
+         */
+        cardContainer: ({ theme }: { theme: Theme }) => ({
+          gap: theme.spacing(2.5),
+          padding: theme.spacing(2.5),
+        }),
+
+        cardItem: ({ theme }: { theme: Theme }) => ({
+          border: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.06)}`,
+          borderRadius: 20,
+          backgroundColor: theme.vars.palette.background.paper,
+          boxShadow: theme.vars.palette.customShadows.neumorphic,
+          transition: theme.transitions.create(
+            ["transform", "box-shadow", "background-color"],
+            { duration: theme.transitions.duration.short },
+          ),
+          willChange: "transform",
+
+          "&:hover": {
+            transform: "translateY(-3px)",
+          },
+
+          "&:active": {
+            transform: "translateY(-1px) scale(0.995)",
+            boxShadow: theme.vars.palette.customShadows.inset,
+          },
+
+          '&[data-selected="true"]': {
+            outline: `2px solid ${theme.vars.palette.primary.main}`,
+            outlineOffset: 0,
+            backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.04),
+            boxShadow: `${theme.vars.palette.customShadows.inset}, 0 0 0 4px ${theme.alpha(
+              theme.vars.palette.primary.main,
+              0.14,
+            )}`,
+          },
+
+          "&:focus-visible": {
+            outline: `2px solid ${theme.vars.palette.primary.main}`,
+            outlineOffset: 2,
+          },
+
+          /**
+           * Chips (locale tags, translation-count badges) read as soft
+           * engraved pills rather than flat solid swatches.
+           */
+          "& .MuiChip-root": {
+            fontWeight: 600,
+            letterSpacing: 0.2,
+            borderRadius: 999,
+            boxShadow: theme.vars.palette.customShadows.circleWell,
+          },
+          "& .MuiChip-outlined": {
+            backgroundColor: theme.vars.palette.background.paper,
+            borderColor: theme.alpha(theme.vars.palette.text.primary, 0.12),
+          },
+        }),
+
+        cardHeader: ({ theme }: { theme: Theme }) => ({
+          alignItems: "center",
+          gap: theme.spacing(1),
+          padding: theme.spacing(1.75, 2, 1.25),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.025),
+          borderBottom: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.06)}`,
+        }),
+
+        cardSelection: {
+          display: "flex",
+          alignItems: "center",
+        },
+
+        cardBody: ({ theme }: { theme: Theme }) => ({
+          padding: theme.spacing(1.5, 2),
+          gap: theme.spacing(1),
+        }),
+
+        cardMetadata: ({ theme }: { theme: Theme }) => ({
+          display: "flex",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: theme.spacing(1),
+          padding: theme.spacing(0, 2, 1.5),
+          color: theme.vars.palette.text.secondary,
+        }),
+
+        cardExpansion: ({ theme }: { theme: Theme }) => ({
+          padding: theme.spacing(0, 1, 1),
+
+          "& .MuiIconButton-root": {
+            borderRadius: "50%",
+            backgroundColor: theme.vars.palette.background.paper,
+            boxShadow: theme.vars.palette.customShadows.circleWell,
+            transition: theme.transitions.create([
+              "box-shadow",
+              "transform",
+              "color",
+            ]),
+
+            "&:hover": {
+              color: theme.vars.palette.primary.main,
+              boxShadow: theme.vars.palette.customShadows.neumorphic,
+            },
+            "&:active": {
+              boxShadow: theme.vars.palette.customShadows.inset,
+              transform: "scale(0.92)",
+            },
+          },
+        }),
+
+        cardActions: ({ theme }: { theme: Theme }) => ({
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: theme.spacing(0.75),
+          padding: theme.spacing(1.25, 2, 1.75),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.025),
+          borderTop: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.06)}`,
+
+          "& .MuiIconButton-root": {
+            borderRadius: "50%",
+            backgroundColor: theme.vars.palette.background.paper,
+            boxShadow: theme.vars.palette.customShadows.circleWell,
+            transition: theme.transitions.create([
+              "box-shadow",
+              "transform",
+              "color",
+            ]),
+
+            "&:hover": {
+              color: theme.vars.palette.primary.main,
+              boxShadow: theme.vars.palette.customShadows.neumorphic,
+            },
+            "&:active": {
+              boxShadow: theme.vars.palette.customShadows.inset,
+              transform: "scale(0.92)",
+            },
+          },
         }),
       },
     },
