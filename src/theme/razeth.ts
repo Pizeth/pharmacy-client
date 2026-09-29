@@ -331,6 +331,167 @@ const standardizedFormComponents = {
 
   /**
    * ================================================================
+   * DataTable leaf filter presentation
+   * ================================================================
+   *
+   * Table filters are compact data-manipulation controls rather than full
+   * application forms. Keep their appearance independent from RazethTextField
+   * / RazethSelectField so form styling can evolve without changing tables.
+   */
+  RazethDataTableTextFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.035,
+          ),
+          "&:hover, &.Mui-focused": {
+            backgroundColor: theme.alpha(
+              theme.vars.palette.text.primary,
+              0.06,
+            ),
+          },
+        },
+        "& .MuiFilledInput-input": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableNumberFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.035,
+          ),
+        },
+        "& .MuiFilledInput-input": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableNumberRangeFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        gap: theme.spacing(0.5),
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.035,
+          ),
+        },
+        "& .MuiFilledInput-input": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableBooleanFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.035,
+          ),
+        },
+        "& .MuiSelect-select": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableSelectFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.035,
+          ),
+          "&:hover, &.Mui-focused": {
+            backgroundColor: theme.alpha(
+              theme.vars.palette.text.primary,
+              0.06,
+            ),
+          },
+        },
+        "& .MuiSelect-select": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+        "& .MuiFormHelperText-root": {
+          marginInline: 0,
+          marginTop: theme.spacing(0.25),
+        },
+      }),
+    },
+  },
+
+  /**
+   * ================================================================
    * TranslationKey create/edit form layout
    * ================================================================
    */
