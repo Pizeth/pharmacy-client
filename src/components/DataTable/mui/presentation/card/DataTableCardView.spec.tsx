@@ -181,6 +181,31 @@ describe("DataTable card presentation", () => {
       "aria-labelledby",
       expand.id,
     );
+
+    /**
+     * Expanded application content may be arbitrarily tall. Keep row commands
+     * before the detail region so expansion cannot push the command surface out
+     * of the visible card.
+     */
+    const cardItem = container.querySelector(
+      `.${dataTableClasses.cardItem}`,
+    );
+    const cardActions = cardItem?.querySelector(
+      `.${dataTableClasses.cardActions}`,
+    );
+    const cardDetail = cardItem?.querySelector(
+      `.${dataTableClasses.cardDetail}`,
+    );
+
+    expect(cardItem).not.toBeNull();
+    expect(cardActions).not.toBeNull();
+    expect(cardDetail).not.toBeNull();
+
+    const children = Array.from(cardItem?.children ?? []);
+
+    expect(children.indexOf(cardActions!)).toBeLessThan(
+      children.indexOf(cardDetail!),
+    );
   });
 
   it("resolves auto to table above the configured card breakpoint", () => {
