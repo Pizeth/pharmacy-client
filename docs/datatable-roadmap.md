@@ -1077,6 +1077,21 @@ check before this roadmap update. These items are **implemented, not browser
 certified**. Matrix A must explicitly recheck desktop/narrow table and card
 presentation before any PASS is recorded.
 
+A follow-up theme-only refinement after PR #32 further narrows the remaining
+visual acceptance surface:
+
+- compact filled table filters keep their existing MUI filled semantics but use
+  a 5px radius instead of inheriting pill-like form geometry,
+- DataTable cards/detail insets now use dedicated
+  `customShadows.dataTableCard` / `customShadows.dataTableInset` tokens so
+  dark-mode table surfaces can use crisper elevation without changing the
+  application's global neumorphism tokens,
+- the TranslationValue detail-panel resource root no longer caps itself at
+  960px, allowing the renderer-owned spanning detail row to use the full
+  available table width.
+
+These remain **browser recheck items**, not acceptance PASS claims.
+
 The remaining runtime-observability, pinning, history/rate-limit and final
 console checks also remain Matrix A gates.
 
