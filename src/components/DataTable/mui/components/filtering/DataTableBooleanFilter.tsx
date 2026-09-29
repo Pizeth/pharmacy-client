@@ -58,6 +58,8 @@ export function DataTableBooleanFilter(inProps: DataTableBooleanFilterProps) {
     value,
     label,
     size = "small",
+    variant,
+    margin,
     className,
     sx,
     onChange,
@@ -76,6 +78,8 @@ export function DataTableBooleanFilter(inProps: DataTableBooleanFilterProps) {
       className={className}
       fullWidth
       size={size}
+      variant={variant}
+      margin={margin}
       sx={sx}
     >
       <InputLabel id={labelId}>{label}</InputLabel>
