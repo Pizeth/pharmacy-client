@@ -5,7 +5,7 @@ import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../../styles";
 // src/components/DataTable/mui/components/toolbar/actions/DataTableFilterToggleButton.tsx
 
 import { styled, Badge, IconButton, Tooltip } from "@mui/material";
-import { FilterAltOutlined, FilterListOffOutlined } from "@mui/icons-material";
+import { FilterList, FilterListOffOutlined } from "@mui/icons-material";
 import { useDataTableFilterDisplay } from "../../../filter-display";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../../table";
@@ -55,9 +55,7 @@ export function DataTableFilterToggleButton<TData extends RowData>(
       {(columnFilters) => {
         const activeFilterCount = columnFilters.length;
 
-        const Icon = showColumnFilters
-          ? FilterListOffOutlined
-          : FilterAltOutlined;
+        const Icon = showColumnFilters ? FilterListOffOutlined : FilterList;
 
         return (
           <Tooltip title={showColumnFilters ? "Hide filters" : "Show filters"}>

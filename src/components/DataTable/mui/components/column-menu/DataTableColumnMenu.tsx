@@ -10,7 +10,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import {
-  FilterAltOutlined,
+  FilterList,
   FilterAltOffOutlined,
   PushPinOutlined,
   RestartAltOutlined,
@@ -100,7 +100,7 @@ export function DataTableColumnMenu<
                 }}
               >
                 <ListItemIcon>
-                  <FilterAltOutlined fontSize="small" />
+                  <FilterList fontSize="small" />
                 </ListItemIcon>
 
                 <ListItemText>

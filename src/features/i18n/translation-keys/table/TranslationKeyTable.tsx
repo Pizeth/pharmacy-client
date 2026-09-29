@@ -100,12 +100,8 @@ export interface TranslationKeyTableProps {
  * First real production resource using the custom TanStack v9 + MUI
  * DataTable stack.
  */
-export function TranslationKeyTable(
-  props: TranslationKeyTableProps = {},
-) {
-  const {
-    queryController,
-  } = props;
+export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
+  const { queryController } = props;
   const [createOpen, setCreateOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<TranslationKey | null>(
     null,
@@ -444,8 +440,7 @@ export function TranslationKeyTable(
           setDeletingTranslation(null);
         }}
         onDeleted={(translation) => {
-          const key =
-            deletingTranslation?.record.key;
+          const key = deletingTranslation?.record.key;
 
           setDeletingTranslation(null);
 
@@ -579,7 +574,7 @@ export function TranslationKeyTable(
             startContent: (
               <ResourceActionButton
                 variant="contained"
-                color="warning"
+                color="error"
                 startIcon={<AddRounded />}
                 onClick={() => {
                   setCreateOpen(true);
