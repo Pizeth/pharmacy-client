@@ -24,6 +24,12 @@ import {
 } from "@mui/material";
 import { he } from "date-fns/locale";
 import { BorderRight } from "@mui/icons-material";
+// Import configuration maps
+import {
+  ROUTE_NAV_MAP,
+  DEFAULT_NAV_ITEMS,
+  NavItemType,
+} from "@/configs/navConfig";
 // import { Link } from "@mui/material";
 
 const PREFIX = "RazethNav";
@@ -427,6 +433,22 @@ const Indicator = styled("div", {
   },
 }));
 
+// Helper function to resolve menu items based on route prefix matching
+const getDynamicNavItems = (pathname: string): NavItemType[] => {
+  // Find key that matches current route starting path (e.g. /mcsgs/hrm matches /mcsgs)
+  const matchedRoute = Object.keys(ROUTE_NAV_MAP).find((routePrefix) =>
+    pathname.startsWith(routePrefix),
+  );
+
+  return matchedRoute ? ROUTE_NAV_MAP[matchedRoute] : DEFAULT_NAV_ITEMS;
+};
+
+interface NavItemsProps {
+  variant?: "vertical" | "horizontal";
+  /** Optional override if you want to pass items directly from a parent component */
+  items?: NavItemType[];
+}
+
 const NAV_ITEMS = [
   {
     label: "ទំព័រដើម",
@@ -460,19 +482,26 @@ const NAV_ITEMS = [
   },
 ];
 
-export const NavItems = ({
-  variant = "vertical",
-}: {
-  variant?: "vertical" | "horizontal";
-}) => {
+export const NavItems = ({ variant = "vertical", items }: NavItemsProps) => {
   const pathname = usePathname();
-  const activeIndex = NAV_ITEMS.findIndex((item) => item.href === pathname);
+
+  // Pick items from props if passed, otherwise dynamically lookup based on pathname
+  const navItems = items ?? getDynamicNavItems(pathname);
+
+  // Exact or prefix matching for active item selection
+  const activeIndex = navItems.findIndex(
+    (item) =>
+      item.href === pathname ||
+      (item.href !== "/" && pathname.startsWith(item.href)),
+  );
+
+  // const activeIndex = NAV_ITEMS.findIndex((item) => item.href === pathname);
   const resolvedIndex = activeIndex === -1 ? 0 : activeIndex;
 
   return (
     <Root>
       <NavList variant={variant}>
-        {NAV_ITEMS.map(({ label, Icon, color, href }, i) => (
+        {navItems.map(({ label, Icon, color, href }, i) => (
           // variant === "vertical" ?
           <NavItem
             key={label}
