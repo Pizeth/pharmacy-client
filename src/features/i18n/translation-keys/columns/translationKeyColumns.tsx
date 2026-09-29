@@ -204,8 +204,7 @@ export function createTranslationKeyColumns(
     ...(enableTranslationDetails
       ? [
           createExpansionColumn<TranslationKey>({
-            header: "Details",
-            size: 72,
+            size: 44,
             enablePinning: true,
             showExpandAll: false,
           }),
