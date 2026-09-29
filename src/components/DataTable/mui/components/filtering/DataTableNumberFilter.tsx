@@ -39,6 +39,8 @@ export function DataTableNumberFilter(inProps: DataTableNumberFilterProps) {
     value,
     label,
     size = "small",
+    variant,
+    margin,
     className,
     sx,
     onChange,
@@ -51,6 +53,8 @@ export function DataTableNumberFilter(inProps: DataTableNumberFilterProps) {
       ownerState={{ ...props, size }}
       fullWidth
       size={size}
+      variant={variant}
+      margin={margin}
       type="number"
       label={label}
       value={value ?? ""}
