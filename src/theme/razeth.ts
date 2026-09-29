@@ -331,6 +331,167 @@ const standardizedFormComponents = {
 
   /**
    * ================================================================
+   * DataTable leaf filter presentation
+   * ================================================================
+   *
+   * Table filters are compact data-manipulation controls rather than full
+   * application forms. Keep their appearance independent from RazethTextField
+   * / RazethSelectField so form styling can evolve without changing tables.
+   */
+  RazethDataTableTextFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.035,
+          ),
+          "&:hover, &.Mui-focused": {
+            backgroundColor: theme.alpha(
+              theme.vars.palette.text.primary,
+              0.06,
+            ),
+          },
+        },
+        "& .MuiFilledInput-input": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableNumberFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.035,
+          ),
+        },
+        "& .MuiFilledInput-input": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableNumberRangeFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        gap: theme.spacing(0.5),
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.035,
+          ),
+        },
+        "& .MuiFilledInput-input": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableBooleanFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.035,
+          ),
+        },
+        "& .MuiSelect-select": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableSelectFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.035,
+          ),
+          "&:hover, &.Mui-focused": {
+            backgroundColor: theme.alpha(
+              theme.vars.palette.text.primary,
+              0.06,
+            ),
+          },
+        },
+        "& .MuiSelect-select": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+        "& .MuiFormHelperText-root": {
+          marginInline: 0,
+          marginTop: theme.spacing(0.25),
+        },
+      }),
+    },
+  },
+
+  /**
+   * ================================================================
    * TranslationKey create/edit form layout
    * ================================================================
    */
@@ -413,24 +574,28 @@ const standardizedFormComponents = {
   RazethTranslationValuesPanel: {
     styleOverrides: {
       root: ({ theme }: { theme: Theme }) => ({
+        width: "100%",
+        maxWidth: 960,
+        boxSizing: "border-box",
         padding: theme.spacing(1.5, 2),
         minWidth: 0,
         backgroundColor: theme.vars.palette.background.paper,
       }),
 
+      /**
+       * Detail content can be hosted by a narrow card while the browser itself
+       * is still desktop-sized. Keep this layout intrinsic to its own width
+       * rather than relying on viewport breakpoints.
+       */
       heading: ({ theme }: { theme: Theme }) => ({
         display: "grid",
-        gridTemplateColumns: "auto minmax(0, 1fr) auto",
+        gridTemplateColumns: "auto minmax(0, 1fr)",
         alignItems: "center",
         gap: theme.spacing(1.25),
         minWidth: 0,
         paddingBottom: theme.spacing(1.25),
         borderBottom: `1px solid ${theme.vars.palette.divider}`,
         color: theme.vars.palette.text.primary,
-
-        [theme.breakpoints.down("sm")]: {
-          gridTemplateColumns: "auto minmax(0, 1fr)",
-        },
       }),
 
       main: {
@@ -446,58 +611,38 @@ const standardizedFormComponents = {
 
       item: ({ theme }: { theme: Theme }) => ({
         display: "grid",
-        gridTemplateColumns:
-          "minmax(96px, auto) minmax(0, 1fr) minmax(170px, auto) auto",
+        gridTemplateColumns: "minmax(84px, auto) minmax(0, 1fr)",
         alignItems: "center",
-        gap: theme.spacing(2),
+        columnGap: theme.spacing(1.5),
+        rowGap: theme.spacing(0.75),
         padding: theme.spacing(1.25, 1),
         border: 0,
         borderBottom: `1px solid ${theme.vars.palette.divider}`,
         borderRadius: 0,
         backgroundImage: "none",
         backgroundColor: "transparent",
-
         "&:hover": {
           backgroundColor: theme.alpha(
             theme.vars.palette.text.primary,
             0.06,
           ),
         },
-
-        [theme.breakpoints.down("md")]: {
-          gridTemplateColumns: "auto minmax(0, 1fr) auto",
-        },
-
-        [theme.breakpoints.down("sm")]: {
-          gridTemplateColumns: "auto minmax(0, 1fr)",
-          gap: theme.spacing(0.75, 1.25),
-        },
       }),
 
       wrapper: {
         minWidth: 0,
-        // overflowWrap: "anywhere",
       },
 
       caption: ({ theme }: { theme: Theme }) => ({
+        gridColumn: "2",
         margin: 0,
         padding: 0,
-        whiteSpace: "nowrap",
+        whiteSpace: "normal",
         color: theme.vars.palette.text.secondary,
-
-        [theme.breakpoints.down("md")]: {
-          gridColumn: "2 / -1",
-        },
-
-        [theme.breakpoints.down("sm")]: {
-          gridColumn: "2",
-        },
-
         '&[data-empty="true"]': {
-          gridColumn: "auto",
+          gridColumn: "1 / -1",
           padding: theme.spacing(2),
           textAlign: "center",
-          whiteSpace: "normal",
         },
       }),
 
@@ -506,14 +651,13 @@ const standardizedFormComponents = {
       },
 
       button: ({ theme }: { theme: Theme }) => ({
+        gridColumn: "2",
         display: "flex",
-        justifyContent: "flex-end",
+        flexWrap: "wrap",
+        justifyContent: "flex-start",
         alignItems: "center",
-
-        [theme.breakpoints.down("sm")]: {
-          gridColumn: "2",
-          justifyContent: "flex-start",
-        },
+        gap: theme.spacing(0.5),
+        minWidth: 0,
       }),
     },
   },
@@ -586,6 +730,79 @@ const defaultThemeInvariants = {
             theme.vars.palette.primary.main,
             0.24,
           ),
+        }),
+
+        cardContainer: ({ theme }: { theme: Theme }) => ({
+          gap: theme.spacing(2.25),
+          padding: theme.spacing(2.25),
+        }),
+
+        cardItem: ({ theme }: { theme: Theme }) => ({
+          border: `1px solid ${theme.alpha(
+            theme.vars.palette.text.primary,
+            0.06,
+          )}`,
+          borderRadius: theme.spacing(2),
+          backgroundImage: "none",
+          backgroundColor: theme.alpha(
+            theme.vars.palette.background.paper,
+            0.96,
+          ),
+          boxShadow: theme.vars.palette.customShadows.neumorphic,
+          transition: theme.transitions.create(
+            ["transform", "box-shadow", "background-color"],
+            { duration: theme.transitions.duration.shortest },
+          ),
+          "&:hover": {
+            transform: "translateY(-1px)",
+          },
+          '&[data-selected="true"]': {
+            backgroundColor: theme.alpha(
+              theme.vars.palette.primary.main,
+              0.08,
+            ),
+          },
+        }),
+
+        cardHeader: ({ theme }: { theme: Theme }) => ({
+          padding: theme.spacing(1.25, 1.5),
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.025,
+          ),
+        }),
+
+        cardBody: ({ theme }: { theme: Theme }) => ({
+          padding: theme.spacing(1.5),
+        }),
+
+        cardMetadata: ({ theme }: { theme: Theme }) => ({
+          padding: theme.spacing(0, 1.5, 1.25),
+        }),
+
+        cardExpansion: ({ theme }: { theme: Theme }) => ({
+          padding: theme.spacing(0, 1.25, 0.75),
+        }),
+
+        cardActions: ({ theme }: { theme: Theme }) => ({
+          minHeight: 40,
+          padding: theme.spacing(0.75, 1.25),
+          backgroundColor: theme.alpha(
+            theme.vars.palette.text.primary,
+            0.025,
+          ),
+        }),
+
+        cardDetail: ({ theme }: { theme: Theme }) => ({
+          margin: theme.spacing(0, 1.25, 1.25),
+          padding: theme.spacing(1),
+          borderTop: 0,
+          borderRadius: theme.spacing(1.5),
+          backgroundColor: theme.alpha(
+            theme.vars.palette.background.default,
+            0.35,
+          ),
+          boxShadow: theme.vars.palette.customShadows.inset,
         }),
 
         expandRowButton: ({ theme }: { theme: Theme }) => ({

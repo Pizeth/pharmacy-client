@@ -174,3 +174,56 @@ it("keeps selection header and row checkboxes on identical geometry", () => {
     });
   }
 });
+
+
+it("keeps a disabled icon-only expansion header when expand-all is unavailable", () => {
+  const disabledColumns = helper.columns([
+    createExpansionColumn<Row>({
+      showExpandAll: false,
+    }),
+    helper.accessor("id", {
+      enableResizing: false,
+      meta: { enableColumnMenu: false },
+    }),
+  ]);
+
+  function Fixture() {
+    const table = useMuiDataTable({
+      columns: disabledColumns,
+      data,
+      getRowId: (row) => row.id,
+      getRowCanExpand: () => true,
+    });
+
+    return (
+      <table.AppTable>
+        <DataTableAccessibilityProvider>
+          <DataTableDensityProvider>
+            <Table>
+              <TableHead>
+                <DataTableHeaderRow
+                  table={table}
+                  headerGroup={table.getHeaderGroups()[0]}
+                  headerRowIndex={0}
+                />
+              </TableHead>
+            </Table>
+          </DataTableDensityProvider>
+        </DataTableAccessibilityProvider>
+      </table.AppTable>
+    );
+  }
+
+  render(
+    <ThemeProvider theme={theme}>
+      <Fixture />
+    </ThemeProvider>,
+  );
+
+  const headerControl = screen.getByRole("button", {
+    name: "Expand all rows unavailable",
+  });
+
+  expect(headerControl).toBeDisabled();
+  expect(screen.queryByText("Details")).toBeNull();
+});

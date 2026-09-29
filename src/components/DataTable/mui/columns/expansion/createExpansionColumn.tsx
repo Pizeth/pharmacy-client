@@ -11,44 +11,31 @@ export const DATA_TABLE_EXPANSION_COLUMN_ID = "__dataTableExpansion";
 
 export interface CreateExpansionColumnOptions {
   /**
-   * Visible header content when expand-all is not used or when the
-   * caller wants an explicit resource label.
+   * Explicit header content.
    *
-   * Default:
+   * When omitted the utility column keeps the standard icon affordance:
    *
-   * - expand-all control when showExpandAll=true
-   * - "Details" when showExpandAll=false
+   * - interactive when showExpandAll=true
+   * - disabled when showExpandAll=false
    */
   readonly header?: string;
 
-  /**
-   * Width of the expansion utility column.
-   *
-   * Default: 44px.
-   */
+  /** Default: 44px. */
   readonly size?: number;
 
-  /**
-   * Whether the utility column can be pinned.
-   *
-   * Default: true.
-   */
+  /** Default: true. */
   readonly enablePinning?: boolean;
 
   /**
-   * Render expand-all control in the header.
+   * Whether the header affordance may expand/collapse the complete page.
+   *
+   * false preserves the compact icon geometry while disabling the command.
    *
    * Default: true.
    */
   readonly showExpandAll?: boolean;
 }
 
-/**
- * Create the standard DataTable expansion display column.
- *
- * Expansion remains actual TanStack row-expansion state; this column
- * provides only the MUI interaction surface.
- */
 export function createExpansionColumn<TData extends RowData>(
   options: CreateExpansionColumnOptions = {},
 ) {
@@ -76,9 +63,7 @@ export function createExpansionColumn<TData extends RowData>(
     header:
       header !== undefined
         ? header
-        : showExpandAll
-          ? () => <DataTableExpandAllButton />
-          : "Details",
+        : () => <DataTableExpandAllButton disabled={!showExpandAll} />,
 
     cell: () => <DataTableExpandRowButton />,
 

@@ -39,6 +39,8 @@ export function DataTableNumberRangeFilter(
     value,
     label,
     size = "small",
+    variant,
+    margin,
     className,
     sx,
     onChange,
@@ -85,6 +87,8 @@ export function DataTableNumberRangeFilter(
           disabled={props.disabled}
         fullWidth
         size={size}
+        variant={variant}
+        margin={margin}
         type="number"
         label={`${label} minimum`}
         value={min ?? ""}
@@ -99,6 +103,8 @@ export function DataTableNumberRangeFilter(
           disabled={props.disabled}
         fullWidth
         size={size}
+        variant={variant}
+        margin={margin}
         type="number"
         label={`${label} maximum`}
         value={max ?? ""}

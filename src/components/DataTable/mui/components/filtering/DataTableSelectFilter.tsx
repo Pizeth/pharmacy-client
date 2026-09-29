@@ -61,6 +61,8 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
     value,
     label,
     size = "small",
+    variant,
+    margin,
     disabled = false,
     loading = false,
     errorMessage,
@@ -99,6 +101,8 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
       ownerState={{ ...props, size, disabled: unavailable, loading }}
       fullWidth
       size={size}
+      variant={variant}
+      margin={margin}
       disabled={unavailable}
       error={Boolean(errorMessage) && !loading}
     >

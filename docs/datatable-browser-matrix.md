@@ -34,7 +34,7 @@ remains a chronological acceptance record.
 
 ## Matrix A — production presentation parity before performance profiling
 
-**Status: IN PROGRESS — card filter/sort fix landed; browser recheck and remaining acceptance gates still required (2026-09-28)**
+**Status: IN PROGRESS — card/filter/sort and visual-parity fixes landed; browser recheck and remaining acceptance gates still required (2026-09-29)**
 
 Purpose:
 
@@ -386,3 +386,36 @@ Completion:
 - Completed date:
 - Commit SHA:
 - Follow-up:
+
+
+### Visual parity follow-up — 2026-09-29
+
+Implementation branch / PR:
+
+- branch: `chatgpt/datatable-visual-parity-2-2-2`
+- PR: #32 — `feat(datatable): polish visual parity surfaces`
+- automated gate before this record:
+  - typecheck: PASS
+  - complete Jest suite: PASS
+  - whitespace check: PASS
+
+This follow-up is intentionally **not** recorded as browser PASS. The code
+addresses defects observed in screenshots while Codex browser acceptance was
+paused, and the browser must verify the actual rendered result.
+
+Changes requiring focused recheck:
+
+| Visual acceptance check | Table | Card | Notes |
+| --- | :---: | :---: | --- |
+| Expanded TranslationValue Add/Edit/Delete controls remain visible at desktop width | PENDING RECHECK | PENDING RECHECK | Detail layout is now intrinsic-width/two-column rather than viewport-breakpoint dependent. |
+| Row action footer remains visible when card detail is expanded | N/A | PENDING RECHECK | Generic card renderer now places actions before expanded detail content. |
+| Card visual hierarchy matches application neumorphic language | N/A | PENDING RECHECK | Uses existing `customShadows.neumorphic` / `customShadows.inset` through DataTable theme slots. Verify light and dark schemes. |
+| Column filters use compact filled presentation | PENDING RECHECK | PENDING RECHECK | DataTable filter component families now theme `variant="filled"`, `margin="none"`, `size="small"`; table filter-cell padding was tightened. |
+| Expansion header has no visible "Details" text | PENDING RECHECK | N/A | TranslationKey uses a 44px disabled double-chevron expand-all affordance while preserving per-row expansion. |
+| Narrow/mobile TranslationValue actions remain usable | PENDING RECHECK | PENDING RECHECK | Recheck the prior mobile behavior after removing viewport-dependent action placement. |
+| Existing CRUD/filter/sort/persistence behavior remains intact | PENDING RECHECK | PENDING RECHECK | No semantic query, Refine, transport, persistence, or server-state code changed in this follow-up. |
+
+Do not start Matrix B from automated CI alone. Complete the pending Matrix A
+browser rows above together with the previously pending card filter/sort,
+selection pinning, page-size, saved visual preference, paced history, runtime
+request-observability and final console checks.

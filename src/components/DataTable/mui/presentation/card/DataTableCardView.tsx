@@ -395,6 +395,12 @@ export function DataTableCardView<TData extends RowData>(
                     </CardExpansionRoot>
                   )}
 
+                  {hasRenderableContent(actions) && (
+                    <CardActionsRoot className={dataTableClasses.cardActions}>
+                      {actions}
+                    </CardActionsRoot>
+                  )}
+
                   {hasRenderableContent(detail) && (
                     <CardDetailRoot
                       className={dataTableClasses.cardDetail}
@@ -413,12 +419,6 @@ export function DataTableCardView<TData extends RowData>(
                     >
                       {detail}
                     </CardDetailRoot>
-                  )}
-
-                  {hasRenderableContent(actions) && (
-                    <CardActionsRoot className={dataTableClasses.cardActions}>
-                      {actions}
-                    </CardActionsRoot>
                   )}
                 </CardItemRoot>
               );
