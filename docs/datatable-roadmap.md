@@ -1052,6 +1052,31 @@ shared toolbar. CI passed typecheck, the complete Jest suite, and
 `git diff --check`.
 
 Those Matrix A cells still require browser re-verification before 2.2.2 starts.
+
+A second visual-parity follow-up landed on 2026-09-29 in PR #32
+(`chatgpt/datatable-visual-parity-2-2-2`) after desktop/card screenshots exposed
+presentation defects that unit tests could not prove visually:
+
+- expanded card row actions now remain before potentially tall detail content,
+- TranslationValue detail content uses an intrinsic two-column layout rather
+  than viewport breakpoints, so edit/delete/add controls cannot disappear merely
+  because a detail/card region is narrow inside a desktop viewport,
+- generic DataTable card slots use the application's existing neumorphic shadow
+  language through `RazethDataTable.styleOverrides`,
+- DataTable leaf-filter components now expose `variant` and `margin` through
+  their MUI theme contracts; the application defaults them to compact
+  `filled` / `margin="none"` presentation,
+- filter-row cell chrome is tighter without changing sticky offsets or density
+  height calculations,
+- TranslationKey's expansion utility header is now the compact 44px,
+  double-chevron affordance; expand-all remains intentionally disabled and the
+  visible "Details" label is gone.
+
+PR #32 CI passed the repository typecheck, complete Jest suite and whitespace
+check before this roadmap update. These items are **implemented, not browser
+certified**. Matrix A must explicitly recheck desktop/narrow table and card
+presentation before any PASS is recorded.
+
 The remaining runtime-observability, pinning, history/rate-limit and final
 console checks also remain Matrix A gates.
 
