@@ -335,6 +335,92 @@ error surface without changing production behavior. Verify in the browser:
 
 Remove or keep the seam strictly development-only after evidence capture.
 
+### Viewport/fullscreen regression fix — 2026-09-30
+
+A browser regression was identified after the shared DataTable content region gained:
+
+```text
+maxHeight: calc(100vh - 350px)
+```
+
+Observed behavior:
+
+- normal table mode correctly stopped consuming the entire page height,
+- fullscreen still inherited the normal-page cap, leaving unused fullscreen space,
+- card mode was clipped by the bounded content region because the card grid did
+  not own vertical scrolling,
+- the resource theme still carried an older table-only container cap, creating a
+  second competing viewport rule.
+
+Implementation branch:
+
+```text
+chatgpt/datatable-viewport-scroll-fix
+```
+
+Generic fix:
+
+- `ContentRoot` keeps the normal-page `calc(100vh - 350px)` cap,
+- `ContainerRoot` now owns both horizontal and vertical scrolling,
+- `DataTableCardView`'s `CardContainerRoot` is a flexing, scrollable
+  presentation viewport,
+- fixed chrome (refresh indicator, pagination and standalone selection footer)
+  does not shrink inside the bounded region,
+- fullscreen explicitly removes the content max-height cap,
+- fullscreen treats table and card presentation roots as the flexible region,
+- the obsolete TranslationKey-only `dataTableClasses.container` max-height /
+  min-height rule was removed from `RazethTranslationKeyTable`,
+- no resource-local `sx` or duplicated card/table height contract was added.
+
+Automated regression coverage on this branch now checks:
+
+- fullscreen content has `maxHeight: none`,
+- card presentation owns `overflow: auto`, `minHeight: 0`, and flexible
+  viewport geometry.
+
+#### Required browser recheck for this regression
+
+Run these before continuing the remaining Matrix A parity items:
+
+1. **Normal table**
+   - open `/admin/i18n`,
+   - use page size 100 where available,
+   - confirm the table remains bounded rather than filling the whole page,
+   - vertically scroll inside the table presentation,
+   - horizontally scroll and confirm pinned columns/header remain correct,
+   - confirm pagination/footer remains visible and is not clipped.
+2. **Fullscreen table**
+   - enter fullscreen,
+   - confirm the DataTable shell uses the full viewport height,
+   - confirm the table presentation expands to the space between toolbar and
+     footer,
+   - vertically and horizontally scroll,
+   - confirm no artificial `calc(100vh - 350px)` dead area remains,
+   - exit fullscreen and confirm the normal bounded height returns.
+3. **Normal card**
+   - switch to card presentation,
+   - confirm cards beyond the first visible rows are reachable by scrolling
+     inside the DataTable content region,
+   - confirm the footer remains visible,
+   - expand at least one card and verify later cards remain reachable.
+4. **Fullscreen card**
+   - enter fullscreen while card mode is active,
+   - confirm the card grid uses all available height between toolbar and footer,
+   - scroll to the last card,
+   - expand/collapse one card and verify scrolling still works,
+   - exit fullscreen and confirm normal bounded card height returns.
+5. **State preservation**
+   - set search/filter/sort/selection,
+   - repeat table -> card -> fullscreen -> exit -> table,
+   - confirm semantic query and row state remain unchanged,
+   - confirm switching presentation alone creates no TranslationKey list request.
+6. **Console**
+   - capture console after the sequence,
+   - record new DataTable errors separately from the known application baseline.
+
+Do not mark this regression PASS from unit tests alone. Record the browser commit
+SHA/environment and results here after the check.
+
 #### Gate order
 
 1. implement A-PIN-DUAL-EDGE,
