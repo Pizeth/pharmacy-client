@@ -884,7 +884,7 @@ const defaultThemeInvariants = {
          * surfaces stay crisp while retaining the application's soft-UI
          * design language. Chip accents retain the shared theme treatment.
          */
-        cardContainer: ({ theme }: { theme: Theme }) => ({
+        cardGrid: ({ theme }: { theme: Theme }) => ({
           gap: theme.spacing(2.5),
           padding: theme.spacing(2.5),
         }),
