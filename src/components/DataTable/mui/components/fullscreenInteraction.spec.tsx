@@ -123,7 +123,12 @@ it.each(["outlined", "plain"] as const)(
       height: "100dvh",
     });
     expect(container.querySelector(`.${dataTableClasses.content}`)).toHaveStyle(
-      { flex: "1 1 0%", minHeight: "0", overflow: "hidden" },
+      {
+        flex: "1 1 0%",
+        minHeight: "0",
+        maxHeight: "none",
+        overflow: "hidden",
+      },
     );
     expect(container.querySelector(`.${dataTableClasses.toolbar}`)).toHaveStyle(
       { flexShrink: "0" },
