@@ -70,7 +70,16 @@ const ContentRoot = styled(Box, {
   display: "flex",
   flexDirection: "column",
   minWidth: 0,
+  minHeight: 0,
+
+  /**
+   * Normal-page viewport cap.
+   *
+   * The shell owns the cap because both table and card presentations live
+   * inside this region. Fullscreen explicitly removes it in DataTableShell.
+   */
   maxHeight: "calc(100vh - 350px)",
+  overflow: "hidden",
 });
 
 /**
@@ -82,7 +91,13 @@ const ContainerRoot = styled(TableContainer, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Container",
   overridesResolver: (_props, styles) => styles.container,
-})({ overflowX: "auto", position: "relative", flex: 1, minHeight: 0 });
+})({
+  overflow: "auto",
+  position: "relative",
+  flex: "1 1 auto",
+  minWidth: 0,
+  minHeight: 0,
+});
 
 /**
  * ------------------------------------------------------------------
