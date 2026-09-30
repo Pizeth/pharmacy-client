@@ -23,7 +23,6 @@ import {
   RazethSideImageOptimized,
   RazethTwinkleStarOptimized,
 } from "@/theme/components";
-import { dataTableClasses } from "@/components/DataTable/mui/styles";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"; // Optional
@@ -540,12 +539,14 @@ const standardizedFormComponents = {
         minWidth: 0,
 
         /**
-         * Resource-specific viewport geometry without caller sx.
+         * Presentation viewport geometry is generic DataTable behavior.
+         *
+         * Keep this resource slot free of table-only height caps so:
+         *
+         * - card and table modes share one viewport contract,
+         * - fullscreen can consume the complete shell,
+         * - resource theme styling cannot accidentally override fullscreen.
          */
-        [`& .${dataTableClasses.container}`]: {
-          maxHeight: "calc(100vh - 290px)",
-          minHeight: 320,
-        },
       },
     },
   },
