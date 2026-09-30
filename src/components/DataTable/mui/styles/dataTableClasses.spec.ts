@@ -40,6 +40,7 @@ const DETAIL_PANEL_STRUCTURAL_SLOTS = [
 
 const CARD_STRUCTURAL_SLOTS = [
   "cardContainer",
+  "cardGrid",
   "cardItem",
   "cardHeader",
   "cardSelection",
