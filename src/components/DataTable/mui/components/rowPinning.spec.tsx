@@ -360,7 +360,9 @@ it("keeps select-sticky rows single-identity while stacking both sticky edges", 
 
   for (const rowId of ["a", "b"]) {
     expect(
-      container.querySelectorAll(`[data-row-id="${rowId}"]`),
+      container.querySelectorAll(
+        `.${"RazethDataTable-bodyRow"}[data-row-id="${rowId}"]`,
+      ),
     ).toHaveLength(1);
 
     expect(
