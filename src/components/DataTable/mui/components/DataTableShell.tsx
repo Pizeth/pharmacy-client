@@ -89,8 +89,30 @@ const ShellRoot = styled(Box, {
     [`& > .${dataTableClasses.content}`]: {
       flex: "1 1 0%",
       minHeight: 0,
+
+      /**
+       * The normal DataTable content region may be viewport-capped. Fullscreen
+       * must consume the entire shell instead of inheriting that page cap.
+       */
+      maxHeight: "none",
       overflow: "hidden",
-      [`& > :not(.${dataTableClasses.container})`]: { flexShrink: 0 },
+
+      /**
+       * Table and card presentations are the only flexible/scrolling children.
+       * Everything else (refresh indicator, pagination, selection footer)
+       * retains its intrinsic height.
+       */
+      [`& > .${dataTableClasses.container}, & > .${dataTableClasses.cardContainer}`]:
+        {
+          flex: "1 1 0%",
+          minHeight: 0,
+          maxHeight: "none",
+        },
+
+      [`& > :not(.${dataTableClasses.container}):not(.${dataTableClasses.cardContainer})`]:
+        {
+          flexShrink: 0,
+        },
     },
     [`& > .${dataTableClasses.toolbar}`]: { flexShrink: 0 },
   },
