@@ -14,6 +14,7 @@ export interface DataTableBodyRowGroupProps<TData extends RowData> {
   readonly pinnedRowStickyTop: number;
   readonly stickyRowPinning: boolean;
   readonly dualEdgeStickyRowPinning: boolean;
+  readonly stickyPinnedRowIds: readonly string[];
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
 }
 
@@ -35,6 +36,7 @@ export function DataTableBodyRowGroup<TData extends RowData>(
     pinnedRowStickyTop,
     stickyRowPinning,
     dualEdgeStickyRowPinning,
+    stickyPinnedRowIds,
     renderDetailPanel,
   } = props;
 
@@ -46,6 +48,7 @@ export function DataTableBodyRowGroup<TData extends RowData>(
         pinnedRowStickyTop={pinnedRowStickyTop}
         stickyRowPinning={stickyRowPinning}
         dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
+        stickyPinnedRowIds={stickyPinnedRowIds}
       />
 
       {renderDetailPanel && (
