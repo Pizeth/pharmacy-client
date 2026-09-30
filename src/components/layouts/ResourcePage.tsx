@@ -35,7 +35,9 @@ const ContentRoot = styled("main", {
   name: PREFIX,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
-})({});
+})({
+  marginTop: 0,
+});
 
 const SurfaceRoot = styled(Paper, {
   name: PREFIX,

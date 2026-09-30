@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import {
   Alert,
+  Box,
   Button,
   CircularProgress,
   Paper,
@@ -51,13 +52,13 @@ const LoadingRoot = styled(Paper, {
   overridesResolver: (_props, styles) => styles.card,
 })({});
 
-const LoadingContentRoot = styled("div", {
+const LoadingContentRoot = styled(Box, {
   name: COMPONENT_NAME,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
 })({});
 
-const TableRegionRoot = styled("div", {
+const TableRegionRoot = styled(Box, {
   name: COMPONENT_NAME,
   slot: "Main",
   overridesResolver: (_props, styles) => styles.main,

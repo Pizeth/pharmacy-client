@@ -34,7 +34,7 @@ remains a chronological acceptance record.
 
 ## Matrix A — production presentation parity before performance profiling
 
-**Status: IN PROGRESS — card/filter/sort and visual-parity fixes landed; browser recheck and remaining acceptance gates still required (2026-09-29)**
+**Status: BLOCKED — visual/usability and functional rechecks passed; controlled filter-error/retry and explicit TranslationKey refetch evidence remain (2026-09-30)**
 
 Purpose:
 
@@ -73,15 +73,15 @@ Required checks:
 | Check | Table | Card | Result / notes |
 | --- | :---: | :---: | --- |
 | Initial rows load | PASS | PASS | Original dataset: 31 keys; initial page: 25. |
-| Named TranslationKey Refine provider handles list query | BLOCKED | BLOCKED | A-OBS: source wiring confirmed; runtime provider invocation not instrumented. |
-| POST /api/v1/i18n/keys/query remains the network wire contract | BLOCKED | BLOCKED | A-OBS: source uses POST; no browser network capture available. |
-| Refine query does not send global-search field names over HTTP | BLOCKED | BLOCKED | A-OBS: do not substitute source inspection for captured request bodies. |
+| Named TranslationKey Refine provider handles list query | PASS | PASS | September 29/30 `[matrix-a]` runtime captures confirm named provider invocation. |
+| POST /api/v1/i18n/keys/query remains the network wire contract | PASS | PASS | Runtime request/response captures confirm POST and HTTP 200; see continuation evidence. |
+| Refine query does not send global-search field names over HTTP | PASS | PASS | Captured wire body uses search.term only. |
 | Table/card toolbar toggle works | PASS | PASS | Both directions using keyboard Enter. Pointer automation was unreliable; see attempt log. |
 | Switching view does not reset page | PASS | PASS | Page 2, 26–31 of 31, retained on card-to-table switch. |
 | Switching view does not reset global search | PASS | PASS | `auth` yields five keys before/after switching. |
 | Switching view does not reset column filters | PASS | PASS | Key contains `email`: same two keys; category/locale combination also retained. |
 | Switching view preserves row selection | PASS | PASS | Row 8 stays selected across both directions. |
-| Selection-driven row pinning remains safe | PARTIAL | PARTIAL | No errors/duplicates observed; non-first-row sticky behavior during scrolling still needs focused verification. |
+| Selection-driven row pinning remains safe | PASS | PASS | September 30 fifth row ID 9 sticks below table header while later rows scroll; card switch retains one selected card and correct bulk state. |
 | Edit row action honors selected-row policy | PASS | PASS | Unselected rows disabled; selected row enabled and edit dialog opens. |
 | Delete row action honors selected-row policy | PASS | PASS | Unselected rows disabled; selected rows enabled. Mutation confirmation tracked separately. |
 | Expand/collapse translation details | PASS | PASS | Row 8 opens/closes; expanded details survive renderer switch. |
@@ -92,20 +92,20 @@ Required checks:
 | TranslationKey edit | PASS | PASS | Descriptions changed to `Matrix A table edit verified` / `Matrix A card edit verified`. |
 | TranslationKey delete | PASS | PASS | Keys 33/34 deleted with user confirmation; prefix search returns No matching rows, 0–0 of 0. |
 | Pagination works | PASS | PASS | Table 11–20 of 31 at size 10; card 26–31 of 31 at size 25. |
-| Page-size change works | PARTIAL | PASS | Card changed 25 to 10; size 10 retained in table. Independent table change pending. |
+| Page-size change works | PASS | PASS | Independent table 25→10 yielded 1–10 of 31, then 11–20 of 31; card change also verified. September 29 continuation evidence below. |
 | Global search works | PASS | PASS | `auth` returns five keys; test-key prefix returns isolated CRUD rows. |
-| Key filter works | PASS | PENDING RECHECK | `email` passed in table. Generic card filter surface landed in `9c01a2c`; rerun in card view. |
-| Description filter works | PASS | PENDING RECHECK | `Password field` passed in table. Generic card filter surface landed in `9c01a2c`; rerun in card view. |
-| Category filter works | PASS | PENDING RECHECK | `auth` passed in table. Generic card filter surface landed in `9c01a2c`; rerun in card view. |
-| Locale filter works | PARTIAL | PENDING RECHECK | English serialization passed; exclusion case remains. Generic card filter surface landed in `9c01a2c`; rerun both inclusion/exclusion in card view. |
-| Sort changes work | PASS | PENDING RECHECK | Table Key descending passed. Generic card sorting menu landed in `9c01a2c`; rerun ascending/descending/clear in card view. |
+| Key filter works | PASS | PASS | September 29 card `email` returned 2 matching keys at `4cbec52`; current visual checks tracked separately. |
+| Description filter works | PASS | PASS | September 29 card `Password field` returned 1 matching key at `4cbec52`. |
+| Category filter works | PASS | PASS | September 29 card `auth` returned 5 matching keys at `4cbec52`. |
+| Locale filter works | PASS | PASS | English includes 30 translated keys; English + sequence_test excludes the untranslated key in both renderers. September 30 runtime recheck. |
+| Sort changes work | PASS | PASS | September 29 card Key asc/desc produced opposite ordered lists; clear sent sorting []. Table descending also passed. |
 | Density control | PASS | PASS | Spacious selected in table, Compact in card; card tooltip confirms Compact. |
 | Fullscreen enter/exit | PASS | PASS | Enter and Exit control states verified in each renderer. |
 | Saved display preference restores after reload | PASS | PASS | Each display restored on its own reload. |
-| Saved density/column preferences still restore | PASS | PARTIAL | Spacious active after reload; Key pin-to-start survives table reload, then restored. Card column preference round-trip not independently checked. |
+| Saved density/column preferences still restore | PASS | PASS | September 30 card-origin Spacious and Key pin-to-start survive reload; original Compact/unpinned Key restored. Earlier table round-trip passed. |
 | Shareable semantic query URL survives reload | PASS | PASS | Category 2, locale en, Key desc and size 25 restore five auth records. |
-| Browser back/forward restores semantic query | BLOCKED | BLOCKED | A-RATE: URLs restore, but backend throttling interrupted result verification. Default history mode is replace, so each local edit is not a new history entry. |
-| No new console errors | PARTIAL | PARTIAL | No DataTable React error observed so far; rate-limit request failures recorded separately. Final capture pending. |
+| Browser back/forward restores semantic query | PASS | PASS | Paced table run September 29 and card run September 30 restore both URLs and corresponding results; earlier throttling was not reproduced. Local edits use replace; test uses explicit history entries. |
+| No new console errors | PASS | PASS | September 30 final capture: no errors, only pre-existing logo.svg fill/parent-position warning. Earlier throttling recorded separately. |
 
 Important boundary:
 
@@ -154,15 +154,34 @@ Required checks:
 | Initial Refine list load | PASS — 60 fixture records, first page 25. |
 | Switch table -> card from toolbar | PASS — keyboard activation. |
 | Switch card -> table from toolbar | PASS — keyboard activation. |
-| View switch does not issue another Refine list request | BLOCKED — A-OBS: fixture getList invocation count is not exposed. |
+| View switch does not issue another Refine list request | PASS — September 29 instrumentation: table/card/table held Document getList count at 2→2. |
 | Search state survives view switch | PASS — Budget returns ten matching records in both renderers. |
 | Pagination state survives view switch | PASS — 26–50 of 60 retained across both switches. |
-| Refresh still issues exactly the expected Refine refetch | BLOCKED — Refresh completes with same ten Budget rows; exact invocation count unverified (A-OBS). |
+| Refresh still issues exactly the expected Refine refetch | PASS — September 29 instrumentation: one Refresh increased Document getList count exactly once, 2→3. |
 | Card content matches current row data | PASS — DOC-0026 through DOC-0050 match title/description/status/days/enabled/date fixture values. |
 | No new console errors | PASS — no errors in captured log; shared logo positioning warning only. |
 
 This matrix proves that card/table presentation is independent from whether the
 resource uses the Standard API adapter or the Refine adapter.
+
+### Remaining Matrix A gates — September 30
+
+- **A-REFETCH — BLOCKED:** healthy TranslationKey toolbar has no Refresh
+  action. Retry exists only on error surfaces. Earlier CRUD refreshed rows,
+  but that mutation run preceded runtime instrumentation, so it does not
+  establish a captured explicit named-provider refetch. Follow-up: expose an
+  intentional manual refresh action or provide a controlled retry scenario;
+  capture one invocation and its POST response. Browser reload is not a
+  substitute for a same-lifecycle refetch.
+- **A-FILTER-ERROR — BLOCKED:** Category/Locale successful async choices and
+  filtering are verified. No controlled lookup failure occurred, and the
+  connected browser tools do not expose request interception/offline controls.
+  Follow-up: provide a test-only deterministic lookup failure/retry scenario,
+  then verify error visibility and successful recovery in both views.
+- User's current visual styling is intentional and preserved. No new visual
+  architecture or extraction work is authorized by these findings.
+- Runtime logging has been removed after evidence capture. Matrix B / 2.2.2
+  remains gated; no virtualization decision or performance claim is made.
 
 ### Matrix A completion record
 
@@ -390,6 +409,93 @@ Completion:
 
 ### Visual parity follow-up — 2026-09-29
 
+#### Continuation — 2026-09-30
+
+Environment: base `a70b8ec3a874472c8edb68faf0ea211df046d53f` plus
+user's uncommitted updates, installed Next.js 16.3.7, Windows, Codex in-app
+browser (version not exposed), desktop screenshots approximately 1190×884,
+mobile override 390×844. Results describe this working tree, not a clean
+release commit. Temporary viewport override reset after verification.
+
+Final post-instrumentation-cleanup automated gate:
+
+- `npm run typecheck`: PASS.
+- `npm test -- --runInBand`: PASS, 93 suites / 489 tests.
+- `npm run test:datatable -- --runInBand`: PASS, 88 suites / 470 tests.
+- `git diff --check`: PASS.
+- Source search confirms no remaining `[matrix-a]` logging.
+- Final browser console: no errors; existing logo positioning warning only.
+
+Same Matrix A, resumed at `a70b8ec`; pre-existing local changes in
+`package.json`, `package-lock.json` and the public link page are preserved.
+The subsequent visual commit intentionally restores global neumorphic shell
+shadows; earlier dedicated-shadow screenshot observations therefore describe
+the prior checkout, not current visual acceptance. Current visuals require
+recheck. The preserved browser tab is a connection-error/login tab; browser
+security policy blocked control and manual localhost navigation/sign-in was
+requested. No new browser PASS is recorded from that attempt. Matrix B remains
+gated. The interrupted focused-test process is no longer available; its final
+result is not assumed.
+After user sign-in, current dark card screenshot confirms readable text,
+clear selected outline, row Edit/Delete before expanded detail, and visible
+Add Translation/English Edit/Delete. Card filters reuse the compact filled
+family. Lower detail controls and light mode still require this checkout's
+recheck; no architecture changes are needed from this observation.
+Typecheck and `git diff --check` pass on the September 30 checkout. Theme
+checkbox automation still times out and leaves dark mode checked; a manual
+light-mode switch was requested to separate app behavior from browser-control
+limitations. Light mode remains unverified until a screenshot is inspected.
+Manual theme switching succeeded. Light-mode expanded `auth_email` screenshot
+now verifies readable card text, soft shell consistent with Navigation,
+distinct inset detail, clear red selected outline, and row actions preceding
+detail controls. The theme-switch blocker was automation-specific; light/dark
+card visual hierarchy is verified on `a70b8ec` with the user's shell styling.
+Scrolling light card detail exposes both English and Khmer Edit/Delete
+controls completely, with Add Translation visible and no horizontal scrolling.
+Non-first-row sticky test: selected fifth row `auth_password` (ID 9), then
+scrolled the table body to profile rows 16–20. Its selected row and enabled
+Edit/Delete remain immediately below the sticky header. Table sticky behavior
+is browser-verified; card selection safety is checked separately.
+Switching that selected fifth row to card preserved exactly one ID-9
+checkbox and the `1 row selected / auth_password` bulk-action state, with
+no duplicate selected card. Card-origin persistence setup: chose Spacious
+and pinned Key to start, then reloaded; restoration check follows.
+Complete Jest on the September 30 checkout: PASS, 93 suites / 489 tests.
+Card preference reload PASS: card view restored, density menu marks Spacious
+active, and Columns shows `Unpin Key from start` pressed. Restoring Compact
+and the original unpinned Key after the check.
+September 30 runtime search: card `auth` returns 1–5 of 5. Named
+`translationKeyStandardApi.getList` sends POST `/api/v1/i18n/keys/query`
+with `search:{term:"auth"}` and no search field names; response HTTP 200.
+Focused Jest PASS: 88 suites / 470 tests.
+Paced card history setup: explicit page-2/size-10 URL renders 11–20 of 31.
+Back restores auth search, page 1, size 25 and 1–5 of 5 matching card results.
+Forward restores page 2, size 10, empty search and 11–20 of 31 card results.
+Paced card Back/Forward result restoration passes without throttling.
+User confirmed the latest visual styling is intentional; preserve it and
+evaluate usability rather than changing its appearance.
+Current card Locale menu loads All/English/Khmer; choosing English resets
+to page 1 and yields 1–10 of 30 (one untranslated key excluded).
+English plus Key `sequence_test` yields No matching rows / 0–0 of 0 in
+card mode, confirming the untranslated-key exclusion case.
+Switching to table retains that exclusion result and wire-request count
+4→4. No semantic request is manufactured by the renderer change.
+Console capture after paced history/filter/switch checks: no errors; only
+the pre-existing logo.svg fill/parent-position warning. Healthy TranslationKey
+toolbar exposes no Refresh control, so an explicit same-query manual refetch
+cannot be exercised through that surface without a mutation or an error.
+Latest light table screenshot confirms full-width expanded detail, both
+translation Edit/Delete groups and Add Translation visible, compact aligned
+filled filters, and icon-only expansion header. User visual changes preserved.
+After temporary instrumentation removal, 390×844 light mobile table recheck
+shows Add Translation and both value Edit/Delete groups fully accessible.
+The table can scroll horizontally, but detail actions do not require it.
+Latest 390×844 light card recheck: selected row actions precede the inset;
+keyboard navigation reaches the lower detail actions and scrolls both locales'
+Edit/Delete into view with readable text and no horizontal overflow.
+Temporary `[matrix-a]` logging removed from the API, named provider and
+Document fixture provider after recording runtime evidence.
+
 Continuation checkpoint (same Matrix A): checkout `6060a85` includes the
 requested 5px filled filters, dedicated card/inset shadow tokens, and removal
 of the TranslationValue panel width cap. The latest visual commit comments
@@ -498,14 +604,14 @@ Changes requiring focused recheck:
 
 | Visual acceptance check | Table | Card | Notes |
 | --- | :---: | :---: | --- |
-| Expanded TranslationValue Add/Edit/Delete controls remain visible at desktop width | PENDING RECHECK | PENDING RECHECK | Detail layout is now intrinsic-width/two-column rather than viewport-breakpoint dependent. |
-| Row action footer remains visible when card detail is expanded | N/A | PENDING RECHECK | Generic card renderer now places actions before expanded detail content. |
-| Card visual hierarchy matches application neumorphic language | N/A | PENDING RECHECK | Card/detail surfaces now use dedicated `customShadows.dataTableCard` / `customShadows.dataTableInset` tokens so dark mode can stay crisp without changing global neumorphism. Verify light and dark schemes. |
-| Column filters use compact filled presentation | PENDING RECHECK | PENDING RECHECK | DataTable filter component families use `variant="filled"`, `margin="none"`, `size="small"`; filled roots now use a compact 5px radius rather than application-form pill geometry. |
-| Expansion header has no visible "Details" text | PENDING RECHECK | N/A | TranslationKey uses a 44px disabled double-chevron expand-all affordance while preserving per-row expansion. |
-| Narrow/mobile TranslationValue actions remain usable | PENDING RECHECK | PENDING RECHECK | Recheck the prior mobile behavior after removing viewport-dependent action placement. |
-| TranslationValue detail panel consumes the complete expanded table row | PENDING RECHECK | N/A | Removed the resource-level 960px width cap; the generic detail row/cell already spans all visible columns. |
-| Existing CRUD/filter/sort/persistence behavior remains intact | PENDING RECHECK | PENDING RECHECK | No semantic query, Refine, transport, persistence, or server-state code changed in this follow-up. |
+| Expanded TranslationValue Add/Edit/Delete controls remain visible at desktop width | PASS | PASS | September 29/30 screenshots show both locale action groups; Add is visible, disabled where all locales already exist. |
+| Row action footer remains visible when card detail is expanded | N/A | PASS | Row actions visibly precede expanded detail in desktop and mobile screenshots. |
+| Card visual hierarchy matches application neumorphic language | N/A | PASS | Light and dark screenshots inspected; selected outline and inset are clear. User explicitly prefers latest global-neumorphic shell styling; preserved. |
+| Column filters use compact filled presentation | PASS | PASS | Rendered screenshots confirm compact aligned filled controls in both views. Async failure/retry is a separate blocked gate. |
+| Expansion header has no visible "Details" text | PASS | N/A | Screenshot shows double-chevron only; browser accessibility confirms disabled header; individual expansion works. |
+| Narrow/mobile TranslationValue actions remain usable | PASS | PASS | 390×844 screenshots confirm both locales' actions; lower card controls also reached by keyboard. |
+| TranslationValue detail panel consumes the complete expanded table row | PASS | N/A | Desktop screenshot confirms detail spans available row width. |
+| Existing CRUD/filter/sort/persistence behavior remains intact | PASS | PASS | Existing CRUD results retained; filters, sorting, selection, history and preference round-trips documented above. Explicit refetch/error evidence remains separately blocked. |
 
 Do not start Matrix B from automated CI alone. Complete the pending Matrix A
 browser rows above together with the previously pending card filter/sort,

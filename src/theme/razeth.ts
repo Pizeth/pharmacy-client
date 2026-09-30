@@ -56,6 +56,7 @@ const globalStyles = (theme: Theme) => ({
     "--app-sideImage-circleColor": theme.custom.sideImage.circleColor,
     "--app-sideImage-logoOffset": theme.custom.sideImage.logoOffset,
     "--app-circle-stop-count": theme.custom.sideImage.circleStopCount,
+    "--app-border-radius": "50px",
   },
   // Custom styles for a text field with an icon
   ".icon-input .MuiInputLabel-root": {
@@ -140,7 +141,9 @@ const standardizedFormComponents = {
           theme.direction === "rtl" ? "-45px" : "45px",
         "--RazethTextField-label-offset-y-small": "9px",
         "--RazethTextField-label-offset-y-medium": "16px",
-        "& .MuiOutlinedInput-root": { borderRadius: 999 },
+        "& .MuiOutlinedInput-root": {
+          borderRadius: "var(--app-border-radius)",
+        },
 
         /**
          * Multiline fields should be rounded panels rather than
@@ -212,7 +215,9 @@ const standardizedFormComponents = {
           theme.direction === "rtl" ? "-45px" : "45px",
         "--RazethSelectField-label-offset-y-small": "9px",
         "--RazethSelectField-label-offset-y-medium": "16px",
-        "& .MuiOutlinedInput-root": { borderRadius: 999 },
+        "& .MuiOutlinedInput-root": {
+          borderRadius: "var(--app-border-radius)",
+        },
       }),
 
       icon: ({ theme }: { theme: Theme }) => ({
@@ -321,7 +326,7 @@ const standardizedFormComponents = {
 
     styleOverrides: {
       root: ({ theme }: { theme: Theme }) => ({
-        borderRadius: 999,
+        borderRadius: "var(--app-border-radius)",
         paddingInline: theme.spacing(2),
         fontWeight: 700,
         whiteSpace: "nowrap",
@@ -928,7 +933,7 @@ const defaultThemeInvariants = {
           "& .MuiChip-root": {
             fontWeight: 600,
             letterSpacing: 0.2,
-            borderRadius: 999,
+            borderRadius: "var(--app-border-radius)",
             boxShadow: theme.vars.palette.customShadows.circleWell,
           },
           "& .MuiChip-outlined": {
@@ -1775,10 +1780,10 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       MuiInputBase: {
         styleOverrides: {
           root: (props: { theme: Theme }) => ({
-            borderRadius: 50,
+            borderRadius: "var(--app-border-radius)",
             "&.Mui-focused .MuiSvgIcon-root": {
               color: props.theme.palette.primary.main,
-              borderRadius: 50,
+              borderRadius: "var(--app-border-radius)",
             },
             "&.Mui-error .MuiSvgIcon-root": {
               color: props.theme.palette.error.main,
@@ -1789,7 +1794,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       MuiFilledInput: {
         styleOverrides: {
           root: {
-            borderRadius: 50,
+            borderRadius: "var(--app-border-radius)",
             backgroundColor: "rgba(0, 0, 0, 0.04)",
             "&$disabled": {
               backgroundColor: "rgba(0, 0, 0, 0.04)",
@@ -1800,7 +1805,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       MuiOutlinedInput: {
         styleOverrides: {
           root: (props: { theme: Theme }) => ({
-            borderRadius: 50,
+            borderRadius: "var(--app-border-radius)",
             "&.Mui-focused .MuiSvgIcon-root": {
               color: props.theme.palette.primary.main,
             },

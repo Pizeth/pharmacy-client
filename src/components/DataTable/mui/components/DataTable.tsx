@@ -14,9 +14,7 @@ import {
   DataTablePersistedVisualStateBridge,
   useDataTablePersistedVisualStateController,
 } from "../persistence";
-import type {
-  DataTablePersistedVisualStateConfig,
-} from "../persistence";
+import type { DataTablePersistedVisualStateConfig } from "../persistence";
 import type { DataTableFullscreenConfig } from "../fullscreen";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { MuiDataTableInstance } from "../table";
@@ -68,7 +66,12 @@ const ContentRoot = styled(Box, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
-})({ display: "flex", flexDirection: "column", minWidth: 0 });
+})({
+  display: "flex",
+  flexDirection: "column",
+  minWidth: 0,
+  maxHeight: "calc(100vh - 350px)",
+});
 
 /**
  * ------------------------------------------------------------------
@@ -305,10 +308,7 @@ function DataTablePresentationRegion<TData extends RowData>(
   return (
     <ContainerRoot
       {...containerProps}
-      className={[
-        dataTableClasses.container,
-        containerProps?.className,
-      ]
+      className={[dataTableClasses.container, containerProps?.className]
         .filter(Boolean)
         .join(" ")}
     >
@@ -329,10 +329,7 @@ function DataTablePresentationRegion<TData extends RowData>(
           return (
             <TableRoot
               {...tableProps}
-              className={[
-                dataTableClasses.table,
-                tableProps?.className,
-              ]
+              className={[dataTableClasses.table, tableProps?.className]
                 .filter(Boolean)
                 .join(" ")}
               style={tableStyle}
@@ -405,8 +402,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     displayMode,
     defaultDisplayMode: defaultDisplayModeProp,
     onDisplayModeChange,
-    autoCardBreakpoint:
-      autoCardBreakpointProp,
+    autoCardBreakpoint: autoCardBreakpointProp,
 
     persistence = false,
   } = props;
@@ -415,29 +411,20 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     variantProp ?? themeDefaults.variant ?? DATA_TABLE_DEFAULT_VARIANT;
 
   const autoCardBreakpoint =
-    autoCardBreakpointProp ??
-    themeDefaults.autoCardBreakpoint ??
-    "sm";
+    autoCardBreakpointProp ?? themeDefaults.autoCardBreakpoint ?? "sm";
 
-  const persistenceController =
-    useDataTablePersistedVisualStateController({
-      table,
-      persistence,
-      density,
-      defaultDensity:
-        defaultDensity ??
-        themeDefaults.density ??
-        "compact",
-      onDensityChange,
-      displayMode,
-      defaultDisplayMode:
-        defaultDisplayModeProp ??
-        themeDefaults.defaultDisplayMode ??
-        "table",
-      onDisplayModeChange,
-      cardAvailable:
-        card !== undefined,
-    });
+  const persistenceController = useDataTablePersistedVisualStateController({
+    table,
+    persistence,
+    density,
+    defaultDensity: defaultDensity ?? themeDefaults.density ?? "compact",
+    onDensityChange,
+    displayMode,
+    defaultDisplayMode:
+      defaultDisplayModeProp ?? themeDefaults.defaultDisplayMode ?? "table",
+    onDisplayModeChange,
+    cardAvailable: card !== undefined,
+  });
 
   /**
    * ----------------------------------------------------------------
@@ -505,90 +492,97 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
         }
       >
         <DataTableAccessibilityProvider>
-        <DataTableDensityProvider
-          density={
-            persistenceController.enabled
-              ? persistenceController.density
-              : density
-          }
-          defaultDensity={defaultDensity}
-          onDensityChange={
-            persistenceController.enabled
-              ? persistenceController.setDensity
-              : onDensityChange
-          }
-        >
-          <DataTablePersistedVisualStateBridge
-            table={table}
-            controller={persistenceController}
-          />
-          <DataTableFullscreenProvider
-            fullscreen={fullscreen}
-            defaultFullscreen={defaultFullscreen}
-            onFullscreenChange={onFullscreenChange}
+          <DataTableDensityProvider
+            density={
+              persistenceController.enabled
+                ? persistenceController.density
+                : density
+            }
+            defaultDensity={defaultDensity}
+            onDensityChange={
+              persistenceController.enabled
+                ? persistenceController.setDensity
+                : onDensityChange
+            }
           >
-            <DataTableRowPinningProvider displayMode={rowPinningDisplayMode}>
-              <DataTableFilterDisplayProvider
-              columnFilterDisplayMode={columnFilterDisplayMode}
-              defaultColumnFilterDisplayMode={defaultColumnFilterDisplayMode}
-              onColumnFilterDisplayModeChange={onColumnFilterDisplayModeChange}
-              showColumnFilters={showColumnFilters}
-              defaultShowColumnFilters={defaultShowColumnFilters}
-              onShowColumnFiltersChange={onShowColumnFiltersChange}
+            <DataTablePersistedVisualStateBridge
+              table={table}
+              controller={persistenceController}
+            />
+            <DataTableFullscreenProvider
+              fullscreen={fullscreen}
+              defaultFullscreen={defaultFullscreen}
+              onFullscreenChange={onFullscreenChange}
             >
-              <DataTableShell ownerState={ownerState}>
-                {toolbar !== false && (
-                  <DataTableToolbar
-                    table={table}
-                    displayModeToggleAvailable={
-                      card !== undefined &&
-                      (displayMode === undefined ||
-                        onDisplayModeChange !== undefined)
-                    }
-                    cardPresentationAvailable={card !== undefined}
-                    autoCardBreakpoint={autoCardBreakpoint}
-                    {...toolbarConfig}
-                  />
-                )}
-                <ContentRoot className={dataTableClasses.content}>
-                  <DataTableRefreshingIndicator
-                    refreshing={refreshing}
-                    progress={refreshProgress}
-                  />
-                  <DataTablePresentationRegion
-                    table={table}
-                    tableProps={tableProps}
-                    containerProps={containerProps}
-                    card={card}
-                    rowPinningDisplayMode={rowPinningDisplayMode}
-                    renderDetailPanel={renderDetailPanel}
-                    autoCardBreakpoint={autoCardBreakpoint}
-                  />
-                  {pagination !== false ? (
-                    <DataTablePagination
-                      table={table}
-                      {...pagination}
-                      startContent={
-                        selectionBar !== false ? (
+              <DataTableRowPinningProvider displayMode={rowPinningDisplayMode}>
+                <DataTableFilterDisplayProvider
+                  columnFilterDisplayMode={columnFilterDisplayMode}
+                  defaultColumnFilterDisplayMode={
+                    defaultColumnFilterDisplayMode
+                  }
+                  onColumnFilterDisplayModeChange={
+                    onColumnFilterDisplayModeChange
+                  }
+                  showColumnFilters={showColumnFilters}
+                  defaultShowColumnFilters={defaultShowColumnFilters}
+                  onShowColumnFiltersChange={onShowColumnFiltersChange}
+                >
+                  <DataTableShell ownerState={ownerState}>
+                    {toolbar !== false && (
+                      <DataTableToolbar
+                        table={table}
+                        displayModeToggleAvailable={
+                          card !== undefined &&
+                          (displayMode === undefined ||
+                            onDisplayModeChange !== undefined)
+                        }
+                        cardPresentationAvailable={card !== undefined}
+                        autoCardBreakpoint={autoCardBreakpoint}
+                        {...toolbarConfig}
+                      />
+                    )}
+                    <ContentRoot className={dataTableClasses.content}>
+                      <DataTableRefreshingIndicator
+                        refreshing={refreshing}
+                        progress={refreshProgress}
+                      />
+                      <DataTablePresentationRegion
+                        table={table}
+                        tableProps={tableProps}
+                        containerProps={containerProps}
+                        card={card}
+                        rowPinningDisplayMode={rowPinningDisplayMode}
+                        renderDetailPanel={renderDetailPanel}
+                        autoCardBreakpoint={autoCardBreakpoint}
+                      />
+                      {pagination !== false ? (
+                        <DataTablePagination
+                          table={table}
+                          {...pagination}
+                          startContent={
+                            selectionBar !== false ? (
+                              <DataTableSelectionBar
+                                table={table}
+                                {...selectionBar}
+                                embedded
+                              />
+                            ) : undefined
+                          }
+                        />
+                      ) : (
+                        selectionBar !== false && (
                           <DataTableSelectionBar
                             table={table}
                             {...selectionBar}
-                            embedded
                           />
-                        ) : undefined
-                      }
-                    />
-                  ) : (
-                    selectionBar !== false && (
-                      <DataTableSelectionBar table={table} {...selectionBar} />
-                    )
-                  )}
-                </ContentRoot>
-              </DataTableShell>
-              </DataTableFilterDisplayProvider>
-            </DataTableRowPinningProvider>
-          </DataTableFullscreenProvider>
-        </DataTableDensityProvider>
+                        )
+                      )}
+                    </ContentRoot>
+                  </DataTableShell>
+                </DataTableFilterDisplayProvider>
+              </DataTableRowPinningProvider>
+            </DataTableFullscreenProvider>
+          </DataTableDensityProvider>
         </DataTableAccessibilityProvider>
       </DataTableDisplayModeProvider>
     </table.AppTable>

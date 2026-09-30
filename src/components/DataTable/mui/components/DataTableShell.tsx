@@ -57,8 +57,8 @@ const ShellRoot = styled(Box, {
         borderColor: (theme.vars ?? theme).palette.divider,
         borderRadius:
           typeof theme.shape.borderRadius === "number"
-            ? theme.shape.borderRadius * 2
-            : `calc(${theme.shape.borderRadius} * 2)`,
+            ? theme.shape.borderRadius * 9
+            : `calc(${theme.shape.borderRadius} * 9)`,
       }
     : {
         border: 0,

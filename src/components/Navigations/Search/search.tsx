@@ -78,7 +78,7 @@ const Label = styled(InputLabel, {
     : "translate(14px, -9px) scale(0.75)",
   pointerEvents: "none",
   // color: theme.palette.error.main,
-  borderRadius: 50,
+  borderRadius: "var(--app-border-radius)",
   // backgroundColor: shrink ? theme.palette.background.paper : "transparent",
   backgroundColor: shrink
     ? theme.alpha(theme.vars.palette.background.default, 0.05)

@@ -11,7 +11,7 @@ const Root = styled(Button, {
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
 })(({ theme }) => ({
-  borderRadius: 999,
+  borderRadius: "var(--app-border-radius)",
   paddingInline: theme.spacing(2),
   fontWeight: 700,
   whiteSpace: "nowrap",
