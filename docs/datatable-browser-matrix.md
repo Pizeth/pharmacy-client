@@ -335,16 +335,174 @@ error surface without changing production behavior. Verify in the browser:
 
 Remove or keep the seam strictly development-only after evidence capture.
 
-#### Gate order
+### Viewport/fullscreen regression fix — 2026-09-30
 
-1. implement A-PIN-DUAL-EDGE,
-2. implement A-FOOTER-FIXED + A-FOOTER-SELECTION together,
-3. run targeted Jest/typecheck, then the complete DataTable suite,
-4. rerun only the affected browser rows first,
-5. close A-REFETCH,
-6. close A-FILTER-ERROR,
-7. run one final Matrix A smoke pass and console capture,
-8. only then mark Matrix A PASS and begin Matrix B / 2.2.2.
+A browser regression was identified after the shared DataTable content region gained:
+
+```text
+maxHeight: calc(100vh - 350px)
+```
+
+Observed behavior:
+
+- normal table mode correctly stopped consuming the entire page height,
+- fullscreen still inherited the normal-page cap, leaving unused fullscreen space,
+- card mode was clipped by the bounded content region because the card grid did
+  not own vertical scrolling,
+- the resource theme still carried an older table-only container cap, creating a
+  second competing viewport rule.
+
+Implementation branch:
+
+```text
+chatgpt/datatable-viewport-scroll-fix
+```
+
+Generic fix:
+
+- `ContentRoot` keeps the normal-page `calc(100vh - 350px)` cap,
+- `ContainerRoot` now owns both horizontal and vertical scrolling,
+- `DataTableCardView`'s `CardContainerRoot` is a flexing, scrollable
+  presentation viewport,
+- fixed chrome (refresh indicator, pagination and standalone selection footer)
+  does not shrink inside the bounded region,
+- fullscreen explicitly removes the content max-height cap,
+- fullscreen treats table and card presentation roots as the flexible region,
+- the obsolete TranslationKey-only `dataTableClasses.container` max-height /
+  min-height rule was removed from `RazethTranslationKeyTable`,
+- no resource-local `sx` or duplicated card/table height contract was added.
+
+Automated regression coverage on this branch now checks:
+
+- fullscreen shell/content keeps the required flex/overflow structure,
+- exiting fullscreen restores the normal-page
+  `maxHeight: calc(100vh - 350px)` cap,
+- card presentation owns `overflow: auto`, `minHeight: 0`, and flexible
+  viewport geometry.
+
+CI note:
+
+- GitHub Actions run `36692123975` failed only in
+  `fullscreenInteraction.spec.tsx`,
+- typecheck passed and 92/93 suites passed (488/489 tests),
+- the failed assertion asked JSDOM to expose `min-height` / `max-height`
+  from a nested Emotion fullscreen selector through `getComputedStyle`,
+- JSDOM returned the nested flex/overflow declarations but did not surface those
+  height declarations, so this was a test-environment false negative rather
+  than evidence that the browser CSS rule was absent,
+- the test was narrowed to the structural fullscreen contract plus the
+  normal-cap restoration; real fullscreen height remains a required browser
+  acceptance check below.
+
+#### Required browser recheck for this regression
+
+Run these before continuing the remaining Matrix A parity items:
+
+1. **Normal table**
+   - open `/admin/i18n`,
+   - use page size 100 where available,
+   - confirm the table remains bounded rather than filling the whole page,
+   - vertically scroll inside the table presentation,
+   - horizontally scroll and confirm pinned columns/header remain correct,
+   - confirm pagination/footer remains visible and is not clipped.
+2. **Fullscreen table**
+   - enter fullscreen,
+   - confirm the DataTable shell uses the full viewport height,
+   - confirm the table presentation expands to the space between toolbar and
+     footer,
+   - vertically and horizontally scroll,
+   - confirm no artificial `calc(100vh - 350px)` dead area remains,
+   - exit fullscreen and confirm the normal bounded height returns.
+3. **Normal card**
+   - switch to card presentation,
+   - confirm cards beyond the first visible rows are reachable by scrolling
+     inside the DataTable content region,
+   - confirm the footer remains visible,
+   - expand at least one card and verify later cards remain reachable.
+4. **Fullscreen card**
+   - enter fullscreen while card mode is active,
+   - confirm the card grid uses all available height between toolbar and footer,
+   - scroll to the last card,
+   - expand/collapse one card and verify scrolling still works,
+   - exit fullscreen and confirm normal bounded card height returns.
+5. **State preservation**
+   - set search/filter/sort/selection,
+   - repeat table -> card -> fullscreen -> exit -> table,
+   - confirm semantic query and row state remain unchanged,
+   - confirm switching presentation alone creates no TranslationKey list request.
+6. **Console**
+   - capture console after the sequence,
+   - record new DataTable errors separately from the known application baseline.
+
+Do not mark this regression PASS from unit tests alone. Record the browser commit
+SHA/environment and results here after the check.
+
+#### Current execution order
+
+Do not skip ahead. The remaining Matrix A work is:
+
+1. **CI for PR #34 must be fully green.**
+   - typecheck,
+   - complete Jest suite,
+   - whitespace check.
+2. **Browser-certify the viewport/fullscreen regression fix.**
+   - normal table bounded scrolling,
+   - fullscreen table fills the shell,
+   - normal card scrolling reaches the last card,
+   - fullscreen card fills the shell and still scrolls,
+   - footer remains visible,
+   - state survives presentation/fullscreen transitions,
+   - no renderer-only TranslationKey request is created,
+   - no new console errors.
+3. **Implement A-PIN-DUAL-EDGE.**
+   - one selected row, one TanStack row ID,
+   - dual physical sticky constraints for `select-sticky`,
+   - deterministic multiple-row top/bottom stacking,
+   - preserve all existing one-edge/static modes and select-all safety.
+4. **Implement A-FOOTER-FIXED + A-FOOTER-SELECTION together.**
+   - density no longer changes footer geometry,
+   - whole shared footer exposes selection state and changes theme surface,
+   - embedded selection content stays transparent,
+   - table/card share the same footer.
+5. Run targeted tests, typecheck, complete DataTable tests, then complete Jest.
+6. Browser-rerun only the affected pinning/footer rows first.
+7. **Close A-REFETCH.**
+   - same mounted TranslationKey lifecycle,
+   - named `translationKeyStandardApi` provider,
+   - canonical `POST /api/v1/i18n/keys/query`,
+   - HTTP success and canonical row replacement,
+   - no permanent product Refresh control added for acceptance.
+8. **Close A-FILTER-ERROR.**
+   - deterministic development/test-only failure-then-retry seam,
+   - warning remains localized,
+   - Retry succeeds,
+   - Category/Locale choices recover,
+   - query/search/selection state remains intact,
+   - table and card both recover.
+9. Run the final Matrix A smoke pass and console/network capture.
+10. Mark Matrix A PASS only when every required row is green.
+11. Only then begin Matrix B / 2.2.2 performance measurement.
+12. Decide whether 2.2.3 virtualization is justified from realistic-density
+    evidence, not from the 1000x32 stress case alone.
+
+#### Deferred architectural PR
+
+PR #31, `refactor(datatable): establish core layering`, is intentionally
+**open, draft, useful, and unmerged**.
+
+It contains substantial behavior-neutral core/react/browser layering work and
+must not be treated as disposable. It is deferred because merging/rebasing that
+large extraction while Matrix A and 2.2.2 are still establishing the production
+baseline would mix architecture migration into browser/performance acceptance.
+
+After 2.2.2 closes:
+
+1. rebase/reconcile PR #31 against the then-current `master`,
+2. preserve the already-finished extraction where it still matches the
+   stabilized contracts,
+3. resolve only real conflicts/API drift,
+4. rerun complete CI and the relevant acceptance surface,
+5. continue the core extraction from that PR rather than recreating it.
 
 The current visual styling outside these bounded behaviors is intentional and
 must be preserved. Matrix B / 2.2.2 remains gated; no virtualization decision

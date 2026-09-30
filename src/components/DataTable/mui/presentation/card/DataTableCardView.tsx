@@ -41,9 +41,19 @@ const CardContainerRoot = styled(Box, {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
   alignItems: "start",
+  alignContent: "start",
   gap: theme.spacing(2),
   padding: theme.spacing(2),
+
+  /**
+   * Card presentation shares the same bounded content region as table mode.
+   * It must therefore own a real scroll viewport instead of allowing the
+   * shell's overflow clipping to hide later cards.
+   */
+  flex: "1 1 auto",
   minWidth: 0,
+  minHeight: 0,
+  overflow: "auto",
 }));
 
 const CardItemRoot = styled(Paper, {

@@ -1205,6 +1205,67 @@ deferred and 2.2 can close without adding another rendering subsystem.
 If profiling demonstrates a material user-visible renderer bottleneck at a
 realistic density, proceed to 2.2.3.
 
+### 2.2.2 pre-gate viewport/fullscreen correction — 2026-09-30
+
+Before continuing the remaining Matrix A parity gates, the shared presentation
+viewport needed one bounded regression fix.
+
+The normal page intentionally caps DataTable content height at
+`calc(100vh - 350px)`, but that rule had become presentation-agnostic in the
+wrong way:
+
+- fullscreen inherited the normal-page cap,
+- card mode had no scrolling presentation root and could be clipped,
+- TranslationKey still had an older table-only resource viewport rule.
+
+The correction keeps one generic ownership model:
+
+```text
+DataTableShell
+  toolbar                         fixed chrome
+  ContentRoot                     normal-page max-height owner
+    table ContainerRoot           scroll viewport
+    OR CardContainerRoot          scroll viewport
+    pagination / selection        fixed chrome
+```
+
+Fullscreen changes only shell geometry:
+
+- remove the normal-page max-height from ContentRoot,
+- let the active table/card presentation flex into the remaining viewport,
+- keep toolbar/footer intrinsic and visible.
+
+No resource `sx`, no table/card duplicated server/query state, and no
+TranslationKey-specific fullscreen behavior are introduced.
+
+Browser acceptance for this correction is documented in
+`docs/datatable-browser-matrix.md` and must pass before the remaining
+A-PIN-DUAL-EDGE / A-FOOTER-* / A-REFETCH / A-FILTER-ERROR gates continue.
+
+PR #34 CI follow-up:
+
+- run `36692123975` passed typecheck and 92/93 Jest suites,
+- the single failure was a JSDOM/Emotion nested-style assertion in
+  `fullscreenInteraction.spec.tsx`, not a runtime implementation failure,
+- the regression assertion now verifies the structural fullscreen flex/overflow
+  contract and normal-page cap restoration while leaving actual fullscreen
+  height to the required browser proof,
+- PR #34 must be completely green before browser acceptance begins.
+
+### Deferred core-layering PR #31
+
+PR #31, `refactor(datatable): establish core layering`, remains intentional
+future architecture work.
+
+It is **open, draft, and unmerged** while Matrix A and 2.2.2 stabilize the
+production behavior/performance baseline. Its extraction should not be discarded
+or recreated.
+
+After 2.2.2 closes, reconcile/rebase PR #31 onto the then-current `master`,
+preserve the useful core/react/browser split, resolve only genuine API drift,
+and use that reconciled PR as the continuation point for the architectural
+migration.
+
 ## 2.2.3 — virtualization architecture
 
 **Status: conditional**
