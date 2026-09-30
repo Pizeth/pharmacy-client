@@ -1252,6 +1252,36 @@ PR #34 CI follow-up:
   height to the required browser proof,
 - PR #34 must be completely green before browser acceptance begins.
 
+### 2.2.2 browser regression follow-up — dual-edge sticky + card grid
+
+The first browser check after the viewport/fullscreen correction exposed two
+remaining renderer defects:
+
+- `select-sticky` still behaved as top-only sticky,
+- card rows could overlap because the scroll viewport and CSS grid were the same
+  shrinkable flex element.
+
+The correction branch is:
+
+`chatgpt/datatable-dual-sticky-card-grid-fix`
+
+Architecture:
+
+- `select-sticky` retains one TanStack top-pin identity,
+- the physical row gets both top and bottom sticky constraints,
+- top stacking follows pin order,
+- bottom stacking uses reverse edge order,
+- no duplicate row ID is introduced into TanStack bottom pinning,
+- card mode now uses an outer scroll viewport plus an inner intrinsic grid,
+- the new `CardGrid` slot is themeable through
+  `RazethDataTable.styleOverrides.cardGrid`,
+- card spacing moved from `cardContainer` to `cardGrid`,
+- no resource-local `sx` or TranslationKey-only layout patch was added.
+
+These changes remain browser-gated. Do not advance Matrix A until the production
+TranslationKey table proves both dual-edge sticky behavior and non-overlapping
+card scrolling.
+
 ### Deferred core-layering PR #31
 
 PR #31, `refactor(datatable): establish core layering`, remains intentional
