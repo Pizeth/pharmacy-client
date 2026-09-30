@@ -35,16 +35,6 @@ export interface DataTableDensityMetrics {
   readonly cellPaddingBlock: number;
 
   /**
-   * Minimum pagination/footer height.
-   */
-  readonly footerHeight: number;
-
-  /**
-   * Vertical pagination/footer padding in MUI spacing units.
-   */
-  readonly footerPaddingBlock: number;
-
-  /**
    * Whether normal data-cell text should remain on one line.
    *
    * Compact mode favors dense scanning.
@@ -68,8 +58,6 @@ const DATA_TABLE_DENSITY_METRICS: Readonly<
     bodyRowHeight: 37,
     cellPaddingInline: 0.75,
     cellPaddingBlock: 0.25,
-    footerHeight: 40,
-    footerPaddingBlock: 0.25,
     nowrap: true,
   },
 
@@ -83,8 +71,6 @@ const DATA_TABLE_DENSITY_METRICS: Readonly<
     bodyRowHeight: 58,
     cellPaddingInline: 1.5,
     cellPaddingBlock: 1,
-    footerHeight: 56,
-    footerPaddingBlock: 1,
     nowrap: false,
   },
 
@@ -98,8 +84,6 @@ const DATA_TABLE_DENSITY_METRICS: Readonly<
     bodyRowHeight: 73,
     cellPaddingInline: 2,
     cellPaddingBlock: 1.5,
-    footerHeight: 64,
-    footerPaddingBlock: 1.5,
     nowrap: false,
   },
 };
@@ -108,8 +92,12 @@ const DATA_TABLE_DENSITY_METRICS: Readonly<
  * Resolve the rendering measurements for one density.
  *
  * Keeping these values in one place prevents individual cells,
- * headers, pagination, and future toolbar components from inventing
+ * headers, and future density-aware table surfaces from inventing
  * independent density rules.
+ *
+ * Footer geometry is intentionally excluded: the shared pagination/selection
+ * footer is one stable application surface and must not resize with row
+ * density.
  */
 export function getDataTableDensityMetrics(
   density: MuiDataTableDensity,
