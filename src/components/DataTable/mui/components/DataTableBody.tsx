@@ -121,6 +121,21 @@ export function DataTableBody<TData extends RowData>(
         const dualEdgeStickyRowPinning =
           rowPinningDisplayMode === "select-sticky";
 
+        /**
+         * MRT does not stack sticky rows in the order they were clicked.
+         *
+         * TanStack rowPinning state is interaction history, so selected rows
+         * may be appended FIFO. Presentation instead follows the current final
+         * row-model sequence. This keeps sticky rows in the same deterministic
+         * order the user sees in the table.
+         *
+         * Use the rendered row list so keepPinnedRows rows that are missing
+         * from the current center model still receive a stable edge index.
+         */
+        const stickyPinnedRowIds = stickyRowPinning
+          ? rows.filter((row) => row.getIsPinned()).map((row) => row.id)
+          : [];
+
         const visibleColumnCount = table.getVisibleLeafColumns().length;
 
         /**
@@ -185,6 +200,7 @@ export function DataTableBody<TData extends RowData>(
                 pinnedRowStickyTop={pinnedRowStickyTop}
                 stickyRowPinning={stickyRowPinning}
                 dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
+                stickyPinnedRowIds={stickyPinnedRowIds}
                 renderDetailPanel={renderDetailPanel}
               />
             ))}
