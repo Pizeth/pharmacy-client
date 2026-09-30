@@ -437,6 +437,54 @@ Run these before continuing the remaining Matrix A parity items:
 Do not mark this regression PASS from unit tests alone. Record the browser commit
 SHA/environment and results here after the check.
 
+#### Browser regression follow-up after PR #35 — 2026-09-30
+
+PR #35 fixed the card overlap regression in the production TranslationKey
+browser path. Card layout is no longer the active blocker.
+
+The next production recheck exposed two remaining MRT-parity gaps:
+
+1. **select-sticky stacking order / spacing**
+   - selected sticky rows were stacked in TanStack pin insertion order (FIFO),
+     not current final row-model order,
+   - selecting rows out of sequence therefore produced visibly wrong top/bottom
+     stacks and inconsistent gaps,
+   - MRT derives the sticky presentation index from the currently rendered
+     pinned-row sequence, while keeping TanStack pinning state as the state
+     authority,
+   - the follow-up derives one ordered list of pinned rendered row IDs and uses
+     that list for both forward top offsets and reverse bottom offsets.
+
+2. **shared footer still changed with row density**
+   - `DataTablePagination` still consumed `footerHeight` and
+     `footerPaddingBlock` from `DataTableDensityMetrics`,
+   - Compact/Comfortable/Spacious therefore changed the bottom footer despite
+     the documented fixed-footer target,
+   - the follow-up removes footer metrics from the density contract and fixes
+     the shared footer at one geometry,
+   - the pagination root now exposes `data-has-selection="true"` and the
+     application theme paints selected/unselected footer backgrounds on the
+     complete footer surface,
+   - clearing selection-driven state also clears selection-owned row pins.
+
+Current follow-up branch:
+
+`chatgpt/datatable-mrt-row-order-footer-parity`
+
+Browser acceptance after CI:
+
+- select rows deliberately out of sequence and confirm sticky top/bottom stacks
+  follow visible table order rather than click order,
+- scroll through the same seven-row selection and confirm no unexplained gaps,
+  overlap, or FIFO reordering,
+- deselect individual rows and confirm the stack closes immediately,
+- use footer CLEAR and confirm both selection and selection-owned pins disappear,
+- switch Compact -> Comfortable -> Spacious and verify row/header density changes
+  while footer height/padding remain visually identical,
+- verify selected footer background covers the complete footer and returns to
+  normal immediately after clear,
+- repeat footer checks in card mode.
+
 #### Browser regression observed after PR #34 merge — 2026-09-30
 
 Production browser recheck on `/admin/i18n` exposed two blockers that unit
