@@ -1282,6 +1282,37 @@ These changes remain browser-gated. Do not advance Matrix A until the production
 TranslationKey table proves both dual-edge sticky behavior and non-overlapping
 card scrolling.
 
+### 2.2.2 MRT row-order + fixed-footer follow-up — 2026-09-30
+
+PR #35 closed the card-overlap regression, but browser testing showed that the
+remaining `select-sticky` implementation still diverged from MRT in one
+important detail: presentation order was based on TanStack pin insertion order.
+That is FIFO interaction history, not visible row order.
+
+The follow-up branch:
+
+`chatgpt/datatable-mrt-row-order-footer-parity`
+
+changes only renderer presentation and the already-planned shared-footer work:
+
+- sticky pinned IDs are derived from the currently rendered/final row sequence,
+- top offsets use forward row order,
+- bottom offsets use reverse row order,
+- TanStack rowPinning arrays remain untouched and authoritative,
+- no resource-local sorting or duplicated pin state is introduced,
+- `footerHeight` and `footerPaddingBlock` are removed from
+  `DataTableDensityMetrics`,
+- the shared pagination/selection footer uses one fixed 56px minimum height and
+  one fixed block padding across all row densities,
+- the footer root exposes selected state through `data-has-selection`,
+- selected footer background is applied through the
+  `RazethDataTable.pagination` theme slot,
+- embedded SelectionBar remains transparent,
+- footer CLEAR also removes selection-driven row pins so selection and
+  select-pinning cannot diverge.
+
+Browser certification is still required before Matrix A advances.
+
 ### Deferred core-layering PR #31
 
 PR #31, `refactor(datatable): establish core layering`, remains intentional
