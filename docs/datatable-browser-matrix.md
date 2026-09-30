@@ -34,7 +34,7 @@ remains a chronological acceptance record.
 
 ## Matrix A — production presentation parity before performance profiling
 
-**Status: BLOCKED — visual/usability and functional rechecks passed; controlled filter-error/retry and explicit TranslationKey refetch evidence remain (2026-09-30)**
+**Status: BLOCKED — MRT-parity follow-up for dual-edge sticky selection and a density-independent selection-aware footer must land, then controlled filter-error/retry and explicit TranslationKey refetch evidence must close (2026-09-30)**
 
 Purpose:
 
@@ -81,7 +81,7 @@ Required checks:
 | Switching view does not reset global search | PASS | PASS | `auth` yields five keys before/after switching. |
 | Switching view does not reset column filters | PASS | PASS | Key contains `email`: same two keys; category/locale combination also retained. |
 | Switching view preserves row selection | PASS | PASS | Row 8 stays selected across both directions. |
-| Selection-driven row pinning remains safe | PASS | PASS | September 30 fifth row ID 9 sticks below table header while later rows scroll; card switch retains one selected card and correct bulk state. |
+| Selection-driven row pinning matches MRT `select-sticky` behavior | PENDING FOLLOW-UP | PASS | Current table renderer proves top-edge sticking only. Required parity: one selected row remains in normal order, sticks to the top when scrolled below it, and sticks to the bottom when scrolled above it. Do not duplicate the row into both TanStack pin regions. Card selection/pinning state remains safe and already passed. |
 | Edit row action honors selected-row policy | PASS | PASS | Unselected rows disabled; selected row enabled and edit dialog opens. |
 | Delete row action honors selected-row policy | PASS | PASS | Unselected rows disabled; selected rows enabled. Mutation confirmation tracked separately. |
 | Expand/collapse translation details | PASS | PASS | Row 8 opens/closes; expanded details survive renderer switch. |
@@ -100,6 +100,8 @@ Required checks:
 | Locale filter works | PASS | PASS | English includes 30 translated keys; English + sequence_test excludes the untranslated key in both renderers. September 30 runtime recheck. |
 | Sort changes work | PASS | PASS | September 29 card Key asc/desc produced opposite ordered lists; clear sent sorting []. Table descending also passed. |
 | Density control | PASS | PASS | Spacious selected in table, Compact in card; card tooltip confirms Compact. |
+| Pagination/footer geometry is independent of row density | PENDING FOLLOW-UP | PENDING FOLLOW-UP | The shared footer currently consumes density footer metrics. Target: one fixed footer height/padding for Compact/Comfortable/Spacious while row/header/cell density continues changing normally. |
+| Pagination/footer changes background when rows are selected | PENDING FOLLOW-UP | PENDING FOLLOW-UP | Selection content already shares the pagination footer. Target: footer root exposes selected-state styling and returns to its normal background immediately after selection is cleared; presentation belongs to the RazethDataTable theme slot, not resource `sx`. |
 | Fullscreen enter/exit | PASS | PASS | Enter and Exit control states verified in each renderer. |
 | Saved display preference restores after reload | PASS | PASS | Each display restored on its own reload. |
 | Saved density/column preferences still restore | PASS | PASS | September 30 card-origin Spacious and Key pin-to-start survive reload; original Compact/unpinned Key restored. Earlier table round-trip passed. |
@@ -166,22 +168,187 @@ resource uses the Standard API adapter or the Refine adapter.
 
 ### Remaining Matrix A gates — September 30
 
-- **A-REFETCH — BLOCKED:** healthy TranslationKey toolbar has no Refresh
-  action. Retry exists only on error surfaces. Earlier CRUD refreshed rows,
-  but that mutation run preceded runtime instrumentation, so it does not
-  establish a captured explicit named-provider refetch. Follow-up: expose an
-  intentional manual refresh action or provide a controlled retry scenario;
-  capture one invocation and its POST response. Browser reload is not a
-  substitute for a same-lifecycle refetch.
-- **A-FILTER-ERROR — BLOCKED:** Category/Locale successful async choices and
-  filtering are verified. No controlled lookup failure occurred, and the
-  connected browser tools do not expose request interception/offline controls.
-  Follow-up: provide a test-only deterministic lookup failure/retry scenario,
-  then verify error visibility and successful recovery in both views.
-- User's current visual styling is intentional and preserved. No new visual
-  architecture or extraction work is authorized by these findings.
-- Runtime logging has been removed after evidence capture. Matrix B / 2.2.2
-  remains gated; no virtualization decision or performance claim is made.
+The screenshots and the legacy `src/components/fts/mrtTable.tsx` reference add
+two final MRT-parity requirements before Matrix A can close. These are bounded
+DataTable behavior/presentation changes. Do **not** alter unrelated routes,
+navigation, page chrome, current table colors, typography, spacing, or other
+visual changes already present on `master`.
+
+#### A-PIN-DUAL-EDGE — IMPLEMENTATION REQUIRED
+
+Current behavior:
+
+- TranslationKey configures `rowPinning={{ displayMode: "select-sticky" }}`.
+- the row checkbox currently calls TanStack `row.pin("top")` for
+  `select-sticky`,
+- `DataTableBodyRow` then applies only the top sticky constraint because it
+  derives one edge directly from `row.getIsPinned()`,
+- browser acceptance therefore proved only top-edge sticking.
+
+Required MRT parity:
+
+- keep TanStack as the only owner of row-pinning state,
+- keep one selected row represented once; **do not** place the same row ID in
+  both `rowPinning.top` and `rowPinning.bottom`,
+- for `select-sticky`, let the selected row remain in its normal body order,
+- apply both sticky constraints to that one physical row:
+  - a top offset stacked beneath sticky header/filter rows,
+  - a bottom offset stacked upward from the table scroll-container edge,
+- this makes the row stick to the top when the viewport scrolls below it and
+  stick to the bottom when the viewport is above it, matching MRT's
+  `select-sticky` behavior,
+- for multiple individually selected rows, use forward pin order for top
+  stacking and reverse pin order for bottom stacking,
+- `select-top`, `select-bottom`, explicit `sticky`, `top`, `bottom`,
+  and `top-and-bottom` behavior must remain unchanged,
+- page select-all must keep the existing safety rule that clears sticky pins
+  instead of creating a viewport-sized sticky block.
+
+Recommended implementation boundary:
+
+1. pass the actual `DataTableRowPinningDisplayMode` (or an equally explicit
+   dual-edge flag) into `DataTableBodyRow`; the current
+   `stickyRowPinning: boolean` is not expressive enough,
+2. replace the single pinned-offset CSS variable with independent top/bottom
+   offsets when needed,
+3. preserve one DOM row and one TanStack row ID,
+4. keep the behavior generic; TranslationKey should not implement scroll
+   listeners or resource-local pinning math.
+
+Automated regression coverage should prove:
+
+- one `select-sticky` selected row has dual top/bottom constraints while
+  TanStack stores it only once,
+- two or more selected rows stack in deterministic order at both edges,
+- deselection removes the sticky constraints,
+- select-all still clears row pinning,
+- `select-top` and `select-bottom` remain one-edge modes,
+- explicit/static row-pinning modes remain unchanged,
+- density changes still recompute body-row stacking offsets correctly.
+
+Browser recheck:
+
+1. select a row near the middle of a long page,
+2. scroll downward until the row leaves its natural position: it must stick
+   beneath the header,
+3. scroll upward past its natural position: the same row must stick to the
+   bottom of the table viewport,
+4. repeat with multiple individually selected rows and confirm clean stacking,
+5. horizontally scroll with pinned columns and confirm no content bleed,
+   duplicate rows, jitter, or overlap.
+
+#### A-FOOTER-FIXED — IMPLEMENTATION REQUIRED
+
+Current behavior:
+
+- `DataTablePagination` reads `useDataTableDensity()`,
+- `DataTableDensityMetrics` contains `footerHeight` and
+  `footerPaddingBlock`,
+- Compact/Comfortable/Spacious therefore change pagination-footer geometry.
+
+Required MRT parity:
+
+- row density controls data/header/filter geometry only,
+- the shared pagination/selection footer keeps one fixed height and vertical
+  padding for all density modes,
+- page-size, range/status, pagination actions, selected-count text and bulk
+  actions remain vertically centered at every density.
+
+Preferred cleanup:
+
+- remove `footerHeight` and `footerPaddingBlock` from
+  `DataTableDensityMetrics` if no other consumer requires them,
+- remove density-driven pagination geometry and the pagination
+  `data-density` styling contract,
+- keep fixed footer geometry in the generic Pagination slot and allow
+  application tuning through
+  `theme.components.RazethDataTable.styleOverrides.pagination`,
+- do not add resource-local `sx`.
+
+Automated regression coverage should render Compact, Comfortable and Spacious
+and assert the same footer min-height/padding while body/header metrics still
+differ.
+
+#### A-FOOTER-SELECTION — IMPLEMENTATION REQUIRED
+
+Current behavior:
+
+- `DataTableSelectionBar` is embedded into the left side of
+  `DataTablePagination`,
+- embedded selection intentionally makes its own background transparent,
+- the pagination root does not currently expose whether selection is active.
+
+Required behavior:
+
+- derive an actual `hasSelection` boolean from TanStack row-selection state,
+- expose that state on the shared Pagination root (for example
+  `data-has-selection="true"`),
+- keep the embedded SelectionBar transparent so the complete footer changes as
+  one surface rather than painting a small nested rectangle,
+- style normal/selected footer backgrounds through the generic
+  `RazethDataTable.pagination` theme slot,
+- clearing the last selected row must immediately restore the normal footer
+  background,
+- the selected footer must remain identical in height to the unselected footer
+  and remain independent of density,
+- table and card modes must share the same footer behavior.
+
+Automated coverage should extend
+`pagination/footerComposition.spec.tsx` and pagination theme tests to verify
+the state attribute/theme styling, clear-selection transition, one-footer
+composition, and density independence.
+
+#### A-REFETCH — BLOCKED
+
+Healthy TranslationKey has no explicit Refresh toolbar action. Earlier CRUD
+did refresh canonical rows, but that mutation run preceded runtime
+instrumentation.
+
+Preferred follow-up: do **not** add a permanent product Refresh control solely
+for acceptance. Temporarily instrument the named TranslationKey provider/list
+lifecycle, perform one reversible TranslationKey or TranslationValue mutation
+whose existing success handler calls `refresh()`, and capture:
+
+1. the same named `translationKeyStandardApi` provider invocation,
+2. the same `POST /api/v1/i18n/keys/query` wire request,
+3. HTTP success and canonical row replacement.
+
+Remove temporary instrumentation afterward. A browser reload is not a
+same-lifecycle refetch proof.
+
+#### A-FILTER-ERROR — BLOCKED
+
+Category/Locale successful async choices and filtering are verified. No
+controlled lookup failure occurred, and the connected browser tools used in the
+previous run did not expose request interception/offline controls.
+
+Follow-up: add the smallest development/test-only deterministic
+failure-then-retry seam that exercises the existing TranslationKey filter-option
+error surface without changing production behavior. Verify in the browser:
+
+1. the lookup failure is visible without breaking the rest of the table,
+2. Retry re-executes the option request,
+3. successful recovery repopulates Category/Locale choices,
+4. existing table query/search/selection state remains intact,
+5. both table and card presentations recover,
+6. no new console errors remain.
+
+Remove or keep the seam strictly development-only after evidence capture.
+
+#### Gate order
+
+1. implement A-PIN-DUAL-EDGE,
+2. implement A-FOOTER-FIXED + A-FOOTER-SELECTION together,
+3. run targeted Jest/typecheck, then the complete DataTable suite,
+4. rerun only the affected browser rows first,
+5. close A-REFETCH,
+6. close A-FILTER-ERROR,
+7. run one final Matrix A smoke pass and console capture,
+8. only then mark Matrix A PASS and begin Matrix B / 2.2.2.
+
+The current visual styling outside these bounded behaviors is intentional and
+must be preserved. Matrix B / 2.2.2 remains gated; no virtualization decision
+or performance claim is made.
 
 ### Matrix A completion record
 
