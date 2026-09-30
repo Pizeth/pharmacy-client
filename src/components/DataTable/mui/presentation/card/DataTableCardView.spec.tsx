@@ -61,7 +61,8 @@ describe("DataTable card presentation", () => {
       components: {
         RazethDataTable: {
           styleOverrides: {
-            cardContainer: { paddingTop: "7px" },
+            cardContainer: { overscrollBehavior: "contain" },
+            cardGrid: { paddingTop: "7px" },
             cardItem: { borderTopWidth: "3px" },
             cardHeader: { minHeight: "41px" },
             cardSelection: { minWidth: "17px" },
@@ -96,6 +97,18 @@ describe("DataTable card presentation", () => {
       flex: "1 1 auto",
       minHeight: "0",
       overflow: "auto",
+      overscrollBehavior: "contain",
+    });
+
+    const cardGrid = container.querySelector(
+      `.${dataTableClasses.cardGrid}`,
+    );
+
+    expect(cardGrid).not.toBeNull();
+    expect(cardGrid).toHaveStyle({
+      display: "grid",
+      gridAutoRows: "max-content",
+      paddingTop: "7px",
     });
 
     expect(
