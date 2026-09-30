@@ -80,6 +80,15 @@ const ContentRoot = styled(Box, {
    */
   maxHeight: "calc(100vh - 350px)",
   overflow: "hidden",
+
+  /**
+   * Presentation owns the remaining bounded viewport while fixed chrome keeps
+   * its intrinsic geometry.
+   */
+  [`& > .${dataTableClasses.pagination}, & > .${dataTableClasses.selectionBar}, & > .${dataTableClasses.refreshingIndicator}`]:
+    {
+      flexShrink: 0,
+    },
 });
 
 /**
