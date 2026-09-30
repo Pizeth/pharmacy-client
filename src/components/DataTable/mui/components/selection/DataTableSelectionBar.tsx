@@ -7,6 +7,10 @@ import { CloseOutlined } from "@mui/icons-material";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
+import {
+  isDataTableSelectionRowPinningMode,
+  useDataTableRowPinningDisplayMode,
+} from "../../row-pinning";
 import { DataTableBulkActions } from "./DataTableBulkActions";
 
 import {
@@ -128,6 +132,8 @@ export function DataTableSelectionBar<TData extends RowData>(
     embedded = false,
   } = props;
 
+  const rowPinningDisplayMode = useDataTableRowPinningDisplayMode();
+
   return (
     <table.Subscribe selector={(state) => state.rowSelection}>
       {(rowSelection) => {
@@ -230,6 +236,17 @@ export function DataTableSelectionBar<TData extends RowData>(
                     onClick={(event) => {
                       event.preventDefault();
                       event.stopPropagation();
+
+                      if (
+                        isDataTableSelectionRowPinningMode(
+                          rowPinningDisplayMode,
+                        )
+                      ) {
+                        table.setRowPinning({
+                          top: [],
+                          bottom: [],
+                        });
+                      }
 
                       table.setRowSelection({});
                     }}
