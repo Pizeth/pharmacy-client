@@ -15,14 +15,14 @@ import {
 
 import {
   areDataTableServerQueryStatesEqual,
-} from "../../mui/query-url";
+} from "../../core/query-url";
 import {
   useDataTableServerState,
-} from "../../mui/server-state";
+} from "../../react/hooks/useDataTableServerState";
 import type {
   DataTableServerQueryState,
   DataTableServerStateController,
-} from "../../mui/server-state";
+} from "../../core/server-state";
 import type {
   UseDataTableServerQueryUrlStateOptions,
 } from "./types";

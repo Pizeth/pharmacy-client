@@ -1,0 +1,3 @@
+export {
+  normalizeDataTableGlobalFilter,
+} from "./globalFilter";

@@ -8,14 +8,14 @@ import type { RowData } from "@tanstack/table-core";
 
 import type {
   DataTableServerQueryState,
-} from "../../mui/server-state";
+} from "../../core/server-state";
 import type {
   DataTableServerResult,
-} from "../../mui/server-data";
+} from "../../core/server-data";
 import type {
   DataTableSemanticServerQueryAdapter,
   DataTableServerSearchDescriptor,
-} from "../../mui/server-query";
+} from "../../core/server-query";
 
 /**
  * Search-filter mapper used by the Refine adapter.
