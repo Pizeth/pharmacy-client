@@ -437,6 +437,63 @@ Run these before continuing the remaining Matrix A parity items:
 Do not mark this regression PASS from unit tests alone. Record the browser commit
 SHA/environment and results here after the check.
 
+#### Selection continuity regression after PR #36 — 2026-09-30
+
+Production browser verification found that selected rows were being cleared by
+ordinary semantic table-query changes:
+
+- sorting,
+- column filtering,
+- global search,
+- pagination/page-size changes.
+
+Root cause was resource lifecycle code, not TanStack selection itself.
+
+`useTranslationKeyDataTable()` explicitly ran:
+
+```ts
+setRowSelection({});
+setRowPinning({ top: [], bottom: [] });
+```
+
+whenever `query.state` changed. The generic live table-state safety layer was
+also configured to prune selection/pinning IDs against only the currently
+loaded canonical server page.
+
+That policy is invalid for a manual/server-paginated table where stable row IDs
+may legitimately be selected while temporarily off-page or filtered out.
+
+Follow-up branch:
+
+`chatgpt/datatable-preserve-selection-across-query`
+
+Architecture correction:
+
+- semantic query transitions reset expanded detail panels only,
+- rowSelection survives sort/filter/search/pagination changes,
+- selection-driven rowPinning survives alongside rowSelection,
+- current-page absence is no longer interpreted as deletion for
+  TranslationKey selection/pinning,
+- `keepPinnedRows=false` remains responsible for preventing off-page pinned
+  records from being rendered into the active page,
+- known successful deletion still removes the deleted stable ID explicitly,
+- resource mutation commands remain safe because Edit/Delete require exactly
+  one selected row that is also loaded in `selectedRows`.
+
+Browser acceptance after CI:
+
+1. select several rows,
+2. sort ascending/descending and verify selection count/IDs survive,
+3. filter so selected rows disappear, then clear the filter and verify those
+   rows return selected,
+4. search so selected rows disappear, then clear search and verify restoration,
+5. change page and page size, navigate back, and verify selected rows remain
+   selected,
+6. confirm select-sticky rows reappear pinned when their selected IDs become
+   visible again,
+7. footer CLEAR must still remove both selection and selection-owned pins,
+8. successful delete must remove only the deleted ID from selection.
+
 #### Browser regression follow-up after PR #35 — 2026-09-30
 
 PR #35 fixed the card overlap regression in the production TranslationKey
