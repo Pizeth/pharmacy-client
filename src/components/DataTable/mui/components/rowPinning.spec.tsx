@@ -405,3 +405,52 @@ it("keeps select-sticky rows single-identity while stacking both sticky edges", 
     "data-row-pinning-dual-edge",
   );
 });
+
+it("orders select-sticky stacks by current row sequence instead of click order", () => {
+  const { container } = render(
+    <ThemeProvider theme={theme}>
+      <SelectStickyFixture />
+    </ThemeProvider>,
+  );
+
+  /**
+   * Click deliberately out of row order.
+   *
+   * TanStack rowPinning interaction history may therefore be d,b,c, but MRT
+   * presentation order must follow the current rendered row sequence b,c,d.
+   */
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select row d",
+    }),
+  );
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select row b",
+    }),
+  );
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select row c",
+    }),
+  );
+
+  expect(screen.getByTestId("select-sticky-top-rows")).toHaveTextContent(
+    "d,b,c",
+  );
+
+  expect(container.querySelector('[data-row-id="b"]')).toHaveStyle({
+    "--DataTable-row-pinned-offset": "36px",
+    "--DataTable-row-pinned-bottom-offset": "74px",
+  });
+
+  expect(container.querySelector('[data-row-id="c"]')).toHaveStyle({
+    "--DataTable-row-pinned-offset": "73px",
+    "--DataTable-row-pinned-bottom-offset": "37px",
+  });
+
+  expect(container.querySelector('[data-row-id="d"]')).toHaveStyle({
+    "--DataTable-row-pinned-offset": "110px",
+    "--DataTable-row-pinned-bottom-offset": "0px",
+  });
+});
