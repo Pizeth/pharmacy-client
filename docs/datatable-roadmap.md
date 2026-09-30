@@ -1282,6 +1282,42 @@ These changes remain browser-gated. Do not advance Matrix A until the production
 TranslationKey table proves both dual-edge sticky behavior and non-overlapping
 card scrolling.
 
+### 2.2.2 Selection continuity follow-up — 2026-09-30
+
+After PR #36 passed browser verification for MRT row ordering and footer
+geometry, one lifecycle regression remained: row selection disappeared after
+sorting, filtering, global search, or pagination.
+
+Root cause:
+
+- TranslationKey resource orchestration explicitly cleared `rowSelection` and
+  `rowPinning` on every `query.state` change,
+- the generic live table-state safety hook was additionally pruning selected
+  and pinned IDs against only the currently loaded server page.
+
+That behavior conflicts with stable-ID selection on a manual/server-paginated
+table. "Not present on this loaded page" does not mean "record no longer
+exists."
+
+Follow-up branch:
+
+`chatgpt/datatable-preserve-selection-across-query`
+
+Target contract:
+
+- selection is stable record-identity application state,
+- sorting/filtering/search/pagination must not clear selection,
+- selection-owned pin identities survive the same query transitions,
+- expansion remains query-context local and still resets on semantic query
+  changes,
+- TranslationKey disables current-page selection/pinning reconciliation in the
+  generic live safety hook,
+- successful known deletion explicitly removes the deleted stable ID,
+- bulk mutation safety continues to require loaded selected rows, so preserving
+  off-page IDs does not authorize mutation of unavailable records.
+
+Browser certification is required before Matrix A advances.
+
 ### 2.2.2 MRT row-order + fixed-footer follow-up — 2026-09-30
 
 PR #35 closed the card-overlap regression, but browser testing showed that the
