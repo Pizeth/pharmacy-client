@@ -87,9 +87,16 @@ describe("DataTable card presentation", () => {
     expect(screen.getByText("Selection")).toBeInTheDocument();
     expect(screen.getByText("Expansion")).toBeInTheDocument();
 
-    expect(
-      container.querySelector(`.${dataTableClasses.cardContainer}`),
-    ).not.toBeNull();
+    const cardContainer = container.querySelector(
+      `.${dataTableClasses.cardContainer}`,
+    );
+
+    expect(cardContainer).not.toBeNull();
+    expect(cardContainer).toHaveStyle({
+      flex: "1 1 auto",
+      minHeight: "0",
+      overflow: "auto",
+    });
 
     expect(
       container.querySelector(`.${dataTableClasses.cardItem}`),
