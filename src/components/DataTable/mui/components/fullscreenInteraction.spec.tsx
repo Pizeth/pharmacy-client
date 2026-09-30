@@ -141,7 +141,10 @@ it.each(["outlined", "plain"] as const)(
     );
     expect(
       container.querySelector(`.${dataTableClasses.content}`),
-    ).not.toHaveStyle({ overflow: "hidden" });
+    ).toHaveStyle({
+      maxHeight: "calc(100vh - 350px)",
+      overflow: "hidden",
+    });
     expect(root(container)).toHaveAttribute("data-variant", variant);
   },
 );
