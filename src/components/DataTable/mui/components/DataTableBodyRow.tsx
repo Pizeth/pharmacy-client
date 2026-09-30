@@ -128,6 +128,12 @@ export interface DataTableBodyRowProps<TData extends RowData> {
    * bottom scroll edge as well. No second TanStack pin is created.
    */
   readonly dualEdgeStickyRowPinning: boolean;
+
+  /**
+   * Sticky presentation order derived from the rendered/final row sequence,
+   * not TanStack rowPinning insertion order.
+   */
+  readonly stickyPinnedRowIds: readonly string[];
 }
 
 /**
@@ -153,6 +159,7 @@ export function DataTableBodyRow<TData extends RowData>(
     pinnedRowStickyTop,
     stickyRowPinning,
     dualEdgeStickyRowPinning,
+    stickyPinnedRowIds,
   } = props;
 
   const { density } = useDataTableDensity();
@@ -171,24 +178,28 @@ export function DataTableBodyRow<TData extends RowData>(
 
         const pinnedPosition = row.getIsPinned();
 
-        const pinnedIndex = pinnedPosition ? row.getPinnedIndex() : -1;
+        /**
+         * TanStack's rowPinning arrays preserve pin/click insertion order.
+         * MRT-style sticky presentation instead follows final row order.
+         */
+        const stickyIndex = pinnedPosition
+          ? stickyPinnedRowIds.indexOf(row.id)
+          : -1;
 
-        const topRows =
-          pinnedPosition === "top" ? table.getTopRows() : [];
-
-        const bottomRows =
-          pinnedPosition === "bottom" ? table.getBottomRows() : [];
+        const reverseStickyIndex =
+          stickyIndex < 0
+            ? -1
+            : stickyPinnedRowIds.length - 1 - stickyIndex;
 
         /**
-         * Top rows stack downward beneath sticky headers.
+         * Top rows stack downward in row-model sequence.
          *
-         * Bottom rows stack upward from the bottom edge. TanStack's pinned
-         * index is array order, so bottom rows need their edge index reversed.
+         * Bottom rows stack upward using the reverse row-model sequence.
          */
         const edgeIndex =
           pinnedPosition === "bottom"
-            ? Math.max(0, bottomRows.length - 1 - pinnedIndex)
-            : Math.max(0, pinnedIndex);
+            ? Math.max(0, reverseStickyIndex)
+            : Math.max(0, stickyIndex);
 
         const pinnedOffset =
           pinnedPosition === "top"
@@ -198,14 +209,15 @@ export function DataTableBodyRow<TData extends RowData>(
               : undefined;
 
         /**
-         * For select-sticky all individually selected rows remain in TanStack's
-         * top pin array. Their top stack follows TanStack order; the bottom
-         * stack uses the reverse edge index so multiple selected rows cannot
-         * collapse onto the same bottom inset.
+         * select-sticky keeps each selected row in one TanStack top-pin
+         * identity, but constrains it against both viewport edges.
+         *
+         * Top and bottom offsets both follow the current row-model sequence,
+         * matching MRT rather than FIFO selection order.
          */
         const dualEdgeBottomOffset =
           dualEdgeStickyRowPinning && pinnedPosition === "top"
-            ? Math.max(0, topRows.length - 1 - pinnedIndex) * rowHeight
+            ? Math.max(0, reverseStickyIndex) * rowHeight
             : undefined;
 
         const style: DataTableBodyRowStyle = {

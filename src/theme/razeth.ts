@@ -857,6 +857,18 @@ const defaultThemeInvariants = {
           },
         },
 
+        pagination: ({ theme }: { theme: Theme }) => ({
+          /**
+           * The complete pagination/selection footer is one surface.
+           * Selection state belongs on the footer root so the background does
+           * not stop at the embedded SelectionBar content.
+           */
+          backgroundColor: theme.vars.palette.background.paper,
+          '&[data-has-selection="true"]': {
+            backgroundColor: theme.vars.palette.action.selected,
+          },
+        }),
+
         paginationStart: {
           minWidth: 0,
           flex: "1 1 auto",

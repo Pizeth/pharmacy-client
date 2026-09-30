@@ -8,7 +8,7 @@ import type { MuiDataTableInstance } from "../../table";
 import { DataTablePageSizeSelect } from "./DataTablePageSizeSelect";
 import { DataTablePaginationActions } from "./DataTablePaginationActions";
 import type { DataTablePaginationConfig } from "./types";
-import { getDataTableDensityMetrics, useDataTableDensity } from "../../density";
+
 
 const PaginationRoot = styled("footer", {
   name: DATA_TABLE_COMPONENT_NAME,
@@ -21,18 +21,15 @@ const PaginationRoot = styled("footer", {
   gap: theme.spacing(2),
   paddingInline: theme.spacing(2),
   flexWrap: "wrap",
-  ...Object.fromEntries(
-    (["compact", "comfortable", "spacious"] as const).map((density) => {
-      const metrics = getDataTableDensityMetrics(density);
-      return [
-        `&[data-density="${density}"]`,
-        {
-          paddingBlock: theme.spacing(metrics.footerPaddingBlock),
-          minHeight: `${metrics.footerHeight}px`,
-        },
-      ];
-    }),
-  ),
+
+  /**
+   * Footer geometry is deliberately density-independent.
+   *
+   * Compact/comfortable/spacious affect table scanning density, not the
+   * bottom command/navigation surface.
+   */
+  minHeight: 56,
+  paddingBlock: theme.spacing(1),
 }));
 const PaginationDividerRoot = styled(Divider, {
   name: DATA_TABLE_COMPONENT_NAME,
@@ -106,11 +103,15 @@ export function DataTablePagination<TData extends RowData>(
     startContent,
   } = props;
 
-  const { density } = useDataTableDensity();
-
   return (
-    <table.Subscribe source={table.atoms.pagination}>
-      {(pagination) => {
+    <table.Subscribe
+      selector={(state) => ({
+        pagination: state.pagination,
+        rowSelection: state.rowSelection,
+      })}
+    >
+      {(state) => {
+        const pagination = state.pagination;
         const { pageIndex, pageSize } = pagination;
 
         const canPreviousPage = table.getCanPreviousPage();
@@ -159,7 +160,11 @@ export function DataTablePagination<TData extends RowData>(
             />
             <PaginationRoot
               className={dataTableClasses.pagination}
-              data-density={density}
+              data-has-selection={
+                Object.keys(state.rowSelection ?? {}).length > 0
+                  ? "true"
+                  : undefined
+              }
             >
               <PaginationStartRoot
                 className={dataTableClasses.paginationStart}

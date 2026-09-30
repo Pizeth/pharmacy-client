@@ -2,7 +2,6 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { fireEvent, render, screen } from "@testing-library/react";
 import {
   DataTableDensityProvider,
-  getDataTableDensityMetrics,
 } from "../../density";
 import { dataTableClasses } from "../../styles";
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "../../table";
@@ -83,15 +82,14 @@ it("exposes all pagination theme slots", () => {
   ).toBe("FOOTER");
 });
 it.each(["compact", "comfortable", "spacious"] as const)(
-  "keeps %s footer geometry",
+  "keeps one fixed footer geometry at %s row density",
   (density) => {
     const { container } = mount(3, density);
-    const metrics = getDataTableDensityMetrics(density);
     expect(
       container.querySelector(`.${dataTableClasses.pagination}`),
     ).toHaveStyle({
-      minHeight: `${metrics.footerHeight}px`,
-      paddingBlock: theme.spacing(metrics.footerPaddingBlock),
+      minHeight: "56px",
+      paddingBlock: theme.spacing(1),
     });
   },
 );
