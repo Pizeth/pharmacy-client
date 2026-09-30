@@ -1090,10 +1090,103 @@ visual acceptance surface:
   960px, allowing the renderer-owned spanning detail row to use the full
   available table width.
 
-These remain **browser recheck items**, not acceptance PASS claims.
+These visual items were browser-rechecked on the September 29/30 Matrix A
+continuation. The latest report at commit
+`722d3d3adf138dcc28a6809c625cc2be327aa8e3` leaves Matrix A blocked for two
+evidence gaps plus two newly requested MRT-parity behaviors.
 
-The remaining runtime-observability, pinning, history/rate-limit and final
-console checks also remain Matrix A gates.
+### 2.2.2 pre-gate MRT-parity follow-up — 2026-09-30
+
+Do not change unrelated page/navigation/theme work already present on
+`master`. The user's current visual styling is intentional. The remaining
+implementation should stay inside the generic DataTable behavior/theme
+boundaries plus the minimum development-only acceptance seam needed to close
+the matrix.
+
+#### Selection-driven sticky row parity
+
+TranslationKey already declares:
+
+```tsx
+rowPinning={{ displayMode: "select-sticky" }}
+```
+
+The current selection controls pin an individually selected row into TanStack's
+top pin region and the renderer applies only a top sticky edge. MRT's
+`select-sticky` semantics are different at the presentation layer: one pinned
+row can stick to the top **or** bottom of the scrolling table depending on which
+edge it crosses.
+
+Architecture target:
+
+- keep TanStack `rowPinning` as the single state authority,
+- do not duplicate a selected row into both top and bottom pin arrays,
+- keep the row in normal rendered order for sticky mode,
+- let `DataTableBodyRow` distinguish `select-sticky` from ordinary
+  one-edge sticky pinning,
+- calculate independent top and bottom stack offsets,
+- for multiple selected rows, use forward order at the top and reverse order at
+  the bottom,
+- preserve `select-top`, `select-bottom`, explicit sticky/static modes and
+  the existing select-all pin-clearing safety rule,
+- do not introduce resource-local scroll listeners or duplicate row state.
+
+This should be covered generically in the row-pinning tests and then verified on
+the production TranslationKey table with a long 100/200-row viewport.
+
+#### Density-independent shared footer
+
+The pagination footer currently consumes `footerHeight` and
+`footerPaddingBlock` from `DataTableDensityMetrics`. That coupling should be
+removed.
+
+Architecture target:
+
+- Compact/Comfortable/Spacious continue changing table row/header/cell
+  geometry,
+- the pagination/selection footer keeps one fixed geometry,
+- remove footer metrics from the density contract when no longer consumed,
+- keep footer presentation themeable through the existing
+  `RazethDataTable.pagination` slot,
+- no resource-local `sx`.
+
+#### Selection-aware footer surface
+
+The selection bar is already embedded into the pagination footer. Keep that
+single-footer composition, but make the outer footer aware of whether TanStack
+currently has selected rows.
+
+Architecture target:
+
+- expose selected state on the Pagination root (for example
+  `data-has-selection`),
+- keep the embedded selection content background transparent,
+- apply the selected footer background at theme level so the whole footer
+  changes as one surface,
+- clearing selection restores the normal footer background immediately,
+- selected/unselected footer geometry must be identical and independent of
+  density,
+- table and card renderers must share the behavior.
+
+#### Matrix A evidence still missing
+
+After the parity changes above, Matrix A still requires:
+
+1. **TranslationKey explicit same-lifecycle refetch evidence** — temporarily
+   instrument the existing named provider/list lifecycle and perform one
+   reversible mutation whose existing success path calls `refresh()`; capture
+   the named provider plus the canonical
+   `POST /api/v1/i18n/keys/query` request. Do not add a permanent product
+   Refresh control just for the test.
+2. **Controlled async filter-option error/retry** — provide a development/test
+   deterministic failure-then-retry seam, prove the existing warning/Retry
+   surface and successful recovery in both table and card modes, then keep the
+   seam development-only or remove it.
+
+The exact acceptance order and browser steps are maintained in
+`docs/datatable-browser-matrix.md`.
+
+Only after those items pass should Matrix A be marked complete.
 
 Then run the baseline matrix in one controlled browser environment and record:
 
