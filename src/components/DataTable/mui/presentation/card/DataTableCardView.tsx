@@ -37,23 +37,37 @@ const CardContainerRoot = styled(Box, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "CardContainer",
   overridesResolver: (_props, styles) => styles.cardContainer,
-})(({ theme }) => ({
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
-  alignItems: "start",
-  alignContent: "start",
-  gap: theme.spacing(2),
-  padding: theme.spacing(2),
-
+})({
   /**
-   * Card presentation shares the same bounded content region as table mode.
-   * It must therefore own a real scroll viewport instead of allowing the
-   * shell's overflow clipping to hide later cards.
+   * Card mode needs the same ownership model as table mode:
+   *
+   *   flex viewport -> intrinsic presentation content
+   *
+   * Do not make the scroll viewport itself a CSS grid. When a grid is also a
+   * shrinkable flex item, browser track sizing can compress implicit rows
+   * against the bounded viewport and visually stack cards on top of each
+   * other. The outer slot owns scrolling; CardGrid owns layout.
    */
   flex: "1 1 auto",
   minWidth: 0,
   minHeight: 0,
   overflow: "auto",
+});
+
+const CardGridRoot = styled(Box, {
+  name: DATA_TABLE_COMPONENT_NAME,
+  slot: "CardGrid",
+  overridesResolver: (_props, styles) => styles.cardGrid,
+})(({ theme }) => ({
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
+  gridAutoRows: "max-content",
+  alignItems: "start",
+  alignContent: "start",
+  gap: theme.spacing(2),
+  padding: theme.spacing(2),
+  minWidth: 0,
+  minHeight: "min-content",
 }));
 
 const CardItemRoot = styled(Paper, {
@@ -298,9 +312,12 @@ export function DataTableCardView<TData extends RowData>(
         return (
           <CardContainerRoot
             className={dataTableClasses.cardContainer}
-            role="list"
             data-density={density}
           >
+            <CardGridRoot
+              className={dataTableClasses.cardGrid}
+              role="list"
+            >
             {rows.map((row) => {
               const context: DataTableCardRenderContext<TData> = {
                 table,
@@ -433,6 +450,7 @@ export function DataTableCardView<TData extends RowData>(
                 </CardItemRoot>
               );
             })}
+            </CardGridRoot>
           </CardContainerRoot>
         );
       }}

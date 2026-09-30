@@ -12,6 +12,7 @@ import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
 
 export interface DataTableBodyRowStyle extends CSSProperties {
   readonly "--DataTable-row-pinned-offset"?: string;
+  readonly "--DataTable-row-pinned-bottom-offset"?: string;
 }
 
 const BodyRowRoot = styled(TableRow, {
@@ -87,6 +88,23 @@ const BodyRowRoot = styled(TableRow, {
       bottom: "var(--DataTable-row-pinned-offset)",
       zIndex: 2,
     },
+
+    /**
+     * MRT-style select-sticky rows use one TanStack top-pin identity but are
+     * physically constrained by both scroll edges.
+     *
+     * Keeping this as presentation-only CSS means:
+     *
+     * - the row renders exactly once,
+     * - TanStack rowPinning remains the only pin state,
+     * - the browser chooses whether the natural row position hits the top or
+     *   bottom sticky boundary first.
+     */
+    '&[data-row-pinning-sticky="true"][data-row-pinning-dual-edge="true"]': {
+      position: "sticky",
+      bottom: "var(--DataTable-row-pinned-bottom-offset)",
+      zIndex: 2,
+    },
   };
 });
 
@@ -104,6 +122,12 @@ export interface DataTableBodyRowProps<TData extends RowData> {
    * Static modes physically regroup rows and leave normal table positioning.
    */
   readonly stickyRowPinning: boolean;
+
+  /**
+   * select-sticky presentation constrains the same top-pinned row against the
+   * bottom scroll edge as well. No second TanStack pin is created.
+   */
+  readonly dualEdgeStickyRowPinning: boolean;
 }
 
 /**
@@ -123,7 +147,13 @@ export interface DataTableBodyRowProps<TData extends RowData> {
 export function DataTableBodyRow<TData extends RowData>(
   props: DataTableBodyRowProps<TData>,
 ) {
-  const { table, row, pinnedRowStickyTop, stickyRowPinning } = props;
+  const {
+    table,
+    row,
+    pinnedRowStickyTop,
+    stickyRowPinning,
+    dualEdgeStickyRowPinning,
+  } = props;
 
   const { density } = useDataTableDensity();
 
@@ -142,6 +172,9 @@ export function DataTableBodyRow<TData extends RowData>(
         const pinnedPosition = row.getIsPinned();
 
         const pinnedIndex = pinnedPosition ? row.getPinnedIndex() : -1;
+
+        const topRows =
+          pinnedPosition === "top" ? table.getTopRows() : [];
 
         const bottomRows =
           pinnedPosition === "bottom" ? table.getBottomRows() : [];
@@ -164,9 +197,24 @@ export function DataTableBodyRow<TData extends RowData>(
               ? edgeIndex * rowHeight
               : undefined;
 
+        /**
+         * For select-sticky all individually selected rows remain in TanStack's
+         * top pin array. Their top stack follows TanStack order; the bottom
+         * stack uses the reverse edge index so multiple selected rows cannot
+         * collapse onto the same bottom inset.
+         */
+        const dualEdgeBottomOffset =
+          dualEdgeStickyRowPinning && pinnedPosition === "top"
+            ? Math.max(0, topRows.length - 1 - pinnedIndex) * rowHeight
+            : undefined;
+
         const style: DataTableBodyRowStyle = {
           "--DataTable-row-pinned-offset":
             pinnedOffset === undefined ? undefined : `${pinnedOffset}px`,
+          "--DataTable-row-pinned-bottom-offset":
+            dualEdgeBottomOffset === undefined
+              ? undefined
+              : `${dualEdgeBottomOffset}px`,
         };
 
         return (
@@ -180,6 +228,13 @@ export function DataTableBodyRow<TData extends RowData>(
           data-row-pinned={pinnedPosition || undefined}
           data-row-pinning-sticky={
             stickyRowPinning && pinnedPosition ? "true" : undefined
+          }
+          data-row-pinning-dual-edge={
+            stickyRowPinning &&
+            dualEdgeStickyRowPinning &&
+            pinnedPosition === "top"
+              ? "true"
+              : undefined
           }
           style={style}
         >

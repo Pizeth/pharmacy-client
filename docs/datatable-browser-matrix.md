@@ -437,6 +437,49 @@ Run these before continuing the remaining Matrix A parity items:
 Do not mark this regression PASS from unit tests alone. Record the browser commit
 SHA/environment and results here after the check.
 
+#### Browser regression observed after PR #34 merge — 2026-09-30
+
+Production browser recheck on `/admin/i18n` exposed two blockers that unit
+coverage had not captured:
+
+1. **A-PIN-DUAL-EDGE still failed visually.**
+   - individually selected rows were pinned only to the top edge,
+   - scrolling downward did not allow the same selected row to stick to the
+     bottom edge,
+   - TanStack correctly held one row identity in the top pin region, so the
+     missing behavior was renderer geometry rather than state ownership.
+
+2. **Card mode regressed into overlapping rows.**
+   - after the bounded/fullscreen viewport fix, `CardContainerRoot` was both a
+     shrinkable flex item and the CSS grid itself,
+   - in the real browser the implicit grid rows compressed inside the bounded
+     flex viewport and cards visually overlapped,
+   - the fix separates responsibilities:
+     - outer `CardContainer` = flexing scroll viewport,
+     - inner `CardGrid` = intrinsic CSS grid content,
+   - `CardGrid` uses `grid-auto-rows: max-content` so expanded/tall cards
+     contribute their real height and later rows cannot occupy the same visual
+     space.
+
+Current fix branch:
+
+`chatgpt/datatable-dual-sticky-card-grid-fix`
+
+The dual-edge implementation keeps one TanStack pin identity and adds
+presentation-only bottom constraints to `select-sticky` rows. Multiple rows
+use forward top offsets and reverse bottom offsets.
+
+Browser acceptance for this branch must explicitly recheck:
+
+- one selected row while scrolling above and below its natural position,
+- multiple selected rows and deterministic edge stacking,
+- deselection cleanup,
+- card mode with no expanded card,
+- card mode with one expanded card,
+- card mode scrolled to the last card,
+- fullscreen card mode,
+- no card overlap at any point.
+
 #### Current execution order
 
 Do not skip ahead. The remaining Matrix A work is:

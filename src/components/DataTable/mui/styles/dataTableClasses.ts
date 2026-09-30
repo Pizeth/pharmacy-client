@@ -147,6 +147,7 @@ export const dataTableClasses = generateUtilityClasses(
      * ============================================================
      */
     "cardContainer",
+    "cardGrid",
     "cardItem",
     "cardHeader",
     "cardSelection",

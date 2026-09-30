@@ -112,6 +112,15 @@ export function DataTableBody<TData extends RowData>(
           rowPinningDisplayMode,
         );
 
+        /**
+         * select-sticky intentionally keeps one TanStack pin identity in the
+         * top region while the renderer constrains that same physical row
+         * against both scroll edges. This mirrors MRT's selected-row behavior
+         * without duplicating the row ID into both TanStack pin arrays.
+         */
+        const dualEdgeStickyRowPinning =
+          rowPinningDisplayMode === "select-sticky";
+
         const visibleColumnCount = table.getVisibleLeafColumns().length;
 
         /**
@@ -175,6 +184,7 @@ export function DataTableBody<TData extends RowData>(
                 row={row}
                 pinnedRowStickyTop={pinnedRowStickyTop}
                 stickyRowPinning={stickyRowPinning}
+                dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
                 renderDetailPanel={renderDetailPanel}
               />
             ))}
