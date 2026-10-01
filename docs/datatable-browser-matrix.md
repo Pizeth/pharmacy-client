@@ -1115,3 +1115,42 @@ request-observability and final console checks.
 - I deletion lifecycle: NOT EXECUTED. No current record was established as disposable; existing `sequence_test` is not assumed safe to delete. No mutation performed, and canonical post-delete selection retention remains uncertified in browser.
 - L console capture: PASS for DataTable errors. No error-level entries; only two occurrences of the existing Next Image `logo.svg` fill/static-parent warning. Unrelated visual/link files preserved.
 - PR #37 continuation outcome: A–H and J–L observed checks pass after fresh load, with the initial stale-page sort-loss observation retained above. I remains NOT EXECUTED. No application fix required from the fresh-load observations; no branch created and no styling/renderer changes made. Matrix A is not promoted to fully green: deletion lifecycle plus previously documented controlled async failure/retry and explicit TranslationKey refetch gates remain outstanding. Matrix B / performance gate is not started.
+
+
+### October 1 — native table width contract follow-up
+
+Branch: `chatgpt/datatable-table-width-contract`
+
+Purpose:
+
+- replace the experimental DOM-measured `overrideWidthSize` path,
+- expose a stable first-class DataTable width contract,
+- allow `tableWidth="100%"` without `tableProps.sx`,
+- preserve TanStack column geometry as the default minimum width,
+- support the same defaults through `RazethDataTable.defaultProps`.
+
+Automated coverage:
+
+- `src/components/DataTable/mui/components/tableGeometryTheme.spec.tsx`
+  verifies intrinsic fallback, 100% width, explicit minimum width, numeric pixel
+  normalization, theme defaults, and explicit-prop precedence.
+
+Browser status: **PENDING**.
+
+Required browser recheck before this follow-up is considered certified:
+
+1. production TranslationKey table with default width still scrolls horizontally
+   when the visible column model is wider than its container,
+2. a fixture/resource using `tableWidth="100%"` visibly fills a wider
+   container without `tableProps.sx`,
+3. start/end pinned columns remain aligned while horizontally scrolling,
+4. column resize handles and resized column geometry remain aligned,
+5. fullscreen enter/exit preserves the width contract,
+6. switching table/card/table does not mutate query state or produce layout
+   regressions,
+7. no new console errors.
+
+This width follow-up does **not** close the remaining Matrix A blockers.
+Deletion-lifecycle browser evidence, controlled async filter-option
+failure/retry, and explicit same-lifecycle TranslationKey refetch evidence
+remain outstanding.
