@@ -17,7 +17,6 @@ const FormatBadge = styled("span")(({ theme }) => ({
   backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.12),
   color: theme.vars.palette.primary.main,
   fontFamily: "monospace",
-  marginRight: theme.spacing(1),
 }));
 
 const columnHelper = createMuiDataTableColumnHelper<PublicDocumentRecord>();
@@ -95,12 +94,14 @@ export function createPublicDocumentColumns(
     columnHelper.display({
       id: "fileSpecs",
       header: "ទំហំឯកសារ",
-      size: 160,
+      size: 200,
       enableSorting: false,
       enableGlobalFilter: false,
       cell: ({ row }) => (
-        <Box display="flex" alignItems="center">
-          <FormatBadge>{row.original.fileType}</FormatBadge>
+        <Box display="flex" alignItems="center" flexWrap="wrap" gap={0.75}>
+          {row.original.fileTypes.map((type) => (
+            <FormatBadge key={type}>{type}</FormatBadge>
+          ))}
           <Typography variant="caption" color="text.secondary">
             {row.original.fileSize}
           </Typography>

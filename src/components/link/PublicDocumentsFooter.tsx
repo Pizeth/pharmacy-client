@@ -4,10 +4,19 @@
 
 import type { ReactNode } from "react";
 import { Box, Container, Link, Stack, Typography, styled } from "@mui/material";
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Mail, MapPin, Phone, Send } from "lucide-react";
 
+import {
+  isExternalUrl,
+  toGoogleMapsUrl,
+  toTelegramUrl,
+  toTelUrl,
+} from "./contactLinks";
 import { PUBLIC_DOCUMENTS_SITE } from "./siteInfo";
-import type { PublicDocumentsSiteInfo } from "./types";
+import type {
+  PublicDocumentsPhoneContact,
+  PublicDocumentsSiteInfo,
+} from "./types";
 import MsgUtils from "@/utils/msgUtils";
 
 const FooterRoot = styled("footer")(({ theme }) => ({
@@ -33,8 +42,81 @@ interface ContactLine {
   readonly key: string;
   readonly icon: ReactNode;
   readonly label: string;
-  readonly text: string;
-  readonly href?: string;
+  readonly content: ReactNode;
+}
+
+interface ContactLinkProps {
+  readonly href: string;
+  readonly title?: string;
+  readonly "aria-label"?: string;
+  readonly children: ReactNode;
+}
+
+/**
+ * Footer link. http(s) links open in a new tab; tel: and mailto: links
+ * hand off to the dialer / mail app instead.
+ */
+function ContactLink(props: ContactLinkProps) {
+  const { href, children, ...rest } = props;
+
+  return (
+    <Link
+      href={href}
+      color="inherit"
+      underline="hover"
+      variant="body2"
+      {...(isExternalUrl(href)
+        ? { target: "_blank", rel: "noopener noreferrer" }
+        : {})}
+      {...rest}
+    >
+      {children}
+    </Link>
+  );
+}
+
+/**
+ * One person on a single line, as two independent links:
+ * the name opens Telegram, the number starts a phone call.
+ */
+function PhoneEntry(props: { readonly phone: PublicDocumentsPhoneContact }) {
+  const { phone } = props;
+
+  const telegramUrl = phone.telegram ? toTelegramUrl(phone.telegram) : null;
+  const label = phone.name ?? (telegramUrl ? "Telegram" : null);
+
+  const numberLink = (
+    <ContactLink href={toTelUrl(phone.number)}>{phone.number}</ContactLink>
+  );
+
+  const labelNode = !label ? null : telegramUrl ? (
+    <ContactLink
+      href={telegramUrl}
+      title="Telegram"
+      aria-label={`Telegram: ${label}`}
+    >
+      {label}
+      <Send
+        size={12}
+        aria-hidden
+        style={{ marginInlineStart: 4, verticalAlign: "-1px" }}
+      />
+    </ContactLink>
+  ) : (
+    label
+  );
+
+  return (
+    <Typography variant="body2" component="div">
+      {labelNode ? (
+        <>
+          {labelNode} ({numberLink})
+        </>
+      ) : (
+        numberLink
+      )}
+    </Typography>
+  );
 }
 
 function buildContactLines(
@@ -47,17 +129,29 @@ function buildContactLines(
       key: "address",
       icon: <MapPin size={16} />,
       label: "អាសយដ្ឋាន",
-      text: contact.address,
+      content: (
+        <ContactLink
+          href={toGoogleMapsUrl(contact.address)}
+          title="Google Maps"
+        >
+          {contact.address.text}
+        </ContactLink>
+      ),
     });
   }
 
-  if (contact.phone) {
+  if (contact.phones && contact.phones.length > 0) {
     lines.push({
       key: "phone",
       icon: <Phone size={16} />,
       label: "លេខទូរសព្ទ",
-      text: "លោកស្រី សន ម៉ាលី (" + contact.phone + ")",
-      href: `tel:${contact.phone.replace(/[^\d+]/g, "")}`,
+      content: (
+        <Stack spacing={0.5}>
+          {contact.phones.map((phone) => (
+            <PhoneEntry key={phone.number} phone={phone} />
+          ))}
+        </Stack>
+      ),
     });
   }
 
@@ -66,8 +160,11 @@ function buildContactLines(
       key: "email",
       icon: <Mail size={16} />,
       label: "អ៊ីម៉ែល",
-      text: contact.email,
-      href: `mailto:${contact.email}`,
+      content: (
+        <ContactLink href={`mailto:${contact.email}`}>
+          {contact.email}
+        </ContactLink>
+      ),
     });
   }
 
@@ -76,7 +173,7 @@ function buildContactLines(
       key: "hours",
       icon: <Clock size={16} />,
       label: "ម៉ោងធ្វើការ",
-      text: contact.hours,
+      content: <Typography variant="body2">{contact.hours}</Typography>,
     });
   }
 
@@ -143,18 +240,7 @@ export function PublicDocumentsFooter(props: PublicDocumentsFooterProps) {
                       >
                         {line.label}
                       </Typography>
-                      {line.href ? (
-                        <Link
-                          href={line.href}
-                          color="inherit"
-                          underline="hover"
-                          variant="body2"
-                        >
-                          {line.text}
-                        </Link>
-                      ) : (
-                        <Typography variant="body2">{line.text}</Typography>
-                      )}
+                      {line.content}
                     </Box>
                   </Stack>
                 ))}

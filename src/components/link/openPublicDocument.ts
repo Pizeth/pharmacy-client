@@ -4,10 +4,26 @@ import type { PublicDocumentRecord } from "./types";
 
 export type PublicDocumentOpenResult = "link" | "download";
 
+/**
+ * Extension of a URL's path, ignoring query string and fragment.
+ */
+function extensionFromUrl(url: string): string | null {
+  const path = url.split(/[?#]/, 1)[0];
+  const match = /\.([A-Za-z0-9]{1,8})$/.exec(path);
+
+  return match ? match[1].toLowerCase() : null;
+}
+
 function safeFileName(doc: PublicDocumentRecord): string {
   const base = doc.title.toLowerCase().replace(/[^a-z0-9]+/g, "_");
 
-  return `${doc.id.toLowerCase()}_${base}.${doc.fileType.toLowerCase()}`;
+  // A fileUrl points at one concrete file, so its own extension wins;
+  // otherwise use the document's primary (first) format.
+  const extension =
+    (doc.fileUrl ? extensionFromUrl(doc.fileUrl) : null) ??
+    doc.fileTypes[0].toLowerCase();
+
+  return `${doc.id.toLowerCase()}_${base}.${extension}`;
 }
 
 function triggerAnchorDownload(href: string, fileName: string): void {
