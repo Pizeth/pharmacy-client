@@ -1318,6 +1318,57 @@ Target contract:
 
 Browser certification is required before Matrix A advances.
 
+### 2.2.2 Native table width contract follow-up — 2026-10-01
+
+The production DataTable needed a first-class way to fill its available
+container width without pushing resource styling into `tableProps.sx`.
+
+The earlier experimental `overrideWidthSize` approach was removed because it
+mixed CSS-unit parsing with runtime DOM measurement, relied on an unattached
+container ref, and could not represent percentage widths robustly.
+
+The generic renderer now owns two presentation-only geometry props:
+
+```tsx
+<DataTable
+  table={table}
+  tableWidth="100%"
+  tableMinWidth="100%"
+/>
+```
+
+Contract:
+
+- `tableWidth` controls the native table's preferred width,
+- `tableMinWidth` optionally replaces its minimum width,
+- when neither is supplied, TanStack's resolved visible-column total remains
+  both the width and minimum width,
+- `tableWidth="100%"` with no explicit `tableMinWidth` fills a wider
+  container while preserving TanStack's column total as the minimum, so narrow
+  containers still scroll horizontally instead of compressing configured
+  columns,
+- numeric values are normalized to pixel CSS values,
+- both properties are also available through
+  `theme.components.RazethDataTable.defaultProps`,
+- explicit DataTable props override theme defaults,
+- no resource-local `sx` is required,
+- no measurement effect, ResizeObserver, or duplicate width state is introduced.
+
+The physical table slot continues using stable themeable structure and CSS
+custom properties; TanStack remains the source of truth for individual column
+sizes.
+
+Focused regression coverage:
+
+`src/components/DataTable/mui/components/tableGeometryTheme.spec.tsx`
+
+Browser acceptance after merge should verify:
+
+1. default intrinsic/TanStack width still horizontally scrolls when needed,
+2. `tableWidth="100%"` fills a wider table container,
+3. pinned columns and resize geometry remain correct,
+4. fullscreen and card/table switching are unchanged.
+
 ### 2.2.2 MRT row-order + fixed-footer follow-up — 2026-09-30
 
 PR #35 closed the card-overlap regression, but browser testing showed that the
