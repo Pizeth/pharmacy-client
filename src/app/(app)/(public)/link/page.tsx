@@ -1,5 +1,29 @@
 "use client";
 
+import { ResourcePage } from "@/components/layouts/ResourcePage";
+import { PublicDocumentsFooter, PublicDocumentsTable } from "@/components/link";
+
+export default function PublicLinkPage() {
+  return (
+    <>
+      <ResourcePage
+        title="ទម្រង់ពាក្យស្នើសុំ"
+        subtitle="ស្វែងរក និងទាញយកទម្រង់ពាក្យស្នើសុំ និងលិខិតបទដ្ឋានគតិយុត្តិ"
+        maxWidth="xl"
+        hero
+        badgeLabel="ឯកសារផ្លូវការ"
+        // badgeIcon={<VerifiedUserOutlinedIcon fontSize="small" color="inherit" />}
+        // badgeLabel="Official Verified Repository"
+        // surface
+      >
+        <PublicDocumentsTable />
+      </ResourcePage>
+
+      <PublicDocumentsFooter />
+    </>
+  );
+}
+
 // src/app/(app)/(public)/link/page.tsx
 //
 // Static public document directory, mirroring
@@ -308,7 +332,7 @@ function downloadDocument(doc: PublicDocumentRecord): void {
   URL.revokeObjectURL(url);
 }
 
-export default function PublicDocumentsPage() {
+export function PublicDocumentsPage() {
   const { mode, setMode } = useColorScheme();
   const [selectedCategory, setSelectedCategory] =
     useState<(typeof CATEGORIES)[number]>("All");

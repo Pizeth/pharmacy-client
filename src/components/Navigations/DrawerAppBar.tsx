@@ -404,6 +404,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 }>(({ theme, open }) => ({
   flexGrow: 1,
   minWidth: 0,
+  // background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #1d4ed8 100%)",
   [theme.breakpoints.up("xs")]: {
     paddingTop: theme.spacing(5),
   },
@@ -1051,7 +1052,6 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
   return (
     <Root>
       <NextParticlesProvider init={init}>
-        {" "}
         {/* <CssBaseline /> */}
         <AppBar
           position="fixed"

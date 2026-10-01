@@ -2,7 +2,7 @@
 
 import { Box, Table, TableContainer, styled } from "@mui/material";
 import type { TableContainerProps, TableProps } from "@mui/material";
-import type { CSSProperties } from "react";
+import { useRef, type CSSProperties } from "react";
 import type { RowData } from "@tanstack/table-core";
 import { DataTableAccessibilityProvider } from "../accessibility";
 import { DataTableDensityProvider } from "../density";
@@ -47,6 +47,7 @@ import { DataTableShell } from "./DataTableShell";
 import { DataTableRefreshingIndicator } from "./states";
 import { DataTableToolbar } from "./toolbar";
 import type { DataTableToolbarConfig } from "./toolbar";
+import { parseUnit } from "@/utils/themeUtils";
 
 /**
  * ------------------------------------------------------------------
@@ -242,6 +243,9 @@ export interface DataTableProps<TData extends RowData>
    * stored through this key.
    */
   readonly persistence?: false | DataTablePersistedVisualStateConfig;
+
+  readonly overrideWidthSize?: string;
+  readonly overrideHeightSize?: string;
 }
 
 /**
@@ -289,6 +293,9 @@ interface DataTablePresentationRegionProps<TData extends RowData> {
   readonly autoCardBreakpoint: NonNullable<
     DataTableDisplayModeConfig["autoCardBreakpoint"]
   >;
+
+  readonly overrideWidthSize?: string;
+  readonly overrideHeightSize?: string;
 }
 
 /**
@@ -307,7 +314,13 @@ function DataTablePresentationRegion<TData extends RowData>(
     rowPinningDisplayMode,
     renderDetailPanel,
     autoCardBreakpoint,
+    overrideWidthSize,
   } = props;
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  ``;
+
+  const totalWidth = containerRef.current?.offsetWidth ?? 0;
 
   const resolvedDisplayMode =
     useDataTableResolvedDisplayMode(autoCardBreakpoint);
@@ -343,10 +356,15 @@ function DataTablePresentationRegion<TData extends RowData>(
         })}
       >
         {() => {
-          const totalSize = table.getTotalSize();
+          const totalSize = overrideWidthSize
+            ? parseUnit(overrideWidthSize, totalWidth)
+            : undefined;
+
+          console.log("totalSize", totalSize, overrideWidthSize, totalWidth);
+          const resolvedTotalSize = totalSize ?? table.getTotalSize();
 
           const tableStyle: DataTableTableStyle = {
-            "--DataTable-table-size": `${totalSize}px`,
+            "--DataTable-table-size": `${resolvedTotalSize}px`,
             ...tableProps?.style,
           };
 
@@ -429,6 +447,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     autoCardBreakpoint: autoCardBreakpointProp,
 
     persistence = false,
+    overrideWidthSize,
   } = props;
 
   const variant =
@@ -578,6 +597,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                         rowPinningDisplayMode={rowPinningDisplayMode}
                         renderDetailPanel={renderDetailPanel}
                         autoCardBreakpoint={autoCardBreakpoint}
+                        overrideWidthSize={overrideWidthSize}
                       />
                       {pagination !== false ? (
                         <DataTablePagination

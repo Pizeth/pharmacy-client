@@ -81,11 +81,11 @@ const globalStyles = (theme: Theme) => ({
     textAlign: "center",
   },
   /* Target ALL Boxes inside Stacks */
-  ".MuiStack-root .MuiBox-root": {
-    margin: `${theme.spacing(0)}`,
-    padding: `${theme.spacing(0)}`,
-    // lineHeight: 0,
-  },
+  // ".MuiStack-root .MuiBox-root": {
+  //   margin: `${theme.spacing(0)}`,
+  //   padding: `${theme.spacing(0)}`,
+  //   // lineHeight: 0,
+  // },
   /* Specific to Password Strength Meter Box */
   ".MuiStack-root > .MuiBox-root:has(.MuiLinearProgress-root)": {
     marginTop: `${theme.spacing(0)}`,
