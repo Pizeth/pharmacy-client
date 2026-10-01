@@ -20,7 +20,7 @@ export const PUBLIC_DOCUMENTS_SITE: PublicDocumentsSiteInfo = {
       text: "ទីស្ដីការក្រសួងមុខងារសាធារណៈ អគារ «ក» ជាន់ទី៤ បន្ទប់៤០១",
       // Paste the Google Maps "Share" link for the exact place. Without
       // it, the address text is used as a Google Maps search instead.
-      // mapUrl: "https://maps.app.goo.gl/XXXXXXXXXXXX",
+      mapUrl: "https://maps.app.goo.gl/XdbVNSJ5Wws3LLa38",
     },
     phones: [
       {
@@ -28,7 +28,7 @@ export const PUBLIC_DOCUMENTS_SITE: PublicDocumentsSiteInfo = {
         number: "+855 97 824 2255",
         // Opens this person's Telegram when the name is clicked.
         // Accepts "https://t.me/username", "@username" or "+855...".
-        // telegram: "https://t.me/username",
+        telegram: "https://t.me/SORN_MALY",
       },
     ],
     email: "sornmaly95@gmail.com",

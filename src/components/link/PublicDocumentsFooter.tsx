@@ -4,7 +4,8 @@
 
 import type { ReactNode } from "react";
 import { Box, Container, Link, Stack, Typography, styled } from "@mui/material";
-import { Clock, Mail, MapPin, Phone, Send } from "lucide-react";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import TelegramIcon from "@mui/icons-material/Telegram";
 
 import {
   isExternalUrl,
@@ -95,9 +96,11 @@ function PhoneEntry(props: { readonly phone: PublicDocumentsPhoneContact }) {
       title="Telegram"
       aria-label={`Telegram: ${label}`}
     >
-      {label}
-      <Send
-        size={12}
+      <Typography variant="body2" component="span">
+        {label}
+      </Typography>
+      <TelegramIcon
+        fontSize="inherit"
         aria-hidden
         style={{ marginInlineStart: 4, verticalAlign: "-1px" }}
       />
