@@ -2,7 +2,7 @@
 
 import { Box, Table, TableContainer, styled } from "@mui/material";
 import type { TableContainerProps, TableProps } from "@mui/material";
-import { useRef, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import type { RowData } from "@tanstack/table-core";
 import { DataTableAccessibilityProvider } from "../accessibility";
 import { DataTableDensityProvider } from "../density";
@@ -47,7 +47,6 @@ import { DataTableShell } from "./DataTableShell";
 import { DataTableRefreshingIndicator } from "./states";
 import { DataTableToolbar } from "./toolbar";
 import type { DataTableToolbarConfig } from "./toolbar";
-import { parseUnit } from "@/utils/themeUtils";
 
 /**
  * ------------------------------------------------------------------
@@ -122,15 +121,57 @@ const TableRoot = styled(Table, {
   tableLayout: "fixed",
   borderCollapse: "separate",
   borderSpacing: 0,
-  width: "var(--DataTable-table-size)",
-  minWidth: "var(--DataTable-table-size)",
+  width: "var(--DataTable-table-width, var(--DataTable-table-size))",
+  minWidth: "var(--DataTable-table-min-width, var(--DataTable-table-size))",
 });
 
 /**
  * Runtime width supplied by TanStack.
  */
 export interface DataTableTableStyle extends CSSProperties {
+  /**
+   * TanStack's resolved sum of visible column widths.
+   *
+   * This remains available as the geometry fallback even when a consumer
+   * requests a wider presentation width such as 100%.
+   */
   "--DataTable-table-size": string;
+
+  /**
+   * Preferred physical table width.
+   */
+  "--DataTable-table-width": string;
+
+  /**
+   * Minimum physical table width.
+   *
+   * By default this remains TanStack's resolved total so filling a wider
+   * container does not destroy horizontal overflow when the column model is
+   * wider than the viewport.
+   */
+  "--DataTable-table-min-width": string;
+}
+
+/**
+ * Normalize public width props before they cross into CSS custom properties.
+ *
+ * React treats numeric width values as pixels for ordinary style properties,
+ * but custom properties are raw tokens. Convert numbers explicitly so:
+ *
+ *   tableWidth={960}
+ *
+ * becomes:
+ *
+ *   --DataTable-table-width: 960px
+ */
+function normalizeDataTableTableSize(
+  value: CSSProperties["width"] | CSSProperties["minWidth"],
+): string | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  return typeof value === "number" ? `${value}px` : String(value);
 }
 
 export interface DataTableProps<TData extends RowData>
@@ -244,8 +285,33 @@ export interface DataTableProps<TData extends RowData>
    */
   readonly persistence?: false | DataTablePersistedVisualStateConfig;
 
-  readonly overrideWidthSize?: string;
-  readonly overrideHeightSize?: string;
+  /**
+   * Preferred width of the native table surface.
+   *
+   * Default:
+   *   TanStack's resolved total visible-column width.
+   *
+   * Common fill-container usage:
+   *
+   *   tableWidth="100%"
+   *
+   * The default minimum width still preserves TanStack's column geometry, so
+   * a table wider than the viewport continues to scroll horizontally.
+   *
+   * This is a first-class geometry prop and does not require tableProps.sx.
+   */
+  readonly tableWidth?: CSSProperties["width"];
+
+  /**
+   * Optional minimum width of the native table surface.
+   *
+   * Default:
+   *   TanStack's resolved total visible-column width.
+   *
+   * Set this explicitly when a resource wants to replace that minimum, for
+   * example together with tableWidth="100%".
+   */
+  readonly tableMinWidth?: CSSProperties["minWidth"];
 }
 
 /**
@@ -294,8 +360,8 @@ interface DataTablePresentationRegionProps<TData extends RowData> {
     DataTableDisplayModeConfig["autoCardBreakpoint"]
   >;
 
-  readonly overrideWidthSize?: string;
-  readonly overrideHeightSize?: string;
+  readonly tableWidth?: CSSProperties["width"];
+  readonly tableMinWidth?: CSSProperties["minWidth"];
 }
 
 /**
@@ -314,13 +380,9 @@ function DataTablePresentationRegion<TData extends RowData>(
     rowPinningDisplayMode,
     renderDetailPanel,
     autoCardBreakpoint,
-    overrideWidthSize,
+    tableWidth,
+    tableMinWidth,
   } = props;
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  ``;
-
-  const totalWidth = containerRef.current?.offsetWidth ?? 0;
 
   const resolvedDisplayMode =
     useDataTableResolvedDisplayMode(autoCardBreakpoint);
@@ -356,16 +418,19 @@ function DataTablePresentationRegion<TData extends RowData>(
         })}
       >
         {() => {
-          const totalSize = overrideWidthSize
-            ? parseUnit(overrideWidthSize, totalWidth)
-            : undefined;
+          const tanStackTableSize = `${table.getTotalSize()}px`;
 
-          console.log("totalSize", totalSize, overrideWidthSize, totalWidth);
-          const resolvedTotalSize = totalSize ?? table.getTotalSize();
+          const resolvedTableWidth =
+            normalizeDataTableTableSize(tableWidth) ?? tanStackTableSize;
+
+          const resolvedTableMinWidth =
+            normalizeDataTableTableSize(tableMinWidth) ?? tanStackTableSize;
 
           const tableStyle: DataTableTableStyle = {
-            "--DataTable-table-size": `${resolvedTotalSize}px`,
             ...tableProps?.style,
+            "--DataTable-table-size": tanStackTableSize,
+            "--DataTable-table-width": resolvedTableWidth,
+            "--DataTable-table-min-width": resolvedTableMinWidth,
           };
 
           return (
@@ -447,7 +512,9 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     autoCardBreakpoint: autoCardBreakpointProp,
 
     persistence = false,
-    overrideWidthSize,
+
+    tableWidth: tableWidthProp,
+    tableMinWidth: tableMinWidthProp,
   } = props;
 
   const variant =
@@ -455,6 +522,16 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
 
   const autoCardBreakpoint =
     autoCardBreakpointProp ?? themeDefaults.autoCardBreakpoint ?? "sm";
+
+  /**
+   * Table geometry follows the same generic presentation precedence as the
+   * other resource-independent defaults:
+   *
+   * explicit prop -> theme default -> TanStack total-size fallback
+   */
+  const tableWidth = tableWidthProp ?? themeDefaults.tableWidth;
+
+  const tableMinWidth = tableMinWidthProp ?? themeDefaults.tableMinWidth;
 
   const persistenceController = useDataTablePersistedVisualStateController({
     table,
@@ -597,7 +674,8 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                         rowPinningDisplayMode={rowPinningDisplayMode}
                         renderDetailPanel={renderDetailPanel}
                         autoCardBreakpoint={autoCardBreakpoint}
-                        overrideWidthSize={overrideWidthSize}
+                        tableWidth={tableWidth}
+                        tableMinWidth={tableMinWidth}
                       />
                       {pagination !== false ? (
                         <DataTablePagination

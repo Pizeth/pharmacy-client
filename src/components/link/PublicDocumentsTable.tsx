@@ -94,7 +94,7 @@ export function PublicDocumentsTable() {
           enableColumnManager: true,
           enableFilterToggle: true,
         }}
-        overrideWidthSize={"100%"}
+        tableWidth="100%"
       />
 
       {/* <Box
