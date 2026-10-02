@@ -14,9 +14,9 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
     id: "DOC-2026-001",
     title: "ពាក្យស្នើសុំអនុញ្ញាតច្បាប់ឈប់សម្រាក",
     category: "សំណើសុំ",
-    fileSize: "1.2 MB",
+    fileSize: "401 KB",
     lastUpdated: "2026-01-15",
-    fileTypes: ["PDF"],
+    fileTypes: ["PDF", "DOCX"],
     description: "សំណើសុំច្បាប់ឈប់សម្រាកសម្រាប់មន្រ្តីរាជការស៊ីវិល",
     driveUrl:
       "https://drive.google.com/drive/folders/1xf6GkjcmSIfrdPbGr-27bGrm9yw75pVE",
@@ -25,9 +25,9 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
     id: "DOC-2026-002",
     title: "ពាក្សស្នើសុំវិញ្ញាបនបត្ររដ្ឋបាល និងវិញ្ញាបនបត្របញ្ជាក់ប្រាក់បៀវត្ស",
     category: "សំណើសុំ",
-    fileSize: "840 KB",
+    fileSize: "350 KB",
     lastUpdated: "2026-02-10",
-    fileTypes: ["PDF"],
+    fileTypes: ["PDF", "DOCX"],
     description:
       "សំណើសុំវិញ្ញាបនបត្ររដ្ឋបាល និងវិញ្ញាបនបត្របញ្ជាក់ប្រាក់បៀវត្ស",
     driveUrl:
@@ -37,9 +37,9 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
     id: "DOC-2026-003",
     title: "ពាក្យស្នើសុំដំឡើងថ្នាក់ និងឋានន្តរស័ក្តិ តាមកម្រិតសញ្ញាបត្រ",
     category: "សំណើសុំ",
-    fileSize: "2.1 MB",
+    fileSize: "250 KB",
     lastUpdated: "2025-11-20",
-    fileTypes: ["PDF"],
+    fileTypes: ["PDF", "DOCX"],
     description: "សំណើសុំដំឡើងថ្នាក់ និងឋានន្តរស័ក្តិ តាមកម្រិតសញ្ញាបត្រ",
     driveUrl:
       "https://drive.google.com/drive/folders/19Xa9Bd68SKGo8PQHaA7XRZg7sMElLJpF",
@@ -48,9 +48,9 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
     id: "DOC-2026-004",
     title: "ពាក្យស្នើសុំដំឡើងថ្នាក់ និងឋានន្តរស័ក្តិ តាមវេនអតីតភាព វេនជ្រើសរើស",
     category: "សំណើសុំ",
-    fileSize: "3.4 MB",
+    fileSize: "350 KB",
     lastUpdated: "2026-03-01",
-    fileTypes: ["DOCX"],
+    fileTypes: ["PDF", "DOCX"],
     description:
       "សំណើសុំដំឡើងថ្នាក់ និងឋានន្តរស័ក្តិ តាមវេនអតីតភាព វេនជ្រើសរើស",
     driveUrl:
@@ -60,9 +60,9 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
     id: "DOC-2026-005",
     title: "ពាក្យស្នើសុំឱ្យស្ថិតនៅក្នុងភាពទំនេរគ្មានបៀវត្ស",
     category: "សំណើសុំ",
-    fileSize: "450 KB",
+    fileSize: "140 KB",
     lastUpdated: "2026-01-05",
-    fileTypes: ["PDF"],
+    fileTypes: ["PDF", "DOCX"],
     description: "សំណើសុំឱ្យស្ថិតនៅក្នុងភាពទំនេរគ្មានបៀវត្ស",
     driveUrl:
       "https://drive.google.com/drive/folders/1s5LnW-_ZAOIwXV_829nyYqUINQwi8hMf",
@@ -71,20 +71,20 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
     id: "DOC-2026-006",
     title: "ពាក្យស្នើសុំឱ្យស្ថិតនៅក្រៅក្របខ័ណ្ឌដើម",
     category: "សំណើសុំ",
-    fileSize: "1.1 MB",
+    fileSize: "135 KB",
     lastUpdated: "2025-12-18",
-    fileTypes: ["PDF"],
+    fileTypes: ["PDF", "DOCX"],
     description: "សំណើសុំឱ្យស្ថិតនៅក្រៅក្របខ័ណ្ឌដើម",
     driveUrl:
       "https://drive.google.com/drive/folders/1NKJTNAJRKmBq4R3Ek69hoyYtrthLXEAy",
   },
   {
     id: "DOC-2026-007",
-    title: "ពាក្យខុំចូលបម្រើការងារវិញ",
+    title: "ពាក្យសុំចូលបម្រើការងារវិញ",
     category: "សំណើសុំ",
-    fileSize: "1.8 MB",
+    fileSize: "350 KB",
     lastUpdated: "2026-02-28",
-    fileTypes: ["PDF"],
+    fileTypes: ["PDF", "DOCX"],
     description: "សំណើសុំចូលបម្រើការងារវិញ",
     driveUrl:
       "https://drive.google.com/drive/folders/1KGIiZJucE0oQMXuhJbUQXIt-C1CmaQZy",
@@ -93,9 +93,9 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
     id: "DOC-2026-008",
     title: "ពាក្យស្នើសុំចូលនិវត្តន៍មុនកាលកំណត់ (អតីតភាពការងារ ៣០ឆ្នាំ)",
     category: "សំណើសុំ",
-    fileSize: "920 KB",
+    fileSize: "175 KB",
     lastUpdated: "2025-10-12",
-    fileTypes: ["DOCX"],
+    fileTypes: ["PDF", "DOCX"],
     description: "សំណើសុំចូលនិវត្តន៍មុនកាលកំណត់ (អតីតភាពការងារ ៣០ឆ្នាំ)",
     driveUrl:
       "https://drive.google.com/drive/folders/1cC4j9U3fWnTFGN01RKkI7raOZMTXlfRz",
@@ -104,9 +104,9 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
     id: "DOC-2026-009",
     title: "ពាក្យស្នើសុំអនុញ្ញាតចូលរួមប្រឡងប្រជែងតាមក្រសួង ស្ថាប័ន",
     category: "សំណើសុំ",
-    fileSize: "920 KB",
+    fileSize: "490 KB",
     lastUpdated: "2025-10-12",
-    fileTypes: ["DOCX"],
+    fileTypes: ["PDF", "DOCX"],
     description: "សំណើសុំអនុញ្ញាតចូលរួមប្រឡងប្រជែងតាមក្រសួង ស្ថាប័ន",
     driveUrl:
       "https://drive.google.com/drive/folders/1B4oFjFDon40tjsCC7uKIWWu9KTzXk8dV",
@@ -115,9 +115,9 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
     id: "DOC-2026-010",
     title: "ពាក្យសុំលាឈប់ពីក្របខ័ណ្ឌមន្រ្តីរាជការ",
     category: "សំណើសុំ",
-    fileSize: "920 KB",
+    fileSize: "170 KB",
     lastUpdated: "2025-10-12",
-    fileTypes: ["DOCX"],
+    fileTypes: ["PDF", "DOCX"],
     description: "សំណើសុំលាឈប់ពីក្របខ័ណ្ឌមន្រ្តីរាជការ",
     driveUrl:
       "https://drive.google.com/drive/folders/17AYeHrC4O0uje7s0MhzS0hvAmg10mtn2",
@@ -127,9 +127,9 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
     title:
       "ការស្នើសុំនិងលុបប្រាក់វិភាជន៍គ្រួសារមន្រ្តីរាជការស៊ីវិលសម្រាប់សហព័ទ្ធនិងកូន",
     category: "សំណើសុំ",
-    fileSize: "920 KB",
+    fileSize: "360 KB",
     lastUpdated: "2025-10-12",
-    fileTypes: ["DOCX"],
+    fileTypes: ["PDF", "DOCX"],
     description:
       "សំណើសុំនិងលុបប្រាក់វិភាជន៍គ្រួសារមន្រ្តីរាជការស៊ីវិលសម្រាប់សហព័ទ្ធនិងកូន",
     driveUrl:
