@@ -907,6 +907,7 @@ const defaultThemeInvariants = {
           backgroundColor: theme.vars.palette.background.paper,
           // boxShadow: theme.vars.palette.customShadows.dataTableCard,
           boxShadow: theme.vars.palette.customShadows.neumorphic,
+          height: `clamp(200px, 25vh, 325px)`,
           transition: theme.transitions.create(
             ["transform", "box-shadow", "background-color"],
             { duration: theme.transitions.duration.short },
@@ -1007,6 +1008,7 @@ const defaultThemeInvariants = {
         }),
 
         cardActions: ({ theme }: { theme: Theme }) => ({
+          marginTop: "auto",
           display: "flex",
           justifyContent: "flex-end",
           gap: theme.spacing(0.75),

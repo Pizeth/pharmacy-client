@@ -1,4 +1,8 @@
-import { openPublicDocument } from "./openPublicDocument";
+import {
+  openPublicDocument,
+  resolvePublicDocumentExtension,
+  viewPublicDocument,
+} from "./openPublicDocument";
 import type { PublicDocumentRecord } from "./types";
 
 const base: PublicDocumentRecord = {
@@ -92,5 +96,47 @@ describe("openPublicDocument", () => {
 
     expect(result).toBe("link");
     expect(clickSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("viewPublicDocument", () => {
+  beforeEach(() => {
+    window.open = jest.fn();
+  });
+
+  it("opens the file in a new tab without opener access", () => {
+    const result = viewPublicDocument({ ...base, fileUrl: "/files/a.pdf" });
+
+    expect(result).toBe("link");
+    expect(window.open).toHaveBeenCalledWith(
+      "/files/a.pdf",
+      "_blank",
+      "noopener,noreferrer",
+    );
+  });
+
+  it("does nothing for a document without a file", () => {
+    const result = viewPublicDocument({
+      ...base,
+      driveUrl: "https://drive.google.com/x",
+    });
+
+    expect(result).toBeNull();
+    expect(window.open).not.toHaveBeenCalled();
+  });
+});
+
+describe("resolvePublicDocumentExtension", () => {
+  it("prefers the file URL's extension, ignoring query and fragment", () => {
+    expect(
+      resolvePublicDocumentExtension({ ...base, fileUrl: "/f/A.DOCX?v=2#x" }),
+    ).toBe("docx");
+  });
+
+  it("falls back to the primary listed format", () => {
+    expect(resolvePublicDocumentExtension(base)).toBe("pdf");
+    expect(resolvePublicDocumentExtension({ ...base, fileUrl: "/f/x" })).toBe(
+      "pdf",
+    );
   });
 });

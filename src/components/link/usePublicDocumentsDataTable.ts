@@ -9,14 +9,26 @@ import { useMuiDataTable } from "@/components/DataTable";
 import { createPublicDocumentColumns } from "./columns";
 import { PUBLIC_DOCUMENTS } from "./data";
 import type { PublicDocumentCategory } from "./data";
+import { createPublicDocumentActions } from "./documentActions";
+import type { PublicDocumentActionsConfig } from "./documentActions";
 import type { PublicDocumentRecord } from "./types";
+
+export const PUBLIC_DOCUMENTS_DEFAULT_PAGE_SIZE = 25;
 
 export interface UsePublicDocumentsDataTableOptions {
   /**
-   * Must be referentially stable (wrap in useCallback) so column
-   * definitions are not rebuilt on every render.
+   * Both handlers must be referentially stable (wrap in useCallback) so
+   * column definitions are not rebuilt on every render.
    */
-  readonly onOpenDocument: (doc: PublicDocumentRecord) => void;
+  readonly onViewDocument: (doc: PublicDocumentRecord) => void;
+  readonly onDownloadDocument: (doc: PublicDocumentRecord) => void;
+
+  /**
+   * Optional per-action visibility overrides. Must also be referentially
+   * stable (define it at module level). By default View is shown only for
+   * PDF/image files and Download for both Drive links and files.
+   */
+  readonly actions?: PublicDocumentActionsConfig;
 }
 
 /**
@@ -29,13 +41,30 @@ export interface UsePublicDocumentsDataTableOptions {
 export function usePublicDocumentsDataTable(
   options: UsePublicDocumentsDataTableOptions,
 ) {
-  const { onOpenDocument } = options;
+  const {
+    onViewDocument,
+    onDownloadDocument,
+    actions: actionsConfig,
+  } = options;
 
   const [category, setCategory] = useState<PublicDocumentCategory>("ទាំងអស់");
 
+  /**
+   * One definition of View / Download, shared by the table column (labelled
+   * buttons) and the card presentation (icon-only buttons).
+   */
+  const actions = useMemo(
+    () =>
+      createPublicDocumentActions(
+        { onView: onViewDocument, onDownload: onDownloadDocument },
+        actionsConfig,
+      ),
+    [onViewDocument, onDownloadDocument, actionsConfig],
+  );
+
   const columns = useMemo(
-    () => createPublicDocumentColumns(onOpenDocument),
-    [onOpenDocument],
+    () => createPublicDocumentColumns(actions),
+    [actions],
   );
 
   const table = useMuiDataTable({
@@ -49,7 +78,10 @@ export function usePublicDocumentsDataTable(
     enableRowSelection: false,
 
     initialState: {
-      pagination: { pageIndex: 0, pageSize: 10 },
+      pagination: {
+        pageIndex: 0,
+        pageSize: PUBLIC_DOCUMENTS_DEFAULT_PAGE_SIZE,
+      },
     },
 
     meta: {
@@ -69,5 +101,5 @@ export function usePublicDocumentsDataTable(
     [table],
   );
 
-  return { table, category, changeCategory };
+  return { table, category, changeCategory, actions };
 }

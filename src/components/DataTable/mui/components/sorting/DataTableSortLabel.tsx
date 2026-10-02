@@ -26,8 +26,18 @@ const HeaderLabelRoot = styled("span", {
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
-  fontWeight: 600,
-  lineHeight: 1.25,
+  fontWeight: 700,
+  lineHeight: 1.7,
+  fontSize: "1rem",
+  fontFamily: [
+    "Roboto",
+    "Helvetica",
+    "sans-serif",
+    "var(--font-interkhmerloopless)",
+    "var(--font-mef1)",
+    "var(--font-mef2)",
+    "var(--font-siemreap)",
+  ].join(","),
 });
 
 const SortLabelRoot = styled(ButtonBase, {

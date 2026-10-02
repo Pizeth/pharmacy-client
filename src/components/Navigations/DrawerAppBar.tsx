@@ -399,12 +399,16 @@ const DesktopToolbar = styled(Toolbar, {
   },
 }));
 
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
+const Main = styled("main", {
+  shouldForwardProp: (prop) =>
+    !["path", "backgroundColor"].includes(prop as string),
+})<{
   open?: boolean;
-}>(({ theme, open }) => ({
+  backgroundColor?: string;
+}>(({ theme, open, backgroundColor }) => ({
   flexGrow: 1,
   minWidth: 0,
-  // background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #1d4ed8 100%)",
+  background: backgroundColor ?? "transparent",
   [theme.breakpoints.up("xs")]: {
     paddingTop: theme.spacing(5),
   },
@@ -773,7 +777,14 @@ const SOCIAL_ITEMS = [
   },
 ];
 
-export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
+export interface DrawerAppBarProps {
+  children: ReactNode;
+  disabledMenu?: boolean;
+  backgroundColor?: string;
+}
+
+export const DrawerAppBar = (props: DrawerAppBarProps) => {
+  const { children, disabledMenu = false, backgroundColor } = props;
   const init = async (engine: Engine): Promise<void> => {
     const [{ loadSlim }, { loadThemesPlugin }] = await Promise.all([
       import("@tsparticles/slim"),
@@ -857,8 +868,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
       </Search> */}
       <GlobalSearch />
       {/* <Divider /> */}
-      <NavItems variant="horizontal" />
-
+      {disabledMenu ? null : <NavItems variant="horizontal" />}
       {/* Bottom items container - automatically pushed to the bottom */}
       <Box
         sx={{
@@ -1199,10 +1209,11 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 </StackWrapper>
               </ProfileToolBar>
             </AppBarContainer>
-            <DesktopToolbar disableGutters variant="dense">
-              {/* Pass The Drawer Button back here to revert back */}
-              <NavItems />
-              {/* <Search>
+            {disabledMenu ? null : (
+              <DesktopToolbar disableGutters variant="dense">
+                {/* Pass The Drawer Button back here to revert back */}
+                <NavItems />
+                {/* <Search>
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
@@ -1245,7 +1256,8 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
                 ))}
               </Menu>
             </Box> */}
-            </DesktopToolbar>
+              </DesktopToolbar>
+            )}
           </Container>
         </AppBar>
         <Drawer
@@ -1268,7 +1280,7 @@ export const DrawerAppBar = ({ children }: { children: ReactNode }) => {
         >
           {drawer}
         </Drawer>
-        <Main open={open}>
+        <Main open={open} backgroundColor={backgroundColor}>
           {/* <DrawerHeader /> */}
           {children}
         </Main>

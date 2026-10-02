@@ -14,7 +14,7 @@ import type { PublicDocumentsSiteInfo } from "./types";
 export const PUBLIC_DOCUMENTS_SITE: PublicDocumentsSiteInfo = {
   name: "ឯកសារសាធារណៈ",
   tagline: "ទម្រង់ពាក្យស្នើសុំសម្រាប់មន្រ្តីរាជការស៊ីវិល និងឯកសារសាធារណៈផ្សេងៗ",
-  organization: "អគ្គលេខាធិការដ្ឋានក្រសួងមុខងារសាធារណៈ នាយកដ្ឋានធនធានមនុស្ស",
+  organization: "នាយកដ្ឋានធនធានមនុស្ស",
   contact: {
     address: {
       text: "ទីស្ដីការក្រសួងមុខងារសាធារណៈ អគារ «ក» ជាន់ទី៤ បន្ទប់៤០១",

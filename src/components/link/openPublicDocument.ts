@@ -14,16 +14,25 @@ function extensionFromUrl(url: string): string | null {
   return match ? match[1].toLowerCase() : null;
 }
 
+/**
+ * Lower-case extension of the document's concrete file.
+ *
+ * A fileUrl points at one concrete file, so its own extension wins;
+ * otherwise the document's primary (first) format is used.
+ */
+export function resolvePublicDocumentExtension(
+  doc: PublicDocumentRecord,
+): string {
+  return (
+    (doc.fileUrl ? extensionFromUrl(doc.fileUrl) : null) ??
+    doc.fileTypes[0].toLowerCase()
+  );
+}
+
 function safeFileName(doc: PublicDocumentRecord): string {
   const base = doc.title.toLowerCase().replace(/[^a-z0-9]+/g, "_");
 
-  // A fileUrl points at one concrete file, so its own extension wins;
-  // otherwise use the document's primary (first) format.
-  const extension =
-    (doc.fileUrl ? extensionFromUrl(doc.fileUrl) : null) ??
-    doc.fileTypes[0].toLowerCase();
-
-  return `${doc.id.toLowerCase()}_${base}.${extension}`;
+  return `${doc.id.toLowerCase()}_${base}.${resolvePublicDocumentExtension(doc)}`;
 }
 
 function triggerAnchorDownload(href: string, fileName: string): void {
@@ -64,4 +73,22 @@ export function openPublicDocument(
   URL.revokeObjectURL(url);
 
   return "download";
+}
+
+/**
+ * Open a document's file in a new tab so the browser's own PDF/image
+ * viewer shows it. A new tab is more reliable than an embedded viewer on
+ * phones, where card view is the default.
+ *
+ * Browser-only: call from event handlers. Does nothing without a fileUrl.
+ */
+export function viewPublicDocument(
+  doc: PublicDocumentRecord,
+): PublicDocumentOpenResult | null {
+  if (!doc.fileUrl) {
+    return null;
+  }
+
+  window.open(doc.fileUrl, "_blank", "noopener,noreferrer");
+  return "link";
 }

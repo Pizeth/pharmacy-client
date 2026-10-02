@@ -1,10 +1,13 @@
 // src/components/link/index.ts
 
+export * from "./cardConfig";
 export * from "./columns";
 export * from "./data";
+export * from "./documentActions";
 export * from "./openPublicDocument";
 export * from "./PublicDocumentsFooter";
 export * from "./PublicDocumentsTable";
+export * from "./RowNumberCell";
 export * from "./siteInfo";
 export * from "./types";
 export * from "./usePublicDocumentsDataTable";

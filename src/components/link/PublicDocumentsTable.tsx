@@ -2,26 +2,45 @@
 
 // src/components/link/PublicDocumentsTable.tsx
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Alert,
-  Box,
   IconButton,
   Snackbar,
   Tab,
   Tabs,
+  Typography,
   useColorScheme,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 import { DataTable } from "@/components/DataTable";
 
+import { createPublicDocumentCardConfig } from "./cardConfig";
 import { PUBLIC_DOCUMENT_CATEGORIES } from "./data";
-import { openPublicDocument } from "./openPublicDocument";
+import { openPublicDocument, viewPublicDocument } from "./openPublicDocument";
 import type { PublicDocumentOpenResult } from "./openPublicDocument";
 import type { PublicDocumentRecord } from "./types";
+import { publicDocumentsSlot } from "./styled";
 import { usePublicDocumentsDataTable } from "./usePublicDocumentsDataTable";
 import ThemeToggle from "../effect/themes/themeToggle";
 import { Moon, Sun } from "lucide-react";
+
+const CategoryTabsRoot = styled(
+  "div",
+  publicDocumentsSlot("CategoryTabs"),
+)({
+  minWidth: 0,
+  maxWidth: "100%",
+});
+
+const CategoryTab = styled(
+  Tab,
+  publicDocumentsSlot("CategoryTab"),
+)({
+  textTransform: "none",
+  fontWeight: 600,
+});
 
 interface OpenedNotice {
   readonly title: string;
@@ -31,23 +50,39 @@ interface OpenedNotice {
 /**
  * Static public document directory table.
  *
- * Activating a row (click, or Enter/Space on the focused row) opens or
- * downloads the document. The Download button does the same; clicks on
- * it do not double-fire the row handler.
+ * Table presentation on wide screens, card presentation on small ones
+ * (the toolbar toggle can still switch manually). Each row offers View
+ * (PDF/image files only) and Download (Drive links and files); see
+ * documentActions.ts for the rules.
  */
 export function PublicDocumentsTable() {
   const { mode, setMode } = useColorScheme();
   const [notice, setNotice] = useState<OpenedNotice | null>(null);
 
-  const handleOpenDocument = useCallback((doc: PublicDocumentRecord) => {
+  const handleDownloadDocument = useCallback((doc: PublicDocumentRecord) => {
     const result = openPublicDocument(doc);
 
     setNotice({ title: doc.title, result });
   }, []);
 
-  const { table, category, changeCategory } = usePublicDocumentsDataTable({
-    onOpenDocument: handleOpenDocument,
-  });
+  const handleViewDocument = useCallback((doc: PublicDocumentRecord) => {
+    const result = viewPublicDocument(doc);
+
+    if (result) {
+      setNotice({ title: doc.title, result });
+    }
+  }, []);
+
+  const { table, category, changeCategory, actions } =
+    usePublicDocumentsDataTable({
+      onViewDocument: handleViewDocument,
+      onDownloadDocument: handleDownloadDocument,
+    });
+
+  const card = useMemo(
+    () => createPublicDocumentCardConfig(actions),
+    [actions],
+  );
 
   return (
     <>
@@ -57,13 +92,17 @@ export function PublicDocumentsTable() {
         // Fill the container; the fixed column sizes stay as the
         // minimum, so narrow viewports scroll instead of squashing.
         tableProps={{ stickyHeader: true }}
-        // onRowClick={(row) => handleOpenDocument(row.original)}
+        // onRowClick={(row) => handleDownloadDocument(row.original)}
+        card={card}
+        // Cards on small screens, table above the breakpoint.
+        defaultDisplayMode="auto"
+        autoCardBreakpoint="md"
         toolbar={{
           search: true,
           searchPosition: "center",
-          searchPlaceholder: "Search title, ID, or keyword…",
+          searchPlaceholder: "ស្វែងរកឯកសារ…",
           startContent: (
-            <Box sx={{ minWidth: 0, maxWidth: "100%" }}>
+            <CategoryTabsRoot>
               <Tabs
                 value={category}
                 onChange={(_, next) => changeCategory(next)}
@@ -72,15 +111,22 @@ export function PublicDocumentsTable() {
                 aria-label="Document categories"
               >
                 {PUBLIC_DOCUMENT_CATEGORIES.map((name) => (
-                  <Tab
+                  <CategoryTab
                     key={name}
-                    label={name}
+                    label={
+                      <Typography
+                        component="span"
+                        variant="subtitle1"
+                        fontWeight={700}
+                      >
+                        {name}
+                      </Typography>
+                    }
                     value={name}
-                    sx={{ textTransform: "none", fontWeight: 600 }}
                   />
                 ))}
               </Tabs>
-            </Box>
+            </CategoryTabsRoot>
           ),
           endContent: (
             <IconButton
