@@ -71,6 +71,7 @@ export function usePublicDocumentsDataTable(
     data: PUBLIC_DOCUMENTS,
     columns,
     getRowId: (row) => row.id,
+    getRowCanExpand: () => true,
 
     enableGlobalFilter: true,
     enableSorting: true,

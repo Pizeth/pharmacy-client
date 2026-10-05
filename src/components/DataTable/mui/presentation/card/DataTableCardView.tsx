@@ -4,7 +4,6 @@ import {
   Alert,
   Box,
   CircularProgress,
-  Paper,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -26,7 +25,20 @@ import {
 } from "../../styles";
 import type { MuiDataTableInstance } from "../../table";
 
+import {
+  CardActionsRoot,
+  CardBodyRoot,
+  CardDetailRoot,
+  CardExpansionRoot,
+  CardHeaderContentRoot,
+  CardHeaderRoot,
+  CardItemRoot,
+  CardMetadataRoot,
+  CardSelectionRoot,
+  hasRenderableContent,
+} from "./cardSlots";
 import { DataTableCardExpandRowButton } from "./DataTableCardExpandRowButton";
+import { DataTableCardFlipItem } from "./DataTableCardFlipItem";
 import { DataTableCardSelectRowCheckbox } from "./DataTableCardSelectRowCheckbox";
 import type {
   DataTableCardConfig,
@@ -70,100 +82,6 @@ const CardGridRoot = styled(Box, {
   minHeight: "min-content",
 }));
 
-const CardItemRoot = styled(Paper, {
-  name: DATA_TABLE_COMPONENT_NAME,
-  slot: "CardItem",
-  overridesResolver: (_props, styles) => styles.cardItem,
-})(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  minWidth: 0,
-  overflow: "hidden",
-  backgroundImage: "none",
-  '&[data-selected="true"]': {
-    outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`,
-    outlineOffset: -2,
-  },
-}));
-
-const CardHeaderRoot = styled("header", {
-  name: DATA_TABLE_COMPONENT_NAME,
-  slot: "CardHeader",
-  overridesResolver: (_props, styles) => styles.cardHeader,
-})(({ theme }) => ({
-  display: "flex",
-  alignItems: "flex-start",
-  gap: theme.spacing(1),
-  padding: theme.spacing(1.5, 2),
-  minWidth: 0,
-  borderBottom: `1px solid ${(theme.vars ?? theme).palette.divider}`,
-}));
-
-const CardHeaderContentRoot = styled("div")({
-  flex: 1,
-  minWidth: 0,
-});
-
-const CardSelectionRoot = styled("div", {
-  name: DATA_TABLE_COMPONENT_NAME,
-  slot: "CardSelection",
-  overridesResolver: (_props, styles) => styles.cardSelection,
-})({
-  display: "inline-flex",
-  flexShrink: 0,
-});
-
-const CardBodyRoot = styled("div", {
-  name: DATA_TABLE_COMPONENT_NAME,
-  slot: "CardBody",
-  overridesResolver: (_props, styles) => styles.cardBody,
-})(({ theme }) => ({
-  padding: theme.spacing(2),
-  minWidth: 0,
-}));
-
-const CardMetadataRoot = styled("div", {
-  name: DATA_TABLE_COMPONENT_NAME,
-  slot: "CardMetadata",
-  overridesResolver: (_props, styles) => styles.cardMetadata,
-})(({ theme }) => ({
-  padding: theme.spacing(0, 2, 2),
-  minWidth: 0,
-}));
-
-const CardActionsRoot = styled("footer", {
-  name: DATA_TABLE_COMPONENT_NAME,
-  slot: "CardActions",
-  overridesResolver: (_props, styles) => styles.cardActions,
-})(({ theme }) => ({
-  display: "flex",
-  justifyContent: "flex-end",
-  alignItems: "center",
-  gap: theme.spacing(0.5),
-  padding: theme.spacing(1, 2),
-  borderTop: `1px solid ${(theme.vars ?? theme).palette.divider}`,
-}));
-
-const CardExpansionRoot = styled("div", {
-  name: DATA_TABLE_COMPONENT_NAME,
-  slot: "CardExpansion",
-  overridesResolver: (_props, styles) => styles.cardExpansion,
-})(({ theme }) => ({
-  display: "flex",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 2, 1),
-}));
-
-const CardDetailRoot = styled("div", {
-  name: DATA_TABLE_COMPONENT_NAME,
-  slot: "CardDetail",
-  overridesResolver: (_props, styles) => styles.cardDetail,
-})(({ theme }) => ({
-  padding: theme.spacing(2),
-  borderTop: `1px solid ${(theme.vars ?? theme).palette.divider}`,
-  minWidth: 0,
-}));
-
 const CardStateRoot = styled(Box, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "CardState",
@@ -201,10 +119,6 @@ const CardErrorStateRoot = styled(Alert, {
   slot: "ErrorState",
   overridesResolver: (_props, styles) => styles.errorState,
 })({});
-
-function hasRenderableContent(content: ReactNode): boolean {
-  return content !== null && content !== undefined && content !== false;
-}
 
 export interface DataTableCardViewProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -364,6 +278,29 @@ export function DataTableCardView<TData extends RowData>(
 
               const detailRenderer =
                 config.renderDetail ?? renderDetailPanel;
+
+              if (
+                config.detailMode === "flip" &&
+                detailRenderer &&
+                row.getCanExpand()
+              ) {
+                return (
+                  <DataTableCardFlipItem
+                    key={row.id}
+                    row={row}
+                    expanded={row.getIsExpanded()}
+                    selected={selected}
+                    density={density}
+                    selection={selection}
+                    header={header}
+                    body={body}
+                    metadata={metadata}
+                    actions={actions}
+                    renderDetail={() => detailRenderer(context)}
+                    flip={config.flip}
+                  />
+                );
+              }
 
               const detail =
                 row.getIsExpanded() && detailRenderer

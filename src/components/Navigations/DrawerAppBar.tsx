@@ -1,5 +1,4 @@
-import { useGetIdentity, useIsAuthenticated } from "@refinedev/core";
-import type { UserMenuProps } from "@/interfaces/component-props.interface";
+import { useNavigationAccount } from "./UserSetting/useNavigationAccount";
 // import AppBar from "@mui/material/AppBar";
 import type { Engine } from "@tsparticles/engine";
 import { Fragment, ReactNode, useEffect, useState } from "react";
@@ -801,12 +800,7 @@ export interface DrawerAppBarProps {
 
 export const DrawerAppBar = (props: DrawerAppBarProps) => {
   const { children, disabledMenu = false, backgroundColor } = props;
-  const { data: auth, isLoading: authLoading } = useIsAuthenticated();
-  const authenticated = auth?.authenticated === true;
-  const { data: identity } = useGetIdentity<NonNullable<UserMenuProps["data"]>>({
-    queryOptions: { enabled: authenticated },
-  });
-  const account = authenticated ? identity : undefined;
+  const { authenticated, authLoading, account } = useNavigationAccount();
   const init = async (engine: Engine): Promise<void> => {
     const [{ loadSlim }, { loadThemesPlugin }] = await Promise.all([
       import("@tsparticles/slim"),

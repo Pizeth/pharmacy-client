@@ -19,7 +19,7 @@ import {
 } from "../../styles";
 import { useMuiDataTableContext } from "../../table";
 
-const ExpandRowButtonRoot = styled(IconButton, {
+export const ExpandRowButtonRoot = styled(IconButton, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "ExpandRowButton",
   overridesResolver: (_props, styles) => styles.expandRowButton,

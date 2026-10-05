@@ -156,6 +156,14 @@ export function createTranslationKeyCardConfig(
   } = options;
 
   return {
+    detailMode: "flip",
+    flip: {
+      flipOnHover: true,
+      labels: {
+        showDetails: "Show translations",
+        hideDetails: "Back to key",
+      },
+    },
     enableSelection:
       true,
 

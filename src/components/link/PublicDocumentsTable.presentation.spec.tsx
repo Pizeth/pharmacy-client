@@ -275,7 +275,7 @@ describe("PublicDocumentsTable (card presentation)", () => {
     const { container } = mountTable();
 
     expect(container.querySelector("table")).toBeNull();
-    expect(screen.getByText("Document 01")).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Document 01" })).toBeVisible();
   });
 
   it("colours the file-type badges on cards the same way", () => {

@@ -8,6 +8,11 @@ import { createTranslationKeyColumns } from "../columns";
 import type { TranslationKey } from "../schemas";
 import { TranslationKeyTranslationsPanel } from "./TranslationKeyTranslationsPanel";
 
+import { createTranslationKeyCardConfig } from "./translationKeyCardConfig";
+
+const onEditTranslation = jest.fn();
+const flipCard = createTranslationKeyCardConfig({ rowActions: [] });
+
 const record: TranslationKey = {
   id: 31,
   key: "detail_panel_test",
@@ -52,7 +57,7 @@ const columns = createTranslationKeyColumns({
   enableTranslationDetails: true,
 });
 
-function Fixture() {
+function Fixture({ cards = false }: { cards?: boolean }) {
   const table = useMuiDataTable({
     data: [record],
     columns,
@@ -70,13 +75,15 @@ function Fixture() {
   return (
     <DataTable
       table={table}
+      card={flipCard}
+      defaultDisplayMode={cards ? "card" : "table"}
       toolbar={false}
       pagination={false}
       renderDetailPanel={({ row }) => (
         <TranslationKeyTranslationsPanel
           record={row.original}
           onCreate={jest.fn()}
-          onEdit={jest.fn()}
+          onEdit={onEditTranslation}
           onDelete={jest.fn()}
         />
       )}
@@ -132,4 +139,19 @@ describe("TranslationKey translation detail panel", () => {
     expect(expansionColumn).not.toBeNull();
     expect(expansionColumn).toHaveAttribute("data-pinned", "start");
   });
+});
+
+
+it("flips to the real translation panel and preserves its resource commands", () => {
+  onEditTranslation.mockClear();
+  render(<Fixture cards />);
+  fireEvent.click(screen.getByRole("button", { name: "Show translations" }));
+  const detail = screen.getByRole("region");
+  expect(within(detail).getByText("Detail value")).toBeVisible();
+  expect(within(detail).getByRole("button", { name: "Add translation" })).toBeEnabled();
+  fireEvent.click(within(detail).getByRole("button", { name: "Edit" }));
+  expect(onEditTranslation).toHaveBeenCalledWith(record, record.translations[0]);
+  fireEvent.click(screen.getByRole("button", { name: "Back to key" }));
+  expect(screen.queryByRole("region")).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Show translations" })).toHaveFocus();
 });

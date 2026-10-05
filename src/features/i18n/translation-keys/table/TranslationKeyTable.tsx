@@ -510,6 +510,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
         <DataTable
           table={table}
           card={card}
+          defaultDisplayMode="auto"
           persistence={{
             /**
              * Saved visual preferences are scoped to this resource surface.

@@ -4,7 +4,7 @@
 
 import { Chip, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Download, Eye, FileText } from "lucide-react";
+import { Download, Eye, FileText, RotateCw } from "lucide-react";
 import type { ReactNode } from "react";
 
 import type {
@@ -70,7 +70,58 @@ const CardDescription = styled(
   publicDocumentsSlot("CardDescription"),
 )(({ theme }) => ({
   color: theme.vars.palette.text.secondary,
+  // A teaser: the full text is on the back of the card.
+  display: "-webkit-box",
+  WebkitLineClamp: 3,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
 }));
+
+const DetailRoot = styled("div", publicDocumentsSlot("CardDetail"))(
+  ({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    gap: theme.spacing(1.5),
+    minWidth: 0,
+  }),
+);
+
+const DetailDescription = styled(
+  Typography,
+  publicDocumentsSlot("CardDetailDescription"),
+)(({ theme }) => ({
+  color: theme.vars.palette.text.primary,
+  overflowWrap: "anywhere",
+}));
+
+const DetailList = styled("dl", publicDocumentsSlot("CardDetailList"))(
+  ({ theme }) => ({
+    display: "grid",
+    gridTemplateColumns: "max-content 1fr",
+    alignItems: "center",
+    columnGap: theme.spacing(1.5),
+    rowGap: theme.spacing(1),
+    margin: 0,
+  }),
+);
+
+const DetailTerm = styled("dt", publicDocumentsSlot("CardDetailTerm"))(
+  ({ theme }) => ({
+    color: theme.vars.palette.text.secondary,
+    fontSize: theme.typography.pxToRem(12),
+  }),
+);
+
+const DetailValue = styled("dd", publicDocumentsSlot("CardDetailValue"))(
+  ({ theme }) => ({
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: theme.spacing(0.75),
+    margin: 0,
+    minWidth: 0,
+  }),
+);
 
 const CardMeta = styled(
   "div",
@@ -101,6 +152,17 @@ const CardFileSize = styled(
 )(({ theme }) => ({
   color: theme.vars.palette.text.secondary,
 }));
+
+/**
+ * Text of the card's flip control and of the labels on its back.
+ * Review the Khmer wording here; nothing else in the card hard-codes it.
+ */
+export const PUBLIC_DOCUMENT_CARD_LABELS = {
+  showDetails: "មើលព័ត៌មានលម្អិត",
+  hideDetails: "ត្រឡប់ក្រោយ",
+  category: "ប្រភេទឯកសារ",
+  fileSpecs: "ទំហំឯកសារ",
+} as const;
 
 const ACTION_ICONS: Record<PublicDocumentActionId, ReactNode> = {
   view: <Eye size={18} />,
@@ -136,7 +198,18 @@ export function createPublicDocumentCardConfig(
 ): DataTableCardConfig<PublicDocumentRecord> {
   return {
     enableSelection: false,
-    enableExpansion: false,
+
+    // The detail is on the back of the card: hover on desktop, the flip
+    // control on touch screens and for the keyboard.
+    detailMode: "flip",
+    flip: {
+      labels: {
+        showDetails: PUBLIC_DOCUMENT_CARD_LABELS.showDetails,
+        hideDetails: PUBLIC_DOCUMENT_CARD_LABELS.hideDetails,
+      },
+      icon: <RotateCw size={18} />,
+    },
+
     actions: createPublicDocumentCardActions(actions),
     maxInlineActions: actions.length,
 
@@ -167,6 +240,36 @@ export function createPublicDocumentCardConfig(
           <CardFileSize variant="caption">{row.original.fileSize}</CardFileSize>
         </CardMeta>
       </CardBody>
+    ),
+
+    renderDetail: ({ row }) => (
+      <DetailRoot>
+        <DetailDescription variant="body2">
+          {row.original.description}
+        </DetailDescription>
+
+        <DetailList>
+          <DetailTerm>{PUBLIC_DOCUMENT_CARD_LABELS.category}</DetailTerm>
+          <DetailValue>
+            <Chip
+              label={row.original.category}
+              size="small"
+              variant="outlined"
+              color="primary"
+            />
+          </DetailValue>
+
+          <DetailTerm>{PUBLIC_DOCUMENT_CARD_LABELS.fileSpecs}</DetailTerm>
+          <DetailValue>
+            {row.original.fileTypes.map((type) => (
+              <FileTypeBadge key={type} type={type} />
+            ))}
+            <CardFileSize variant="caption">
+              {row.original.fileSize}
+            </CardFileSize>
+          </DetailValue>
+        </DetailList>
+      </DetailRoot>
     ),
   };
 }

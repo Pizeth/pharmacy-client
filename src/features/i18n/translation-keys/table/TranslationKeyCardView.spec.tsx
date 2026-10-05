@@ -197,9 +197,9 @@ describe(
         );
 
         expect(
-          screen.getByText(
+          screen.getAllByText(
             "auth.login.title",
-          ),
+          )[0],
         ).toBeVisible();
 
         expect(
@@ -277,7 +277,7 @@ describe(
             "button",
             {
               name:
-                "Expand details for row 31",
+                "Show translations",
             },
           ),
         );
@@ -295,7 +295,7 @@ describe(
             "button",
             {
               name:
-                "Collapse details for row 31",
+                "Back to key",
             },
           ),
         );

@@ -156,6 +156,10 @@ export const dataTableClasses = generateUtilityClasses(
     "cardActions",
     "cardExpansion",
     "cardDetail",
+    "cardFlip",
+    "cardFlipInner",
+    "cardFace",
+    "cardFlipControl",
     "cardState",
 
     /**
