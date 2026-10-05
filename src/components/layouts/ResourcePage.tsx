@@ -81,6 +81,12 @@ const HeroBanner = styled(Box)(({ theme }) => ({
   -7px -7px 15px rgba(255, 255, 255, 0.12), 
   7px 7px 15px rgba(3, 2, 43, 0.6)
 `,
+  ...theme.applyStyles("dark", {
+    background:
+      "linear-gradient(135deg, #182635 0%, #223b53 52%, #1a2b40 100%)",
+    boxShadow:
+      "inset 0 1px 0 rgba(180, 205, 235, 0.08), 0 8px 24px rgba(0, 0, 0, 0.28)",
+  }),
   "& .MuiTypography-subtitle2": {
     color: theme.vars.palette.common.white,
     fontweight: 700,

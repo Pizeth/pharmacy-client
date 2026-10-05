@@ -41,6 +41,12 @@ const INTERACTIVE_DESCENDANT_SELECTOR = [
   '[role="button"]',
   '[role="checkbox"]',
   '[role="menuitem"]',
+  '[role="switch"]',
+  '[role="radio"]',
+  '[role="textbox"]',
+  '[role="combobox"]',
+  '[role="slider"]',
+  '[contenteditable]:not([contenteditable="false"])',
   "[data-row-click-ignore]",
 ].join(",");
 
@@ -303,7 +309,11 @@ export function DataTableBodyRow<TData extends RowData>(
             onClick={
               onRowClick
                 ? (event) => {
-                    if (isFromInteractiveDescendant(event)) {
+                    if (
+                      event.defaultPrevented ||
+                      event.button !== 0 ||
+                      isFromInteractiveDescendant(event)
+                    ) {
                       return;
                     }
 
@@ -315,6 +325,8 @@ export function DataTableBodyRow<TData extends RowData>(
               onRowClick
                 ? (event) => {
                     if (
+                      event.defaultPrevented ||
+                      event.repeat ||
                       event.target !== event.currentTarget ||
                       (event.key !== "Enter" && event.key !== " ")
                     ) {

@@ -10,12 +10,15 @@ import {
   alpha,
   useTheme,
   CircularProgress,
+  Avatar,
+  useMediaQuery,
 } from "@mui/material";
 import {
   SettingsOutlined,
   ContactSupportOutlined,
   PaletteOutlined,
   LogoutOutlined,
+  LoginOutlined,
   VerifiedUserOutlined,
   AccountCircle,
   Dashboard,
@@ -48,6 +51,7 @@ import AvatarWrapper from "@/components/CustomComponents/AvatarWrapper";
 import AvatarFrame from "@/components/CustomComponents/AvatarFrame";
 // import ThemeToggle from "@/components/CustomComponents/DaynightSwitch";
 import ThemeToggle from "@/components/effect/themes/themeToggle";
+import { useRouter } from "next/navigation";
 import { useLogout } from "@refinedev/core";
 
 const PREFIX = "RazethUserSetting";
@@ -128,7 +132,16 @@ export const UserMenu = (inProps: UserMenuProps) => {
   const theme = useTheme();
 
   const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { anchorEl, open, onClose, data } = props;
+  const {
+    anchorEl,
+    open,
+    onClose,
+    data,
+    authenticated,
+    authLoading = false,
+  } = props;
+  const smallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const router = useRouter();
 
   const { mutate: logout, isPending: isLoggingOut } = useLogout(); // 👈 add this
 
@@ -137,7 +150,12 @@ export const UserMenu = (inProps: UserMenuProps) => {
     logout();
   };
 
-  const storagePercent = (data.storageUsed / data.storageTotal) * 100;
+  const storagePercent =
+    data?.storageUsed != null &&
+    data?.storageTotal != null &&
+    data.storageTotal > 0
+      ? (data.storageUsed / data.storageTotal) * 100
+      : undefined;
 
   // 1. Sound Logic
   // Tip: Use a very short 'pop' or 'click' sound (under 200ms)
@@ -161,7 +179,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
       }}
       transformOrigin={{
         vertical: "bottom",
-        horizontal: "left",
+        horizontal: smallScreen ? "right" : "left",
       }}
       // anchorOrigin={{
       //   vertical: "top",
@@ -183,7 +201,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
             // boxShadow: `0px 10px 40px ${alpha(theme.palette.common.black, 0.1)}`,
             // Ensure background is transparent so the motion.div
             // handles the shadow and shape correctly
-            overflow: "visible",
+            overflowY: "auto",
             background: "transparent", // Let the Paper inside handle styles
             boxShadow: "none",
             border: "none",
@@ -263,38 +281,49 @@ export const UserMenu = (inProps: UserMenuProps) => {
             }}
           />
           {/* 1. Profile Header */}
-          <Header>
-            <Wrapper>
-              <AvatarContainer role={data.role} size="small">
-                <AvatarFrame>
-                  <AvatarWrapper>
-                    <MiniImg src={data.avatar} />
-                  </AvatarWrapper>
-                </AvatarFrame>
-              </AvatarContainer>
-              <Typography variant="subtitle2" fontWeight={700}>
-                {data.name}
-                {/* <VerifiedUserOutlined fontSize="small" /> */}
-                <VerifiedOutlined
-                  fontSize="small"
-                  color="primary"
-                  // sx={{ ml: 0.25 }}
-                />
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {data.email}
-              </Typography>
-            </Wrapper>
+          {authenticated && data && (
+            <Header>
+              <Wrapper>
+                <AvatarContainer role={data.role} size="small">
+                  <AvatarFrame>
+                    <AvatarWrapper>
+                      <MiniImg src={data.avatar} alt={data.name}>
+                        {data.name?.charAt(0)}
+                      </MiniImg>
+                      {/* <Avatar src={data.avatar} alt={data.name}>
+                        {data.name?.charAt(0)}
+                      </Avatar> */}
+                    </AvatarWrapper>
+                  </AvatarFrame>
+                </AvatarContainer>
+                <Typography variant="subtitle2" fontWeight={700}>
+                  {data.name}
+                  {/* <VerifiedUserOutlined fontSize="small" /> */}
+                  {data.isVerified && (
+                    <VerifiedOutlined
+                      fontSize="small"
+                      color="primary"
+                      // sx={{ ml: 0.25 }}
+                    />
+                  )}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {data.email}
+                </Typography>
+              </Wrapper>
 
-            {/* Storage Bar (Ref Image 1) */}
-            <MiniDashboard
-              mainCaption={`${data.storageUsed} used of ${data.storageTotal}GB`}
-              subCaption="Try pro plan"
-              link="#"
-            >
-              <CircularProgressStatic value={storagePercent} />
-            </MiniDashboard>
-          </Header>
+              {/* Storage Bar (Ref Image 1) */}
+              {storagePercent !== undefined && (
+                <MiniDashboard
+                  mainCaption={`${data.storageUsed} used of ${data.storageTotal}GB`}
+                  subCaption="Try pro plan"
+                  link="#"
+                >
+                  <CircularProgressStatic value={storagePercent} />
+                </MiniDashboard>
+              )}
+            </Header>
+          )}
 
           <Divider
             sx={{
@@ -312,45 +341,46 @@ export const UserMenu = (inProps: UserMenuProps) => {
             style={{ padding: "8px" }}
           >
             {/* 3. Wrap each MenuItem in a motion.div with item variants */}
-            {[
-              {
-                label: "Profile",
-                icon: <AccountCircleOutlined fontSize="small" />,
-              },
-              {
-                label: "Dashboard",
-                icon: <DashboardOutlined fontSize="small" />,
-              },
-              {
-                label: "Tasks",
-                icon: <AssignmentTurnedInOutlined fontSize="small" />,
-              },
-              {
-                label: "Reports",
-                icon: <AssessmentOutlined fontSize="small" />,
-              },
-              {
-                label: "Calendar",
-                icon: <EventAvailableOutlined fontSize="small" />,
-              },
-              {
-                label: "Support",
-                icon: <ContactSupportOutlined fontSize="small" />,
-              },
-              {
-                label: "Settings",
-                icon: <SettingsOutlined fontSize="small" />,
-              },
-            ].map((item) => (
-              <motion.div key={item.label} variants={itemVariants}>
-                <MenuItem onClick={onClose} sx={menuItemStyle(theme)}>
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <Typography variant="body2" fontWeight={500}>
-                    {item.label}
-                  </Typography>
-                </MenuItem>
-              </motion.div>
-            ))}
+            {authenticated &&
+              [
+                {
+                  label: "Profile",
+                  icon: <AccountCircleOutlined fontSize="small" />,
+                },
+                {
+                  label: "Dashboard",
+                  icon: <DashboardOutlined fontSize="small" />,
+                },
+                {
+                  label: "Tasks",
+                  icon: <AssignmentTurnedInOutlined fontSize="small" />,
+                },
+                {
+                  label: "Reports",
+                  icon: <AssessmentOutlined fontSize="small" />,
+                },
+                {
+                  label: "Calendar",
+                  icon: <EventAvailableOutlined fontSize="small" />,
+                },
+                {
+                  label: "Support",
+                  icon: <ContactSupportOutlined fontSize="small" />,
+                },
+                {
+                  label: "Settings",
+                  icon: <SettingsOutlined fontSize="small" />,
+                },
+              ].map((item) => (
+                <motion.div key={item.label} variants={itemVariants}>
+                  <MenuItem onClick={onClose} sx={menuItemStyle(theme)}>
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <Typography variant="body2" fontWeight={500}>
+                      {item.label}
+                    </Typography>
+                  </MenuItem>
+                </motion.div>
+              ))}
 
             {/* Specialized Role Item */}
             {/* <motion.div variants={itemVariants}>
@@ -527,8 +557,15 @@ export const UserMenu = (inProps: UserMenuProps) => {
             >
               <MenuItem
                 // onClick={onClose}
-                onClick={handleLogout} // 👈 was onClick={onClose}
-                disabled={isLoggingOut} // 👈 disable while logging out
+                onClick={
+                  authenticated
+                    ? handleLogout
+                    : () => {
+                        onClose();
+                        router.push("/login");
+                      }
+                }
+                disabled={authLoading || isLoggingOut}
                 sx={{
                   ...menuItemStyle,
                   borderRadius: "50px",
@@ -543,8 +580,10 @@ export const UserMenu = (inProps: UserMenuProps) => {
                   {/* <LogoutOutlined fontSize="small" sx={{ color: "inherit" }} /> */}
                   {isLoggingOut ? (
                     <CircularProgress size={16} color="inherit" /> // 👈 spinner while logging out
-                  ) : (
+                  ) : authenticated ? (
                     <LogoutOutlined fontSize="small" color="inherit" />
+                  ) : (
+                    <LoginOutlined fontSize="small" color="inherit" />
                   )}
                 </ListItemIcon>
                 <Typography
@@ -552,7 +591,13 @@ export const UserMenu = (inProps: UserMenuProps) => {
                   fontWeight={700}
                   color="textPrimary"
                 >
-                  {isLoggingOut ? "Signing out..." : "Logout"}
+                  {authLoading
+                    ? "Loading…"
+                    : isLoggingOut
+                      ? "Signing out..."
+                      : authenticated
+                        ? "Logout"
+                        : "Login"}
                 </Typography>
               </MenuItem>
             </motion.div>

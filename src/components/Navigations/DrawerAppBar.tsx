@@ -1,3 +1,5 @@
+import { useGetIdentity, useIsAuthenticated } from "@refinedev/core";
+import type { UserMenuProps } from "@/interfaces/component-props.interface";
 // import AppBar from "@mui/material/AppBar";
 import type { Engine } from "@tsparticles/engine";
 import { Fragment, ReactNode, useEffect, useState } from "react";
@@ -437,6 +439,7 @@ const Main = styled("main", {
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth})`,
+    [theme.breakpoints.down("sm")]: { marginLeft: 0, width: "100%" },
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
@@ -457,13 +460,26 @@ const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   "& .MuiDrawer-paper": {
     width: drawerWidth,
+    [theme.breakpoints.down("sm")]: { width: "100%" },
     boxSizing: "border-box",
     // minWidth: 230,
     // maxWidth: 300,
     display: "flex",
     flexDirection: "column",
-    height: "100%",
-    background: `
+    // Follow the visible viewport as mobile browser bars expand/collapse.
+    height: "100vh",
+    "@supports (height: 100dvh)": {
+      height: "100dvh",
+    },
+    paddingBottom: "env(safe-area-inset-bottom, 0px)",
+    overflowY: "auto",
+    overscrollBehaviorY: "contain",
+    // Scroll tall content instead of compressing the header and footer.
+    "& > *": {
+      flexShrink: 0,
+    },
+    backgroundColor: theme.vars.palette.background.paper,
+    backgroundImage: `
       linear-gradient(135deg, 
       ${theme.alpha(theme.vars.palette.primary.main, 0.1)}, 
       ${theme.alpha(theme.vars.palette.secondary.main, 0.1)})
@@ -785,6 +801,12 @@ export interface DrawerAppBarProps {
 
 export const DrawerAppBar = (props: DrawerAppBarProps) => {
   const { children, disabledMenu = false, backgroundColor } = props;
+  const { data: auth, isLoading: authLoading } = useIsAuthenticated();
+  const authenticated = auth?.authenticated === true;
+  const { data: identity } = useGetIdentity<NonNullable<UserMenuProps["data"]>>({
+    queryOptions: { enabled: authenticated },
+  });
+  const account = authenticated ? identity : undefined;
   const init = async (engine: Engine): Promise<void> => {
     const [{ loadSlim }, { loadThemesPlugin }] = await Promise.all([
       import("@tsparticles/slim"),
@@ -804,7 +826,6 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
   };
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    console.log(event.currentTarget);
     setAnchorElUser(event.currentTarget);
   };
 
@@ -936,8 +957,8 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
           onClick={handleOpenUserMenu}
         >
           <Avatar
-            src="/static/images/otto.webp"
-            alt="User"
+            src={account?.avatar}
+            alt={account?.name ?? "Account"}
             sx={{
               width: 50,
               height: 50,
@@ -956,7 +977,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
                 lineHeight: 1.2,
               }}
             >
-              Liam Smith
+              {account?.name ?? (authLoading ? "Loading account…" : "Account")}
             </Typography>
             <Typography
               variant="caption"
@@ -968,7 +989,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
               }}
               noWrap
             >
-              smith@example.com
+              {account?.email ?? "Theme and sign in"}
             </Typography>
           </Box>
           <SettingsIcon
@@ -1035,14 +1056,9 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
           anchorEl={anchorElUser}
           open={Boolean(anchorElUser)}
           onClose={handleCloseUserMenu}
-          data={{
-            name: "ម៉ម ពិសិដ្ឋ",
-            email: "admin@razeth.com",
-            role: "Admin",
-            avatar: "/static/images/otto.webp",
-            storageUsed: 150,
-            storageTotal: 200,
-          }}
+          authenticated={authenticated}
+          authLoading={authLoading}
+          data={account}
         />
       </Box>
     </Fragment>

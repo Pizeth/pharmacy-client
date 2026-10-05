@@ -15,6 +15,10 @@ describe("badge colours by kind of file", () => {
       document: "secondary",
       image: "warning",
       spreadsheet: "success",
+      presentation: "error",
+      audio: "info",
+      video: "info",
+      code: "secondary",
       archive: "neutral",
       other: "neutral",
     });
@@ -31,12 +35,16 @@ describe("badge colours by kind of file", () => {
     ["ZIP", "neutral"],
     ["RAR", "neutral"],
     ["7Z", "neutral"],
+    ["PPTX", "error"],
+    ["MP3", "info"],
+    ["MP4", "info"],
+    ["TSX", "secondary"],
   ])("colours %s as %s", (type, tone) => {
     expect(getFileTypeTone(type)).toBe(tone);
   });
 
   it("leaves unrecognised formats neutral", () => {
-    expect(getFileTypeTone("PPTX")).toBe("neutral");
+    expect(getFileTypeTone("unknown-format")).toBe("neutral");
     expect(getFileTypeTone("TXT")).toBe("neutral");
     expect(getFileTypeTone("")).toBe("neutral");
   });

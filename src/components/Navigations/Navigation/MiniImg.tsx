@@ -39,18 +39,39 @@ const Root = styled(Box, {
   },
 }));
 
-const MiniImg = ({ src = "/static/images/logo.svg" }) => {
+export interface MiniImgProps {
+  src?: string | undefined;
+  alt?: string;
+  children?: React.ReactNode;
+  preload?: boolean;
+  loading?: "eager" | "lazy";
+  style?: React.CSSProperties;
+  unoptimized?: boolean;
+}
+
+const MiniImg = (props: MiniImgProps) => {
+  const {
+    src = "/static/images/logo.svg",
+    alt = "Image",
+    children,
+    preload = false,
+    loading = "eager",
+    style = { objectFit: "contain" },
+    unoptimized = true,
+  } = props;
+
   return (
     <Root>
       <Image
         src={src}
-        alt="Logo"
-        preload={false}
-        loading="eager"
+        alt={alt}
+        preload={preload}
+        loading={loading}
         fill
-        style={{ objectFit: "contain" }}
-        unoptimized
+        style={style}
+        unoptimized={unoptimized}
       />
+      {children}
     </Root>
   );
 };

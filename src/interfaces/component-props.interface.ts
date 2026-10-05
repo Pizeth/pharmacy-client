@@ -282,14 +282,17 @@ export interface UserMenuProps {
   open: boolean;
   placement?: PopperPlacementType;
   onClose: () => void;
-  data: {
+  authenticated: boolean;
+  authLoading?: boolean;
+  data?: {
     name: string;
     email: string;
     role: string;
-    avatar: string;
-    storageUsed: number;
-    storageTotal: number;
-  };
+    avatar?: string | undefined;
+    isVerified?: boolean;
+    storageUsed?: number;
+    storageTotal?: number;
+  } | undefined;
 }
 
 export interface RazethAvatarContainerProps extends HtmlHTMLAttributes<HTMLDivElement> {

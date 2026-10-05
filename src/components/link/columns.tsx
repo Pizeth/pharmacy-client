@@ -22,6 +22,8 @@
 import { Button, Chip, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Download, Eye, FileText } from "lucide-react";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import CloudDownloadOutlinedIcon from "@mui/icons-material/CloudDownloadOutlined";
 import type { ReactNode } from "react";
 
 import { createMuiDataTableColumnHelper } from "@/components/DataTable";
@@ -116,6 +118,9 @@ const ActionsRoot = styled(
   justifyContent: "center",
   flexWrap: "wrap",
   gap: theme.spacing(1),
+  "& .MuiButtonBase-root": {
+    color: theme.vars.palette.common.white,
+  },
 }));
 
 const ActionLabel = styled(
@@ -127,8 +132,8 @@ const ActionLabel = styled(
 }));
 
 const ACTION_ICONS: Record<PublicDocumentActionId, ReactNode> = {
-  view: <Eye size={14} />,
-  download: <Download size={14} />,
+  view: <VisibilityOutlinedIcon fontSize="small" />,
+  download: <CloudDownloadOutlinedIcon fontSize="small" />,
 };
 
 interface PublicDocumentActionButtonsProps {

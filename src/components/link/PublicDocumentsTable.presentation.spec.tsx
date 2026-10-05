@@ -202,7 +202,7 @@ describe("PublicDocumentsTable (table presentation)", () => {
 
     expect(badgeTone("D-01")).toBe("primary"); // PDF
     expect(badgeTone("D-02")).toBe("warning"); // PNG
-    expect(badgeTone("D-03")).toBe("info"); // DOCX
+    expect(badgeTone("D-03")).toBe("secondary"); // DOCX
   });
 
   it("opens a file in a new tab from View, without downloading it", () => {
@@ -219,6 +219,25 @@ describe("PublicDocumentsTable (table presentation)", () => {
       "_blank",
       "noopener,noreferrer",
     );
+    expect(window.open).toHaveBeenCalledTimes(1);
+    expect(HTMLAnchorElement.prototype.click).not.toHaveBeenCalled();
+  });
+
+  it("opens a Drive folder once from the row surface or keyboard", () => {
+    const { container } = mountTable();
+    const row = container.querySelector<HTMLElement>('[data-row-id="D-04"]')!;
+
+    fireEvent.click(within(row).getByText("Document 04"));
+    expect(window.open).toHaveBeenCalledTimes(1);
+    expect(window.open).toHaveBeenLastCalledWith(
+      "https://drive.google.com/drive/folders/D-04",
+      "_blank",
+      "noopener,noreferrer",
+    );
+
+    fireEvent.keyDown(row, { key: "Enter" });
+    fireEvent.keyDown(row, { key: "Enter", repeat: true });
+    expect(window.open).toHaveBeenCalledTimes(2);
     expect(HTMLAnchorElement.prototype.click).not.toHaveBeenCalled();
   });
 
@@ -268,7 +287,7 @@ describe("PublicDocumentsTable (card presentation)", () => {
 
     expect(tones).toContain("PDF:primary");
     expect(tones).toContain("PNG:warning");
-    expect(tones).toContain("DOCX:info");
+    expect(tones).toContain("DOCX:secondary");
   });
 
   it("uses icon-only action buttons named by their labels", () => {

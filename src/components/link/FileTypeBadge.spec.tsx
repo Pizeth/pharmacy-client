@@ -80,7 +80,10 @@ describe("FileTypeBadge", () => {
     ["PNG", "image", "warning"],
     ["XLSX", "spreadsheet", "success"],
     ["ZIP", "archive", "neutral"],
-    ["PPTX", "other", "neutral"],
+    ["PPTX", "presentation", "error"],
+    ["MP3", "audio", "info"],
+    ["MP4", "video", "info"],
+    ["TSX", "code", "secondary"],
   ])("marks %s as a %s badge in the %s tone", (type, category, tone) => {
     const badge = mountBadge(type);
 
@@ -97,7 +100,8 @@ describe("FileTypeBadge", () => {
     ["DOCX", "secondary"],
     ["PNG", "warning"],
     ["XLSX", "success"],
-    ["ZIP", "neutral"],
+    ["PPTX", "error"],
+    ["MP3", "info"],
   ])(
     "styles %s from the %s palette colour, in light and dark mode",
     (type, role) => {
@@ -128,14 +132,14 @@ describe("FileTypeBadge", () => {
     const rules = rulesFor(mountBadge("DOCX"));
     const all = rules.map((rule) => rule.text).join("\n");
 
-    expect(all).toContain("--mui-palette-info-");
-    for (const other of ["primary", "warning", "success", "error"]) {
+    expect(all).toContain("--mui-palette-secondary-");
+    for (const other of ["primary", "warning", "success", "error", "info"]) {
       expect(all).not.toContain(`--mui-palette-${other}-`);
     }
   });
 
-  it("uses neutral text colours for unrecognised formats", () => {
-    const rules = rulesFor(mountBadge("TXT"));
+  it.each(["TXT", "ZIP"])("uses neutral text colours for %s", (type) => {
+    const rules = rulesFor(mountBadge(type));
     const all = rules.map((rule) => rule.text).join("\n");
 
     expect(lightRule(rules)?.text).toContain(

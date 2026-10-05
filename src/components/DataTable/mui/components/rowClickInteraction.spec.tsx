@@ -19,7 +19,23 @@ const columns = helper.columns([
   helper.display({
     id: "action",
     header: "Action",
-    cell: () => <button type="button">Run</button>,
+    cell: () => (
+      <>
+        <button type="button">Run</button>
+        <span contentEditable suppressContentEditableWarning>
+          <span>Editable</span>
+        </span>
+        <span role="switch" aria-checked={false} tabIndex={0}>
+          <span>Switch</span>
+        </span>
+        <span data-row-click-ignore>
+          <span>Ignore</span>
+        </span>
+        <span onClick={(event) => event.preventDefault()}>
+          Cancel activation
+        </span>
+      </>
+    ),
   }),
 ]);
 
@@ -69,6 +85,25 @@ function getRowElement(container: HTMLElement, rowId: string): HTMLElement {
 }
 
 describe("DataTable row click", () => {
+  it.each(["Editable", "Switch", "Ignore", "Cancel activation"])(
+    "does not activate from %s descendants",
+    (label) => {
+      const onRowClick = jest.fn();
+      mount(onRowClick);
+      fireEvent.click(screen.getAllByText(label)[0]);
+      expect(onRowClick).not.toHaveBeenCalled();
+    },
+  );
+
+  it("does not repeat activation when an activation key is held", () => {
+    const onRowClick = jest.fn();
+    const { container } = mount(onRowClick);
+    const row = getRowElement(container, "a");
+    fireEvent.keyDown(row, { key: "Enter" });
+    fireEvent.keyDown(row, { key: "Enter", repeat: true });
+    fireEvent.keyDown(row, { key: " ", repeat: true });
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+  });
   it("is inert when no handler is supplied", () => {
     const { container } = mount();
     const row = getRowElement(container, "a");

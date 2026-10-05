@@ -1,5 +1,6 @@
 "use client";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
+import { styled } from "@mui/material/styles";
 
 const backgroundColor = `linear-gradient(
                             135deg,
@@ -11,6 +12,15 @@ const backgroundColor = `linear-gradient(
                             #0c147d 90%,
                             #080091 100%
                         )`;
+
+const BackgroundRoot = styled("div")(({ theme }) => ({
+  display: "contents",
+  "--Link-page-background": backgroundColor,
+  ...theme.applyStyles("dark", {
+    "--Link-page-background":
+      "linear-gradient(135deg, #101720 0%, #172331 40%, #1d2c3d 55%, #172331 75%, #101720 100%)",
+  }),
+}));
 /* Layout UI */
 export default function LinkLayout({
   children,
@@ -20,8 +30,13 @@ export default function LinkLayout({
   /* Place children where you want to render a page or nested layout */
   // return <DrawerAppBar>{children}</DrawerAppBar>;
   return (
-    <DrawerAppBar disabledMenu={true} backgroundColor={backgroundColor}>
-      {children}
-    </DrawerAppBar>
+    <BackgroundRoot>
+      <DrawerAppBar
+        disabledMenu={true}
+        backgroundColor="var(--Link-page-background)"
+      >
+        {children}
+      </DrawerAppBar>
+    </BackgroundRoot>
   );
 }
