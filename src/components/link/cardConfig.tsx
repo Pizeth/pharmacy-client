@@ -18,6 +18,7 @@ import type {
 } from "./documentActions";
 import { publicDocumentsSlot } from "./styled";
 import type { PublicDocumentRecord } from "./types";
+import { FileTypeBadge } from "./FileTypeBadge";
 
 const CardHeader = styled(
   "div",
@@ -81,18 +82,18 @@ const CardMeta = styled(
   gap: theme.spacing(0.75),
 }));
 
-const CardFormatBadge = styled(
-  "span",
-  publicDocumentsSlot("CardFormatBadge"),
-)(({ theme }) => ({
-  fontSize: "0.6875rem",
-  fontWeight: 700,
-  padding: "2px 6px",
-  borderRadius: 4,
-  backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.12),
-  color: theme.vars.palette.primary.main,
-  fontFamily: "monospace",
-}));
+// const CardFormatBadge = styled(
+//   "span",
+//   publicDocumentsSlot("CardFormatBadge"),
+// )(({ theme }) => ({
+//   fontSize: "0.6875rem",
+//   fontWeight: 700,
+//   padding: "2px 6px",
+//   borderRadius: 4,
+//   backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.12),
+//   color: theme.vars.palette.primary.main,
+//   fontFamily: "monospace",
+// }));
 
 const CardFileSize = styled(
   Typography,
@@ -161,7 +162,7 @@ export function createPublicDocumentCardConfig(
             color="primary"
           />
           {row.original.fileTypes.map((type) => (
-            <CardFormatBadge key={type}>{type}</CardFormatBadge>
+            <FileTypeBadge key={type} type={type} />
           ))}
           <CardFileSize variant="caption">{row.original.fileSize}</CardFileSize>
         </CardMeta>

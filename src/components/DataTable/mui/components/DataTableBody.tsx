@@ -19,6 +19,7 @@ import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
 import { useOptionalDataTableFilterDisplay } from "../filter-display";
 import { DataTableDetailPanelRenderer } from "./detail-panel";
 import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
+import type { DataTableRowClickHandler } from "./DataTableBodyRow";
 
 const BodyRoot = styled(TableBody, {
   name: DATA_TABLE_COMPONENT_NAME,
@@ -30,6 +31,7 @@ export interface DataTableBodyProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
   readonly rowPinningDisplayMode?: DataTableRowPinningDisplayMode;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
+  readonly onRowClick?: DataTableRowClickHandler<TData>;
 }
 
 /**
@@ -60,6 +62,7 @@ export function DataTableBody<TData extends RowData>(
     table,
     rowPinningDisplayMode = "sticky",
     renderDetailPanel,
+    onRowClick,
   } = props;
 
   const { density } = useDataTableDensity();
@@ -202,6 +205,7 @@ export function DataTableBody<TData extends RowData>(
                 dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
                 stickyPinnedRowIds={stickyPinnedRowIds}
                 renderDetailPanel={renderDetailPanel}
+                onRowClick={onRowClick}
               />
             ))}
           </BodyRoot>

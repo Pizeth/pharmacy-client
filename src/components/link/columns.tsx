@@ -31,21 +31,22 @@ import type {
   PublicDocumentActionId,
 } from "./documentActions";
 import { PublicDocumentRowNumberCell } from "./RowNumberCell";
+import { FileTypeBadge } from "./FileTypeBadge";
 import { publicDocumentsSlot } from "./styled";
 import type { PublicDocumentRecord } from "./types";
 
-const FormatBadge = styled(
-  "span",
-  publicDocumentsSlot("FormatBadge"),
-)(({ theme }) => ({
-  fontSize: "0.6875rem",
-  fontWeight: 700,
-  padding: "2px 6px",
-  borderRadius: 4,
-  backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.12),
-  color: theme.vars.palette.primary.main,
-  fontFamily: "monospace",
-}));
+// const FormatBadge = styled(
+//   "span",
+//   publicDocumentsSlot("FormatBadge"),
+// )(({ theme }) => ({
+//   fontSize: "0.6875rem",
+//   fontWeight: 700,
+//   padding: "2px 6px",
+//   borderRadius: 4,
+//   backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.12),
+//   color: theme.vars.palette.primary.main,
+//   fontFamily: "monospace",
+// }));
 
 const DocumentCell = styled(
   "div",
@@ -254,7 +255,7 @@ export function createPublicDocumentColumns(
       cell: ({ row }) => (
         <FileSpecsRoot>
           {row.original.fileTypes.map((type) => (
-            <FormatBadge key={type}>{type}</FormatBadge>
+            <FileTypeBadge key={type} type={type} />
           ))}
           <FileSize variant="caption">{row.original.fileSize}</FileSize>
         </FileSpecsRoot>

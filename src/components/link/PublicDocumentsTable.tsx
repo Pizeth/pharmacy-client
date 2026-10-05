@@ -92,7 +92,7 @@ export function PublicDocumentsTable() {
         // Fill the container; the fixed column sizes stay as the
         // minimum, so narrow viewports scroll instead of squashing.
         tableProps={{ stickyHeader: true }}
-        // onRowClick={(row) => handleDownloadDocument(row.original)}
+        onRowClick={(row) => handleDownloadDocument(row.original)}
         card={card}
         // Cards on small screens, table above the breakpoint.
         defaultDisplayMode="auto"

@@ -2,21 +2,20 @@
 
 import { resolvePublicDocumentExtension } from "./openPublicDocument";
 import type { PublicDocumentRecord } from "./types";
-
 export type PublicDocumentActionId = "view" | "download";
-
 export type PublicDocumentViewKind = "pdf" | "image";
+import { isBrowserViewableImageExtension } from "./fileTypes";
 
-const IMAGE_EXTENSIONS: ReadonlySet<string> = new Set([
-  "png",
-  "jpg",
-  "jpeg",
-  "gif",
-  "webp",
-  "avif",
-  "bmp",
-  "svg",
-]);
+// const IMAGE_EXTENSIONS: ReadonlySet<string> = new Set([
+//   "png",
+//   "jpg",
+//   "jpeg",
+//   "gif",
+//   "webp",
+//   "avif",
+//   "bmp",
+//   "svg",
+// ]);
 
 /**
  * What kind of file the viewer can show, or null when it cannot.
@@ -33,7 +32,7 @@ export function getPublicDocumentViewKind(
     return "pdf";
   }
 
-  return IMAGE_EXTENSIONS.has(extension) ? "image" : null;
+  return isBrowserViewableImageExtension(extension) ? "image" : null;
 }
 
 /**

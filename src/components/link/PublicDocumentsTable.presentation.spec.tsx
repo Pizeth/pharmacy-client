@@ -1,6 +1,6 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { fireEvent, render, screen, within } from "@testing-library/react";
-
+import { MsgUtils } from "@/utils/msgUtils";
 import { PublicDocumentsTable } from "./PublicDocumentsTable";
 
 /**
@@ -107,7 +107,9 @@ function rowNumbers(container: HTMLElement): string[] {
 }
 
 function sequence(from: number, to: number): string[] {
-  return Array.from({ length: to - from + 1 }, (_, i) => String(from + i));
+  return Array.from({ length: to - from + 1 }, (_, i) =>
+    MsgUtils.toLocaleNumerals(from + i, "km-KH"),
+  );
 }
 
 describe("PublicDocumentsTable (table presentation)", () => {
@@ -190,6 +192,19 @@ describe("PublicDocumentsTable (table presentation)", () => {
     }
   });
 
+  it("colours each row's file-type badge by kind of file", () => {
+    const { container } = mountTable();
+
+    const badgeTone = (id: string) =>
+      container
+        .querySelector<HTMLElement>(`[data-row-id="${id}"] [data-tone]`)
+        ?.getAttribute("data-tone");
+
+    expect(badgeTone("D-01")).toBe("primary"); // PDF
+    expect(badgeTone("D-02")).toBe("warning"); // PNG
+    expect(badgeTone("D-03")).toBe("info"); // DOCX
+  });
+
   it("opens a file in a new tab from View, without downloading it", () => {
     const { container } = mountTable();
 
@@ -242,6 +257,18 @@ describe("PublicDocumentsTable (card presentation)", () => {
 
     expect(container.querySelector("table")).toBeNull();
     expect(screen.getByText("Document 01")).toBeVisible();
+  });
+
+  it("colours the file-type badges on cards the same way", () => {
+    const { container } = mountTable();
+
+    const tones = Array.from(
+      container.querySelectorAll<HTMLElement>("[data-tone]"),
+    ).map((badge) => `${badge.textContent}:${badge.dataset.tone}`);
+
+    expect(tones).toContain("PDF:primary");
+    expect(tones).toContain("PNG:warning");
+    expect(tones).toContain("DOCX:info");
   });
 
   it("uses icon-only action buttons named by their labels", () => {

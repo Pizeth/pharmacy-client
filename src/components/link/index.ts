@@ -4,6 +4,8 @@ export * from "./cardConfig";
 export * from "./columns";
 export * from "./data";
 export * from "./documentActions";
+export * from "./fileTypes";
+export * from "./FileTypeBadge";
 export * from "./openPublicDocument";
 export * from "./PublicDocumentsFooter";
 export * from "./PublicDocumentsTable";

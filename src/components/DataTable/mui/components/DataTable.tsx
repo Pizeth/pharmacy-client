@@ -36,6 +36,7 @@ import { DATA_TABLE_DEFAULT_VARIANT } from "../theme";
 import type { DataTableOwnerState, DataTableVariantProps } from "../theme";
 import { useDataTableThemeDefaults } from "../theme/useDataTableThemeDefaults";
 import { DataTableBody } from "./DataTableBody";
+import type { DataTableRowClickHandler } from "./DataTableBodyRow";
 import { DataTableColumnGroup } from "./DataTableColumnGroup";
 import { DataTableHead } from "./DataTableHead";
 import type { DataTableDetailPanelRenderer } from "./detail-panel";
@@ -213,6 +214,14 @@ export interface DataTableProps<TData extends RowData>
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
 
   /**
+   * Optional row activation handler for the table presentation.
+   *
+   * Clicks on interactive descendants (buttons, links, inputs,
+   * checkboxes) are ignored. Card presentation is unaffected.
+   */
+  readonly onRowClick?: DataTableRowClickHandler<TData>;
+
+  /**
    * Resource-owned card composition.
    *
    * Required whenever the resolved presentation mode is "card".
@@ -356,6 +365,7 @@ interface DataTablePresentationRegionProps<TData extends RowData> {
     DataTableRowPinningConfig["displayMode"]
   >;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
+  readonly onRowClick?: DataTableRowClickHandler<TData>;
   readonly autoCardBreakpoint: NonNullable<
     DataTableDisplayModeConfig["autoCardBreakpoint"]
   >;
@@ -379,6 +389,7 @@ function DataTablePresentationRegion<TData extends RowData>(
     card,
     rowPinningDisplayMode,
     renderDetailPanel,
+    onRowClick,
     autoCardBreakpoint,
     tableWidth,
     tableMinWidth,
@@ -447,6 +458,7 @@ function DataTablePresentationRegion<TData extends RowData>(
                 table={table}
                 rowPinningDisplayMode={rowPinningDisplayMode}
                 renderDetailPanel={renderDetailPanel}
+                onRowClick={onRowClick}
               />
             </TableRoot>
           );
@@ -472,6 +484,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     toolbar = themeDefaults.enableToolbar ?? true,
 
     renderDetailPanel,
+    onRowClick,
     card,
     rowPinning,
     refreshing = false,
@@ -673,6 +686,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                         card={card}
                         rowPinningDisplayMode={rowPinningDisplayMode}
                         renderDetailPanel={renderDetailPanel}
+                        onRowClick={onRowClick}
                         autoCardBreakpoint={autoCardBreakpoint}
                         tableWidth={tableWidth}
                         tableMinWidth={tableMinWidth}
