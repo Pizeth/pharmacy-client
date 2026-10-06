@@ -139,7 +139,7 @@ export const PUBLIC_DOCUMENTS: readonly PublicDocumentRecord[] = [
 
 export const PUBLIC_DOCUMENT_CATEGORIES = [
   "ទាំងអស់",
-  "សំណើសុំ",
+  "ពាក្យស្នើសុំ",
   "លិខិតរដ្ឋបាល",
   "ព្រះរាជក្រឹត្យ",
   "អនុក្រឹត្យ",

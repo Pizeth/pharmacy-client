@@ -69,11 +69,12 @@ const theme = createTheme({
 });
 
 function mountTable() {
-  return render(
+  const result = render(
     <ThemeProvider theme={theme}>
       <PublicDocumentsTable />
     </ThemeProvider>,
   );
+  return result;
 }
 
 function setScreen(size: "small" | "wide"): void {
@@ -142,11 +143,14 @@ describe("PublicDocumentsTable (table presentation)", () => {
   it("restarts the numbering for a filtered list", () => {
     const { container } = mountTable();
 
-    // The tab after "All" is the first real category (D-01..D-20).
-    fireEvent.click(screen.getAllByRole("tab")[1]);
+    fireEvent.click(screen.getByRole("tab", { name: "លិខិតរដ្ឋបាល" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "សំណើសុំ" }));
 
     expect(bodyRows(container)).toHaveLength(20);
     expect(rowNumbers(container)).toEqual(sequence(1, 20));
+    fireEvent.click(screen.getByRole("tab", { name: "ទំព័រដើម" }));
+    expect(bodyRows(container)).toHaveLength(25);
+    expect(screen.getByRole("tab", { name: "លិខិតបទដ្ឋានគតិយុត្តិ" })).toHaveAttribute("aria-selected", "false");
   });
 
   it("keeps the numbers in displayed order when the table is sorted", () => {
@@ -263,6 +267,20 @@ describe("PublicDocumentsTable (table presentation)", () => {
 });
 
 describe("PublicDocumentsTable (card presentation)", () => {
+  it("switches between normal and compact cards without losing full details", () => {
+    setScreen("small");
+    const { container } = mountTable();
+    const compactSwitch = screen.getByRole("switch", { name: "Compact cards" });
+    expect(compactSwitch).toBeChecked();
+    expect(screen.queryByText("Description 1")).toBeNull();
+    const front = container.querySelector<HTMLElement>('[data-row-id="D-01"] [data-face="front"]')!;
+    fireEvent.click(within(front).getByRole("button", { name: "មើលព័ត៌មានលម្អិត" }));
+    expect(screen.getByText("Description 1")).toBeVisible();
+    fireEvent.click(compactSwitch);
+    expect(compactSwitch).not.toBeChecked();
+    expect(within(front).getByText("Description 1")).toBeVisible();
+  });
+
   beforeEach(() => {
     setScreen("small");
     window.open = jest.fn();
@@ -280,6 +298,7 @@ describe("PublicDocumentsTable (card presentation)", () => {
 
   it("colours the file-type badges on cards the same way", () => {
     const { container } = mountTable();
+    fireEvent.click(screen.getByRole("switch", { name: "Compact cards" }));
 
     const tones = Array.from(
       container.querySelectorAll<HTMLElement>("[data-tone]"),

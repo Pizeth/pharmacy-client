@@ -372,9 +372,6 @@ const FooterBottom = styled(
   paddingBlock: theme.spacing(2.5),
   borderTop: `1px solid ${theme.vars.palette.divider}`,
   textAlign: "center",
-  [theme.breakpoints.up("md")]: {
-    textAlign: "start",
-  },
 }));
 
 const Copyright = styled(

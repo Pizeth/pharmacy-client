@@ -48,10 +48,11 @@ const CardFlipInner = styled("div", {
   overridesResolver: (_props, styles) => styles.cardFlipInner,
 })({
   /**
-   * Both faces share one grid cell, so the card is as tall as its taller
-   * face and flipping never shifts the layout.
+   * Only the visible face participates in sizing. The hidden face stays
+   * mounted for the rotation without reserving space for its content.
    */
   display: "grid",
+  position: "relative",
   minWidth: 0,
   transformStyle: "preserve-3d",
   transition: `transform ${FLIP_DURATION_MS}ms cubic-bezier(0.4, 0.2, 0.2, 1)`,
@@ -77,6 +78,12 @@ const CardFaceRoot = styled("div", {
   backfaceVisibility: "hidden",
   WebkitBackfaceVisibility: "hidden",
 
+  '&[aria-hidden="true"]': {
+    position: "absolute",
+    inset: "0 0 auto",
+    width: "100%",
+  },
+
   '&[data-face="back"]': {
     transform: "rotateY(180deg)",
   },
@@ -90,10 +97,8 @@ const CardFaceRoot = styled("div", {
 });
 
 const CardFlipDetailRoot = styled(CardDetailRoot)({
-  // The back face keeps its footer in place; long detail scrolls.
-  flex: "1 1 auto",
-  minHeight: 0,
-  overflow: "auto",
+  flex: "0 0 auto",
+  overflow: "visible",
 });
 
 const CardFlipControlRoot = styled("span", {
@@ -101,10 +106,10 @@ const CardFlipControlRoot = styled("span", {
   slot: "CardFlipControl",
   overridesResolver: (_props, styles) => styles.cardFlipControl,
 })({
-  // Pushes the card's actions to the end, so they sit in the same place on
-  // both faces.
   display: "inline-flex",
-  marginInlineEnd: "auto",
+  flexShrink: 0,
+  marginInlineStart: "auto",
+  alignSelf: "center",
 });
 
 export interface DataTableCardFlipItemProps<TData extends RowData> {
@@ -112,6 +117,7 @@ export interface DataTableCardFlipItemProps<TData extends RowData> {
   readonly expanded: boolean;
   readonly selected: boolean;
   readonly density: string;
+  readonly compactCard?: boolean;
 
   readonly selection?: ReactNode;
   readonly header?: ReactNode;
@@ -145,6 +151,7 @@ export function DataTableCardFlipItem<TData extends RowData>(
     expanded,
     selected,
     density,
+    compactCard,
     selection,
     header,
     body,
@@ -188,14 +195,14 @@ export function DataTableCardFlipItem<TData extends RowData>(
   const pendingFocus = useRef<"front" | "back" | null>(null);
 
   useEffect(() => {
-    if (pendingFocus.current === "back" && expanded) {
+    if (pendingFocus.current === "back" && flipped) {
       backButtonRef.current?.focus();
-    } else if (pendingFocus.current === "front" && !expanded) {
+    } else if (pendingFocus.current === "front" && !flipped) {
       frontButtonRef.current?.focus();
     }
 
     pendingFocus.current = null;
-  }, [expanded]);
+  }, [flipped]);
 
   const toggle = (from: "front" | "back") => {
     setHovered(false);
@@ -212,9 +219,6 @@ export function DataTableCardFlipItem<TData extends RowData>(
   const handlePointerLeave = () => {
     setHovered(false);
   };
-
-  const showHeader =
-    hasRenderableContent(selection) || hasRenderableContent(header);
 
   const cardProps = {
     variant: "outlined" as const,
@@ -239,8 +243,8 @@ export function DataTableCardFlipItem<TData extends RowData>(
           aria-hidden={flipped ? true : undefined}
           inert={flipped}
         >
-          <CardItemRoot {...cardProps}>
-            {showHeader && (
+          <CardItemRoot {...cardProps} data-compact={compactCard ? "true" : undefined}>
+            {(
               <CardHeaderRoot className={dataTableClasses.cardHeader}>
                 {hasRenderableContent(selection) && (
                   <CardSelectionRoot
@@ -250,37 +254,36 @@ export function DataTableCardFlipItem<TData extends RowData>(
                   </CardSelectionRoot>
                 )}
 
-                {hasRenderableContent(header) && (
-                  <CardHeaderContentRoot>{header}</CardHeaderContentRoot>
+                {(hasRenderableContent(header) || compactCard) && (
+                  <CardHeaderContentRoot>{header ?? body}</CardHeaderContentRoot>
                 )}
+                <CardFlipControlRoot className={dataTableClasses.cardFlipControl}>
+                  <DataTableCardFlipButton
+                    id={frontButtonId}
+                    label={showDetailsLabel}
+                    expanded={false}
+                    controlsId={backFaceId}
+                    icon={flip?.icon}
+                    buttonRef={frontButtonRef}
+                    onToggle={() => toggle("front")}
+                  />
+                </CardFlipControlRoot>
               </CardHeaderRoot>
             )}
 
-            <CardBodyRoot className={dataTableClasses.cardBody}>
-              {body}
-            </CardBodyRoot>
+            {!compactCard && (
+              <CardBodyRoot className={dataTableClasses.cardBody}>
+                {body}
+              </CardBodyRoot>
+            )}
 
-            {hasRenderableContent(metadata) && (
+            {!compactCard && hasRenderableContent(metadata) && (
               <CardMetadataRoot className={dataTableClasses.cardMetadata}>
                 {metadata}
               </CardMetadataRoot>
             )}
 
             <CardActionsRoot className={dataTableClasses.cardActions}>
-              <CardFlipControlRoot
-                className={dataTableClasses.cardFlipControl}
-              >
-                <DataTableCardFlipButton
-                  id={frontButtonId}
-                  label={showDetailsLabel}
-                  expanded={false}
-                  controlsId={backFaceId}
-                  icon={flip?.icon}
-                  buttonRef={frontButtonRef}
-                  onToggle={() => toggle("front")}
-                />
-              </CardFlipControlRoot>
-
               {actions}
             </CardActionsRoot>
           </CardItemRoot>
@@ -295,10 +298,26 @@ export function DataTableCardFlipItem<TData extends RowData>(
           aria-hidden={flipped ? undefined : true}
           inert={!flipped}
         >
-          <CardItemRoot {...cardProps}>
-            {hasRenderableContent(header) && (
+          <CardItemRoot {...cardProps} data-card-side="back" data-compact={compactCard ? "true" : undefined}>
+            {(
               <CardHeaderRoot className={dataTableClasses.cardHeader}>
+                {hasRenderableContent(selection) && (
+                  <CardSelectionRoot className={dataTableClasses.cardSelection}>
+                    {selection}
+                  </CardSelectionRoot>
+                )}
                 <CardHeaderContentRoot>{header}</CardHeaderContentRoot>
+                <CardFlipControlRoot className={dataTableClasses.cardFlipControl}>
+                  <DataTableCardFlipButton
+                    id={backButtonId}
+                    label={hideDetailsLabel}
+                    expanded
+                    controlsId={backFaceId}
+                    icon={flip?.icon}
+                    buttonRef={backButtonRef}
+                    onToggle={() => toggle("back")}
+                  />
+                </CardFlipControlRoot>
               </CardHeaderRoot>
             )}
 
@@ -310,27 +329,6 @@ export function DataTableCardFlipItem<TData extends RowData>(
             </CardFlipDetailRoot>
 
             <CardActionsRoot className={dataTableClasses.cardActions}>
-              {/*
-               * Only after the card was turned with the control. While it is
-               * showing because of hover, moving the pointer away is the way
-               * back, so a control here would do nothing.
-               */}
-              {expanded && (
-                <CardFlipControlRoot
-                  className={dataTableClasses.cardFlipControl}
-                >
-                  <DataTableCardFlipButton
-                    id={backButtonId}
-                    label={hideDetailsLabel}
-                    expanded
-                    controlsId={backFaceId}
-                    icon={flip?.icon}
-                    buttonRef={backButtonRef}
-                    onToggle={() => toggle("back")}
-                  />
-                </CardFlipControlRoot>
-              )}
-
               {actions}
             </CardActionsRoot>
           </CardItemRoot>

@@ -102,6 +102,29 @@ function pointer(
 }
 
 describe("DataTable card flip mode", () => {
+  it("keeps compact fronts minimal and preserves the full detail and actions", () => {
+    const { container } = mount({
+      card: { ...FLIP_CARD, compactCard: true, renderMetadata: () => "Metadata" },
+    });
+    const card = getCard(container, "1");
+    const front = face(card, "front");
+    expect(within(front).getByText("Header Alpha")).toBeVisible();
+    expect(within(front).queryByText("Body Alpha")).toBeNull();
+    expect(within(front).queryByText("Metadata")).toBeNull();
+    expect(within(front).getByRole("button", { name: "Act" })).toBeVisible();
+    fireEvent.click(within(front).getByRole("button", { name: "Show details" }));
+    const back = face(card, "back");
+    expect(within(back).getByText("Detail Alpha")).toBeVisible();
+    expect(within(back).getByRole("button", { name: "Act" })).toBeVisible();
+    fireEvent.click(within(back).getByRole("button", { name: "Back to front" }));
+    expect(card).toHaveAttribute("data-flipped", "false");
+  });
+
+  it("uses body as the compact title content when no header is supplied", () => {
+    const { container } = mount({ card: { ...FLIP_CARD, compactCard: true, renderHeader: undefined } });
+    expect(within(face(getCard(container, "1"), "front")).getByText("Body Alpha")).toBeVisible();
+  });
+
   it("renders two faces per card, front showing and back hidden", () => {
     const { container } = mount();
 
@@ -297,18 +320,18 @@ describe("DataTable card flip mode", () => {
       ).toBeInTheDocument();
     });
 
-    it("offers no back control while the card only shows because of hover", () => {
+    it("offers a title-bar back control while hovering and returns focus to the front", () => {
       const { container } = mount();
       const card = getCard(container, "1");
 
       pointer(card, "pointerover", "mouse");
 
-      expect(
-        within(face(card, "back")).queryByRole("button", {
-          name: "Back to front",
-          hidden: true,
-        }),
-      ).toBeNull();
+      const backButton = within(face(card, "back")).getByRole("button", { name: "Back to front" });
+      expect(backButton.closest("header")).not.toBeNull();
+      expect(backButton.closest("footer")).toBeNull();
+      fireEvent.click(backButton);
+      expect(card).toHaveAttribute("data-flipped", "false");
+      expect(within(face(card, "front")).getByRole("button", { name: "Show details" })).toHaveFocus();
     });
 
     it("stays flipped after the mouse leaves when it was turned with the control", () => {

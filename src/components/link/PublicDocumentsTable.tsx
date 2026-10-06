@@ -5,7 +5,11 @@
 import { useCallback, useMemo, useState } from "react";
 import {
   Alert,
+  FormControlLabel,
+  Menu,
+  MenuItem,
   IconButton,
+  Switch,
   Snackbar,
   Tab,
   Tabs,
@@ -18,21 +22,44 @@ import { DataTable } from "@/components/DataTable";
 
 import { createPublicDocumentCardConfig } from "./cardConfig";
 import { PUBLIC_DOCUMENT_CATEGORIES } from "./data";
+import type { PublicDocumentCategory } from "./data";
 import { openPublicDocument, viewPublicDocument } from "./openPublicDocument";
 import type { PublicDocumentOpenResult } from "./openPublicDocument";
 import type { PublicDocumentRecord } from "./types";
 import { publicDocumentsSlot } from "./styled";
 import { usePublicDocumentsDataTable } from "./usePublicDocumentsDataTable";
 import ThemeToggle from "../effect/themes/themeToggle";
-import { Moon, Sun } from "lucide-react";
+import { ChevronDown, Moon, Sun } from "lucide-react";
 
 const CategoryTabsRoot = styled(
   "div",
   publicDocumentsSlot("CategoryTabs"),
 )({
+  display: "flex",
+  alignItems: "center",
+  flexWrap: "wrap",
+  gap: 8,
   minWidth: 0,
   maxWidth: "100%",
 });
+
+const GROUP_LABEL = "លិខិតបទដ្ឋានគតិយុត្តិ";
+const GROUP_CATEGORIES: readonly PublicDocumentCategory[] = [
+  "ព្រះរាជក្រឹត្យ",
+  "អនុក្រឹត្យ",
+  "ប្រកាស",
+  "សេចក្ដីសម្រេច",
+];
+const ADMIN_LABEL = "លិខិតរដ្ឋបាល";
+const ADMIN_CATEGORIES: readonly PublicDocumentCategory[] = [
+  "ពាក្យស្នើសុំ",
+  "លិខិតរដ្ឋបាល",
+  "សេចក្ដីជូនដំណឹង",
+];
+const CategoryGroupMenu = styled(
+  Menu,
+  publicDocumentsSlot("CategoryGroup"),
+)({});
 
 const CategoryTab = styled(
   Tab,
@@ -50,14 +77,21 @@ interface OpenedNotice {
 /**
  * Static public document directory table.
  *
- * Table presentation on wide screens, card presentation on small ones
- * (the toolbar toggle can still switch manually). Each row offers View
+ * Table presentation on desktop and compact cards on mobile by default;
+ * the toolbar can switch presentation manually. Each row offers View
  * (PDF/image files only) and Download (Drive links and files); see
  * documentActions.ts for the rules.
  */
-export function PublicDocumentsTable() {
+export function PublicDocumentsTable({
+  compactCard = true,
+}: { compactCard?: boolean } = {}) {
   const { mode, setMode } = useColorScheme();
   const [notice, setNotice] = useState<OpenedNotice | null>(null);
+  const [useCompactCard, setUseCompactCard] = useState(compactCard);
+  const [categoryAnchor, setCategoryAnchor] = useState<HTMLElement | null>(
+    null,
+  );
+  const [activeGroup, setActiveGroup] = useState<"legal" | "admin">("legal");
 
   const handleDownloadDocument = useCallback((doc: PublicDocumentRecord) => {
     const result = openPublicDocument(doc);
@@ -80,8 +114,8 @@ export function PublicDocumentsTable() {
     });
 
   const card = useMemo(
-    () => createPublicDocumentCardConfig(actions),
-    [actions],
+    () => createPublicDocumentCardConfig(actions, useCompactCard),
+    [actions, useCompactCard],
   );
 
   return (
@@ -94,7 +128,6 @@ export function PublicDocumentsTable() {
         tableProps={{ stickyHeader: true }}
         onRowClick={(row) => handleDownloadDocument(row.original)}
         card={card}
-        // Cards on small screens, table above the breakpoint.
         defaultDisplayMode="auto"
         autoCardBreakpoint="md"
         toolbar={{
@@ -104,13 +137,61 @@ export function PublicDocumentsTable() {
           startContent: (
             <CategoryTabsRoot>
               <Tabs
-                value={category}
-                onChange={(_, next) => changeCategory(next)}
+                value={
+                  ADMIN_CATEGORIES.includes(category)
+                    ? "admin-group"
+                    : GROUP_CATEGORIES.includes(category)
+                      ? "legal-group"
+                      : category
+                }
+                onChange={(_, next) => {
+                  if (next !== "legal-group" && next !== "admin-group")
+                    changeCategory(next);
+                }}
                 variant="scrollable"
                 scrollButtons="auto"
                 aria-label="Document categories"
               >
-                {PUBLIC_DOCUMENT_CATEGORIES.map((name) => (
+                <CategoryTab value="ទាំងអស់" label="ទាំងអស់" />
+                <CategoryTab
+                  value="admin-group"
+                  label={ADMIN_LABEL}
+                  icon={<ChevronDown size={16} />}
+                  iconPosition="end"
+                  aria-haspopup="menu"
+                  aria-expanded={
+                    Boolean(categoryAnchor) && activeGroup === "admin"
+                  }
+                  onClick={(event) => {
+                    setActiveGroup("admin");
+                    setCategoryAnchor(event.currentTarget);
+                  }}
+                />
+                <CategoryTab
+                  value="legal-group"
+                  label={GROUP_LABEL}
+                  icon={<ChevronDown size={16} />}
+                  iconPosition="end"
+                  aria-haspopup="menu"
+                  aria-expanded={
+                    Boolean(categoryAnchor) && activeGroup === "legal"
+                  }
+                  aria-controls={
+                    categoryAnchor
+                      ? "public-documents-category-menu"
+                      : undefined
+                  }
+                  onClick={(event) => {
+                    setActiveGroup("legal");
+                    setCategoryAnchor(event.currentTarget);
+                  }}
+                />
+                {PUBLIC_DOCUMENT_CATEGORIES.filter(
+                  (name) =>
+                    name !== "ទាំងអស់" &&
+                    !GROUP_CATEGORIES.includes(name) &&
+                    !ADMIN_CATEGORIES.includes(name),
+                ).map((name) => (
                   <CategoryTab
                     key={name}
                     label={
@@ -126,15 +207,55 @@ export function PublicDocumentsTable() {
                   />
                 ))}
               </Tabs>
+              <CategoryGroupMenu
+                id="public-documents-category-menu"
+                anchorEl={categoryAnchor}
+                open={Boolean(categoryAnchor)}
+                onClose={() => setCategoryAnchor(null)}
+                slotProps={{
+                  list: {
+                    "aria-label":
+                      activeGroup === "admin" ? ADMIN_LABEL : GROUP_LABEL,
+                  },
+                }}
+              >
+                {(activeGroup === "admin"
+                  ? ADMIN_CATEGORIES
+                  : GROUP_CATEGORIES
+                ).map((name) => (
+                  <MenuItem
+                    key={name}
+                    selected={category === name}
+                    onClick={() => {
+                      changeCategory(name);
+                      setCategoryAnchor(null);
+                    }}
+                  >
+                    {name}
+                  </MenuItem>
+                ))}
+              </CategoryGroupMenu>
             </CategoryTabsRoot>
           ),
           endContent: (
-            <IconButton
-              onClick={() => setMode(mode === "dark" ? "light" : "dark")}
-              aria-label="toggle dark/light theme"
-            >
-              {mode === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-            </IconButton>
+            <>
+              <FormControlLabel
+                label="Compact cards"
+                control={
+                  <Switch
+                    size="small"
+                    checked={useCompactCard}
+                    onChange={(_, checked) => setUseCompactCard(checked)}
+                  />
+                }
+              />
+              <IconButton
+                onClick={() => setMode(mode === "dark" ? "light" : "dark")}
+                aria-label="toggle dark/light theme"
+              >
+                {mode === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </IconButton>
+            </>
             // <ThemeToggle />
           ),
           enableColumnManager: true,

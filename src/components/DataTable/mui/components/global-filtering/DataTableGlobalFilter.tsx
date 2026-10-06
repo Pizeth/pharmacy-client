@@ -12,6 +12,8 @@ import {
   styled,
 } from "@mui/material";
 import { Close, SearchOutlined } from "@mui/icons-material";
+import { SearchInput, SearchLabel } from "@/components/Search/SearchInput";
+import { useState } from "react";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../../table";
 import { normalizeDataTableGlobalFilter } from "../../utils/globalFilter";
@@ -254,6 +256,8 @@ function DataTableGlobalFilterInput<TData extends RowData>(
   });
 
   const value = input.value;
+  const [focused, setFocused] = useState(false);
+  const shrink = focused || value.length > 0;
 
   const hasValue = value.length > 0;
 
@@ -267,11 +271,13 @@ function DataTableGlobalFilterInput<TData extends RowData>(
 
   return (
     <GlobalFilterRoot
+      slots={{ input: SearchInput, inputLabel: SearchLabel }}
       className={rootClassName}
       size={size}
       fullWidth={fullWidth}
       value={value}
-      placeholder={placeholder}
+      label={placeholder}
+      onFocus={() => setFocused(true)}
       aria-label={label}
       onChange={(event) => {
         input.setValue(event.target.value);
@@ -294,9 +300,11 @@ function DataTableGlobalFilterInput<TData extends RowData>(
        * Leaving the field commits any pending value immediately.
        */
       onBlur={() => {
+        setFocused(false);
         input.commit();
       }}
       slotProps={{
+        inputLabel: { shrink },
         input: {
           startAdornment: (
             <InputAdornment position="start">

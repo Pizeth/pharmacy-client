@@ -43,7 +43,7 @@ export interface DataTableCardFlipConfig {
   readonly labels?: DataTableCardFlipLabels;
 
   /**
-   * Icon of the flip control. Defaults to a circular-arrows icon.
+   * Override both flip icons. Defaults to list chevrons for show/hide details.
    */
   readonly icon?: ReactNode;
 }
@@ -55,6 +55,10 @@ export interface DataTableCardFlipConfig {
  * content that makes sense for one domain record.
  */
 export interface DataTableCardConfig<TData extends RowData> {
+  /** Minimal front: header (or body when no header), selection and actions in one row.
+   * Body teasers and metadata are omitted; detail content is unchanged. Default false.
+   */
+  readonly compactCard?: boolean;
   readonly renderHeader?: DataTableCardRenderer<TData>;
 
   /**

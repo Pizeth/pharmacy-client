@@ -511,6 +511,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
           table={table}
           card={card}
           defaultDisplayMode="auto"
+          autoCardBreakpoint="md"
           persistence={{
             /**
              * Saved visual preferences are scoped to this resource surface.

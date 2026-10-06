@@ -15,8 +15,10 @@ import {
   Stack,
   // SwipeableDrawer,
   Tooltip,
+  useMediaQuery,
+  useScrollTrigger,
 } from "@mui/material";
-import { styled, alpha } from "@mui/material/styles";
+import { styled, alpha, useTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -100,6 +102,11 @@ const AppBar = styled(MuiAppBar, {
   // ❌ Remove this — it corrupts Menu positioning
   // overflow: "hidden", // Keeps particles inside the bar
   boxShadow: "none",
+  '&[data-mobile-compact="true"]': {
+    height: 48,
+    minHeight: 48,
+    overflow: "hidden",
+  },
   variants: [
     {
       props: ({ open }) => open,
@@ -166,6 +173,12 @@ const ProfileToolBar = styled(Toolbar, {
   alignItems: "center",
   display: "flex",
   justifyContent: "space-between",
+  '[data-mobile-compact="true"] &&': {
+    height: 48,
+    minHeight: 48,
+    padding: 0,
+    gap: theme.spacing(1),
+  },
 }));
 
 const LogoSection = styled(Box, {
@@ -176,6 +189,17 @@ const LogoSection = styled(Box, {
   display: "flex",
   alignItems: "center",
   alignContent: "middle",
+  [theme.breakpoints.down("md")]: {
+    width: "100%",
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) minmax(0, 3fr) minmax(0, 1fr)",
+    '& > .MuiIconButton-root': { justifySelf: "start", maxWidth: "100%" },
+  },
+  '[data-mobile-compact="true"] &&': {
+    display: "flex",
+    width: "auto",
+    flexShrink: 0,
+  },
 }));
 
 const LogoCaption = styled(Box, {
@@ -183,6 +207,12 @@ const LogoCaption = styled(Box, {
   slot: "Caption",
   overridesResolver: (_props, styles) => styles.caption,
 })(({ theme }) => ({
+  '[data-mobile-compact="true"] &&': { display: "none" },
+  [theme.breakpoints.down("md")]: {
+    gridColumn: 2,
+    minWidth: 0,
+    width: "100%",
+  },
   textAlign: "center",
   position: "relative",
   display: "inline-block",
@@ -376,6 +406,20 @@ const StackWrapper = styled(Stack, {
   slot: "StackWrapper",
   overridesResolver: (_props, styles) => styles.stackWrapper,
 })(({ theme }) => ({
+  '[data-mobile-compact="true"] &&': {
+    display: "flex",
+    minWidth: 0,
+    overflowX: "auto",
+    alignItems: "center",
+    '& .MuiIconButton-root': {
+      width: 32,
+      height: 32,
+      minWidth: 32,
+      padding: theme.spacing(0.5),
+      flexShrink: 0,
+    },
+    '& svg': { width: 20, height: 20 },
+  },
   [theme.breakpoints.up("xs")]: {
     display: "none",
   },
@@ -589,6 +633,15 @@ const NavMenuButton = styled(IconButton, {
     // padding: `${theme.spacing(1)}`,
     padding: 0,
     opacity: visible === true ? 1 : 0,
+    '[data-mobile-compact="true"] &&': {
+      width: 44,
+      height: 44,
+      minWidth: 44,
+      minHeight: 44,
+      margin: 0,
+      padding: theme.spacing(1),
+      alignSelf: "center",
+    },
     // margin: `${theme.spacing(1)}`,
     // "&:hover": {
     //   svg: {
@@ -800,6 +853,10 @@ export interface DrawerAppBarProps {
 
 export const DrawerAppBar = (props: DrawerAppBarProps) => {
   const { children, disabledMenu = false, backgroundColor } = props;
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down("md"));
+  const scrolled = useScrollTrigger({ disableHysteresis: true, threshold: 96 });
+  const compactMobile = mobile && scrolled;
   const { authenticated, authLoading, account } = useNavigationAccount();
   const init = async (engine: Engine): Promise<void> => {
     const [{ loadSlim }, { loadThemesPlugin }] = await Promise.all([
@@ -1078,6 +1135,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
           color="primary"
           component="nav"
           enableColorOnDark
+          data-mobile-compact={compactMobile ? "true" : undefined}
         >
           <Container maxWidth="xl">
             {/* 2. The Particles Canvas */}
@@ -1089,7 +1147,10 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
             {/* Content Container (Above Canvas) */}
             <AppBarContainer maxWidth="xl">
               {/* --- SECTION 2: LOGO & TITLE --- */}
-              <ProfileToolBar disableGutters variant="dense">
+              <ProfileToolBar
+                disableGutters
+                variant="dense"
+              >
                 <LogoSection>
                   {/* Logo Image */}
                   <NavMenuButton
@@ -1104,9 +1165,9 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
                     // ]}
                   >
                     {/* <MenuIcon /> */}
-                    <DrawerToggle>
+                    {compactMobile ? <MenuIcon /> : <DrawerToggle>
                       <MiniImg />
-                    </DrawerToggle>
+                    </DrawerToggle>}
                   </NavMenuButton>
 
                   {/* Logo Title */}

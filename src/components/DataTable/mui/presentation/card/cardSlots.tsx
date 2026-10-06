@@ -4,7 +4,7 @@ import { Paper } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { ReactNode } from "react";
 
-import { DATA_TABLE_COMPONENT_NAME } from "../../styles";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
 /**
  * Styled slots shared by every card structure (inline detail and flip).
@@ -23,6 +23,47 @@ export const CardItemRoot = styled(Paper, {
   minWidth: 0,
   overflow: "hidden",
   backgroundImage: "none",
+  '&&[data-card-side="back"]': {
+    height: "auto",
+    maxHeight: "none",
+    [`& .${dataTableClasses.cardDetail}`]: {
+      backgroundColor: "transparent",
+      boxShadow: "none",
+    },
+  },
+  '&&[data-compact="true"]': {
+    height: "auto",
+    minHeight: 72,
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) auto auto",
+    alignItems: "center",
+    [`& > .${dataTableClasses.cardHeader}, & > .${dataTableClasses.cardBody}`]: {
+      minHeight: 72,
+      boxSizing: "border-box",
+      border: 0,
+      backgroundColor: "transparent",
+      padding: theme.spacing(1.5, 2),
+    },
+    [`& > .${dataTableClasses.cardHeader} .${dataTableClasses.cardFlipControl}`]: {
+      alignSelf: "center",
+      alignItems: "center",
+    },
+    [`& > .${dataTableClasses.cardActions}`]: {
+      gridColumn: 2,
+      gridRow: 1,
+      marginTop: 0,
+      border: 0,
+      backgroundColor: "transparent",
+      padding: theme.spacing(1, 1.5),
+    },
+    [`& > .${dataTableClasses.cardExpansion}`]: {
+      padding: theme.spacing(1),
+    },
+    [`& > .${dataTableClasses.cardDetail}`]: {
+      gridColumn: "1 / -1",
+      gridRow: 2,
+    },
+  },
   '&[data-selected="true"]': {
     outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`,
     outlineOffset: -2,

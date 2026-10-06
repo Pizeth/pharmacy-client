@@ -55,6 +55,21 @@ const theme = createTheme({
     },
   },
 });
+
+it("floats the shared search label on focus and keeps it floated for entered text", () => {
+  const { container } = render(<ThemeProvider theme={theme}><Fixture /></ThemeProvider>);
+  const label = container.querySelector("label")!;
+  const input = screen.getByRole("textbox");
+  expect(label).toHaveAttribute("data-shrink", "true");
+  fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+  fireEvent.blur(input);
+  expect(label).toHaveAttribute("data-shrink", "false");
+  fireEvent.focus(input);
+  expect(label).toHaveAttribute("data-shrink", "true");
+  fireEvent.change(input, { target: { value: "beta" } });
+  fireEvent.blur(input);
+  expect(label).toHaveAttribute("data-shrink", "true");
+});
 it.each(["start", "center", "end"] as const)(
   "preserves desktop %s search placement and themed regions",
   (position) => {
@@ -92,8 +107,12 @@ it("hides and reopens search without clearing TanStack's query", () => {
     </ThemeProvider>,
   );
   expect(screen.getByRole("textbox")).toHaveValue("alpha");
+  const reservedSearch = screen.getByRole("search");
   fireEvent.click(screen.getByRole("button", { name: "Hide global search" }));
   expect(screen.queryByRole("search")).toBeNull();
+  expect(reservedSearch).toBeInTheDocument();
+  expect(reservedSearch).toHaveAttribute("inert");
+  expect(reservedSearch).toHaveAttribute("data-open", "false");
   fireEvent.click(screen.getByRole("button", { name: "Show global search" }));
   expect(screen.getByRole("textbox")).toHaveValue("alpha");
 });
@@ -113,7 +132,7 @@ it("moves the single search field to its themed row on narrow screens", () => {
   try {
     const { container, unmount } = render(
       <ThemeProvider theme={theme}>
-        <Fixture position="end" />
+        <Fixture position="end" collapsible />
       </ThemeProvider>,
     );
     const row = container.querySelector(
@@ -122,6 +141,12 @@ it("moves the single search field to its themed row on narrow screens", () => {
     expect(row).toHaveStyle({ paddingTop: "9px", width: "100%" });
     expect(row).toContainElement(screen.getByRole("search"));
     expect(screen.getAllByRole("textbox")).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Hide global search" }));
+    expect(row).toBeInTheDocument();
+    expect(row.querySelector('[data-open="false"]')).not.toBeNull();
+    expect(screen.queryByRole("textbox")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Show global search" }));
+    expect(screen.getByRole("textbox")).toHaveValue("alpha");
     expect(
       container.querySelector(`.${dataTableClasses.toolbarCenter}`),
     ).toBeNull();

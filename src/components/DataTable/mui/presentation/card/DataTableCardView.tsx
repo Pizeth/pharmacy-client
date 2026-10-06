@@ -73,6 +73,9 @@ const CardGridRoot = styled(Box, {
 })(({ theme }) => ({
   display: "grid",
   gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
+  '&[data-compact="true"]': {
+    gridTemplateColumns: "minmax(0, 1fr)",
+  },
   gridAutoRows: "max-content",
   alignItems: "start",
   alignContent: "start",
@@ -231,6 +234,7 @@ export function DataTableCardView<TData extends RowData>(
             <CardGridRoot
               className={dataTableClasses.cardGrid}
               role="list"
+              data-compact={config.compactCard ? "true" : undefined}
             >
             {rows.map((row) => {
               const context: DataTableCardRenderContext<TData> = {
@@ -291,6 +295,7 @@ export function DataTableCardView<TData extends RowData>(
                     expanded={row.getIsExpanded()}
                     selected={selected}
                     density={density}
+                    compactCard={config.compactCard}
                     selection={selection}
                     header={header}
                     body={body}
@@ -320,6 +325,7 @@ export function DataTableCardView<TData extends RowData>(
                   data-row-id={row.id}
                   data-selected={selected ? "true" : undefined}
                   data-density={density}
+                  data-compact={config.compactCard ? "true" : undefined}
                 >
                   {showHeader && (
                     <CardHeaderRoot className={dataTableClasses.cardHeader}>
@@ -339,11 +345,13 @@ export function DataTableCardView<TData extends RowData>(
                     </CardHeaderRoot>
                   )}
 
-                  <CardBodyRoot className={dataTableClasses.cardBody}>
-                    {body}
-                  </CardBodyRoot>
+                  {(!config.compactCard || !hasRenderableContent(header)) && (
+                    <CardBodyRoot className={dataTableClasses.cardBody}>
+                      {body}
+                    </CardBodyRoot>
+                  )}
 
-                  {hasRenderableContent(metadata) && (
+                  {!config.compactCard && hasRenderableContent(metadata) && (
                     <CardMetadataRoot
                       className={dataTableClasses.cardMetadata}
                     >

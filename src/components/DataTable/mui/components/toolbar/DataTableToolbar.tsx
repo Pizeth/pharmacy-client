@@ -70,6 +70,21 @@ const ToolbarSearchRoot = styled(Box, {
   maxWidth: "100%",
   minWidth: 0,
   flexShrink: 1,
+  '& > div': {
+    transition: theme.transitions.create(["opacity", "clip-path"], { duration: 200 }),
+    clipPath: "inset(-40px -40px -40px -40px)",
+    visibility: "visible",
+  },
+  '&[data-open="false"] > div': {
+    opacity: 0,
+    clipPath: "inset(-40px 100% -40px -40px)",
+    visibility: "hidden",
+    pointerEvents: "none",
+    transition: `${theme.transitions.create(["opacity", "clip-path"], { duration: 200 })}, visibility 0s 200ms`,
+  },
+  "@media (prefers-reduced-motion: reduce)": {
+    '&& > div': { transition: "none" },
+  },
 }));
 const ToolbarSearchRowRoot = styled(Box, {
   name: DATA_TABLE_COMPONENT_NAME,
@@ -174,19 +189,24 @@ export function DataTableToolbar<TData extends RowData>(
    * Search field is created once and placed in the appropriate
    * desktop region, or its own responsive row on narrow screens.
    */
-  const searchField = searchVisibility.open ? (
+  const searchField = search ? (
     <ToolbarSearchRoot
       className={dataTableClasses.toolbarSearch}
       id={globalSearchId}
       role="search"
       aria-label="Table search"
+      data-open={searchVisibility.open ? "true" : "false"}
+      aria-hidden={!searchVisibility.open}
+      inert={!searchVisibility.open}
     >
-      <DataTableGlobalFilter
-        table={table}
-        placeholder={searchPlaceholder}
-        debounceMs={searchDebounceMs}
-        fullWidth={narrow}
-      />
+      <div>
+        <DataTableGlobalFilter
+          table={table}
+          placeholder={searchPlaceholder}
+          debounceMs={searchDebounceMs}
+          fullWidth
+        />
+      </div>
     </ToolbarSearchRoot>
   ) : null;
 

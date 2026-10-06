@@ -1,7 +1,7 @@
 "use client";
 
 import { Tooltip } from "@mui/material";
-import { Cached } from "@mui/icons-material";
+import { ListChevronsDownUp, ListChevronsUpDown } from "lucide-react";
 import type { ReactNode, Ref } from "react";
 
 import { dataTableClasses } from "../../styles";
@@ -46,7 +46,7 @@ export function DataTableCardFlipButton(
     expanded,
     controlsId,
     onToggle,
-    icon = <Cached fontSize="small" />,
+    icon,
     buttonRef,
   } = props;
 
@@ -67,7 +67,7 @@ export function DataTableCardFlipButton(
           onToggle();
         }}
       >
-        {icon}
+        {icon ?? (expanded ? <ListChevronsDownUp size={18} /> : <ListChevronsUpDown size={18} />)}
       </ExpandRowButtonRoot>
     </Tooltip>
   );

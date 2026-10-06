@@ -4,7 +4,7 @@
 
 import { Chip, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Download, Eye, FileText, RotateCw } from "lucide-react";
+import { Download, Eye, FileText } from "lucide-react";
 import type { ReactNode } from "react";
 
 import type {
@@ -195,8 +195,10 @@ export function createPublicDocumentCardActions(
  */
 export function createPublicDocumentCardConfig(
   actions: readonly PublicDocumentActionDescriptor[],
+  compactCard = false,
 ): DataTableCardConfig<PublicDocumentRecord> {
   return {
+    compactCard,
     enableSelection: false,
 
     // The detail is on the back of the card: hover on desktop, the flip
@@ -207,7 +209,6 @@ export function createPublicDocumentCardConfig(
         showDetails: PUBLIC_DOCUMENT_CARD_LABELS.showDetails,
         hideDetails: PUBLIC_DOCUMENT_CARD_LABELS.hideDetails,
       },
-      icon: <RotateCw size={18} />,
     },
 
     actions: createPublicDocumentCardActions(actions),

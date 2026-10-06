@@ -158,7 +158,8 @@ export function createTranslationKeyCardConfig(
   return {
     detailMode: "flip",
     flip: {
-      flipOnHover: true,
+      // Keep key actions on the front until details are explicitly requested.
+      flipOnHover: false,
       labels: {
         showDetails: "Show translations",
         hideDetails: "Back to key",

@@ -189,6 +189,31 @@ describe(
       onEdit.mockClear();
     });
 
+    it("shares row selection between the front and detail faces", () => {
+      render(<Fixture />);
+      fireEvent.click(screen.getByRole("button", { name: "Show translations" }));
+      const selection = screen.getByRole("checkbox", { name: "Select row 31" });
+      expect(selection.closest('[data-face="back"]')).not.toBeNull();
+      expect(selection.closest(".MuiCheckbox-root")).toBeVisible();
+      fireEvent.click(selection);
+      expect(selection).toBeChecked();
+      fireEvent.click(screen.getByRole("button", { name: "Back to key" }));
+      expect(screen.getByRole("checkbox", { name: "Select row 31" })).toBeChecked();
+      expect(screen.getByRole("button", { name: "Edit for row 31" })).toBeEnabled();
+    });
+
+    it("keeps key actions on the front when the mouse enters the card", () => {
+      render(<Fixture />);
+      const edit = screen.getByRole("button", { name: "Edit for row 31" });
+      const card = edit.closest('[data-flipped]')!;
+      const event = new MouseEvent("pointerover", { bubbles: true });
+      Object.defineProperty(event, "pointerType", { value: "mouse" });
+      fireEvent(card, event);
+      expect(card).toHaveAttribute("data-flipped", "false");
+      expect(edit.closest('[data-face="front"]')).not.toBeNull();
+      expect(edit).toBeVisible();
+    });
+
     it(
       "renders resource content and shares selection/action state",
       () => {

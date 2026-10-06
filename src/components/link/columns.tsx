@@ -118,7 +118,7 @@ const ActionsRoot = styled(
   justifyContent: "center",
   flexWrap: "wrap",
   gap: theme.spacing(1),
-  "& .MuiButtonBase-root": {
+  "& .MuiButtonBase-root.MuiButton-root": {
     color: theme.vars.palette.common.white,
   },
 }));
