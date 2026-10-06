@@ -1,6 +1,6 @@
 "use client";
 
-// src/components/link/FileTypeBadge.tsx
+// src/components/hrd/FileTypeBadge.tsx
 
 import { styled } from "@mui/material/styles";
 

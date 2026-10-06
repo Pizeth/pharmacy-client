@@ -1,6 +1,6 @@
 "use client";
 
-// src/components/link/cardConfig.tsx
+// src/components/hrd/cardConfig.tsx
 
 import { Chip, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";

@@ -155,3 +155,16 @@ it("moves the single search field to its themed row on narrow screens", () => {
     window.matchMedia = original;
   }
 });
+
+
+it("keeps focus in search after clearing and supports Escape", () => {
+  render(<ThemeProvider theme={theme}><Fixture /></ThemeProvider>);
+  const input = screen.getByRole("textbox", { name: "Search table" });
+  fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+  expect(input).toHaveValue("");
+  expect(input).toHaveFocus();
+  fireEvent.change(input, { target: { value: "beta" } });
+  fireEvent.keyDown(input, { key: "Escape" });
+  expect(input).toHaveValue("");
+  expect(input).toHaveFocus();
+});

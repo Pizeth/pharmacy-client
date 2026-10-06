@@ -1,4 +1,4 @@
-// src/components/link/siteInfo.ts
+// src/components/hrd/siteInfo.ts
 
 import type { PublicDocumentsSiteInfo } from "./types";
 
@@ -11,9 +11,9 @@ import type { PublicDocumentsSiteInfo } from "./types";
  * number (tel: link) side by side; the address opens Google Maps and
  * the email becomes a mailto: link.
  */
-export const PUBLIC_DOCUMENTS_SITE: PublicDocumentsSiteInfo = {
-  name: "ឯកសារសាធារណៈ",
-  tagline: "ទម្រង់ពាក្យស្នើសុំសម្រាប់មន្រ្តីរាជការស៊ីវិល និងឯកសារសាធារណៈផ្សេងៗ",
+export const HRD_SITE: PublicDocumentsSiteInfo = {
+  name: "នាយកដ្ឋានធនធានមនុស្ស",
+  tagline: "ក្រសួងមុខងារសាធារណៈ • Human Resource Department",
   organization: "នាយកដ្ឋានធនធានមនុស្ស",
   contact: {
     address: {

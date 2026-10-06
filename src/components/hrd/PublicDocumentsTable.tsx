@@ -1,6 +1,6 @@
 "use client";
 
-// src/components/link/PublicDocumentsTable.tsx
+// src/components/hrd/PublicDocumentsTable.tsx
 
 import { useCallback, useMemo, useState } from "react";
 import {
@@ -69,6 +69,14 @@ const CategoryTab = styled(
   fontWeight: 600,
 });
 
+function CategoryLabel({ children }: { readonly children: string }) {
+  return (
+    <Typography component="span" variant="subtitle1" fontWeight={700}>
+      {children}
+    </Typography>
+  );
+}
+
 interface OpenedNotice {
   readonly title: string;
   readonly result: PublicDocumentOpenResult;
@@ -131,9 +139,13 @@ export function PublicDocumentsTable({
         defaultDisplayMode="auto"
         autoCardBreakpoint="md"
         toolbar={{
-          search: true,
+          searchMode: "collapsible",
+          defaultSearchOpen: true,
           searchPosition: "center",
           searchPlaceholder: "ស្វែងរកឯកសារ…",
+          // search: true,
+          // searchPosition: "center",
+          // searchPlaceholder: "ស្វែងរកឯកសារ…",
           startContent: (
             <CategoryTabsRoot>
               <Tabs
@@ -152,10 +164,13 @@ export function PublicDocumentsTable({
                 scrollButtons="auto"
                 aria-label="Document categories"
               >
-                <CategoryTab value="ទាំងអស់" label="ទាំងអស់" />
+                <CategoryTab
+                  value="ទាំងអស់"
+                  label={<CategoryLabel>ទាំងអស់</CategoryLabel>}
+                />
                 <CategoryTab
                   value="admin-group"
-                  label={ADMIN_LABEL}
+                  label={<CategoryLabel>{ADMIN_LABEL}</CategoryLabel>}
                   icon={<ChevronDown size={16} />}
                   iconPosition="end"
                   aria-haspopup="menu"
@@ -169,7 +184,7 @@ export function PublicDocumentsTable({
                 />
                 <CategoryTab
                   value="legal-group"
-                  label={GROUP_LABEL}
+                  label={<CategoryLabel>{GROUP_LABEL}</CategoryLabel>}
                   icon={<ChevronDown size={16} />}
                   iconPosition="end"
                   aria-haspopup="menu"
@@ -194,15 +209,7 @@ export function PublicDocumentsTable({
                 ).map((name) => (
                   <CategoryTab
                     key={name}
-                    label={
-                      <Typography
-                        component="span"
-                        variant="subtitle1"
-                        fontWeight={700}
-                      >
-                        {name}
-                      </Typography>
-                    }
+                    label={<CategoryLabel>{name}</CategoryLabel>}
                     value={name}
                   />
                 ))}
@@ -231,7 +238,7 @@ export function PublicDocumentsTable({
                       setCategoryAnchor(null);
                     }}
                   >
-                    {name}
+                    <CategoryLabel>{name}</CategoryLabel>
                   </MenuItem>
                 ))}
               </CategoryGroupMenu>

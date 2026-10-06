@@ -1,6 +1,6 @@
 "use client";
 
-// src/components/link/usePublicDocumentsDataTable.ts
+// src/components/hrd/usePublicDocumentsDataTable.ts
 
 import { useCallback, useMemo, useState } from "react";
 

@@ -1,6 +1,6 @@
 "use client";
 
-// src/components/link/columns.tsx
+// src/components/hrd/columns.tsx
 
 // import { Box, Button, Chip, Stack, Typography, styled } from "@mui/material";
 // import { Download, FileText } from "lucide-react";

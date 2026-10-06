@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
   },
   allowedDevOrigins: [
+    "127.0.0.1",
     "local-origin.dev",
     "*.local-origin.dev",
     "local-store.razeth.com",
@@ -44,6 +45,12 @@ const nextConfig: NextConfig = {
     "@refinedev/nextjs-router",
     "@refinedev/nestjsx-crud",
   ],
+  async redirects() {
+    return [
+      { source: "/link", destination: "/hrd/documents", permanent: true },
+      { source: "/link/:path*", destination: "/hrd/:path*", permanent: true },
+    ];
+  },
   async rewrites() {
     return [
       // Proxy API calls to your NestJS backend during development

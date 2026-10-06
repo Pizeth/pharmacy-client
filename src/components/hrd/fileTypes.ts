@@ -1,4 +1,4 @@
-// src/components/link/fileTypes.ts
+// src/components/hrd/fileTypes.ts
 
 /**
  * What kind of file a format label stands for.

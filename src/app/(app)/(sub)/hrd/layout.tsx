@@ -1,6 +1,7 @@
 "use client";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
 import { styled } from "@mui/material/styles";
+import { HrdFooter } from "@/components/hrd/HrdFooter";
 
 const backgroundColor = `linear-gradient(
                             135deg,
@@ -15,14 +16,14 @@ const backgroundColor = `linear-gradient(
 
 const BackgroundRoot = styled("div")(({ theme }) => ({
   display: "contents",
-  "--Link-page-background": backgroundColor,
+  "--Hrd-page-background": backgroundColor,
   ...theme.applyStyles("dark", {
-    "--Link-page-background":
+    "--Hrd-page-background":
       "linear-gradient(135deg, #101720 0%, #172331 40%, #1d2c3d 55%, #172331 75%, #101720 100%)",
   }),
 }));
 /* Layout UI */
-export default function LinkLayout({
+export default function HrdLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -30,12 +31,12 @@ export default function LinkLayout({
   /* Place children where you want to render a page or nested layout */
   // return <DrawerAppBar>{children}</DrawerAppBar>;
   return (
-    <BackgroundRoot>
+    <BackgroundRoot lang="km">
       <DrawerAppBar
-        disabledMenu={true}
-        backgroundColor="var(--Link-page-background)"
+        backgroundColor="var(--Hrd-page-background)"
       >
         {children}
+        <HrdFooter />
       </DrawerAppBar>
     </BackgroundRoot>
   );

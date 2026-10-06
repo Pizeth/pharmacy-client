@@ -1,0 +1,40 @@
+.root { max-width: 1280px; margin: auto; padding: 12px 24px 64px; color: var(--app-palette-text-primary, #182c42); }
+.breadcrumbs { font-size: 13px; }
+.breadcrumbs a { color: inherit; text-decoration: none; }
+.breadcrumbs a:hover { text-decoration: underline; }
+.header { text-align: center; padding: 38px 0 44px; }
+.header h1 { line-height: 1.8; }
+.eyebrow { color: var(--app-palette-text-secondary, #596f82); letter-spacing: .12em; }
+.accent { display: block; width: 46px; height: 3px; background: #d8b36c; margin: 16px auto; }
+.layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 28px; align-items: start; }
+.sidebar { border: 1px solid var(--app-palette-divider, #dce3eb); background: var(--app-palette-background-paper, #fff); }
+.navTitle { padding: 18px 20px; background: #08477f; color: #fff; }
+.navigation { display: flex; flex-direction: column; }
+.navigation a { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; text-decoration: none; color: inherit; border-bottom: 1px solid var(--app-palette-divider, #dce3eb); }
+.navigation a svg { flex-shrink: 0; }
+.navigation a:hover, .navigation a[aria-current="page"] { background: var(--app-palette-action-selected, #08477f12); box-shadow: inset 3px 0 #d8b36c; }
+.identity { display: flex; flex-direction: column; gap: 10px; padding: 28px 20px; color: var(--app-palette-text-secondary, #596f82); }
+.panel { background: var(--app-palette-background-paper, #fff); border: 1px solid var(--app-palette-divider, #dce3eb); padding: 40px; min-width: 0; }
+.panel h2, .panel h3, .panel h4 { line-height: 1.9; }
+.profile, .introduction { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; padding: 10px 0 36px; }
+.portrait, .largePortrait { position: relative; display: flex; justify-content: center; align-items: center; border-radius: 50%; overflow: hidden; background: var(--app-palette-action-hover, #eff3f7); color: var(--app-palette-text-secondary, #6d859a); flex-shrink: 0; }
+.portrait { width: 160px; height: 160px; }
+.largePortrait { width: 240px; height: 240px; border: 6px solid var(--app-palette-background-paper, #fff); outline: 1px solid var(--app-palette-divider, #dce3eb); margin-bottom: 8px; }
+.portrait img, .largePortrait img { object-fit: cover; }
+.section { border-top: 1px solid var(--app-palette-divider, #dce3eb); padding: 26px 0; }
+.section:last-child { padding-bottom: 0; }
+.section h2, .section h3 { margin-bottom: 16px; }
+.pending { display: flex; align-items: center; gap: 9px; color: var(--app-palette-text-secondary, #596f82); line-height: 1.9; }
+.pending svg { flex-shrink: 0; }
+.prose, .list li { line-height: 2.1; white-space: pre-line; }
+.list { padding-inline-start: 24px; }
+.list li + li { margin-top: 12px; }
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; min-height: 300px; margin: 28px 0; padding: 32px 20px; border: 1px dashed var(--app-palette-divider, #dce3eb); background: var(--app-palette-action-hover, #eff3f7); }
+.empty > svg { color: var(--app-palette-text-secondary, #596f82); }
+.empty .pending { justify-content: center; }
+.chart { margin: 28px 0; }
+.chart img { display: block; width: 100%; height: auto; }
+.staffGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 16px; margin-top: 24px; }
+.staffCard { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+@media (max-width: 1000px) { .layout { grid-template-columns: 220px minmax(0, 1fr); gap: 20px; } .panel { padding: 28px; } .staffGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .root { padding: 12px 16px 40px; } .header { padding: 24px 0 30px; } .header h1 { font-size: 25px; } .layout { grid-template-columns: minmax(0, 1fr); } .identity, .navTitle { display: none; } .navigation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .navigation a { padding: 14px 12px; } .navigation a svg { display: none; } .panel { padding: 24px 18px; } .largePortrait { width: 200px; height: 200px; } .pending { align-items: start; } .pending svg { margin-top: 5px; } .staffGrid { grid-template-columns: minmax(0, 1fr); } }

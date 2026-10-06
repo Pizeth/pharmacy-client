@@ -1,4 +1,4 @@
-// src/components/link/documentActions.ts
+// src/components/hrd/documentActions.ts
 
 import { resolvePublicDocumentExtension } from "./openPublicDocument";
 import type { PublicDocumentRecord } from "./types";

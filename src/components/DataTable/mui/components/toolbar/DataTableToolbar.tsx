@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Stack, styled, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Collapse, Stack, styled, useMediaQuery, useTheme } from "@mui/material";
 import type { Breakpoint } from "@mui/material/styles";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
@@ -70,20 +70,19 @@ const ToolbarSearchRoot = styled(Box, {
   maxWidth: "100%",
   minWidth: 0,
   flexShrink: 1,
-  '& > div': {
-    transition: theme.transitions.create(["opacity", "clip-path"], { duration: 200 }),
-    clipPath: "inset(-40px -40px -40px -40px)",
-    visibility: "visible",
+  containerType: "inline-size",
+  display: "flex",
+  justifyContent: "center",
+  "& > .MuiCollapse-root": {
+    display: "flex",
+    justifyContent: "center",
   },
-  '&[data-open="false"] > div': {
-    opacity: 0,
-    clipPath: "inset(-40px 100% -40px -40px)",
-    visibility: "hidden",
-    pointerEvents: "none",
-    transition: `${theme.transitions.create(["opacity", "clip-path"], { duration: 200 })}, visibility 0s 200ms`,
+  "& .MuiCollapse-wrapper": {
+    flexShrink: 0,
   },
-  "@media (prefers-reduced-motion: reduce)": {
-    '&& > div': { transition: "none" },
+  "& .MuiCollapse-wrapperInner": {
+    // Keep the input at its available width while Collapse animates its viewport.
+    width: "100cqw",
   },
 }));
 const ToolbarSearchRowRoot = styled(Box, {
@@ -165,6 +164,7 @@ export function DataTableToolbar<TData extends RowData>(
    * toolbar row and takes the available width.
    */
   const narrow = useMediaQuery(theme.breakpoints.down("md"));
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   const context: DataTableToolbarRenderContext<TData> = {
     table,
@@ -199,14 +199,18 @@ export function DataTableToolbar<TData extends RowData>(
       aria-hidden={!searchVisibility.open}
       inert={!searchVisibility.open}
     >
-      <div>
+      <Collapse
+        in={searchVisibility.open}
+        orientation="horizontal"
+        timeout={reducedMotion ? 0 : 300}
+      >
         <DataTableGlobalFilter
           table={table}
           placeholder={searchPlaceholder}
           debounceMs={searchDebounceMs}
           fullWidth
         />
-      </div>
+      </Collapse>
     </ToolbarSearchRoot>
   ) : null;
 

@@ -1,5 +1,5 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MsgUtils } from "@/utils/msgUtils";
 import { PublicDocumentsTable } from "./PublicDocumentsTable";
 
@@ -11,11 +11,10 @@ import { PublicDocumentsTable } from "./PublicDocumentsTable";
  * - D-03  DOCX file     -> Download only (not viewable)
  * - D-04+ Drive folder  -> Download only (links are never viewed)
  *
- * D-01..D-20 share one category, D-21..D-30 another.
+ * D-01..D-20 are administrative requests, D-21..D-30 are royal decrees.
  */
 jest.mock("./data", () => {
   const actual = jest.requireActual("./data");
-  const [, categoryA, categoryB] = actual.PUBLIC_DOCUMENT_CATEGORIES;
 
   const documents = Array.from({ length: 30 }, (_, index) => {
     const n = index + 1;
@@ -23,7 +22,7 @@ jest.mock("./data", () => {
     const base = {
       id,
       title: `Document ${String(n).padStart(2, "0")}`,
-      category: n <= 20 ? categoryA : categoryB,
+      category: n <= 20 ? "ពាក្យស្នើសុំ" : "ព្រះរាជក្រឹត្យ",
       fileSize: "1 MB",
       lastUpdated: "2026-01-01",
       description: `Description ${n}`,
@@ -140,17 +139,60 @@ describe("PublicDocumentsTable (table presentation)", () => {
     expect(rowNumbers(container)).toEqual(sequence(26, 30));
   });
 
-  it("restarts the numbering for a filtered list", () => {
+  it("restarts the numbering for a filtered list", async () => {
     const { container } = mountTable();
 
+    fireEvent.click(screen.getByRole("button", { name: /next page/i }));
     fireEvent.click(screen.getByRole("tab", { name: "លិខិតរដ្ឋបាល" }));
-    fireEvent.click(screen.getByRole("menuitem", { name: "សំណើសុំ" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "ពាក្យស្នើសុំ" }));
 
-    expect(bodyRows(container)).toHaveLength(20);
+    await waitFor(() => expect(bodyRows(container)).toHaveLength(20));
     expect(rowNumbers(container)).toEqual(sequence(1, 20));
-    fireEvent.click(screen.getByRole("tab", { name: "ទំព័រដើម" }));
+    expect(screen.getByRole("tab", { name: "លិខិតរដ្ឋបាល" })).toHaveAttribute(
+      "aria-selected", "true",
+    );
+    fireEvent.click(screen.getByRole("tab", { name: "ទាំងអស់" }));
     expect(bodyRows(container)).toHaveLength(25);
-    expect(screen.getByRole("tab", { name: "លិខិតបទដ្ឋានគតិយុត្តិ" })).toHaveAttribute("aria-selected", "false");
+    expect(
+      screen.getByRole("tab", { name: "លិខិតបទដ្ឋានគតិយុត្តិ" }),
+    ).toHaveAttribute("aria-selected", "false");
+  });
+
+  it.each([
+    ["លិខិតរដ្ឋបាល", ["ពាក្យស្នើសុំ", "លិខិតរដ្ឋបាល", "សេចក្ដីជូនដំណឹង"]],
+    ["លិខិតបទដ្ឋានគតិយុត្តិ", ["ព្រះរាជក្រឹត្យ", "អនុក្រឹត្យ", "ប្រកាស", "សេចក្ដីសម្រេច"]],
+  ] as const)("lists the current categories in the %s menu", (group, categories) => {
+    mountTable();
+    fireEvent.click(screen.getByRole("tab", { name: group }));
+    const menu = screen.getByRole("menu", { name: group });
+    expect(within(menu).getAllByRole("menuitem").map((item) => item.textContent))
+      .toEqual(categories);
+  });
+
+  it("filters legal documents and clears the filter through All", () => {
+    const { container } = mountTable();
+    fireEvent.click(screen.getByRole("tab", { name: "លិខិតបទដ្ឋានគតិយុត្តិ" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "ព្រះរាជក្រឹត្យ" }));
+    expect(rowIds(container)).toEqual(
+      Array.from({ length: 10 }, (_, index) => `D-${index + 21}`),
+    );
+    expect(rowNumbers(container)).toEqual(sequence(1, 10));
+    expect(screen.getByRole("tab", { name: "លិខិតបទដ្ឋានគតិយុត្តិ" }))
+      .toHaveAttribute("aria-selected", "true");
+    fireEvent.click(screen.getByRole("tab", { name: "ទាំងអស់" }));
+    expect(bodyRows(container)).toHaveLength(25);
+    expect(screen.getByRole("tab", { name: "ទាំងអស់" }))
+      .toHaveAttribute("aria-selected", "true");
+  });
+
+  it("keeps Other as a direct category tab", () => {
+    const { container } = mountTable();
+    fireEvent.click(screen.getByRole("tab", { name: "ផ្សេងៗ" }));
+    expect(screen.getByRole("tab", { name: "ផ្សេងៗ" }))
+      .toHaveAttribute("aria-selected", "true");
+    expect(bodyRows(container)).toHaveLength(0);
+    expect(screen.getByText("មិនមានឯកសារណាដែលពាក់ព័ន្ធ ឬត្រូវគ្នានឹងការស្វែងរកនោះទេ"))
+      .toBeVisible();
   });
 
   it("keeps the numbers in displayed order when the table is sorted", () => {
@@ -273,8 +315,12 @@ describe("PublicDocumentsTable (card presentation)", () => {
     const compactSwitch = screen.getByRole("switch", { name: "Compact cards" });
     expect(compactSwitch).toBeChecked();
     expect(screen.queryByText("Description 1")).toBeNull();
-    const front = container.querySelector<HTMLElement>('[data-row-id="D-01"] [data-face="front"]')!;
-    fireEvent.click(within(front).getByRole("button", { name: "មើលព័ត៌មានលម្អិត" }));
+    const front = container.querySelector<HTMLElement>(
+      '[data-row-id="D-01"] [data-face="front"]',
+    )!;
+    fireEvent.click(
+      within(front).getByRole("button", { name: "មើលព័ត៌មានលម្អិត" }),
+    );
     expect(screen.getByText("Description 1")).toBeVisible();
     fireEvent.click(compactSwitch);
     expect(compactSwitch).not.toBeChecked();

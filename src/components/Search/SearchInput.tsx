@@ -1,5 +1,7 @@
 "use client";
+
 import { OutlinedInput, InputLabel, alpha, styled } from "@mui/material";
+
 const PREFIX = "RazethSearch";
 export const SearchInput = styled(OutlinedInput, {
   name: PREFIX,
@@ -13,7 +15,10 @@ export const SearchInput = styled(OutlinedInput, {
 
   transition: theme.transitions.create(["background-color", "width"]),
 
-  backgroundColor: theme.alpha((theme.vars ?? theme).palette.text.primary, 0.05),
+  backgroundColor: theme.alpha(
+    (theme.vars ?? theme).palette.text.primary,
+    0.05,
+  ),
   backdropFilter: "blur(10px) saturate(150%)",
   border: `1px solid ${theme.alpha((theme.vars ?? theme).palette.text.primary, 0.075)}`,
   input: {
@@ -30,7 +35,10 @@ export const SearchInput = styled(OutlinedInput, {
     border: "none",
   },
   "&:hover": {
-    backgroundColor: theme.alpha((theme.vars ?? theme).palette.text.primary, 0.25),
+    backgroundColor: theme.alpha(
+      (theme.vars ?? theme).palette.text.primary,
+      0.25,
+    ),
     svg: {
       fill: theme.palette.error.main,
       color: theme.palette.error.main,
@@ -45,7 +53,10 @@ export const SearchInput = styled(OutlinedInput, {
   },
 
   "&.Mui-focused": {
-    backgroundColor: theme.alpha((theme.vars ?? theme).palette.text.primary, 0.07),
+    backgroundColor: theme.alpha(
+      (theme.vars ?? theme).palette.text.primary,
+      0.07,
+    ),
     boxShadow: `0 8px 32px 0 ${theme.alpha((theme.vars ?? theme).palette.common.black, 0.25)}`,
     border: `1px solid ${alpha(theme.palette.error.main, 0.5)}`,
   },
@@ -74,7 +85,7 @@ export const SearchLabel = styled(InputLabel, {
   overridesResolver: (_props, styles) => styles.label,
 })<{ shrink?: boolean }>(({ theme, shrink }) => ({
   left: shrink ? 0 : theme.spacing(4),
-  padding: shrink ? theme.spacing(0, 1) : "none",
+  padding: shrink ? theme.spacing(0, 1) : 0,
   fontFamily: "var(--font-interkhmerloopless)",
   // color: alpha(theme.palette.text.primary, 0.5),
   transform: !shrink
@@ -87,7 +98,7 @@ export const SearchLabel = styled(InputLabel, {
   backgroundColor: shrink
     ? theme.alpha((theme.vars ?? theme).palette.background.default, 0.05)
     : "transparent",
-  backdropFilter: "blur(10px) saturate(150%)",
+  backdropFilter: shrink ? "blur(10px) saturate(150%)" : "none",
   // border: `1px solid ${alpha(theme.palette.common.white, 0.075)}`,
   // Color when focused
   "&:hover": {
@@ -97,4 +108,3 @@ export const SearchLabel = styled(InputLabel, {
     color: theme.palette.error.main,
   },
 }));
-

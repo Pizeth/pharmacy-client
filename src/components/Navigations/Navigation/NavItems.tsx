@@ -1,20 +1,20 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useId, useState } from "react";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 // import { NavList, NavItem, NavLink, NavIcon, NavText, Indicator } from "./Navigation";
 
-import RielIcon from "@/components/icons/riel";
 // import { HomeIcon, PersonIcon, ChatIcon, CameraIcon, SettingsIcon } from "./icons";
-import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
-import RazHome from "@/components/icons/home";
-import RazPeople from "@/components/icons/people";
-import RazContact from "@/components/icons/contact";
 import { styled } from "@mui/material/styles";
 import { indicatorSpin } from "@/theme/keyframes";
 import Link from "next/link";
 import { colorItemMixin, resolveColor } from "@/utils/themeUtils";
 import {
   Box,
+  ButtonBase,
+  Menu,
+  MenuItem,
   List,
   ListItem,
   ListItemButton,
@@ -22,12 +22,11 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { he } from "date-fns/locale";
-import { BorderRight } from "@mui/icons-material";
 // Import configuration maps
 import {
-  ROUTE_NAV_MAP,
-  DEFAULT_NAV_ITEMS,
+  getDynamicNavItems,
+  getActiveNavIndex,
+  matchesNavRoute,
   NavItemType,
 } from "@/configs/navConfig";
 // import { Link } from "@mui/material";
@@ -433,119 +432,113 @@ const Indicator = styled("div", {
   },
 }));
 
-// Helper function to resolve menu items based on route prefix matching
-const getDynamicNavItems = (pathname: string): NavItemType[] => {
-  // Find key that matches current route starting path (e.g. /mcsgs/hrm matches /mcsgs)
-  const matchedRoute = Object.keys(ROUTE_NAV_MAP).find((routePrefix) =>
-    pathname.startsWith(routePrefix),
-  );
-
-  return matchedRoute ? ROUTE_NAV_MAP[matchedRoute] : DEFAULT_NAV_ITEMS;
-};
+const NavGroupButton = styled(ButtonBase)(({ theme }) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "100%",
+  padding: theme.spacing(1, 2),
+  color: "inherit",
+  "&:hover": { backgroundColor: theme.palette.action.hover },
+}));
 
 interface NavItemsProps {
   variant?: "vertical" | "horizontal";
-  /** Optional override if you want to pass items directly from a parent component */
   items?: NavItemType[];
 }
 
-const NAV_ITEMS = [
-  {
-    label: "ទំព័រដើម",
-    Icon: <RazHome color="error" fontSize="medium" />,
-    color: "error",
-    href: "/",
-  },
-  {
-    label: "ប្រព័ន្ធចរន្តឯកសារ",
-    Icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />,
-    color: "secondary",
-    href: "/fts",
-  },
-  {
-    label: "ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក",
-    Icon: <RazPeople color="primary" fontSize="medium" />,
-    color: "primary",
-    href: "/hrm",
-  },
-  {
-    label: "ប្រព័ន្ធគ្រប់គ្រងបៀវត្ស",
-    Icon: <RielIcon color="success" fontSize="medium" />,
-    color: "success",
-    href: "/payrolls",
-  },
-  {
-    label: "អំពីក្រសួង",
-    Icon: <RazContact color="info" fontSize="medium" />,
-    color: "info",
-    href: "/about",
-  },
-];
-
 export const NavItems = ({ variant = "vertical", items }: NavItemsProps) => {
   const pathname = usePathname();
-
-  // Pick items from props if passed, otherwise dynamically lookup based on pathname
+  const menuId = useId();
+  const [menu, setMenu] = useState<{
+    anchor: HTMLElement;
+    item: NavItemType;
+    pathname: string;
+  } | null>(null);
   const navItems = items ?? getDynamicNavItems(pathname);
+  const activeIndex = getActiveNavIndex(pathname, navItems);
+  const menuOpen = menu !== null && menu.pathname === pathname && navItems.includes(menu.item);
 
-  // Exact or prefix matching for active item selection
-  const activeIndex = navItems.findIndex(
-    (item) =>
-      item.href === pathname ||
-      (item.href !== "/" && pathname.startsWith(item.href)),
+  const labelContent = (item: NavItemType) => (
+    <>
+      <NavIcon variant={variant}>{item.Icon}</NavIcon>
+      <NavText
+        primary={item.label}
+        variant={variant}
+        slotProps={{
+          primary: variant === "vertical" ? { variant: "h4" } : { component: "span" },
+        }}
+      />
+    </>
   );
-
-  // const activeIndex = NAV_ITEMS.findIndex((item) => item.href === pathname);
-  const resolvedIndex = activeIndex === -1 ? 0 : activeIndex;
 
   return (
     <Root>
       <NavList variant={variant}>
-        {navItems.map(({ label, Icon, color, href }, i) => (
-          // variant === "vertical" ?
+        {navItems.map((item, index) => (
           <NavItem
-            key={label}
-            color={color}
-            active={resolvedIndex === i}
+            key={item.href}
+            color={item.color}
+            active={activeIndex === index}
             variant={variant}
           >
-            <NavLink
-              href={href}
-              color={color}
-              variant={variant}
-              active={resolvedIndex === i}
-            >
-              <NavIcon variant={variant}>{Icon}</NavIcon>
-              {/* {Icon} */}
-              <NavText
-                primary={label}
-                variant={variant}
-                slotProps={{
-                  primary:
-                    variant === "vertical"
-                      ? { variant: "h4" }
-                      : { component: "span" },
+            {item.children?.length ? (
+              <NavGroupButton
+                id={`${menuId}-${index}`}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen && menu?.item === item}
+                aria-controls={menuOpen && menu?.item === item ? `${menuId}-menu` : undefined}
+                onClick={(event) => setMenu({ anchor: event.currentTarget, item, pathname })}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    setMenu({ anchor: event.currentTarget, item, pathname });
+                  }
                 }}
+                sx={(theme) => ({
+                  color: variant === "vertical"
+                    ? (theme.vars ?? theme).palette.common.white
+                    : (theme.vars ?? theme).palette.text.primary,
+                })}
               >
-                {label}
-              </NavText>
-              {/* <Typography variant="h4" align="center">
-                            {item.title}
-                        </Typography> */}
-              {/* <ListItemIcon>{Icon}</ListItemIcon> */}
-              {/* <ListItemText primary={label} slotProps={{ primary: { variant: "h4" } }} /> */}
-            </NavLink>
+                {labelContent(item)}
+                <ExpandMoreIcon />
+              </NavGroupButton>
+            ) : (
+              <NavLink
+                href={item.href}
+                color={item.color}
+                variant={variant}
+                active={activeIndex === index}
+                aria-current={pathname === item.href ? "page" : undefined}
+              >
+                {labelContent(item)}
+              </NavLink>
+            )}
           </NavItem>
-          // :
-          // <VerticalNavItem key={label} color={color} active={resolvedIndex === i}>
-          //     <ListItemButton component={Link} href={href}>
-          //         <ListItemIcon>{Icon}</ListItemIcon>
-          //         <ListItemText primary={label} />
-          //     </ListItemButton>
-          // </VerticalNavItem>
         ))}
-        {/* <Indicator activeIndex={resolvedIndex} /> */}
       </NavList>
+      <Menu
+        id={`${menuId}-menu`}
+        anchorEl={menuOpen ? menu?.anchor : null}
+        open={menuOpen}
+        onClose={() => setMenu(null)}
+        slotProps={{ list: { "aria-labelledby": menuOpen ? menu?.anchor.id : undefined } }}
+      >
+        {menu?.item.children?.map((child) => (
+          <MenuItem
+            key={child.href}
+            component={Link}
+            href={child.href}
+            selected={matchesNavRoute(pathname, child.href)}
+            aria-current={pathname === child.href ? "page" : undefined}
+            onClick={() => setMenu(null)}
+          >
+            <ListItemIcon>{child.Icon}</ListItemIcon>
+            <Typography component="span" variant="subtitle1">{child.label}</Typography>
+          </MenuItem>
+        ))}
+      </Menu>
     </Root>
   );
 };

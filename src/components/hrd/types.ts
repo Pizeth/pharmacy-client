@@ -1,4 +1,4 @@
-// src/components/link/types.ts
+// src/components/hrd/types.ts
 
 /**
  * One row of the static public document directory.

@@ -1,6 +1,6 @@
 "use client";
 
-// // src/components/link/PublicDocumentsFooter.tsx
+// // src/components/hrd/HrdFooter.tsx
 
 // import type { ReactNode } from "react";
 // import { Box, Container, Link, Stack, Typography, styled } from "@mui/material";
@@ -13,7 +13,7 @@
 //   toTelegramUrl,
 //   toTelUrl,
 // } from "./contactLinks";
-// import { PUBLIC_DOCUMENTS_SITE } from "./siteInfo";
+// import { HRD_SITE } from "./siteInfo";
 // import type {
 //   PublicDocumentsPhoneContact,
 //   PublicDocumentsSiteInfo,
@@ -183,7 +183,7 @@
 //   return lines;
 // }
 
-// export interface PublicDocumentsFooterProps {
+// export interface HrdFooterProps {
 //   readonly site?: PublicDocumentsSiteInfo;
 // }
 
@@ -191,8 +191,8 @@
 //  * Contact information and copyright for the public directory.
 //  * Content comes from siteInfo.ts.
 //  */
-// export function PublicDocumentsFooter(props: PublicDocumentsFooterProps) {
-//   const { site = PUBLIC_DOCUMENTS_SITE } = props;
+// export function HrdFooter(props: HrdFooterProps) {
+//   const { site = HRD_SITE } = props;
 
 //   const contactLines = buildContactLines(site.contact);
 //   const year = MsgUtils.toLocaleNumerals(new Date().getFullYear(), "km-KH");
@@ -268,7 +268,7 @@
 //   );
 // }
 
-// src/components/link/PublicDocumentsFooter.tsx
+// src/components/hrd/HrdFooter.tsx
 
 import type { ReactNode } from "react";
 import { Container, Link, Stack, Typography } from "@mui/material";
@@ -282,7 +282,7 @@ import {
   toTelegramUrl,
   toTelUrl,
 } from "./contactLinks";
-import { PUBLIC_DOCUMENTS_SITE } from "./siteInfo";
+import { HRD_SITE } from "./siteInfo";
 import { publicDocumentsSlot } from "./styled";
 import type {
   PublicDocumentsPhoneContact,
@@ -525,7 +525,7 @@ function buildContactLines(
   return lines;
 }
 
-export interface PublicDocumentsFooterProps {
+export interface HrdFooterProps {
   readonly site?: PublicDocumentsSiteInfo;
 }
 
@@ -533,8 +533,8 @@ export interface PublicDocumentsFooterProps {
  * Contact information and copyright for the public directory.
  * Content comes from siteInfo.ts.
  */
-export function PublicDocumentsFooter(props: PublicDocumentsFooterProps) {
-  const { site = PUBLIC_DOCUMENTS_SITE } = props;
+export function HrdFooter(props: HrdFooterProps) {
+  const { site = HRD_SITE } = props;
 
   const contactLines = buildContactLines(site.contact);
   const year = MsgUtils.toLocaleNumerals(new Date().getFullYear(), "km-KH");

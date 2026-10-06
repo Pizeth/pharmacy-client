@@ -1,4 +1,4 @@
-// src/components/link/contactLinks.ts
+// src/components/hrd/contactLinks.ts
 
 import type { PublicDocumentsAddress } from "./types";
 

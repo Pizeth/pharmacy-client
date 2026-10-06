@@ -4,18 +4,87 @@ import RazPeople from "@/components/icons/people";
 import RazContact from "@/components/icons/contact";
 import RielIcon from "@/components/icons/riel";
 import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
-import DashboardIcon from "@mui/icons-material/Dashboard";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import NewspaperIcon from "@mui/icons-material/Newspaper";
 import FolderIcon from "@mui/icons-material/Folder";
-import SettingsIcon from "@mui/icons-material/Settings";
+import PublicIcon from "@mui/icons-material/Public";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import SensorOccupiedIcon from "@mui/icons-material/SensorOccupied";
+import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 
 export interface NavItemType {
   label: string;
   Icon: React.ReactNode;
   color: string;
   href: string;
+  children?: NavItemType[];
 }
 
 export const ROUTE_NAV_MAP: Record<string, NavItemType[]> = {
+  "/hrd": [
+    {
+      label: "ទំព័រដើម",
+      Icon: <RazHome color="error" fontSize="medium" />,
+      color: "error",
+      href: "/hrd",
+    },
+    {
+      label: "អំពីអង្គភាព",
+      Icon: <AccountBalanceIcon color="info" />,
+      color: "info",
+      href: "/hrd/about",
+      children: [
+        {
+          label: "អំពីប្រធាននាយកដ្ឋាន",
+          Icon: <SensorOccupiedIcon color="info" />,
+          color: "info",
+          href: "/hrd/about/director",
+        },
+        {
+          label: "ព័ត៌មានសង្ខេបនាយកដ្ឋាន",
+          Icon: <InfoOutlinedIcon color="info" />,
+          color: "info",
+          href: "/hrd/about/overview",
+        },
+        {
+          label: "រចនាសម្ព័ន្ធ",
+          Icon: <AccountTreeOutlinedIcon color="info" />,
+          color: "info",
+          href: "/hrd/about/structure",
+        },
+        {
+          label: "ថ្នាក់ដឹកនាំ និងមន្រ្តី",
+          Icon: <RazPeople color="info" />,
+          color: "info",
+          href: "/hrd/about/staff",
+        },
+      ],
+    },
+    {
+      label: "បណ្ដុំឯកសារ",
+      Icon: <FolderIcon color="secondary" />,
+      color: "secondary",
+      href: "/hrd/documents",
+    },
+    {
+      label: "ព័ត៌មាន",
+      Icon: <NewspaperIcon color="primary" />,
+      color: "primary",
+      href: "/hrd/news",
+    },
+    {
+      label: "សេវាសាធារណៈ",
+      Icon: <PublicIcon color="success" />,
+      color: "success",
+      href: "/hrd/services",
+    },
+    {
+      label: "ទំនាក់ទំនង",
+      Icon: <RazContact color="info" fontSize="medium" />,
+      color: "info",
+      href: "/hrd/contact",
+    },
+  ],
   // Navigation for /mcsgs routes
   "/mcsgs": [
     {
@@ -104,4 +173,38 @@ export const ROUTE_NAV_MAP: Record<string, NavItemType[]> = {
 };
 
 // Fallback items if path matches no registered section
-export const DEFAULT_NAV_ITEMS: NavItemType[] = ROUTE_NAV_MAP["/mcsgs"];
+export const DEFAULT_NAV_ITEMS: NavItemType[] = ROUTE_NAV_MAP["/"];
+
+/** Match entire path segments, never /hrd-other or /mcsgs-other. */
+export function matchesNavRoute(pathname: string, route: string): boolean {
+  return (
+    pathname === route || (route !== "/" && pathname.startsWith(`${route}/`))
+  );
+}
+
+export function getDynamicNavItems(pathname: string): NavItemType[] {
+  const section = Object.keys(ROUTE_NAV_MAP)
+    .filter((route) => matchesNavRoute(pathname, route))
+    .sort((a, b) => b.length - a.length)[0];
+  return section ? ROUTE_NAV_MAP[section] : DEFAULT_NAV_ITEMS;
+}
+
+export function getActiveNavIndex(
+  pathname: string,
+  items: NavItemType[],
+): number {
+  let activeIndex = -1;
+  let longestMatch = -1;
+  items.forEach((item, index) => {
+    for (const candidate of [item, ...(item.children ?? [])]) {
+      if (
+        matchesNavRoute(pathname, candidate.href) &&
+        candidate.href.length > longestMatch
+      ) {
+        activeIndex = index;
+        longestMatch = candidate.href.length;
+      }
+    }
+  });
+  return activeIndex;
+}

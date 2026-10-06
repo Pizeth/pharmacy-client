@@ -2,7 +2,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 
-import { PublicDocumentsFooter } from "./PublicDocumentsFooter";
+import { HrdFooter } from "./HrdFooter";
 import type { PublicDocumentsSiteInfo } from "./types";
 
 const shadows = {
@@ -32,10 +32,10 @@ function renderFooter(contact: PublicDocumentsSiteInfo["contact"]): void {
     <ThemeProvider theme={theme}>{node}</ThemeProvider>
   );
 
-  render(wrap(<PublicDocumentsFooter site={site} />));
+  render(wrap(<HrdFooter site={site} />));
 }
 
-describe("PublicDocumentsFooter phone line", () => {
+describe("HrdFooter phone line", () => {
   it("renders the name and the number as two separate links on one line", () => {
     renderFooter({
       phones: [
@@ -138,7 +138,7 @@ describe("PublicDocumentsFooter phone line", () => {
   });
 });
 
-describe("PublicDocumentsFooter address and email", () => {
+describe("HrdFooter address and email", () => {
   it("opens the configured Google Maps link in a new tab", () => {
     renderFooter({
       address: {

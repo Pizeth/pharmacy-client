@@ -1,4 +1,4 @@
-// src/components/link/openPublicDocument.ts
+// src/components/hrd/openPublicDocument.ts
 
 import type { PublicDocumentRecord } from "./types";
 

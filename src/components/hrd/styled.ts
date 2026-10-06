@@ -1,4 +1,4 @@
-// src/components/link/styled.ts
+// src/components/hrd/styled.ts
 
 import type { CSSInterpolation } from "@mui/material/styles";
 

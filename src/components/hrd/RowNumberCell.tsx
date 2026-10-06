@@ -1,6 +1,6 @@
 "use client";
 
-// src/components/link/RowNumberCell.tsx
+// src/components/hrd/RowNumberCell.tsx
 
 import { styled } from "@mui/material/styles";
 

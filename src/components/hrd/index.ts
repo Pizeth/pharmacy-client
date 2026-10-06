@@ -1,4 +1,4 @@
-// src/components/link/index.ts
+// src/components/hrd/index.ts
 
 export * from "./cardConfig";
 export * from "./columns";
@@ -7,7 +7,7 @@ export * from "./documentActions";
 export * from "./fileTypes";
 export * from "./FileTypeBadge";
 export * from "./openPublicDocument";
-export * from "./PublicDocumentsFooter";
+export * from "./HrdFooter";
 export * from "./PublicDocumentsTable";
 export * from "./RowNumberCell";
 export * from "./siteInfo";
