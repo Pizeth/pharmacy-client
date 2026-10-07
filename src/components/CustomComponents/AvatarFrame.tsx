@@ -12,8 +12,10 @@ const Root = styled(Box, {
 })(({ theme }) => ({
   position: "relative",
   overflow: "hidden",
-  width: `max(50px, 5rem)`,
-  height: `max(50px, 5rem)`,
+  width: "100%",
+  height: "auto",
+  aspectRatio: "1 / 1",
+  flexShrink: 0,
   // background: "rgba(0, 0, 0, 0.5)",
   backgroundColor: theme.vars.palette.background.paper,
   borderRadius: "50%",
@@ -21,6 +23,7 @@ const Root = styled(Box, {
   // boxShadow: "0px 0px 10px 1px #000000ee",
   // boxShadow: "3px 3px 15px rgb(0, 0, 0), -3px -3px 15px rgb(58, 58, 58)",
   boxShadow: theme.vars.palette.customShadows.circleWell,
+  '&[data-neumorphic="false"]': { boxShadow: "none", backgroundColor: "transparent" },
   // overflow: "hidden",
   // margin: `${theme.spacing(1)}`,
   // width: `fill-available`,
@@ -56,8 +59,8 @@ const Content = styled(Box, {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "90%",
-  height: "90%",
+  width: `calc(100% - ${theme.spacing(0.5)})`,
+  height: `calc(100% - ${theme.spacing(0.5)})`,
   backfaceVisibility: "hidden",
   overflow: "hidden",
   justifyContent: "center",
@@ -65,6 +68,7 @@ const Content = styled(Box, {
   display: "flex",
   alignItems: "center",
   borderRadius: "50%",
+  border: `0.5px solid ${theme.alpha(theme.vars.palette.text.primary, 0.05)}`, // Subtle edge highlight
   "&::before": {
     content: '""',
     position: "absolute",
@@ -103,9 +107,9 @@ const Content = styled(Box, {
   // },
 }));
 
-const AvatarFrame = ({ children }: { children?: ReactNode }) => {
+const AvatarFrame = ({ children, neumorphic = true }: { children?: ReactNode; neumorphic?: boolean }) => {
   return (
-    <Root>
+    <Root data-neumorphic={neumorphic}>
       {/* <Container> */}
       <Content>{children}</Content>
       {/* </Container> */}

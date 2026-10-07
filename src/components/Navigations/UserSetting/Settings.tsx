@@ -10,7 +10,6 @@ import {
   alpha,
   useTheme,
   CircularProgress,
-  Avatar,
   useMediaQuery,
 } from "@mui/material";
 import {
@@ -43,18 +42,26 @@ import { styled, Theme, useThemeProps } from "@mui/material/styles";
 import { UserMenuProps } from "@/interfaces/component-props.interface";
 import ParticleContainer from "@/theme/effects/particle";
 import options from "@/configs/particleConfig";
-import MiniImg from "../Navigation/MiniImg";
-import AvatarContainer from "./AvatarContainer";
+import AvatarContainer from "@/components/Avatar/AvatarContainer";
 import CircularProgressStatic from "@/components/CustomComponents/CircularProgressStatic";
 import MiniDashboard from "./MiniDashboard";
-import AvatarWrapper from "@/components/CustomComponents/AvatarWrapper";
-import AvatarFrame from "@/components/CustomComponents/AvatarFrame";
 // import ThemeToggle from "@/components/CustomComponents/DaynightSwitch";
 import ThemeToggle from "@/components/effect/themes/themeToggle";
 import { useRouter } from "next/navigation";
 import { useLogout } from "@refinedev/core";
 
 const PREFIX = "RazethUserSetting";
+
+const PublicAction = styled(MenuItem, {
+  name: PREFIX,
+  slot: "PublicAction",
+  overridesResolver: (_props, styles) => styles.publicAction,
+})(({ theme }) => ({
+  borderRadius: "15px",
+  padding: theme.spacing(1, 1.5),
+  "& .MuiListItemIcon-root": { minWidth: 38 },
+  "&:hover": { backgroundColor: theme.alpha((theme.vars ?? theme).palette.primary.main, 0.04) },
+}));
 
 const Header = styled(Box, {
   name: PREFIX,
@@ -71,6 +78,9 @@ const Wrapper = styled(Box, {
   flexDirection: "column",
   alignItems: "center",
   marginBottom: theme.spacing(1),
+  "& > :first-child": {
+    marginBottom: theme.spacing(1.5),
+  },
   "& .MuiTypography-root": {
     // lineHeight: 1.5,
     svg: {
@@ -281,21 +291,18 @@ export const UserMenu = (inProps: UserMenuProps) => {
             }}
           />
           {/* 1. Profile Header */}
+          {!authenticated && !authLoading && (
+            <Header>
+              <Wrapper>
+                <AvatarContainer src="/static/images/otto.webp" alt="Guest avatar" />
+                <Typography variant="subtitle2">Guest</Typography>
+              </Wrapper>
+            </Header>
+          )}
           {authenticated && data && (
             <Header>
               <Wrapper>
-                <AvatarContainer role={data.role} size="small">
-                  <AvatarFrame>
-                    <AvatarWrapper>
-                      <MiniImg src={data.avatar} alt={data.name}>
-                        {data.name?.charAt(0)}
-                      </MiniImg>
-                      {/* <Avatar src={data.avatar} alt={data.name}>
-                        {data.name?.charAt(0)}
-                      </Avatar> */}
-                    </AvatarWrapper>
-                  </AvatarFrame>
-                </AvatarContainer>
+                <AvatarContainer role={data.role} size="small" src={data.avatar} alt={data.name} fallback={data.name?.charAt(0)} />
                 <Typography variant="subtitle2" fontWeight={700}>
                   {data.name}
                   {/* <VerifiedUserOutlined fontSize="small" /> */}
@@ -341,6 +348,17 @@ export const UserMenu = (inProps: UserMenuProps) => {
             style={{ padding: "8px" }}
           >
             {/* 3. Wrap each MenuItem in a motion.div with item variants */}
+            {!authenticated && !authLoading && (
+              <motion.div variants={itemVariants}>
+                <PublicAction onClick={() => {
+                  onClose();
+                  router.push("/hrd/contact");
+                }}>
+                  <ListItemIcon><ContactSupportOutlined fontSize="small" /></ListItemIcon>
+                  <Typography variant="body2" fontWeight={500}>Contact us</Typography>
+                </PublicAction>
+              </motion.div>
+            )}
             {authenticated &&
               [
                 {

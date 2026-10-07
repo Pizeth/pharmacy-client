@@ -12,6 +12,9 @@ import {
 import type { DataTableThemeProps } from "@/components/DataTable/mui/theme/types";
 import type { DataTableVariantProps } from "@/components/DataTable/mui/theme/variants";
 import type { DataTableSlotKey } from "@/components/DataTable/mui/styles/dataTableClasses";
+import type { HrdSlotKey } from "@/features/hrd/styles/hrdSlotKeys";
+import type { PublicDocumentsSlotKey } from "@/features/hrd/styles/publicDocumentsSlotKeys";
+import type { AvatarContainerProps } from "@/components/Avatar/AvatarContainer";
 
 import { ClassKey, CustomComponents } from "@/types/classKey";
 import {
@@ -102,6 +105,9 @@ declare module "@mui/material/styles" {
     ClassKey
   > {
     RazethDataTable: DataTableSlotKey;
+    RazethHrd: HrdSlotKey;
+    RazethPublicDocuments: PublicDocumentsSlotKey;
+    RazethAvatarContainer: "root" | "chip" | "foreground";
   }
 
   /**
@@ -117,9 +123,22 @@ declare module "@mui/material/styles" {
    */
   interface ComponentsPropsList extends RazethComponentsPropsList {
     RazethDataTable: DataTableVariantProps;
+    RazethHrd: Record<string, unknown>;
+    RazethPublicDocuments: Record<string, unknown>;
+    RazethAvatarContainer: AvatarContainerProps;
   }
 
   interface Components extends CustomComponents {
+    RazethAvatarContainer?: {
+      defaultProps?: Partial<AvatarContainerProps>;
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAvatarContainer"];
+    };
+    RazethPublicDocuments?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethPublicDocuments"];
+    };
+    RazethHrd?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethHrd"];
+    };
     /** Shared structural slots and resource-independent presentation defaults. */
     RazethDataTable?: {
       /**

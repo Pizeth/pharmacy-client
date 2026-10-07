@@ -1,5 +1,5 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { fireEvent, render, screen, within, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, within, waitFor } from "@testing-library/react";
 import { usePathname } from "next/navigation";
 import { NavItems } from "./NavItems";
 
@@ -12,7 +12,7 @@ Object.assign(theme, {
 
 beforeEach(() => pathname.mockReturnValue("/hrd"));
 
-it.each(["vertical", "horizontal"] as const)(
+it.each(["vertical"] as const)(
   "renders the HRD menu and keyboard dropdown in the %s layout", async (variant) => {
     render(<ThemeProvider theme={theme}><NavItems variant={variant} /></ThemeProvider>);
     expect(screen.getAllByRole("link")).toHaveLength(5);
@@ -42,4 +42,41 @@ it("closes the dropdown after navigation to another route", () => {
   rerender(<ThemeProvider theme={theme}><NavItems /></ThemeProvider>);
   expect(screen.getByRole("button", { name: "អំពីអង្គភាព" })).toHaveAttribute("aria-expanded", "false");
   expect(screen.getByRole("link", { name: "ព័ត៌មាន" })).toHaveAttribute("aria-current", "page");
+});
+
+it("opens on desktop hover and stays open while crossing into the dropdown", () => {
+  jest.useFakeTimers();
+  render(<ThemeProvider theme={theme}><NavItems /></ThemeProvider>);
+  const trigger = screen.getByRole("button", { name: "អំពីអង្គភាព" });
+  fireEvent.mouseEnter(trigger);
+  expect(trigger).toHaveAttribute("aria-expanded", "true");
+  const menu = screen.getByRole("menu");
+  fireEvent.mouseLeave(trigger);
+  fireEvent.mouseEnter(menu.parentElement!);
+  act(() => jest.advanceTimersByTime(200));
+  expect(trigger).toHaveAttribute("aria-expanded", "true");
+  fireEvent.mouseLeave(menu.parentElement!);
+  act(() => jest.advanceTimersByTime(200));
+  expect(trigger).toHaveAttribute("aria-expanded", "false");
+  jest.useRealTimers();
+});
+
+it("expands drawer children inline and notifies selection only for navigation links", async () => {
+  const onNavigate = jest.fn();
+  render(<ThemeProvider theme={theme}><NavItems variant="horizontal" onNavigate={onNavigate} /></ThemeProvider>);
+  const trigger = screen.getByRole("button", { name: "អំពីអង្គភាព" });
+  fireEvent.mouseEnter(trigger);
+  expect(trigger).toHaveAttribute("aria-expanded", "false");
+  fireEvent.click(trigger);
+  expect(trigger).toHaveAttribute("aria-expanded", "true");
+  expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  expect(onNavigate).not.toHaveBeenCalled();
+  const child = screen.getByRole("link", { name: "អំពីប្រធាននាយកដ្ឋាន" });
+  expect(child).toHaveAttribute("href", "/hrd/about/director");
+  fireEvent.click(child);
+  expect(onNavigate).toHaveBeenCalledTimes(1);
+  fireEvent.click(trigger);
+  await waitFor(() => expect(screen.queryByRole("link", { name: "អំពីប្រធាននាយកដ្ឋាន" })).toBeNull());
+  fireEvent.click(screen.getByRole("link", { name: "ទំព័រដើម" }));
+  expect(onNavigate).toHaveBeenCalledTimes(2);
 });

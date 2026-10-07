@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HrdHomePage } from "@/components/hrd/HrdHomePage";
+import { HrdHomePage } from "@/features/hrd/pages/home/HrdHomePage";
 
 export const metadata: Metadata = {
   title: "នាយកដ្ឋានធនធានមនុស្ស | HRD",

@@ -102,6 +102,8 @@ export interface SignUpFormProps extends LoginFormProps {
 }
 
 export interface DrawerToggleProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  neumorphic?: boolean;
+  softGlow?: boolean;
   wrapper?: ReactNode;
   children?: ReactNode;
   icon?: ReactNode;

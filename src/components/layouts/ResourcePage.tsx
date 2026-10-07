@@ -157,8 +157,8 @@ export function ResourcePage(inProps: ResourcePageProps) {
           <HeroBanner>
             <Box
               sx={{
-                display: { xs: "none", md: "inherit" },
-                // display: "none",
+                // display: { xs: "none", md: "inherit" },
+                display: "none",
                 justifyContent: "space-between",
                 mb: 7,
               }}

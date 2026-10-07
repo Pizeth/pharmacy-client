@@ -45,7 +45,7 @@ describe("DocumentTable", () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByPlaceholderText("Search documents…"),
+      screen.getByRole("textbox", { name: "Search table" }),
     ).toBeInTheDocument();
 
     expect(

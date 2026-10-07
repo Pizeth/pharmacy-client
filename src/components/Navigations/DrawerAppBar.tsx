@@ -63,6 +63,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import GlobalSearch from "./Search/search";
 import ParticleContainer from "@/theme/effects/particle";
 import { UserMenu } from "./UserSetting/Settings";
+import AvatarContainer from "@/components/Avatar/AvatarContainer";
 import { th } from "date-fns/locale";
 import MCS from "../icons/socials/mcs";
 import Icons from "../icons/components/socials";
@@ -70,6 +71,31 @@ import ParticleHexBackground from "../effect/backgrounds/particleHex";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
+const AccountButton = styled(ListItemButton, {
+  name: PREFIX,
+  slot: "AccountButton",
+  overridesResolver: (_props, styles) => styles.accountButton,
+})(({ theme }) => ({
+  borderRadius: typeof theme.shape.borderRadius === "number"
+    ? theme.shape.borderRadius * 2
+    : `calc(${theme.shape.borderRadius} * 2)`,
+  paddingInline: theme.spacing(1.5),
+  backgroundColor: theme.vars.palette.background.paper,
+  boxShadow: theme.vars.palette.customShadows.neumorphic,
+  "&:hover": {
+    backgroundColor: theme.vars.palette.background.paper,
+    boxShadow: theme.vars.palette.customShadows.inset,
+  },
+}));
+const AccountAvatar = styled(AvatarContainer, {
+  name: PREFIX,
+  slot: "AccountAvatar",
+  overridesResolver: (_props, styles) => styles.accountAvatar,
+})(({ theme }) => ({
+  width: theme.spacing(6.25),
+  margin: theme.spacing(0, 1, 0, 0),
+  "& .MuiAvatar-root > .MuiSvgIcon-root": { fontSize: theme.spacing(3) },
+}));
 // 1. Define the responsive width once
 const drawerWidth = "clamp(250px, 30vmin, 300px)";
 
@@ -940,7 +966,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
       </Search> */}
       <GlobalSearch />
       {/* <Divider /> */}
-      {disabledMenu ? null : <NavItems variant="horizontal" />}
+      {disabledMenu ? null : <NavItems variant="horizontal" onNavigate={() => setOpen(false)} />}
       {/* Bottom items container - automatically pushed to the bottom */}
       <Box
         sx={{
@@ -999,25 +1025,12 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
         </Box>
 
         {/* The Profile Section */}
-        <ListItemButton
-          sx={{
-            borderRadius: 2,
-            px: 0,
-            "&:hover": { bgcolor: "rgba(255,255,255,0.05)" },
-          }}
-          onClick={handleOpenUserMenu}
-        >
-          <Avatar
-            src={account?.avatar}
+        <AccountButton onClick={handleOpenUserMenu}>
+          <AccountAvatar
+            src={account?.avatar || "/static/images/otto.webp"}
             alt={account?.name ?? "Account"}
-            sx={{
-              width: 50,
-              height: 50,
-              mr: 1,
-              p: 0.125,
-              // borderRadius: "12px",
-              border: "1px solid rgba(197, 190, 190, 0.73)",
-            }} // Squircle avatar
+            fallback={account?.name?.charAt(0)}
+            neumorphic
           />
           <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
             <Typography
@@ -1052,7 +1065,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
               mr: 0.5,
             }}
           />
-        </ListItemButton>
+        </AccountButton>
 
         {/* The Popup Menu */}
         {/* <Menu

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 // import { NavList, NavItem, NavLink, NavIcon, NavText, Indicator } from "./Navigation";
 
@@ -13,6 +13,7 @@ import { colorItemMixin, resolveColor } from "@/utils/themeUtils";
 import {
   Box,
   ButtonBase,
+  Collapse,
   Menu,
   MenuItem,
   List,
@@ -276,10 +277,9 @@ const NavLink = styled(Link, {
     // color: active
     //   ? theme.vars.palette.common.white
     //   : theme.vars.palette.text.primary,
-    color:
-      variant === "vertical"
-        ? theme.vars.palette.common.white
-        : theme.vars.palette.text.primary,
+    color: variant === "vertical"
+      ? theme.vars.palette.common.white
+      : theme.vars.palette.text.primary,
     // color: theme.vars?.palette?.text?.primary ?? theme.palette.text.primary,
     fontSize: "1rem",
     // padding: "12.7px 12.7px",
@@ -432,29 +432,55 @@ const Indicator = styled("div", {
   },
 }));
 
-const NavGroupButton = styled(ButtonBase)(({ theme }) => ({
+const NavGroupButton = styled(ButtonBase, {
+  name: PREFIX, slot: "GroupButton", overridesResolver: (_props, styles) => styles.groupButton,
+})(({ theme }) => ({
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
   padding: theme.spacing(1, 2),
-  color: "inherit",
+  color: theme.vars.palette.common.white,
   "&:hover": { backgroundColor: theme.palette.action.hover },
 }));
+
+const DrawerRoot = styled(Root, { name: PREFIX, slot: "DrawerRoot", overridesResolver: (_props, styles) => styles.drawerRoot })({ width: "100%", alignItems: "flex-start" });
+const DrawerList = styled(List, { name: PREFIX, slot: "DrawerList", overridesResolver: (_props, styles) => styles.drawerList })({ width: "100%", padding: 0 });
+const DrawerItem = styled(ListItem, { name: PREFIX, slot: "DrawerItem", overridesResolver: (_props, styles) => styles.drawerItem })({ display: "block" });
+const DrawerGroupButton = styled(ListItemButton, { name: PREFIX, slot: "DrawerGroupButton", overridesResolver: (_props, styles) => styles.drawerGroupButton })<{ component?: "button" }>({ width: "100%" });
+const DrawerChildLink = styled(ListItemButton, { name: PREFIX, slot: "DrawerChildLink", overridesResolver: (_props, styles) => styles.drawerChildLink })<{ component?: typeof Link; href: string }>(({ theme }) => ({ paddingLeft: theme.spacing(4) }));
+const DrawerChildIcon = styled(ListItemIcon, { name: PREFIX, slot: "DrawerChildIcon", overridesResolver: (_props, styles) => styles.drawerChildIcon })({ minWidth: 36 });
+const GroupArrow = styled(ExpandMoreIcon, { name: PREFIX, slot: "GroupArrow", overridesResolver: (_props, styles) => styles.groupArrow })({ transition: "transform 200ms", "[aria-expanded='true'] > &": { transform: "rotate(180deg)" } });
+const DesktopMenu = styled(Menu, { name: PREFIX, slot: "Menu", overridesResolver: (_props, styles) => styles.menu })({ pointerEvents: "none", "& .MuiPaper-root": { pointerEvents: "auto" } });
 
 interface NavItemsProps {
   variant?: "vertical" | "horizontal";
   items?: NavItemType[];
+  onNavigate?: () => void;
 }
 
-export const NavItems = ({ variant = "vertical", items }: NavItemsProps) => {
+export const NavItems = ({ variant = "vertical", items, onNavigate }: NavItemsProps) => {
   const pathname = usePathname();
   const menuId = useId();
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelClose = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = null;
+  };
+  const scheduleClose = () => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => setMenu(null), 180);
+  };
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+  }, []);
   const [menu, setMenu] = useState<{
     anchor: HTMLElement;
     item: NavItemType;
     pathname: string;
+    hover?: boolean;
   } | null>(null);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
   const navItems = items ?? getDynamicNavItems(pathname);
   const activeIndex = getActiveNavIndex(pathname, navItems);
   const menuOpen = menu !== null && menu.pathname === pathname && navItems.includes(menu.item);
@@ -472,6 +498,50 @@ export const NavItems = ({ variant = "vertical", items }: NavItemsProps) => {
     </>
   );
 
+  if (variant === "horizontal") {
+    return <DrawerRoot>
+      <DrawerList>
+        {navItems.map((item, index) => {
+          const expanded = expandedGroups.includes(item.href);
+          const groupId = `${menuId}-group-${index}`;
+          return <DrawerItem key={item.href} disablePadding>
+            {item.children?.length ? <>
+              <DrawerGroupButton
+                component="button"
+                id={`${groupId}-trigger`}
+                aria-expanded={expanded}
+                aria-controls={groupId}
+                selected={activeIndex === index}
+                onClick={() => setExpandedGroups(current => expanded
+                  ? current.filter(href => href !== item.href)
+                  : [...current, item.href])}
+              >
+                {labelContent(item)}
+                <GroupArrow />
+              </DrawerGroupButton>
+              <Collapse in={expanded} timeout="auto" unmountOnExit>
+                <List id={groupId} aria-labelledby={`${groupId}-trigger`} disablePadding>
+                  {item.children.map(child => <ListItem key={child.href} disablePadding>
+                    <DrawerChildLink component={Link} href={child.href}
+                      selected={matchesNavRoute(pathname, child.href)}
+                      aria-current={pathname === child.href ? "page" : undefined}
+                      onClick={onNavigate}>
+                      <DrawerChildIcon>{child.Icon}</DrawerChildIcon>
+                      <Typography component="span" variant="subtitle1">{child.label}</Typography>
+                    </DrawerChildLink>
+                  </ListItem>)}
+                </List>
+              </Collapse>
+            </> : <ListItemButton component={Link} href={item.href}
+              selected={activeIndex === index}
+              aria-current={pathname === item.href ? "page" : undefined}
+              onClick={onNavigate}>{labelContent(item)}</ListItemButton>}
+          </DrawerItem>;
+        })}
+      </DrawerList>
+    </DrawerRoot>;
+  }
+
   return (
     <Root>
       <NavList variant={variant}>
@@ -488,18 +558,23 @@ export const NavItems = ({ variant = "vertical", items }: NavItemsProps) => {
                 aria-haspopup="menu"
                 aria-expanded={menuOpen && menu?.item === item}
                 aria-controls={menuOpen && menu?.item === item ? `${menuId}-menu` : undefined}
-                onClick={(event) => setMenu({ anchor: event.currentTarget, item, pathname })}
+                onMouseEnter={(event) => {
+                  if (variant !== "vertical") return;
+                  cancelClose();
+                  setMenu({ anchor: event.currentTarget, item, pathname, hover: true });
+                }}
+                onMouseLeave={() => { if (variant === "vertical") scheduleClose(); }}
+                onClick={(event) => {
+                  cancelClose();
+                  setMenu({ anchor: event.currentTarget, item, pathname });
+                }}
                 onKeyDown={(event) => {
                   if (event.key === "ArrowDown") {
                     event.preventDefault();
+                    cancelClose();
                     setMenu({ anchor: event.currentTarget, item, pathname });
                   }
                 }}
-                sx={(theme) => ({
-                  color: variant === "vertical"
-                    ? (theme.vars ?? theme).palette.common.white
-                    : (theme.vars ?? theme).palette.text.primary,
-                })}
               >
                 {labelContent(item)}
                 <ExpandMoreIcon />
@@ -518,12 +593,27 @@ export const NavItems = ({ variant = "vertical", items }: NavItemsProps) => {
           </NavItem>
         ))}
       </NavList>
-      <Menu
+      <DesktopMenu
         id={`${menuId}-menu`}
         anchorEl={menuOpen ? menu?.anchor : null}
         open={menuOpen}
         onClose={() => setMenu(null)}
-        slotProps={{ list: { "aria-labelledby": menuOpen ? menu?.anchor.id : undefined } }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        disableScrollLock
+        disableAutoFocus={menu?.hover}
+        disableEnforceFocus={menu?.hover}
+        disableRestoreFocus={menu?.hover}
+        autoFocus={!menu?.hover}
+        disableAutoFocusItem={menu?.hover}
+        hideBackdrop={variant === "vertical"}
+        slotProps={{
+          paper: {
+            onMouseEnter: cancelClose,
+            onMouseLeave: () => { if (variant === "vertical") scheduleClose(); },
+          },
+          list: { "aria-labelledby": menuOpen ? menu?.anchor.id : undefined },
+        }}
       >
         {menu?.item.children?.map((child) => (
           <MenuItem
@@ -538,7 +628,7 @@ export const NavItems = ({ variant = "vertical", items }: NavItemsProps) => {
             <Typography component="span" variant="subtitle1">{child.label}</Typography>
           </MenuItem>
         ))}
-      </Menu>
+      </DesktopMenu>
     </Root>
   );
 };
