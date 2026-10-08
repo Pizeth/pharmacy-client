@@ -108,6 +108,7 @@ declare module "@mui/material/styles" {
     RazethHrd: HrdSlotKey;
     RazethPublicDocuments: PublicDocumentsSlotKey;
     RazethAvatarContainer: "root" | "chip" | "foreground";
+    RazethBackToTop: "root";
   }
 
   /**
@@ -126,9 +127,13 @@ declare module "@mui/material/styles" {
     RazethHrd: Record<string, unknown>;
     RazethPublicDocuments: Record<string, unknown>;
     RazethAvatarContainer: AvatarContainerProps;
+    RazethBackToTop: Record<string, unknown>;
   }
 
   interface Components extends CustomComponents {
+    RazethBackToTop?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethBackToTop"];
+    };
     RazethAvatarContainer?: {
       defaultProps?: Partial<AvatarContainerProps>;
       styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAvatarContainer"];

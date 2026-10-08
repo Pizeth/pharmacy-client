@@ -82,6 +82,22 @@ const AccountButton = styled(ListItemButton, {
   paddingInline: theme.spacing(1.5),
   backgroundColor: theme.vars.palette.background.paper,
   boxShadow: theme.vars.palette.customShadows.neumorphic,
+  "& [data-account-gear]": {
+    width: theme.spacing(4.5),
+    height: theme.spacing(4.5),
+    padding: theme.spacing(0.75),
+    boxSizing: "border-box",
+    flexShrink: 0,
+    marginRight: theme.spacing(0.5),
+    borderRadius: "50%",
+    color: theme.alpha(theme.vars.palette.text.primary, 0.4),
+    backgroundColor: theme.vars.palette.background.paper,
+    boxShadow: theme.vars.palette.customShadows.neumorphic,
+    transition: theme.transitions.create("box-shadow"),
+  },
+  "&:hover [data-account-gear], &:focus-visible [data-account-gear]": {
+    boxShadow: theme.vars.palette.customShadows.inset,
+  },
   "&:hover": {
     backgroundColor: theme.vars.palette.background.paper,
     boxShadow: theme.vars.palette.customShadows.inset,
@@ -218,7 +234,7 @@ const LogoSection = styled(Box, {
   [theme.breakpoints.down("md")]: {
     width: "100%",
     display: "grid",
-    gridTemplateColumns: "minmax(0, 1fr) minmax(0, 3fr) minmax(0, 1fr)",
+    gridTemplateColumns: "6rem minmax(0, 1fr) 6rem",
     '& > .MuiIconButton-root': { justifySelf: "start", maxWidth: "100%" },
   },
   '[data-mobile-compact="true"] &&': {
@@ -659,14 +675,20 @@ const NavMenuButton = styled(IconButton, {
     // padding: `${theme.spacing(1)}`,
     padding: 0,
     opacity: visible === true ? 1 : 0,
+    [theme.breakpoints.down("md")]: {
+      width: variant === "main" ? "6rem" : "stretch",
+      flexShrink: 0,
+    },
     '[data-mobile-compact="true"] &&': {
-      width: 44,
-      height: 44,
-      minWidth: 44,
-      minHeight: 44,
+      width: 48,
+      height: 48,
+      minWidth: 48,
+      minHeight: 48,
+      fontSize: "3rem",
       margin: 0,
-      padding: theme.spacing(1),
+      padding: 0,
       alignSelf: "center",
+      "& > .MuiSvgIcon-root": { fontSize: "3rem" },
     },
     // margin: `${theme.spacing(1)}`,
     // "&:hover": {
@@ -1058,12 +1080,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
           </Box>
           <SettingsIcon
             fontSize="medium"
-            sx={{
-              // color: (theme) => "rgba(255,255,255,0.4)",
-              color: (theme) =>
-                theme.alpha(theme.vars.palette.text.primary, 0.4),
-              mr: 0.5,
-            }}
+            data-account-gear
           />
         </AccountButton>
 
@@ -1178,7 +1195,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
                     // ]}
                   >
                     {/* <MenuIcon /> */}
-                    {compactMobile ? <MenuIcon /> : <DrawerToggle>
+                    {compactMobile ? <MenuIcon fontSize="inherit" /> : <DrawerToggle>
                       <MiniImg />
                     </DrawerToggle>}
                   </NavMenuButton>

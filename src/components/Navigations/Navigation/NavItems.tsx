@@ -149,7 +149,18 @@ const NavItem = styled(ListItem, {
     "&:hover": {
       // backgroundPosition: "0 100%",
       transition: "all 0.25s ease-in",
-      a: { color: active ? "inherit" : resolved },
+      "& > a, & > button": {
+        color: active ? theme.vars.palette.common.white : `color-mix(in srgb, ${resolved} 60%, black)`,
+        backgroundColor: active
+          ? theme.vars.palette.action.hover
+          : theme.alpha(theme.vars.palette.background.paper, 0.9),
+        backgroundImage: active ? "none" : `linear-gradient(${theme.alpha(resolved, 0.12)}, ${theme.alpha(resolved, 0.12)})`,
+        backdropFilter: active ? "none" : "blur(12px)",
+        boxShadow: active ? "none" : `inset 0 0 0 1px ${theme.alpha(resolved, 0.4)}`,
+        ...theme.applyStyles("dark", {
+          color: active ? theme.vars.palette.common.white : `color-mix(in srgb, ${resolved} 60%, white)`,
+        }),
+      },
       // backgroundImage:
       //   variant === "vertical"
       //     ? `linear-gradient(180deg, transparent 0%, ${theme.alpha(theme.vars.palette.background.paper, 0.75)} 100%)`
@@ -179,7 +190,7 @@ const NavItem = styled(ListItem, {
     },
     svg: {
       // color: active ? `oklch(from ${resolved} calc(l - 0.6) c h)` : resolved,
-      color: active ? `oklch(from ${resolved} 1 0 h)` : resolved,
+      color: "inherit",
       // color: active ? `contrast-color(${resolved})` : resolved,
     },
   };
@@ -242,7 +253,7 @@ const VerticalNavItem = styled(ListItem, {
     },
     svg: {
       // color: active ? `oklch(from ${resolved} calc(l - 0.6) c h)` : resolved,
-      color: active ? `oklch(from ${resolved} 1 0 h)` : resolved,
+      color: "inherit",
       // color: active ? `contrast-color(${resolved})` : resolved,
     },
   };
@@ -348,6 +359,7 @@ const NavIcon = styled(ListItemIcon, {
     // display: "inline-flex",
     alignItems: "center",
     justifyContent: variant === "vertical" ? "center" : "left",
+    color: "inherit",
     // fontSize: "1.5em",
     // lineHeight: "75px",
     transition: "0.5s",
@@ -446,10 +458,55 @@ const NavGroupButton = styled(ButtonBase, {
 
 const DrawerRoot = styled(Root, { name: PREFIX, slot: "DrawerRoot", overridesResolver: (_props, styles) => styles.drawerRoot })({ width: "100%", alignItems: "flex-start" });
 const DrawerList = styled(List, { name: PREFIX, slot: "DrawerList", overridesResolver: (_props, styles) => styles.drawerList })({ width: "100%", padding: 0 });
-const DrawerItem = styled(ListItem, { name: PREFIX, slot: "DrawerItem", overridesResolver: (_props, styles) => styles.drawerItem })({ display: "block" });
+const DrawerItem = styled(ListItem, {
+  name: PREFIX, slot: "DrawerItem", overridesResolver: (_props, styles) => styles.drawerItem,
+  shouldForwardProp: prop => prop !== "navColor",
+})<{ navColor: string }>(({ theme, navColor }) => {
+  const { gradient, resolved } = colorItemMixin(navColor, theme);
+  return {
+    display: "block",
+    color: theme.vars.palette.text.primary,
+    "& .MuiListItemIcon-root": { color: "inherit" },
+    "& > .MuiListItemButton-root": {
+      "&::after": {
+        content: '""', position: "absolute", left: 0, top: 0,
+        width: "2.5px", height: 0, backgroundColor: resolved,
+        transition: "height 200ms ease",
+      },
+      "&:hover::after": { height: "100%" },
+      "&.Mui-selected::after": { backgroundColor: "currentColor" },
+    },
+    "& > .MuiListItemButton-root.Mui-selected": {
+      backgroundImage: gradient,
+      backgroundSize: "100% 200%",
+      backgroundPosition: "0 100%",
+      color: theme.vars.palette.common.white,
+      "& .MuiListItemIcon-root svg": { color: "inherit" },
+    },
+  };
+});
 const DrawerGroupButton = styled(ListItemButton, { name: PREFIX, slot: "DrawerGroupButton", overridesResolver: (_props, styles) => styles.drawerGroupButton })<{ component?: "button" }>({ width: "100%" });
-const DrawerChildLink = styled(ListItemButton, { name: PREFIX, slot: "DrawerChildLink", overridesResolver: (_props, styles) => styles.drawerChildLink })<{ component?: typeof Link; href: string }>(({ theme }) => ({ paddingLeft: theme.spacing(4) }));
-const DrawerChildIcon = styled(ListItemIcon, { name: PREFIX, slot: "DrawerChildIcon", overridesResolver: (_props, styles) => styles.drawerChildIcon })({ minWidth: 36 });
+const DrawerChildLink = styled(ListItemButton, {
+  name: PREFIX, slot: "DrawerChildLink", overridesResolver: (_props, styles) => styles.drawerChildLink,
+  shouldForwardProp: prop => prop !== "navColor",
+})<{ component?: typeof Link; href: string; navColor: string }>(({ theme, navColor }) => ({
+  paddingLeft: theme.spacing(4),
+  "&::after": {
+    content: '""', position: "absolute", left: 0, top: 0,
+    width: "2.5px", height: 0, backgroundColor: resolveColor(navColor, theme),
+    transition: "height 200ms ease",
+  },
+  "&:hover::after": { height: "100%" },
+  "&.Mui-selected::after": { backgroundColor: "currentColor" },
+  "&.Mui-selected": {
+    backgroundImage: colorItemMixin(navColor, theme).gradient,
+    backgroundSize: "100% 200%",
+    backgroundPosition: "0 100%",
+    color: theme.vars.palette.common.white,
+    "& .MuiListItemIcon-root svg": { color: "inherit" },
+  },
+}));
+const DrawerChildIcon = styled(ListItemIcon, { name: PREFIX, slot: "DrawerChildIcon", overridesResolver: (_props, styles) => styles.drawerChildIcon })({ minWidth: 36, color: "inherit" });
 const GroupArrow = styled(ExpandMoreIcon, { name: PREFIX, slot: "GroupArrow", overridesResolver: (_props, styles) => styles.groupArrow })({ transition: "transform 200ms", "[aria-expanded='true'] > &": { transform: "rotate(180deg)" } });
 const DesktopMenu = styled(Menu, { name: PREFIX, slot: "Menu", overridesResolver: (_props, styles) => styles.menu })({ pointerEvents: "none", "& .MuiPaper-root": { pointerEvents: "auto" } });
 
@@ -504,7 +561,7 @@ export const NavItems = ({ variant = "vertical", items, onNavigate }: NavItemsPr
         {navItems.map((item, index) => {
           const expanded = expandedGroups.includes(item.href);
           const groupId = `${menuId}-group-${index}`;
-          return <DrawerItem key={item.href} disablePadding>
+          return <DrawerItem key={item.href} navColor={item.color} disablePadding>
             {item.children?.length ? <>
               <DrawerGroupButton
                 component="button"
@@ -522,7 +579,7 @@ export const NavItems = ({ variant = "vertical", items, onNavigate }: NavItemsPr
               <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <List id={groupId} aria-labelledby={`${groupId}-trigger`} disablePadding>
                   {item.children.map(child => <ListItem key={child.href} disablePadding>
-                    <DrawerChildLink component={Link} href={child.href}
+                    <DrawerChildLink component={Link} href={child.href} navColor={child.color}
                       selected={matchesNavRoute(pathname, child.href)}
                       aria-current={pathname === child.href ? "page" : undefined}
                       onClick={onNavigate}>

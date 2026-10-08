@@ -85,7 +85,7 @@ export function HrdHomePage() {
         </S.DocumentGrid>
       </S.Section>
 
-      <S.Welcome ref={reveal} data-scroll-reveal="fade-up" aria-labelledby="hrd-welcome-heading">
+      <S.Welcome ref={reveal} data-scroll-reveal="flip-left" aria-labelledby="hrd-welcome-heading">
         <S.WelcomeSymbol><Users size={68} strokeWidth={1} aria-hidden="true" />
           <Typography variant="overline">HUMAN RESOURCE DEPARTMENT</Typography>
         </S.WelcomeSymbol>
@@ -98,7 +98,7 @@ export function HrdHomePage() {
         </S.WelcomeCopy>
       </S.Welcome>
 
-      <S.QuickLinks ref={reveal} data-scroll-reveal="slide-up" aria-label="តំណភ្ជាប់រហ័ស">
+      <S.QuickLinks ref={reveal} data-scroll-reveal="flip-up" aria-label="តំណភ្ជាប់រហ័ស">
         <Link href="/hrd/documents"><FolderOpen aria-hidden="true" /><Typography variant="subtitle1" fontWeight={700}>បណ្ដុំឯកសារ</Typography><ArrowRight size={18} /></Link>
         <a href="#hrd-resources"><FileText aria-hidden="true" /><Typography variant="subtitle1" fontWeight={700}>ទម្រង់ពាក្យស្នើសុំ</Typography><ArrowRight size={18} /></a>
         <a href="#hrd-contact"><Mail aria-hidden="true" /><Typography variant="subtitle1" fontWeight={700}>ទំនាក់ទំនង</Typography><ArrowRight size={18} /></a>
@@ -111,7 +111,7 @@ export function HrdHomePage() {
         </S.SectionHeading>
         <S.ResourceGrid>
           {resources.map((document) => (
-            <S.ResourceCard ref={reveal} data-scroll-reveal="fade-up" key={document.id} href="/hrd/documents">
+            <S.ResourceCard ref={reveal} data-scroll-reveal="zoom-in" key={document.id} href="/hrd/documents">
               <FileText size={28} strokeWidth={1.5} aria-hidden="true" />
               <Typography component="h3" variant="subtitle1" fontWeight={700}>{document.title}</Typography>
               <S.Secondary variant="caption">{document.fileTypes.join(" · ")} / {document.fileSize}</S.Secondary>
@@ -121,7 +121,7 @@ export function HrdHomePage() {
         </S.ResourceGrid>
       </S.Section>
 
-      <S.Contact ref={reveal} data-scroll-reveal="fade-up" id="hrd-contact" aria-labelledby="hrd-contact-heading">
+      <S.Contact ref={reveal} data-scroll-reveal="fade" id="hrd-contact" aria-labelledby="hrd-contact-heading">
         <div>
           <Typography component="h2" variant="h5" id="hrd-contact-heading">ត្រូវការព័ត៌មានបន្ថែម?</Typography>
           <Typography variant="body1">សូមទាក់ទងនាយកដ្ឋានធនធានមនុស្ស</Typography>

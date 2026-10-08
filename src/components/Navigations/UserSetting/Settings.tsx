@@ -61,6 +61,18 @@ const PublicAction = styled(MenuItem, {
   padding: theme.spacing(1, 1.5),
   "& .MuiListItemIcon-root": { minWidth: 38 },
   "&:hover": { backgroundColor: theme.alpha((theme.vars ?? theme).palette.primary.main, 0.04) },
+  "&[data-auth-action]": {
+    borderRadius: "50px",
+    backgroundColor: theme.alpha((theme.vars ?? theme).palette.primary.main, 0.075),
+    color: (theme.vars ?? theme).palette.primary.main,
+    boxShadow: (theme.vars ?? theme).palette.customShadows.neumorphic,
+    transition: theme.transitions.create(["box-shadow", "background-color"]),
+    "&:hover, &.Mui-focusVisible": {
+      backgroundColor: theme.alpha((theme.vars ?? theme).palette.primary.main, 0.125),
+      boxShadow: (theme.vars ?? theme).palette.customShadows.inset,
+    },
+    "&.Mui-disabled": { boxShadow: "none" },
+  },
 }));
 
 const Header = styled(Box, {
@@ -573,7 +585,8 @@ export const UserMenu = (inProps: UserMenuProps) => {
               initial="closed"
               animate={open ? "open" : "closed"}
             >
-              <MenuItem
+              <PublicAction
+                data-auth-action
                 // onClick={onClose}
                 onClick={
                   authenticated
@@ -584,15 +597,6 @@ export const UserMenu = (inProps: UserMenuProps) => {
                       }
                 }
                 disabled={authLoading || isLoggingOut}
-                sx={{
-                  ...menuItemStyle,
-                  borderRadius: "50px",
-                  bgcolor: alpha(theme.palette.primary.main, 0.075),
-                  color: theme.palette.primary.main,
-                  "&:hover": {
-                    bgcolor: alpha(theme.palette.primary.main, 0.125),
-                  },
-                }}
               >
                 <ListItemIcon>
                   {/* <LogoutOutlined fontSize="small" sx={{ color: "inherit" }} /> */}
@@ -617,7 +621,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
                         ? "Logout"
                         : "Login"}
                 </Typography>
-              </MenuItem>
+              </PublicAction>
             </motion.div>
           </Box>
 

@@ -80,8 +80,8 @@ export const ROUTE_NAV_MAP: Record<string, NavItemType[]> = {
     },
     {
       label: "ទំនាក់ទំនង",
-      Icon: <RazContact color="info" fontSize="medium" />,
-      color: "info",
+      Icon: <RazContact color="warning" fontSize="medium" />,
+      color: "warning",
       href: "/hrd/contact",
     },
   ],

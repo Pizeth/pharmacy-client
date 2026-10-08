@@ -11,30 +11,45 @@ export function useHomeScrollReveal() {
     const nodes = Array.from(elements.current);
     if (typeof window.matchMedia !== "function") return;
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (preference.matches || typeof IntersectionObserver === "undefined") return;
+    if (typeof IntersectionObserver === "undefined") return;
+
+    let previousScrollY = window.scrollY;
+    let scrollingDown = true;
+    const trackDirection = () => {
+      const nextScrollY = window.scrollY;
+      if (nextScrollY !== previousScrollY) scrollingDown = nextScrollY > previousScrollY;
+      previousScrollY = nextScrollY;
+    };
+    window.addEventListener("scroll", trackDirection, { passive: true });
 
     const observer = new IntersectionObserver((entries) => {
+      if (preference.matches) return;
       entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.setAttribute("data-reveal-state", "visible");
-        observer.unobserve(entry.target);
+        const state = entry.isIntersecting
+          ? scrollingDown ? "visible" : "static"
+          : entry.boundingClientRect.top < 0 ? "static" : "waiting";
+        entry.target.setAttribute("data-reveal-state", state);
       });
-    }, { rootMargin: "0px 0px -60px 0px", threshold: 0 });
+    }, { threshold: 0 });
 
-    nodes.forEach((node) => {
-      if (node.getBoundingClientRect().top < window.innerHeight - 60) return;
-      node.setAttribute("data-reveal-state", "waiting");
-      observer.observe(node);
-    });
-    const showAll = () => {
-      if (!preference.matches) return;
-      nodes.forEach((node) => node.removeAttribute("data-reveal-state"));
+    const updateMotion = () => {
       observer.disconnect();
+      nodes.forEach((node) => {
+        if (preference.matches) {
+          node.removeAttribute("data-reveal-state");
+          return;
+        }
+        const bounds = node.getBoundingClientRect();
+        node.setAttribute("data-reveal-state", bounds.top < window.innerHeight && bounds.bottom > 0 ? "visible" : "waiting");
+        observer.observe(node);
+      });
     };
-    preference.addEventListener("change", showAll);
+    updateMotion();
+    preference.addEventListener("change", updateMotion);
     return () => {
       observer.disconnect();
-      preference.removeEventListener("change", showAll);
+      window.removeEventListener("scroll", trackDirection);
+      preference.removeEventListener("change", updateMotion);
       nodes.forEach((node) => node.removeAttribute("data-reveal-state"));
     };
   }, []);

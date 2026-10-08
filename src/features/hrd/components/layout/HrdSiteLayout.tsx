@@ -29,6 +29,11 @@ const Content = styled(
   backgroundColor: theme.alpha(theme.vars.palette.background.paper, 0.75),
   backgroundImage: `linear-gradient(135deg, ${theme.alpha(theme.vars.palette.primary.main, 0.1)}, ${theme.alpha(theme.vars.palette.secondary.main, 0.1)})`,
   backdropFilter: "blur(20px) saturate(175%)",
+  // Backdrop filters contain fixed descendants; release the viewport-sized shell.
+  '&:has([data-fullscreen="true"])': {
+    backdropFilter: "none",
+    WebkitBackdropFilter: "none",
+  },
   WebkitBackdropFilter: "blur(20px) saturate(175%)",
   color: theme.vars.palette.text.primary,
 }));

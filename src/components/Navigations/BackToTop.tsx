@@ -1,7 +1,21 @@
 import { Fab, useScrollTrigger, Zoom } from "@mui/material";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { styled } from "@mui/material/styles";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { useState } from "react";
+
+const BackToTopButton = styled(Fab, { name: "RazethBackToTop", slot: "Root", overridesResolver: (_props, styles) => styles.root })({
+  position: "fixed",
+  bottom: "2.5vmin",
+  right: "2.5vmin",
+  boxShadow: "5px 5px 12px rgb(0 0 0 / 35%), -4px -4px 10px rgb(255 255 255 / 22%), inset 1px 1px 2px rgb(255 255 255 / 25%)",
+  "&:hover": {
+    boxShadow: "7px 7px 16px rgb(0 0 0 / 40%), -5px -5px 12px rgb(255 255 255 / 25%), inset 1px 1px 2px rgb(255 255 255 / 30%)",
+  },
+  "&:active": {
+    boxShadow: "inset 3px 3px 7px rgb(0 0 0 / 30%), inset -3px -3px 7px rgb(255 255 255 / 22%)",
+  },
+  "& img": { objectFit: "contain" },
+});
 
 function BackToTopFab() {
   // threshold: 100 means the trigger becomes true after scrolling 100px
@@ -22,23 +36,17 @@ function BackToTopFab() {
 
   return (
     <Zoom in={trigger} aria-label="scroll back to top">
-      <Fab
+      <BackToTopButton
         color="primary"
         size="small"
         onClick={handleClick}
-        sx={{
-          position: "fixed",
-          bottom: "2.5vmin",
-          right: "2.5vmin",
-          img: { objectFit: "contain" },
-        }}
       >
         {isScrolling ? (
           <img src="/static/images/shoryuken.gif" alt="Scrolling..." />
         ) : (
           <ArrowUpwardIcon />
         )}
-      </Fab>
+      </BackToTopButton>
     </Zoom>
   );
 }

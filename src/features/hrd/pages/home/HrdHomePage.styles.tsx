@@ -16,14 +16,26 @@ export const Root = styled(HrdPageContainer, hrdSlot("HomeRoot"))(({ theme }) =>
   color: "var(--Hrd-text)",
   paddingBottom: "40px",
   "& [data-scroll-reveal]": {
-    transition: "opacity 400ms cubic-bezier(0.25, 0.1, 0.25, 1), transform 400ms cubic-bezier(0.25, 0.1, 0.25, 1)",
+    transition: "opacity 600ms ease, transform 600ms cubic-bezier(0.25, 0.1, 0.25, 1)",
   },
   "& [data-reveal-state=waiting]": {
-    transform: "translateY(100px)",
-  },
-  "& [data-scroll-reveal=fade-up][data-reveal-state=waiting]": {
     opacity: 0,
+    transform: "translateY(32px)",
   },
+  "& [data-scroll-reveal=flip-left][data-reveal-state=waiting]": {
+    transform: "perspective(1200px) rotateY(12deg)",
+  },
+  "& [data-scroll-reveal=flip-up][data-reveal-state=waiting]": {
+    transform: "perspective(1200px) rotateX(18deg)",
+  },
+  "& [data-scroll-reveal=zoom-in][data-reveal-state=waiting]": {
+    transform: "scale(0.94)",
+  },
+  "& [data-scroll-reveal=fade][data-reveal-state=waiting]": {
+    transform: "none",
+  },
+  "& [data-reveal-state=visible]": { opacity: 1, transform: "none" },
+  "& [data-reveal-state=static]": { opacity: 1, transform: "none", transition: "none" },
   "& [data-scroll-reveal]:focus-within": {
     opacity: 1,
     transform: "none",
