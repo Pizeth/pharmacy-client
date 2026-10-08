@@ -10,6 +10,7 @@ import { HRD_HOME_HIGHLIGHTS } from "../../data/homeHighlights";
 import { HRD_SITE } from "../../data/siteInfo";
 import * as S from "./HrdHomePage.styles";
 import { useHomeScrollReveal } from "./useHomeScrollReveal";
+import { HrdCardCarousel } from "./HrdCardCarousel";
 
 const featuredDocuments = PUBLIC_DOCUMENTS.slice(0, 3);
 const resources = PUBLIC_DOCUMENTS.slice(3, 7);
@@ -61,6 +62,7 @@ export function HrdHomePage() {
         ))}
       </S.Pagination>
 
+      <HrdCardCarousel />
       <S.Section aria-labelledby="hrd-documents-heading">
         <S.SectionHeading ref={reveal} data-scroll-reveal="slide-up">
           <Typography component="h2" variant="h4" id="hrd-documents-heading">ឯកសារសំខាន់ៗ</Typography>

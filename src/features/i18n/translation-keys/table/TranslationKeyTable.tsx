@@ -5,7 +5,6 @@ import {
   Alert,
   Box,
   Button,
-  CircularProgress,
   Paper,
   Typography,
 } from "@mui/material";
@@ -37,6 +36,7 @@ import type { TranslationKey, TranslationValue } from "../schemas";
 import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
 import { TranslationKeyTranslationsPanel } from "./TranslationKeyTranslationsPanel";
 import { createTranslationKeyCardConfig } from "./translationKeyCardConfig";
+import CloudLoader, { CloudLoaderMessage } from "@/components/effect/loaders/CloudLoader/CloudLoader";
 
 const COMPONENT_NAME = "RazethTranslationKeyTable";
 
@@ -250,11 +250,11 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
   if (server.isInitialLoading) {
     return (
       <LoadingRoot variant="outlined">
-        <LoadingContentRoot>
-          <CircularProgress />
-          <Typography variant="body2" color="text.secondary">
+        <LoadingContentRoot role="status" aria-live="polite" aria-busy="true">
+          <CloudLoader />
+          <CloudLoaderMessage variant="body2">
             Loading translation keys…
-          </Typography>
+          </CloudLoaderMessage>
         </LoadingContentRoot>
       </LoadingRoot>
     );

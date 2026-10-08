@@ -23,7 +23,10 @@ import { DataTable } from "@/components/DataTable/index";
 import { createPublicDocumentCardConfig } from "./publicDocumentCardConfig";
 import { PUBLIC_DOCUMENT_CATEGORIES } from "../data/publicDocuments";
 import type { PublicDocumentCategory } from "../data/publicDocuments";
-import { openPublicDocument, viewPublicDocument } from "../actions/openPublicDocument";
+import {
+  openPublicDocument,
+  viewPublicDocument,
+} from "../actions/openPublicDocument";
 import type { PublicDocumentOpenResult } from "../actions/openPublicDocument";
 import type { PublicDocumentRecord } from "../../types/publicDocuments.types";
 import { publicDocumentsSlot } from "../../styles/styled";
@@ -45,10 +48,15 @@ const CategoryTabsRoot = styled(
 
 const GROUP_LABEL = "លិខិតបទដ្ឋានគតិយុត្តិ";
 const GROUP_CATEGORIES: readonly PublicDocumentCategory[] = [
+  "ច្បាប់",
+  "ព្រះរាជក្រម",
   "ព្រះរាជក្រឹត្យ",
   "អនុក្រឹត្យ",
   "ប្រកាស",
   "សេចក្ដីសម្រេច",
+  "សេចក្ដីណែនាំ",
+  "សារាចរ",
+  "បទប្បញ្ញត្តិ",
 ];
 const ADMIN_LABEL = "លិខិតរដ្ឋបាល";
 const ADMIN_CATEGORIES: readonly PublicDocumentCategory[] = [
@@ -100,6 +108,9 @@ export function PublicDocumentsTable({
     null,
   );
   const [activeGroup, setActiveGroup] = useState<"legal" | "admin">("legal");
+  const [selectedGroup, setSelectedGroup] = useState<"legal" | "admin">(
+    "admin",
+  );
 
   const handleDownloadDocument = useCallback((doc: PublicDocumentRecord) => {
     const result = openPublicDocument(doc);
@@ -150,11 +161,14 @@ export function PublicDocumentsTable({
             <CategoryTabsRoot>
               <Tabs
                 value={
-                  ADMIN_CATEGORIES.includes(category)
-                    ? "admin-group"
-                    : GROUP_CATEGORIES.includes(category)
-                      ? "legal-group"
-                      : category
+                  ADMIN_CATEGORIES.includes(category) &&
+                  GROUP_CATEGORIES.includes(category)
+                    ? `${selectedGroup}-group`
+                    : ADMIN_CATEGORIES.includes(category)
+                      ? "admin-group"
+                      : GROUP_CATEGORIES.includes(category)
+                        ? "legal-group"
+                        : category
                 }
                 onChange={(_, next) => {
                   if (next !== "legal-group" && next !== "admin-group")
@@ -234,6 +248,7 @@ export function PublicDocumentsTable({
                     key={name}
                     selected={category === name}
                     onClick={() => {
+                      setSelectedGroup(activeGroup);
                       changeCategory(name);
                       setCategoryAnchor(null);
                     }}

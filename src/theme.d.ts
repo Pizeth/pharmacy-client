@@ -15,6 +15,8 @@ import type { DataTableSlotKey } from "@/components/DataTable/mui/styles/dataTab
 import type { HrdSlotKey } from "@/features/hrd/styles/hrdSlotKeys";
 import type { PublicDocumentsSlotKey } from "@/features/hrd/styles/publicDocumentsSlotKeys";
 import type { AvatarContainerProps } from "@/components/Avatar/AvatarContainer";
+import type { RouteContentLoadingSlot } from "@/components/layouts/RouteContentLoading";
+import type { PulseLoaderSlot } from "@/components/effect/loaders/PulseLoader/PulseLoader.styles";
 
 import { ClassKey, CustomComponents } from "@/types/classKey";
 import {
@@ -106,6 +108,9 @@ declare module "@mui/material/styles" {
   > {
     RazethDataTable: DataTableSlotKey;
     RazethHrd: HrdSlotKey;
+    RazethLoader: PulseLoaderSlot;
+    RazethCloudLoader: "root" | "message";
+    RazethRouteContentLoading: RouteContentLoadingSlot;
     RazethPublicDocuments: PublicDocumentsSlotKey;
     RazethAvatarContainer: "root" | "chip" | "foreground";
     RazethBackToTop: "root";
@@ -125,12 +130,21 @@ declare module "@mui/material/styles" {
   interface ComponentsPropsList extends RazethComponentsPropsList {
     RazethDataTable: DataTableVariantProps;
     RazethHrd: Record<string, unknown>;
+    RazethLoader: Record<string, unknown>;
+    RazethCloudLoader: Record<string, unknown>;
+    RazethRouteContentLoading: Record<string, unknown>;
     RazethPublicDocuments: Record<string, unknown>;
     RazethAvatarContainer: AvatarContainerProps;
     RazethBackToTop: Record<string, unknown>;
   }
 
   interface Components extends CustomComponents {
+    RazethCloudLoader?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethCloudLoader"];
+    };
+    RazethLoader?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethLoader"];
+    };
     RazethBackToTop?: {
       styleOverrides?: ComponentsOverrides<MuiTheme>["RazethBackToTop"];
     };
@@ -140,6 +154,9 @@ declare module "@mui/material/styles" {
     };
     RazethPublicDocuments?: {
       styleOverrides?: ComponentsOverrides<MuiTheme>["RazethPublicDocuments"];
+    };
+    RazethRouteContentLoading?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethRouteContentLoading"];
     };
     RazethHrd?: {
       styleOverrides?: ComponentsOverrides<MuiTheme>["RazethHrd"];

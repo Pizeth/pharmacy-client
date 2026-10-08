@@ -51,6 +51,13 @@ are rendered once by the shared layout; pages must not duplicate them. The
 footer stays outside the constrained content wrapper. Preserve app-bar colors,
 desktop hover menus, inline drawer expansion, and close-on-navigation behavior.
 
+Route loading uses Next.js `loading.tsx` boundaries. HRD's boundary sits below
+`HrdSiteLayout`, keeping navigation, breadcrumbs, and the footer available while
+page content streams. The shared `RouteContentLoading` skeleton uses typed
+`RazethRouteContentLoading` theme slots and the same `xl` content width; it also
+serves other routes in the `(app)` group. Instant cached navigation needs no
+artificial loading delay.
+
 ## Verification
 
 Run the HRD feature tests and TypeScript checks after structural changes.

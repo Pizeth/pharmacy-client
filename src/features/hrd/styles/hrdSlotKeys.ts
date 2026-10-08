@@ -1,4 +1,7 @@
 export type HrdSlotKey =
+  | "homeGallery" | "homeGalleryHeading" | "homeGalleryScene" | "homeGalleryAssembly"
+  | "homeGalleryCard" | "homeGalleryFlip" | "homeGalleryFace" | "homeGalleryLink"
+  | "homeGalleryControls" | "homeGalleryControl"
   | "layoutRoot"
   | "layoutContent"
   | "pageContainer"

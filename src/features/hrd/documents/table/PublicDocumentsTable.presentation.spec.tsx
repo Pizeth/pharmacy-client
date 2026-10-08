@@ -1,5 +1,11 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { MsgUtils } from "@/utils/msgUtils";
 import { PublicDocumentsTable } from "./PublicDocumentsTable";
 
@@ -149,7 +155,8 @@ describe("PublicDocumentsTable (table presentation)", () => {
     await waitFor(() => expect(bodyRows(container)).toHaveLength(20));
     expect(rowNumbers(container)).toEqual(sequence(1, 20));
     expect(screen.getByRole("tab", { name: "លិខិតរដ្ឋបាល" })).toHaveAttribute(
-      "aria-selected", "true",
+      "aria-selected",
+      "true",
     );
     fireEvent.click(screen.getByRole("tab", { name: "ទាំងអស់" }));
     expect(bodyRows(container)).toHaveLength(25);
@@ -160,13 +167,45 @@ describe("PublicDocumentsTable (table presentation)", () => {
 
   it.each([
     ["លិខិតរដ្ឋបាល", ["ពាក្យស្នើសុំ", "លិខិតរដ្ឋបាល", "សេចក្ដីជូនដំណឹង"]],
-    ["លិខិតបទដ្ឋានគតិយុត្តិ", ["ព្រះរាជក្រឹត្យ", "អនុក្រឹត្យ", "ប្រកាស", "សេចក្ដីសម្រេច"]],
-  ] as const)("lists the current categories in the %s menu", (group, categories) => {
+    [
+      "លិខិតបទដ្ឋានគតិយុត្តិ",
+      [
+        "ច្បាប់",
+        "ព្រះរាជក្រម",
+        "ព្រះរាជក្រឹត្យ",
+        "អនុក្រឹត្យ",
+        "ប្រកាស",
+        "សេចក្ដីសម្រេច",
+        "សេចក្ដីណែនាំ",
+        "សារាចរ",
+        "បទប្បញ្ញត្តិ",
+      ],
+    ],
+  ] as const)(
+    "lists the current categories in the %s menu",
+    (group, categories) => {
+      mountTable();
+      fireEvent.click(screen.getByRole("tab", { name: group }));
+      const menu = screen.getByRole("menu", { name: group });
+      expect(
+        within(menu)
+          .getAllByRole("menuitem")
+          .map((item) => item.textContent),
+      ).toEqual(categories);
+    },
+  );
+
+  it("keeps announcements in the administrative menu only", () => {
     mountTable();
-    fireEvent.click(screen.getByRole("tab", { name: group }));
-    const menu = screen.getByRole("menu", { name: group });
-    expect(within(menu).getAllByRole("menuitem").map((item) => item.textContent))
-      .toEqual(categories);
+    fireEvent.click(screen.getByRole("tab", { name: "លិខិតបទដ្ឋានគតិយុត្តិ" }));
+    expect(screen.queryByRole("menuitem", { name: "សេចក្ដីជូនដំណឹង" })).not.toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    fireEvent.click(screen.getByRole("tab", { name: "លិខិតរដ្ឋបាល" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "សេចក្ដីជូនដំណឹង" }));
+    expect(screen.getByRole("tab", { name: "លិខិតរដ្ឋបាល" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
   });
 
   it("filters legal documents and clears the filter through All", () => {
@@ -177,22 +216,30 @@ describe("PublicDocumentsTable (table presentation)", () => {
       Array.from({ length: 10 }, (_, index) => `D-${index + 21}`),
     );
     expect(rowNumbers(container)).toEqual(sequence(1, 10));
-    expect(screen.getByRole("tab", { name: "លិខិតបទដ្ឋានគតិយុត្តិ" }))
-      .toHaveAttribute("aria-selected", "true");
+    expect(
+      screen.getByRole("tab", { name: "លិខិតបទដ្ឋានគតិយុត្តិ" }),
+    ).toHaveAttribute("aria-selected", "true");
     fireEvent.click(screen.getByRole("tab", { name: "ទាំងអស់" }));
     expect(bodyRows(container)).toHaveLength(25);
-    expect(screen.getByRole("tab", { name: "ទាំងអស់" }))
-      .toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "ទាំងអស់" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
   });
 
   it("keeps Other as a direct category tab", () => {
     const { container } = mountTable();
     fireEvent.click(screen.getByRole("tab", { name: "ផ្សេងៗ" }));
-    expect(screen.getByRole("tab", { name: "ផ្សេងៗ" }))
-      .toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "ផ្សេងៗ" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
     expect(bodyRows(container)).toHaveLength(0);
-    expect(screen.getByText("មិនមានឯកសារណាដែលពាក់ព័ន្ធ ឬត្រូវគ្នានឹងការស្វែងរកនោះទេ"))
-      .toBeVisible();
+    expect(
+      screen.getByText(
+        "មិនមានឯកសារណាដែលពាក់ព័ន្ធ ឬត្រូវគ្នានឹងការស្វែងរកនោះទេ",
+      ),
+    ).toBeVisible();
   });
 
   it("keeps the numbers in displayed order when the table is sorted", () => {
