@@ -1,6 +1,20 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { HrdAboutPage } from "./HrdAboutPage";
 import { ABOUT_PAGES, HRD_ABOUT_CONTENT, type AboutSection } from "../../data/aboutContent";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { DirectorReveal } from "./DirectorReveal";
+
+it("supports director slot overrides and toggles pending content without hover", () => {
+  const theme = createTheme({ components: { RazethHrd: { styleOverrides: { directorReveal: { outline: "3px solid rgb(1, 2, 3)" } } } } });
+  const { container } = render(<ThemeProvider theme={theme}><DirectorReveal person={null} /></ThemeProvider>);
+  expect(getComputedStyle(container.firstElementChild!).outline).toBe("3px solid rgb(1, 2, 3)");
+  const button = screen.getByRole("button");
+  expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+  fireEvent.click(button);
+  expect(screen.getByRole("heading")).toHaveTextContent("ប្រធាននាយកដ្ឋានធនធានមនុស្ស");
+  fireEvent.click(button);
+  expect(button).toHaveAttribute("aria-expanded", "false");
+});
 
 it.each(Object.keys(ABOUT_PAGES) as AboutSection[])("renders %s with matching navigation and pending content", (section) => {
   render(<HrdAboutPage section={section} />);
@@ -17,6 +31,10 @@ it("renders approved director details instead of their pending states", () => {
     name: "Test Director", position: "Director", biography: "Approved biography",
     education: ["Education entry"], experience: ["Experience entry"],
   } }} />);
+  const reveal = screen.getByRole("button", { name: "បង្ហាញព័ត៌មានប្រធាននាយកដ្ឋាន" });
+  expect(reveal).toHaveAttribute("aria-expanded", "false");
+  fireEvent.click(reveal);
+  expect(reveal).toHaveAttribute("aria-expanded", "true");
   expect(screen.getByRole("heading", { name: "Test Director" })).toBeInTheDocument();
   expect(screen.getByText("Approved biography")).toBeInTheDocument();
   expect(screen.getByText("Education entry")).toBeInTheDocument();

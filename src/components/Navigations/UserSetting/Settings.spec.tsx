@@ -14,7 +14,10 @@ jest.mock("./AvatarContainer", () => ({ __esModule: true, default: ({ children }
 jest.mock("@/components/CustomComponents/AvatarWrapper", () => ({ __esModule: true, default: ({ children }: { children: React.ReactNode }) => <div>{children}</div> }));
 jest.mock("@/components/CustomComponents/AvatarFrame", () => ({ __esModule: true, default: ({ children }: { children: React.ReactNode }) => <div>{children}</div> }));
 
-const theme = createTheme({ cssVariables: true });
+const theme = createTheme({ cssVariables: true, palette: { customShadows: {
+  neumorphic: "2px 2px 4px black", inset: "inset 2px 2px 4px black",
+  circleWell: "inset 2px 2px 4px black", dataTableCard: "none", dataTableInset: "none",
+} } });
 const identity = { name: "Test Member", email: "member@example.com", role: "member" };
 function mount(authenticated: boolean, authLoading = false) {
   return render(<ThemeProvider theme={theme}><UserMenu open anchorEl={document.body} onClose={mockClose} authenticated={authenticated} authLoading={authLoading} data={identity} /></ThemeProvider>);
@@ -25,12 +28,12 @@ beforeEach(() => {
 });
 afterEach(() => jest.restoreAllMocks());
 
-test("signed-out users see theme and Login without cached identity or account actions", () => {
+test("signed-out users see Login without cached identity, account actions, or the relocated theme toggle", () => {
   mount(false);
   expect(screen.getByRole("img", { name: "Guest avatar" })).toBeInTheDocument();
   expect(screen.queryByText(identity.name)).not.toBeInTheDocument();
   expect(screen.queryByText("Profile")).not.toBeInTheDocument();
-  expect(screen.getByText("Toggle theme")).toBeInTheDocument();
+  expect(screen.queryByText("Toggle theme")).not.toBeInTheDocument();
   fireEvent.click(screen.getByText("Login"));
   expect(mockPush).toHaveBeenCalledWith("/login");
   expect(mockLogout).not.toHaveBeenCalled();
@@ -41,6 +44,7 @@ test("authenticated users see real identity and Logout without fabricated storag
   expect(screen.getByText(identity.name)).toBeInTheDocument();
   expect(screen.getByText(identity.email)).toBeInTheDocument();
   expect(screen.getByText("Profile")).toBeInTheDocument();
+  expect(screen.queryByText("Toggle theme")).not.toBeInTheDocument();
   expect(screen.queryByText(/used of/)).not.toBeInTheDocument();
   fireEvent.click(screen.getByText("Logout"));
   expect(mockLogout).toHaveBeenCalledTimes(1);

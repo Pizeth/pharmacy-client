@@ -1,4 +1,5 @@
 import { useNavigationAccount } from "./UserSetting/useNavigationAccount";
+import { initParticles } from "@/theme/effects/initParticles";
 // import AppBar from "@mui/material/AppBar";
 import type { Engine } from "@tsparticles/engine";
 import { Fragment, ReactNode, useEffect, useState } from "react";
@@ -60,6 +61,7 @@ import RazX from "../icons/socials/x";
 import options from "@/configs/particleConfig";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SettingsIcon from "@mui/icons-material/Settings";
+import PaletteOutlined from "@mui/icons-material/PaletteOutlined";
 import GlobalSearch from "./Search/search";
 import ParticleContainer from "@/theme/effects/particle";
 import { UserMenu } from "./UserSetting/Settings";
@@ -71,6 +73,27 @@ import ParticleHexBackground from "../effect/backgrounds/particleHex";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
+const DrawerThemeRow = styled("div", {
+  name: "RazethDrawerTheme",
+  slot: "Root",
+  overridesResolver: (_props, styles) => styles.root,
+})(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: theme.spacing(1),
+  padding: theme.spacing(1, 1.5),
+  marginBottom: theme.spacing(1.5),
+  color: theme.vars.palette.text.primary,
+}));
+const DrawerThemeLabel = styled(Typography, {
+  name: "RazethDrawerTheme",
+  slot: "Label",
+  overridesResolver: (_props, styles) => styles.label,
+})(({ theme }) => ({
+  display: "flex", alignItems: "center", gap: theme.spacing(1),
+  "& > svg": { color: theme.vars.palette.text.secondary },
+}));
 const AccountButton = styled(ListItemButton, {
   name: PREFIX,
   slot: "AccountButton",
@@ -906,14 +929,6 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
   const scrolled = useScrollTrigger({ disableHysteresis: true, threshold: 96 });
   const compactMobile = mobile && scrolled;
   const { authenticated, authLoading, account } = useNavigationAccount();
-  const init = async (engine: Engine): Promise<void> => {
-    const [{ loadSlim }, { loadThemesPlugin }] = await Promise.all([
-      import("@tsparticles/slim"),
-      import("@tsparticles/plugin-themes"),
-    ]);
-
-    await Promise.all([loadSlim(engine), loadThemesPlugin(engine)]);
-  };
 
   const [open, setOpen] = useState(false);
   // const [init, setInit] = useState(false);
@@ -1046,6 +1061,12 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
           </Typography>
         </Box>
 
+        <DrawerThemeRow>
+          <DrawerThemeLabel variant="body2">
+            <PaletteOutlined fontSize="small" />Theme
+          </DrawerThemeLabel>
+          <ThemeToggle />
+        </DrawerThemeRow>
         {/* The Profile Section */}
         <AccountButton onClick={handleOpenUserMenu}>
           <AccountAvatar
@@ -1075,7 +1096,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
               }}
               noWrap
             >
-              {account?.email ?? "Theme and sign in"}
+              {account?.email ?? "Settings and sign in"}
             </Typography>
           </Box>
           <SettingsIcon
@@ -1158,7 +1179,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
 
   return (
     <Root>
-      <NextParticlesProvider init={init}>
+      <NextParticlesProvider init={initParticles}>
         {/* <CssBaseline /> */}
         <AppBar
           position="fixed"

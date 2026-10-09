@@ -70,7 +70,7 @@ export function HrdHomePage() {
         </S.SectionHeading>
         <S.DocumentGrid>
           {featuredDocuments.map((document, index) => (
-            <S.DocumentCard ref={reveal} data-scroll-reveal="fade-up" href="/hrd/documents" key={document.id}>
+            <S.DocumentCard data-effect-card ref={reveal} data-scroll-reveal="fade-up" href="/hrd/documents" key={document.id}>
               <S.DocumentCover data-cover={index}>
                 <Typography variant="caption">នាយកដ្ឋានធនធានមនុស្ស</Typography>
                 <FileText size={48} strokeWidth={1} aria-hidden="true" />
@@ -113,7 +113,7 @@ export function HrdHomePage() {
         </S.SectionHeading>
         <S.ResourceGrid>
           {resources.map((document) => (
-            <S.ResourceCard ref={reveal} data-scroll-reveal="zoom-in" key={document.id} href="/hrd/documents">
+            <S.ResourceCard data-effect-card ref={reveal} data-scroll-reveal="zoom-in" key={document.id} href="/hrd/documents">
               <FileText size={28} strokeWidth={1.5} aria-hidden="true" />
               <Typography component="h3" variant="subtitle1" fontWeight={700}>{document.title}</Typography>
               <S.Secondary variant="caption">{document.fileTypes.join(" · ")} / {document.fileSize}</S.Secondary>

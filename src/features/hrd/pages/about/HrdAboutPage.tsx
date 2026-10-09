@@ -7,6 +7,7 @@ import { ArrowRight, Building2, Clock3, Download, GitBranch, UserRound, UsersRou
 import { ABOUT_PAGES, HRD_ABOUT_CONTENT, type AboutSection } from "../../data/aboutContent";
 import type { HrdAboutContent, PersonProfile } from "../../types/hrdAbout.types";
 import * as S from "./HrdAboutPage.styles";
+import { DirectorReveal } from "./DirectorReveal";
 
 function Pending({ text = "ព័ត៌មានកំពុងរៀបចំ" }: { text?: string }) {
   return <S.Pending data-pending component="p" variant="body2"><Clock3 size={16} aria-hidden="true" />{text}</S.Pending>;
@@ -47,10 +48,7 @@ export function HrdAboutPage({ section, content = HRD_ABOUT_CONTENT }: { section
       </S.Sidebar>
       <S.Panel  aria-label={page.title}>
         {section === "director" && <>
-          <S.Profile><Portrait person={content.director} large />
-            <Typography component="h2" variant="h5">{content.director?.name ?? "ប្រធាននាយកដ្ឋានធនធានមនុស្ស"}</Typography>
-            {content.director ? <Typography color="text.secondary">{content.director.position}</Typography> : <Pending text="ឈ្មោះ និងរូបថតកំពុងរៀបចំ" />}
-          </S.Profile>
+          <S.Profile><DirectorReveal person={content.director} /></S.Profile>
           <ContentSection title="ជីវប្រវត្តិសង្ខេប" text={content.director?.biography} />
           <ContentSection title="ការសិក្សា និងការបណ្តុះបណ្តាល" items={content.director?.education} />
           <ContentSection title="បទពិសោធន៍ការងារ" items={content.director?.experience} />

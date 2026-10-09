@@ -15,7 +15,6 @@ import {
 import {
   SettingsOutlined,
   ContactSupportOutlined,
-  PaletteOutlined,
   LogoutOutlined,
   LoginOutlined,
   VerifiedUserOutlined,
@@ -45,8 +44,6 @@ import options from "@/configs/particleConfig";
 import AvatarContainer from "@/components/Avatar/AvatarContainer";
 import CircularProgressStatic from "@/components/CustomComponents/CircularProgressStatic";
 import MiniDashboard from "./MiniDashboard";
-// import ThemeToggle from "@/components/CustomComponents/DaynightSwitch";
-import ThemeToggle from "@/components/effect/themes/themeToggle";
 import { useRouter } from "next/navigation";
 import { useLogout } from "@refinedev/core";
 
@@ -529,55 +526,6 @@ export const UserMenu = (inProps: UserMenuProps) => {
             }}
           />
 
-          {/* 3. Theme Toggle Section */}
-          <Box
-            sx={{
-              px: 2.5,
-              py: 1.5,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              justifyItems: "center",
-              // alignContent: "center",
-              transition: "color 0.25s ease",
-              svg: {
-                transition: "fill 0.25s ease",
-              },
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <PaletteOutlined fontSize="small" color="action" />
-              <Typography variant="body2" fontWeight={500}>
-                Theme
-              </Typography>
-            </Box>
-            {/* Simple custom toggle UI placeholder */}
-            {/* <Box
-              sx={{
-                bgcolor: alpha(theme.palette.action.focus, 0.5),
-                p: 0.5,
-                borderRadius: "10px",
-                display: "flex",
-                gap: 0.5,
-              }}
-            > */}
-            {/* <Box
-                sx={{
-                  p: 0.5,
-                  bgcolor: theme.palette.background.paper,
-                  borderRadius: "6px",
-                  boxShadow: 1,
-                  display: "flex",
-                }}
-              >
-                <SettingsOutlined sx={{ fontSize: 14 }} />
-              </Box>
-              <Box sx={{ p: 0.5, display: "flex", opacity: 0.5 }}>
-                <SettingsOutlined sx={{ fontSize: 14 }} />
-              </Box> */}
-            {/* </Box> */}
-            <ThemeToggle />
-          </Box>
           {/* Logout Section (Staggered separately) */}
           <Box sx={{ p: 1, pb: 1.5 }}>
             <motion.div

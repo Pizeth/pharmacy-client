@@ -3,11 +3,24 @@
 import Link from "next/link";
 import { Button, IconButton, Typography } from "@mui/material";
 import type { ButtonProps, TypographyProps } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, keyframes } from "@mui/material/styles";
 import { HrdPageContainer } from "../../components/layout/HrdPageLayout";
 import { hrdSlot } from "../../styles/styled";
 
+const gridDrift = keyframes({ to: { backgroundPosition: "48px 48px" } });
+const scan = keyframes({ from: { transform: "translateY(-100%)" }, to: { transform: "translateY(420px)" } });
+const titleGlow = keyframes({ "50%": { filter: "drop-shadow(0 0 10px var(--Hrd-effect-accent))" } });
+
 export const Root = styled(HrdPageContainer, hrdSlot("HomeRoot"))(({ theme }) => ({
+  "--Hrd-effect-accent": (theme.vars ?? theme).palette.secondary.main,
+  "& a[data-effect-card]": { position: "relative", overflow: "hidden", transition: "box-shadow 350ms ease, translate 350ms ease, border-color 350ms ease",
+    "&::after": { content: '""', position: "absolute", inset: 0, pointerEvents: "none",
+      backgroundImage: `linear-gradient(110deg, transparent 25%, ${theme.alpha((theme.vars ?? theme).palette.secondary.main, 0.16)} 50%, transparent 75%)`,
+      transform: "translateX(-100%)", transition: "transform 700ms ease" },
+    "&:hover, &:focus-visible": { translate: "0 -5px", borderColor: (theme.vars ?? theme).palette.secondary.main,
+      boxShadow: `0 8px 28px ${theme.alpha((theme.vars ?? theme).palette.secondary.main, 0.24)}, 0 0 0 1px ${(theme.vars ?? theme).palette.secondary.main}`,
+      "&::after": { transform: "translateX(100%)" } },
+  },
   "--Hrd-blue": "#08477f",
   "--Hrd-gold": "#d8b36c",
   "--Hrd-surface": `${(theme.vars ?? theme).palette.background.paper}`,
@@ -41,6 +54,8 @@ export const Root = styled(HrdPageContainer, hrdSlot("HomeRoot"))(({ theme }) =>
     transform: "none",
   },
   "@media (prefers-reduced-motion: reduce)": {
+    "& *, & *::before, & *::after": { animation: "none !important", transition: "none !important" },
+    "& a[data-effect-card]:hover, & a[data-effect-card]:focus-visible": { translate: "none" },
     "& [data-scroll-reveal]": { transition: "none", transform: "none", opacity: 1 },
   },
   [theme.breakpoints.down(700.05)]: {
@@ -115,6 +130,13 @@ export const GoldLine = styled("span", hrdSlot("HomeGoldLine"))(({ theme }) => (
 }));
 
 export const FeatureCopy = styled("div", hrdSlot("HomeFeatureCopy"))(({ theme }) => ({
+  position: "relative", isolation: "isolate", overflow: "hidden",
+  "&::before": { content: '""', position: "absolute", inset: 0, zIndex: -1, pointerEvents: "none",
+    backgroundImage: `linear-gradient(${theme.alpha((theme.vars ?? theme).palette.secondary.light, 0.12)} 1px, transparent 1px), linear-gradient(90deg, ${theme.alpha((theme.vars ?? theme).palette.secondary.light, 0.12)} 1px, transparent 1px)`,
+    backgroundSize: "48px 48px", animation: `${gridDrift} 16s linear infinite` },
+  "&::after": { content: '""', position: "absolute", top: 0, left: 0, right: 0, height: 2, pointerEvents: "none",
+    backgroundImage: `linear-gradient(90deg, transparent, ${(theme.vars ?? theme).palette.secondary.light}, transparent)`,
+    opacity: 0.5, animation: `${scan} 6s linear infinite` },
   alignSelf: "center",
   padding: "44px 55px",
   [theme.breakpoints.down(1000.05)]: {
@@ -131,6 +153,7 @@ export const FeatureEyebrow = styled(Typography, hrdSlot("HomeFeatureEyebrow"))<
 }));
 
 export const FeatureTitle = styled(Typography, hrdSlot("HomeFeatureTitle"))<TypographyProps>(({ theme }) => ({
+  animation: `${titleGlow} 4s ease-in-out infinite`,
   lineHeight: "1.9",
   fontSize: "clamp(21px, 2.1vw, 30px)",
   margin: "12px 0 18px",

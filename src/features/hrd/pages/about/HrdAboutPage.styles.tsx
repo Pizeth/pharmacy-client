@@ -229,6 +229,7 @@ export const Panel = styled("article", hrdSlot("AboutPanel"))(({ theme }) => ({
 }));
 
 export const Profile = styled("div", hrdSlot("AboutProfile"))(({ theme }) => ({
+  containerType: "inline-size",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
