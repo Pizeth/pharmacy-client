@@ -108,6 +108,8 @@ export function DataTablePagination<TData extends RowData>(
       selector={(state) => ({
         pagination: state.pagination,
         rowSelection: state.rowSelection,
+        globalFilter: state.globalFilter,
+        columnFilters: state.columnFilters,
       })}
     >
       {(state) => {
@@ -132,7 +134,7 @@ export function DataTablePagination<TData extends RowData>(
         const knownRowCount =
           table.options.rowCount ??
           (!table.options.manualPagination
-            ? table.options.data.length
+            ? table.getRowCount()
             : undefined);
 
         /**
