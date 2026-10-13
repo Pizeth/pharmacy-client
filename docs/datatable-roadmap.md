@@ -1414,6 +1414,113 @@ preserve the useful core/react/browser split, resolve only genuine API drift,
 and use that reconciled PR as the continuation point for the architectural
 migration.
 
+
+
+### October 13 — latest-master rescope before Matrix A closeout
+
+Current repository baseline:
+
+- master before this documentation update:
+  `3b62de029f0bd75debf6ddda1755b663230ec096`,
+- PR #38 is merged,
+- subsequent direct pushes introduced additional DataTable behavior plus the HRD
+  feature family,
+- the latest direct-push master commit has no associated GitHub Actions run, so
+  the next implementation branch must begin by proving a fresh automated
+  baseline rather than assuming green CI.
+
+Important clarification about the core:
+
+The user has recently changed many DataTable-adjacent files, but
+`src/components/DataTable/core/**` itself has not been materially rewritten by
+the post-PR #38 pushes. Current master still contains the earlier foundation:
+
+- feature/builder pipeline,
+- command registry,
+- framework-independent context/runtime,
+- event bus,
+- plugin/service registries,
+- core TanStack table construction,
+- React runtime hooks.
+
+The latest core-path semantic change on master remains the September 25
+row-pinning feature exposure. Current generated stock-feature coverage is:
+
+- 12 exposed,
+- 5 intentionally ignored:
+  - cellSelectionFeature,
+  - cellSpanningFeature,
+  - columnFacetingFeature,
+  - columnGroupingFeature,
+  - rowAggregationFeature.
+
+What *did* change substantially after PR #38 is the MUI/resource surface:
+
+- generic row-click/keyboard row activation,
+- card flip detail mode,
+- card flip slots/classes and tests,
+- global-filter composition using the shared SearchInput,
+- collapsible horizontal search presentation and commit semantics,
+- HRD PublicDocuments becoming a real client-side DataTable consumer,
+- PublicDocuments table/card/compact-card/category/action behavior,
+- TranslationKey card/detail integration adjustments,
+- theme and navigation/resource composition around those surfaces.
+
+#### PR #31 disposition
+
+PR #31 remains **open, draft, useful, and unmerged**, but it must now be treated
+as a donor/reference branch rather than something to mechanically rebase and
+merge wholesale.
+
+Current comparison against master:
+
+- 83 commits ahead,
+- 102 commits behind,
+- it contains a broad second-stage extraction into:
+  - `core/density`,
+  - `core/server-state`,
+  - `core/server-data`,
+  - `core/server-query`,
+  - `core/query-url`,
+  - `core/live`,
+  - `core/persistence`,
+  - React/browser adapter splits.
+
+Since current master has since changed row pinning, presentation, card flip,
+search, width geometry, resources and dependencies, PR #31 should be reconciled
+only after the production/performance baseline is closed.
+
+Recommended post-2.2 strategy:
+
+1. keep PR #31 available as architectural reference,
+2. create a fresh branch from then-current master,
+3. port one transport-independent domain at a time,
+4. remove the corresponding old MUI-owned implementation only after tests pass,
+5. add import-boundary tests/enforcement,
+6. do not mix behavior changes with layer migration,
+7. rerun focused + complete DataTable + browser acceptance after each bounded
+   extraction.
+
+#### Immediate next goal
+
+Do **not** start Matrix B yet.
+
+The next branch should close latest-master Matrix A with this order:
+
+1. establish green automated baseline,
+2. certify native table width,
+3. certify generic row activation,
+4. certify card flip,
+5. certify collapsible global search/debounce semantics,
+6. rerun TranslationKey selection/query smoke,
+7. close safe delete + filter-error/retry + same-lifecycle refetch evidence,
+8. final console/network smoke,
+9. mark Matrix A PASS,
+10. then begin Matrix B performance measurements.
+
+The detailed browser/implementation order is maintained in
+`docs/datatable-browser-matrix.md`.
+
 ## 2.2.3 — virtualization architecture
 
 **Status: conditional**
