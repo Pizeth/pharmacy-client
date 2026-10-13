@@ -1,13 +1,11 @@
 "use client";
 import { GlobalStyles, Portal, useMediaQuery } from "@mui/material";
 import { useColorScheme, useTheme } from "@mui/material/styles";
-import { useEffect, useId, useMemo, useState } from "react";
-import { NextParticlesProvider } from "@tsparticles/nextjs";
-import type { ISourceOptions } from "@tsparticles/engine";
-import { initParticles } from "@/theme/effects/initParticles";
+import { useEffect, useId, useRef, useState } from "react";
+import ParticleField from "./ParticleField";
+import GradientRing from "./GradientRing";
 import * as S from "./PulseLoader.styles";
 
-const STORM_PARTICLES = Array.from({ length: 400 }, (_, index) => <S.StormParticle key={index} />);
 
 const LOADING_MESSAGES = [
   "Initializing System",
@@ -26,21 +24,7 @@ export default function PulseLoader() {
   const palette = scheme ? theme.colorSchemes?.[scheme]?.palette ?? theme.palette : theme.palette;
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const particleId = useId().replace(/:/g, "");
-  const particleOptions = useMemo(() => {
-    const options = (color: string, count: number, size: number): ISourceOptions => ({
-      fullScreen: { enable: false }, fpsLimit: 30, detectRetina: true,
-      pauseOnBlur: true, pauseOnOutsideViewport: true,
-      particles: {
-        number: { value: count }, paint: { fill: { color: { value: color }, enable: true } },
-        shape: { type: "circle" }, links: { enable: false },
-        opacity: { value: { min: 0.1, max: 0.5 }, animation: { enable: true, speed: 0.5, sync: false } },
-        size: { value: { min: 1, max: size } },
-        move: { enable: true, speed: 0.5, outModes: { default: "bounce" } },
-      },
-      interactivity: { events: { onHover: { enable: false }, onClick: { enable: false } } },
-    });
-    return { core: options(palette.primary.main, 70, 10), ambient: options(palette.primary.light, 100, 15) };
-  }, [palette.primary.main, palette.primary.light]);
+  const emblemRef = useRef<HTMLDivElement>(null);
   const [messageIndex, setMessageIndex] = useState<number | null>(null);
   useEffect(() => {
     setMessageIndex(Math.floor(Math.random() * LOADING_MESSAGES.length));
@@ -54,14 +38,14 @@ export default function PulseLoader() {
       <GlobalStyles styles={'@property --PulseLoader-frame-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }'} />
       <S.Root role="status" aria-label="Loading…" aria-live="polite" aria-busy="true">
         <S.Background aria-hidden="true">
-          {!reducedMotion && <NextParticlesProvider init={initParticles}>
-            <S.Particle id={`pulse-ambient-${particleId}`} data-layer="ambient" options={particleOptions.ambient} />
-            <S.Particle id={`pulse-core-${particleId}`} data-layer="core" options={particleOptions.core} />
-          </NextParticlesProvider>}
+          {!reducedMotion && <ParticleField emblemRef={emblemRef} main={palette.primary.main} light={palette.primary.light} />}
         </S.Background>
         <S.Frame aria-hidden="true" />
-        <S.Emblem aria-hidden="true">
-          <S.Storm><S.StormCore>{STORM_PARTICLES}</S.StormCore></S.Storm>
+        <S.Emblem ref={emblemRef} aria-hidden="true">
+          <S.CircleBackground />
+          <S.Storm />
+          <S.OuterGlow />
+          <GradientRing />
           <S.Ring data-ring="outer" />
           <S.Ring data-ring="middle" />
           <S.Ring data-ring="inner">

@@ -3,9 +3,10 @@ import { Typography } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import type { CSSInterpolation } from "@mui/material/styles";
 import AvatarContainer from "@/components/Avatar/AvatarContainer";
-import ParticleContainer from "@/theme/effects/particle";
+import { GLOW_INSET } from "./geometry";
+import { hi } from "@/theme/keyframes";
 
-export type PulseLoaderSlot = "root" | "frame" | "storm" | "stormCore" | "stormParticle" | "background" | "particle" | "ring" | "emblem" | "glow" | "avatar" | "pulse" | "progress" | "orbit" | "message";
+export type PulseLoaderSlot = "root" | "frame" | "storm" | "background" | "circleBackground" | "particle" | "ring" | "gradientRing" | "emblem" | "glow" | "outerGlow" | "avatar" | "pulse" | "progress" | "orbit" | "message";
 const slot = (name: Capitalize<PulseLoaderSlot>) => ({
   name: "RazethLoader", slot: name,
   overridesResolver: (_props: unknown, styles: Record<string, CSSInterpolation>) => styles[name.charAt(0).toLowerCase() + name.slice(1)],
@@ -15,26 +16,30 @@ const pulse = keyframes({ from: { opacity: 0.45, transform: "scale(1)" }, to: { 
 const orbit = keyframes({ "0%": { transform: "rotate(0deg)" }, "80%, 100%": { transform: "rotate(360deg)" } });
 const glowRotation = keyframes({ to: { transform: "rotate(360deg)" } });
 const frameRotation = keyframes({ to: { "--PulseLoader-frame-angle": "1turn" } });
-const stormBirth = keyframes({
-  "0%, 100%": { opacity: 0 },
-  "10%": { opacity: 1 },
-  "20%": { transform: "rotateZ(var(--storm-y)) rotateX(var(--storm-z)) translate3d(var(--storm-radius), 0, 0)" },
-  "60%": { transform: "rotateZ(var(--storm-y)) rotateX(var(--storm-z)) translate3d(var(--storm-radius), 0, var(--storm-depth))" },
-  "90%": { transform: "rotateZ(var(--storm-y)) rotateX(var(--storm-z)) translate3d(calc(var(--storm-radius) + 30px), 0, var(--storm-depth))" },
+const backgroundFlicker = keyframes({
+  "0%, 28%, 39%, 41%, 44%, 64%, 100%": { backdropFilter: "var(--f) hue-rotate(0deg)" },
+  "25%, 42%, 80%": { backdropFilter: "var(--f) hue-rotate(-25deg)" },
+  "32%, 40%, 58%": { backdropFilter: "var(--f) hue-rotate(-20deg)" },
 });
+const blobHeights = [235, 252, 150, 253, 204, 134, 179, 299, 215, 281, 158, 210];
+const blobImages = blobHeights.flatMap(height => [
+  `radial-gradient(4px 100px at 0px ${height}px, var(--c), #0000)`,
+  `radial-gradient(4px 100px at 300px ${height}px, var(--c), #0000)`,
+  `radial-gradient(3px 4px at 150px ${height / 2}px, var(--c1) 100%, #0000 150%)`,
+]).join(",");
+const blobSizes = blobHeights.flatMap(height => Array(3).fill(`300px ${height}px`)).join(",");
 const ringFade = keyframes({
   "0%, 100%": { opacity: 0.2 },
   "50%": { opacity: 1 },
 });
 export const Root = styled("div", slot("Root"))(({ theme }) => ({
   isolation: "isolate", overflow: "hidden",
-  position: "fixed", inset: 0, zIndex: theme.zIndex.modal + 1,
+  position: "fixed", top: 0, left: 0, right: 0, height: "100dvh", boxSizing: "border-box", zIndex: theme.zIndex.modal + 1,
   "--PulseLoader-accent": "#ff0000",
   display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
   gap: theme.spacing(4), padding: theme.spacing(3),
   backgroundColor: theme.alpha((theme.vars ?? theme).palette.background.default, 0.92),
   color: (theme.vars ?? theme).palette.text.primary,
-  backdropFilter: "blur(20px) saturate(175%)",
   "@media (prefers-reduced-motion: reduce)": {
     "& *, & *::before, & *::after": { animation: "none !important", transition: "none !important" },
   },
@@ -49,39 +54,50 @@ export const Frame = styled("div", slot("Frame"))(({ theme }) => ({
     filter: "blur(0.75em)", animation: `${frameRotation} 4s linear infinite`, opacity: 0.85 },
 }));
 export const Background = styled("div", slot("Background"))(({ theme }) => ({
-  position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none",
+  position: "absolute", inset: 0, zIndex: 0, overflow: "hidden", pointerEvents: "none",
   backgroundImage: `radial-gradient(ellipse at center, ${theme.alpha((theme.vars ?? theme).palette.primary.main, 0.12)}, transparent 65%)`,
 }));
-export const Particle = styled(ParticleContainer, slot("Particle"))({
-  inset: "25% 0 auto", width: "100%", height: "50%",
-  "&[data-layer=ambient]": { opacity: 0.18 },
+export const Particle = styled("canvas", slot("Particle"))({
+  position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none",
 });
 export const Emblem = styled("div", slot("Emblem"))(({ theme }) => ({
-  position: "relative", width: "clamp(100px, 20vmin, 160px)", aspectRatio: "1",
+  position: "relative", zIndex: 1, width: "min(clamp(100px, 20vmin, 160px), calc((100vw - 64px) / 2.8), calc((100dvh - 64px) / 2.8))", aspectRatio: "1",
   display: "grid", placeItems: "center", marginBlock: theme.spacing(7),
 }));
 // Solar storm inspired by Zarko Rvovic's CodePen xxNxKoQ.
-export const Storm = styled("div", slot("Storm"))(({ theme }) => ({
-  position: "absolute", inset: "-90%", pointerEvents: "none", borderRadius: "50%",
-  "--storm-radius": "clamp(118px, 23.6vmin, 188.8px)", "--storm-depth": "clamp(120px, 24vmin, 192px)",
-  maskImage: "radial-gradient(farthest-side, transparent 75%, black 78%)",
-  "&::before": { content: '""', position: "absolute", inset: "8%", borderRadius: "50%",
-    boxShadow: `0 0 8px 3px ${(theme.vars ?? theme).palette.primary.main}, inset 0 0 8px 1px ${(theme.vars ?? theme).palette.error.main}` },
-}));
-export const StormCore = styled("div", slot("StormCore"))({
-  position: "absolute", top: "50%", left: "50%", width: 0, height: 0,
-  transformStyle: "preserve-3d", filter: "blur(10px)", animation: `${glowRotation} 15s linear infinite reverse`,
+export const CircleBackground = styled("span", slot("CircleBackground"))({
+    position: "absolute", inset: "-47%", borderRadius: "50%", overflow: "hidden", pointerEvents: "none",
+    // Confine the dotted overlay's backdrop blur to this pattern, including in light mode.
+    isolation: "isolate", filter: "opacity(1)", backgroundColor: "#000",
+    "&::before": {
+      content: '""', position: "absolute", inset: "-145%", rotate: "-45deg",
+      "--c": "#fa0", "--c1": "#f00",
+      backgroundImage: blobImages,
+      backgroundSize: blobSizes,
+      animation: `${hi} 150s linear infinite`,
+    },
+    "&::after": {
+      content: '""', position: "absolute", inset: 0,
+      backgroundImage: "radial-gradient(circle at 50% 50%, #0000 0, #0000 2px, hsl(0 0 4%) 2px)",
+      backgroundSize: "8px 8px", "--f": "blur(3em) brightness(9)",
+      backdropFilter: "var(--f)",
+      animation: `${backgroundFlicker} 5s ease-in-out infinite`,
+    },
 });
-export const StormParticle = styled("span", slot("StormParticle"))(({ theme }) => ({
-  position: "absolute", width: 11, height: 11, borderRadius: "50%", backgroundColor: (theme.vars ?? theme).palette.primary.main, opacity: 0,
-  "&:nth-child(even)": { backgroundColor: (theme.vars ?? theme).palette.error.main },
-  transformStyle: "preserve-3d", animation: `${stormBirth} 4s infinite`,
-  ...Object.fromEntries(Array.from({ length: 400 }, (_, index) => [
-    `&:nth-child(${index + 1})`, { "--storm-y": `${(index * 137.508) % 360}deg`,
-      "--storm-z": `${(index * 73.19) % 360}deg`, animationDelay: `${index * -0.01}s` },
-  ])),
+export const Storm = styled("div", slot("Storm"))(({ theme }) => ({
+  position: "absolute", inset: GLOW_INSET, pointerEvents: "none", borderRadius: "50%",
+  // CharandeepSingh01's inward glow, applied to our existing outer circle without a border.
+  boxShadow: `0 0 20px ${(theme.vars ?? theme).palette.primary.main} inset, 0 0 8px 1px ${theme.alpha((theme.vars ?? theme).palette.primary.main, 0.25)}`,
 }));
 // Counter-rotating broken rings inspired by Colin Horn's CodePen zdNMVy.
+export const GradientRing = styled("span", slot("GradientRing"))(({ theme }) => ({
+  // SVG r=20/viewBox=66: the visible arc now matches the logo frame diameter.
+  position: "absolute", inset: "-32.5%", zIndex: 2, pointerEvents: "none", borderRadius: "50%",
+  "--PulseLoader-gradient-error": (theme.vars ?? theme).palette.error.main,
+  "--PulseLoader-gradient-primary": (theme.vars ?? theme).palette.primary.main,
+  animation: `${glowRotation} 1.2s linear infinite`,
+  "& svg": { display: "block", width: "100%", height: "100%" },
+}));
 export const Ring = styled("span", slot("Ring"))(({ theme }) => ({
   position: "absolute", inset: "-55%", borderRadius: "50%", pointerEvents: "none",
   "--PulseLoader-ring-color": (theme.vars ?? theme).palette.primary.main,
@@ -100,6 +116,17 @@ export const Ring = styled("span", slot("Ring"))(({ theme }) => ({
   },
 }));
 // Adapted from xXJollyHAKERXx's Uiverse glow spinner (MIT).
+export const OuterGlow = styled("span", slot("OuterGlow"))(({ theme }) => ({
+  position: "absolute", inset: "-47%", borderRadius: "50%", pointerEvents: "none",
+  animation: `${glowRotation} 1.7s linear infinite`,
+  boxShadow: `0 -5px 20px ${(theme.vars ?? theme).palette.primary.main}, 0 5px 20px ${(theme.vars ?? theme).palette.error.main}`,
+  "&::before": {
+    content: '""', position: "absolute", inset: 0, borderRadius: "inherit",
+    backgroundImage: `linear-gradient(${(theme.vars ?? theme).palette.primary.main} 35%, ${(theme.vars ?? theme).palette.error.main})`,
+    maskImage: "radial-gradient(farthest-side, transparent calc(100% - 6px), black calc(100% - 3px))",
+    filter: "blur(1px)",
+  },
+}));
 export const Glow = styled("span", slot("Glow"))(({ theme }) => ({
   position: "absolute", inset: "-3%", borderRadius: "50%", pointerEvents: "none",
   backgroundImage: `linear-gradient(${(theme.vars ?? theme).palette.primary.main} 35%, ${(theme.vars ?? theme).palette.error.main})`,
@@ -118,7 +145,7 @@ export const Pulse = styled("span", slot("Pulse"))(({ theme }) => ({
   animation: `${pulse} 2s ease-out infinite`,
 }));
 export const Progress = styled("div", slot("Progress"))(({ theme }) => ({
-  position: "absolute", inset: `calc(-10% - ${theme.spacing(1.5)})`,
+  position: "absolute", inset: `calc(${GLOW_INSET} - ${theme.spacing(1.5)})`,
   pointerEvents: "none", zIndex: 3,
 }));
 export const Orbit = styled("span", slot("Orbit"))({
@@ -129,7 +156,7 @@ export const Orbit = styled("span", slot("Orbit"))({
   ])),
   "&::after": {
     content: '""', position: "absolute", top: 0, left: "50%",
-    transform: "translate(-50%, -50%)", width: "7%", aspectRatio: "1", borderRadius: "50%",
+    transform: "translate(-50%, -50%)", width: "clamp(8px, 1.6vmin, 13px)", aspectRatio: "1", borderRadius: "50%",
     backgroundColor: "var(--PulseLoader-accent)", boxShadow: "0 0 20px 2px var(--PulseLoader-accent)",
   },
 });

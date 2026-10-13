@@ -7,12 +7,22 @@ MIT License
 Copyright - 2026 krlozCJ (Carlos Juárez)
 Copyright - 2026 xXJollyHAKERXx
 Copyright - 2026 andrew-manzyk (Andrew Manzyk)
+Copyright - 2026 CharandeepSingh01 (Charandeep Singh)
+Copyright - 2026 aadium (Aadi Umrani)
+Copyright - 2026 SelfMadeSystem (SelfMadeSystem)
 
 Cloud loader adapted from https://uiverse.io/andrew-manzyk/smart-ladybug-8
 in the sibling CloudLoader directory, under the same MIT license below.
 
 Glow spinner adapted from https://uiverse.io/xXJollyHAKERXx/lucky-falcon-75
 under the same MIT license below.
+
+Gradient ring adapted from https://uiverse.io/aadium/friendly-puma-64
+under the same MIT license below.
+
+Circle background adapted from https://uiverse.io/SelfMadeSystem/short-newt-53
+under the same MIT license below, sharing the login SideImage's motion keyframes.
+
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,5 +42,5 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-Accent color reference: https://uiverse.io/CharandeepSingh01/curly-husky-35
+Inward glow and accent color reference: https://uiverse.io/CharandeepSingh01/curly-husky-35
 (`red`, equivalent to `#ff0000`).

@@ -1,8 +1,7 @@
 import { act, render, screen } from "@testing-library/react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import PulseLoader from "../loader";
-jest.mock("@/theme/effects/particle", () => ({ __esModule: true, default: () => <div /> }));
-jest.mock("@tsparticles/nextjs", () => ({ NextParticlesProvider: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
+jest.mock("./ParticleField", () => ({ __esModule: true, default: () => <canvas /> }));
 
 jest.mock("@/components/Avatar/AvatarContainer", () => ({
   __esModule: true,
