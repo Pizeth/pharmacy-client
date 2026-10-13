@@ -34,7 +34,7 @@ remains a chronological acceptance record.
 
 ## Matrix A — production presentation parity before performance profiling
 
-**Status: BLOCKED — MRT-parity follow-up for dual-edge sticky selection and a density-independent selection-aware footer must land, then controlled filter-error/retry and explicit TranslationKey refetch evidence must close (2026-09-30)**
+**Status: BLOCKED — latest-master Matrix A closeout is required after post-PR #38 renderer/resource changes; the remaining original evidence gaps are safe deletion lifecycle, controlled filter-error/retry, and explicit same-lifecycle TranslationKey refetch (2026-10-13)**
 
 Purpose:
 
@@ -81,7 +81,7 @@ Required checks:
 | Switching view does not reset global search | PASS | PASS | `auth` yields five keys before/after switching. |
 | Switching view does not reset column filters | PASS | PASS | Key contains `email`: same two keys; category/locale combination also retained. |
 | Switching view preserves row selection | PASS | PASS | Row 8 stays selected across both directions. |
-| Selection-driven row pinning matches MRT `select-sticky` behavior | PENDING FOLLOW-UP | PASS | Current table renderer proves top-edge sticking only. Required parity: one selected row remains in normal order, sticks to the top when scrolled below it, and sticks to the bottom when scrolled above it. Do not duplicate the row into both TanStack pin regions. Card selection/pinning state remains safe and already passed. |
+| Selection-driven row pinning matches MRT `select-sticky` behavior | PASS | PASS | Post-PR #36 browser verification and the later selection-lifecycle run confirm stable final-row ordering, clean stacked sticky rows without unexplained gaps, one selected identity, horizontal pinned-column coexistence, and safe card selection state. |
 | Edit row action honors selected-row policy | PASS | PASS | Unselected rows disabled; selected row enabled and edit dialog opens. |
 | Delete row action honors selected-row policy | PASS | PASS | Unselected rows disabled; selected rows enabled. Mutation confirmation tracked separately. |
 | Expand/collapse translation details | PASS | PASS | Row 8 opens/closes; expanded details survive renderer switch. |
@@ -100,8 +100,8 @@ Required checks:
 | Locale filter works | PASS | PASS | English includes 30 translated keys; English + sequence_test excludes the untranslated key in both renderers. September 30 runtime recheck. |
 | Sort changes work | PASS | PASS | September 29 card Key asc/desc produced opposite ordered lists; clear sent sorting []. Table descending also passed. |
 | Density control | PASS | PASS | Spacious selected in table, Compact in card; card tooltip confirms Compact. |
-| Pagination/footer geometry is independent of row density | PENDING FOLLOW-UP | PENDING FOLLOW-UP | The shared footer currently consumes density footer metrics. Target: one fixed footer height/padding for Compact/Comfortable/Spacious while row/header/cell density continues changing normally. |
-| Pagination/footer changes background when rows are selected | PENDING FOLLOW-UP | PENDING FOLLOW-UP | Selection content already shares the pagination footer. Target: footer root exposes selected-state styling and returns to its normal background immediately after selection is cleared; presentation belongs to the RazethDataTable theme slot, not resource `sx`. |
+| Pagination/footer geometry is independent of row density | PASS | PASS | Post-PR #36 user/browser verification confirms Compact/Comfortable/Spacious still change table density while the shared pagination/selection footer keeps one fixed geometry. |
+| Pagination/footer changes background when rows are selected | PASS | PASS | The shared footer exposes selection state, the whole footer uses the selected theme surface, and Clear restores the normal surface without changing footer geometry. |
 | Fullscreen enter/exit | PASS | PASS | Enter and Exit control states verified in each renderer. |
 | Saved display preference restores after reload | PASS | PASS | Each display restored on its own reload. |
 | Saved density/column preferences still restore | PASS | PASS | September 30 card-origin Spacious and Key pin-to-start survive reload; original Compact/unpinned Key restored. Earlier table round-trip passed. |
@@ -1154,3 +1154,134 @@ This width follow-up does **not** close the remaining Matrix A blockers.
 Deletion-lifecycle browser evidence, controlled async filter-option
 failure/retry, and explicit same-lifecycle TranslationKey refetch evidence
 remain outstanding.
+
+
+### October 13 — latest-master closeout rescope after PR #38
+
+Current clean repository baseline for the next browser/CI handoff:
+
+- master commit: `3b62de029f0bd75debf6ddda1755b663230ec096`
+- PR #38 (`fix(datatable): add overridable native table width`) is merged,
+- master is 15 commits ahead of the PR #38 merge commit
+  `4b6f7c086befa80945a66d864e5e128f82e2822e`,
+- those later commits include real DataTable behavior/presentation changes plus
+  large HRD/resource/navigation work,
+- no GitHub Actions run is associated with the latest direct-push master commit,
+  so the next branch must establish a fresh automated baseline before changing
+  DataTable behavior.
+
+#### DataTable changes added after PR #38 that require targeted regression proof
+
+1. **Generic row activation**
+   - `DataTable` now exposes row-click activation through the body/row chain,
+   - interactive descendants must not trigger the row action,
+   - Enter/Space on the focused row must remain keyboard-accessible,
+   - the new generic regression surface is
+     `src/components/DataTable/mui/components/rowClickInteraction.spec.tsx`.
+
+2. **Card flip detail presentation**
+   - card detail can now use `detailMode: "flip"`,
+   - flip state is still TanStack expansion state,
+   - mouse hover may reveal the back face while touch/pen must not depend on
+     hover,
+   - hidden faces use `aria-hidden` / `inert`,
+   - focus transfers between matching front/back controls,
+   - actions are present on both faces,
+   - card flip slots/classes are now part of the generic theme surface.
+
+3. **Global-search / toolbar presentation rework**
+   - the DataTable global filter now composes the shared
+     `src/components/Search/SearchInput.tsx` input family,
+   - collapsible search uses horizontal MUI Collapse,
+   - Enter commits immediately,
+   - Escape clears when clearable,
+   - blur commits pending debounce,
+   - hiding/reopening search must preserve committed semantic search state,
+   - card filter/sort controls remain renderer-independent.
+
+4. **Native table-width contract**
+   - `tableWidth` / `tableMinWidth` from PR #38 remain the supported API,
+   - `tableWidth="100%"` is now used by the HRD public-document resource,
+   - no return to `overrideWidthSize` or resource-local `tableProps.sx`
+     width hacks is allowed.
+
+5. **HRD PublicDocuments is now an additional real DataTable consumer**
+   - current route family lives under `src/features/hrd/documents`,
+   - it is a client-side/static-data resource, not a replacement for the
+     Refine-backed Document proof,
+   - it exercises client-side filtering/sorting/pagination, auto table/card
+     presentation, compact cards, row activation, row actions, category
+     filtering, theme switching, and the 100% table-width contract,
+   - row activation must not double-fire when View/Download/action controls are
+     used.
+
+#### Core/react architecture audit
+
+The latest direct pushes did **not** materially rewrite
+`src/components/DataTable/core/**`.
+
+Current master still contains the earlier framework core:
+
+- builder / generated feature resolution,
+- commands,
+- context/runtime,
+- events,
+- plugins,
+- registries/services,
+- core TanStack table construction,
+- the small React runtime/hooks projection.
+
+The most recent core-path commit on master is the September 25 row-pinning
+feature exposure. The generated feature audit now exposes 12 TanStack stock
+features and intentionally ignores 5.
+
+Draft PR #31 remains valuable architecture research, but it is no longer a
+candidate for a blind merge/rebase:
+
+- PR #31 is currently 83 commits ahead of its old base and 102 commits behind
+  current master,
+- it introduces a second set of `core/density`, `core/server-*`,
+  `core/live`, `core/persistence`, `core/query-url` domains plus React
+  splits,
+- current master has since changed row pinning, card/table presentation, width,
+  row activation, search, resources, and dependencies.
+
+Keep PR #31 open/draft as the donor/reference branch. After Matrix A and Matrix
+B close, reconcile it deliberately against current master by porting one
+transport-independent domain at a time and proving boundaries, rather than
+attempting a mechanical whole-branch merge.
+
+#### Updated Matrix A closeout order
+
+Before Matrix B/performance profiling:
+
+1. establish a green latest-master automated baseline:
+   - `npm run typecheck`
+   - `npm run test:datatable -- --runInBand`
+   - `npm test -- --runInBand`
+   - `git diff --check`
+2. browser-certify the PR #38 width contract,
+3. browser-certify generic row activation on HRD PublicDocuments:
+   - row click activates once,
+   - keyboard Enter/Space activates once,
+   - View/Download/buttons/links do not bubble into row activation,
+4. browser-certify card flip:
+   - front/back control,
+   - hover only for mouse,
+   - touch/narrow usage through explicit control,
+   - focus/inert/aria behavior,
+   - no layout overlap,
+   - actions remain reachable,
+5. browser-certify the reworked collapsible global search and debounce semantics
+   in both TranslationKey and HRD PublicDocuments,
+6. re-run the already-established TranslationKey selection/query smoke after the
+   post-PR #38 renderer changes,
+7. close the remaining original Matrix A evidence gaps:
+   - safe deletion lifecycle,
+   - deterministic async filter-option failure/retry,
+   - explicit same-mounted-lifecycle TranslationKey refetch,
+8. perform one final integrated console/network smoke,
+9. only then mark Matrix A PASS and begin Matrix B.
+
+Matrix B / the virtualization decision remains gated until this closeout is
+complete.
