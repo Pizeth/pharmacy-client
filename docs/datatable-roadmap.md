@@ -1521,6 +1521,14 @@ The next branch should close latest-master Matrix A with this order:
 The detailed browser/implementation order is maintained in
 `docs/datatable-browser-matrix.md`.
 
+### October 13 — Matrix A automated retry regression (continuation)
+
+Latest `master` baseline `17a2f0ff01d427f37d83616c6f00c2280bb6c4a0` has a successful GitHub Actions CI run: [run #263](https://github.com/Pizeth/pharmacy-client/actions/runs/38349267985). This confirms typecheck and the full Jest suite for that baseline, not browser certification.
+
+On `chatgpt/datatable-matrix-a-validation-20261013`, a focused resource-owned regression extends `useTranslationKeyFilterOptions.spec.tsx` to exercise deterministic initial category lookup failure, explicit retry, recovered sorted category options, persistent static locale options, and protection against obsolete responses from transports that ignore abort. This is automated hook evidence only: it does **not** certify the Matrix A browser warning/Retry surface in both table and card modes. Browser evidence and remaining safe deletion/same-lifecycle refetch checks are still pending.
+
+Do not advance Matrix A to PASS or start Matrix B until those checks and the latest-master width, row activation, card flip and search rechecks are recorded in `docs/datatable-browser-matrix.md`. PR #31 remains draft/donor and should not be merged mechanically. No virtualization is authorized yet.
+
 ## 2.2.3 — virtualization architecture
 
 **Status: conditional**
