@@ -1037,7 +1037,7 @@ The repeatable manual protocol is documented in:
 
 ## 2.2.2 — browser measurement and virtualization decision gate
 
-**Status: next — gated by Matrix A browser recheck**
+**Status: realistic density measurements recorded (2026-10-13); 1000×32 stress interaction protocol blocked by renderer stalls. Conditional 2.2.3 review justified; see latest Matrix B decision record.**
 
 Run `Matrix A` in `docs/datatable-browser-matrix.md` first so the production
 TranslationKey named-Refine path and the independent Refine-backed Document
@@ -1592,3 +1592,19 @@ The project reaches migration closure when:
 At that point the custom stack is not merely an MRT replacement. It is the
 application's reusable data-presentation platform built around TanStack v9,
 MUI and replaceable data-source adapters.
+
+### October 13 — browser continuation after PR #39
+
+On `codex/datatable-matrix-a-closeout`, browser certification found an HRD client-side search footer defect: filtered/no-match rows retained the raw-data total. Pagination now reads TanStack v9 `getRowCount()` and subscribes to global/column filters. Browser recheck covers matched/empty/clear counts in table/card, with an automated regression. Typecheck, 91 focused suites (518 tests), and 120 full suites (709 tests) pass.
+
+Safe selected-ID deletion, controlled Category failure/retry in both renderers, and explicit same-mounted named Refine refetch evidence are now recorded in the matrix. Temporary test controls/logging were removed. Native width, row activation, narrow explicit flip controls, focus/inert, and search checks pass. Genuine hover/touch/pen checks remain pending; Matrix A is not promoted and Matrix B remains gated.
+
+### October 13 — Matrix A completion
+
+User confirms genuine mouse hover and touch flip controls both work. With those user-verified passes and the recorded browser/automated continuation, Matrix A is complete. Matrix B / 2.2.2 is now current for evidence-based profiling; virtualization remains undecided until measurements. Tested state is master `b2a2950b66e09b7893ac59bc153c6269e6165bb8` plus the pagination fix on `codex/datatable-matrix-a-closeout`.
+
+### October 13 — Matrix B measurements and conditional 2.2.3
+
+Measured 25/100/200 rows in table/card, 500-row table stress, and 1000×32 table mount in the existing development fixture. Additional eight-column cases show material cost at reachable 100/200 page sizes (356.67ms / 769.67ms average), independent of transport latency. Cards are cheaper but also scale with row count. The 1000×32 interaction protocol remains BLOCKED by rendering/input-observation deadlines; its mount takes 15.84s for 32,000 cells.
+
+Proceed to conditional 2.2.3 architecture review, documented in `docs/datatable-virtualization-2-2-3.md`. Do not close 2.2 by claiming responsive normal densities. No virtualizer/renderer dependency added. Production profiling and rerender diagnosis precede implementation; Matrix B retains the stress blocker. PR #31 core extraction stays separate.

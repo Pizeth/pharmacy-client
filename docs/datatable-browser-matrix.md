@@ -34,7 +34,7 @@ remains a chronological acceptance record.
 
 ## Matrix A — production presentation parity before performance profiling
 
-**Status: BLOCKED — latest-master Matrix A closeout is required after post-PR #38 renderer/resource changes; the remaining original evidence gaps are safe deletion lifecycle, controlled filter-error/retry, and explicit same-lifecycle TranslationKey refetch (2026-10-13)**
+**Status: PASS — October 13 browser continuation plus user-verified mouse-hover and touch controls complete Matrix A. Browser-found client pagination total fix is on `codex/datatable-matrix-a-closeout`. Current matrix is Matrix B.**
 
 Purpose:
 
@@ -660,10 +660,10 @@ or performance claim is made.
 
 Fill this only after every required item passes.
 
-- Status: ☐ PASS / ☐ BLOCKED
-- Completed date:
-- Commit SHA:
-- Notes:
+- Status: PASS
+- Completed date: 2026-10-13
+- Commit SHA: `b2a2950b66e09b7893ac59bc153c6269e6165bb8` plus the tested uncommitted pagination fix on `codex/datatable-matrix-a-closeout`.
+- Notes: Windows, Codex in-app browser, development localhost:8080. Automated baseline 120 suites/709 tests and typecheck pass. Browser continuation closes deletion/retry/refetch and new renderer/resource checks; user confirms genuine mouse hover and touch controls work. Existing logo warning recorded separately. No temporary instrumentation remains.
 
 When Matrix A passes, promote **Matrix B** below to current.
 
@@ -763,7 +763,7 @@ When Matrix A passes, promote **Matrix B** below to current.
 
 ## Matrix B — 2.2.2 performance / virtualization decision gate
 
-**Status: WAITING FOR MATRIX A**
+**Status: BLOCKED — realistic cases measured; material renderer cost at 100/200 rows, and 1000×32 stress interaction completion exceeds browser deadlines. Conditional 2.2.3 architecture review recorded in `docs/datatable-virtualization-2-2-3.md` (2026-10-13).**
 
 Development-only route:
 
@@ -785,11 +785,11 @@ Run in this order:
 
 | Rows | Columns | Table | Card | Mount | Avg | Max | DOM rows/cells/cards | Scroll / interaction notes |
 | ---: | ---: | :---: | :---: | ---: | ---: | ---: | --- | --- |
-| 25 | 8 | ☐ | ☐ | | | | | |
-| 100 | 16 | ☐ | ☐ | | | | | |
-| 200 | 16 | ☐ | ☐ | | | | | |
-| 500 | 16 | ☐ | optional | | | | | |
-| 1000 | 32 | ☐ | optional | | | | | |
+| 25 | 8 | Measured | Measured | T 123.80 / C 119.50 | T 118.04 / C 80.31 | T 296.70 / C 166.20 | T 26/201; C 25 | Three interaction cycles; separate scroll checks. |
+| 100 | 16 | Measured | Measured | T 845.50 / C 423.50 | T 831.78 / C 256.42 | T 1511.40 / C 434.40 | T 101/1601; C 100 | Material update cost; card cheaper. |
+| 200 | 16 | Measured | Measured | T 1575.90 / C 680.10 | T 1166.43 / C 520.15 | T 1709.70 / C 751.80 | T 201/3201; C 200 | Visible update stalls in development. |
+| 500 | 16 | Measured stress | Not run (optional) | 4090.40 | 2701.14 | 4090.40 | 501/8001 | Three cycles applied despite dispatch timeouts. |
+| 1000 | 32 | Mount measured; interactions BLOCKED | Not run (optional) | 15839.40 | Mount sample 7951.85 | Mount 15839.40 | 1000/32000 | Input/observation deadlines; full cycles not claimed. |
 
 For each required case:
 
@@ -820,7 +820,7 @@ Answer these questions from the measurements:
 Decision:
 
 - ☐ **DEFER virtualization** — normal production densities remain responsive.
-- ☐ **PROCEED to 2.2.3** — profiling demonstrates a material user-visible
+- ☑ **PROCEED to conditional 2.2.3 architecture review** — development profiling demonstrates a material
   renderer bottleneck at a realistic density.
 
 If virtualization proceeds, preserve:
@@ -837,12 +837,12 @@ If virtualization proceeds, preserve:
 
 ### Matrix B completion record
 
-- Status: ☐ PASS / ☐ BLOCKED
-- Completed date:
-- Commit SHA:
-- Decision:
-- Evidence summary:
-- Next matrix / phase:
+- Status: BLOCKED (stress protocol); realistic density measurement run complete
+- Completed date: 2026-10-13 measurement attempt
+- Commit SHA: `b2a2950b66e09b7893ac59bc153c6269e6165bb8` plus tested pagination fix on `codex/datatable-matrix-a-closeout`
+- Decision: conditional 2.2.3 architecture review; implementation gated on production profiling/rerender diagnosis
+- Evidence summary: eight table/card cases including two additional 8-column realistic-width diagnostics; 100×8 averages 356.67ms and 200×8 averages 769.67ms. No request latency in fixture. Stress grows to 15.84s mount at 32,000 cells and prevents full 1000-row interaction protocol. No profiling console warnings/errors.
+- Next matrix / phase: bounded 2.2.3 architecture review in `docs/datatable-virtualization-2-2-3.md`; Matrix B remains current with stress blocker. No new renderer or virtualization dependency introduced.
 
 ---
 
@@ -1285,3 +1285,98 @@ Before Matrix B/performance profiling:
 
 Matrix B / the virtualization decision remains gated until this closeout is
 complete.
+
+### October 13 — PR #39 merged Matrix A continuation
+
+- Baseline: `b2a2950` (PR #39 merge), clean working tree at start; Windows, Codex in-app browser, `localhost:8080`, authenticated TranslationKey route, 31 keys. Existing Matrix A continued using the updated October 13 closeout order.
+- Automated: typecheck PASS; focused Jest initially blocked by sandbox temporary-cache EPERM, rerun requested outside sandbox. Full suite pending.
+- Native default-width browser check: PASS. TranslationKey rendered table width 1940px in a 1036px scroll container; horizontal scroll exposes Updated/Created while start expand/select and end Actions remain aligned and reachable in screenshot. Other width cases remain pending.
+- Fullscreen width round-trip PASS: table stays 1940px while container changes 1036→1084→1036px.
+- Browser control temporarily timed out; reconnecting the same tab recovered without application edits. No selection/search result was inferred from the failed call.
+- TranslationKey search: Enter on `auth` settles to five matching rows with `dt.search=auth`; hide/reopen retains `auth`; Escape clears the visible input. Settled clear result and blur/debounce/card checks pending.
+- Search Escape settled PASS: returns 1–25 of 31. Selected ID 8 and switched table→card: checked identity and one-row footer preserved.
+- Card flip explicit keyboard control: opens auth_email back face, focus transfers to `Back to key`, active control has no inert/aria-hidden ancestor. Settled screenshot shows a readable back face with translation actions and no card overlap; lower content extends inside the scroll area, so lower-action reachability remains to verify. Initial screenshot was mid-animation and is not used as a defect finding.
+- Focused Jest PASS: 91 suites / 517 tests, 314.435s, unrestricted rerun completed. Full suite still running.
+- Card flip lower actions PASS: scrolling/focus exposes Khmer Edit/Delete plus key Edit/Delete; hidden front has both inert and aria-hidden=true. Back-to-key returns focus to Show translations.
+- Card search blur commit PASS: `email` + Tab settles to two rows and semantic URL `dt.search=email`; card→table retains checked ID 8 and result set.
+- HRD native `100%` width PASS at wide desktop: 1410px minimum, rendered width equals 1486px container at viewport 1920×1080. At default viewport, table preserves 1410px minimum within 1021px container. Screenshot confirms filled wide surface.
+- HRD first-row Enter activation: one Opening notice and exactly one new Google Drive folder tab. Pointer/Space and action bubbling checks pending.
+- Full Jest PASS: 120 suites / 708 tests, 136.015s. No application changes made.
+- HRD row activation PASS for observed resource controls: Enter, Space, pointer click on first row title each opens exactly one Drive folder tab. Clicking nested Download opens exactly one tab (no duplicated row activation). Test-created destination tabs closed after checking.
+- HRD search regression found: settled no-match search hides rows but footer stays `1–11 of 11`. Root cause: client total uses raw data length and footer subscribes only pagination/selection. Fix on `codex/datatable-matrix-a-closeout` uses TanStack v9 getRowCount and subscribes to global/column filters. Regression covers matching search, no-match search, clear, and column filter. Browser and automated rechecks pending. An intermediate v8 method-name attempt caused a local runtime overlay; corrected to the installed v9 API before recheck.
+- Pagination fix browser recheck PASS: impossible search gives `0–0 of 0`; Khmer `ឈប់សម្រាក` gives `1–1 of 1`; table→card keeps that count; Escape restores `1–11 of 11`. Typecheck PASS on final getRowCount implementation. First regression execution used intermediate method and failed; final full/focused reruns now active.
+- HRD narrow card screenshot at 390×844 shows separate compact cards and accessible controls; document clientWidth=scrollWidth=375px (no horizontal document overflow).
+- TranslationKey narrow flip PASS for explicit keyboard control at 390×844: Show translations opens back face; scrolling via lower detail-control focus exposes Khmer Edit/Delete and row action footer without horizontal overflow or overlap. Genuine touch/pen pointer events and mouse hover are not certified by viewport/keyboard emulation alone.
+- Prepared safe delete lifecycle in card mode: created `codex_matrix_a_20261013_delete` (ID 35), common category, no values. Selected ID 8, isolated ID 35 via search, selected it; footer counts two while one loaded selected row enables the resource Delete. Confirmation dialog names ID 35's key and says irreversible. User action-time confirmation pending; no delete sent yet.
+- Confirmed deletion browser PASS: ID 35 deleted with user approval; footer count changes two→one, clearing search restores checked ID 8 and canonical 31-key dataset. No existing record was mutated.
+- Temporary resource-owned dev controls/instrumentation added solely to capture controlled Category failure/retry and explicit mounted Refine refresh. These will be removed after evidence; they are not permanent UI additions.
+- Controlled card Category failure/retry PASS: temporary dev trigger rejects one category request; rendered warning/Retry appears, Category disabled, Locale remains enabled. Retry makes real category request and restores enabled sorted options All/auth/common/navigation/profile/translation/validation. Test trigger has no production transport/persistence change and will be removed.
+- Controlled table Category failure/retry PASS: warning/Retry renders, Category disabled, Locale enabled; real retry restores enabled Category.
+- Explicit same-mounted Refine refetch PASS: temporary button directly invokes existing resource refresh; semantic URL/state unchanged. Runtime logs show provider `translationKeyStandardApi.getList` → POST `/api/v1/i18n/keys/query` → canonical response. One action increases POST count 6→7; subsequent table→card holds count 7→7. Initial/HMR paired requests are excluded from this measurement.
+- Runtime search wire PASS: named provider emits POST body `search:{term:"auth"}` only; settled card result five keys.
+- Removed all temporary Matrix A dev buttons, category-failure injection and provider/wire logging. Source diff is only pagination implementation + regression; docs preserve evidence. Final smoke follows cleanup.
+- Native width resize PASS: keyboard ArrowRight changes Key 240→248px; header and first body cell both measure 248px, screenshot aligned; ArrowLeft restores 240px.
+- Final clean smoke after removing instrumentation: auth restores five rows on reload; card→table works; no post-cleanup console errors, only existing logo.svg fill/static-parent warning. The earlier intermediate API-name runtime error remains documented separately and is resolved.
+- Final automated state: typecheck PASS; focused suite 91/518 PASS; full suite 120/709 PASS; git diff --check PASS. Temporary resource files have no semantic diff. Test key ID 35 cleaned up; dataset 31.
+
+#### Current closeout status after this continuation
+
+| Gate | Result |
+| --- | --- |
+| Native width, horizontal utility pins, fullscreen, keyboard resize alignment | PASS |
+| HRD row pointer/Enter/Space activation and nested Download non-duplication | PASS |
+| Card flip explicit keyboard/narrow controls, focus transfer, inert/aria, lower actions, no overlap | PASS |
+| Genuine mouse hover and touch/pen behavior | PENDING manual pointer verification; connected API lacks hover/touch/pen input |
+| TranslationKey search Enter/Escape/hide-show/blur and HRD matched/no-match/clear counts | PASS; HRD footer defect fixed with regression |
+| Selection/renderer smoke and safe deletion lifecycle | PASS |
+| Controlled Category failure/retry in both renderers, Locale remains available | PASS |
+| Explicit same-mounted Refine refetch and switch request count | PASS |
+| Final console smoke | PASS; existing logo warning only |
+
+Matrix A remains incomplete until genuine hover/touch checks are recorded. Matrix B and virtualization remain gated. Permanent change is bounded to correct client-side pagination totals/subscriptions; presentation/theme/resource architecture preserved.
+- User confirms both remaining pointer checks: mouse hover reveals back face cleanly, and touch Show translations/Back to key works without hover. Recorded as USER-VERIFIED PASS (not automated pointer evidence). This supersedes the pending pointer gate above. Matrix A PASS; Matrix B promoted to current.
+
+### October 13 — Matrix B profiling run
+
+Environment: Windows / Codex in-app browser / development React Profiler, viewport 1101×884; same tested pagination-fix working tree on baseline b2a2950. No Jest process active during profiling. Mount is maximum duration in the clean two-commit mount/reset sample (second commit is a small update). Sequence: selection, expansion, two Name sorts, repeated three times; DOM counts include final expanded detail row. These development measurements are comparative, not production thresholds.
+
+| Rows | Columns | Mode | Clean mount max ms | Final last ms | Avg ms | Max ms | DOM rows/cells/cards |
+| ---: | ---: | --- | ---: | ---: | ---: | ---: | --- |
+| 25 | 8 | Table | 123.80 | 96.20 | 118.04 | 296.70 | 26 / 201 / 0 |
+
+25×8 table interactions settled without timeout; selection commits cost 202–297ms, sort/expand ~96–116ms. Vertical scrollTop 550 and horizontal scrollLeft 123 reached using actual scroll input; pinned Name/Status present. Additional cases pending; no virtualization decision yet.
+| 25 | 8 | Card | 119.50 | 141.90 | 80.31 | 166.20 | 0 / 0 / 25 |
+
+25-row card: three cycles complete without timeout, vertical scrolling works. Cards remain separate/readable. Measurement contains mount and update commits; no network request is involved in this synthetic fixture.
+| 100 | 16 | Table | 845.50 | 876.00 | 831.78 | 1511.40 | 101 / 1601 / 0 |
+
+100×16 table: three cycles finish, but normal sort/expansion actual durations ~878–1101ms; selection largest commit reflected in aggregate max 1511.40ms. Material development-mode renderer cost observed (not request latency). Scroll input reaches top 884px / left 1086px. Need card/200 comparison and actual resource density context before decision.
+| 100 | 16 | Card | 423.50 | 242.70 | 256.42 | 434.40 | 0 / 0 / 100 |
+
+100-card updates are materially cheaper than 100×16 table updates; three cycles and scrolling complete. This isolates a substantial dense-cell cost from the shared query/data layer.
+| 200 | 16 | Table | 1575.90 | 1203.20 | 1166.43 | 1709.70 | 201 / 3201 / 0 |
+
+200×16 table: three cycles complete but ~1.17s average actual duration indicates visible interaction stalls in development. Scroll input still reaches top 884px / left 1086px; no scroll-triggered remount expected. Card comparison pending.
+| 200 | 16 | Card | 680.10 | 751.80 | 520.15 | 751.80 | 0 / 0 / 200 |
+
+200-card three cycles complete, updates materially slower than 25/100 cards. Changing to 500 cards timed out one key-dispatch tool call but did apply (fresh DOM confirms 500); transition excluded from clean samples. Stress measurements follow in table mode.
+| 500 | 16 | Table stress | 4090.40 | 3037.30 | 2701.14 | 4090.40 | 501 / 8001 / 0 |
+
+500-row stress: all twelve interaction dispatches time out at browser-control deadline, but each settled observation shows commit progression (4→15) and applied interactions; no retry duplicates. Sort/expansion commits ~2907–3123ms. This corroborates scaling cost, not a standalone virtualization justification.
+| 1000 | 32 | Table stress mount | 15839.40 | 64.30 | 7951.85 | 15839.40 | 1000 / 32000 / 0 |
+
+1000×32 clean mount produces 32,000 cells and takes 15.84s. First selection attempt exceeded input deadline and subsequent observation timed out while renderer busy. Interaction sequence incomplete at this point; no invented interaction sample. This case is stress-only and cannot justify virtualization alone.
+| 100 | 8 | Table diagnostic | 521.80 | 335.70 | 356.67 | 544.40 | 101 / 801 / 0 |
+
+Additional realistic-width diagnostic: 100×8 still shows ~357ms average and ~544ms maximum. Current resources default to 25 rows; their page-size UI permits 100/200, so these densities are reachable, although current TranslationKey data has only 31 keys and Document fixture 60. This is density evidence from synthetic local renderer, not proof from 100 real backend records.
+
+1000×32 interaction protocol: stopped after first selection because renderer stalls repeatedly exceed input/observation deadlines; settled count 4 commits confirms selection applied. Complete three-cycle stress sample NOT CLAIMED. Controls recovered when reducing to 100 rows. Treat stress interaction completion as BLOCKED by observed renderer cost, not missing result/transport failure.
+| 200 | 8 | Table diagnostic | 863.60 | 966.40 | 769.67 | 1032.50 | 201 / 1601 / 0 |
+
+200×8 realistic-width diagnostic: three interaction cycles, average 769.67ms / max 1032.50ms. Scroll reaches top884/left123. This confirms costs at eight-column density and supports conditional architecture investigation at reachable page sizes, not only 32-column stress.
+
+### October 13 — Matrix B decision record
+
+The required realistic 25/100/200 table/card density samples and the 500-row stress sample are recorded above; the 1000×32 mount is measured but full interaction cycles are BLOCKED by repeated renderer/input-observation deadline overruns. No error/warning console entries on the performance fixture. Returned fixture to 25×8 Table after measurement.
+
+Decision: proceed to conditional 2.2.3 architecture review. Eight-column diagnostics still show 356.67ms average at 100 and 769.67ms at 200, so unconditional deferral based on responsive normal densities is not supported. Development-only timing, one-machine scope, no frame/FPS recording, current small real datasets, separate scroll sweeps (not three per-cycle frame traces), and incomplete 1000-row stress protocol remain explicit limitations. Production/profiling-build verification and rerender diagnosis gate any implementation. Design is documented in `docs/datatable-virtualization-2-2-3.md`; PR #31 remains separate.

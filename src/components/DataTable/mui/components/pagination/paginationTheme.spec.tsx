@@ -125,6 +125,35 @@ it("renders an MRT-style row range when the exact total is known", () => {
   expect(screen.getByText("21–26 of 26")).toBeVisible();
 });
 
+it("updates client-side totals after search and column filters", () => {
+  function FilteredFixture() {
+    const table = useMuiDataTable({
+      columns,
+      data: [{ name: "Alpha" }, { name: "Beta" }, { name: "Gamma" }],
+      initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+    });
+    return (
+      <table.AppTable>
+        <button onClick={() => table.setGlobalFilter("Alpha")}>Search Alpha</button>
+        <button onClick={() => table.setGlobalFilter("missing")}>Search missing</button>
+        <button onClick={() => table.setGlobalFilter("")}>Clear search</button>
+        <button onClick={() => table.getColumn("name")?.setFilterValue("Beta")}>Filter Beta</button>
+        <DataTablePagination table={table} />
+      </table.AppTable>
+    );
+  }
+  render(<ThemeProvider theme={theme}><FilteredFixture /></ThemeProvider>);
+  expect(screen.getByText("1–3 of 3")).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: "Search Alpha" }));
+  expect(screen.getByText("1–1 of 1")).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: "Search missing" }));
+  expect(screen.getByText("0–0 of 0")).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+  expect(screen.getByText("1–3 of 3")).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: "Filter Beta" }));
+  expect(screen.getByText("1–1 of 1")).toBeVisible();
+});
+
 it("keeps unknown totals open-ended and hides first/last controls", () => {
   mount(-1);
   expect(screen.getByText("Page 1")).toBeVisible();
