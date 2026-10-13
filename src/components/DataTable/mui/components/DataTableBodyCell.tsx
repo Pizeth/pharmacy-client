@@ -9,6 +9,7 @@ import type { MuiDataTableInstance } from "../table";
 import { resolveTableCellAlignment } from "./alignment";
 import { getDataTablePinnedLayout } from "./pinning";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
+import { DataTableDiagnosticCommit, useDataTableRenderDiagnostics } from "../diagnostics/renderDiagnostics";
 
 export interface DataTableBodyCellStyle extends CSSProperties {
   readonly "--DataTable-column-size": string;
@@ -118,6 +119,7 @@ export function DataTableBodyCell<
   const { table, cell } = props;
 
   const { density } = useDataTableDensity();
+  const diagnostics = useDataTableRenderDiagnostics();
   const { direction } = useTheme();
 
   const meta = cell.column.columnDef.meta;
@@ -160,6 +162,7 @@ export function DataTableBodyCell<
             data-truncate={meta?.truncate === false ? "false" : undefined}
             style={style}
           >
+            {diagnostics && <DataTableDiagnosticCommit layer="cell" id={`${cell.row.id}/${cell.column.id}`} />}
             <appCell.FlexRender />
           </BodyCellRoot>
         );

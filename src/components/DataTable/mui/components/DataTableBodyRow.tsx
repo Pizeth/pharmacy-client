@@ -14,6 +14,7 @@ import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
 import { DataTableBodyCell } from "./DataTableBodyCell";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
+import { DataTableDiagnosticCommit, useDataTableRenderDiagnostics } from "../diagnostics/renderDiagnostics";
 
 /**
  * Optional row activation handler.
@@ -228,18 +229,23 @@ export function DataTableBodyRow<TData extends RowData>(
   } = props;
 
   const { density } = useDataTableDensity();
+  const diagnostics = useDataTableRenderDiagnostics();
 
   const rowHeight = getDataTableDensityMetrics(density).bodyRowHeight;
 
   return (
     <table.Subscribe
       selector={(state) => ({
-        rowSelection: state.rowSelection,
+        rowSelection: diagnostics?.narrowRowSelection
+          ? Boolean(state.rowSelection?.[row.id])
+          : state.rowSelection,
         rowPinning: state.rowPinning,
       })}
     >
       {(state) => {
-        const selected = Boolean(state.rowSelection?.[row.id]);
+        const selected = typeof state.rowSelection === "boolean"
+          ? state.rowSelection
+          : Boolean(state.rowSelection?.[row.id]);
 
         const pinnedPosition = row.getIsPinned();
 
@@ -347,6 +353,7 @@ export function DataTableBodyRow<TData extends RowData>(
             }
             style={style}
           >
+            {diagnostics && <DataTableDiagnosticCommit layer="row" id={row.id} />}
             <table.Subscribe
               selector={(state) => ({
                 columnVisibility: state.columnVisibility,

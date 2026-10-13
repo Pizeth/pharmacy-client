@@ -20,6 +20,7 @@ import { useOptionalDataTableFilterDisplay } from "../filter-display";
 import { DataTableDetailPanelRenderer } from "./detail-panel";
 import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
 import type { DataTableRowClickHandler } from "./DataTableBodyRow";
+import { DataTableDiagnosticCommit, useDataTableRenderDiagnostics } from "../diagnostics/renderDiagnostics";
 
 const BodyRoot = styled(TableBody, {
   name: DATA_TABLE_COMPONENT_NAME,
@@ -66,6 +67,7 @@ export function DataTableBody<TData extends RowData>(
   } = props;
 
   const { density } = useDataTableDensity();
+  const diagnostics = useDataTableRenderDiagnostics();
   const filterDisplay = useOptionalDataTableFilterDisplay();
 
   const columnFilterDisplayMode =
@@ -106,10 +108,11 @@ export function DataTableBody<TData extends RowData>(
       })}
     >
       {(selected) => {
-        const rows = getDataTableRowsForPinningDisplay(
+        const readRows = () => getDataTableRowsForPinningDisplay(
           table,
           rowPinningDisplayMode,
         );
+        const rows = diagnostics ? diagnostics.measureRowModel(readRows) : readRows();
 
         const stickyRowPinning = isDataTableStickyRowPinningMode(
           rowPinningDisplayMode,
@@ -195,6 +198,7 @@ export function DataTableBody<TData extends RowData>(
 
         return (
           <BodyRoot className={dataTableClasses.body}>
+            {diagnostics && <DataTableDiagnosticCommit layer="body" id="body" />}
             {rows.map((row) => (
               <DataTableBodyRowGroup
                 key={row.id}

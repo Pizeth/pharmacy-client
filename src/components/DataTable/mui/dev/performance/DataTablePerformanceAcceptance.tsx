@@ -48,6 +48,8 @@ import {
 import type {
   DataTablePerformanceMetrics,
 } from "./performanceMetrics";
+import { DataTableDiagnosticCommit, DataTableRenderDiagnosticsContext } from "../../diagnostics/renderDiagnostics";
+import { createRenderDiagnosticCollector, type RenderDiagnosticCollector } from "./renderDiagnosticCollector";
 
 const COMPONENT_NAME =
   "RazethDataTablePerformance";
@@ -345,6 +347,8 @@ const cardConfig:
   };
 
 export interface PerformanceTableProps {
+  readonly narrowOwner: boolean;
+  readonly diagnostics: RenderDiagnosticCollector | null;
   readonly rowCount: number;
   readonly columnCount: number;
   readonly displayMode: DataTableDisplayMode;
@@ -360,6 +364,8 @@ const PerformanceTable =
         PerformanceTableProps,
     ) {
       const {
+        narrowOwner,
+        diagnostics,
         rowCount,
         columnCount,
         displayMode,
@@ -395,7 +401,7 @@ const PerformanceTable =
           ],
         );
 
-      const table =
+      const subscribedTable =
         useMuiDataTable({
           columns,
           data,
@@ -407,6 +413,7 @@ const PerformanceTable =
 
           enableSorting:
             true,
+          enableGlobalFilter: true,
           enableMultiSort:
             true,
           enableRowSelection:
@@ -439,35 +446,47 @@ const PerformanceTable =
               ],
             },
           },
-        });
+        }, narrowOwner ? (state) => ({ globalFilter: state.globalFilter }) : undefined);
+
+      // The renderer's instance type exposes full state. This fixture-only
+      // adapter keeps that snapshot while varying the owner's subscription;
+      // renderer subscriptions still read the original full TanStack store.
+      const table = Object.assign({}, subscribedTable, { state: subscribedTable.store.get() });
+
+      const dispatch = (update: () => void) => diagnostics
+        ? diagnostics.measureDispatch(update)
+        : update();
 
       const toggleFirstSelection =
         (): void => {
+          diagnostics?.begin("selection");
           const first =
             table.getRow(
               "1",
             );
 
-          first.toggleSelected(
+          dispatch(() => first.toggleSelected(
             !first.getIsSelected(),
-          );
+          ));
         };
 
       const toggleFirstExpansion =
         (): void => {
+          diagnostics?.begin("expansion");
           const first =
             table.getRow(
               "1",
             );
 
-          first.toggleExpanded(
+          dispatch(() => first.toggleExpanded(
             !first.getIsExpanded(),
-          );
+          ));
         };
 
       const toggleSort =
         (): void => {
-          table.setSorting(
+          diagnostics?.begin("sorting");
+          dispatch(() => table.setSorting(
             (
               current,
             ) => [
@@ -483,11 +502,12 @@ const PerformanceTable =
                     : false,
               },
             ],
-          );
+          ));
         };
 
       return (
         <>
+          {diagnostics && <DataTableDiagnosticCommit layer="owner" id="owner" />}
           <Stack
             direction="row"
             spacing={1}
@@ -528,13 +548,19 @@ const PerformanceTable =
               type="button"
               variant="outlined"
               onClick={() => {
+                diagnostics?.begin("reset");
                 table.resetSorting();
                 table.resetRowSelection();
                 table.resetExpanded();
+                table.resetGlobalFilter();
               }}
             >
               Reset interactions
             </Button>
+            <Button onClick={() => {
+              diagnostics?.begin("filtering");
+              dispatch(() => table.setGlobalFilter(table.state.globalFilter ? "" : "Record 0001"));
+            }}>Toggle name filter</Button>
           </Stack>
 
           <TableSurfaceRoot
@@ -612,6 +638,15 @@ function formatDuration(
  * before any virtualization dependency or production behavior is introduced.
  */
 export function DataTablePerformanceAcceptance() {
+  const collector = useMemo(() => createRenderDiagnosticCollector(), []);
+  const [diagnosticsEnabled, setDiagnosticsEnabled] = useState(false);
+  const [narrowOwner, setNarrowOwner] = useState(false);
+  const [narrowRowSelection, setNarrowRowSelection] = useState(false);
+  const diagnosticObserver = useMemo(() => ({
+    ...collector.observer,
+    narrowRowSelection,
+  }), [collector, narrowRowSelection]);
+  const [diagnosticSnapshot, setDiagnosticSnapshot] = useState(collector.snapshot);
   const [
     rowCount,
     setRowCount,
@@ -699,6 +734,10 @@ export function DataTablePerformanceAcceptance() {
         actualDuration,
         baseDuration,
       ) => {
+        if (diagnosticsEnabled) {
+          collector.recordReactCommit(actualDuration);
+          setDiagnosticSnapshot(collector.snapshot());
+        }
         setMetrics(
           (
             previous,
@@ -722,11 +761,14 @@ export function DataTablePerformanceAcceptance() {
       },
       [
         readDomCounts,
+        collector,
+        diagnosticsEnabled,
       ],
     );
 
   const resetMeasurements =
     (): void => {
+      collector.begin("mount");
       setMetrics(
         EMPTY_DATA_TABLE_PERFORMANCE_METRICS,
       );
@@ -999,9 +1041,37 @@ export function DataTablePerformanceAcceptance() {
         </Stack>
       </MetricsRoot>
 
+      <Button onClick={() => {
+        setDiagnosticsEnabled((enabled) => !enabled);
+        setNarrowOwner(false);
+        setNarrowRowSelection(false);
+      }}>
+        {diagnosticsEnabled ? "Disable rerender diagnostics" : "Enable rerender diagnostics"}
+      </Button>
+      <Button disabled={!diagnosticsEnabled} onClick={() => setNarrowOwner((narrow) => !narrow)}>
+        {narrowOwner ? "Use default owner subscription" : "Use narrow owner subscription"}
+      </Button>
+      <Button disabled={!diagnosticsEnabled} onClick={() => setNarrowRowSelection((narrow) => !narrow)}>
+        {narrowRowSelection ? "Use default row selection subscription" : "Use row-specific selection probe"}
+      </Button>
+      {diagnosticsEnabled && <MetricsRoot variant="outlined">
+        <Typography variant="body2">Committed subscribed table output (cards are not instrumented); mount effects may replay in Strict Mode. Model reads include cached retrieval and pinning-display work; durations overlap React Profiler time.</Typography>
+        <Typography variant="body2">
+          {diagnosticSnapshot.operation}: {diagnosticSnapshot.uniqueRows} rows / {diagnosticSnapshot.uniqueCells} cells committed;
+          React {diagnosticSnapshot.reactActualMs} ms; model read {diagnosticSnapshot.modelReadMs} ms;
+          dispatch {diagnosticSnapshot.stateDispatchMs} ms.
+        </Typography>
+        <details>
+          <summary>Per-row committed outputs</summary>
+          <Typography variant="body2">Diagnostics: {JSON.stringify(diagnosticSnapshot, null, 2)}</Typography>
+        </details>
+      </MetricsRoot>}
+      <DataTableRenderDiagnosticsContext.Provider value={diagnosticsEnabled ? diagnosticObserver : null}>
       <PerformanceTable
+        narrowOwner={narrowOwner}
+        diagnostics={diagnosticsEnabled ? collector : null}
         key={
-          `${fixtureVersion}:${rowCount}:${columnCount}:${displayMode}`
+          `${fixtureVersion}:${rowCount}:${columnCount}:${displayMode}:${narrowOwner}:${narrowRowSelection}`
         }
         rowCount={
           rowCount
@@ -1019,6 +1089,7 @@ export function DataTablePerformanceAcceptance() {
           surfaceRef
         }
       />
+      </DataTableRenderDiagnosticsContext.Provider>
     </Root>
   );
 }

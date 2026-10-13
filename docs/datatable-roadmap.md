@@ -1608,3 +1608,9 @@ User confirms genuine mouse hover and touch flip controls both work. With those 
 Measured 25/100/200 rows in table/card, 500-row table stress, and 1000×32 table mount in the existing development fixture. Additional eight-column cases show material cost at reachable 100/200 page sizes (356.67ms / 769.67ms average), independent of transport latency. Cards are cheaper but also scale with row count. The 1000×32 interaction protocol remains BLOCKED by rendering/input-observation deadlines; its mount takes 15.84s for 32,000 cells.
 
 Proceed to conditional 2.2.3 architecture review, documented in `docs/datatable-virtualization-2-2-3.md`. Do not close 2.2 by claiming responsive normal densities. No virtualizer/renderer dependency added. Production profiling and rerender diagnosis precede implementation; Matrix B retains the stress blocker. PR #31 core extraction stays separate.
+
+### October 13 — 2.2.3.1 committed-output diagnosis
+
+Fetched master ddb1459 (PR #40); work branch codex/datatable-rerender-diagnosis. Opt-in development counters distinguish committed owner/body/row/cell output from speculative function renders, with separate inclusive model-read and synchronous dispatch intervals. At100×8, selection commits100rows/800cells. Narrow owner alone does not remove it; row-specific selection projection in the fixture reduces it to row1/eightcells, reproduced repeatedly. Expansion/sorting still commit the full displayed list. No production selector optimization, virtualizer, dependency, or PR #31 extraction introduced.
+
+Evidence and limitations are recorded in `docs/datatable-rerender-diagnosis-2-2-3-1.md`. Next milestone is2.2.3.2 controlled production-equivalent profiling, followed by bounded optimization validation. The row-pinning/global mutation-policy cases require their own proof before applying the fixture prototype to production.

@@ -80,3 +80,17 @@ interaction completion remains blocked and recorded in the matrix.
 
 PR #31 stays draft/donor. The core/MUI extraction remains separate from this
 bounded performance work; do not mechanically merge the extraction branch.
+
+## 2.2.3.1 — rerender diagnosis (October 13)
+
+Committed-output measurements and the repeatable fixture probes are documented
+in `docs/datatable-rerender-diagnosis-2-2-3-1.md`. Selection fan-out is confirmed:
+at 100×8, whole-selection row subscriptions commit every row and all 800 cells,
+even with a narrow table-owner subscription. A fixture-only row-specific
+projection commits only row 1 and its eight cells. Expansion/sorting still
+commit the full displayed list; independent cell-store notifications are not
+proven. Timed model reads are cached/inclusive reads, not exclusive pipeline
+CPU attribution. Production selector behavior remains unchanged.
+
+Proceed next to 2.2.3.2 production-equivalent profiling and a bounded optimization
+comparison; virtualization implementation remains unapproved.
