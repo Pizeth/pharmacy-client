@@ -95,6 +95,7 @@ export const Feature = styled("section", hrdSlot("HomeFeature"))(({ theme }) => 
   background: "var(--Hrd-blue)",
   color: "#fff",
   overflow: "hidden",
+  touchAction: "pan-y",
   [theme.breakpoints.down(700.05)]: {
     gridTemplateColumns: "1fr",
   },
