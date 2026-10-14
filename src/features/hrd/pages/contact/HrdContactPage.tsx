@@ -33,7 +33,7 @@ export function HrdContactPage({ site = HRD_SITE }: { site?: PublicDocumentsSite
         <S.CardMasthead>
           <S.Brand>
             <S.BrandLogo>
-              <Image src="/static/images/placeholder-mcs-orange-new.svg" width={64} height={64} alt="" />
+              <Image src="/static/images/logo.svg" width={64} height={64} alt="" />
             </S.BrandLogo>
             <div>
               <Typography variant="overline">ក្រសួងមុខងារសាធារណៈ</Typography>
