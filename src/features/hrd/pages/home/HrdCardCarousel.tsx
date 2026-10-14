@@ -8,6 +8,9 @@ import * as S from "./HrdCardCarousel.styles";
 
 const cards = PUBLIC_DOCUMENTS;
 const angleStep = 360 / cards.length;
+// The same radius must decide both tap tolerance and the point where
+// movement becomes a swipe, so small horizontal drift cannot be both.
+const touchTapSlop = 18;
 
 /** Scoped circular gallery inspired by Ana Tudor's CodePen XJrYqGb. */
 export function HrdCardCarousel() {
@@ -88,7 +91,8 @@ export function HrdCardCarousel() {
     const dy = point.clientY - start.y;
     if (!start.horizontal) {
       // Let the browser own vertical scrolling. The scene uses touch-action: pan-y.
-      if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(dy)) return;
+      // No swipe may begin inside the same 18px radius accepted by touchEnd.
+      if (Math.hypot(dx, dy) <= touchTapSlop || Math.abs(dx) <= Math.abs(dy)) return;
       start.horizontal = true;
       setFlipped(null);
     }
@@ -107,7 +111,7 @@ export function HrdCardCarousel() {
       if (event.cancelable) event.preventDefault();
       setAngle(current => Math.round(current / angleStep) * angleStep);
     } else if (point && start.card !== null && !start.link &&
-      Math.hypot(point.clientX - start.x, point.clientY - start.y) < 8) {
+      Math.hypot(point.clientX - start.x, point.clientY - start.y) <= touchTapSlop) {
       setFlipped(current => current === start.card ? null : start.card);
     }
   };
