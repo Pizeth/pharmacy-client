@@ -22,3 +22,23 @@ it("cycles featured content in both directions and supports direct selection", (
   fireEvent.click(screen.getByRole("button", { name: "ព័ត៌មានមុន" }));
   expect(screen.getByRole("button", { name: "ព័ត៌មាន 3" })).toHaveAttribute("aria-pressed", "true");
 });
+
+it("supports direct horizontal touch swipes over hero content, while vertical drags do not slide", () => {
+  mountHome();
+  const hero = screen.getByRole("region", { name: "ព័ត៌មានសំខាន់" });
+  const visual = hero.firstElementChild!;
+  const touch = (x: number, y: number) => [{ identifier: 1, clientX: x, clientY: y, target: visual }];
+  fireEvent.touchStart(visual, { touches: touch(220, 120) });
+  fireEvent.touchMove(visual, { touches: touch(215, 210) });
+  fireEvent.touchEnd(visual, { touches: [], changedTouches: touch(215, 210) });
+  expect(screen.getByRole("button", { name: "ព័ត៌មាន 1" })).toHaveAttribute("aria-pressed", "true");
+  fireEvent.touchStart(visual, { touches: touch(220, 120) });
+  fireEvent.touchMove(visual, { touches: touch(110, 124) });
+  fireEvent.touchEnd(visual, { touches: [], changedTouches: touch(110, 124) });
+  expect(screen.getByRole("button", { name: "ព័ត៌មាន 2" })).toHaveAttribute("aria-pressed", "true");
+  const copy = screen.getByRole("link", { name: "មើលបណ្ដុំឯកសារ" });
+  const linkTouch = [{ identifier: 2, clientX: 100, clientY: 100, target: copy }];
+  fireEvent.touchStart(copy, { touches: linkTouch });
+  fireEvent.touchEnd(copy, { touches: [], changedTouches: linkTouch });
+  expect(screen.getByRole("button", { name: "ព័ត៌មាន 2" })).toHaveAttribute("aria-pressed", "true");
+});
