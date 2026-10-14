@@ -130,3 +130,30 @@ test("touch cancellation settles a partially rotated gallery", () => {
     `-${360 / 11}deg`,
   );
 });
+
+test("touch taps on card content tolerate finger drift and still toggle the entire card", () => {
+  render(<ThemeProvider theme={createTheme()}><HrdCardCarousel /></ThemeProvider>);
+  const card = document.querySelector<HTMLElement>('article[data-index="0"]')!;
+  const content = card.querySelector<HTMLElement>(".MuiTypography-root")!;
+  const point = (x: number, y: number) => [{ identifier: 1, clientX: x, clientY: y, target: content }];
+
+  fireEvent.touchStart(content, { touches: point(200, 100) });
+  fireEvent.touchMove(content, { touches: point(207, 111) });
+  fireEvent.touchEnd(content, { touches: [], changedTouches: point(207, 111) });
+  expect(card).toHaveAttribute("data-flipped", "true");
+  expect(screen.getByText("1 / 11")).toBeInTheDocument();
+
+  fireEvent.touchStart(content, { touches: point(200, 100) });
+  fireEvent.touchEnd(content, { touches: [], changedTouches: point(200, 100) });
+  expect(card).toHaveAttribute("data-flipped", "false");
+});
+
+test("decorative side cards never intercept taps intended for interactive cards", () => {
+  render(<ThemeProvider theme={createTheme()}><HrdCardCarousel /></ThemeProvider>);
+  const center = document.querySelector<HTMLElement>('article[data-index="0"]')!;
+  const side = document.querySelector<HTMLElement>('article[data-index="2"]')!;
+  expect(center).toHaveAttribute("data-flippable", "true");
+  expect(side).toHaveAttribute("data-flippable", "false");
+  const styles = getComputedStyle(side);
+  expect(styles.pointerEvents).toBe("none");
+});
