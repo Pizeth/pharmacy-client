@@ -92,3 +92,41 @@ test("touch swipe beginning on a card rotates, but taps flip and vertical swipes
   fireEvent.touchEnd(nextCard, { touches: [], changedTouches: nextTouch });
   expect(nextCard).toHaveAttribute("data-flipped", "true");
 });
+
+test("a second finger interrupts and snaps a partly rotated card drag", () => {
+  render(<ThemeProvider theme={createTheme()}><HrdCardCarousel /></ThemeProvider>);
+  const card = document.querySelector<HTMLElement>('article[data-index="0"]')!;
+  const assembly = document.querySelector<HTMLElement>('[class*="RazethHrd-homeGalleryAssembly"]')!;
+  const point = (identifier: number, x: number, y: number) => ({
+    identifier, clientX: x, clientY: y, target: card,
+  });
+  const first = point(1, 200, 100);
+  const dragged = point(1, 120, 102);
+  const second = point(2, 180, 108);
+
+  fireEvent.touchStart(card, { touches: [first] });
+  fireEvent.touchMove(card, { touches: [dragged] });
+  expect(assembly.style.getPropertyValue("--Hrd-gallery-angle")).toBe("-20deg");
+
+  fireEvent.touchStart(card, { touches: [dragged, second] });
+  expect(assembly.style.getPropertyValue("--Hrd-gallery-angle")).toBe(
+    `-${360 / 11}deg`,
+  );
+  fireEvent.touchEnd(card, { touches: [dragged], changedTouches: [second] });
+  fireEvent.touchEnd(card, { touches: [], changedTouches: [dragged] });
+  expect(screen.getByText("2 / 11")).toBeInTheDocument();
+  expect(card).toHaveAttribute("data-flipped", "false");
+});
+
+test("touch cancellation settles a partially rotated gallery", () => {
+  render(<ThemeProvider theme={createTheme()}><HrdCardCarousel /></ThemeProvider>);
+  const card = document.querySelector<HTMLElement>('article[data-index="0"]')!;
+  const assembly = document.querySelector<HTMLElement>('[class*="RazethHrd-homeGalleryAssembly"]')!;
+  const point = (x: number, y: number) => [{ identifier: 1, clientX: x, clientY: y, target: card }];
+  fireEvent.touchStart(card, { touches: point(200, 100) });
+  fireEvent.touchMove(card, { touches: point(120, 100) });
+  fireEvent.touchCancel(card, { touches: [] });
+  expect(assembly.style.getPropertyValue("--Hrd-gallery-angle")).toBe(
+    `-${360 / 11}deg`,
+  );
+});
