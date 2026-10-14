@@ -206,19 +206,25 @@ export const SocialButton = (inProps: SocialButtonProps) => {
     ...rest
   } = props;
 
+  // A disabled social placeholder must remain a disabled button, not an
+  // anchor pointing to "#". Active provider icons retain their real links.
+  const socialIconButton = (
+    <IconButton
+      {...(disabled ? {} : { href, target: "_blank", rel: "noopener noreferrer" })}
+      aria-label={label}
+      size={size}
+      color="inherit"
+      disabled={disabled}
+    >
+      {icon}
+    </IconButton>
+  );
+
   return (
     <SocialButtonRoot className={className} sx={sx} {...rest}>
       {buttonType === "iconButton" ? (
         <Tooltip title={label}>
-          <IconButton
-            href={href}
-            target="_blank"
-            size={size}
-            color="inherit"
-            disabled={disabled}
-          >
-            {icon}
-          </IconButton>
+          {disabled ? <span>{socialIconButton}</span> : socialIconButton}
         </Tooltip>
       ) : (
         <Button variant={variant} disabled={disabled} fullWidth>
