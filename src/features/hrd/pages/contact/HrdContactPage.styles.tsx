@@ -20,7 +20,7 @@ export const Layout = styled("div",hrdSlot("ContactLayout"))(({theme})=>({
   [theme.breakpoints.down("md")]:{gridTemplateColumns:"minmax(0,1fr)"}
 }));
 export const IdCard = styled("article",hrdSlot("ContactIdCard"))(({theme})=>({
-  minWidth:0,overflow:"hidden",borderRadius:theme.shape.borderRadius*2,
+  minWidth:0,overflow:"hidden",borderRadius:theme.shape.borderRadius,
   border:`1px solid ${(theme.vars??theme).palette.divider}`,
   background:(theme.vars??theme).palette.background.paper,
   boxShadow:theme.shadows[7]
