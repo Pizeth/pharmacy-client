@@ -8,9 +8,8 @@ import * as S from "./HrdCardCarousel.styles";
 
 const cards = PUBLIC_DOCUMENTS;
 const angleStep = 360 / cards.length;
-// Finger drift on a stationary mobile tap can exceed the mouse-oriented 8px
-// threshold. Classify deliberate horizontal travel separately from a tap.
-const touchSwipeThreshold = 16;
+// The same radius must decide both tap tolerance and the point where
+// movement becomes a swipe, so small horizontal drift cannot be both.
 const touchTapSlop = 18;
 
 /** Scoped circular gallery inspired by Ana Tudor's CodePen XJrYqGb. */
@@ -92,7 +91,8 @@ export function HrdCardCarousel() {
     const dy = point.clientY - start.y;
     if (!start.horizontal) {
       // Let the browser own vertical scrolling. The scene uses touch-action: pan-y.
-      if (Math.abs(dx) < touchSwipeThreshold || Math.abs(dx) <= Math.abs(dy)) return;
+      // No swipe may begin inside the same 18px radius accepted by touchEnd.
+      if (Math.hypot(dx, dy) <= touchTapSlop || Math.abs(dx) <= Math.abs(dy)) return;
       start.horizontal = true;
       setFlipped(null);
     }
