@@ -11,7 +11,8 @@ it("uses a spokesperson-style ID card with logo and Otto placeholders, and real 
   expect(screen.getByRole("link", { name: HRD_SITE.contact.email! })).toHaveAttribute("href", `mailto:${HRD_SITE.contact.email}`);
   expect(screen.getByRole("link", { name: "+855 97 824 2255" })).toHaveAttribute("href", "tel:+855978242255");
   expect(screen.getByRole("link", { name: /Telegram: លោកស្រី សន ម៉ាលី/ })).toHaveAttribute("href", "https://t.me/SORN_MALY");
-  expect(screen.getByRole("button", { name: /Facebook/ })).toBeDisabled();
+  expect(screen.getByRole("button", { name: /Meta/ })).toBeDisabled();
+  expect(screen.getByText(/Meta \/ Facebook/)).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "បើកក្នុង Google Maps" })).toHaveAttribute("href", HRD_SITE.contact.address!.mapUrl);
   expect(screen.getByTitle("ផែនទីទីតាំងនាយកដ្ឋានធនធានមនុស្ស")).toHaveAttribute("src", `https://www.google.com/maps?q=${encodeURIComponent(HRD_SITE.contact.address!.text)}&output=embed`);
 });
@@ -22,7 +23,7 @@ it("shows pending states without inventing identity or social links", () => {
   expect(screen.getByText("ព័ត៌មានទំនាក់ទំនងកំពុងរៀបចំ")).toBeInTheDocument();
   expect(screen.getByText("ឈ្មោះអ្នកទំនាក់ទំនងកំពុងរៀបចំ")).toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Telegram" })).not.toBeInTheDocument();
-  expect(screen.getByRole("button", { name: /Facebook/ })).toBeDisabled();
+  expect(screen.getByRole("button", { name: /Meta/ })).toBeDisabled();
   expect(screen.queryByTitle("ផែនទីទីតាំងនាយកដ្ឋានធនធានមនុស្ស")).not.toBeInTheDocument();
 });
 
