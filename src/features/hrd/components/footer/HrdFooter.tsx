@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Container, Link, Stack, Typography } from "@mui/material";
+import NextLink from "next/link";
 import { styled } from "@mui/material/styles";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import TelegramIcon from "@mui/icons-material/Telegram";
@@ -93,6 +94,12 @@ const ContactLabel = styled(
 )(({ theme }) => ({
   display: "block",
   color: theme.vars.palette.text.secondary,
+}));
+
+const FooterQuickLinks = styled("nav", publicDocumentsSlot("FooterQuickLinks"))(({theme})=>({
+  display:"flex",flexWrap:"wrap",gap:theme.spacing(1.5,3),marginTop:theme.spacing(2),
+  "& a":{color:"inherit",fontWeight:600,textDecoration:"none"},
+  "& a:hover, & a:focus-visible":{textDecoration:"underline"}
 }));
 
 const FooterBottom = styled(
@@ -278,6 +285,12 @@ export function HrdFooter(props: HrdFooterProps) {
               {site.name}
             </FooterHeading>
             <FooterTagline variant="body2">{site.tagline}</FooterTagline>
+            <FooterQuickLinks aria-label="តំណភ្ជាប់រហ័ស">
+              <NextLink href="/hrd">ទំព័រដើម</NextLink>
+              <NextLink href="/hrd/documents">បណ្ដុំឯកសារ</NextLink>
+              <NextLink href="/hrd#hrd-faq">សំណួរដែលសួរញឹកញាប់</NextLink>
+              <NextLink href="/hrd/contact">ទំនាក់ទំនង</NextLink>
+            </FooterQuickLinks>
           </div>
 
           {contactLines.length > 0 && (

@@ -60,7 +60,7 @@ const PROVIDERS = {
   },
 };
 
-const Root = styled(Box, {
+export const SocialIconsRoot = styled(Box, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
@@ -349,7 +349,7 @@ const Root = styled(Box, {
 
 const Icons = () => {
   return (
-    <Root>
+    <SocialIconsRoot>
       {Object.entries(PROVIDERS).map(([key, provider]) => (
         <SocialButton
           key={key}
@@ -363,7 +363,7 @@ const Icons = () => {
           {/* {provider.name} */}
         </SocialButton>
       ))}
-    </Root>
+    </SocialIconsRoot>
   );
 };
 

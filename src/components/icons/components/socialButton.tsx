@@ -50,11 +50,11 @@ const SocialButtonRoot = styled(Box, {
     margin: theme.spacing(0.25),
     minWidth: "1rem",
     borderRadius: "50%",
-    backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.0925),
+    backgroundColor: theme.alpha((theme.vars ?? theme).palette.text.primary, 0.0925),
     boxShadow: `
-      inset 0 0 20px ${theme.alpha(theme.vars.palette.background.paper, 0.3)}, 
-      inset 0 0 5px ${theme.alpha(theme.vars.palette.background.default, 0.5)}, 
-      0 5px 5px ${theme.alpha(theme.vars.palette.text.primary, 0.175)}`,
+      inset 0 0 20px ${theme.alpha((theme.vars ?? theme).palette.background.paper, 0.3)}, 
+      inset 0 0 5px ${theme.alpha((theme.vars ?? theme).palette.background.default, 0.5)}, 
+      0 5px 5px ${theme.alpha((theme.vars ?? theme).palette.text.primary, 0.175)}`,
     transition: "background 0.3s ease-in-out",
     overflow: "hidden",
     // maxWidth: "3rem",
@@ -206,19 +206,25 @@ export const SocialButton = (inProps: SocialButtonProps) => {
     ...rest
   } = props;
 
+  // A disabled social placeholder must remain a disabled button, not an
+  // anchor pointing to "#". Active provider icons retain their real links.
+  const socialIconButton = (
+    <IconButton
+      {...(disabled ? {} : { href, target: "_blank", rel: "noopener noreferrer" })}
+      aria-label={label}
+      size={size}
+      color="inherit"
+      disabled={disabled}
+    >
+      {icon}
+    </IconButton>
+  );
+
   return (
     <SocialButtonRoot className={className} sx={sx} {...rest}>
       {buttonType === "iconButton" ? (
         <Tooltip title={label}>
-          <IconButton
-            href={href}
-            target="_blank"
-            size={size}
-            color="inherit"
-            disabled={disabled}
-          >
-            {icon}
-          </IconButton>
+          {disabled ? <span>{socialIconButton}</span> : socialIconButton}
         </Tooltip>
       ) : (
         <Button variant={variant} disabled={disabled} fullWidth>

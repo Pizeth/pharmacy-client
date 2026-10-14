@@ -174,3 +174,10 @@ describe("HrdFooter address and email", () => {
     expect(link).not.toHaveAttribute("target");
   });
 });
+
+it("offers a footer FAQ quick link back to the HRD homepage section", () => {
+  renderFooter({ email: "hello@example.com" });
+  expect(screen.getByRole("navigation", { name: "តំណភ្ជាប់រហ័ស" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "សំណួរដែលសួរញឹកញាប់" })).toHaveAttribute("href", "/hrd#hrd-faq");
+  expect(screen.getByRole("link", { name: "ទំនាក់ទំនង" })).toHaveAttribute("href", "/hrd/contact");
+});
