@@ -9,6 +9,7 @@ import { DataTableRenderDiagnosticsContext } from "../../diagnostics/renderDiagn
 import type { MuiDataTableInstance } from "../../table";
 import { dataTableClasses } from "../../styles";
 import { afterTwoFrames, summarizeSamples } from "./browserMeasurements";
+import { assertProfilingRunActive, hasRenderedFirstRow, hasRenderedRowState } from "./profilingOutputChecks";
 
 const Root = styled("main", { name: "RazethDataTablePerformance", slot: "Root" })(({ theme }) => ({
   padding: theme.spacing(2), color: (theme.vars ?? theme).palette.text.primary,
@@ -97,11 +98,12 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
           mode === "table" ? '[aria-label="Performance table scroll viewport"]' : `.${dataTableClasses.cardContainer}`,
         );
         const measure = async (action: string, repeat: number, update: () => void, verify: () => boolean) => {
-          if (cancelled.current || document.visibilityState !== "visible") throw new Error("BLOCKED: cancelled or hidden browser");
+          assertProfilingRunActive(cancelled.current, document.visibilityState);
           collector.begin(action);
           const start = performance.now();
           if (probe === "off") update(); else collector.measureDispatch(update);
           await afterTwoFrames();
+          assertProfilingRunActive(cancelled.current, document.visibilityState);
           const end = performance.now();
           if (end - start > 15_000) throw new Error(`BLOCKED: ${action} exceeded 15 seconds`);
           if (!verify()) throw new Error(`BLOCKED: ${action} output mismatch`);
@@ -142,13 +144,16 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
             }, () => count() === rows);
             for (const selected of [true, false]) await measure(selected ? "select" : "deselect", repeat,
               () => table().getRow("1").toggleSelected(selected),
-              () => table().getRow("1").getIsSelected() === selected && (mode === "card" || Boolean(surfaceRef.current?.querySelector('tr[data-row-id="1"][data-selected="true"]')) === selected));
+              () => table().getRow("1").getIsSelected() === selected &&
+                hasRenderedRowState(surfaceRef.current, mode, "1", selected, false));
             for (const expanded of [true, false]) await measure(expanded ? "expand" : "collapse", repeat,
               () => table().getRow("1").toggleExpanded(expanded),
-              () => table().getRow("1").getIsExpanded() === expanded && Boolean(surfaceRef.current?.querySelector('[data-detail-panel="1"]')) === expanded);
+              () => table().getRow("1").getIsExpanded() === expanded &&
+                hasRenderedRowState(surfaceRef.current, mode, "1", false, expanded));
             for (const desc of [true, false]) await measure(desc ? "sort-desc" : "sort-asc", repeat,
               () => table().setSorting([{ id: "name", desc }]),
-              () => table().getRowModel().rows[0]?.id === (desc ? String(rows) : "1"));
+              () => table().getRowModel().rows[0]?.id === (desc ? String(rows) : "1") &&
+                hasRenderedFirstRow(surfaceRef.current, mode, desc ? String(rows) : "1"));
             for (const filter of ["Record 0001", ""]) await measure(filter ? "filter" : "clear-filter", repeat,
               () => table().setGlobalFilter(filter), () => count() === (filter ? 1 : rows));
             await measure("scroll-vertical", repeat, () => {
@@ -162,15 +167,19 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
               table().getRow("1").toggleSelected(true);
               table().getRow("1").toggleExpanded(true);
               await afterTwoFrames();
+              assertProfilingRunActive(cancelled.current, document.visibilityState);
               for (const target of [initialMode === "table" ? "card" : "table", initialMode] as const) {
                 const store = table().store;
                 await measure(`switch-${target}`, repeat, () => {
                   mode = target;
                   setFixture((current) => current ? { ...current, mode: target } : current);
-                }, () => table().store === store && count() === rows && table().getRow("1").getIsSelected() && table().getRow("1").getIsExpanded());
+                }, () => table().store === store && count() === rows && table().getRow("1").getIsSelected() &&
+                  table().getRow("1").getIsExpanded() &&
+                  hasRenderedRowState(surfaceRef.current, target, "1", true, true));
               }
             }
           }
+          assertProfilingRunActive(cancelled.current, document.visibilityState);
           result.status = "PASS";
         } catch (error) {
           result.status = error instanceof Error ? error.message : "BLOCKED: unknown error";
@@ -181,6 +190,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
         if (track === "500") setStressAllowed(result.status === "PASS" && result.samples.every((sample) => sample.elapsedMs < 5000));
         if (result.status !== "PASS") throw new Error(result.status);
       }
+      assertProfilingRunActive(cancelled.current, document.visibilityState);
       setStatus("Complete");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "BLOCKED");
