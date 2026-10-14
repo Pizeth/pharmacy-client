@@ -2,8 +2,11 @@
 
 import Image from "next/image";
 import { Button, Typography } from "@mui/material";
-import { Clock3, ExternalLink, Mail, MapPin, Phone, Send } from "lucide-react";
-import FacebookIcon from "@mui/icons-material/Facebook";
+import { Clock3, ExternalLink, Mail, MapPin, Phone } from "lucide-react";
+import Meta from "@/components/icons/socials/meta";
+import Telegram from "@/components/icons/socials/telegram";
+import { SocialButton } from "@/components/icons/components/socialButton";
+import { SocialIconsRoot } from "@/components/icons/components/socials";
 import { HRD_SITE } from "../../data/siteInfo";
 import { toGoogleMapsUrl, toTelegramUrl, toTelUrl } from "../../utils/contactLinks";
 import type { PublicDocumentsSiteInfo } from "../../types/publicDocuments.types";
@@ -69,9 +72,11 @@ export function HrdContactPage({ site = HRD_SITE }: { site?: PublicDocumentsSite
               <div>
                 <S.DetailLabel variant="caption">{phone.name ? `ទូរសព្ទ • ${phone.name}` : "ទូរសព្ទ"}</S.DetailLabel>
                 <Typography component="a" variant="body1" href={toTelUrl(phone.number)}>{phone.number}</Typography>
-                {telegram && <Button component="a" href={telegram} target="_blank" rel="noopener noreferrer"
-                  aria-label={`Telegram: ${phone.name ?? phone.number}`}
-                  size="small" variant="text" startIcon={<Send size={16} />}>Telegram</Button>}
+                {telegram && <SocialIconsRoot>
+                  <SocialButton className="telegram" buttonType="iconButton"
+                    icon={<Telegram fontSize="medium" />}
+                    label={`Telegram: ${phone.name ?? phone.number}`} href={telegram} />
+                </SocialIconsRoot>}
               </div>
             </S.DetailLine>;
           })}
@@ -90,9 +95,11 @@ export function HrdContactPage({ site = HRD_SITE }: { site?: PublicDocumentsSite
         </S.CardDetails>
 
         <S.SocialActions aria-label="បណ្ដាញទំនាក់ទំនង">
-          <Button disabled variant="outlined" startIcon={<FacebookIcon fontSize="small" />}>
-            Facebook (ឆាប់ៗនេះ)
-          </Button>
+          <SocialIconsRoot>
+            <SocialButton className="meta" buttonType="iconButton" disabled
+              icon={<Meta fontSize="medium" />} label="Meta (ឆាប់ៗនេះ)" />
+          </SocialIconsRoot>
+          <Typography variant="caption" color="text.secondary">Meta / Facebook — ឆាប់ៗនេះ</Typography>
         </S.SocialActions>
       </S.IdCard>
 
