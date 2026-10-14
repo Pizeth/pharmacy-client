@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { Button, Typography } from "@mui/material";
-import { Clock3, ExternalLink, Facebook, Mail, MapPin, Phone, Send } from "lucide-react";
+import { Clock3, ExternalLink, Mail, MapPin, Phone, Send } from "lucide-react";
+import FacebookIcon from "@mui/icons-material/Facebook";
 import { HRD_SITE } from "../../data/siteInfo";
 import { toGoogleMapsUrl, toTelegramUrl, toTelUrl } from "../../utils/contactLinks";
 import type { PublicDocumentsSiteInfo } from "../../types/publicDocuments.types";
@@ -17,7 +18,6 @@ export function HrdContactPage({ site = HRD_SITE }: { site?: PublicDocumentsSite
   const { contact } = site;
   const representative = contact.phones?.find(phone => phone.name) ?? contact.phones?.[0];
   const mapUrl = contact.address ? toGoogleMapsUrl(contact.address) : null;
-  const telegram = representative?.telegram ? toTelegramUrl(representative.telegram) : null;
   const hasDetails = Boolean(contact.phones?.length || contact.email || contact.hours);
 
   return <S.Root>
@@ -62,13 +62,19 @@ export function HrdContactPage({ site = HRD_SITE }: { site?: PublicDocumentsSite
 
         <S.CardDetails>
           <Typography component="h3" variant="subtitle2">ព័ត៌មានសម្រាប់ទាក់ទង</Typography>
-          {contact.phones?.map(phone => <S.DetailLine key={phone.number}>
-            <Phone size={19} aria-hidden="true" />
-            <div>
-              <S.DetailLabel variant="caption">{phone.name ? `ទូរសព្ទ • ${phone.name}` : "ទូរសព្ទ"}</S.DetailLabel>
-              <Typography component="a" variant="body1" href={toTelUrl(phone.number)}>{phone.number}</Typography>
-            </div>
-          </S.DetailLine>)}
+          {contact.phones?.map(phone => {
+            const telegram = phone.telegram ? toTelegramUrl(phone.telegram) : null;
+            return <S.DetailLine key={phone.number}>
+              <Phone size={19} aria-hidden="true" />
+              <div>
+                <S.DetailLabel variant="caption">{phone.name ? `ទូរសព្ទ • ${phone.name}` : "ទូរសព្ទ"}</S.DetailLabel>
+                <Typography component="a" variant="body1" href={toTelUrl(phone.number)}>{phone.number}</Typography>
+                {telegram && <Button component="a" href={telegram} target="_blank" rel="noopener noreferrer"
+                  aria-label={`Telegram: ${phone.name ?? phone.number}`}
+                  size="small" variant="text" startIcon={<Send size={16} />}>Telegram</Button>}
+              </div>
+            </S.DetailLine>;
+          })}
           {contact.email && <S.DetailLine>
             <Mail size={19} aria-hidden="true" />
             <div>
@@ -84,9 +90,7 @@ export function HrdContactPage({ site = HRD_SITE }: { site?: PublicDocumentsSite
         </S.CardDetails>
 
         <S.SocialActions aria-label="បណ្ដាញទំនាក់ទំនង">
-          {telegram && <Button component="a" href={telegram} target="_blank" rel="noopener noreferrer"
-            variant="contained" startIcon={<Send size={18} />}>Telegram</Button>}
-          <Button disabled variant="outlined" startIcon={<Facebook size={18} />}>
+          <Button disabled variant="outlined" startIcon={<FacebookIcon fontSize="small" />}>
             Facebook (ឆាប់ៗនេះ)
           </Button>
         </S.SocialActions>
