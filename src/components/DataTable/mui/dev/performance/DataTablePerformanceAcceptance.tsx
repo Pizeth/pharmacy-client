@@ -4,6 +4,7 @@ import {
   Profiler,
   memo,
   useCallback,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -50,6 +51,7 @@ import type {
 } from "./performanceMetrics";
 import { DataTableDiagnosticCommit, DataTableRenderDiagnosticsContext } from "../../diagnostics/renderDiagnostics";
 import { createRenderDiagnosticCollector, type RenderDiagnosticCollector } from "./renderDiagnosticCollector";
+import type { MuiDataTableInstance } from "../../table";
 
 const COMPONENT_NAME =
   "RazethDataTablePerformance";
@@ -347,6 +349,7 @@ const cardConfig:
   };
 
 export interface PerformanceTableProps {
+  readonly onTable?: (table: MuiDataTableInstance<DataTablePerformanceRow>) => void;
   readonly narrowOwner: boolean;
   readonly diagnostics: RenderDiagnosticCollector | null;
   readonly rowCount: number;
@@ -357,7 +360,7 @@ export interface PerformanceTableProps {
     RefObject<HTMLElement | null>;
 }
 
-const PerformanceTable =
+export const PerformanceTable =
   memo(
     function PerformanceTable(
       props:
@@ -452,6 +455,7 @@ const PerformanceTable =
       // adapter keeps that snapshot while varying the owner's subscription;
       // renderer subscriptions still read the original full TanStack store.
       const table = Object.assign({}, subscribedTable, { state: subscribedTable.store.get() });
+      useLayoutEffect(() => { props.onTable?.(table); });
 
       const dispatch = (update: () => void) => diagnostics
         ? diagnostics.measureDispatch(update)

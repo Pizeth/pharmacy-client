@@ -1,5 +1,24 @@
 # TanStack v9 + MUI DataTable roadmap
 
+## Current handoff — October 14, 2026
+
+**2.2.3.2 BLOCKED at environment gate; not complete.** Fetched master and local
+HEAD: `48e881fe67441d9ba8862b8c222daf509fdc05ad`. No production code changed.
+The installed dependency tree differed from the lockfile. Corrective `npm ci`
+encountered extraction errors while a separate `npm i` was active; this task
+stopped its own install pending coordination. No production samples or new
+test passes are claimed; no commit/push or Actions run was created.
+
+The immediate next task is to finish 2.2.3.2 using the no-code gate and bounded
+measurement protocol in `docs/datatable-performance-2-2-3-2.md`: establish the
+correct dependencies/build, safely gate the local fixture, collect repeated
+production browser and separately labeled profiling-build samples, compare the
+existing experiments, and run all required validation. Decision remains
+**insufficient evidence; further profiling required**. Proposed 2.2.3.3 is a
+bounded selection-dependency correctness proof, conditional on measured benefit;
+its exact scope and acceptance are recorded in that report. Virtualization and
+PR #31 extraction remain unapproved. Historical entries below are unchanged.
+
 This document records the current architecture roadmap after the TranslationKey
 production proof and the row-pinning hardening pass.
 

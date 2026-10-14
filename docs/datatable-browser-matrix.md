@@ -1,5 +1,22 @@
 # DataTable browser matrix runbook
 
+## October 14 — 2.2.3.2 production profiling gate
+
+**BLOCKED; phase incomplete.** Latest fetched master is
+`48e881fe67441d9ba8862b8c222daf509fdc05ad`. No production browser measurements
+were collected. Installed Next/TanStack versions differed from the lockfile;
+the corrective install encountered extraction errors while a separate `npm i`
+process was active. This task stopped its own installer pending coordination.
+This environment failure is distinct from the earlier development stress stall.
+
+All required normal-density production cases and 500x16 stress remain unmeasured;
+1000x32 is not eligible until the prerequisite stress case stays responsive.
+The no-code profiling gate, warm-up/repeat protocol, explicit stop conditions,
+validation status and continuation are in
+`docs/datatable-performance-2-2-3-2.md`. Historical development timings below
+remain historical evidence only. No production optimization or virtualization
+is approved by this attempt.
+
 This file is the living handoff for DataTable browser acceptance.
 
 It is intentionally written so Codex, ChatGPT, or a future maintainer can pick

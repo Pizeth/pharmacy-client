@@ -3,6 +3,22 @@
 Status: architecture review justified by October 13 Matrix B; no virtualization
 implementation or dependency introduced.
 
+## October 14 — production evidence gate
+
+2.2.3.2 is BLOCKED before measurements by dependency/build setup; see
+`docs/datatable-performance-2-2-3-2.md`. Decision **3: evidence remains
+insufficient; further profiling is required**. This does not overturn the
+development selection fan-out diagnosis, but supplies no production latency or
+DOM/layout attribution. No bounded optimization was implemented or newly
+evaluated in production, and no virtualizer is approved.
+
+Resume lockfile-matched production profiling first. Conditional 2.2.3.3 should
+prove a compatible selection-dependency boundary for row-local content, global
+custom cells and resource actions, including selected-row pinning and off-page
+selection. Its detailed acceptance criteria are in the profiling report. Do not
+start production integration or the PR #31 extraction on the strength of the
+development-only speedup.
+
 ## Evidence and limits
 
 Measured the existing development-only React Profiler fixture on Windows in the
