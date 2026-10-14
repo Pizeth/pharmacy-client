@@ -1,38 +1,111 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
 import { Button, Typography } from "@mui/material";
-import { Clock3, ExternalLink, Mail, MapPin, Phone, Send } from "lucide-react";
+import { Clock3, ExternalLink, Facebook, Mail, MapPin, Phone, Send } from "lucide-react";
 import { HRD_SITE } from "../../data/siteInfo";
 import { toGoogleMapsUrl, toTelegramUrl, toTelUrl } from "../../utils/contactLinks";
 import type { PublicDocumentsSiteInfo } from "../../types/publicDocuments.types";
 import * as S from "./HrdContactPage.styles";
 
+/**
+ * A spokesperson-style identity/contact card, adapted from the visual hierarchy
+ * on the Ministry of Interior contact page. Images are local placeholders;
+ * never present Otto as an official staff photograph or mint a fake ID number.
+ */
 export function HrdContactPage({ site = HRD_SITE }: { site?: PublicDocumentsSiteInfo }) {
   const { contact } = site;
+  const representative = contact.phones?.find(phone => phone.name) ?? contact.phones?.[0];
   const mapUrl = contact.address ? toGoogleMapsUrl(contact.address) : null;
+  const telegram = representative?.telegram ? toTelegramUrl(representative.telegram) : null;
+  const hasDetails = Boolean(contact.phones?.length || contact.email || contact.hours);
+
   return <S.Root>
-    <S.Header><Typography variant="overline" color="text.secondary">Contact Us</Typography><Typography component="h1" variant="h4">ទំនាក់ទំនង</Typography><S.Accent  /><Typography color="text.secondary">{site.name}</Typography></S.Header>
+    <S.Header>
+      <Typography variant="overline" color="text.secondary">Contact / Representative</Typography>
+      <Typography component="h1" variant="h4">ទំនាក់ទំនង</Typography>
+      <S.Accent />
+      <Typography variant="body1" color="text.secondary">ព័ត៌មានអ្នកទំនាក់ទំនងនាយកដ្ឋានធនធានមនុស្ស</Typography>
+    </S.Header>
+
     <S.Layout>
-      <S.Location  aria-labelledby="hrd-location-title">
-        <S.SectionHeader><MapPin aria-hidden="true" /><Typography id="hrd-location-title" component="h2" variant="h5">ទីតាំងនាយកដ្ឋាន</Typography></S.SectionHeader>
+      <S.IdCard aria-labelledby="hrd-representative-name">
+        <S.CardMasthead>
+          <S.Brand>
+            <S.BrandLogo>
+              <Image src="/static/images/placeholder-mcs-orange-new.svg" width={64} height={64} alt="" />
+            </S.BrandLogo>
+            <div>
+              <Typography variant="overline">ក្រសួងមុខងារសាធារណៈ</Typography>
+              <Typography variant="subtitle1">{site.name}</Typography>
+            </div>
+          </S.Brand>
+          <S.CardType variant="caption">CONTACT CARD</S.CardType>
+        </S.CardMasthead>
+
+        <S.Person>
+          <S.Portrait>
+            <Image src="/static/images/otto.webp" alt="រូបភាពគំរូ Otto — មិនមែនរូបថតមន្រ្តីផ្លូវការ" fill sizes="(max-width: 700px) 130px, 180px" />
+          </S.Portrait>
+          <S.PersonInfo>
+            <Typography variant="overline" color="text.secondary">អ្នកទំនាក់ទំនង / Contact person</Typography>
+            <Typography id="hrd-representative-name" component="h2" variant="h5">
+              {representative?.name ?? "ឈ្មោះអ្នកទំនាក់ទំនងកំពុងរៀបចំ"}
+            </Typography>
+            <S.Role>
+              <Typography component="span" variant="caption">តួនាទី</Typography>
+              <Typography variant="body1">តំណាងទំនាក់ទំនងនាយកដ្ឋាន</Typography>
+            </S.Role>
+            <S.PlaceholderNote variant="caption">រូបថត និងនិមិត្តសញ្ញាគំរូ — រង់ចាំព័ត៌មានផ្លូវការ</S.PlaceholderNote>
+          </S.PersonInfo>
+        </S.Person>
+
+        <S.CardDetails>
+          <Typography component="h3" variant="subtitle2">ព័ត៌មានសម្រាប់ទាក់ទង</Typography>
+          {contact.phones?.map(phone => <S.DetailLine key={phone.number}>
+            <Phone size={19} aria-hidden="true" />
+            <div>
+              <S.DetailLabel variant="caption">{phone.name ? `ទូរសព្ទ • ${phone.name}` : "ទូរសព្ទ"}</S.DetailLabel>
+              <Typography component="a" variant="body1" href={toTelUrl(phone.number)}>{phone.number}</Typography>
+            </div>
+          </S.DetailLine>)}
+          {contact.email && <S.DetailLine>
+            <Mail size={19} aria-hidden="true" />
+            <div>
+              <S.DetailLabel variant="caption">អ៊ីម៉ែល</S.DetailLabel>
+              <Typography component="a" variant="body1" href={`mailto:${contact.email}`}>{contact.email}</Typography>
+            </div>
+          </S.DetailLine>}
+          {contact.hours && <S.DetailLine>
+            <Clock3 size={19} aria-hidden="true" />
+            <div><S.DetailLabel variant="caption">ម៉ោងធ្វើការ</S.DetailLabel><Typography variant="body1">{contact.hours}</Typography></div>
+          </S.DetailLine>}
+          {!hasDetails && <Typography color="text.secondary">ព័ត៌មានទំនាក់ទំនងកំពុងរៀបចំ</Typography>}
+        </S.CardDetails>
+
+        <S.SocialActions aria-label="បណ្ដាញទំនាក់ទំនង">
+          {telegram && <Button component="a" href={telegram} target="_blank" rel="noopener noreferrer"
+            variant="contained" startIcon={<Send size={18} />}>Telegram</Button>}
+          <Button disabled variant="outlined" startIcon={<Facebook size={18} />}>
+            Facebook (ឆាប់ៗនេះ)
+          </Button>
+        </S.SocialActions>
+      </S.IdCard>
+
+      <S.Location aria-labelledby="hrd-location-title">
+        <S.SectionHeader><MapPin size={22} aria-hidden="true" /><Typography id="hrd-location-title" component="h2" variant="h5">ស្វែងរកការិយាល័យ</Typography></S.SectionHeader>
+        <Typography variant="body2" color="text.secondary">ទីតាំង និងផ្លូវទៅកាន់នាយកដ្ឋាន</Typography>
         {contact.address ? <>
-          <S.Map  title="ផែនទីទីតាំងនាយកដ្ឋានធនធានមនុស្ស" src={`https://www.google.com/maps?q=${encodeURIComponent(contact.address.text)}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
-          <S.Address><Typography variant="body1">{contact.address.text}</Typography><Button component="a" href={mapUrl!} target="_blank" rel="noopener noreferrer" startIcon={<ExternalLink size={17} />} variant="outlined">បើកក្នុង Google Maps</Button></S.Address>
-        </> : <S.Address>ទីតាំងកំពុងរៀបចំ</S.Address>}
+          <S.Map title="ផែនទីទីតាំងនាយកដ្ឋានធនធានមនុស្ស"
+            src={`https://www.google.com/maps?q=${encodeURIComponent(contact.address.text)}&output=embed`}
+            loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+          <S.Address>
+            <Typography variant="body1">{contact.address.text}</Typography>
+            {mapUrl && <Button component="a" href={mapUrl} target="_blank" rel="noopener noreferrer"
+              startIcon={<ExternalLink size={17} />} variant="outlined">បើកក្នុង Google Maps</Button>}
+          </S.Address>
+        </> : <S.Address><Typography>ទីតាំងកំពុងរៀបចំ</Typography></S.Address>}
       </S.Location>
-      <S.Details  aria-labelledby="hrd-contact-title">
-        <Typography id="hrd-contact-title" component="h2" variant="h5">ព័ត៌មានទំនាក់ទំនង</Typography>
-        <S.Description color="text.secondary">សម្រាប់ព័ត៌មានអំពីឯកសារ និងការទំនាក់ទំនងជាមួយនាយកដ្ឋានធនធានមនុស្ស។</S.Description>
-        {contact.phones?.map(phone => {
-          const telegram = phone.telegram ? toTelegramUrl(phone.telegram) : null;
-          return <S.Line key={phone.number}><Phone size={22} aria-hidden="true" /><div><Typography component="h3" variant="subtitle1">លេខទូរសព្ទ</Typography>{phone.name && <Typography variant="body2" color="text.secondary">{phone.name}</Typography>}<Typography component="a" href={toTelUrl(phone.number)} variant="body1">{phone.number}</Typography>{telegram && <Button component="a" href={telegram} target="_blank" rel="noopener noreferrer" startIcon={<Send size={16} />} size="small">Telegram</Button>}</div></S.Line>;
-        })}
-        {contact.email && <S.Line><Mail size={22} aria-hidden="true" /><div><Typography component="h3" variant="subtitle1">អ៊ីម៉ែល</Typography><Typography component="a" href={`mailto:${contact.email}`} variant="body1">{contact.email}</Typography></div></S.Line>}
-        {contact.hours && <S.Line><Clock3 size={22} aria-hidden="true" /><div><Typography component="h3" variant="subtitle1">ម៉ោងធ្វើការ</Typography><Typography variant="body1">{contact.hours}</Typography></div></S.Line>}
-        {!contact.phones?.length && !contact.email && !contact.hours && <Typography color="text.secondary">ព័ត៌មានទំនាក់ទំនងកំពុងរៀបចំ</Typography>}
-        <S.Documents><Typography variant="body2">ចង់ស្វែងរកទម្រង់ពាក្យស្នើសុំ?</Typography><Button component={Link} href="/hrd/documents">មើលបណ្ដុំឯកសារ</Button></S.Documents>
-      </S.Details>
     </S.Layout>
   </S.Root>;
 }
