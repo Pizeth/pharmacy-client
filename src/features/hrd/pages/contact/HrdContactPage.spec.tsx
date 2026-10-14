@@ -10,7 +10,7 @@ it("uses a spokesperson-style ID card with logo and Otto placeholders, and real 
   expect(screen.getByText(/រង់ចាំព័ត៌មានផ្លូវការ/)).toBeInTheDocument();
   expect(screen.getByRole("link", { name: HRD_SITE.contact.email! })).toHaveAttribute("href", `mailto:${HRD_SITE.contact.email}`);
   expect(screen.getByRole("link", { name: "+855 97 824 2255" })).toHaveAttribute("href", "tel:+855978242255");
-  expect(screen.getByRole("link", { name: "Telegram" })).toHaveAttribute("href", "https://t.me/SORN_MALY");
+  expect(screen.getByRole("link", { name: /Telegram: លោកស្រី សន ម៉ាលី/ })).toHaveAttribute("href", "https://t.me/SORN_MALY");
   expect(screen.getByRole("button", { name: /Facebook/ })).toBeDisabled();
   expect(screen.getByRole("link", { name: "បើកក្នុង Google Maps" })).toHaveAttribute("href", HRD_SITE.contact.address!.mapUrl);
   expect(screen.getByTitle("ផែនទីទីតាំងនាយកដ្ឋានធនធានមនុស្ស")).toHaveAttribute("src", `https://www.google.com/maps?q=${encodeURIComponent(HRD_SITE.contact.address!.text)}&output=embed`);
@@ -24,4 +24,22 @@ it("shows pending states without inventing identity or social links", () => {
   expect(screen.queryByRole("link", { name: "Telegram" })).not.toBeInTheDocument();
   expect(screen.getByRole("button", { name: /Facebook/ })).toBeDisabled();
   expect(screen.queryByTitle("ផែនទីទីតាំងនាយកដ្ឋានធនធានមនុស្ស")).not.toBeInTheDocument();
+});
+
+it("preserves Telegram links for non-representative contacts while omitting invalid handles", () => {
+  render(<HrdContactPage site={{
+    ...HRD_SITE,
+    contact: {
+      phones: [
+        { name: "Primary", number: "+855 12 111 111" },
+        { name: "Second", number: "+855 12 222 222", telegram: "@second_contact" },
+        { name: "Third", number: "+855 12 333 333", telegram: "javascript:alert(1)" },
+      ],
+    },
+  }} />);
+  expect(screen.getByRole("heading", { name: "Primary" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Telegram: Second" })).toHaveAttribute("href", "https://t.me/second_contact");
+  expect(screen.getByRole("link", { name: "+855 12 222 222" })).toHaveAttribute("href", "tel:+85512222222");
+  expect(screen.queryByRole("link", { name: "Telegram: Primary" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Telegram: Third" })).not.toBeInTheDocument();
 });
