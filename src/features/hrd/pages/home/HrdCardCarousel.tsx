@@ -61,8 +61,15 @@ export function HrdCardCarousel() {
     }
     drag.current = null;
   };
+  const cancelTouch = () => {
+    const gesture = touch.current;
+    touch.current = null;
+    // A second finger or a browser touchcancel can interrupt a partially
+    // rotated gesture. Always settle before discarding its starting state.
+    if (gesture?.horizontal) setAngle(current => Math.round(current / angleStep) * angleStep);
+  };
   const startTouch = (event: TouchEvent<HTMLDivElement>) => {
-    if (event.touches.length !== 1) { touch.current = null; return; }
+    if (event.touches.length !== 1) { cancelTouch(); return; }
     const point = event.touches[0];
     const target = event.target;
     const card = target instanceof Element ? target.closest<HTMLElement>('article[data-flippable="true"]') : null;
@@ -74,7 +81,8 @@ export function HrdCardCarousel() {
   };
   const moveTouch = (event: TouchEvent<HTMLDivElement>) => {
     const start = touch.current;
-    if (!start || event.touches.length !== 1) return;
+    if (!start) return;
+    if (event.touches.length !== 1) { cancelTouch(); return; }
     const point = event.touches[0];
     const dx = point.clientX - start.x;
     const dy = point.clientY - start.y;
@@ -87,6 +95,9 @@ export function HrdCardCarousel() {
     setAngle(start.angle + dx * 0.25);
   };
   const endTouch = (event: TouchEvent<HTMLDivElement>) => {
+    // One finger of a multi-touch sequence may end while another remains.
+    // Treat that as cancellation, never as a completed tap/swipe.
+    if (event.touches.length > 0) { cancelTouch(); return; }
     const start = touch.current;
     touch.current = null;
     if (!start) return;
@@ -99,10 +110,6 @@ export function HrdCardCarousel() {
       Math.hypot(point.clientX - start.x, point.clientY - start.y) < 8) {
       setFlipped(current => current === start.card ? null : start.card);
     }
-  };
-  const cancelTouch = () => {
-    if (touch.current?.horizontal) setAngle(current => Math.round(current / angleStep) * angleStep);
-    touch.current = null;
   };
   return <S.Root aria-label="ឯកសារជារង្វង់" aria-roledescription="carousel">
     <GlobalStyles styles={S.frameProperties} />
