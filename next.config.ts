@@ -2,6 +2,8 @@ import "./src/configs/envConfig";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  distDir: process.env.DATATABLE_LOCAL_PROFILE === "browser" || process.env.DATATABLE_LOCAL_PROFILE === "react"
+    ? `build/datatable-${process.env.DATATABLE_LOCAL_PROFILE}` : ".next",
   /* config options here */
   // experimental: {
   //   appDir: true,
@@ -10,6 +12,7 @@ const nextConfig: NextConfig = {
     useTypeScriptCli: true, // Forces Next.js to use the native tsc binary
   },
   env: {
+    DATATABLE_PROFILE_BUILD_MODE: process.env.DATATABLE_LOCAL_PROFILE ?? "disabled",
     NEXT_PUBLIC_BACKEND_URL:
       process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000",
     NEXT_PUBLIC_API_URL:

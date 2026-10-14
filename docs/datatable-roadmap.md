@@ -1,5 +1,29 @@
 # TanStack v9 + MUI DataTable roadmap
 
+## Current handoff — October 14, 2026
+
+2.2.3.2 COMPLETE; all required local validation passed.
+Branch codex/datatable-production-profiling, measured source a0ceb53 (based on
+master 48e881f). Later master 9b02af0 has no DataTable/config/package/CI changes.
+The final evidence commit is the commit containing this handoff, after a0ceb53.
+Do not replay dependency repair or the completed browser matrix.
+
+Eight normal cases, both stress cases, and six controlled comparisons in each
+of two production builds passed. At 200x16, selection commits fell from 200 rows /
+3200 cells to one row / 16 cells; React median 399.9 to 3.4 ms. Broad expansion
+and sorting work persists; timing drift prevents precise universal speedup claims.
+Decision 2: bounded optimization helps but virtualization may still be justified.
+No production behavior or resource contract changed; experiments stay opt-in.
+
+Next phase 2.2.3.3: prove row-local versus global cell/action dependencies,
+off-page/global counts, cross-row mutation guards, all selected-pinning and
+keepPinnedRows combinations; retain feature-bound hooks. Recheck sort/filter,
+pagination, detail panels, RTL/resize/focus and same-instance table/card state.
+Then repeat counterbalanced 25/100/200 production comparisons before considering
+rollout. Exact acceptance, raw evidence and limitations are in
+[the profiling report](datatable-performance-2-2-3-2.md). Virtualization and PR #31
+extraction remain outside this next bounded phase. Historical entries follow.
+
 This document records the current architecture roadmap after the TranslationKey
 production proof and the row-pinning hardening pass.
 

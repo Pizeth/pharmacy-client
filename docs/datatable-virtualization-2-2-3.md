@@ -3,6 +3,25 @@
 Status: architecture review justified by October 13 Matrix B; no virtualization
 implementation or dependency introduced.
 
+## October 14 — production evidence and recommendation
+
+Decision **2: bounded optimization helps but virtualization may still be justified**.
+See [2.2.3.2 report](datatable-performance-2-2-3-2.md) for separate ordinary
+production and React-profile measurements. Selection fan-out is confirmed:
+200x16 default commits 200 rows/3200 cells, owner-only still commits all of them,
+row projection commits one row/16 cells. React selection median falls from399.9
+ms to3.4 ms. Expansion/sort still commits the full list. Large stress DOM counts
+coincide with multi-second work but do not isolate layout or prove virtualization
+is the right solution. Absolute browser timings drift; no universal SLA claimed.
+
+No production optimization or virtualizer was enabled. First complete2.2.3.3:
+prove compatible row-local/global dependencies, custom cells, resource action
+policies, off-page selection and selected-row pinning/keepPinnedRows. Repeat
+counterbalanced production measurements after correctness. Residual rendering,
+body remapping and layout require separate attribution before virtualization.
+Keep the existing feature-bound hook family and public resource contracts.
+PR #31 extraction stays separate. Earlier development evidence follows.
+
 ## Evidence and limits
 
 Measured the existing development-only React Profiler fixture on Windows in the

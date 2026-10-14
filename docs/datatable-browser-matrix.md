@@ -1,5 +1,28 @@
 # DataTable browser matrix runbook
 
+## October 14 — 2.2.3.2 production measurements
+
+Production measurements and local validation COMPLETE.
+Source a0ceb53 on codex/datatable-production-profiling; Windows/Chrome153 IAB,
+1440x900, Next16.4/React19.3 production builds behind local-hr.razeth.com.
+Eight normal cases PASS (39 samples each); six instrumented comparison cases
+PASS in both ordinary and React-profile builds (33 each); 500x16 and 1000x32
+stress PASS (33 each). One warm-up then three recorded repeats per action.
+
+Selection/expansion, both sorts, filter/clear, vertical scroll and same-store
+mode switching passed the synthetic checks. Horizontal scroll passed on 16/32
+column tables; eight-column/card horizontal actions had no overflow and are N/A.
+No native input INP/FPS, CPU trace, or exhaustive resource-policy browser rerun
+is claimed. No console errors/warnings captured in comparison runs.
+
+Initial dependency blocker was repaired with coordinated npm ci. The earlier
+development-mode stress stall below remains historical, not a production failure.
+Raw samples, median/mean/max, drift caveats and stop conditions are in
+[the report](datatable-performance-2-2-3-2.md) and adjacent JSON evidence.
+Decision 2: bounded selection optimization helps; virtualization stays conditional.
+Next matrix is 2.2.3.3 selection-dependency correctness and counterbalanced
+production remeasurement. No production selector change was enabled.
+
 This file is the living handoff for DataTable browser acceptance.
 
 It is intentionally written so Codex, ChatGPT, or a future maintainer can pick
