@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import type { TouchEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button, Typography } from "@mui/material";
@@ -19,9 +20,35 @@ export function HrdHomePage() {
   const reveal = useHomeScrollReveal();
   const [slideIndex, setSlideIndex] = useState(0);
   const slide = HRD_HOME_HIGHLIGHTS[slideIndex];
+  const touch = useRef<{ x: number; y: number; horizontal: boolean } | null>(null);
   const changeSlide = (step: number) =>
     setSlideIndex((current) => (current + step + HRD_HOME_HIGHLIGHTS.length) % HRD_HOME_HIGHLIGHTS.length);
 
+  const startSwipe = (event: TouchEvent<HTMLElement>) => {
+    if (event.touches.length !== 1) { touch.current = null; return; }
+    const point = event.touches[0];
+    touch.current = { x: point.clientX, y: point.clientY, horizontal: false };
+  };
+  const moveSwipe = (event: TouchEvent<HTMLElement>) => {
+    const start = touch.current;
+    if (!start || event.touches.length !== 1) return;
+    const point = event.touches[0];
+    const dx = point.clientX - start.x;
+    const dy = point.clientY - start.y;
+    if (!start.horizontal && Math.abs(dx) >= 8 && Math.abs(dx) > Math.abs(dy)) start.horizontal = true;
+  };
+  const endSwipe = (event: TouchEvent<HTMLElement>) => {
+    const start = touch.current;
+    touch.current = null;
+    const point = event.changedTouches[0];
+    if (!start || !point || !start.horizontal) return;
+    const dx = point.clientX - start.x;
+    const dy = point.clientY - start.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return;
+    // Swipes starting over the hero link must not navigate accidentally.
+    if (event.cancelable) event.preventDefault();
+    changeSlide(dx < 0 ? 1 : -1);
+  };
   return (
     <S.Root>
       <S.Identity>
@@ -32,7 +59,9 @@ export function HrdHomePage() {
         <S.English variant="body2">HUMAN RESOURCE DEPARTMENT</S.English>
       </S.Identity>
 
-      <S.Feature  aria-label="ព័ត៌មានសំខាន់" aria-roledescription="carousel">
+      <S.Feature aria-label="ព័ត៌មានសំខាន់" aria-roledescription="carousel"
+        onTouchStart={startSwipe} onTouchMove={moveSwipe} onTouchEnd={endSwipe}
+        onTouchCancel={() => { touch.current = null; }}>
         <S.FeatureVisual>
           <Image src="/static/images/hrd-office.svg" alt="" fill sizes="(max-width: 700px) 100vw, 50vw" preload />
           <S.VisualCaption>
