@@ -70,3 +70,25 @@ test("touch taps toggle a front card without rotating the gallery", () => {
     expect(card).toHaveAttribute("data-flipped", "false");
   } finally { window.PointerEvent = previous; }
 });
+
+test("touch swipe beginning on a card rotates, but taps flip and vertical swipes retain the page", () => {
+  render(<ThemeProvider theme={createTheme()}><HrdCardCarousel /></ThemeProvider>);
+  const card = document.querySelector<HTMLElement>('article[data-index="0"]')!;
+  const touch = (x: number, y: number) => [{ identifier: 1, clientX: x, clientY: y, target: card }];
+  fireEvent.touchStart(card, { touches: touch(200, 100) });
+  fireEvent.touchMove(card, { touches: touch(198, 180) });
+  fireEvent.touchEnd(card, { touches: [], changedTouches: touch(198, 180) });
+  expect(screen.getByText("1 / 11")).toBeInTheDocument();
+
+  fireEvent.touchStart(card, { touches: touch(200, 100) });
+  fireEvent.touchMove(card, { touches: touch(60, 105) });
+  fireEvent.touchEnd(card, { touches: [], changedTouches: touch(60, 105) });
+  expect(screen.getByText("2 / 11")).toBeInTheDocument();
+
+  // A short touch remains a flip gesture, not a carousel rotation.
+  const nextCard = document.querySelector<HTMLElement>('article[data-index="1"]')!;
+  const nextTouch = [{ identifier: 2, clientX: 180, clientY: 100, target: nextCard }];
+  fireEvent.touchStart(nextCard, { touches: nextTouch });
+  fireEvent.touchEnd(nextCard, { touches: [], changedTouches: nextTouch });
+  expect(nextCard).toHaveAttribute("data-flipped", "true");
+});
