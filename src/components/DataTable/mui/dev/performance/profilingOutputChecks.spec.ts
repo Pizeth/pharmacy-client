@@ -1,3 +1,4 @@
+import { dataTableClasses } from "../../styles";
 import { assertProfilingRunActive, hasRenderedFirstRow, hasRenderedRowState } from "./profilingOutputChecks";
 
 function fixture() {
@@ -8,8 +9,8 @@ function fixture() {
       <tr data-row-id="1"><td>Record 0001</td></tr>
       <tr><td data-detail-panel="2">Detail</td></tr>
     </tbody></table>
-    <div class="RazethDataTable-cardItem" data-row-id="2" data-selected="true"><div data-detail-panel="2">Detail</div></div>
-    <div class="RazethDataTable-cardItem" data-row-id="1"></div>
+    <div class="${dataTableClasses.cardItem}" data-row-id="2" data-selected="true"><div data-detail-panel="2">Detail</div></div>
+    <div class="${dataTableClasses.cardItem}" data-row-id="1"></div>
   `;
   return root;
 }
