@@ -157,3 +157,27 @@ test("decorative side cards never intercept taps intended for interactive cards"
   const styles = getComputedStyle(side);
   expect(styles.pointerEvents).toBe("none");
 });
+
+test.each([17, 18])("horizontal finger drift of %ipx remains a tap even with touchmove", (drift) => {
+  render(<ThemeProvider theme={createTheme()}><HrdCardCarousel /></ThemeProvider>);
+  const card = document.querySelector<HTMLElement>('article[data-index="0"]')!;
+  const point = (x: number) => [{ identifier: 1, clientX: x, clientY: 100, target: card }];
+  fireEvent.touchStart(card, { touches: point(200) });
+  fireEvent.touchMove(card, { touches: point(200 - drift) });
+  fireEvent.touchEnd(card, { touches: [], changedTouches: point(200 - drift) });
+  expect(card).toHaveAttribute("data-flipped", "true");
+  expect(screen.getByText("1 / 11")).toBeInTheDocument();
+});
+
+test("horizontal movement beyond tap tolerance remains a gallery swipe", () => {
+  render(<ThemeProvider theme={createTheme()}><HrdCardCarousel /></ThemeProvider>);
+  const card = document.querySelector<HTMLElement>('article[data-index="0"]')!;
+  const assembly = document.querySelector<HTMLElement>('[class*="RazethHrd-homeGalleryAssembly"]')!;
+  const point = (x: number) => [{ identifier: 1, clientX: x, clientY: 100, target: card }];
+  fireEvent.touchStart(card, { touches: point(200) });
+  fireEvent.touchMove(card, { touches: point(180) });
+  expect(assembly.style.getPropertyValue("--Hrd-gallery-angle")).toBe("-5deg");
+  fireEvent.touchEnd(card, { touches: [], changedTouches: point(180) });
+  expect(card).toHaveAttribute("data-flipped", "false");
+  expect(assembly.style.getPropertyValue("--Hrd-gallery-angle")).toBe("0deg");
+});
