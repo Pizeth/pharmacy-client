@@ -25,9 +25,15 @@ export const Assembly = styled("div", hrdSlot("HomeGalleryAssembly"))({
 export const Card = styled("article", hrdSlot("HomeGalleryCard"))({
   position: "absolute", inset: 0, transformStyle: "preserve-3d", touchAction: "pan-y",
   transform: "rotateY(var(--Hrd-gallery-card-angle)) translateZ(var(--Hrd-gallery-radius))",
-  "&[data-facing=false]": { pointerEvents: "none" },
-  "&[data-flippable=true]:hover > div, &[data-flippable=true]:focus-within > div, &[data-flipped=true] > div": { transform: "rotateY(180deg)" },
-  "@media (hover: none)": { "&[data-flippable=true]:hover > div": { transform: "none" }, "&[data-flipped=true] > div": { transform: "rotateY(180deg)" } },
+  // The two decorative side cards must not intercept taps on the center
+  // interactive cards. Touches elsewhere still bubble to the scene for swipes.
+  "&[data-flippable=false]": { pointerEvents: "none" },
+  // Explicit tap state always wins, including on mobile browsers with sticky
+  // synthetic :hover. Hover itself is allowed only for real hover pointers.
+  "&[data-flipped=true] > div, &[data-flippable=true]:has(:focus-visible) > div": { transform: "rotateY(180deg)" },
+  "@media (hover: hover) and (pointer: fine)": {
+    "&[data-flippable=true]:hover > div": { transform: "rotateY(180deg)" },
+  },
 });
 export const Flip = styled("div", hrdSlot("HomeGalleryFlip"))({
   position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d", transition: "transform 350ms ease-out",
@@ -47,8 +53,13 @@ export const Face = styled("div", hrdSlot("HomeGalleryFace"))(({ theme }) => ({
   backgroundClip: "padding-box, padding-box, border-box",
   transition: "--Hrd-gallery-frame-angle 350ms ease-out",
   color: (theme.vars ?? theme).palette.text.primary, boxShadow: theme.shadows[6],
-  "article[data-flippable=true]:hover &, article[data-flippable=true]:focus-within &, article[data-flipped=true] &": {
+  "article[data-flipped=true] &, article[data-flippable=true]:has(:focus-visible) &": {
     "--Hrd-gallery-frame": (theme.vars ?? theme).palette.error.main, "--Hrd-gallery-frame-angle": "135deg",
+  },
+  "@media (hover: hover) and (pointer: fine)": {
+    "article[data-flippable=true]:hover &": {
+      "--Hrd-gallery-frame": (theme.vars ?? theme).palette.error.main, "--Hrd-gallery-frame-angle": "135deg",
+    },
   },
   "&::after": {
     content: '""', position: "absolute", inset: 0, borderRadius: "inherit",
