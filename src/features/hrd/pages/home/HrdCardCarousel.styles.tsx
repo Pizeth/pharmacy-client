@@ -23,7 +23,7 @@ export const Assembly = styled("div", hrdSlot("HomeGalleryAssembly"))({
   "@media (prefers-reduced-motion: reduce)": { transition: "none" },
 });
 export const Card = styled("article", hrdSlot("HomeGalleryCard"))({
-  position: "absolute", inset: 0, transformStyle: "preserve-3d",
+  position: "absolute", inset: 0, transformStyle: "preserve-3d", touchAction: "pan-y",
   transform: "rotateY(var(--Hrd-gallery-card-angle)) translateZ(var(--Hrd-gallery-radius))",
   "&[data-facing=false]": { pointerEvents: "none" },
   "&[data-flippable=true]:hover > div, &[data-flippable=true]:focus-within > div, &[data-flipped=true] > div": { transform: "rotateY(180deg)" },

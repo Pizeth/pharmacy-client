@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import type { CSSProperties, PointerEvent } from "react";
+import type { CSSProperties, PointerEvent, TouchEvent } from "react";
 import { GlobalStyles, Typography } from "@mui/material";
 import { ArrowLeft, ArrowRight, FileText } from "lucide-react";
 import { PUBLIC_DOCUMENTS } from "../../documents/data/publicDocuments";
@@ -15,6 +15,7 @@ export function HrdCardCarousel() {
   const [flipped, setFlipped] = useState<number | null>(null);
   const scene = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; y: number; angle: number; horizontal: boolean; card: number | null } | null>(null);
+  const touch = useRef<{ x: number; y: number; angle: number; horizontal: boolean; card: number | null; link: boolean } | null>(null);
   useEffect(() => {
     const element = scene.current;
     if (!element) return;
@@ -35,6 +36,9 @@ export function HrdCardCarousel() {
   const selected = ((Math.round(-angle / angleStep) % cards.length) + cards.length) % cards.length;
   const step = (direction: number) => { setFlipped(null); setAngle(current => (Math.round(current / angleStep) - direction) * angleStep); };
   const move = (event: PointerEvent<HTMLDivElement>) => {
+    // Touch events remain targeted at the original 3D card throughout a swipe;
+    // pointer capture after the first move can lose that target on mobile.
+    if (event.pointerType === "touch") return;
     const start = drag.current;
     if (!start) return;
     const dx = event.clientX - start.x;
@@ -48,6 +52,7 @@ export function HrdCardCarousel() {
     setAngle(start.angle + dx * 0.25);
   };
   const end = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return;
     if (drag.current?.horizontal) setAngle(current => Math.round(current / angleStep) * angleStep);
     else if (event.type === "pointerup" && event.pointerType !== "mouse" && drag.current?.card != null &&
       Math.hypot(event.clientX - drag.current.x, event.clientY - drag.current.y) < 8 && !(event.target as HTMLElement).closest("a")) {
@@ -56,14 +61,65 @@ export function HrdCardCarousel() {
     }
     drag.current = null;
   };
+  const cancelTouch = () => {
+    const gesture = touch.current;
+    touch.current = null;
+    // A second finger or a browser touchcancel can interrupt a partially
+    // rotated gesture. Always settle before discarding its starting state.
+    if (gesture?.horizontal) setAngle(current => Math.round(current / angleStep) * angleStep);
+  };
+  const startTouch = (event: TouchEvent<HTMLDivElement>) => {
+    if (event.touches.length !== 1) { cancelTouch(); return; }
+    const point = event.touches[0];
+    const target = event.target;
+    const card = target instanceof Element ? target.closest<HTMLElement>('article[data-flippable="true"]') : null;
+    touch.current = {
+      x: point.clientX, y: point.clientY, angle, horizontal: false,
+      card: card ? Number(card.dataset.index) : null,
+      link: target instanceof Element && target.closest("a") !== null,
+    };
+  };
+  const moveTouch = (event: TouchEvent<HTMLDivElement>) => {
+    const start = touch.current;
+    if (!start) return;
+    if (event.touches.length !== 1) { cancelTouch(); return; }
+    const point = event.touches[0];
+    const dx = point.clientX - start.x;
+    const dy = point.clientY - start.y;
+    if (!start.horizontal) {
+      // Let the browser own vertical scrolling. The scene uses touch-action: pan-y.
+      if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(dy)) return;
+      start.horizontal = true;
+      setFlipped(null);
+    }
+    setAngle(start.angle + dx * 0.25);
+  };
+  const endTouch = (event: TouchEvent<HTMLDivElement>) => {
+    // One finger of a multi-touch sequence may end while another remains.
+    // Treat that as cancellation, never as a completed tap/swipe.
+    if (event.touches.length > 0) { cancelTouch(); return; }
+    const start = touch.current;
+    touch.current = null;
+    if (!start) return;
+    const point = event.changedTouches[0];
+    if (start.horizontal) {
+      // Suppress synthetic link clicks after a drag, but not on ordinary taps.
+      if (event.cancelable) event.preventDefault();
+      setAngle(current => Math.round(current / angleStep) * angleStep);
+    } else if (point && start.card !== null && !start.link &&
+      Math.hypot(point.clientX - start.x, point.clientY - start.y) < 8) {
+      setFlipped(current => current === start.card ? null : start.card);
+    }
+  };
   return <S.Root aria-label="ឯកសារជារង្វង់" aria-roledescription="carousel">
     <GlobalStyles styles={S.frameProperties} />
     <S.Heading variant="h5">ឯកសារសម្រាប់មន្រ្តីរាជការ</S.Heading>
     <S.Scene ref={scene} aria-label="រមូរឬអូសដើម្បីប្ដូរឯកសារ" onPointerDown={event => {
-      if (event.button !== 0) return;
+      if (event.pointerType === "touch" || event.button !== 0) return;
       const card = (event.target as HTMLElement).closest<HTMLElement>('article[data-flippable="true"]');
       drag.current = { x: event.clientX, y: event.clientY, angle, horizontal: false, card: card ? Number(card.dataset.index) : null };
-    }} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onLostPointerCapture={end}>
+    }} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onLostPointerCapture={end}
+      onTouchStart={startTouch} onTouchMove={moveTouch} onTouchEnd={endTouch} onTouchCancel={cancelTouch}>
       {/* Runtime rotation geometry; all permanent presentation belongs to theme slots. */}
       <S.Assembly style={{ "--Hrd-gallery-angle": `${angle}deg` } as CSSProperties}>
         {cards.map((document, index) => {
