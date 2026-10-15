@@ -1,4 +1,6 @@
-export type HrdSlotKey =
+export type HrdSlotKey = | "contactPageGrid" | "contactHours"
+  | "contactCard" | "contactCardHeader" | "contactLogo" | "contactCardBody"
+  | "contactPortrait" | "contactCopy" | "contactRole" | "contactRow" | "contactLink" | "contactSocials"
   | "directorReveal" | "directorSeal" | "directorCopy" | "directorVisual"
   | "homeGallery" | "homeGalleryHeading" | "homeGalleryScene" | "homeGalleryAssembly"
   | "homeGalleryCard" | "homeGalleryFlip" | "homeGalleryFace" | "homeGalleryLink"

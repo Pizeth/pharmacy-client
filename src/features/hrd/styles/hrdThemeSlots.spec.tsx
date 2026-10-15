@@ -4,12 +4,12 @@ import { HrdHomePage } from "../pages/home/HrdHomePage";
 import { HrdContactPage } from "../pages/contact/HrdContactPage";
 import { HrdAboutPage } from "../pages/about/HrdAboutPage";
 
-const theme = createTheme({
+const theme = createTheme({ cssVariables: true,
   components: {
     RazethHrd: {
       styleOverrides: {
         homeFeature: { borderTop: "7px solid rgb(1, 2, 3)" },
-        contactLocation: { borderTop: "7px solid rgb(1, 2, 3)" },
+        contactCard: { borderTop: "7px solid rgb(1, 2, 3)" },
         aboutPanel: { borderTop: "7px solid rgb(1, 2, 3)" },
       },
     },
@@ -18,7 +18,7 @@ const theme = createTheme({
 
 it.each([
   ["home", <HrdHomePage />, "region", "ព័ត៌មានសំខាន់"],
-  ["contact", <HrdContactPage />, "region", "ទីតាំងនាយកដ្ឋាន"],
+  ["contact", <HrdContactPage />, "article", "លោកស្រី សន ម៉ាលី"],
   ["about", <HrdAboutPage section="overview" />, "article", "ព័ត៌មានសង្ខេបនាយកដ្ឋាន"],
 ] as const)("allows the theme to override the %s presentation slot", (_name, page, role, label) => {
   render(<ThemeProvider theme={theme}>{page}</ThemeProvider>);

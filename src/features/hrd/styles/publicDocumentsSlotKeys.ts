@@ -32,6 +32,8 @@ export type PublicDocumentsSlotKey =
   | "footer"
   | "footerBottom"
   | "footerGrid"
+  | "footerQuickLinks"
+  | "footerQuickLinksList"
   | "footerHeading"
   | "footerTagline"
   | "formatBadge"

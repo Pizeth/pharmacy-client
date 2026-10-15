@@ -1,5 +1,5 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 
 import { HrdFooter } from "./HrdFooter";
@@ -19,6 +19,14 @@ const theme = createTheme({
     light: { palette: { customShadows: shadows } },
     dark: { palette: { customShadows: shadows } },
   },
+  components: {
+    RazethPublicDocuments: {
+      styleOverrides: {
+        footerQuickLinks: { borderTop: "3px solid rgb(1, 2, 3)" },
+        footerQuickLinksList: { rowGap: "13px" },
+      },
+    },
+  },
 });
 
 function renderFooter(contact: PublicDocumentsSiteInfo["contact"]): void {
@@ -34,6 +42,15 @@ function renderFooter(contact: PublicDocumentsSiteInfo["contact"]): void {
 
   render(wrap(<HrdFooter site={site} />));
 }
+
+it("exposes quick navigation and supports footer theme slot overrides", () => {
+  renderFooter({});
+  const navigation = screen.getByRole("navigation", { name: "តំណរហ័ស" });
+  expect(within(navigation).getAllByRole("link").map(link => link.getAttribute("href")))
+    .toEqual(["/hrd", "/hrd/about", "/hrd/documents", "/hrd/contact"]);
+  expect(navigation).toHaveStyle({ borderTopWidth: "3px", borderTopColor: "rgb(1, 2, 3)" });
+  expect(within(navigation).getByRole("list")).toHaveStyle({ rowGap: "13px" });
+});
 
 describe("HrdFooter phone line", () => {
   it("renders the name and the number as two separate links on one line", () => {

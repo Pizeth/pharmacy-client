@@ -202,6 +202,7 @@ export const SocialButton = (inProps: SocialButtonProps) => {
     href = "#",
     size = "small",
     disabled = false,
+    placeholder = false,
     children,
     ...rest
   } = props;
@@ -210,15 +211,24 @@ export const SocialButton = (inProps: SocialButtonProps) => {
     <SocialButtonRoot className={className} sx={sx} {...rest}>
       {buttonType === "iconButton" ? (
         <Tooltip title={label}>
-          <IconButton
+          {placeholder ? <IconButton
+            aria-label={label}
+            aria-disabled="true"
+            size={size}
+            color="inherit"
+            disabled={disabled}
+          >{icon}</IconButton> : <IconButton
             href={href}
             target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            aria-disabled={placeholder || undefined}
             size={size}
             color="inherit"
             disabled={disabled}
           >
             {icon}
-          </IconButton>
+          </IconButton>}
         </Tooltip>
       ) : (
         <Button variant={variant} disabled={disabled} fullWidth>
