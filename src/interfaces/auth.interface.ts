@@ -103,6 +103,7 @@ export interface SocialLoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
 
 // export interface SocialButtonProps extends ButtonProps /*ExtendButtonBase<ButtonTypeMap> & ButtonOwnProps */ {
 export interface SocialButtonProps extends HtmlHTMLAttributes<HTMLDivElement> /*ExtendButtonBase<ButtonTypeMap> & ButtonOwnProps */ {
+  placeholder?: boolean;
   className?: string;
   icon?: ReactNode;
   label?: string;

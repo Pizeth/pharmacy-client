@@ -202,6 +202,7 @@ export const SocialButton = (inProps: SocialButtonProps) => {
     href = "#",
     size = "small",
     disabled = false,
+    placeholder = false,
     children,
     ...rest
   } = props;
@@ -210,8 +211,9 @@ export const SocialButton = (inProps: SocialButtonProps) => {
   // anchor pointing to "#". Active provider icons retain their real links.
   const socialIconButton = (
     <IconButton
-      {...(disabled ? {} : { href, target: "_blank", rel: "noopener noreferrer" })}
+      {...(disabled || placeholder ? {} : { href, target: "_blank", rel: "noopener noreferrer" })}
       aria-label={label}
+      aria-disabled={placeholder || undefined}
       size={size}
       color="inherit"
       disabled={disabled}

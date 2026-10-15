@@ -41,6 +41,7 @@ export interface PublicDocumentRecord {
 export interface PublicDocumentsPhoneContact {
   /** Display name. Links to Telegram when `telegram` is set. */
   readonly name?: string;
+  readonly role?: string;
 
   /** Phone number, shown as written. Opens the dialer (tel:). */
   readonly number: string;

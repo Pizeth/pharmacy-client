@@ -25,6 +25,7 @@ export const HRD_SITE: PublicDocumentsSiteInfo = {
     phones: [
       {
         name: "លោកស្រី សន ម៉ាលី",
+        role: "អនុប្រធានការិយាល័យ",
         number: "+855 97 824 2255",
         // Opens this person's Telegram when the name is clicked.
         // Accepts "https://t.me/username", "@username" or "+855...".

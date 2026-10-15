@@ -1,4 +1,7 @@
 export type HrdSlotKey =
+  | "contactPageGrid" | "contactHours"
+  | "contactCard" | "contactCardHeader" | "contactLogo" | "contactCardBody"
+  | "contactPortrait" | "contactCopy" | "contactRole" | "contactRow" | "contactLink" | "contactSocials"
   | "directorReveal" | "directorSeal" | "directorCopy" | "directorVisual"
   | "homeGallery" | "homeGalleryHeading" | "homeGalleryScene" | "homeGalleryAssembly"
   | "homeGalleryCard" | "homeGalleryFlip" | "homeGalleryFace" | "homeGalleryLink"
@@ -44,8 +47,8 @@ export type HrdSlotKey =
   | "homeResourceCard"
   | "homeContact"
   | "contactIdCard" | "contactCardMasthead" | "contactBrand" | "contactBrandLogo"
-  | "contactCardType" | "contactPerson" | "contactPortrait" | "contactPersonInfo"
-  | "contactRole" | "contactPlaceholderNote" | "contactCardDetails"
+  | "contactCardType" | "contactPerson" | "contactPersonInfo"
+  | "contactPlaceholderNote" | "contactCardDetails"
   | "contactDetailLine" | "contactDetailLabel" | "contactSocialActions"
   | "homeFaq" | "homeFaqHeader" | "homeFaqList" | "homeFaqItem" | "homeFaqQuestion" | "homeFaqAnswer"
   | "contactRoot"

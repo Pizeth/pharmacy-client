@@ -1,122 +1,65 @@
 "use client";
 
-import Image from "next/image";
+import Link from "next/link";
 import { Button, Typography } from "@mui/material";
-import { Clock3, ExternalLink, Mail, MapPin, Phone } from "lucide-react";
+import { Mail, Phone, MapPin, ExternalLink, Clock3 } from "lucide-react";
+import SocialButton from "@/components/icons/components/socialButton";
 import Meta from "@/components/icons/socials/meta";
 import Telegram from "@/components/icons/socials/telegram";
-import { SocialButton } from "@/components/icons/components/socialButton";
-import { SocialIconsRoot } from "@/components/icons/components/socials";
 import { HRD_SITE } from "../../data/siteInfo";
 import { toGoogleMapsUrl, toTelegramUrl, toTelUrl } from "../../utils/contactLinks";
 import type { PublicDocumentsSiteInfo } from "../../types/publicDocuments.types";
 import * as S from "./HrdContactPage.styles";
 
-/**
- * A spokesperson-style identity/contact card, adapted from the visual hierarchy
- * on the Ministry of Interior contact page. Images are local placeholders;
- * never present Otto as an official staff photograph or mint a fake ID number.
- */
 export function HrdContactPage({ site = HRD_SITE }: { site?: PublicDocumentsSiteInfo }) {
-  const { contact } = site;
-  const representative = contact.phones?.find(phone => phone.name) ?? contact.phones?.[0];
-  const mapUrl = contact.address ? toGoogleMapsUrl(contact.address) : null;
-  const hasDetails = Boolean(contact.phones?.length || contact.email || contact.hours);
-
-  return <S.Root>
-    <S.Header>
-      <Typography variant="overline" color="text.secondary">Contact / Representative</Typography>
-      <Typography component="h1" variant="h4">ទំនាក់ទំនង</Typography>
-      <S.Accent />
-      <Typography variant="body1" color="text.secondary">ព័ត៌មានអ្នកទំនាក់ទំនងនាយកដ្ឋានធនធានមនុស្ស</Typography>
-    </S.Header>
-
-    <S.Layout>
-      <S.IdCard aria-labelledby="hrd-representative-name">
-        <S.CardMasthead>
-          <S.Brand>
-            <S.BrandLogo>
-              <Image src="/static/images/logo.svg" width={64} height={64} alt="" />
-            </S.BrandLogo>
-            <div>
-              <Typography variant="overline">ក្រសួងមុខងារសាធារណៈ</Typography>
-              <Typography variant="subtitle1">{site.name}</Typography>
-            </div>
-          </S.Brand>
-          <S.CardType variant="caption">CONTACT CARD</S.CardType>
-        </S.CardMasthead>
-
-        <S.Person>
-          <S.Portrait>
-            <Image src="/static/images/otto.webp" alt="រូបភាពគំរូ Otto — មិនមែនរូបថតមន្រ្តីផ្លូវការ" fill sizes="(max-width: 700px) 130px, 180px" />
-          </S.Portrait>
-          <S.PersonInfo>
-            <Typography variant="overline" color="text.secondary">អ្នកទំនាក់ទំនង / Contact person</Typography>
-            <Typography id="hrd-representative-name" component="h2" variant="h5">
-              {representative?.name ?? "ឈ្មោះអ្នកទំនាក់ទំនងកំពុងរៀបចំ"}
-            </Typography>
-            <S.Role>
-              <Typography component="span" variant="caption">តួនាទី</Typography>
-              <Typography variant="body1">តំណាងទំនាក់ទំនងនាយកដ្ឋាន</Typography>
-            </S.Role>
-            <S.PlaceholderNote variant="caption">រូបថត និងនិមិត្តសញ្ញាគំរូ — រង់ចាំព័ត៌មានផ្លូវការ</S.PlaceholderNote>
-          </S.PersonInfo>
-        </S.Person>
-
-        <S.CardDetails>
-          <Typography component="h3" variant="subtitle2">ព័ត៌មានសម្រាប់ទាក់ទង</Typography>
-          {contact.phones?.map(phone => {
-            const telegram = phone.telegram ? toTelegramUrl(phone.telegram) : null;
-            return <S.DetailLine key={phone.number}>
-              <Phone size={19} aria-hidden="true" />
-              <div>
-                <S.DetailLabel variant="caption">{phone.name ? `ទូរសព្ទ • ${phone.name}` : "ទូរសព្ទ"}</S.DetailLabel>
-                <Typography component="a" variant="body1" href={toTelUrl(phone.number)}>{phone.number}</Typography>
-                {telegram && <SocialIconsRoot>
-                  <SocialButton className="telegram" buttonType="iconButton"
-                    icon={<Telegram fontSize="medium" />}
-                    label={`Telegram: ${phone.name ?? phone.number}`} href={telegram} />
-                </SocialIconsRoot>}
-              </div>
-            </S.DetailLine>;
-          })}
-          {contact.email && <S.DetailLine>
-            <Mail size={19} aria-hidden="true" />
-            <div>
-              <S.DetailLabel variant="caption">អ៊ីម៉ែល</S.DetailLabel>
-              <Typography component="a" variant="body1" href={`mailto:${contact.email}`}>{contact.email}</Typography>
-            </div>
-          </S.DetailLine>}
-          {contact.hours && <S.DetailLine>
-            <Clock3 size={19} aria-hidden="true" />
-            <div><S.DetailLabel variant="caption">ម៉ោងធ្វើការ</S.DetailLabel><Typography variant="body1">{contact.hours}</Typography></div>
-          </S.DetailLine>}
-          {!hasDetails && <Typography color="text.secondary">ព័ត៌មានទំនាក់ទំនងកំពុងរៀបចំ</Typography>}
-        </S.CardDetails>
-
-        <S.SocialActions aria-label="បណ្ដាញទំនាក់ទំនង">
-          <SocialIconsRoot>
-            <SocialButton className="meta" buttonType="iconButton" disabled
-              icon={<Meta fontSize="medium" />} label="Meta (ឆាប់ៗនេះ)" />
-          </SocialIconsRoot>
-          <Typography variant="caption" color="text.secondary">Meta / Facebook — ឆាប់ៗនេះ</Typography>
-        </S.SocialActions>
-      </S.IdCard>
-
+  return (
+    <S.Root>
+      <S.Header>
+        <Typography variant="overline" color="text.secondary">Contact Us</Typography>
+        <Typography component="h1" variant="h4">ទំនាក់ទំនង</Typography>
+        <Typography color="text.secondary">{site.name}</Typography>
+      </S.Header>
+      <S.PageGrid>
+      <S.Details>
+      <S.Layout aria-label="បញ្ជីទំនាក់ទំនង">
+        {site.contact.phones?.map((person, index) => {
+          const telegram = person.telegram ? toTelegramUrl(person.telegram) : null;
+          const nameId = `hrd-contact-person-${index}`;
+          return (
+            <S.Card key={person.number} aria-labelledby={nameId}>
+              <S.CardHeader>
+                <S.Logo src="/static/images/logo.svg" width={64} height={64} alt="" />
+                <Typography component="h2" variant="subtitle1">{site.name}</Typography>
+              </S.CardHeader>
+              <S.CardBody>
+                <S.Portrait src="/static/images/otto.webp" width={144} height={166} alt="Otto — រូបភាពបណ្ដោះអាសន្ន" />
+                <S.Copy>
+                  <Typography id={nameId} component="h3" variant="subtitle1">{person.name ?? "ព័ត៌មានទំនាក់ទំនង"}</Typography>
+                  <S.Role><Typography component="span" variant="body2" color="text.secondary">តួនាទី</Typography><Typography component="span" variant="body2">{person.role ?? "—"}</Typography></S.Role>
+                  {site.contact.email && <S.ContactRow><Mail size={18} aria-hidden="true" /><S.ContactLink href={`mailto:${site.contact.email}`}>{site.contact.email}</S.ContactLink></S.ContactRow>}
+                  <S.ContactRow><Phone size={18} aria-hidden="true" /><S.ContactLink href={toTelUrl(person.number)}>{person.number}</S.ContactLink></S.ContactRow>
+                  <S.Socials>
+                    <SocialButton buttonType="iconButton" className="meta" label="Meta — Facebook link coming soon" icon={<Meta />} placeholder />
+                    {telegram && <SocialButton buttonType="iconButton" className="telegram" label="Telegram" icon={<Telegram />} href={telegram} />}
+                  </S.Socials>
+                </S.Copy>
+              </S.CardBody>
+            </S.Card>
+          );
+        })}
+        {!site.contact.phones?.length && <Typography color="text.secondary">ព័ត៌មានទំនាក់ទំនងកំពុងរៀបចំ</Typography>}
+      </S.Layout>
+      {site.contact.hours && <S.Hours><Clock3 size={20} aria-hidden="true" /><div><Typography variant="subtitle2">ម៉ោងធ្វើការ</Typography><Typography variant="body2" color="text.secondary">{site.contact.hours}</Typography></div></S.Hours>}
+      <S.Documents><Typography variant="body2">ចង់ស្វែងរកទម្រង់ពាក្យស្នើសុំ?</Typography><Button component={Link} href="/hrd/documents">មើលបណ្ដុំឯកសារ</Button></S.Documents>
+      </S.Details>
       <S.Location aria-labelledby="hrd-location-title">
-        <S.SectionHeader><MapPin size={22} aria-hidden="true" /><Typography id="hrd-location-title" component="h2" variant="h5">ស្វែងរកការិយាល័យ</Typography></S.SectionHeader>
-        <Typography variant="body2" color="text.secondary">ទីតាំង និងផ្លូវទៅកាន់នាយកដ្ឋាន</Typography>
-        {contact.address ? <>
-          <S.Map title="ផែនទីទីតាំងនាយកដ្ឋានធនធានមនុស្ស"
-            src={`https://www.google.com/maps?q=${encodeURIComponent(contact.address.text)}&output=embed`}
-            loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
-          <S.Address>
-            <Typography variant="body1">{contact.address.text}</Typography>
-            {mapUrl && <Button component="a" href={mapUrl} target="_blank" rel="noopener noreferrer"
-              startIcon={<ExternalLink size={17} />} variant="outlined">បើកក្នុង Google Maps</Button>}
-          </S.Address>
-        </> : <S.Address><Typography>ទីតាំងកំពុងរៀបចំ</Typography></S.Address>}
+        <S.SectionHeader><MapPin aria-hidden="true" /><Typography id="hrd-location-title" component="h2" variant="h5">ទីតាំងនាយកដ្ឋាន</Typography></S.SectionHeader>
+        {site.contact.address ? <>
+          <S.Map title="ផែនទីទីតាំងនាយកដ្ឋានធនធានមនុស្ស" src={`https://www.google.com/maps?q=${encodeURIComponent(site.contact.address.text)}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+          <S.Address><Typography>{site.contact.address.text}</Typography><Button component="a" href={toGoogleMapsUrl(site.contact.address)} target="_blank" rel="noopener noreferrer" startIcon={<ExternalLink size={17} />} variant="outlined">បើកក្នុង Google Maps</Button></S.Address>
+        </> : <S.Address>ទីតាំងកំពុងរៀបចំ</S.Address>}
       </S.Location>
-    </S.Layout>
-  </S.Root>;
+      </S.PageGrid>
+    </S.Root>
+  );
 }

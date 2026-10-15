@@ -1,8 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Container, Link, Stack, Typography } from "@mui/material";
 import NextLink from "next/link";
+import { Container, Link, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import TelegramIcon from "@mui/icons-material/Telegram";
@@ -54,10 +54,43 @@ const FooterGrid = styled(
   gap: theme.spacing(4),
   paddingBlock: theme.spacing(5),
   gridTemplateColumns: "1fr",
+  "& > *": { minWidth: 0 },
   [theme.breakpoints.up("md")]: {
-    gridTemplateColumns: "1.2fr 1fr",
+    gridTemplateColumns: "minmax(0, 1.2fr) minmax(0, 0.65fr) minmax(0, 1fr)",
   },
 }));
+
+const QuickLinks = styled("nav", publicDocumentsSlot("FooterQuickLinks"))({
+  minWidth: 0,
+});
+
+const QuickLinksList = styled("ul", publicDocumentsSlot("FooterQuickLinksList"))(({ theme }) => ({
+  listStyle: "none",
+  margin: 0,
+  padding: 0,
+  display: "grid",
+  gap: theme.spacing(0.5),
+  "& a": {
+    display: "inline-flex",
+    alignItems: "center",
+    minHeight: 40,
+    color: theme.vars.palette.text.secondary,
+    "&:hover": { color: theme.vars.palette.primary.main },
+    "&:focus-visible": {
+      outline: `2px solid ${theme.vars.palette.primary.main}`,
+      outlineOffset: 4,
+      borderRadius: 2,
+    },
+  },
+}));
+
+const quickLinks = [
+  { href: "/hrd", label: "ទំព័រដើម" },
+  { href: "/hrd/about", label: "អំពីនាយកដ្ឋាន" },
+  { href: "/hrd/documents", label: "ឯកសារ" },
+  { href: "/hrd#hrd-faq", label: "សំណួរដែលសួរញឹកញាប់" },
+  { href: "/hrd/contact", label: "ទំនាក់ទំនង" },
+] as const;
 
 const FooterHeading = styled(
   Typography,
@@ -94,12 +127,6 @@ const ContactLabel = styled(
 )(({ theme }) => ({
   display: "block",
   color: theme.vars.palette.text.secondary,
-}));
-
-const FooterQuickLinks = styled("nav", publicDocumentsSlot("FooterQuickLinks"))(({theme})=>({
-  display:"flex",flexWrap:"wrap",gap:theme.spacing(1.5,3),marginTop:theme.spacing(2),
-  "& a":{color:"inherit",fontWeight:600,textDecoration:"none"},
-  "& a:hover, & a:focus-visible":{textDecoration:"underline"}
 }));
 
 const FooterBottom = styled(
@@ -285,13 +312,22 @@ export function HrdFooter(props: HrdFooterProps) {
               {site.name}
             </FooterHeading>
             <FooterTagline variant="body2">{site.tagline}</FooterTagline>
-            <FooterQuickLinks aria-label="តំណភ្ជាប់រហ័ស">
-              <NextLink href="/hrd">ទំព័រដើម</NextLink>
-              <NextLink href="/hrd/documents">បណ្ដុំឯកសារ</NextLink>
-              <NextLink href="/hrd#hrd-faq">សំណួរដែលសួរញឹកញាប់</NextLink>
-              <NextLink href="/hrd/contact">ទំនាក់ទំនង</NextLink>
-            </FooterQuickLinks>
           </div>
+
+          <QuickLinks aria-labelledby="hrd-footer-quick-links">
+            <FooterHeading id="hrd-footer-quick-links" variant="subtitle2" gutterBottom>
+              តំណរហ័ស
+            </FooterHeading>
+            <QuickLinksList>
+              {quickLinks.map(({ href, label }) => (
+                <li key={href}>
+                  <Link component={NextLink} href={href} underline="hover" variant="body2">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </QuickLinksList>
+          </QuickLinks>
 
           {contactLines.length > 0 && (
             <ContactBlock>
