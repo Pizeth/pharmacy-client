@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { FormProvider, useForm } from "react-hook-form";
 import { AccountBox, KeyOutlined } from "@mui/icons-material";
 import { TextField } from "./textfield";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { UserRound } from "lucide-react";
 // import ControlledInput from "./controlledInput";
 // import userEvent from "@testing-library/user-event";
 
@@ -9,6 +11,19 @@ interface Values {
   key: string;
   officialId: string;
 }
+
+function LucideFixture() {
+  const form = useForm({ defaultValues: { name: "" } });
+  return <ThemeProvider theme={createTheme({ palette: { primary: { main: "#123456" } } })}>
+    <FormProvider {...form}><TextField name="name" label="Name" iconStart={<UserRound />} /></FormProvider>
+  </ThemeProvider>;
+}
+
+it("lets Lucide start icons inherit the focused field color", () => {
+  const { container } = render(<LucideFixture />);
+  fireEvent.focus(screen.getByRole("textbox", { name: "Name" }));
+  expect(container.querySelector(".lucide")?.closest(".MuiInputAdornment-root")).toHaveStyle({ color: "#123456" });
+});
 
 // interface TestFormValues {
 //   email: string;

@@ -115,6 +115,7 @@ declare module "@mui/material/styles" {
     RazethAvatarContainer: "root" | "chip" | "foreground";
     RazethBackToTop: "root";
     RazethDrawerTheme: "root" | "label";
+    RazethNavPattern: "root";
   }
 
   /**
@@ -138,9 +139,13 @@ declare module "@mui/material/styles" {
     RazethAvatarContainer: AvatarContainerProps;
     RazethBackToTop: Record<string, unknown>;
     RazethDrawerTheme: Record<string, unknown>;
+    RazethNavPattern: Record<string, unknown>;
   }
 
   interface Components extends CustomComponents {
+    RazethNavPattern?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethNavPattern"];
+    };
     RazethDrawerTheme?: {
       styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDrawerTheme"];
     };

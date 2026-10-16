@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Image from "next/image";
 import NextLink from "next/link";
 import { Container, Link, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -28,6 +29,20 @@ const FooterRoot = styled(
   // marginTop: theme.spacing(6),
   borderTop: `1px solid ${theme.vars.palette.divider}`,
   backgroundColor: theme.vars.palette.background.paper,
+  display: "grid", isolation: "isolate",
+  "& > .MuiContainer-root": { gridArea: "1 / 1", minWidth: 0 },
+  "&::before": {
+    content: '""', gridArea: "1 / 1", zIndex: -1, pointerEvents: "none",
+    backgroundColor: "#26247B",
+    opacity: 0.15,
+    maskImage: 'url("/static/svg/patterns/silhouette.svg?v=normalized")',
+    maskSize: "100% auto", maskRepeat: "no-repeat", maskPosition: "center bottom",
+  },
+  ...theme.applyStyles("dark", {
+    "&::before": {
+      backgroundImage: "linear-gradient(90deg, #F0C54C, #EDAC4C 50%, #EA9548)",
+    },
+  }),
 }));
 
 const IconBubble = styled(
@@ -107,6 +122,13 @@ const FooterTagline = styled(
   color: theme.vars.palette.text.secondary,
 }));
 
+const FooterIdentity = styled("div", publicDocumentsSlot("FooterIdentity"))(({ theme }) => ({
+  display: "flex", alignItems: "center", alignSelf: "start", gap: theme.spacing(2),
+}));
+const FooterLogo = styled(Image, publicDocumentsSlot("FooterLogo"))({
+  width: 64, height: 64, objectFit: "contain", flexShrink: 0,
+});
+
 const ContactBlock = styled(
   "address",
   publicDocumentsSlot("ContactBlock"),
@@ -134,16 +156,33 @@ const FooterBottom = styled(
   publicDocumentsSlot("FooterBottom"),
 )(({ theme }) => ({
   paddingBlock: theme.spacing(2.5),
-  borderTop: `1px solid ${theme.vars.palette.divider}`,
   textAlign: "center",
+  borderTop: "3px solid transparent",
+  borderImage: "linear-gradient(90deg, #F0C54C, #EDAC4C 50%, #EA9548) 1",
+  backgroundColor: "#26247B",
+  color: "#fff",
+  position: "relative", isolation: "isolate",
+  "&::after": {
+    content: '""', position: "absolute", inset: "0 0 0 auto",
+    width: "clamp(160px, 32vw, 500px)", maxWidth: "100%",
+    pointerEvents: "none", zIndex: -1, opacity: 0.2,
+    backgroundColor: "#fff",
+    maskImage: 'url("/static/svg/patterns/red-pattern.svg"), linear-gradient(to right, transparent, black 75%)',
+    maskSize: "104px 104px, 100% 100%", maskRepeat: "repeat, no-repeat",
+    maskPosition: "right center", maskComposite: "intersect",
+  },
+  ...theme.applyStyles("dark", {
+    "&::after": {
+      inset: "0 auto 0 0", maskPosition: "left center",
+      maskImage: 'url("/static/svg/patterns/red-pattern.svg"), linear-gradient(to left, transparent, black 75%)',
+    },
+  }),
 }));
 
 const Copyright = styled(
   Typography,
   publicDocumentsSlot("Copyright"),
-)(({ theme }) => ({
-  color: theme.vars.palette.text.secondary,
-}));
+)({ color: "inherit" });
 
 interface ContactLine {
   readonly key: string;
@@ -307,12 +346,15 @@ export function HrdFooter(props: HrdFooterProps) {
     <FooterRoot>
       <Container maxWidth="xl">
         <FooterGrid>
-          <div>
+          <FooterIdentity>
+            <FooterLogo src="/static/images/logo.svg" alt="" width={64} height={64} />
+            <div>
             <FooterHeading variant="subtitle1" gutterBottom>
               {site.name}
             </FooterHeading>
             <FooterTagline variant="body2">{site.tagline}</FooterTagline>
-          </div>
+            </div>
+          </FooterIdentity>
 
           <QuickLinks aria-labelledby="hrd-footer-quick-links">
             <FooterHeading id="hrd-footer-quick-links" variant="subtitle2" gutterBottom>
@@ -355,13 +397,14 @@ export function HrdFooter(props: HrdFooterProps) {
             </ContactBlock>
           )}
         </FooterGrid>
-
+      </Container>
         <FooterBottom>
+          <Container maxWidth="xl">
           <Copyright variant="caption">
             © ​{year} រក្សាសិទ្ធិគ្រប់យ៉ាងដោយ {site.organization}
           </Copyright>
+          </Container>
         </FooterBottom>
-      </Container>
     </FooterRoot>
   );
 }

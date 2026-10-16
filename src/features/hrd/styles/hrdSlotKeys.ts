@@ -1,6 +1,9 @@
 export type HrdSlotKey =
+  | "contactFormSection" | "contactForm" | "contactFields" | "contactSendButton" | "contactCarousel" | "contactCarouselImage"
   | "contactPageGrid" | "contactHours"
   | "contactCard" | "contactCardHeader" | "contactLogo" | "contactCardBody"
+  | "contactCardArt" | "contactCardShape"
+  | "contactHeaderPattern"
   | "contactPortrait" | "contactCopy" | "contactRole" | "contactRow" | "contactLink" | "contactSocials"
   | "directorReveal" | "directorSeal" | "directorCopy" | "directorVisual"
   | "homeGallery" | "homeGalleryHeading" | "homeGalleryScene" | "homeGalleryAssembly"

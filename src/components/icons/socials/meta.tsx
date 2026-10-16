@@ -1,6 +1,10 @@
+"use client";
+
+import { useId } from "react";
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
 export default function RazMeta(props: SvgIconProps) {
+  const gradientId = `meta-gradient-${useId()}`;
   return (
     <SvgIcon inheritViewBox {...props}>
       <svg
@@ -13,7 +17,7 @@ export default function RazMeta(props: SvgIconProps) {
         {/* Define the native SVG gradient here */}
         <defs>
           <linearGradient
-            id="meta-gradient"
+            id={gradientId}
             x1="3.35028"
             y1="9.20306"
             x2="14.3671"
@@ -33,7 +37,7 @@ export default function RazMeta(props: SvgIconProps) {
         />
         <path
           className="meta-gradient-layer"
-          fill="url(#meta-gradient)"
+          fill={`url(#${gradientId})`}
           opacity={1}
           d="M1.31885 4.7685C2.11117 3.54719 3.25458 2.69312 4.56603 2.69312C5.32552 2.69312 6.08057 2.9179 6.86899 3.56167C7.73142 4.26552 8.65061 5.42452 9.79736 7.33466L10.2085 8.02015C11.2012 9.67379 11.7659 10.5245 12.0964 10.9257C12.5215 11.4409 12.8192 11.5945 13.2059 11.5945C14.1868 11.5945 14.4317 10.6931 14.4317 9.66154L15.9562 9.6137C15.9562 10.692 15.7437 11.4843 15.382 12.1103C15.0326 12.7157 14.3515 13.3205 13.2059 13.3205C12.4937 13.3205 11.8627 13.1658 11.165 12.5076C10.6286 12.0023 10.0016 11.1049 9.51915 10.2981L8.08418 7.90107C7.3642 6.69812 6.70374 5.80119 6.32149 5.39502C5.91031 4.95824 5.38172 4.43077 4.53821 4.43077C3.8555 4.43077 3.27573 4.89665 2.79054 5.62944C2.14828 6.66491 1.72819 8.20727 1.72819 9.68842C1.72819 10.2994 1.86229 10.7684 2.03756 11.0522L0.564192 12.0225C0.185838 11.3933 0 10.5675 0 9.62666C0 7.91571 0.469604 6.13242 1.36264 4.75532C2.15496 3.53401 3.29837 2.67993 4.60982 2.67993L4.582 4.41758Z"
         />

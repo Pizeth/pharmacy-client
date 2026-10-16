@@ -42,6 +42,7 @@ export interface PublicDocumentsPhoneContact {
   /** Display name. Links to Telegram when `telegram` is set. */
   readonly name?: string;
   readonly role?: string;
+  readonly portrait?: string;
 
   /** Phone number, shown as written. Opens the dialer (tel:). */
   readonly number: string;
@@ -62,6 +63,7 @@ export interface PublicDocumentsPhoneContact {
 }
 
 export interface PublicDocumentsAddress {
+  readonly street?: string;
   /** Address text shown in the footer. */
   readonly text: string;
 

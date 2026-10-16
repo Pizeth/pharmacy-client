@@ -1,5 +1,6 @@
 import { useNavigationAccount } from "./UserSetting/useNavigationAccount";
 import { initParticles } from "@/theme/effects/initParticles";
+import NavPattern from "./Navigation/NavPattern";
 // import AppBar from "@mui/material/AppBar";
 import type { Engine } from "@tsparticles/engine";
 import { Fragment, ReactNode, useEffect, useState } from "react";
@@ -1188,6 +1189,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
           enableColorOnDark
           data-mobile-compact={compactMobile ? "true" : undefined}
         >
+          <NavPattern />
           <Container maxWidth="xl">
             {/* 2. The Particles Canvas */}
             {/* {init && <ParticleContainer id="tsparticles" options={options()} />} */}

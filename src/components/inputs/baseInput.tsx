@@ -266,7 +266,16 @@ const StartAdornmentRoot = styled(InputAdornment, {
   name: PREFIX,
   slot: "Icon",
   overridesResolver: (_props, styles) => styles.icon,
-})({});
+})(({ theme }) => ({
+  // Color the adornment itself so icons using currentColor (including Lucide)
+  // follow the same field states as MUI SvgIcon without vendor-specific classes.
+  ".MuiInputBase-root.Mui-focused &": {
+    color: (theme.vars ?? theme).palette.primary.main,
+  },
+  ".MuiInputBase-root.Mui-error &": {
+    color: (theme.vars ?? theme).palette.error.main,
+  },
+}));
 
 /**
  * Low-level RHF/MUI input primitive.

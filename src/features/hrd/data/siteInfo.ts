@@ -17,6 +17,7 @@ export const HRD_SITE: PublicDocumentsSiteInfo = {
   organization: "នាយកដ្ឋានធនធានមនុស្ស",
   contact: {
     address: {
+      street: "ផ្លូវវត្តអង្គតាម៉ិញ សង្កាត់ចោមចៅ ខណ្ឌពោធិ៍សែនជ័យ រាជធានីភ្នំពេញ កម្ពុជា",
       text: "ទីស្ដីការក្រសួងមុខងារសាធារណៈ អគារ «ក» ជាន់ទី៤ បន្ទប់៤០១",
       // Paste the Google Maps "Share" link for the exact place. Without
       // it, the address text is used as a Google Maps search instead.
@@ -26,6 +27,7 @@ export const HRD_SITE: PublicDocumentsSiteInfo = {
       {
         name: "លោកស្រី សន ម៉ាលី",
         role: "អនុប្រធានការិយាល័យ",
+        portrait: "/static/images/hrd-contact-portrait.png",
         number: "+855 97 824 2255",
         // Opens this person's Telegram when the name is clicked.
         // Accepts "https://t.me/username", "@username" or "+855...".
