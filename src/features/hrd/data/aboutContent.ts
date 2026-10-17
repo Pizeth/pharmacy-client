@@ -9,6 +9,8 @@ export const ABOUT_PAGES = {
 
 export type AboutSection = keyof typeof ABOUT_PAGES;
 
+export const HRD_DIRECTOR_PHOTO = "/static/images/hrd-director.jpg";
+
 // Add approved HRD information here when it becomes available.
 export const HRD_ABOUT_CONTENT: HrdAboutContent = {
   director: null,
