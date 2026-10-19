@@ -1,10 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import NextLink from "next/link";
 import { Container, Link, Stack, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { keyframes, styled } from "@mui/material/styles";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import TelegramIcon from "@mui/icons-material/Telegram";
 
@@ -21,6 +21,74 @@ import type {
   PublicDocumentsSiteInfo,
 } from "../../types/publicDocuments.types";
 import MsgUtils from "@/utils/msgUtils";
+import Icons from "@/components/icons/components/socials";
+
+const footerRise = keyframes({
+  from: { opacity: 0, transform: "translateY(20px)" },
+  to: { opacity: 1, transform: "translateY(0)" },
+});
+const socialEntrance = keyframes({
+  "0%": { opacity: 0, translate: "0 22px", scale: "0.8" },
+  "70%": { opacity: 1, translate: "0 -4px", scale: "1.04" },
+  "100%": { opacity: 1, translate: "0 0", scale: "1" },
+});
+const stripeReveal = keyframes({
+  from: { transform: "scaleX(0)", opacity: 0 },
+  to: { transform: "scaleX(1)", opacity: 1 },
+});
+
+/** Replay on viewport re-entry; leave content visible without observer support. */
+function useFooterReveal<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    if (!ref.current || typeof IntersectionObserver === "undefined") return;
+    let finish: ReturnType<typeof setTimeout> | undefined;
+    let entered = false;
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) {
+          entered = false;
+          clearTimeout(finish);
+          setRevealed(false);
+        } else if (!entered && entry.intersectionRatio >= 0.08) {
+          entered = true;
+          setRevealed(true);
+          // Release the entrance animation so existing social hover animations win.
+          finish = setTimeout(() => setRevealed(false), 1400);
+        }
+      }
+    }, { threshold: [0, 0.08] });
+    observer.observe(ref.current);
+    return () => { observer.disconnect(); clearTimeout(finish); };
+  }, []);
+  return { ref, "data-revealed": revealed ? "true" : undefined };
+}
+
+const FooterSocials = styled("section", publicDocumentsSlot("FooterSocials"))(({ theme }) => ({
+  display: "flex", flexDirection: "column", alignItems: "center", gap: theme.spacing(1.5),
+  padding: theme.spacing(1.5, 0),
+  borderTop: "4px solid #26247B",
+  backgroundColor: (theme.vars ?? theme).palette.background.default,
+  "& .MuiIconButton-root": { margin: theme.spacing(0.5) },
+  position: "relative",
+  "&::before": {
+    content: '""', position: "absolute", top: -4, left: 0, right: 0, height: 4,
+    background: "linear-gradient(90deg, #26247B, #7774d9, #26247B)",
+    pointerEvents: "none", opacity: 0,
+  },
+  '@media (prefers-reduced-motion: no-preference)': {
+    '&[data-revealed="true"]::before': { animation: `${stripeReveal} 850ms ease-out` },
+    '&[data-revealed="true"] > .MuiTypography-root': { animation: `${footerRise} 550ms ease-out backwards` },
+    '&[data-revealed="true"] > div > *': {
+      animation: `${socialEntrance} 650ms cubic-bezier(0.22, 1, 0.36, 1) backwards`,
+      ...Object.fromEntries(Array.from({ length: 7 }, (_, i) => [
+        `&:nth-child(${i + 1})`, { animationDelay: `${100 + i * 75}ms` },
+      ])),
+    },
+    '&:focus-within > div > *': { animation: "none" },
+  },
+}));
 
 const FooterRoot = styled(
   "footer",
@@ -70,6 +138,12 @@ const FooterGrid = styled(
   paddingBlock: theme.spacing(5),
   gridTemplateColumns: "1fr",
   "& > *": { minWidth: 0 },
+  '@media (prefers-reduced-motion: no-preference)': {
+    '&[data-revealed="true"] > *': { animation: `${footerRise} 650ms ease-out backwards` },
+    '&[data-revealed="true"] > :nth-child(2)': { animationDelay: "90ms" },
+    '&[data-revealed="true"] > :nth-child(3)': { animationDelay: "180ms" },
+    '&:focus-within > *': { animation: "none" },
+  },
   [theme.breakpoints.up("md")]: {
     gridTemplateColumns: "minmax(0, 1.2fr) minmax(0, 0.65fr) minmax(0, 1fr)",
   },
@@ -338,6 +412,8 @@ export interface HrdFooterProps {
  */
 export function HrdFooter(props: HrdFooterProps) {
   const { site = HRD_SITE } = props;
+  const contentReveal = useFooterReveal<HTMLDivElement>();
+  const socialReveal = useFooterReveal<HTMLElement>();
 
   const contactLines = buildContactLines(site.contact);
   const year = MsgUtils.toLocaleNumerals(new Date().getFullYear(), "km-KH");
@@ -345,7 +421,7 @@ export function HrdFooter(props: HrdFooterProps) {
   return (
     <FooterRoot>
       <Container maxWidth="xl">
-        <FooterGrid>
+        <FooterGrid {...contentReveal}>
           <FooterIdentity>
             <FooterLogo src="/static/images/logo.svg" alt="" width={64} height={64} />
             <div>
@@ -398,6 +474,10 @@ export function HrdFooter(props: HrdFooterProps) {
           )}
         </FooterGrid>
       </Container>
+        <FooterSocials {...socialReveal} data-site-footer aria-label="បណ្ដាញសង្គម">
+          <Typography variant="subtitle2">បណ្ដាញសង្គម</Typography>
+          <Icons />
+        </FooterSocials>
         <FooterBottom>
           <Container maxWidth="xl">
           <Copyright variant="caption">

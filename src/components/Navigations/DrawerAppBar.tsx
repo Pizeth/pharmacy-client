@@ -1,6 +1,7 @@
 import { useNavigationAccount } from "./UserSetting/useNavigationAccount";
 import { initParticles } from "@/theme/effects/initParticles";
 import NavPattern from "./Navigation/NavPattern";
+import { useHeaderScrollState } from "./Navigation/useHeaderScrollState";
 // import AppBar from "@mui/material/AppBar";
 import type { Engine } from "@tsparticles/engine";
 import { Fragment, ReactNode, useEffect, useState } from "react";
@@ -18,7 +19,6 @@ import {
   // SwipeableDrawer,
   Tooltip,
   useMediaQuery,
-  useScrollTrigger,
 } from "@mui/material";
 import { styled, alpha, useTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -74,6 +74,9 @@ import ParticleHexBackground from "../effect/backgrounds/particleHex";
 // const drawerWidth = 250;
 
 const PREFIX = "RazethDrawer";
+const MOBILE_HEADER_HEIGHT = 112;
+const MOBILE_COMPACT_HEIGHT = 64;
+const DESKTOP_COMPACT_HEIGHT = "calc(5rem + 16px)";
 const DrawerThemeRow = styled("div", {
   name: "RazethDrawerTheme",
   slot: "Root",
@@ -239,6 +242,14 @@ const ProfileToolBar = styled(Toolbar, {
   alignItems: "center",
   display: "flex",
   justifyContent: "space-between",
+  maxHeight: 180,
+  [theme.breakpoints.down("md")]: { height: MOBILE_HEADER_HEIGHT, minHeight: MOBILE_HEADER_HEIGHT, padding: 0, gap: theme.spacing(1) },
+  '[data-mobile-scrolled="true"] &&': { height: MOBILE_COMPACT_HEIGHT, minHeight: MOBILE_COMPACT_HEIGHT },
+  transition: theme.transitions.create(["height", "min-height", "max-height", "opacity", "padding"], { duration: 220 }),
+  '[data-desktop-compact="true"] &&': {
+    maxHeight: 0, minHeight: 0, padding: 0, opacity: 0, visibility: "hidden", overflow: "hidden",
+  },
+  "@media (prefers-reduced-motion: reduce)": { transition: "none" },
   '[data-mobile-compact="true"] &&': {
     height: 48,
     minHeight: 48,
@@ -255,12 +266,13 @@ const LogoSection = styled(Box, {
   display: "flex",
   alignItems: "center",
   alignContent: "middle",
+  "& [data-mobile-brand]": { display: "none" },
   [theme.breakpoints.down("md")]: {
-    width: "100%",
-    display: "grid",
-    gridTemplateColumns: "6rem minmax(0, 1fr) 6rem",
-    '& > .MuiIconButton-root': { justifySelf: "start", maxWidth: "100%" },
+    minWidth: 0, flex: 1, gap: theme.spacing(1),
+    '& > .MuiIconButton-root': { display: "none" },
+    "& [data-mobile-brand]": { display: "inline-grid", width: 80, height: 80, margin: 0, flexShrink: 0 },
   },
+  '[data-mobile-scrolled="true"] && [data-mobile-brand]': { width: 52, height: 52 },
   '[data-mobile-compact="true"] &&': {
     display: "flex",
     width: "auto",
@@ -278,7 +290,12 @@ const LogoCaption = styled(Box, {
     gridColumn: 2,
     minWidth: 0,
     width: "100%",
+    textAlign: "center",
+    "&& h6": { fontSize: "clamp(0.7rem, 3vw, 0.9rem)", lineHeight: 1.8, padding: 0, letterSpacing: 0 },
+    "&& h5": { display: "block", fontSize: "2rem", lineHeight: 0.6, marginBlock: theme.spacing(0.5) },
+    "&& .MuiTypography-subtitle1": { fontSize: "0.625rem", lineHeight: 1.6, whiteSpace: "nowrap" },
   },
+  '[data-mobile-scrolled="true"] && h5': { display: "none" },
   textAlign: "center",
   position: "relative",
   display: "inline-block",
@@ -472,28 +489,36 @@ const StackWrapper = styled(Stack, {
   slot: "StackWrapper",
   overridesResolver: (_props, styles) => styles.stackWrapper,
 })(({ theme }) => ({
-  '[data-mobile-compact="true"] &&': {
-    display: "flex",
-    minWidth: 0,
-    overflowX: "auto",
-    alignItems: "center",
-    '& .MuiIconButton-root': {
-      width: 32,
-      height: 32,
-      minWidth: 32,
-      padding: theme.spacing(0.5),
-      flexShrink: 0,
-    },
-    '& svg': { width: 20, height: 20 },
-  },
   [theme.breakpoints.up("xs")]: {
     display: "none",
   },
   [theme.breakpoints.up("md")]: {
     display: "flex",
+    width: "auto",
   },
+  '[data-mobile-compact="true"] &&': {
+    display: "flex", width: "auto", minWidth: 0, overflowX: "auto", alignItems: "center",
+    '& .MuiIconButton-root': { width: 32, height: 32, minWidth: 32, padding: theme.spacing(0.5), flexShrink: 0 },
+    '& svg': { width: 20, height: 20 },
+  },
+  '[data-socials-hidden="true"] &&': { display: "none" },
   button: {
     color: "inherit",
+  },
+}));
+
+const MobileMenuButton = styled(IconButton, {
+  name: PREFIX, slot: "Content", overridesResolver: (_props, styles) => styles.content,
+})(({ theme }) => ({
+  display: "none",
+  [theme.breakpoints.down("md")]: {
+    display: "inline-flex", width: 44, height: 44, flexShrink: 0, padding: theme.spacing(1),
+    "& [data-menu-glyph]": {
+      display: "block", width: 30, height: 30, flexShrink: 0,
+      backgroundColor: "#edad54",
+      mask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z'/%3E%3C/svg%3E") center / contain no-repeat`,
+      "@media (prefers-reduced-motion: reduce)": { animation: "none" },
+    },
   },
 }));
 
@@ -507,8 +532,18 @@ const DesktopToolbar = styled(Toolbar, {
   },
   [theme.breakpoints.up("md")]: {
     display: "flex",
+    paddingLeft: `calc(${DESKTOP_COMPACT_HEIGHT} + 8px)`,
+    '[data-desktop-compact="true"] &&': { paddingLeft: 0, height: DESKTOP_COMPACT_HEIGHT, minHeight: DESKTOP_COMPACT_HEIGHT },
   },
 }));
+
+const CompactLogoButton = styled(IconButton, {
+  name: PREFIX, slot: "Content", overridesResolver: (_props, styles) => styles.content,
+})({
+  display: "none", width: DESKTOP_COMPACT_HEIGHT, height: DESKTOP_COMPACT_HEIGHT, marginRight: 8, padding: 8, flexShrink: 0,
+  '[data-desktop-compact="true"] &&': { display: "inline-flex" },
+  "& > div": { width: "5rem", height: "5rem", margin: 0 },
+});
 
 const Main = styled("main", {
   shouldForwardProp: (prop) =>
@@ -609,14 +644,32 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-const DrawerHeader = styled("div")(({ theme }) => ({
+const DrawerHeader = styled("div", {
+  name: PREFIX,
+  slot: "Content",
+  overridesResolver: (_props, styles) => styles.content,
+})(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   alignSelf: "stretch",
   // padding: theme.spacing(0, 1),
   padding: 0,
   // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
+  height: DESKTOP_COMPACT_HEIGHT,
+  minHeight: DESKTOP_COMPACT_HEIGHT,
+  flexShrink: 0,
+  transition: theme.transitions.create(["height", "min-height"], { duration: 220 }),
+  [theme.breakpoints.down("md")]: {
+    height: MOBILE_HEADER_HEIGHT,
+    minHeight: MOBILE_HEADER_HEIGHT,
+    '&[data-mobile-scrolled="true"]': {
+      height: MOBILE_COMPACT_HEIGHT,
+      minHeight: MOBILE_COMPACT_HEIGHT,
+    },
+    "& [data-drawer-logo]": { width: 80, height: 80, margin: 0 },
+    '&[data-mobile-scrolled="true"] [data-drawer-logo]': { width: 52, height: 52 },
+  },
+  "@media (prefers-reduced-motion: reduce)": { transition: "none" },
   // justifyContent: "flex-end",
   justifyContent: "center",
   // button: {
@@ -927,8 +980,8 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
   const { children, disabledMenu = false, backgroundColor } = props;
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down("md"));
-  const scrolled = useScrollTrigger({ disableHysteresis: true, threshold: 96 });
-  const compactMobile = mobile && scrolled;
+  const { scrolled, headerRef } = useHeaderScrollState();
+  const compactDesktop = !mobile && !disabledMenu && scrolled;
   const { authenticated, authLoading, account } = useNavigationAccount();
 
   const [open, setOpen] = useState(false);
@@ -971,7 +1024,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
     //   gridStrokeColor="rgba(255, 255, 255, 0.0125)" // Translucent line integration
     // >
     <Fragment>
-      <DrawerHeader>
+      <DrawerHeader data-mobile-scrolled={mobile && scrolled ? "true" : undefined}>
         <NavMenuButton onClick={handleDrawerToggle} variant="side">
           <HamBurgerNav
           // sx={{
@@ -986,7 +1039,7 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
           //   },
           // }}
           >
-            <DrawerToggle>
+            <DrawerToggle data-drawer-logo>
               <MiniImg />
             </DrawerToggle>
           </HamBurgerNav>
@@ -1183,11 +1236,14 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
       <NextParticlesProvider init={initParticles}>
         {/* <CssBaseline /> */}
         <AppBar
+          ref={headerRef}
           position="fixed"
           color="primary"
           component="nav"
           enableColorOnDark
-          data-mobile-compact={compactMobile ? "true" : undefined}
+          data-desktop-compact={compactDesktop ? "true" : undefined}
+          data-mobile-scrolled={mobile && scrolled ? "true" : undefined}
+          data-socials-hidden={mobile || scrolled ? "true" : undefined}
         >
           <NavPattern />
           <Container maxWidth="xl">
@@ -1201,10 +1257,14 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
             <AppBarContainer maxWidth="xl">
               {/* --- SECTION 2: LOGO & TITLE --- */}
               <ProfileToolBar
+                inert={compactDesktop || undefined}
                 disableGutters
                 variant="dense"
               >
                 <LogoSection>
+                  <AvatarContainer data-mobile-brand neumorphic={false} softGlow>
+                    <MiniImg alt="អគ្គលេខាធិការដ្ឋាន" />
+                  </AvatarContainer>
                   {/* Logo Image */}
                   <NavMenuButton
                     color="inherit"
@@ -1218,9 +1278,9 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
                     // ]}
                   >
                     {/* <MenuIcon /> */}
-                    {compactMobile ? <MenuIcon fontSize="inherit" /> : <DrawerToggle>
+                    <DrawerToggle>
                       <MiniImg />
-                    </DrawerToggle>}
+                    </DrawerToggle>
                   </NavMenuButton>
 
                   {/* Logo Title */}
@@ -1232,6 +1292,9 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
                     </Typography>
                   </LogoCaption>
                 </LogoSection>
+                <MobileMenuButton color="inherit" aria-label="open drawer" aria-expanded={open} onClick={handleDrawerToggle}>
+                  <span data-menu-glyph aria-hidden="true" />
+                </MobileMenuButton>
 
                 {/* --- SECTION 3: NAVIGATION MENU --- */}
                 <StackWrapper direction="row" spacing={1}>
@@ -1335,6 +1398,11 @@ export const DrawerAppBar = (props: DrawerAppBarProps) => {
             </AppBarContainer>
             {disabledMenu ? null : (
               <DesktopToolbar disableGutters variant="dense">
+                <CompactLogoButton color="inherit" aria-label="open drawer" aria-expanded={open} onClick={handleDrawerToggle}>
+                  <AvatarContainer neumorphic={false} softGlow>
+                    <MiniImg alt="អគ្គលេខាធិការដ្ឋាន" />
+                  </AvatarContainer>
+                </CompactLogoButton>
                 {/* Pass The Drawer Button back here to revert back */}
                 <NavItems />
                 {/* <Search>

@@ -15,20 +15,20 @@ export const Root = styled("div", hrdSlot("DirectorReveal"))(({ theme }) => ({
     transition: "border-radius 500ms ease, background-color 500ms ease" },
   "&[data-expanded=true]": { width: "100%", height: 320,
     "&::before": { borderRadius: `calc(${typeof theme.shape.borderRadius === "number" ? `${theme.shape.borderRadius}px` : theme.shape.borderRadius} * 3)`, backgroundColor: directorBlue },
-    "& button img": { transform: "scale(0)", opacity: 0 },
+    "& button img": { opacity: 0, transitionDelay: "0ms" },
     "& [data-copy]": { opacity: 1, transform: "translateX(0)", transitionDelay: "500ms" },
-    "& [data-visual]": { transform: "scale(1)", opacity: 1, transitionDelay: "500ms" },
+    "& [data-visual]": { transform: "translateY(0) scale(1)", opacity: 1, transitionDelay: "400ms" },
   },
   "@media (hover: none), (max-width: 600px)": {
     "&[data-expanded=true]": { height: 420 },
     "&[data-expanded=true] [data-copy]": { width: "100%", top: "auto", bottom: theme.spacing(3) },
-    "& [data-visual]": { top: theme.spacing(3), right: "calc(50% - 90px)", width: 180, height: 200 },
+    "& [data-visual]": { top: theme.spacing(3), right: "calc(50% - 90px)", width: 180, height: 180 },
   },
   "@media (prefers-reduced-motion: reduce)": { "&, &::before, & *": { transition: "none !important" } },
 }));
 export const Seal = styled("button", hrdSlot("DirectorSeal"))(() => ({
-  position: "absolute", inset: 0, width: "100%", border: 0, background: "transparent", cursor: "pointer", borderRadius: "inherit", zIndex: 2,
-  "& img": { maxWidth: "70%", objectFit: "cover", borderRadius: "50%", transition: "transform 500ms ease, opacity 500ms ease" },
+  position: "absolute", inset: 0, width: "100%", height: "100%", padding: 4, border: 0, background: "transparent", cursor: "pointer", borderRadius: "50%", zIndex: 2,
+  "& img": { display: "block", width: "min(292px, 100%)", height: "auto", aspectRatio: "1", marginInline: "auto", objectFit: "cover", objectPosition: "center top", borderRadius: "50%", transition: "opacity 200ms ease 800ms" },
   "&:focus-visible": { outline: `3px solid ${directorBlue}`, outlineOffset: 6 },
 }));
 export const Copy = styled("div", hrdSlot("DirectorCopy"))(({ theme }) => ({
@@ -38,8 +38,16 @@ export const Copy = styled("div", hrdSlot("DirectorCopy"))(({ theme }) => ({
   "& h2": { marginBottom: theme.spacing(2) },
 }));
 export const Visual = styled("div", hrdSlot("DirectorVisual"))(({ theme }) => ({
-  position: "absolute", right: "5%", top: "-5%", width: "35%", height: 300, display: "grid", placeItems: "center",
+  position: "absolute", right: "5%", top: "-5%", width: "min(35%, 280px)", aspectRatio: "1", display: "grid", placeItems: "center",
   color: (theme.vars ?? theme).palette.common.white, opacity: 0,
-  transform: "scale(0)", transition: "transform 500ms ease, opacity 500ms ease",
-  "& img": { objectFit: "contain" },
+  borderRadius: "24%", overflow: "hidden",
+  "&::after": {
+    content: '""', position: "absolute", inset: 0, zIndex: 1,
+    padding: 3, borderRadius: "inherit", pointerEvents: "none",
+    background: "linear-gradient(135deg, #F0C54C, #EDAC4C 50%, #EA9548)",
+    mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+    maskComposite: "exclude",
+  },
+  transform: "translateY(8px) scale(0.96)", transition: "transform 400ms ease, opacity 200ms ease",
+  "& img": { objectFit: "cover", objectPosition: "center top" },
 }));

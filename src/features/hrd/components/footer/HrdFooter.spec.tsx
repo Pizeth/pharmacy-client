@@ -5,6 +5,14 @@ import type { ReactNode } from "react";
 import { HrdFooter } from "./HrdFooter";
 import type { PublicDocumentsSiteInfo } from "../../types/publicDocuments.types";
 
+it("provides a dedicated footer social section for the mobile header handoff", () => {
+  renderFooter({});
+  const socials = screen.getByRole("region", { name: "បណ្ដាញសង្គម" });
+  expect(socials).toHaveAttribute("data-site-footer");
+  expect(within(socials).getByRole("link", { name: "Meta" })).toHaveAttribute("href", "https://facebook.com/CivilServiceCambodia");
+  expect(within(socials).getByRole("link", { name: "Telegram" })).toBeInTheDocument();
+});
+
 const shadows = {
   neumorphic: "none",
   inset: "none",
@@ -129,10 +137,8 @@ describe("HrdFooter phone line", () => {
       phones: [{ number: "012 345 678", telegram: "dara_sok" }],
     });
 
-    expect(screen.getByRole("link", { name: /Telegram/ })).toHaveAttribute(
-      "href",
-      "https://t.me/dara_sok",
-    );
+    expect(screen.getAllByRole("link", { name: /Telegram/ }).map(link => link.getAttribute("href")))
+      .toContain("https://t.me/dara_sok");
     expect(screen.getByRole("link", { name: "012 345 678" })).toBeVisible();
   });
 

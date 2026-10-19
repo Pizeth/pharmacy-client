@@ -30,6 +30,7 @@ export type PublicDocumentsSlotKey =
   | "fileSpecs"
   | "fileTypeBadge"
   | "footer"
+  | "footerSocials"
   | "footerBottom"
   | "footerQuickLinks"
   | "footerGrid"

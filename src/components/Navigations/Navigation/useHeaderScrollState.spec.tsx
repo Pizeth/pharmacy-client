@@ -1,0 +1,51 @@
+import { act, renderHook } from "@testing-library/react";
+import { useHeaderScrollState } from "./useHeaderScrollState";
+
+jest.mock("next/navigation", () => ({ usePathname: () => "/hrd" }));
+
+it.each([112, 212])("waits for the full %ipx header height and retains that threshold while compact", height => {
+  let frame: FrameRequestCallback | undefined;
+  const request = jest.spyOn(window, "requestAnimationFrame").mockImplementation(callback => { frame = callback; return 1; });
+  const cancel = jest.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+  const disconnect = jest.fn();
+  const originalObserver = global.ResizeObserver;
+  global.ResizeObserver = jest.fn(() => ({ observe: jest.fn(), unobserve: jest.fn(), disconnect })) as unknown as typeof ResizeObserver;
+  const footer = document.createElement("footer");
+  footer.dataset.siteFooter = "";
+  document.body.appendChild(footer);
+  let top = 2000;
+  jest.spyOn(footer, "getBoundingClientRect").mockImplementation(() => ({ top, bottom: top + 500 } as DOMRect));
+  const scroll = (y: number) => act(() => {
+    Object.defineProperty(window, "scrollY", { configurable: true, value: y });
+    window.dispatchEvent(new Event("scroll"));
+    frame?.(0);
+  });
+  Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+  const { result, unmount } = renderHook(useHeaderScrollState);
+  const header = document.createElement("nav");
+  jest.spyOn(header, "getBoundingClientRect").mockImplementation(() => ({ height: header.hasAttribute("data-mobile-scrolled") ? 64 : height } as DOMRect));
+  result.current.headerRef.current = header;
+  expect(result.current).toMatchObject({ scrolled: false, footerVisible: false });
+  scroll(height);
+  expect(result.current.scrolled).toBe(false);
+  scroll(height + 1);
+  expect(result.current).toMatchObject({ scrolled: true, footerVisible: false });
+  header.setAttribute("data-mobile-scrolled", "true");
+  scroll(height - 8);
+  expect(result.current.scrolled).toBe(true);
+  scroll(height - 17);
+  expect(result.current.scrolled).toBe(false);
+  header.removeAttribute("data-mobile-scrolled");
+  top = 300;
+  scroll(1800);
+  expect(result.current).toMatchObject({ scrolled: true, footerVisible: true });
+  top = 2000;
+  scroll(0);
+  expect(result.current).toMatchObject({ scrolled: false, footerVisible: false });
+  unmount();
+  expect(disconnect).toHaveBeenCalled();
+  footer.remove();
+  global.ResizeObserver = originalObserver;
+  request.mockRestore();
+  cancel.mockRestore();
+});
