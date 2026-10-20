@@ -1059,7 +1059,7 @@ export function DataTablePerformanceAcceptance() {
         {narrowRowSelection ? "Use default row selection subscription" : "Use row-specific selection probe"}
       </Button>
       {diagnosticsEnabled && <MetricsRoot variant="outlined">
-        <Typography variant="body2">Committed subscribed table output (cards are not instrumented); mount effects may replay in Strict Mode. Model reads include cached retrieval and pinning-display work; durations overlap React Profiler time.</Typography>
+        <Typography variant="body2">Committed subscribed output: table rows/cells or card rows; mount effects may replay in Strict Mode. Cards have no table-cell commits. Model reads include cached retrieval and pinning-display work; durations overlap React Profiler time.</Typography>
         <Typography variant="body2">
           {diagnosticSnapshot.operation}: {diagnosticSnapshot.uniqueRows} rows / {diagnosticSnapshot.uniqueCells} cells committed;
           React {diagnosticSnapshot.reactActualMs} ms; model read {diagnosticSnapshot.modelReadMs} ms;

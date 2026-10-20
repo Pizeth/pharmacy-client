@@ -1,5 +1,28 @@
 # Contact page
 
+## Google Maps marker
+
+The contact map uses the branded `public/static/svg/hrd-map-marker.svg` at the
+verified coordinates in `siteInfo.ts`. It is a self-contained, optimized emblem
+inside a blue/gold pin. The marker moves with map pan/zoom and opens an office
+information window with a Google Maps directions link.
+
+Set these browser-visible configuration values in `.env.local` and restart dev
+(rebuild for production):
+
+```
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_browser_key
+NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=your_javascript_map_id
+```
+
+Enable Maps JavaScript API for the key and restrict it to your site's HTTP
+referrers (including localhost for development). The map ID is required by
+Advanced Markers; without one, development uses Google's `DEMO_MAP_ID`. Supply
+your own map ID for production. No key is committed to the repository.
+Until a key and coordinates exist, the existing Google iframe remains visible.
+SDK load failures also fall back to that iframe. The SDK loads only when the
+map section approaches the viewport, and marker listeners are cleaned up.
+
 The illustration carousel occupies its own full-width section at the very top.
 The page adds theme spacing above it to separate it from the shared breadcrumbs;
 there is no duplicate page-title block below the carousel.

@@ -12,6 +12,7 @@ import * as S from "./HrdContactPage.styles";
 import { ContactCardArtwork } from "./ContactCardArtwork";
 import { ContactForm } from "./ContactForm";
 import { ContactCarousel } from "./ContactCarousel";
+import { ContactMap } from "./ContactMap";
 
 export function HrdContactPage({ site = HRD_SITE }: { site?: PublicDocumentsSiteInfo }) {
   return (
@@ -60,7 +61,7 @@ export function HrdContactPage({ site = HRD_SITE }: { site?: PublicDocumentsSite
       <S.Location aria-labelledby="hrd-location-title">
         <S.SectionHeader><MapPin aria-hidden="true" /><Typography id="hrd-location-title" component="h2" variant="h5">ទីតាំងនាយកដ្ឋាន</Typography></S.SectionHeader>
         {site.contact.address ? <>
-          <S.Map title="ផែនទីទីតាំងនាយកដ្ឋានធនធានមនុស្ស" src={`https://www.google.com/maps?q=${encodeURIComponent(site.contact.address.text)}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+          <ContactMap address={site.contact.address} name={site.name} />
           <S.Address><Typography>{site.contact.address.text}</Typography><Button component="a" href={toGoogleMapsUrl(site.contact.address)} target="_blank" rel="noopener noreferrer" startIcon={<ExternalLink size={17} />} variant="outlined">បើកក្នុង Google Maps</Button></S.Address>
         </> : <S.Address>ទីតាំងកំពុងរៀបចំ</S.Address>}
       </S.Location>

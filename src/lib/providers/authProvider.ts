@@ -17,7 +17,9 @@ import {
   TOKEN_KEY,
 } from "@/types/constants";
 import {
+  createLoginRedirect,
   getBrowserAuthRedirectTarget,
+  getCurrentBrowserTarget,
   getUnauthenticatedLoginRedirect,
 } from "@/lib/auth/redirectTarget";
 // import { fetchSessionDirect } from "../auth/sessionFetch";
@@ -152,6 +154,7 @@ export const authProvider: AuthProvider = {
 
   // ── Sign out ───────────────────────────────────────────────────────────────
   logout: async (): Promise<AuthActionResponse> => {
+    const redirectTo = createLoginRedirect(getCurrentBrowserTarget(LANDING_PAGE), LANDING_PAGE);
     const { error } = await authClient.signOut({
       fetchOptions: {
         // credentials: "include",
@@ -176,7 +179,7 @@ export const authProvider: AuthProvider = {
     // Clear all auth-related cookies
     clearAuthCookies();
     clearAxiosAuth();
-    return { success: true, redirectTo: "/login" };
+    return { success: true, redirectTo };
   },
 
   // ── Register ───────────────────────────────────────────────────────────────

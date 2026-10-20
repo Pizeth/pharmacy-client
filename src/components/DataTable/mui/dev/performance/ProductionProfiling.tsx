@@ -79,8 +79,12 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
     const cases: Array<readonly [number, number, Mode, Probe]> = track === "normal"
       ? NORMAL.map(([rows, columns, mode]) => [rows, columns, mode, "off"])
       : track === "compare"
-        ? (["default", "owner", "row"] as const).flatMap((probe) =>
-          ([[100, 8], [200, 16]] as const).map(([rows, columns]) => [rows, columns, "table", probe] as const))
+        ? NORMAL.filter(([rows, , mode]) => rows !== 25 || mode === "table")
+          .flatMap(([rows, columns, mode], index) => {
+            const probes = ["default", "owner", "row"] as const;
+            // Rotate case order so the default is not systematically first.
+            return probes.map((_, offset) => [rows, columns, mode, probes[(index + offset) % probes.length]] as const);
+          })
         : [[track === "500" ? 500 : 1000, track === "500" ? 16 : 32, "table", "off"]];
     try {
       for (const [rows, columns, initialMode, probe] of cases) {
@@ -116,7 +120,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
             action, repeat, elapsedMs: +(end - start).toFixed(2),
             reactMs: snapshot.reactCommits ? snapshot.reactActualMs : null,
             reactCommits: snapshot.reactCommits || null,
-            rowsCommitted: probe === "off" || mode === "card" ? null : snapshot.uniqueRows,
+            rowsCommitted: probe === "off" ? null : snapshot.uniqueRows,
             cellsCommitted: probe === "off" || mode === "card" ? null : snapshot.uniqueCells,
             ownerCommits: probe === "off" ? null : snapshot.ownerCommits,
             bodyCommits: probe === "off" ? null : snapshot.bodyCommits,

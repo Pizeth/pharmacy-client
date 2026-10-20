@@ -96,7 +96,12 @@ export const Portrait = styled("div", hrdSlot("AboutPortrait"))(({ theme }) => (
 }));
 
 export const Root = styled(HrdPageContainer, hrdSlot("AboutRoot"))(({ theme }) => ({
+  "--Hrd-about-raised-shadow": "-6px -6px 14px rgba(255,255,255,0.8), 7px 7px 16px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.45)",
+  ...theme.applyStyles("dark", {
+    "--Hrd-about-raised-shadow": "-6px -6px 14px rgba(255,255,255,0.05), 7px 7px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)",
+  }),
   margin: "auto",
+  paddingTop: theme.spacing(3),
   paddingBottom: "64px",
   color: `${(theme.vars ?? theme).palette.text.primary}`,
   [theme.breakpoints.down(700.05)]: {
@@ -106,28 +111,22 @@ export const Root = styled(HrdPageContainer, hrdSlot("AboutRoot"))(({ theme }) =
 
 export const Header = styled("header", hrdSlot("AboutHeader"))(({ theme }) => ({
   textAlign: "center",
-  padding: "38px 0 44px",
+  paddingBottom: theme.spacing(3),
   "& h1": {
     lineHeight: "1.8",
   },
   [theme.breakpoints.down(700.05)]: {
-    padding: "24px 0 30px",
     "& h1": {
       fontSize: "25px",
     },
   },
 }));
 
-export const Eyebrow = styled(Typography, hrdSlot("AboutEyebrow"))<TypographyProps>(({ theme }) => ({
-  color: `${(theme.vars ?? theme).palette.text.secondary}`,
-  letterSpacing: ".12em",
-}));
-
 export const Accent = styled("span", hrdSlot("AboutAccent"))(({ theme }) => ({
   display: "block",
   width: "46px",
   height: "3px",
-  background: "#d8b36c",
+  background: "linear-gradient(90deg, #F0C54C, #EDAC4C 50%, #EA9548)",
   margin: "16px auto",
 }));
 
@@ -146,14 +145,19 @@ export const Layout = styled("div", hrdSlot("AboutLayout"))(({ theme }) => ({
 }));
 
 export const Sidebar = styled("aside", hrdSlot("AboutSidebar"))(({ theme }) => ({
+  boxShadow: "var(--Hrd-about-raised-shadow)",
+  borderRadius: theme.spacing(2),
+  overflow: "hidden",
   border: `1px solid ${(theme.vars ?? theme).palette.divider}`,
   background: `${(theme.vars ?? theme).palette.background.paper}`,
 }));
 
 export const NavTitle = styled(Typography, hrdSlot("AboutNavTitle"))<TypographyProps>(({ theme }) => ({
   padding: "18px 20px",
-  background: "#08477f",
-  color: "#fff",
+  background: "linear-gradient(90deg, #F0C54C, #EDAC4C 50%, #EA9548)",
+  color: "#26247B",
+  borderBottom: "3px solid transparent",
+  borderImage: "linear-gradient(90deg, #F0C54C, #EDAC4C 50%, #EA9548) 1",
   [theme.breakpoints.down(700.05)]: {
     display: "none",
   },
@@ -170,18 +174,23 @@ export const Navigation = styled("nav", hrdSlot("AboutNavigation"))(({ theme }) 
     padding: "18px 20px",
     textDecoration: "none",
     color: "inherit",
+    borderInlineStart: "3px solid transparent",
     borderBottom: `1px solid ${(theme.vars ?? theme).palette.divider}`,
   },
   "& a svg": {
     flexShrink: "0",
   },
   "& a:hover": {
-    background: `${(theme.vars ?? theme).palette.action.selected}`,
-    boxShadow: "inset 3px 0 #d8b36c",
+    background: "#26247B",
+    color: "#F0C54C",
+    borderInlineStart: "3px solid transparent",
+    borderImage: "linear-gradient(#F0C54C, #EDAC4C 50%, #EA9548) 1",
   },
   "& a[aria-current=\"page\"]": {
-    background: `${(theme.vars ?? theme).palette.action.selected}`,
-    boxShadow: "inset 3px 0 #d8b36c",
+    background: "#26247B",
+    color: "#F0C54C",
+    borderInlineStart: "3px solid transparent",
+    borderImage: "linear-gradient(#F0C54C, #EDAC4C 50%, #EA9548) 1",
   },
   [theme.breakpoints.down(700.05)]: {
     display: "grid",
@@ -207,6 +216,7 @@ export const Identity = styled("div", hrdSlot("AboutIdentity"))(({ theme }) => (
 }));
 
 export const Panel = styled("article", hrdSlot("AboutPanel"))(({ theme }) => ({
+  borderRadius: theme.spacing(2),
   background: `${(theme.vars ?? theme).palette.background.paper}`,
   border: `1px solid ${(theme.vars ?? theme).palette.divider}`,
   padding: "40px",
@@ -257,6 +267,7 @@ export const Chart = styled("div", hrdSlot("AboutChart"))(({ theme }) => ({
 }));
 
 export const Empty = styled("div", hrdSlot("AboutEmpty"))(({ theme }) => ({
+  borderRadius: theme.spacing(2),
   display: "flex",
   flexDirection: "column",
   alignItems: "center",

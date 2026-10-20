@@ -14,7 +14,7 @@ export const Root = styled("div", hrdSlot("DirectorReveal"))(({ theme }) => ({
     boxShadow: `0 0 28px ${theme.alpha(directorBlue, 0.3)}`,
     transition: "border-radius 500ms ease, background-color 500ms ease" },
   "&[data-expanded=true]": { width: "100%", height: 320,
-    "&::before": { borderRadius: `calc(${typeof theme.shape.borderRadius === "number" ? `${theme.shape.borderRadius}px` : theme.shape.borderRadius} * 3)`, backgroundColor: directorBlue },
+    "&::before": { borderRadius: theme.spacing(2), backgroundColor: directorBlue },
     "& button img": { opacity: 0, transitionDelay: "0ms" },
     "& [data-copy]": { opacity: 1, transform: "translateX(0)", transitionDelay: "500ms" },
     "& [data-visual]": { transform: "translateY(0) scale(1)", opacity: 1, transitionDelay: "400ms" },
@@ -40,7 +40,7 @@ export const Copy = styled("div", hrdSlot("DirectorCopy"))(({ theme }) => ({
 export const Visual = styled("div", hrdSlot("DirectorVisual"))(({ theme }) => ({
   position: "absolute", right: "5%", top: "-5%", width: "min(35%, 280px)", aspectRatio: "1", display: "grid", placeItems: "center",
   color: (theme.vars ?? theme).palette.common.white, opacity: 0,
-  borderRadius: "24%", overflow: "hidden",
+  borderRadius: theme.spacing(2), overflow: "hidden",
   "&::after": {
     content: '""', position: "absolute", inset: 0, zIndex: 1,
     padding: 3, borderRadius: "inherit", pointerEvents: "none",

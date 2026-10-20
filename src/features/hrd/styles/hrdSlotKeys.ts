@@ -1,4 +1,5 @@
 export type HrdSlotKey =
+  | "contactMapCanvas"
   | "contactFormSection" | "contactForm" | "contactFields" | "contactSendButton" | "contactCarousel" | "contactCarouselImage"
   | "contactPageGrid" | "contactHours"
   | "contactCard" | "contactCardHeader" | "contactLogo" | "contactCardBody"

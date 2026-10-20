@@ -17,6 +17,7 @@ export const HRD_SITE: PublicDocumentsSiteInfo = {
   organization: "នាយកដ្ឋានធនធានមនុស្ស",
   contact: {
     address: {
+      coordinates: { latitude: 11.5478875, longitude: 104.8623906 },
       street: "ផ្លូវវត្តអង្គតាម៉ិញ សង្កាត់ចោមចៅ ខណ្ឌពោធិ៍សែនជ័យ រាជធានីភ្នំពេញ កម្ពុជា",
       text: "ទីស្ដីការក្រសួងមុខងារសាធារណៈ អគារ «ក» ជាន់ទី៤ បន្ទប់៤០១",
       // Paste the Google Maps "Share" link for the exact place. Without

@@ -1,5 +1,21 @@
 # TanStack v9 + MUI DataTable roadmap
 
+## October 20 — 2.2.3.3 correctness gate
+
+Dependency diagnosis and remeasurement are complete; production rollout remains
+BLOCKED. Both builds passed 21 comparison cases each (1,386 measured actions).
+The real resource browser follow-up also exposes 13.8125px overlap between selected
+rows: actual 50.8125px heights exceed nominal 37px sticky increments. Preserve the
+existing run and record this FAIL; do not declare the current follow-up green.
+
+The real-table adversarial proof confirms the diagnostic row-local projection
+can leave a globally dependent cell and cross-row action stale. Keep production
+subscriptions unchanged (decision C); no virtualization or PR #31 extraction.
+The 28 mode/direction/keepPinnedRows combinations and A1–A12 focused tests pass.
+Broader validation and current profiling/browser results are tracked in
+[the dependency report](datatable-dependency-correctness-2-2-3-3.md) and the
+independent [navbar report](navbar-responsive-regression-2026-10-20.md).
+
 ## Current handoff — October 14, 2026
 
 2.2.3.2 COMPLETE; all required local validation passed.

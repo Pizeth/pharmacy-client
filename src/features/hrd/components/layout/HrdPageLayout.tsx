@@ -8,7 +8,6 @@ import type { TypographyProps } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { styled } from "@mui/material/styles";
 import { ROUTE_NAV_MAP } from "@/configs/navConfig";
-import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { ABOUT_PAGES } from "../../data/aboutContent";
 import { hrdSlot } from "../../styles/styled";
 
@@ -141,9 +140,10 @@ export function HrdBreadcrumbs() {
 }
 
 export const HrdDocumentsPageRoot = styled(
-  ResourcePage,
+  PageRoot,
   hrdSlot("DocumentsPage"),
 )(({ theme }) => ({
   marginTop: 0,
+  paddingBlock: theme.spacing(3),
   [theme.breakpoints.down("sm")]: { marginTop: 0 },
 }));

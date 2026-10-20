@@ -13,6 +13,7 @@ import type { DataTableThemeProps } from "@/components/DataTable/mui/theme/types
 import type { DataTableVariantProps } from "@/components/DataTable/mui/theme/variants";
 import type { DataTableSlotKey } from "@/components/DataTable/mui/styles/dataTableClasses";
 import type { HrdSlotKey } from "@/features/hrd/styles/hrdSlotKeys";
+import type { NavigationSlotMap } from "@/components/Navigations/styles/slots";
 import type { PublicDocumentsSlotKey } from "@/features/hrd/styles/publicDocumentsSlotKeys";
 import type { AvatarContainerProps } from "@/components/Avatar/AvatarContainer";
 import type { RouteContentLoadingSlot } from "@/components/layouts/RouteContentLoading";
@@ -102,7 +103,7 @@ declare module "@mui/material/styles" {
   // ComponentNameToClassKey can derive its keys from our map.
   // Note: If each component has different keys (e.g., 'root', 'card'),
   // this interface should be defined manually for full accuracy.
-  interface ComponentNameToClassKey extends Record<
+  interface ComponentNameToClassKey extends NavigationSlotMap, Record<
     keyof RazethComponentsPropsList,
     ClassKey
   > {
@@ -116,6 +117,7 @@ declare module "@mui/material/styles" {
     RazethBackToTop: "root";
     RazethDrawerTheme: "root" | "label";
     RazethNavPattern: "root";
+    RazethNavigationLayout: "main" | "headerDivider";
   }
 
   /**
@@ -130,6 +132,11 @@ declare module "@mui/material/styles" {
    * Theme defaultProps are typed separately below.
    */
   interface ComponentsPropsList extends RazethComponentsPropsList {
+    RazethDrawer: Record<string, unknown>;
+    RazethNav: Record<string, unknown>;
+    RazethSearch: Record<string, unknown>;
+    RazethSearchPoppers: Record<string, unknown>;
+    RazethUserSetting: import("@/interfaces/component-props.interface").UserMenuProps;
     RazethDataTable: DataTableVariantProps;
     RazethHrd: Record<string, unknown>;
     RazethLoader: Record<string, unknown>;
@@ -140,9 +147,18 @@ declare module "@mui/material/styles" {
     RazethBackToTop: Record<string, unknown>;
     RazethDrawerTheme: Record<string, unknown>;
     RazethNavPattern: Record<string, unknown>;
+    RazethNavigationLayout: Record<string, unknown>;
   }
 
   interface Components extends CustomComponents {
+    RazethDrawer?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDrawer"] };
+    RazethNav?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethNav"] };
+    RazethSearch?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSearch"] };
+    RazethSearchPoppers?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSearchPoppers"] };
+    RazethUserSetting?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethUserSetting"] };
+    RazethNavigationLayout?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethNavigationLayout"];
+    };
     RazethNavPattern?: {
       styleOverrides?: ComponentsOverrides<MuiTheme>["RazethNavPattern"];
     };

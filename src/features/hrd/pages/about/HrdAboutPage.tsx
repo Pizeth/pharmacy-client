@@ -30,12 +30,6 @@ function Portrait({ person, large = false }: { person: PersonProfile | null; lar
 export function HrdAboutPage({ section, content = HRD_ABOUT_CONTENT }: { section: AboutSection; content?: HrdAboutContent }) {
   const page = ABOUT_PAGES[section];
   return <S.Root>
-    <S.Header>
-      <S.Eyebrow variant="overline">{page.english}</S.Eyebrow>
-      <Typography component="h1" variant="h4">{page.title}</Typography>
-      <S.Accent  />
-      <Typography variant="body2" color="text.secondary">នាយកដ្ឋានធនធានមនុស្ស • ក្រសួងមុខងារសាធារណៈ</Typography>
-    </S.Header>
     <S.Layout>
       <S.Sidebar>
         <S.NavTitle component="h2" variant="subtitle1">អំពីអង្គភាព</S.NavTitle>
@@ -44,9 +38,14 @@ export function HrdAboutPage({ section, content = HRD_ABOUT_CONTENT }: { section
             <Typography component="span" variant="body2">{entry.title}</Typography><ArrowRight size={16} aria-hidden="true" />
           </Link>)}
         </S.Navigation>
-        <S.Identity><Building2 size={30} aria-hidden="true" /><Typography variant="body2">នាយកដ្ឋានធនធានមនុស្ស</Typography><Typography variant="caption" color="text.secondary">Human Resource Department</Typography></S.Identity>
+        <S.Identity><Building2 size={30} aria-hidden="true" /><Typography variant="body2">នាយកដ្ឋានធនធានមនុស្ស</Typography></S.Identity>
       </S.Sidebar>
       <S.Panel  aria-label={page.title}>
+        <S.Header>
+          <Typography component="h1" variant="h4">{page.title}</Typography>
+          <S.Accent />
+          <Typography variant="body2" color="text.secondary">នាយកដ្ឋានធនធានមនុស្ស • ក្រសួងមុខងារសាធារណៈ</Typography>
+        </S.Header>
         {section === "director" && <>
           <S.Profile><DirectorReveal person={content.director} /></S.Profile>
           <ContentSection title="ជីវប្រវត្តិសង្ខេប" text={content.director?.biography} />

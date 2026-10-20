@@ -3,6 +3,19 @@
 Status: architecture review justified by October 13 Matrix B; no virtualization
 implementation or dependency introduced.
 
+## October 20 — dependency gate outcome
+
+The 2.2.3.3 real-table adversarial proof rejects rollout of the current row-local
+diagnostic projection: selecting a second row can leave the first row's global
+count cell and mutation guard stale. Production subscriptions remain unchanged
+(decision C). See [the dependency report](datatable-dependency-correctness-2-2-3-3.md).
+An explicit compatible callback-dependency contract needs separate design before
+selection narrowing can ship. Fixture performance reductions cannot waive this
+gate or approve a virtualizer; full-model sort/expansion costs remain separate.
+The real resource browser also shows 13.8125px selected-row overlap from nominal
+37px sticky offsets applied to 50.8125px rows. Record that geometry blocker and
+measure actual pinned heights before certifying variable-height pinning.
+
 ## October 14 — production evidence and recommendation
 
 Decision **2: bounded optimization helps but virtualization may still be justified**.

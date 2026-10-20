@@ -18,7 +18,11 @@ it("supports director slot overrides and toggles pending content without hover",
 
 it.each(Object.keys(ABOUT_PAGES) as AboutSection[])("renders %s with matching navigation and pending content", (section) => {
   render(<HrdAboutPage section={section} />);
-  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(ABOUT_PAGES[section].title);
+  expect(screen.queryByText(ABOUT_PAGES[section].english)).not.toBeInTheDocument();
+  expect(screen.queryByText("Human Resource Department")).not.toBeInTheDocument();
+  const panel = screen.getByRole("article", { name: ABOUT_PAGES[section].title });
+  expect(within(panel).getByRole("heading", { level: 1 })).toHaveTextContent(ABOUT_PAGES[section].title);
+  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   const nav = screen.getByRole("navigation", { name: "ទំព័រអំពីអង្គភាព" });
   expect(within(nav).getAllByRole("link")).toHaveLength(4);
   expect(within(nav).getByRole("link", { name: ABOUT_PAGES[section].title })).toHaveAttribute("aria-current", "page");

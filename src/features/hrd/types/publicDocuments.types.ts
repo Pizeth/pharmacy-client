@@ -63,6 +63,8 @@ export interface PublicDocumentsPhoneContact {
 }
 
 export interface PublicDocumentsAddress {
+  /** Verified office position for an interactive map marker. */
+  readonly coordinates?: { readonly latitude: number; readonly longitude: number };
   readonly street?: string;
   /** Address text shown in the footer. */
   readonly text: string;

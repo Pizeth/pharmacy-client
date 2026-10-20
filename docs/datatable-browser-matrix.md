@@ -1,5 +1,46 @@
 # DataTable browser matrix runbook
 
+## October 20 — dependency correctness and navigation regression
+
+First navigation browser result: 900px expanded header overlaps the breadcrumb
+(206.02px header bottom vs 157px breadcrumb top). A measured content-offset fix
+is implemented and browser RECHECK PASS (breadcrumb218.02px below header206.02px);
+see the navbar report. This is independent
+of DataTable certification and does not reopen completed Matrix A semantics.
+
+Final rebuilt navbar checks: all six widths show correct settled header modes,
+keyboard menus and no horizontal overflow. Back restores y787; near-footer Back
+restores y3338; FAQ heading clears the97px header. User confirms touch and
+reduced-motion functionality manually. Hover and independent motion suppression
+remain unverified; reload retention is partial (header agrees with actual scroll).
+
+2.2.3.3 ordinary-production remeasurement: 21 comparison cases PASS /693
+measured actions, no browser warnings/errors. Evidence is in
+[the current profiling report](datatable-performance-2-2-3-3.md). Separate React
+profiling also passed 21 cases/693 measured actions, with no warnings/errors;
+its timings are not mixed into browser intervals. These fixture
+PASS results do not override decision C on global dependency correctness.
+
+**Current browser FAIL — selected-row height:** real TranslationKey rows 10 and 7,
+selected in reverse display order, each render once and use correct order-based
+36/73px offsets. Their actual heights are 50.8125px, so the nominal 37px increment
+overlaps them by 13.8125px after scrolling. Header/footer remain accessible.
+Production card switching retains both checked IDs; bulk mutation guards remain
+disabled for two selections. Restored table and cleared selection. See dependency
+report/screenshot. This must be fixed and browser rechecked before claiming a
+fully green pinning gate. No virtualizer or production subscription change added.
+
+Historical Matrix A completion remains recorded; this continues the existing
+run, whose current variable-height sticky recheck is FAIL. The
+2.2.3.3 focused proof exposes stale global cells/actions under the experimental
+row-local projection; production subscriptions stay unchanged. See
+[the dependency report](datatable-dependency-correctness-2-2-3-3.md) for the
+dependency inventory and decision C. Current responsive navigation geometry,
+history and orientation-emulation checks are tracked separately in
+[the navbar report](navbar-responsive-regression-2026-10-20.md). Browser rows
+remain PENDING until actually observed; automated identity/offset assertions do
+not certify sticky behavior in a browser.
+
 ## October 14 — 2.2.3.2 production measurements
 
 Production measurements and local validation COMPLETE.

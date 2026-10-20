@@ -9,13 +9,7 @@ export const metadata: Metadata = {
 
 export default function HrdDocumentsPage() {
   return (
-    <HrdDocumentsPageRoot
-      title="បណ្ដុំឯកសារ"
-      subtitle={metadata.description}
-      maxWidth="xl"
-      // hero
-      // badgeLabel="ឯកសារផ្លូវការ"
-    >
+    <HrdDocumentsPageRoot maxWidth="xl">
       <PublicDocumentsTable />
     </HrdDocumentsPageRoot>
   );

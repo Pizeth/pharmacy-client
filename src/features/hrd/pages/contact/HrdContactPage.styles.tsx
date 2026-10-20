@@ -188,6 +188,12 @@ export const Map = styled("iframe", hrdSlot("ContactMap"))(({ theme }) => ({
   backgroundColor: (theme.vars ?? theme).palette.action.hover,
   [theme.breakpoints.down("sm")]: { height: 260 },
 }));
+export const MapCanvas = styled("div", hrdSlot("ContactMapCanvas"))(({ theme }) => ({
+  position: "relative", isolation: "isolate", width: "100%", height: 440,
+  backgroundColor: (theme.vars ?? theme).palette.background.default,
+  "& img[data-hrd-map-marker]": { width: 48, height: "auto", filter: "drop-shadow(0 3px 4px rgba(0,0,0,0.3))" },
+  [theme.breakpoints.down("sm")]: { height: 260 },
+}));
 
 export const FormSection = styled("section", hrdSlot("ContactFormSection"))(({ theme }) => ({
   display: "grid", gap: theme.spacing(2), minWidth: 0,
@@ -200,9 +206,9 @@ export const Form = styled("form", hrdSlot("ContactForm"))(({ theme }) => ({
   "& h2": { lineHeight: 1.8 },
   [theme.breakpoints.down("sm")]: { padding: theme.spacing(2) },
 }));
-export const SendButton = styled(Button, hrdSlot("ContactSendButton"))(({ theme }) => ({
-  borderRadius: theme.shape.borderRadius,
-}));
+export const SendButton = styled(Button, hrdSlot("ContactSendButton"))({
+  borderRadius: "50px",
+});
 export const Fields = styled("div", hrdSlot("ContactFields"))(({ theme }) => ({
   display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: theme.spacing(2),
   [theme.breakpoints.down("sm")]: { gridTemplateColumns: "minmax(0, 1fr)" },

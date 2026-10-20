@@ -1,0 +1,217 @@
+{
+  "baseline": "5849b8d2db4daf3f5994adf7c178f9769e09d652 plus local changes",
+  "orientation": "viewport emulation",
+  "observations": [
+    {
+      "case": "900-top-fixed",
+      "desktop": null,
+      "firstHeading": 290.9375,
+      "height": 800,
+      "mobile": null,
+      "navHeight": 206.015625,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": null,
+      "width": 885,
+      "y": 0
+    },
+    {
+      "requested": {
+        "width": 1280,
+        "height": 800
+      },
+      "desktop": "true",
+      "firstHeading": -547.40625,
+      "height": 800,
+      "mobile": null,
+      "navHeight": 97,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": "true",
+      "width": 1265,
+      "y": 787
+    },
+    {
+      "requested": {
+        "width": 900,
+        "height": 800
+      },
+      "desktop": "true",
+      "firstHeading": -496.0625,
+      "height": 800,
+      "mobile": null,
+      "navHeight": 97,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": "true",
+      "width": 885,
+      "y": 787
+    },
+    {
+      "requested": {
+        "width": 899,
+        "height": 800
+      },
+      "desktop": null,
+      "firstHeading": -589.078125,
+      "height": 800,
+      "mobile": "true",
+      "navHeight": 65,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": "true",
+      "width": 884,
+      "y": 787
+    },
+    {
+      "requested": {
+        "width": 900,
+        "height": 800
+      },
+      "desktop": "true",
+      "firstHeading": -496.0625,
+      "height": 800,
+      "mobile": null,
+      "navHeight": 97,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": "true",
+      "width": 885,
+      "y": 787
+    },
+    {
+      "requested": {
+        "width": 844,
+        "height": 390
+      },
+      "desktop": null,
+      "firstHeading": -589.078125,
+      "height": 390,
+      "mobile": "true",
+      "navHeight": 65,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": "true",
+      "width": 829,
+      "y": 787
+    },
+    {
+      "requested": {
+        "width": 390,
+        "height": 844
+      },
+      "desktop": null,
+      "firstHeading": -589.078125,
+      "height": 844,
+      "mobile": "true",
+      "navHeight": 65,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": "true",
+      "width": 375,
+      "y": 787
+    },
+    {
+      "case": "top",
+      "requested": {
+        "width": 899,
+        "height": 800
+      },
+      "desktop": null,
+      "firstHeading": 197.921875,
+      "height": 800,
+      "mobile": null,
+      "navHeight": 113,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": "true",
+      "width": 884,
+      "y": 0
+    },
+    {
+      "case": "top",
+      "requested": {
+        "width": 900,
+        "height": 800
+      },
+      "desktop": null,
+      "firstHeading": 290.9375,
+      "height": 800,
+      "mobile": null,
+      "navHeight": 206.015625,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": null,
+      "width": 885,
+      "y": 0
+    },
+    {
+      "case": "top",
+      "requested": {
+        "width": 390,
+        "height": 844
+      },
+      "desktop": null,
+      "firstHeading": 197.921875,
+      "height": 844,
+      "mobile": null,
+      "navHeight": 113,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": "true",
+      "width": 375,
+      "y": 0
+    },
+    {
+      "case": "top",
+      "requested": {
+        "width": 844,
+        "height": 390
+      },
+      "desktop": null,
+      "firstHeading": 197.921875,
+      "height": 390,
+      "mobile": null,
+      "navHeight": 113,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": "true",
+      "width": 829,
+      "y": 0
+    },
+    {
+      "case": "top",
+      "requested": {
+        "width": 390,
+        "height": 844
+      },
+      "desktop": null,
+      "firstHeading": 197.921875,
+      "height": 844,
+      "mobile": null,
+      "navHeight": 113,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": "true",
+      "width": 375,
+      "y": 0
+    },
+    {
+      "case": "top",
+      "requested": {
+        "width": 1280,
+        "height": 800
+      },
+      "desktop": null,
+      "firstHeading": 239.59375,
+      "height": 800,
+      "mobile": null,
+      "navHeight": 154.671875,
+      "navTop": 0,
+      "overflow": false,
+      "socialsHidden": null,
+      "width": 1265,
+      "y": 0
+    }
+  ]
+}

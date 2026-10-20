@@ -7,7 +7,8 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
+import { DataTableDiagnosticCommit, useDataTableRenderDiagnostics } from "../../diagnostics/renderDiagnostics";
 import type { RowData } from "@tanstack/table-core";
 
 import type { DataTableDetailPanelRenderer } from "../../components/detail-panel";
@@ -146,6 +147,7 @@ export function DataTableCardView<TData extends RowData>(
   } = props;
 
   const { density } = useDataTableDensity();
+  const diagnostics = useDataTableRenderDiagnostics();
 
   const {
     getExpandButtonId,
@@ -236,6 +238,7 @@ export function DataTableCardView<TData extends RowData>(
               role="list"
               data-compact={config.compactCard ? "true" : undefined}
             >
+            {diagnostics && <DataTableDiagnosticCommit layer="body" id="card-body" />}
             {rows.map((row) => {
               const context: DataTableCardRenderContext<TData> = {
                 table,
@@ -289,8 +292,9 @@ export function DataTableCardView<TData extends RowData>(
                 row.getCanExpand()
               ) {
                 return (
+                  <Fragment key={row.id}>
+                  {diagnostics && <DataTableDiagnosticCommit layer="row" id={row.id} />}
                   <DataTableCardFlipItem
-                    key={row.id}
                     row={row}
                     expanded={row.getIsExpanded()}
                     selected={selected}
@@ -304,6 +308,7 @@ export function DataTableCardView<TData extends RowData>(
                     renderDetail={() => detailRenderer(context)}
                     flip={config.flip}
                   />
+                  </Fragment>
                 );
               }
 
@@ -327,6 +332,7 @@ export function DataTableCardView<TData extends RowData>(
                   data-density={density}
                   data-compact={config.compactCard ? "true" : undefined}
                 >
+                  {diagnostics && <DataTableDiagnosticCommit layer="row" id={row.id} />}
                   {showHeader && (
                     <CardHeaderRoot className={dataTableClasses.cardHeader}>
                       {hasRenderableContent(selection) && (
