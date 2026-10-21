@@ -1,6 +1,6 @@
 "use client";
 
-import { styled, TableBody } from "@mui/material";
+import { BodyRoot, DataTableStickyRowMeasurements } from "./DataTableStickyRowMeasurements";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../table";
 import {
@@ -8,7 +8,7 @@ import {
   isDataTableStickyRowPinningMode,
   type DataTableRowPinningDisplayMode,
 } from "../row-pinning";
-import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
+import { dataTableClasses } from "../styles";
 import {
   DataTableEmptyState,
   DataTableErrorState,
@@ -21,12 +21,6 @@ import { DataTableDetailPanelRenderer } from "./detail-panel";
 import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
 import type { DataTableRowClickHandler } from "./DataTableBodyRow";
 import { DataTableDiagnosticCommit, useDataTableRenderDiagnostics } from "../diagnostics/renderDiagnostics";
-
-const BodyRoot = styled(TableBody, {
-  name: DATA_TABLE_COMPONENT_NAME,
-  slot: "Body",
-  overridesResolver: (_props, styles) => styles.body,
-})({});
 
 export interface DataTableBodyProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
@@ -138,9 +132,13 @@ export function DataTableBody<TData extends RowData>(
          * Use the rendered row list so keepPinnedRows rows that are missing
          * from the current center model still receive a stable edge index.
          */
-        const stickyPinnedRowIds = stickyRowPinning
-          ? rows.filter((row) => row.getIsPinned()).map((row) => row.id)
-          : [];
+        const stickyPinnedRowIds: { top: string[]; bottom: string[] } = { top: [], bottom: [] };
+        if (stickyRowPinning) {
+          for (const row of rows) {
+            const edge = row.getIsPinned();
+            if (edge) stickyPinnedRowIds[edge].push(row.id);
+          }
+        }
 
         const visibleColumnCount = table.getVisibleLeafColumns().length;
 
@@ -197,7 +195,12 @@ export function DataTableBody<TData extends RowData>(
         }
 
         return (
-          <BodyRoot className={dataTableClasses.body}>
+          <DataTableStickyRowMeasurements
+            enabled={stickyRowPinning}
+            top={pinnedRowStickyTop}
+            fallbackHeight={densityMetrics.bodyRowHeight}
+            dualEdge={dualEdgeStickyRowPinning}
+          >
             {diagnostics && <DataTableDiagnosticCommit layer="body" id="body" />}
             {rows.map((row) => (
               <DataTableBodyRowGroup
@@ -207,12 +210,12 @@ export function DataTableBody<TData extends RowData>(
                 pinnedRowStickyTop={pinnedRowStickyTop}
                 stickyRowPinning={stickyRowPinning}
                 dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
-                stickyPinnedRowIds={stickyPinnedRowIds}
+                stickyPinnedRowIds={stickyPinnedRowIds[row.getIsPinned() || "top"]}
                 renderDetailPanel={renderDetailPanel}
                 onRowClick={onRowClick}
               />
             ))}
-          </BodyRoot>
+          </DataTableStickyRowMeasurements>
         );
       }}
     </table.Subscribe>
