@@ -9,8 +9,21 @@ function mountHome() {
 it("offers document links on the new HRD route", () => {
   mountHome();
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("នាយកដ្ឋានធនធានមនុស្ស");
+  expect(screen.queryByText("HUMAN RESOURCE DEPARTMENT")).not.toBeInTheDocument();
+  expect(screen.queryByText("Frequently Asked Questions")).not.toBeInTheDocument();
   expect(screen.getByRole("link", { name: "ស្វែងរកឯកសារ" })).toHaveAttribute("href", "/hrd/documents");
   expect(screen.getByRole("link", { name: "ទំនាក់ទំនងតាមអ៊ីមែល" }).getAttribute("href")).toMatch(/^mailto:/);
+});
+
+it.each(["light", "dark"] as const)("keeps carousel links white in %s mode despite shared button colors", (mode) => {
+  const theme = createTheme({ palette: { mode }, components: {
+    MuiButtonBase: { styleOverrides: { root: { "&.MuiButton-root": { color: "#123456" } } } },
+  } });
+  render(<ThemeProvider theme={theme}><HrdHomePage /></ThemeProvider>);
+  expect(screen.getByRole("link", { name: "ស្វែងរកឯកសារ" })).toHaveStyle({ color: "#fff" });
+  document.querySelectorAll('[class*="RazethHrd-homeGalleryLink"]').forEach((link) => {
+    expect(link).toHaveStyle({ color: "#fff" });
+  });
 });
 
 it("cycles featured content in both directions and supports direct selection", () => {

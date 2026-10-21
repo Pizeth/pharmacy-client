@@ -115,6 +115,7 @@ declare module "@mui/material/styles" {
     RazethPublicDocuments: PublicDocumentsSlotKey;
     RazethAvatarContainer: "root" | "chip" | "foreground";
     RazethBackToTop: "root";
+    RazethSideImagePreview: "root" | "toolbar";
     RazethDrawerTheme: "root" | "label";
     RazethNavPattern: "root";
     RazethNavigationLayout: "main" | "headerDivider";
@@ -145,12 +146,14 @@ declare module "@mui/material/styles" {
     RazethPublicDocuments: Record<string, unknown>;
     RazethAvatarContainer: AvatarContainerProps;
     RazethBackToTop: Record<string, unknown>;
+    RazethSideImagePreview: Record<string, unknown>;
     RazethDrawerTheme: Record<string, unknown>;
     RazethNavPattern: Record<string, unknown>;
     RazethNavigationLayout: Record<string, unknown>;
   }
 
   interface Components extends CustomComponents {
+    RazethSideImagePreview?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSideImagePreview"] };
     RazethDrawer?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDrawer"] };
     RazethNav?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethNav"] };
     RazethSearch?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSearch"] };

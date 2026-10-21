@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 import { Button, Typography } from "@mui/material";
 import Link from "next/link";
 import { hrdSlot } from "../../styles/styled";
+import { goldIconEmphasis } from "./goldEmphasis";
 
 export const Root = styled("section", hrdSlot("HomeGallery"))(({ theme }) => ({ paddingBlock: theme.spacing(3), overflow: "hidden", containerType: "inline-size" }));
 export const frameProperties = {
@@ -69,10 +70,19 @@ export const Face = styled("div", hrdSlot("HomeGalleryFace"))(({ theme }) => ({
   "article[data-facing=false] &::after": { opacity: 0.65 },
   "article[data-facing=false] & > *": { visibility: "hidden" },
   "&[data-side=back]": { transform: "rotateY(180deg)" },
-  "& > svg": { color: (theme.vars ?? theme).palette.primary.main },
+  "& > svg": { color: "var(--Hrd-gold, #E8B841)", ...goldIconEmphasis },
   "& .MuiTypography-root": { fontSize: "clamp(0.8rem, 1.4cqw, 1rem)", overflowWrap: "anywhere" },
   "@media (prefers-reduced-motion: reduce)": { transition: "none" },
 }));
-export const DocumentLink = styled(Link, hrdSlot("HomeGalleryLink"))(({ theme }) => ({ color: (theme.vars ?? theme).palette.primary.main, fontWeight: 700 }));
+export const DocumentLink = styled(Link, hrdSlot("HomeGalleryLink"))({
+  "&&, &&:hover, &&:visited": { color: "#fff" },
+  background: "#26247B",
+  padding: "6px 12px",
+  borderRadius: "var(--app-border-radius)",
+  fontWeight: 700,
+});
 export const Controls = styled("div", hrdSlot("HomeGalleryControls"))(({ theme }) => ({ display: "flex", justifyContent: "center", alignItems: "center", gap: theme.spacing(2), marginTop: theme.spacing(2) }));
-export const Control = styled(Button, hrdSlot("HomeGalleryControl"))({});
+export const Control = styled(Button, hrdSlot("HomeGalleryControl"))(({ theme }) => ({
+  "&&.MuiButton-root": { color: (theme.vars ?? theme).palette.text.primary },
+  "& svg": { color: "currentColor", filter: "none", WebkitTextStroke: 0, textShadow: "none" },
+}));

@@ -289,6 +289,10 @@ export const SocialIconsRoot = styled(Box, {
     },
   },
   "& .x": {
+    "& svg path": {
+      fill: "#000",
+      ...theme.applyStyles("dark", { fill: "#FFF" }),
+    },
     "&:hover": {
       svg: {
         path: { fill: "#FFF" },

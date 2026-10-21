@@ -25,6 +25,30 @@ it("lets Lucide start icons inherit the focused field color", () => {
   expect(container.querySelector(".lucide")?.closest(".MuiInputAdornment-root")).toHaveStyle({ color: "#123456" });
 });
 
+function MultilineFixture() {
+  const form = useForm({ defaultValues: { centered: "", top: "", single: "" } });
+  return <FormProvider {...form}>
+    <TextField name="centered" label="Centered message" iconStart={<UserRound />} multiline minRows={5} />
+    <TextField name="top" label="Top message" iconStart={<UserRound />} iconStartAlignment="top" multiline minRows={5} />
+    <TextField name="single" label="Single line" iconStart={<UserRound />} iconStartAlignment="top" />
+  </FormProvider>;
+}
+
+it("opts multiline start icons into first-line alignment while preserving the centered default", () => {
+  render(<MultilineFixture />);
+  const adornment = (name: string) => screen.getByRole("textbox", { name })
+    .closest(".MuiInputBase-root")?.querySelector(".MuiInputAdornment-positionStart");
+
+  expect(adornment("Centered message")).toHaveStyle({ alignSelf: "auto" });
+  expect(adornment("Top message")).toHaveStyle({ alignSelf: "flex-start", marginTop: "0px" });
+  expect(adornment("Single line")).toHaveStyle({ alignSelf: "auto" });
+
+  const input = screen.getByRole("textbox", { name: "Top message" });
+  fireEvent.focus(input);
+  expect(document.querySelector(`label[for="${input.id}"]`)).toHaveAttribute("data-shrink", "true");
+  expect(adornment("Top message")).toHaveStyle({ alignSelf: "flex-start" });
+});
+
 // interface TestFormValues {
 //   email: string;
 // }

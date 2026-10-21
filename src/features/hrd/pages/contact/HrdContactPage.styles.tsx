@@ -180,7 +180,7 @@ export const Location = styled("section", hrdSlot("ContactLocation"))(({ theme }
 }));
 export const SectionHeader = styled("div", hrdSlot("ContactSectionHeader"))(({ theme }) => ({
   display: "flex", alignItems: "center", gap: theme.spacing(1.5), padding: theme.spacing(2.5),
-  "& svg": { color: "#b7791f", flexShrink: 0, ...theme.applyStyles("dark", { color: "#e5bd70" }) },
+  "& svg": { color: "#E8B841", flexShrink: 0 },
   "& h2": { lineHeight: 1.8 },
 }));
 export const Map = styled("iframe", hrdSlot("ContactMap"))(({ theme }) => ({
@@ -208,6 +208,10 @@ export const Form = styled("form", hrdSlot("ContactForm"))(({ theme }) => ({
 }));
 export const SendButton = styled(Button, hrdSlot("ContactSendButton"))({
   borderRadius: "50px",
+  "&&.MuiButton-root": {
+    color: "#fff",
+    "&:hover, &.Mui-disabled": { color: "#fff" },
+  },
 });
 export const Fields = styled("div", hrdSlot("ContactFields"))(({ theme }) => ({
   display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: theme.spacing(2),
@@ -222,6 +226,12 @@ export const Carousel = styled("section", hrdSlot("ContactCarousel"))(({ theme }
   position: "relative", overflow: "hidden", borderRadius: "var(--Hrd-contact-section-radius)",
   backgroundColor: (theme.vars ?? theme).palette.background.paper,
   height: "clamp(220px, 32vw, 480px)",
+  "&::after": {
+    content: '""', position: "absolute", inset: "auto 0 0", height: "clamp(48px, 9vw, 124px)",
+    backgroundImage: 'url("/static/svg/patterns/contact-carousel-divider.svg")',
+    backgroundSize: "100% 100%", backgroundRepeat: "no-repeat",
+    pointerEvents: "none",
+  },
 }));
 export const CarouselImage = styled(Image, hrdSlot("ContactCarouselImage"))({
   display: "block", width: "100%", height: "100%", objectFit: "cover",

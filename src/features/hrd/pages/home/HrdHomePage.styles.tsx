@@ -6,23 +6,30 @@ import type { ButtonProps, TypographyProps } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import { HrdPageContainer } from "../../components/layout/HrdPageLayout";
 import { hrdSlot } from "../../styles/styled";
+import { goldIconEmphasis, goldTextEmphasis } from "./goldEmphasis";
 
 const gridDrift = keyframes({ to: { backgroundPosition: "48px 48px" } });
 const scan = keyframes({ from: { transform: "translateY(-100%)" }, to: { transform: "translateY(420px)" } });
 const titleGlow = keyframes({ "50%": { filter: "drop-shadow(0 0 10px var(--Hrd-effect-accent))" } });
 
 export const Root = styled(HrdPageContainer, hrdSlot("HomeRoot"))(({ theme }) => ({
-  "--Hrd-effect-accent": (theme.vars ?? theme).palette.secondary.main,
+  "--Hrd-effect-accent": "#E8B841",
   "& a[data-effect-card]": { position: "relative", overflow: "hidden", transition: "box-shadow 350ms ease, translate 350ms ease, border-color 350ms ease",
     "&::after": { content: '""', position: "absolute", inset: 0, pointerEvents: "none",
-      backgroundImage: `linear-gradient(110deg, transparent 25%, ${theme.alpha((theme.vars ?? theme).palette.secondary.main, 0.16)} 50%, transparent 75%)`,
+      backgroundImage: "linear-gradient(110deg, transparent 25%, rgba(232,184,65,0.16) 50%, transparent 75%)",
       transform: "translateX(-100%)", transition: "transform 700ms ease" },
-    "&:hover, &:focus-visible": { translate: "0 -5px", borderColor: (theme.vars ?? theme).palette.secondary.main,
-      boxShadow: `0 8px 28px ${theme.alpha((theme.vars ?? theme).palette.secondary.main, 0.24)}, 0 0 0 1px ${(theme.vars ?? theme).palette.secondary.main}`,
+    "&:hover, &:focus-visible": { translate: "0 -5px", borderColor: "var(--Hrd-gold)",
+      boxShadow: "0 8px 28px rgba(232,184,65,0.24), 0 0 0 1px var(--Hrd-gold)",
       "&::after": { transform: "translateX(100%)" } },
   },
   "--Hrd-blue": "#08477f",
-  "--Hrd-gold": "#d8b36c",
+  "--Hrd-gold": "#E8B841",
+  "--Hrd-gold-gradient": "linear-gradient(90deg, #F0C54C, #EDAC4C 50%, #EA9548)",
+  ...theme.applyStyles("light", {
+    "--Hrd-accent-outline": "rgb(195 203 215 / 35%)",
+    "--Hrd-accent-shadow": "1px 1px 1.5px rgb(195 203 215 / 30%), -0.5px -0.5px 1px rgb(245 247 250 / 35%)",
+    "--Hrd-accent-icon-shadow": "drop-shadow(1px 1px 1.5px rgb(195 203 215 / 30%)) drop-shadow(-0.5px -0.5px 1px rgb(245 247 250 / 35%))",
+  }),
   "--Hrd-surface": `${(theme.vars ?? theme).palette.background.paper}`,
   "--Hrd-text": `${(theme.vars ?? theme).palette.text.primary}`,
   margin: "0 auto",
@@ -81,12 +88,6 @@ export const Kicker = styled(Typography, hrdSlot("HomeKicker"))<TypographyProps>
   color: `${(theme.vars ?? theme).palette.text.secondary}`,
 }));
 
-export const English = styled(Typography, hrdSlot("HomeEnglish"))<TypographyProps>(({ theme }) => ({
-  letterSpacing: ".14em",
-  fontSize: "11px",
-  color: `${(theme.vars ?? theme).palette.text.secondary}`,
-}));
-
 export const Feature = styled("section", hrdSlot("HomeFeature"))(({ theme }) => ({
   position: "relative",
   display: "grid",
@@ -126,14 +127,14 @@ export const GoldLine = styled("span", hrdSlot("HomeGoldLine"))(({ theme }) => (
   display: "block",
   width: "36px",
   height: "3px",
-  background: "var(--Hrd-gold)",
+  background: "var(--Hrd-gold-gradient)",
   marginBottom: "10px",
 }));
 
 export const FeatureCopy = styled("div", hrdSlot("HomeFeatureCopy"))(({ theme }) => ({
   position: "relative", isolation: "isolate", overflow: "hidden",
   "&::before": { content: '""', position: "absolute", inset: 0, zIndex: -1, pointerEvents: "none",
-    backgroundImage: `linear-gradient(${theme.alpha((theme.vars ?? theme).palette.secondary.light, 0.12)} 1px, transparent 1px), linear-gradient(90deg, ${theme.alpha((theme.vars ?? theme).palette.secondary.light, 0.12)} 1px, transparent 1px)`,
+    backgroundImage: "linear-gradient(rgba(240,197,76,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(240,197,76,0.12) 1px, transparent 1px)",
     backgroundSize: "48px 48px", animation: `${gridDrift} 16s linear infinite` },
   "&::after": { content: '""', position: "absolute", top: 0, left: 0, right: 0, height: 2, pointerEvents: "none",
     backgroundImage: `linear-gradient(90deg, transparent, ${(theme.vars ?? theme).palette.secondary.light}, transparent)`,
@@ -149,7 +150,10 @@ export const FeatureCopy = styled("div", hrdSlot("HomeFeatureCopy"))(({ theme })
 }));
 
 export const FeatureEyebrow = styled(Typography, hrdSlot("HomeFeatureEyebrow"))<TypographyProps>(({ theme }) => ({
-  color: "#e5c589",
+  ...goldTextEmphasis,
+  "--Hrd-accent-outline": "rgb(0 0 0 / 37.5%)",
+  "--Hrd-accent-shadow": "1.5px 1.5px 2px rgb(0 0 0 / 35%), -1px -1px 1px rgb(255 255 255 / 25%)",
+  color: "var(--Hrd-gold)",
   letterSpacing: ".03em",
 }));
 
@@ -169,10 +173,11 @@ export const FeatureDescription = styled(Typography, hrdSlot("HomeFeatureDescrip
 }));
 
 export const HeroButton = styled(Button, hrdSlot("HomeHeroButton"))<ButtonProps>(({ theme }) => ({
-  color: "#fff",
+  "&&.MuiButton-root, &&.MuiButton-root:hover, &&.MuiButton-root:visited": { color: "#fff" },
   marginTop: "22px",
   padding: "8px 0",
-  borderBottom: "1px solid #d8b36c",
+  borderBottom: "1px solid var(--Hrd-gold)",
+  borderImage: "var(--Hrd-gold-gradient) 1",
   borderRadius: "0",
 }));
 
@@ -217,7 +222,7 @@ export const Dot = styled("button", hrdSlot("HomeDot"))(({ theme }) => ({
     borderColor: "#08477f",
   },
   "&:focus-visible": {
-    outline: "2px solid #d8b36c",
+    outline: "2px solid var(--Hrd-gold)",
     outlineOffset: "4px",
   },
 }));
@@ -243,7 +248,7 @@ export const SectionHeading = styled("div", hrdSlot("HomeSectionHeading"))(({ th
     display: "block",
     width: "45px",
     height: "3px",
-    background: "var(--Hrd-gold)",
+    background: "var(--Hrd-gold-gradient)",
     marginTop: "12px",
   },
   [theme.breakpoints.down(700.05)]: {
@@ -286,6 +291,7 @@ export const DocumentCover = styled("div", hrdSlot("HomeDocumentCover"))(({ them
   color: "#fff",
   textAlign: "center",
   borderTop: "5px solid var(--Hrd-gold)",
+  borderImage: "var(--Hrd-gold-gradient) 1",
   background: "radial-gradient(circle at 90% 10%, #ffffff17, transparent 55%), #08477f",
   "& h6": {
     lineHeight: "1.8",
@@ -310,7 +316,8 @@ export const CardCopy = styled("div", hrdSlot("HomeCardCopy"))(({ theme }) => ({
 }));
 
 export const Category = styled(Typography, hrdSlot("HomeCategory"))<TypographyProps>(({ theme }) => ({
-  color: `${(theme.vars ?? theme).palette.primary.main}`,
+  ...goldTextEmphasis,
+  color: "var(--Hrd-gold)",
 }));
 
 export const Secondary = styled(Typography, hrdSlot("HomeSecondary"))<TypographyProps>(({ theme }) => ({
@@ -374,6 +381,7 @@ export const QuickLinks = styled("section", hrdSlot("HomeQuickLinks"))(({ theme 
     padding: "28px",
     textDecoration: "none",
     borderBottom: "3px solid var(--Hrd-gold)",
+    borderImage: "var(--Hrd-gold-gradient) 1",
   },
   "& a > svg:last-child": {
     marginLeft: "auto",
@@ -420,7 +428,8 @@ export const ResourceCard = styled(Link, hrdSlot("HomeResourceCard"))(({ theme }
   border: `1px solid ${(theme.vars ?? theme).palette.divider}`,
   padding: "28px 24px",
   "& > svg": {
-    color: `${(theme.vars ?? theme).palette.primary.main}`,
+    color: "var(--Hrd-gold)",
+    ...goldIconEmphasis,
   },
   "& h3": {
     lineHeight: "1.9",
@@ -440,6 +449,7 @@ export const Contact = styled("section", hrdSlot("HomeContact"))(({ theme }) => 
   marginTop: "25px",
   background: "var(--Hrd-surface)",
   borderInlineStart: "4px solid var(--Hrd-gold)",
+  borderImage: "var(--Hrd-gold-gradient) 1",
   scrollMarginTop: "220px",
   "& h2": {
     marginBottom: "12px",

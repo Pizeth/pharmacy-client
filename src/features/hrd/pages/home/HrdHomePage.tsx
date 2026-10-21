@@ -57,7 +57,6 @@ export function HrdHomePage() {
           <S.Kicker variant="overline">ក្រសួងមុខងារសាធារណៈ</S.Kicker>
           <Typography component="h1" variant="h4">នាយកដ្ឋានធនធានមនុស្ស</Typography>
         </div>
-        <S.English variant="body2">HUMAN RESOURCE DEPARTMENT</S.English>
       </S.Identity>
 
       <S.Feature aria-label="ព័ត៌មានសំខាន់" aria-roledescription="carousel"
@@ -119,7 +118,6 @@ export function HrdHomePage() {
 
       <S.Welcome ref={reveal} data-scroll-reveal="flip-left" aria-labelledby="hrd-welcome-heading">
         <S.WelcomeSymbol><Users size={68} strokeWidth={1} aria-hidden="true" />
-          <Typography variant="overline">HUMAN RESOURCE DEPARTMENT</Typography>
         </S.WelcomeSymbol>
         <S.WelcomeCopy>
           <S.Category variant="overline">សូមស្វាគមន៍</S.Category>

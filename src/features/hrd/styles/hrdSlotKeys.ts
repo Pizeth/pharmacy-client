@@ -22,7 +22,6 @@ export type HrdSlotKey =
   | "homeRoot"
   | "homeIdentity"
   | "homeKicker"
-  | "homeEnglish"
   | "homeFeature"
   | "homeFeatureVisual"
   | "homeVisualCaption"

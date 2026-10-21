@@ -385,6 +385,8 @@ export interface BaseInputProps<
   type?: string;
 
   iconStart?: ReactNode;
+  /** Vertical alignment of the start icon in multiline fields. Defaults to center. */
+  iconStartAlignment?: "center" | "top";
   iconEnd?: ReactNode;
 
   /**

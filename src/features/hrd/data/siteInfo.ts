@@ -13,7 +13,7 @@ import type { PublicDocumentsSiteInfo } from "../types/publicDocuments.types";
  */
 export const HRD_SITE: PublicDocumentsSiteInfo = {
   name: "នាយកដ្ឋានធនធានមនុស្ស",
-  tagline: "ក្រសួងមុខងារសាធារណៈ • Human Resource Department",
+  tagline: "ក្រសួងមុខងារសាធារណៈ",
   organization: "នាយកដ្ឋានធនធានមនុស្ស",
   contact: {
     address: {

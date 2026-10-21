@@ -72,6 +72,18 @@ newer results. Body-scroll locking has its own cleanup, independent of requests.
 Keyboard selection uses the same result title as pointer selection. Search
 inputs use unique IDs, and the clear action has an accessible label.
 
+## Back to top
+
+`BackToTop.tsx` retains the `RazethBackToTop.root` slot and uses the signature
+blue surface with a gold gradient border and gold arrow. `useScrollToTop.ts`
+owns the animation and cleanup. `SHORYUKEN_DURATION_MS` is 1600ms, measured from
+the asset's 16 frames at 100ms each. Distance changes velocity, not duration;
+requestAnimationFrame applies cubic easing with instant scroll steps so native
+smooth scrolling cannot add a competing duration. Keep the button visible while
+the GIF plays, even after crossing its normal 100px visibility threshold.
+Wheel, touch and scrolling keys cancel the animation; unmount cancels the frame
+and listeners. Reduced-motion users return to the top instantly without the GIF.
+
 ## Verification
 
 Run `npm test -- --runInBand --roots src --testPathPatterns src/components/Navigations`

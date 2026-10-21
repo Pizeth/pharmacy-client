@@ -153,6 +153,7 @@ export const Sidebar = styled("aside", hrdSlot("AboutSidebar"))(({ theme }) => (
 }));
 
 export const NavTitle = styled(Typography, hrdSlot("AboutNavTitle"))<TypographyProps>(({ theme }) => ({
+  fontWeight: theme.typography.fontWeightBold,
   padding: "18px 20px",
   background: "linear-gradient(90deg, #F0C54C, #EDAC4C 50%, #EA9548)",
   color: "#26247B",

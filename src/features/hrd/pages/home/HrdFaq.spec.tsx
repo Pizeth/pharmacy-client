@@ -8,9 +8,10 @@ it("renders resource-grounded FAQs with native accessible expandable summaries",
   expect(screen.getByRole("heading", { name: "សំណួរដែលសួរញឹកញាប់" })).toBeInTheDocument();
   const items = document.querySelectorAll("#hrd-faq details");
   expect(items).toHaveLength(HRD_FAQ.length);
-  expect(items[0]).toHaveAttribute("open");
+  items.forEach((item) => expect(item).not.toHaveAttribute("open"));
   const question = screen.getByText(HRD_FAQ[1].question);
   fireEvent.click(question.closest("summary")!);
   expect(items[1]).toHaveAttribute("open");
+  items.forEach((item) => { if (!item.hasAttribute("open")) fireEvent.click(item.querySelector("summary")!); });
   expect(screen.getAllByRole("link", { name: /បណ្ដុំឯកសារ|ឯកសារទាំងអស់|ព័ត៌មានទំនាក់ទំនង|ទាក់ទងនាយកដ្ឋាន/ }).length).toBeGreaterThan(0);
 });

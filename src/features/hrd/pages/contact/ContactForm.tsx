@@ -43,7 +43,7 @@ export function ContactForm({ email }: { email?: string }) {
       <TextField name="phone" label="លេខទូរសព្ទ / Telegram" iconStart={<Phone size={18} />} autoComplete="tel" rules={requiredText} required fullWidth />
       <TextField name="subject" label="ប្រធានបទ" iconStart={<FileText size={18} />} rules={requiredText} required fullWidth />
     </S.Fields>
-    <TextField name="message" label="សារ" iconStart={<MessageSquare size={18} />} multiline minRows={5} rules={requiredText} required fullWidth />
+    <TextField name="message" label="សារ" iconStart={<MessageSquare size={18} />} iconStartAlignment="top" multiline minRows={5} rules={requiredText} required fullWidth />
     <S.SendButton type="submit" variant="contained" size="large" startIcon={<Mail size={18} />} disabled={!email}>ផ្ញើសារ</S.SendButton>
     {!email && <Alert severity="info">អ៊ីមែលទំនាក់ទំនងកំពុងរៀបចំ</Alert>}
     {draftOpened && <Alert severity="info" role="status">សារមិនទាន់បានផ្ញើទេ។ សូមបញ្ជូនសារពីកម្មវិធីអ៊ីមែលរបស់អ្នក។</Alert>}

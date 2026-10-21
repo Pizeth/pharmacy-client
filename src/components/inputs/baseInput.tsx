@@ -267,6 +267,12 @@ const StartAdornmentRoot = styled(InputAdornment, {
   slot: "Icon",
   overridesResolver: (_props, styles) => styles.icon,
 })(({ theme }) => ({
+  '&&[data-alignment="top"]': {
+    alignSelf: "flex-start",
+    height: "1.4375em",
+    maxHeight: "none",
+    marginTop: 0,
+  },
   // Color the adornment itself so icons using currentColor (including Lucide)
   // follow the same field states as MUI SvgIcon without vendor-specific classes.
   ".MuiInputBase-root.Mui-focused &": {
@@ -310,6 +316,7 @@ export function BaseInput<TFieldValues extends FieldValues>(
     rootRef,
     type = "text",
     iconStart,
+    iconStartAlignment = "center",
     iconEnd,
     resettable = true,
     clearAlwaysVisible,
@@ -405,7 +412,7 @@ export function BaseInput<TFieldValues extends FieldValues>(
     {
       readOnly,
       startAdornment: iconStart ? (
-        <StartAdornmentRoot position="start">{iconStart}</StartAdornmentRoot>
+        <StartAdornmentRoot position="start" data-alignment={multiline ? iconStartAlignment : "center"}>{iconStart}</StartAdornmentRoot>
       ) : undefined,
       endAdornment,
     },
