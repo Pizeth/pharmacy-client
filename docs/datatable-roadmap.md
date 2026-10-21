@@ -1,5 +1,17 @@
 # TanStack v9 + MUI DataTable roadmap
 
+## October 21 — 2.2.3.4 sticky-height repair
+
+Track A COMPLETE: measured sticky data-row heights replace nominal stacking;
+the real13.8125px overlap is now0px. Independent bands, wrapping, resize, content,
+density, sorting/filtering/paging and table/card lifecycle were browser checked.
+See [the repair record](datatable-sticky-height-2-2-3-4.md) for bounds and limits.
+Final validation:139 suites/796 tests, typecheck and whitespace PASS.
+Selection optimization stays deferred (decision C); production subscriptions
+are unchanged. [Dependency contract](datatable-selection-dependency-contract.md)
+records unproven opt-in invariants. No profiling rerun, virtualization or PR #31
+extraction. Navbar reload outcomes are recorded separately.
+
 ## October 20 — 2.2.3.3 correctness gate
 
 Dependency diagnosis and remeasurement are complete; production rollout remains

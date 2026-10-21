@@ -1,5 +1,17 @@
 # DataTable browser matrix runbook
 
+## October 21 — existing run, 2.2.3.4 Track A recheck
+
+PASS: the prior13.8125px real selected-row overlap is now0px, with unchanged
+50.8125px row heights and measured36/86.8125px offsets. T1–T16, all seven modes,
+retention/filter/page transitions, independent bands and wrapping are recorded in
+[the repair report](datatable-sticky-height-2-2-3-4.md) with raw bounds/screenshots.
+Final clean-load resource console: no warnings/errors. Focused13/81, full139/796,
+typecheck and whitespace PASS. This continues the existing run; historical FAIL
+evidence below is retained. Selection optimization remains deferred; no
+virtualization or new performance claim. Overfilled pin-band capacity and the
+existing dynamic keepPinnedRows option-cache limitation are documented.
+
 ## October 20 — dependency correctness and navigation regression
 
 First navigation browser result: 900px expanded header overlaps the breadcrumb

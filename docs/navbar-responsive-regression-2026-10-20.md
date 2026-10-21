@@ -1,5 +1,27 @@
 # Responsive navigation regression — October 20, 2026
 
+## October 21 — latest refactored master restoration follow-up
+
+Base0cb91e2510baf156442bd3ef4f9e0d79da9c2d36; no navigation source changes.
+Raw local-development browser evidence: `navbar-restoration-2026-10-21.json`.
+Previously user-verified physical rotation and hover are retained, not repeated.
+
+| Case | Result | Settled evidence |
+| --- | --- | --- |
+| Reload at top | PASS | y0, header155.671875px, breadcrumb167.671875px |
+| Reload compact/scrolled | Browser-dependent restoration; state PASS | Before y630/header98px; reload resets y0 and correctly expands155.671875px |
+| Reload near footer | Browser-dependent restoration; state PASS | Before y3419/footer top219.296875px; reload resets y0 and expands |
+| HRD→Contact→Back | PASS | Contact y0 expanded; Back restores y630/header98px compact |
+| FAQ hash reload | Browser-dependent restoration; state PASS | Hash click y2634 compact; reload keeps hash but resets y0, correctly expanded |
+| Restore then resize across md | PASS | 899px top114px header/breadcrumb126px; y700 compact66px. 900px same y compact98px; top expands181.34375px/breadcrumb193.34375px |
+
+No horizontal overflow or runtime console errors. Geometry matches actual scroll;
+no restoration storage/history override or navigation redesign was needed.
+Initial unpaced wheel samples at y0 are retained in raw evidence but excluded
+from compact/reload conclusions; the settled keyboard-scroll samples above govern.
+Focused DataTable/navigation13 suites/81 tests and final full139/796 PASS.
+Historical production measurements below remain distinct from this development run.
+
 Source baseline: `5849b8d2db4daf3f5994adf7c178f9769e09d652` plus local changes.
 Separate track from DataTable dependency correctness. Preserve the current HRD
 design, footer, decorative contact card and intentional slideshow.

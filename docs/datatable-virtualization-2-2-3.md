@@ -3,6 +3,15 @@
 Status: architecture review justified by October 13 Matrix B; no virtualization
 implementation or dependency introduced.
 
+## October 21 — geometry repair, selection gate preserved
+
+2.2.3.4 Track A repairs the measured13.8125px sticky-row overlap using mounted
+data-row heights and independent edge sums. See the [repair record](datatable-sticky-height-2-2-3-4.md).
+This does not change production selection subscriptions or resolve their
+dependency gate. Decision C remains; the [contract notes](datatable-selection-dependency-contract.md)
+define prerequisites for later opt-in work. Existing2.2.3.3 profiling evidence
+is retained without a costly rerun. No virtualization implementation is approved.
+
 ## October 20 — dependency gate outcome
 
 The 2.2.3.3 real-table adversarial proof rejects rollout of the current row-local

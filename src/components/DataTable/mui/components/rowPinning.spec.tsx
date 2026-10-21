@@ -28,6 +28,23 @@ const data: Row[] = [
 
 const theme = createTheme();
 
+it("measures initially pinned real table rows without waiting for a selection or resize", () => {
+  const rect = jest.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+    const height = this.dataset.rowId === "b" ? 50.8125 : 61.25;
+    return { x: 0, y: 0, top: 0, left: 0, right: 100, bottom: height, width: 100, height, toJSON() {} };
+  });
+  try {
+    const { container } = render(<ThemeProvider theme={theme}><Fixture /></ThemeProvider>);
+    expect(container.querySelector('[data-row-id="c"]')).toHaveStyle({ "--DataTable-row-pinned-offset": "86.8125px" });
+    expect(container.querySelector('[data-row-id="d"]')).toHaveStyle({ "--DataTable-row-pinned-offset": "0px" });
+    rect.mockClear();
+    fireEvent.scroll(container);
+    expect(rect).not.toHaveBeenCalled();
+  } finally {
+    rect.mockRestore();
+  }
+});
+
 function Fixture({
   displayMode = "sticky",
 }: {
