@@ -6,6 +6,17 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { useScrollToTop } from "./useScrollToTop";
 import { HEADER_GOLD_GRADIENT } from "./styles/constants";
 import { usePathname } from "next/navigation";
+import { useScrollProgress } from "./useScrollProgress";
+
+const ProgressGlow = styled("span", { name: "RazethBackToTop", slot: "ProgressRing", overridesResolver: (_props, styles) => styles.progressRing })({
+  position: "absolute",
+  inset: 1,
+  borderRadius: "inherit",
+  pointerEvents: "none",
+  filter: "blur(0.6px)",
+  boxShadow: "inset 0 0 5px 2px rgb(240 197 76 / 65%)",
+  maskImage: "conic-gradient(#000 calc(var(--BackToTop-progress, 0) * 1turn), transparent 0)",
+});
 
 const BackToTopButton = styled(Fab, { name: "RazethBackToTop", slot: "Root", overridesResolver: (_props, styles) => styles.root })({
   position: "fixed",
@@ -37,15 +48,18 @@ function BackToTopFab() {
   });
 
   const { isScrolling, scrollToTop } = useScrollToTop();
+  const progressRef = useScrollProgress();
 
   return (
     <Zoom in={trigger || isScrolling}>
       <BackToTopButton
+        ref={progressRef}
         size="small"
         onClick={scrollToTop}
         aria-label="scroll back to top"
         aria-busy={isScrolling}
       >
+        <ProgressGlow aria-hidden="true" />
         {isScrolling ? (
           <img src="/static/images/shoryuken.gif" alt="Scrolling..." />
         ) : (

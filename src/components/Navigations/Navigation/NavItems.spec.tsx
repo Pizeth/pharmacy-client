@@ -80,3 +80,38 @@ it("expands drawer children inline and notifies selection only for navigation li
   fireEvent.click(screen.getByRole("link", { name: "ទំព័រដើម" }));
   expect(onNavigate).toHaveBeenCalledTimes(2);
 });
+
+it("glides one pill between hover/focus targets and returns to the current route", () => {
+  const bounds = jest.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+    if (this.hasAttribute("data-nav-pill-target")) {
+      const siblings = [...this.parentElement!.querySelectorAll("[data-nav-pill-target]")];
+      return new DOMRect(20 + siblings.indexOf(this) * 150, 10, 150, 56);
+    }
+    return new DOMRect(20, 10, 900, 56);
+  });
+  const view = render(<ThemeProvider theme={theme}><NavItems /></ThemeProvider>);
+  try {
+    const home = screen.getByRole("link", { name: "ទំព័រដើម" });
+    const documents = screen.getByRole("link", { name: "បណ្ដុំឯកសារ" });
+    const list = home.closest("ul")!;
+    expect(list.querySelectorAll('[aria-hidden="true"][role="presentation"]')).toHaveLength(1);
+    expect(list.style.getPropertyValue("--Nav-pill-x")).toBe("4px");
+    fireEvent.mouseEnter(documents);
+    expect(list.style.getPropertyValue("--Nav-pill-x")).toBe("304px");
+    expect(home).toHaveAttribute("aria-current", "page");
+    fireEvent.mouseLeave(list);
+    expect(list.style.getPropertyValue("--Nav-pill-x")).toBe("4px");
+    fireEvent.mouseEnter(home);
+    fireEvent.focus(documents);
+    expect(list.style.getPropertyValue("--Nav-pill-x")).toBe("304px");
+    fireEvent.blur(documents, { relatedTarget: document.body });
+    expect(list.style.getPropertyValue("--Nav-pill-x")).toBe("4px");
+    pathname.mockReturnValue("/hrd/documents");
+    view.rerender(<ThemeProvider theme={theme}><NavItems /></ThemeProvider>);
+    expect(list.style.getPropertyValue("--Nav-pill-x")).toBe("304px");
+    expect(documents).toHaveAttribute("aria-current", "page");
+  } finally {
+    view.unmount();
+    bounds.mockRestore();
+  }
+});

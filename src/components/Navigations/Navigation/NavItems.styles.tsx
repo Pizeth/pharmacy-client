@@ -2,7 +2,7 @@
 
 import { navigationSlot } from "../styles/slots";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { styled } from "@mui/material/styles";
+import { keyframes, styled } from "@mui/material/styles";
 import Link from "next/link";
 import { colorItemMixin, resolveColor } from "@/utils/themeUtils";
 import { Box, ButtonBase, Menu, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
@@ -28,82 +28,98 @@ export const NavList = styled(List, navigationSlot("RazethNav", "List"))<{
   margin: 0,
   listStyle: "none"
 }));
+export const NavPill = styled("li", navigationSlot("RazethNav", "Pill"))(({ theme }) => ({
+  position: "absolute",
+  top: "calc(var(--Nav-pill-y, 0px) + var(--Nav-pill-height, 0px) / 2)",
+  left: 0,
+  width: "var(--Nav-pill-width, 0px)",
+  height: `min(var(--Nav-pill-height, 0px), ${theme.spacing(6)})`,
+  transform: "translate3d(var(--Nav-pill-x, 0px), -50%, 0)",
+  borderRadius: 999,
+  listStyle: "none",
+  pointerEvents: "none",
+  opacity: 0,
+  background: "linear-gradient(135deg, #F5DB8D, #E8B841)",
+  boxShadow: "inset 0 1px 1px rgb(255 255 255 / 55%), 0 3px 10px rgb(38 36 123 / 20%)",
+  transition: "transform 280ms cubic-bezier(0.22, 1, 0.36, 1), width 280ms cubic-bezier(0.22, 1, 0.36, 1), height 180ms ease, opacity 150ms ease",
+  '[data-pill-ready="true"] > &': { opacity: 1 },
+  "@media (prefers-reduced-motion: reduce)": { transition: "none" },
+}));
+const drawBorder = keyframes({
+  from: { strokeDasharray: 100, strokeDashoffset: 100 },
+  "99%": { strokeDasharray: 100, strokeDashoffset: 0 },
+  // A continuous final stroke avoids the dash seam on a closed rounded path.
+  to: { strokeDasharray: "none", strokeDashoffset: 0 },
+});
+export const NavHoverBorder = styled("svg", navigationSlot("RazethNav", "HoverBorder"))(({ theme }) => ({
+  position: "absolute",
+  insetInline: 4,
+  top: "50%",
+  transform: "translateY(-50%)",
+  width: "calc(100% - 8px)",
+  height: `min(calc(100% - 8px), ${theme.spacing(6)})`,
+  pointerEvents: "none",
+  overflow: "visible",
+  shapeRendering: "geometricPrecision",
+  fill: "none",
+  stroke: "var(--Nav-item-color)",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  "& rect": {
+    width: "calc(100% - 2px)", height: "calc(100% - 2px)",
+    strokeDasharray: 100, strokeDashoffset: 100,
+  },
+  "a:hover > & rect, button:hover > & rect": { animation: `${drawBorder} 650ms ease-out 1 forwards` },
+  "@media (prefers-reduced-motion: reduce)": {
+    "a:hover > & rect, button:hover > & rect": { animation: "none", strokeDasharray: "none", strokeDashoffset: 0 },
+  },
+}));
 export const NavItem = styled(ListItem, {
   ...navigationSlot("RazethNav", "Item"),
-  shouldForwardProp: prop => prop !== "active" && prop !== "color"
+  shouldForwardProp: prop => prop !== "active" && prop !== "color",
 })<{
   color: string;
   active?: boolean;
   variant?: "vertical" | "horizontal";
-}>(({
-  theme,
-  color,
-  active,
-  variant = "vertical"
-}) => {
-  const {
-    resolved,
-    gradient
-  } = colorItemMixin(color, theme);
-  return {
-    position: "relative",
-    listStyle: "none",
-    zIndex: 1,
-    cursor: "pointer",
-    display: "inline-flex",
-    float: "left",
-    margin: 0,
-    padding: 0,
-    outline: 0,
-    boxSizing: "border-box",
-    verticalAlign: "middle",
-    lineHeight: 1.75,
-    textTransform: "uppercase",
-    width: variant == "vertical" ? "fit-content" : "100%",
-    justifyContent: variant == "vertical" ? "center" : "flex-start",
-    minWidth: "64px",
-    backgroundImage: gradient,
-    backgroundSize: "100% 200%",
-    backgroundPosition: active ? "0 100%" : "0 0",
-    transition: "background-position 0.5s",
-    "&:active": {
-      backgroundPosition: "0 100%",
-      transition: "all 0.25s ease-in"
+}>(({ theme, color }) => ({
+  "--Nav-item-color": resolveColor(color, theme),
+  position: "relative",
+  zIndex: 1,
+  display: "inline-flex",
+  width: "fit-content",
+  minWidth: 64,
+  margin: 0,
+  padding: 0,
+  listStyle: "none",
+  textTransform: "uppercase",
+  "& > a, & > button": {
+    borderRadius: 999,
+    background: "transparent",
+    transition: "color 180ms ease",
+    "&:focus-visible": {
+      outline: "none",
+      "&::after": {
+        content: '""',
+        position: "absolute",
+        insetInline: 4,
+        top: "50%",
+        height: `min(calc(100% - 8px), ${theme.spacing(6)})`,
+        transform: "translateY(-50%)",
+        borderRadius: "inherit",
+        outline: "2px solid white",
+        outlineOffset: 2,
+        pointerEvents: "none",
+      },
     },
-    "&:hover": {
-      transition: "all 0.25s ease-in",
-      "& > a, & > button": {
-        color: active ? theme.vars.palette.common.white : `color-mix(in srgb, ${resolved} 60%, black)`,
-        backgroundColor: active ? theme.vars.palette.action.hover : theme.alpha(theme.vars.palette.background.paper, 0.9),
-        backgroundImage: active ? "none" : `linear-gradient(${theme.alpha(resolved, 0.12)}, ${theme.alpha(resolved, 0.12)})`,
-        backdropFilter: active ? "none" : "blur(12px)",
-        boxShadow: active ? "none" : `inset 0 0 0 1px ${theme.alpha(resolved, 0.4)}`,
-        ...theme.applyStyles("dark", {
-          color: active ? theme.vars.palette.common.white : `color-mix(in srgb, ${resolved} 60%, white)`
-        })
-      }
-    },
-    "&::after": {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      content: "''",
-      display: "block",
-      background: resolved,
-      transition: "width .3s"
-    },
-    "&:hover::after": {
-      height: variant == "vertical" ? "2.5px" : "100%",
-      width: variant == "vertical" ? "100%" : "2.5px",
-      background: active ? "white" : resolved,
-      backgroundPosition: "right",
-      backgroundSize: "2.5px 100%"
-    },
-    svg: {
-      color: "inherit"
-    }
-  };
-});
+  },
+  '&[data-pill-highlighted="true"] > a, &[data-pill-highlighted="true"] > button': {
+    color: "#26247B",
+  },
+  "& svg": { color: "inherit" },
+  "@media (prefers-reduced-motion: reduce)": {
+    "& > a, & > button": { transition: "none" },
+  },
+}));
 export const NavLink = styled(Link, {
   ...navigationSlot("RazethNav", "Link"),
   shouldForwardProp: prop => prop !== "active" && prop !== "color"
@@ -130,10 +146,6 @@ export const NavLink = styled(Link, {
     padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
     color: variant === "vertical" ? theme.vars.palette.common.white : theme.vars.palette.text.primary,
     fontSize: "1rem",
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover
-    },
-    "&:hover svg": {}
   };
 });
 export const NavIcon = styled(ListItemIcon, navigationSlot("RazethNav", "Icon"))<{
@@ -180,9 +192,6 @@ export const NavGroupButton = styled(ButtonBase, navigationSlot("RazethNav", "Gr
   alignSelf: "stretch",
   padding: theme.spacing(1, 2),
   color: theme.vars.palette.common.white,
-  "&:hover": {
-    backgroundColor: theme.palette.action.hover
-  }
 }));
 export const DrawerRoot = styled(Root, navigationSlot("RazethNav", "DrawerRoot"))({
   width: "100%",

@@ -7,7 +7,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Link from "next/link";
 import { Collapse, MenuItem, List, ListItem, ListItemButton, ListItemIcon, Typography } from "@mui/material";
 import { getDynamicNavItems, getActiveNavIndex, matchesNavRoute } from "@/configs/navConfig";
-import { Root, NavList, NavItem, NavLink, NavIcon, NavText, NavGroupButton, DrawerRoot, DrawerList, DrawerItem, DrawerGroupButton, DrawerChildLink, DrawerChildIcon, GroupArrow, DesktopMenu } from "./NavItems.styles";
+import { Root, NavList, NavPill, NavHoverBorder, NavItem, NavLink, NavIcon, NavText, NavGroupButton, DrawerRoot, DrawerList, DrawerItem, DrawerGroupButton, DrawerChildLink, DrawerChildIcon, GroupArrow, DesktopMenu } from "./NavItems.styles";
+import { useGlidingPill } from "./useGlidingPill";
 interface NavItemsProps {
   variant?: "vertical" | "horizontal";
   items?: NavItemType[];
@@ -42,7 +43,15 @@ export const NavItems = ({
   const navItems = items ?? getDynamicNavItems(pathname);
   const activeIndex = getActiveNavIndex(pathname, navItems);
   const menuOpen = menu !== null && menu.pathname === pathname && navItems.includes(menu.item);
+  const [hovered, setHovered] = useState<{ pathname: string; index: number } | null>(null);
+  const [focused, setFocused] = useState<{ pathname: string; index: number } | null>(null);
+  const pillIndex = (hovered?.pathname === pathname ? hovered.index : undefined)
+    ?? (menuOpen ? navItems.indexOf(menu.item) : undefined)
+    ?? (focused?.pathname === pathname ? focused.index : undefined)
+    ?? activeIndex;
+  const listRef = useGlidingPill(variant === "vertical", pillIndex, navItems.map(item => item.href).join("\n"), pathname);
   const labelContent = (item: NavItemType) => <>
+      {variant === "vertical" && <NavHoverBorder aria-hidden="true"><rect x="1" y="1" rx="24" pathLength="100" /></NavHoverBorder>}
       <NavIcon variant={variant}>{item.Icon}</NavIcon>
       <NavText primary={item.label} variant={variant} slotProps={{
       primary: variant === "vertical" ? {
@@ -81,8 +90,17 @@ export const NavItems = ({
     </DrawerRoot>;
   }
   return <Root>
-      <NavList variant={variant}>
-        {navItems.map((item, index) => <NavItem key={item.href} color={item.color} active={activeIndex === index} variant={variant}>
+      <NavList ref={listRef} variant={variant} onMouseLeave={() => setHovered(null)} onBlurCapture={event => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setFocused(null);
+      }}>
+        <NavPill aria-hidden="true" role="presentation" />
+        {navItems.map((item, index) => <NavItem key={item.href} color={item.color} active={activeIndex === index} variant={variant}
+          data-nav-pill-target data-pill-highlighted={pillIndex === index}
+          onMouseEnter={() => setHovered({ pathname, index })}
+          onFocusCapture={() => {
+            setHovered(null);
+            setFocused({ pathname, index });
+          }}>
             {item.children?.length ? <NavGroupButton id={`${menuId}-${index}`} aria-haspopup="menu" aria-expanded={menuOpen && menu?.item === item} aria-controls={menuOpen && menu?.item === item ? `${menuId}-menu` : undefined} onMouseEnter={event => {
           if (variant !== "vertical") return;
           cancelClose();

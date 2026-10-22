@@ -114,7 +114,7 @@ declare module "@mui/material/styles" {
     RazethRouteContentLoading: RouteContentLoadingSlot;
     RazethPublicDocuments: PublicDocumentsSlotKey;
     RazethAvatarContainer: "root" | "chip" | "foreground";
-    RazethBackToTop: "root";
+    RazethBackToTop: "root" | "progressRing";
     RazethSideImagePreview: "root" | "toolbar";
     RazethDrawerTheme: "root" | "label";
     RazethNavPattern: "root";

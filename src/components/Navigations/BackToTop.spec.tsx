@@ -8,6 +8,52 @@ jest.mock("@mui/material", () => ({
   useScrollTrigger: () => true,
 }));
 
+it("fills the ring only at the bottom and recalculates after page height changes", () => {
+  const root = document.documentElement;
+  const descriptors = [
+    [window, "scrollY"], [root, "scrollHeight"], [root, "clientHeight"],
+  ] as const;
+  const originals = descriptors.map(([target, key]) => Object.getOwnPropertyDescriptor(target, key));
+  let y = 500;
+  let height = 2000;
+  Object.defineProperty(window, "scrollY", { configurable: true, get: () => y });
+  Object.defineProperty(root, "scrollHeight", { configurable: true, get: () => height });
+  Object.defineProperty(root, "clientHeight", { configurable: true, value: 1000 });
+  let pending: FrameRequestCallback | undefined;
+  jest.spyOn(window, "requestAnimationFrame").mockImplementation(callback => { pending = callback; return 1; });
+  const cancel = jest.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+  jest.mocked(usePathname).mockReturnValue("/hrd");
+  const view = render(<BackToTop />);
+  const progress = () => screen.getByRole("button").style.getPropertyValue("--BackToTop-progress");
+  const update = (event: string) => act(() => { fireEvent(window, new Event(event)); pending?.(0); });
+  try {
+    expect(progress()).toBe("0.5");
+    y = 999;
+    update("scroll");
+    expect(progress()).toBe("0.999");
+    y = 1000;
+    update("scroll");
+    expect(progress()).toBe("1");
+    height = 3000;
+    update("resize");
+    expect(progress()).toBe("0.5");
+    y = -10;
+    update("scroll");
+    expect(progress()).toBe("0");
+    fireEvent.scroll(window);
+    view.unmount();
+    expect(cancel).toHaveBeenCalledWith(1);
+  } finally {
+    view.unmount();
+    jest.restoreAllMocks();
+    descriptors.forEach(([target, key], index) => {
+      const descriptor = originals[index];
+      if (descriptor) Object.defineProperty(target, key, descriptor);
+      else Reflect.deleteProperty(target, key);
+    });
+  }
+});
+
 it("releases the old route animation and resets the GIF/busy state on navigation", () => {
   const frames = new Map<number, FrameRequestCallback>();
   let sequence = 0;
