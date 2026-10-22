@@ -3,6 +3,30 @@
 October 22, 2026. **Outcome B — Contract established, rollout deferred.**
 This is a correctness milestone, not a completed production optimization.
 
+## PR cleanup follow-up — October 22
+
+The original scope and validation below describe proof commit `0921295`.
+At the user's follow-up request, the previously recorded baseline CI failures
+were repaired: FAQ shadows now preserve the application token while falling back
+for ordinary themes, and the existing named input-adornment slot explicitly sets
+its default `alignSelf: auto`. All14 tests in the four failing suites pass;
+[CI306](https://github.com/Pizeth/pharmacy-client/actions/runs/39720166273) is green
+for repair commit `08a4521`. Historical failure evidence below is retained.
+
+`.coderabbit.yaml` now enables automatic draft reviews. CodeRabbit has confirmed
+it is reviewing this draft with the repository configuration.
+
+The user's package upgrades are retained except for resolver6's incompatible
+optional Effect4/TypeSchema Effect3 peer graph. Resolver5.9.2 remains compatible
+with the application's Zod integration; the ineffective `$effect` override was
+removed. TypeScript is aligned to6.0.3 and ESLint to9.39.5 to satisfy the actual
+Next lint stack's peer ranges. `npm ls --all` reports no dependency problems.
+The lockfile is regenerated without force/legacy-peer-deps. Final updated-tree
+validation is reported with the latest PR head's checks.
+
+These CI/dependency repairs do not resolve the selection callback gates or change
+Outcome B. Production DataTable subscriptions and virtualization remain deferred.
+
 ## Source and scope
 
 Base: `9b75b0372938767d01874f43cc0bd401011a7a40`, fetched `origin/master`;
