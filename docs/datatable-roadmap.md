@@ -1,5 +1,20 @@
 # TanStack v9 + MUI DataTable roadmap
 
+## October 22 — 2.2.3.5 scoped output proof
+
+**Outcome B: contract established, rollout deferred.** An internal typed output
+boundary proves local A can skip B while global/nested output and live aggregate
+guards update. New D1–D26 tests retain the old unsafe projection counterexample.
+Callback-snapshot and nullable-detail negative probes show why this cannot yet
+narrow generic production owners/rows. Browser reproduces live2/snapshot0 versus
+the default's correct2/2. See the [full report](datatable-selection-dependencies-2-2-3-5.md).
+
+Production subscriptions/resources are unchanged; real TranslationKey selected
+row overlap remains0px. No approved candidate exists for a new performance matrix.
+Next gate: compatible live callback context plus independent invocation boundaries
+for nullable details and card slots, followed by correctness and profiling.
+Virtualization and PR #31 remain separate. Historical outcomes below are retained.
+
 ## October 21 — 2.2.3.4 sticky-height repair
 
 Track A COMPLETE: measured sticky data-row heights replace nominal stacking;

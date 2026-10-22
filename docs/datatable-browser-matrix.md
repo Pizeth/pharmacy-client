@@ -1,5 +1,42 @@
 # DataTable browser matrix runbook
 
+## October 22 — 2.2.3.5 independent output dependencies
+
+Continues this run on base `9b75b0372938767d01874f43cc0bd401011a7a40`.
+Chrome155 IAB, Windows, development,1101×884. No production subscriptions changed.
+Dedicated route: `/dev/datatable/selection-dependencies` (development only).
+
+- D5/D6/D8 live-store output probe: browser PASS. Select A then B: raw2,
+  A global2, nested global2, other-row callback "B selected", both guards disabled.
+  Table rows are37px and adjacent bounds meet at294.875px (zero overlap).
+- D21 live-store card/detail probe: browser PASS. A count/nested/detail2;
+  cross-card guard disabled after B selection.
+- **Rollout blocker D6/D21: REPRODUCED.** With the existing callback snapshot
+  probe, switch to cards before selecting A/B. Experimental owner: raw/live2,
+  callback snapshot0, guard still enabled. Default owner with identical callbacks:
+  snapshot2, guard disabled. Broad card commits and a correct store cannot certify
+  a narrowed owner's callback contract. This is an expected diagnostic failure,
+  not a passing production optimization.
+- Transition follow-up PASS: page select-all/clear, Space selection, sort/filter
+  raw-v-filtered count, RTL hide/resize/logical pin,420px table/card parity.
+  Name180→172px; table940px inside403px horizontal scroll container.
+- Actual TranslationKey PASS: IDs10 then7 selected; bulk guards disabled across
+  table/card/table. At scroll583,10 bottom374.734375 equals7 top374.734375;
+  both50.8125px high, offsets36/86.8125, overlap0. Selection cleared afterwards.
+- Independent Document Refine fixture PASS: DOC-0001 search1–1 of1,
+  sort/card/Refresh retain result; clear1–25 of60; page2=26–50 of60; restored.
+  This existing UI has no selection/action controls; those browser checks are N/A.
+- Final console: fixture no warnings/errors; resources no errors, existing
+  logo.svg parent-position warning only. No physical touch/pen claim.
+
+Decision **B**: scoped internal contract established; generic production rollout
+remains blocked by reproduced callback snapshots and nullable invocation proof.
+No new full-density profiling run until a compatible candidate passes correctness.
+
+Screenshots and the final decision are tracked in
+`datatable-selection-dependencies-2-2-3-5.md`. Historical certification remains
+intact; virtualization and PR #31 stay separate.
+
 ## October 21 — existing run, 2.2.3.4 Track A recheck
 
 PASS: the prior13.8125px real selected-row overlap is now0px, with unchanged
