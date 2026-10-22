@@ -5,6 +5,7 @@ import { styled } from "@mui/material/styles";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { useScrollToTop } from "./useScrollToTop";
 import { HEADER_GOLD_GRADIENT } from "./styles/constants";
+import { usePathname } from "next/navigation";
 
 const BackToTopButton = styled(Fab, { name: "RazethBackToTop", slot: "Root", overridesResolver: (_props, styles) => styles.root })({
   position: "fixed",
@@ -55,4 +56,8 @@ function BackToTopFab() {
   );
 }
 
-export default BackToTopFab;
+export default function BackToTop() {
+  const pathname = usePathname();
+  // A persistent navigation layout must release the previous route's animation.
+  return <BackToTopFab key={pathname} />;
+}

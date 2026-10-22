@@ -72,4 +72,28 @@ describe("GIF-timed back-to-top scrolling", () => {
     expect(result.current.isScrolling).toBe(false);
     expect(frames.size).toBe(0);
   });
+
+  it.each(["touchstart", "keydown"])("cancels on %s and permits a fresh animation", type => {
+    position = 3000;
+    const { result, unmount } = renderHook(useScrollToTop);
+    const remove = jest.spyOn(window, "removeEventListener");
+    act(() => result.current.scrollToTop());
+    tick(400);
+    if (type === "keydown") {
+      act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "a" })));
+      expect(result.current.isScrolling).toBe(true);
+    }
+    act(() => window.dispatchEvent(type === "keydown"
+      ? new KeyboardEvent("keydown", { key: "PageDown" }) : new Event(type)));
+    expect(result.current.isScrolling).toBe(false);
+    expect(frames.size).toBe(0);
+    expect(remove).toHaveBeenCalledWith("wheel", expect.any(Function));
+    expect(remove).toHaveBeenCalledWith("touchstart", expect.any(Function));
+    expect(remove).toHaveBeenCalledWith("keydown", expect.any(Function));
+    act(() => result.current.scrollToTop());
+    expect(result.current.isScrolling).toBe(true);
+    expect(frames.size).toBe(1);
+    unmount();
+    expect(frames.size).toBe(0);
+  });
 });
