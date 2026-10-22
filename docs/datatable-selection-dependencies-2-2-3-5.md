@@ -21,7 +21,8 @@ optional Effect4/TypeSchema Effect3 peer graph. Resolver5.9.2 remains compatible
 with the application's Zod integration; the ineffective `$effect` override was
 removed. TypeScript is aligned to6.0.3 and ESLint to9.39.5 to satisfy the actual
 Next lint stack's peer ranges. `npm ls --all` reports no dependency problems.
-The lockfile is regenerated without force/legacy-peer-deps. Final updated-tree
+The lockfile is regenerated without force/legacy-peer-deps. The final
+`npm ci --strict-peer-deps` and TypeScript check both pass. Full updated-tree
 validation is reported with the latest PR head's checks.
 
 These CI/dependency repairs do not resolve the selection callback gates or change
@@ -221,7 +222,7 @@ Evidence:
 - [Real sticky row bounds](evidence/datatable-selection-2-2-3-5/translation-key-sticky.jpg)
 - [Document filtered card](evidence/datatable-selection-2-2-3-5/document-card-filter.jpg)
 
-## Resource and automated validation
+## Original proof validation at `0921295`
 
 Existing TranslationKey suites cover controlled selection, canonical replacements,
 semantic query transitions, unloaded IDs, select-sticky continuity, one-loaded-row
@@ -245,15 +246,24 @@ Validation:
 | Four failing suites rerun independently | Same8 failures,6 passes; no new fixture imported |
 | `git diff --check` | PASS |
 
-The eight full-suite failures are in unchanged baseline code:
+At proof commit `0921295c071aad6799a642f27b24d325049df9fd`, the eight
+full-suite failures occurred in code identical to base
+`9b75b0372938767d01874f43cc0bd401011a7a40` in the following paths:
 `HrdHomePage.spec.tsx` (5), `HrdFaq.spec.tsx` (1), `hrdThemeSlots.spec.tsx` (1),
 and `textfieldInteraction.spec.tsx` (1). HRD styles assume CSS-variable/custom-shadow
 theme values absent from their test themes; the multiline adornment expectation
-also fails. A path-restricted `git diff HEAD` confirms no HRD, input, package,
-lockfile, Jest config or setup changes. Re-running just those four suites reproduces
-the failures without importing the new dependency fixture. Do not weaken tests or
-change unrelated navigation/theme/input code to claim green. The PR remains draft;
-full-suite failure is not waived. Raw summaries are retained in
+also failed. The explicit base-to-proof comparison
+`git diff 9b75b0372938767d01874f43cc0bd401011a7a40 0921295c071aad6799a642f27b24d325049df9fd -- src/features/hrd src/components/inputs package.json package-lock.json jest.config.mjs jest.setup.ts`
+is empty. Re-running just those four suites at that proof state reproduced the
+failures without importing the new dependency fixture. This attribution applies
+only to that original measurement, not to the current PR head.
+
+Follow-up commit `08a4521` intentionally changes `baseInput.tsx` and
+`HrdFaq.styles.tsx` on those exercised paths and clears all eight failures;
+CI306 passes. Subsequent package/lockfile changes also belong to the cleanup
+follow-up, not the original proof. Tests and timeouts were not weakened.
+The PR remains draft because Outcome B's selection rollout gates remain open,
+not because the historical eight failures are being waived. Raw summaries are retained in
 [validation evidence](evidence/datatable-selection-2-2-3-5/validation.txt).
 
 Independent final review checked source/state ownership, stable callback inputs,

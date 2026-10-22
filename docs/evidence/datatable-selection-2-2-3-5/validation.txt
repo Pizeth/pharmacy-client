@@ -1,4 +1,5 @@
 DataTable 2.2.3.5 local validation — October 22, 2026
+Original proof revision: 0921295c071aad6799a642f27b24d325049df9fd
 Base: 9b75b0372938767d01874f43cc0bd401011a7a40
 Branch: codex/datatable-selection-dependencies
 Windows / Node24.16.0 / npm11.14.1 / Next16.4.2 / TanStack9.3.1
@@ -26,7 +27,7 @@ npm run test:datatable -- --runInBand --roots src
 npm test -- --runInBand --roots src
 142 suites:138 PASS,4 FAIL.819 tests:811 PASS,8 FAIL.234.597s.
 
-Unchanged baseline suites rerun independently:
+At original proof0921295, these suites were rerun independently:
   src/features/hrd/pages/home/HrdHomePage.spec.tsx
   src/features/hrd/styles/hrdThemeSlots.spec.tsx
   src/components/inputs/textfieldInteraction.spec.tsx
@@ -35,9 +36,21 @@ Unchanged baseline suites rerun independently:
 Failures:5 HrdHomePage (theme.vars null.palette),1 HrdFaq (same),
 1 hrdThemeSlots (customShadows undefined.neumorphic),
 1 textfieldInteraction (multiline adornment alignSelf:auto expectation).
-git diff HEAD -- src/features/hrd src/components/inputs package.json
+git diff 9b75b0372938767d01874f43cc0bd401011a7a40
+  0921295c071aad6799a642f27b24d325049df9fd
+  -- src/features/hrd src/components/inputs package.json
   package-lock.json jest.config.mjs jest.setup.ts
-Empty: no differences in failing baseline code/config/dependencies.
+Empty: no differences in those paths between base and original proof revision.
+This is historical attribution at0921295, not a claim about current PR HEAD.
+Follow-up08a4521 changes baseInput.tsx and HrdFaq.styles.tsx on the exercised
+failure paths; all14 tests in those four suites pass, and CI306 is green:
+https://github.com/Pizeth/pharmacy-client/actions/runs/39720166273
+Later package upgrades and final-tree validation are tracked by the latest PR
+checks. No assertion or timeout was weakened. Outcome B remains unchanged.
+Updated tree: npm ls --all reports no problems; npm ci --strict-peer-deps PASS;
+npm run typecheck PASS. Resolver5.9.2,TypeScript6.0.3,ESLint9.39.5 satisfy the
+installed optional-validation and Next lint-tool peer contracts. No force or
+legacy-peer-deps flags and no peer-suppression overrides were used.
 
 git diff --check
 PASS. Existing LF/CRLF conversion notices are not whitespace errors.
