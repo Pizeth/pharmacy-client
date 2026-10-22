@@ -47,7 +47,7 @@ export const authClient = createAuthClient({
     passkeyClient(),
     multiSessionClient(),
     adminClient(), // 👈 this is what adds role to the session type
-    sentinelClient(),
+    sentinelClient({ identifyUrl: process.env.BETTER_AUTH_IDENTIFY_URL }),
     oneTapClient({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string,
       // Optional client configuration:
