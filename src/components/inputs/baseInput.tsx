@@ -267,6 +267,7 @@ const StartAdornmentRoot = styled(InputAdornment, {
   slot: "Icon",
   overridesResolver: (_props, styles) => styles.icon,
 })(({ theme }) => ({
+  alignSelf: "auto",
   '&&[data-alignment="top"]': {
     alignSelf: "flex-start",
     height: "1.4375em",

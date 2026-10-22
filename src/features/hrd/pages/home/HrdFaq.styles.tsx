@@ -12,7 +12,7 @@ export const Header=styled("div",hrdSlot("HomeFaqHeader"))(({theme})=>({
     width:theme.spacing(6),height:theme.spacing(6),padding:theme.spacing(1),
     boxSizing:"border-box",flexShrink:0,borderRadius:"50%",
     backgroundColor:(theme.vars??theme).palette.background.paper,
-    boxShadow:theme.vars.palette.customShadows.neumorphic,
+    boxShadow:(theme.vars??theme).palette.customShadows?.neumorphic??theme.shadows[2],
     ...theme.applyStyles("light", {
       backgroundColor:"#26247B",
       backgroundImage:"linear-gradient(145deg, #37358E, #201E69)",

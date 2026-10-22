@@ -19,6 +19,10 @@ it("applies the light palette through a live scheme selector without replacing d
     document.documentElement.classList.replace("light", "dark");
     expect(getComputedStyle(screen.getByTestId("panel")).backgroundColor).toBe("rgb(0, 0, 0)");
     expect(getComputedStyle(screen.getByTestId("circle")).backgroundColor).toBe("rgb(0, 0, 0)");
+    expect(getComputedStyle(screen.getByTestId("circle")).animation).toBe("original-motion 150s linear infinite");
+    document.documentElement.classList.replace("dark", "light");
+    expect(getComputedStyle(screen.getByTestId("panel")).backgroundColor).toBe("rgb(228, 231, 236)");
+    expect(getComputedStyle(screen.getByTestId("circle")).backgroundColor).toBe("rgb(52, 56, 62)");
   } finally {
     document.documentElement.classList.remove("light", "dark");
   }

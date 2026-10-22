@@ -1,4 +1,28 @@
-# Selection dependency contract — deferred design
+# Selection dependency contract — scoped proof, production deferred
+
+## October 22 — internal executable contract, outcome B
+
+The [2.2.3.5 report](datatable-selection-dependencies-2-2-3-5.md) supersedes the
+design-only status below, preserving its safe default. An internal discriminated
+output boundary accepts either explicit `selectionDependency: "row"` plus stable
+`rowId`, or undeclared/`"global"` output. Local output excludes only other rows'
+selection; all non-selection state and changed React inputs still invalidate it.
+Global output independently subscribes to the complete authoritative snapshot,
+including when its local parent skips. It owns no selection copy or second store.
+This type/component is experimental and not exported as a production guarantee.
+
+D5/D6/D8/D21 DOM-and-commit tests prove live-store output isolation. They also
+retain precise rollout failures: hook callback context can expose a narrowed
+`table.state`, and a nullable detail callback cannot be repaired by a descendant
+subscription that never mounted. Identical default callbacks remain correct.
+The internal boundary establishes a viable contract, not automatic compatibility
+for whole-row narrowing. Production hook/renderer/resources stay broad.
+
+Next (2.2.3.6): preserve the full existing live callback context and independently subscribe
+callback invocation/empty-slot decisions before exposing declarations. Only then
+repeat the gated production comparison. No new performance claim or virtualizer.
+
+## Historical October 21 decision
 
 October 21, 2026; decision **C**. Track A's production geometry defect takes
 priority. No production subscription or callback API changes are included.

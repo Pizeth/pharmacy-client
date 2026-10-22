@@ -3,6 +3,22 @@
 Status: architecture review justified by October 13 Matrix B; no virtualization
 implementation or dependency introduced.
 
+## October 22 — 2.2.3.5 independent outputs, rollout deferred
+
+Outcome **B**: internal per-output contracts preserve global descendants beneath
+local parents, with measured committed-output reduction and adversarial DOM
+assertions. Generic production narrowing remains blocked: independently rerun
+callbacks can still receive narrowed `table.state`, and a null detail callback
+needs invalidation before its descendant can mount. Both are executable negative
+proofs; default callbacks stay correct. See the
+[2.2.3.5 report](datatable-selection-dependencies-2-2-3-5.md).
+
+No production selector/geometry change and no correctness-approved candidate for
+reprofiling. Preserve 2.2.3.2–3 evidence without an expensive repeat. Resolve live
+callback-context and invocation ownership, then measure the compatible candidate
+before attributing remaining costs or considering virtualization. PR #31 stays
+separate; the repaired real sticky overlap remains0px.
+
 ## October 21 — geometry repair, selection gate preserved
 
 2.2.3.4 Track A repairs the measured13.8125px sticky-row overlap using mounted

@@ -8,6 +8,7 @@ import {
   adminClient,
   jwtClient, // 👈 add this — it adds role to the inferred type
 } from "better-auth/client/plugins";
+import { sentinelClient } from "@better-auth/infra/client";
 
 import { passkeyClient } from "@better-auth/passkey/client";
 import { API_URL, COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
@@ -46,6 +47,7 @@ export const authClient = createAuthClient({
     passkeyClient(),
     multiSessionClient(),
     adminClient(), // 👈 this is what adds role to the session type
+    sentinelClient(),
     oneTapClient({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string,
       // Optional client configuration:
