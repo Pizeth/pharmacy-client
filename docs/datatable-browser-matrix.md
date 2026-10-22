@@ -1,5 +1,11 @@
 # DataTable browser matrix runbook
 
+PR #47's final HRD/login/dependency acceptance is recorded in
+[pr47-final-acceptance.md](pr47-final-acceptance.md). This does not restart
+Matrix A or replace the geometry/profiling evidence below. Outcome B remains;
+2.2.3.6 live callback-context/nullable invocation correctness must pass before
+another 2.2.3.3 performance run or any production selection narrowing.
+
 ## October 22 — 2.2.3.5 independent output dependencies
 
 Continues this run on base `9b75b0372938767d01874f43cc0bd401011a7a40`.

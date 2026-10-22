@@ -16,17 +16,33 @@ for repair commit `08a4521`. Historical failure evidence below is retained.
 `.coderabbit.yaml` now enables automatic draft reviews. CodeRabbit has confirmed
 it is reviewing this draft with the repository configuration.
 
-The user's package upgrades are retained except for resolver6's incompatible
-optional Effect4/TypeSchema Effect3 peer graph. Resolver5.9.2 remains compatible
-with the application's Zod integration; the ineffective `$effect` override was
-removed. TypeScript is aligned to6.0.3 and ESLint to9.39.5 to satisfy the actual
-Next lint stack's peer ranges. `npm ls --all` reports no dependency problems.
-The lockfile is regenerated without force/legacy-peer-deps. The final
-`npm ci --strict-peer-deps` and TypeScript check both pass. Full updated-tree
-validation is reported with the latest PR head's checks.
+Historical repair validation at `194f54a` used resolver5.9.2, TypeScript6.0.3
+and ESLint9.39.5; its strict install/tree results apply only to that revision.
+The maintainer subsequently chose resolver6.0.0 and TypeScript7.0.2 in `5e179bd`.
+Resolver6 now resolves normally with explicit devDependency Effect4.0.5. The app
+imports only the Zod adapter; no TypeSchema/Effect3 adapters are installed.
+ESLint remains9.39.5. The ineffective `$effect` override was removed; no force,
+legacy-peer-deps or peer-suppression overrides are used.
+
+The incoming TypeScript7 tree exceeded typescript-eslint8.71.1's `<6.1.0` peer
+range and also blocked lint API loading. The maintainer then explicitly approved
+Microsoft's supported side-by-side setup: `@typescript/native` aliases compiler
+7.0.2, while `typescript` aliases the TypeScript6 compatibility API6.0.3. The
+`tsc` executable remains7.0.2; tooling loads API6.0.3. Typecheck, strict lockfile
+resolution and `npm ls --all` pass. Historical failed strict checks describe the
+incoming direct-TS7 setup, not this final split. See
+[the final acceptance record](pr47-final-acceptance.md) for current results,
+review dispositions and browser conditions.
 
 These CI/dependency repairs do not resolve the selection callback gates or change
 Outcome B. Production DataTable subscriptions and virtualization remain deferred.
+
+Next milestone: **2.2.3.6 — live callback-context and nullable detail-renderer
+subscription correctness**. Preserve the existing full callback context and
+subscribe callback invocation before nullable/empty output is decided. Pass the
+adversarial table/card, controlled/off-page and cross-row guard tests before
+repeating the expensive 2.2.3.3 profiling matrix. No new performance run is
+justified by the current diagnostic-only boundary.
 
 ## Source and scope
 

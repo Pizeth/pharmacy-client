@@ -11,7 +11,7 @@ the default's correct2/2. See the [full report](datatable-selection-dependencies
 
 Production subscriptions/resources are unchanged; real TranslationKey selected
 row overlap remains0px. No approved candidate exists for a new performance matrix.
-Next gate: compatible live callback context plus independent invocation boundaries
+Next gate **2.2.3.6**: compatible live callback context plus independent invocation boundaries
 for nullable details and card slots, followed by correctness and profiling.
 Virtualization and PR #31 remain separate. Historical outcomes below are retained.
 

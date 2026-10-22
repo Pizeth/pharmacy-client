@@ -47,10 +47,25 @@ failure paths; all14 tests in those four suites pass, and CI306 is green:
 https://github.com/Pizeth/pharmacy-client/actions/runs/39720166273
 Later package upgrades and final-tree validation are tracked by the latest PR
 checks. No assertion or timeout was weakened. Outcome B remains unchanged.
-Updated tree: npm ls --all reports no problems; npm ci --strict-peer-deps PASS;
+Historical tree at194f54a: npm ls --all reports no problems; npm ci --strict-peer-deps PASS;
 npm run typecheck PASS. Resolver5.9.2,TypeScript6.0.3,ESLint9.39.5 satisfy the
 installed optional-validation and Next lint-tool peer contracts. No force or
 legacy-peer-deps flags and no peer-suppression overrides were used.
+
+Superseded at5e179bd by maintainer choice: resolver6.0.0,Effect4.0.5,
+TypeScript7.0.2,ESLint9.39.5. Resolver's Zod/RHF/Effect peers resolve normally;
+no TypeSchema/Effect3 adapter is installed. TypeScript7 exceeds the installed
+typescript-eslint8.71.1 peer range >=4.8.4 <6.1.0. The maintainer accepts that
+upstream warning initially; the incoming strict npm ci FAILS and npm ls --all
+reports invalid TypeScript7.0.2. The maintainer then approved Microsoft's
+side-by-side compiler7/API6 setup. Final tsc=7.0.2, tooling API=6.0.3;
+strict lockfile resolution/npm ls --all/typecheck PASS. Final strict clean-install
+and suite results are in the acceptance report. Historical checks remain scoped.
+Latest acceptance results: docs/pr47-final-acceptance.md.
+Final source4c0a935: npm ci --strict-peer-deps PASS; npm ls --all has no problems;
+tsc7.0.2/tooling API6.0.3 verified; typecheck PASS; full Jest144 suites/828 tests
+PASS (170.074s); CI310 PASS. Lint restored but173 existing source errors remain
+outside PR-changed source paths; changed acceptance files have0 lint errors.
 
 git diff --check
 PASS. Existing LF/CRLF conversion notices are not whitespace errors.

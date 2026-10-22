@@ -18,7 +18,7 @@ subscription that never mounted. Identical default callbacks remain correct.
 The internal boundary establishes a viable contract, not automatic compatibility
 for whole-row narrowing. Production hook/renderer/resources stay broad.
 
-Next: preserve the full existing callback context and independently subscribe
+Next (2.2.3.6): preserve the full existing live callback context and independently subscribe
 callback invocation/empty-slot decisions before exposing declarations. Only then
 repeat the gated production comparison. No new performance claim or virtualizer.
 
