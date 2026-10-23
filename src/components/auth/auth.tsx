@@ -36,6 +36,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthProps } from "@/interfaces/component-props.interface";
 import AuthForm from "./ui/authForm";
+import { AuthErrorNotice } from "./AuthErrorNotice";
 import { EffectProps } from "@/interfaces/auth.interface";
 import AuthNavigationLink from "./ui/authNavaigation";
 import SocialButton from "../icons/components/socialButton";
@@ -60,6 +61,7 @@ import { LANDING_PAGE } from "@/types/constants";
 import { useSetAtom } from "jotai";
 import { resetAllValidationsAtom } from "@/Stores/validationStore";
 import { getAuthRedirectTarget } from "@/lib/auth/redirectTarget";
+import { reportLoginFailure } from "@/lib/auth/loginFeedback";
 
 const PREFIX = "RazethAuth";
 
@@ -852,7 +854,7 @@ export const Auth = (inProps: AuthProps) => {
   } = props;
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const { isFetching, data } = useIsAuthenticated();
+  const { isLoading, isFetching, data } = useIsAuthenticated();
   const theme = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -893,7 +895,7 @@ export const Auth = (inProps: AuthProps) => {
 
     // Only reaches here once we KNOW the user is unauthenticated
     // and the login form is about to actually render
-    authClient.oneTap({
+    void authClient.oneTap({
       // callbackURL: `${window.location.origin}/dashboard`,
       fetchOptions: {
         onSuccess: () => {
@@ -908,7 +910,7 @@ export const Auth = (inProps: AuthProps) => {
       //   );
       //   // Render your alternative UI here
       // },
-    });
+    }).catch(() => reportLoginFailure());
     // not authenticated, stay on the login page
   }, [router, data, isFetching, destination]);
 
@@ -988,7 +990,7 @@ export const Auth = (inProps: AuthProps) => {
 
   // 👇 Don't render the full login page until we KNOW the user is unauthenticated.
   // Covers two cases: still checking, or check succeeded (about to redirect away).
-  if (isFetching || data?.authenticated) {
+  if (isLoading || data?.authenticated) {
     return <PulseLoader />; // or your app's existing loading component
   }
 
@@ -1081,6 +1083,7 @@ export const Auth = (inProps: AuthProps) => {
                       {/* Divider and Social Login - shown for both forms */}
                       {divider}
                       {social}
+                      {currentMode === "signin" && <AuthErrorNotice />}
                       {/* <LogoutButton /> */}
                     </Box>
                   </CardContent>

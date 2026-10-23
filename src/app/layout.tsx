@@ -10,6 +10,7 @@ import RefineContext from "./refineContext";
 import Script from "next/script";
 import { Suspense } from "react";
 import { RouteContentLoading } from "@/components/layouts/RouteContentLoading";
+import { LoginFeedback } from "@/components/auth/LoginFeedback";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -157,6 +158,7 @@ export default function RootLayout({
         {/* <AppRouterCacheProvider>{children}+ </AppRouterCacheProvider> */}
         {/* <InitColorSchemeScript attribute="class" /> ← before everything */}
         <ThemeProviderWrapper theme={darkTheme}>
+          <Suspense fallback={null}><LoginFeedback /></Suspense>
           <Suspense fallback={<RouteContentLoading />}>
             {/* <RefineContext>{children}</RefineContext> */}
             {children}

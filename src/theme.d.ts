@@ -18,6 +18,7 @@ import type { PublicDocumentsSlotKey } from "@/features/hrd/styles/publicDocumen
 import type { AvatarContainerProps } from "@/components/Avatar/AvatarContainer";
 import type { RouteContentLoadingSlot } from "@/components/layouts/RouteContentLoading";
 import type { PulseLoaderSlot } from "@/components/effect/loaders/PulseLoader/PulseLoader.styles";
+import type { LoginFeedbackSlot } from "@/components/auth/LoginFeedback.styles";
 
 import { ClassKey, CustomComponents } from "@/types/classKey";
 import {
@@ -112,6 +113,7 @@ declare module "@mui/material/styles" {
     RazethLoader: PulseLoaderSlot;
     RazethCloudLoader: "root" | "message";
     RazethRouteContentLoading: RouteContentLoadingSlot;
+    RazethLoginFeedback: LoginFeedbackSlot;
     RazethPublicDocuments: PublicDocumentsSlotKey;
     RazethAvatarContainer: "root" | "chip" | "foreground";
     RazethBackToTop: "root" | "progressRing";
@@ -134,6 +136,7 @@ declare module "@mui/material/styles" {
    */
   interface ComponentsPropsList extends RazethComponentsPropsList {
     RazethDrawer: Record<string, unknown>;
+    RazethLoginFeedback: Record<string, unknown>;
     RazethNav: Record<string, unknown>;
     RazethSearch: Record<string, unknown>;
     RazethSearchPoppers: Record<string, unknown>;
@@ -153,6 +156,7 @@ declare module "@mui/material/styles" {
   }
 
   interface Components extends CustomComponents {
+    RazethLoginFeedback?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethLoginFeedback"] };
     RazethSideImagePreview?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSideImagePreview"] };
     RazethDrawer?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDrawer"] };
     RazethNav?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethNav"] };

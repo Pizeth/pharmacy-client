@@ -68,8 +68,6 @@ export const authProvider: AuthProvider = {
       rememberMe: false,
     });
 
-    console.log("result", result);
-
     if (result.error?.status === 422 || result.error?.status === 404) {
       // Not a valid username — try as email
       result = await authClient.signIn.email({
@@ -104,8 +102,8 @@ export const authProvider: AuthProvider = {
       return {
         success: false,
         error: {
-          name: "LoginError",
-          message: error.message || error.statusText || "Invalid credentials",
+          name: error?.code || "LoginError",
+          message: error?.message || error?.statusText || "Invalid credentials",
           statusCode: error?.status ?? 401,
         },
       };

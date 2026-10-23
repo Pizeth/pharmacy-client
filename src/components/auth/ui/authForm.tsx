@@ -25,6 +25,7 @@ import {
 } from "@mui/icons-material";
 import { AuthFormProps } from "@/interfaces/component-props.interface";
 import { RefineError, useLogin, useRegister } from "@refinedev/core";
+import { beginLoginAttempt, reportLoginFailure } from "@/lib/auth/loginFeedback";
 import {
   loginSchema,
   registerSchema,
@@ -396,6 +397,7 @@ const AuthForm = (inProps: AuthFormProps) => {
 
   const onSubmit = async (values: LoginValues | RegisterValues) => {
     if (isLogin) {
+      beginLoginAttempt();
       login(
         { ...values, captchaToken },
         {
@@ -406,7 +408,7 @@ const AuthForm = (inProps: AuthFormProps) => {
 
               // 👇 If the server says the account is not activated, redirect to /activate
               // if (errorMessage.includes("not activated")) {
-              if (error.statusCode === 403) {
+              if (error?.name === "EMAIL_NOT_VERIFIED") {
                 const identifier = (values as LoginValues).identifier;
                 router.replace(
                   `/activate?email=${encodeURIComponent(identifier)}`,
@@ -414,10 +416,9 @@ const AuthForm = (inProps: AuthFormProps) => {
                 return;
               }
 
-              // Handle other login errors normally (Refine also handles notifications)
-              console.error("Login failed:", data.error);
             }
           },
+          onError: () => reportLoginFailure(),
         },
       ); // 🔥 uses authProvider automatically
     } else {

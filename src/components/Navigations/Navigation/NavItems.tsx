@@ -51,7 +51,7 @@ export const NavItems = ({
     ?? activeIndex;
   const listRef = useGlidingPill(variant === "vertical", pillIndex, navItems.map(item => item.href).join("\n"), pathname);
   const labelContent = (item: NavItemType) => <>
-      {variant === "vertical" && <NavHoverBorder aria-hidden="true"><rect x="1" y="1" rx="24" pathLength="100" /></NavHoverBorder>}
+      {variant === "vertical" && <NavHoverBorder aria-hidden="true" />}
       <NavIcon variant={variant}>{item.Icon}</NavIcon>
       <NavText primary={item.label} variant={variant} slotProps={{
       primary: variant === "vertical" ? {

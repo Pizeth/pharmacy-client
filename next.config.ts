@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
     useTypeScriptCli: true, // Forces Next.js to use the native tsc binary
   },
   env: {
+    // Project ingestion URL is public; never expose the infrastructure API key.
+    NEXT_PUBLIC_BETTER_AUTH_IDENTIFY_URL:
+      process.env.BETTER_AUTH_IDENTIFY_URL?.trim() ||
+      process.env.NEXT_PUBLIC_BETTER_AUTH_IDENTIFY_URL?.trim(),
     DATATABLE_PROFILE_BUILD_MODE: process.env.DATATABLE_LOCAL_PROFILE ?? "disabled",
     NEXT_PUBLIC_BACKEND_URL:
       process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000",

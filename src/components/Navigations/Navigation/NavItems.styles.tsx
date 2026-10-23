@@ -46,32 +46,35 @@ export const NavPill = styled("li", navigationSlot("RazethNav", "Pill"))(({ them
   "@media (prefers-reduced-motion: reduce)": { transition: "none" },
 }));
 const drawBorder = keyframes({
-  from: { strokeDasharray: 100, strokeDashoffset: 100 },
-  "99%": { strokeDasharray: 100, strokeDashoffset: 0 },
-  // A continuous final stroke avoids the dash seam on a closed rounded path.
-  to: { strokeDasharray: "none", strokeDashoffset: 0 },
+  from: { clipPath: "polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0)" },
+  "25%": { clipPath: "polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0)" },
+  "50%": { clipPath: "polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%)" },
+  "75%": { clipPath: "polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%)" },
+  to: { clipPath: "polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0)" },
 });
-export const NavHoverBorder = styled("svg", navigationSlot("RazethNav", "HoverBorder"))(({ theme }) => ({
+export const NavHoverBorder = styled("span", navigationSlot("RazethNav", "HoverBorder"))(({ theme }) => ({
   position: "absolute",
-  insetInline: 4,
+  // Keep the outline outside the pill's 4px inset.
+  insetInline: 2,
   top: "50%",
   transform: "translateY(-50%)",
-  width: "calc(100% - 8px)",
-  height: `min(calc(100% - 8px), ${theme.spacing(6)})`,
+  width: "calc(100% - 4px)",
+  height: `calc(min(calc(100% - 8px), ${theme.spacing(6)}) + 4px)`,
   pointerEvents: "none",
-  overflow: "visible",
-  shapeRendering: "geometricPrecision",
-  fill: "none",
-  stroke: "var(--Nav-item-color)",
-  strokeWidth: 2,
-  strokeLinecap: "round",
-  "& rect": {
-    width: "calc(100% - 2px)", height: "calc(100% - 2px)",
-    strokeDasharray: 100, strokeDashoffset: 100,
+  borderRadius: 999,
+  filter: "drop-shadow(0 0 3px var(--Nav-item-color)) drop-shadow(0 0 8px color-mix(in srgb, var(--Nav-item-color) 75%, transparent))",
+  "&::before": {
+    content: '""', position: "absolute", inset: 0,
+    boxSizing: "border-box", borderRadius: "inherit",
+    border: "2px solid rgb(255 255 255 / 90%)",
+    boxShadow: "inset 0 0 2px rgb(255 255 255 / 45%), 0 0 2px rgb(255 255 255 / 35%), inset 0 0 5px var(--Nav-item-color), 0 0 6px var(--Nav-item-color)",
+    opacity: 0,
   },
-  "a:hover > & rect, button:hover > & rect": { animation: `${drawBorder} 650ms ease-out 1 forwards` },
+  "a:hover > &::before, button:hover > &::before": {
+    opacity: 1, animation: `${drawBorder} 650ms linear 1 forwards`,
+  },
   "@media (prefers-reduced-motion: reduce)": {
-    "a:hover > & rect, button:hover > & rect": { animation: "none", strokeDasharray: "none", strokeDashoffset: 0 },
+    "a:hover > &::before, button:hover > &::before": { animation: "none", clipPath: "none" },
   },
 }));
 export const NavItem = styled(ListItem, {

@@ -10,10 +10,10 @@ import { useScrollProgress } from "./useScrollProgress";
 
 const ProgressGlow = styled("span", { name: "RazethBackToTop", slot: "ProgressRing", overridesResolver: (_props, styles) => styles.progressRing })({
   position: "absolute",
-  inset: 1,
+  inset: -9,
   borderRadius: "inherit",
   pointerEvents: "none",
-  filter: "blur(0.6px)",
+  filter: "blur(1.5px)",
   boxShadow: "inset 0 0 5px 2px rgb(240 197 76 / 65%)",
   maskImage: "conic-gradient(#000 calc(var(--BackToTop-progress, 0) * 1turn), transparent 0)",
 });
