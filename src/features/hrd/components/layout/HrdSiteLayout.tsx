@@ -1,7 +1,6 @@
 "use client";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
 import { styled } from "@mui/material/styles";
-import { HrdFooter } from "../footer/HrdFooter";
 import { HrdBreadcrumbs } from "./HrdPageLayout";
 import { hrdSlot } from "../../styles/styled";
 
@@ -45,7 +44,6 @@ export function HrdSiteLayout({ children }: { children: React.ReactNode }) {
           <HrdBreadcrumbs />
           {children}
         </Content>
-        <HrdFooter />
       </DrawerAppBar>
     </BackgroundRoot>
   );

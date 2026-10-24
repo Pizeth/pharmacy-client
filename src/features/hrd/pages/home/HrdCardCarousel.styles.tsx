@@ -75,11 +75,12 @@ export const Face = styled("div", hrdSlot("HomeGalleryFace"))(({ theme }) => ({
   "@media (prefers-reduced-motion: reduce)": { transition: "none" },
 }));
 export const DocumentLink = styled(Link, hrdSlot("HomeGalleryLink"))({
-  "&&, &&:hover, &&:visited": { color: "#fff" },
+  "&&, &&:hover, &&:visited": { color: "var(--Hrd-gold, #E8B841)" },
   background: "#26247B",
   padding: "6px 12px",
   borderRadius: "var(--app-border-radius)",
   fontWeight: 700,
+  fontFamily: "var(--font-interkhmerloopless), sans-serif",
 });
 export const Controls = styled("div", hrdSlot("HomeGalleryControls"))(({ theme }) => ({ display: "flex", justifyContent: "center", alignItems: "center", gap: theme.spacing(2), marginTop: theme.spacing(2) }));
 export const Control = styled(Button, hrdSlot("HomeGalleryControl"))(({ theme }) => ({

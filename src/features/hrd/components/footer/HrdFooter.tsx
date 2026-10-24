@@ -345,6 +345,11 @@ function buildContactLines(
   contact: PublicDocumentsSiteInfo["contact"],
 ): ContactLine[] {
   const lines: ContactLine[] = [];
+  const personTelegram = contact.person && toTelegramUrl(contact.person.telegram);
+  if (contact.person && personTelegram) {
+    lines.push({ key: "person", icon: <TelegramIcon fontSize="small" />, label: "ទំនាក់ទំនងតាម Telegram",
+      content: <ContactLink href={personTelegram}>{contact.person.name}</ContactLink> });
+  }
 
   if (contact.address) {
     lines.push({
@@ -404,6 +409,7 @@ function buildContactLines(
 
 export interface HrdFooterProps {
   readonly site?: PublicDocumentsSiteInfo;
+  readonly links?: readonly { readonly href: string; readonly label: string }[];
 }
 
 /**
@@ -411,7 +417,7 @@ export interface HrdFooterProps {
  * Content comes from siteInfo.ts.
  */
 export function HrdFooter(props: HrdFooterProps) {
-  const { site = HRD_SITE } = props;
+  const { site = HRD_SITE, links = quickLinks } = props;
   const contentReveal = useFooterReveal<HTMLDivElement>();
   const socialReveal = useFooterReveal<HTMLElement>();
 
@@ -437,7 +443,7 @@ export function HrdFooter(props: HrdFooterProps) {
               តំណរហ័ស
             </FooterHeading>
             <QuickLinksList>
-              {quickLinks.map(({ href, label }) => (
+              {links.map(({ href, label }) => (
                 <li key={href}>
                   <Link component={NextLink} href={href} underline="hover" variant="body2">
                     {label}
@@ -481,7 +487,7 @@ export function HrdFooter(props: HrdFooterProps) {
         <FooterBottom>
           <Container maxWidth="xl">
           <Copyright variant="caption">
-            © ​{year} រក្សាសិទ្ធិគ្រប់យ៉ាងដោយ {site.organization}
+            © ​{year} រក្សាសិទ្ធិគ្រប់យ៉ាងដោយ {HRD_SITE.organization}
           </Copyright>
           </Container>
         </FooterBottom>

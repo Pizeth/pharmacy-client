@@ -5,6 +5,7 @@ import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { NextParticlesProvider } from "@tsparticles/nextjs";
 import { initParticles } from "@/theme/effects/initParticles";
+import { SiteFooter } from "@/components/layouts/SiteFooter";
 import { NavigationHeader } from "./components/NavigationHeader";
 import { NavigationDrawer } from "./components/NavigationDrawer";
 import { useHeaderScrollState } from "./Navigation/useHeaderScrollState";
@@ -36,7 +37,7 @@ export function DrawerAppBar({
     <NextParticlesProvider init={initParticles}>
       <NavigationHeader headerRef={headerRef} compactDesktop={compactDesktop} mobile={mobile} scrolled={scrolled} open={open} disabledMenu={disabledMenu} onToggle={toggleDrawer} />
       <NavigationDrawer open={open} geometry={geometry} compactDesktop={compactDesktop} mobileScrolled={mobile && scrolled} disabledMenu={disabledMenu} onToggle={toggleDrawer} onNavigate={closeDrawer} />
-      <Main open={open} backgroundColor={backgroundColor} style={geometry}>{children}</Main>
+      <Main open={open} backgroundColor={backgroundColor} style={geometry}>{children}<SiteFooter /></Main>
     </NextParticlesProvider>
   </Root>;
 }

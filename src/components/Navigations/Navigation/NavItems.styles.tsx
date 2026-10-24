@@ -180,6 +180,7 @@ export const NavText = styled(ListItemText, navigationSlot("RazethNav", "Text"))
   variant = "vertical"
 }) => ({
   letterSpacing: "0.05em",
+  "& .MuiTypography-root": { fontWeight: 600 },
   textTransform: "uppercase",
   transform: "translateY(0px)",
   textAlign: variant === "vertical" ? "center" : "left"
@@ -269,6 +270,7 @@ export const DrawerChildLink = styled(ListItemButton, {
   navColor
 }) => ({
   paddingLeft: theme.spacing(4),
+  "& .MuiTypography-root": { fontWeight: 600 },
   "&::after": {
     content: '""',
     position: "absolute",
@@ -306,6 +308,7 @@ export const GroupArrow = styled(ExpandMoreIcon, navigationSlot("RazethNav", "Gr
   }
 });
 export const DesktopMenu = styled(Menu, navigationSlot("RazethNav", "Menu"))({
+  "& .MuiTypography-root": { fontWeight: 600 },
   pointerEvents: "none",
   "& .MuiPaper-root": {
     pointerEvents: "auto"

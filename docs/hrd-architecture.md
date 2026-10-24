@@ -51,6 +51,11 @@ are rendered once by the shared layout; pages must not duplicate them. The
 footer stays outside the constrained content wrapper. Preserve app-bar colors,
 desktop hover menus, inline drawer expansion, and close-on-navigation behavior.
 
+`DrawerAppBar` mounts the shared `SiteFooter` once for its routes. Route identity,
+contact details, and quick links are selected in `components/layouts/siteFooterConfig.ts`;
+HRD retains its feature-owned content and footer presentation. Social links and
+copyright remain shared. Do not mount a second footer in `HrdSiteLayout`.
+
 Route loading uses Next.js `loading.tsx` boundaries. HRD's boundary sits below
 `HrdSiteLayout`, keeping navigation, breadcrumbs, and the footer available while
 page content streams. The shared `RouteContentLoading` skeleton uses typed

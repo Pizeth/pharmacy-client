@@ -78,6 +78,7 @@ export interface PublicDocumentsAddress {
 }
 
 export interface PublicDocumentsContactInfo {
+  readonly person?: { readonly name: string; readonly telegram: string };
   readonly address?: PublicDocumentsAddress;
   readonly phones?: readonly PublicDocumentsPhoneContact[];
   readonly email?: string;

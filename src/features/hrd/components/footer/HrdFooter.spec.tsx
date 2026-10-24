@@ -3,7 +3,19 @@ import { render, screen, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 
 import { HrdFooter } from "./HrdFooter";
+import { getSiteFooterConfig } from "@/components/layouts/siteFooterConfig";
 import type { PublicDocumentsSiteInfo } from "../../types/publicDocuments.types";
+
+it("changes route details while retaining shared social links and copyright", () => {
+  const wrap = (node: ReactNode) => <ThemeProvider theme={theme}>{node}</ThemeProvider>;
+  const view = render(wrap(<HrdFooter {...getSiteFooterConfig("/hrd")} />));
+  const copyright = screen.getByText(/រក្សាសិទ្ធិគ្រប់យ៉ាងដោយ/).textContent;
+  view.rerender(wrap(<HrdFooter {...getSiteFooterConfig("/admin/documents", { person: { name: "Super Admin", telegram: "https://t.me/razeth" } })} />));
+  expect(screen.getByRole("link", { name: "Super Admin" })).toHaveAttribute("href", "https://t.me/razeth");
+  expect(screen.queryByText("sornmaly95@gmail.com")).not.toBeInTheDocument();
+  expect(screen.getByText(/រក្សាសិទ្ធិគ្រប់យ៉ាងដោយ/).textContent).toBe(copyright);
+  expect(within(screen.getByRole("region", { name: "បណ្ដាញសង្គម" })).getByRole("link", { name: "Telegram" })).toHaveAttribute("href", "https://t.me/mcsgovkh");
+});
 
 it("provides a dedicated footer social section for the mobile header handoff", () => {
   renderFooter({});
