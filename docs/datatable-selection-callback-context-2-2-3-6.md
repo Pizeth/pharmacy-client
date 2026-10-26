@@ -42,8 +42,8 @@ policy snapshot, discarded props comparator or fabricated table-state type is us
 
 ## Changed boundaries and compatibility limits
 
-Only diagnostics, the development acceptance fixture, tests and documentation
-change. Generic body/cell/detail/card components, action policies, hook family,
+The milestone implementation changes diagnostics, the development acceptance
+fixture, tests and documentation. A separate CI repair is described below. Generic body/cell/detail/card components, action policies, hook family,
 sticky measurements, resources and transports are untouched. All original D1–D26
 coverage and expected unsafe-projection counterexamples remain.
 
@@ -108,10 +108,8 @@ production-resource browser evidence remains historical, not newly certified.
 - npm ls --all: PASS; compiler7/tooling-API6 split unchanged.
 - npm run typecheck: PASS (including generated feature synchronization).
 - Focused: 2 suites / 31 tests PASS.
-- Full serial source suite: 148/150 suites, 870/874 tests PASS. Four unchanged
-  master failures reproduce independently: HRD carousel link colors (two themes)
-  and DrawerAppBar tests without QueryClientProvider (two tests). No unrelated
-  HRD/footer/navbar fix or weakened test is bundled into this milestone.
+- Final full serial source suite: **150 suites / 874 tests PASS**. Initial runs
+  had148/150 suites and870/874 tests passing; see the separate CI repair below.
 - Changed-file ESLint: zero errors, one pre-existing exhaustive-deps warning in
   the fixture's columns memo (also present on master). Full repository:174 errors,
   508 warnings. Rules unchanged; lint is recorded separately from correctness.
@@ -122,3 +120,23 @@ profiling is therefore skipped: there is no production candidate to compare.
 No virtualization decision follows from this internal proof. Next: place stable
 invocation boundaries before physical output decisions, then solve owner/context
 fan-out without losing the genuine full callback contract. Keep resources broad.
+
+## Separate CI repair — October 26
+
+[CI317](https://github.com/Pizeth/pharmacy-client/actions/runs/40343746399)
+confirmed exactly the same four initial master failures. Typecheck and the new
+DataTable tests passed. Rather than weaken assertions, the follow-up isolates
+SiteFooter in DrawerAppBar's existing coordination unit test (header/drawer are
+already isolated there); rendering the real footer now requires application query
+and custom-theme providers unrelated to those two assertions. No production
+footer or navigation logic changes.
+
+HrdCardCarousel's named HomeGalleryLink slot restores the white text explicitly
+required by its existing light/dark regression on the unchanged dark-blue button.
+Browser computed styles confirm white rgb(255,255,255) on rgb(38,36,123) for all11
+links. This is a one-line regression repair, not an HRD/contact/slideshow redesign.
+The existing assertions, timeout settings and lint rules remain intact.
+
+Repair-focused suites:4/4,38/38 tests PASS. Final full suite:150/150,874/874 tests
+PASS. Typecheck PASS; repair-file ESLint clean. Historical initial failures above
+are retained in validation.txt. This CI cleanup does not promote Outcome B to A.

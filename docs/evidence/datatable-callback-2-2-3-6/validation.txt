@@ -69,3 +69,38 @@ Ignored TanStack features:
   - columnFacetingFeature
   - columnGroupingFeature
   - rowAggregationFeature
+
+
+=== Separate CI repair ===
+=== repair-focused.txt ===
+
+Test Suites: 4 passed, 4 total
+Tests:       38 passed, 38 total
+Snapshots:   0 total
+Time:        22.045 s
+Ran all test suites matching src/features/hrd/pages/home/HrdHomePage.spec.tsx|src/components/Navigations/DrawerAppBar.spec.tsx|src/components/DataTable/mui/components/liveCallbackContext.spec.tsx|src/components/DataTable/mui/components/selectionDependencyContract.spec.tsx.
+
+
+=== repair-full.txt ===
+> jest --runInBand --roots src
+
+
+Test Suites: 150 passed, 150 total
+Tests:       874 passed, 874 total
+Snapshots:   0 total
+Time:        105.882 s, estimated 111 s
+Ran all test suites.
+
+
+=== repair-typecheck.txt ===
+   5 intentionally ignored
+
+Ignored TanStack features:
+  - cellSelectionFeature
+  - cellSpanningFeature
+  - columnFacetingFeature
+  - columnGroupingFeature
+  - rowAggregationFeature
+
+
+=== repair-lint.txt ===
