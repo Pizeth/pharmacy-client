@@ -75,7 +75,7 @@ export const Face = styled("div", hrdSlot("HomeGalleryFace"))(({ theme }) => ({
   "@media (prefers-reduced-motion: reduce)": { transition: "none" },
 }));
 export const DocumentLink = styled(Link, hrdSlot("HomeGalleryLink"))({
-  "&&, &&:hover, &&:visited": { color: "var(--Hrd-gold, #E8B841)" },
+  "&&, &&:hover, &&:visited": { color: "#fff" },
   background: "#26247B",
   padding: "6px 12px",
   borderRadius: "var(--app-border-radius)",

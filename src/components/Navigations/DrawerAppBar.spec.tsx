@@ -3,6 +3,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { DrawerAppBar } from "./DrawerAppBar";
 
+// Drawer coordination is isolated from the footer's application query/theme providers.
+jest.mock("@/components/layouts/SiteFooter", () => ({ SiteFooter: () => <footer /> }));
 jest.mock("@tsparticles/nextjs", () => ({ NextParticlesProvider: ({ children }: { children: React.ReactNode }) => children }));
 jest.mock("./Navigation/useHeaderScrollState", () => ({ useHeaderScrollState: () => ({ headerRef: { current: null }, scrolled: true, headerHeight: 156 }) }));
 jest.mock("./components/NavigationHeader", () => ({ NavigationHeader: ({ onToggle, open, compactDesktop, disabledMenu }: NavigationHeaderProps) =>
