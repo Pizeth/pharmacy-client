@@ -94,7 +94,7 @@ export const NavItem = styled(ListItem, {
   margin: 0,
   padding: 0,
   listStyle: "none",
-  textTransform: "uppercase",
+  textTransform: "none",
   "& > a, & > button": {
     borderRadius: 999,
     background: "transparent",
@@ -180,8 +180,8 @@ export const NavText = styled(ListItemText, navigationSlot("RazethNav", "Text"))
   variant = "vertical"
 }) => ({
   letterSpacing: "0.05em",
-  "& .MuiTypography-root": { fontWeight: 600 },
-  textTransform: "uppercase",
+  "& .MuiTypography-root": { fontWeight: 500 },
+  textTransform: "none",
   transform: "translateY(0px)",
   textAlign: variant === "vertical" ? "center" : "left"
 }));
@@ -270,7 +270,7 @@ export const DrawerChildLink = styled(ListItemButton, {
   navColor
 }) => ({
   paddingLeft: theme.spacing(4),
-  "& .MuiTypography-root": { fontWeight: 600 },
+  "& .MuiTypography-root": { fontWeight: 500 },
   "&::after": {
     content: '""',
     position: "absolute",
@@ -308,7 +308,7 @@ export const GroupArrow = styled(ExpandMoreIcon, navigationSlot("RazethNav", "Gr
   }
 });
 export const DesktopMenu = styled(Menu, navigationSlot("RazethNav", "Menu"))({
-  "& .MuiTypography-root": { fontWeight: 600 },
+  "& .MuiTypography-root": { fontWeight: 500 },
   pointerEvents: "none",
   "& .MuiPaper-root": {
     pointerEvents: "auto"

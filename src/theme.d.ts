@@ -109,6 +109,12 @@ declare module "@mui/material/styles" {
     ClassKey
   > {
     RazethDataTable: DataTableSlotKey;
+    RazethSiteBreadcrumbs: import("@/components/layouts/SiteBreadcrumbs").SiteBreadcrumbSlot;
+    RazethTableCreateButton: "root";
+    RazethCompactCardToggle: import("@/components/Tables/CompactCardToggle").CompactCardToggleSlot;
+    RazethResourceTableLoading: import("@/components/Tables/ResourceTableLoading").ResourceTableLoadingSlot;
+    RazethAdminUsers: import("@/features/admin/users/styles").AdminUserSlot;
+    RazethAdminSocial: import("@/features/admin/social/styles").AdminSocialSlot;
     RazethHrd: HrdSlotKey;
     RazethLoader: PulseLoaderSlot;
     RazethCloudLoader: "root" | "message";
@@ -135,6 +141,12 @@ declare module "@mui/material/styles" {
    * Theme defaultProps are typed separately below.
    */
   interface ComponentsPropsList extends RazethComponentsPropsList {
+    RazethSiteBreadcrumbs: Record<string, unknown>;
+    RazethTableCreateButton: Record<string, unknown>;
+    RazethCompactCardToggle: Record<string, unknown>;
+    RazethResourceTableLoading: Record<string, unknown>;
+    RazethAdminUsers: Record<string, unknown>;
+    RazethAdminSocial: Record<string, unknown>;
     RazethDrawer: Record<string, unknown>;
     RazethLoginFeedback: Record<string, unknown>;
     RazethNav: Record<string, unknown>;
@@ -156,6 +168,12 @@ declare module "@mui/material/styles" {
   }
 
   interface Components extends CustomComponents {
+    RazethSiteBreadcrumbs?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSiteBreadcrumbs"] };
+    RazethTableCreateButton?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethTableCreateButton"] };
+    RazethCompactCardToggle?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethCompactCardToggle"] };
+    RazethResourceTableLoading?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethResourceTableLoading"] };
+    RazethAdminUsers?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAdminUsers"] };
+    RazethAdminSocial?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAdminSocial"] };
     RazethLoginFeedback?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethLoginFeedback"] };
     RazethSideImagePreview?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSideImagePreview"] };
     RazethDrawer?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDrawer"] };

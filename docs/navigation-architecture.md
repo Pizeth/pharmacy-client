@@ -27,6 +27,17 @@ Keep existing import paths available for callers. The folder `index.ts` exposes
 the application entry; internal components import their owning files directly.
 Do not introduce an additional account/auth subscription in the header.
 
+## Breadcrumbs
+
+`DrawerAppBar` renders the shared `components/layouts/SiteBreadcrumbs` before
+its page content. The auth group layout also renders this trail. Route labels
+and real ancestor destinations are resolved in `breadcrumbRoutes.ts`, including
+admin dashboard/resource/create/edit/delete routes. Breadcrumb presentation
+uses typed `RazethSiteBreadcrumbs` theme slots. The current item is a non-link
+with `aria-current="page"`; ancestor links have visible keyboard focus.
+HRD keeps its existing localized trail inside its content surface and passes
+`breadcrumbs={null}` to the shell. Never render two trails on the same page.
+
 ## Theme slots
 
 `styles/slots.ts` defines `NavigationSlotMap` and the typed `navigationSlot()`
@@ -105,3 +116,13 @@ navigation with automatic closing, theme switching, and account popup opening.
 The original light theme and browser viewport were restored afterward. No runtime
 console errors were reported during these checks. Authenticated popup behavior
 was inspected without logging out; guest behavior remains covered by unit tests.
+# Shared breadcrumb presentation
+
+HRD is the visual standard across all routes. Both HRD and SiteBreadcrumbs use
+`components/layouts/breadcrumbStyles.ts`, retaining their existing theme slots.
+Items have padded hover targets; the current page uses the selected background
+and inset primary underline. Keep the breadcrumb top margin at theme spacing 1.5,
+without bottom padding; page content starts with spacing 3 and no extra top margin.
+Do not add competing spacer wrappers before page headings.
+
+Sign-in (`/login`) is an intentional breadcrumb exception and renders no trail.

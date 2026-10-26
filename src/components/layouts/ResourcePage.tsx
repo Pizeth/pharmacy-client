@@ -14,12 +14,7 @@ const Root = styled(Container, {
   name: PREFIX,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})(({ theme }) => ({
-  marginTop: theme.spacing(-5),
-  [theme.breakpoints.down("sm")]: {
-    marginTop: theme.spacing(-1.5),
-  },
-}));
+})({});
 
 const HeaderRoot = styled("header", {
   name: PREFIX,

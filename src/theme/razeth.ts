@@ -33,7 +33,7 @@ const globalStyles = (theme: Theme) => ({
     margin: 0,
     padding: 0,
     fontFamily: [
-      "Roboto",
+      "var(--font-inter)",
       "Helvetica",
       "sans-serif",
       "var(--font-siemreap)",
@@ -287,6 +287,7 @@ const standardizedFormComponents = {
 
     styleOverrides: {
       root: ({ theme }: { theme: Theme }) => ({
+        marginTop: 0,
         paddingBlock: theme.spacing(3),
       }),
 
@@ -657,7 +658,7 @@ const defaultThemeInvariants = {
     //   fontFamily: "var(--font-siemreap)",
     // },
     fontFamily: [
-      "Roboto",
+      "var(--font-inter)",
       "Helvetica",
       "sans-serif",
       "var(--font-interkhmerloopless)",
@@ -667,7 +668,7 @@ const defaultThemeInvariants = {
     ].join(","),
     h6: {
       fontWeight: 700,
-      fontFamily: "var(--font-mef2)", // Use Moul for headers like "Kingdom of Cambodia"
+      fontFamily: "var(--font-inter), var(--font-mef2), Helvetica, sans-serif",
     },
   },
   sidebar: {
@@ -1337,7 +1338,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
     },
     typography: {
       fontFamily: [
-        "Roboto",
+        "var(--font-inter)",
         "Helvetica",
         "sans-serif",
         // "var(--font-interkhmerloopless)",
@@ -1350,7 +1351,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         "var(--font-kantumruy)",
       ].join(","),
       h6: {
-        fontFamily: "var(--font-mef2)", // Use Moul for headers like "Kingdom of Cambodia"
+        fontFamily: "var(--font-inter), var(--font-mef2), Helvetica, sans-serif",
         fontSize: "1rem",
       },
       h5: {
@@ -1358,7 +1359,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         fontSize: "1.15rem",
       },
       h4: {
-        fontFamily: "var(--font-kantumruy)", // Use Moul for headers like "Kingdom of Cambodia"
+        fontFamily: "var(--font-inter), var(--font-kantumruy), Helvetica, sans-serif",
         fontSize: "1.3rem",
       },
     },
@@ -1735,7 +1736,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         styleOverrides: {
           root: {
             fontFamily: [
-              "Roboto",
+              "var(--font-inter)",
               "Helvetica",
               "sans-serif",
               "var(--font-interkhmerloopless)",
@@ -1766,16 +1767,16 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           },
           h6: {
             fontFamily: [
-              // "Roboto",
-              // "Helvetica",
-              // "sans-serif",
+              "var(--font-inter)",
               "var(--font-moul)",
               "var(--font-google)",
+              "Helvetica",
+              "sans-serif",
             ].join(","),
           },
           h5: {
             fontFamily: [
-              "Roboto",
+              "var(--font-inter)",
               "Helvetica",
               "sans-serif",
               "var(--font-moul)",
@@ -1783,10 +1784,10 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           },
           h4: {
             fontFamily: [
-              "Roboto",
+              "var(--font-inter)",
+              "var(--font-kantumruy)",
               "Helvetica",
               "sans-serif",
-              "var(--font-kantumruy)",
             ].join(","),
             fontWeight: "inherit",
           },

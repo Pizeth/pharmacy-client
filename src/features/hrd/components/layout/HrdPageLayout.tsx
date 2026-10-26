@@ -9,6 +9,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { styled } from "@mui/material/styles";
 import { ROUTE_NAV_MAP } from "@/configs/navConfig";
 import { ABOUT_PAGES } from "../../data/aboutContent";
+import { breadcrumbRootStyles, breadcrumbTrailStyles, breadcrumbItemStyles, breadcrumbIconStyles, breadcrumbSeparatorStyles } from "@/components/layouts/breadcrumbStyles";
 import { hrdSlot } from "../../styles/styled";
 
 const PageRoot = styled(Container, hrdSlot("PageContainer"))({});
@@ -27,56 +28,11 @@ export function HrdPageContainer({
   );
 }
 
-const BreadcrumbRoot = styled(
-  Container,
-  hrdSlot("BreadcrumbContainer"),
-)(({ theme }) => ({ marginTop: theme.spacing(1.5) }));
-const BreadcrumbTrail = styled(
-  Breadcrumbs,
-  hrdSlot("Breadcrumbs"),
-)(({ theme }) => ({
-  ...theme.typography.body2,
-  "& a": { color: "inherit", textDecoration: "none" },
-  "& .MuiBreadcrumbs-ol": { rowGap: theme.spacing(0.5) },
-  "& .MuiBreadcrumbs-separator": { marginInline: theme.spacing(0.5) },
-}));
-const BreadcrumbItem = styled(
-  Typography,
-  hrdSlot("BreadcrumbItem"),
-)<TypographyProps>(({ theme }) => ({
-  display: "inline-flex",
-  alignItems: "center",
-  gap: theme.spacing(0.75),
-  padding: theme.spacing(0.5, 1),
-  borderRadius: theme.shape.borderRadius,
-  color: (theme.vars ?? theme).palette.text.secondary,
-  transition: theme.transitions.create(["background-color", "box-shadow"]),
-  "a &:hover": { backgroundColor: (theme.vars ?? theme).palette.action.hover },
-  "a:focus-visible &": {
-    outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`,
-    outlineOffset: 2,
-  },
-  '&[aria-current="page"]': {
-    color: (theme.vars ?? theme).palette.text.primary,
-    backgroundColor: (theme.vars ?? theme).palette.action.selected,
-    boxShadow: `inset 0 -2px ${(theme.vars ?? theme).palette.primary.main}`,
-  },
-}));
-const BreadcrumbIcon = styled(
-  "span",
-  hrdSlot("BreadcrumbIcon"),
-)(({ theme }) => ({
-  display: "inline-flex",
-  flexShrink: 0,
-  "& .MuiSvgIcon-root": { fontSize: theme.typography.pxToRem(18) },
-}));
-const BreadcrumbSeparator = styled(
-  ChevronRightIcon,
-  hrdSlot("BreadcrumbSeparator"),
-)(({ theme }) => ({
-  fontSize: theme.typography.pxToRem(16),
-  color: (theme.vars ?? theme).palette.text.disabled,
-}));
+const BreadcrumbRoot = styled(Container, hrdSlot("BreadcrumbContainer"))(({ theme }) => breadcrumbRootStyles(theme));
+const BreadcrumbTrail = styled(Breadcrumbs, hrdSlot("Breadcrumbs"))(({ theme }) => breadcrumbTrailStyles(theme));
+const BreadcrumbItem = styled(Typography, hrdSlot("BreadcrumbItem"))<TypographyProps>(({ theme }) => breadcrumbItemStyles(theme));
+const BreadcrumbIcon = styled("span", hrdSlot("BreadcrumbIcon"))(({ theme }) => breadcrumbIconStyles(theme));
+const BreadcrumbSeparator = styled(ChevronRightIcon, hrdSlot("BreadcrumbSeparator"))(({ theme }) => breadcrumbSeparatorStyles(theme));
 const navigationItems = ROUTE_NAV_MAP["/hrd"].flatMap((item) => [
   item,
   ...(item.children ?? []),

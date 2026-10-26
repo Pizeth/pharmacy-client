@@ -22,6 +22,12 @@ const drain = keyframes({ from: { transform: "scaleX(1)" }, to: { transform: "sc
 
 export const ToastRoot = styled(Snackbar, slot("Root"))(({ theme }) => ({
   maxWidth: `min(520px, calc(100vw - ${theme.spacing(4)}))`,
+  [theme.breakpoints.down("sm")]: {
+    left: theme.spacing(2),
+    right: theme.spacing(2),
+    marginInline: "auto",
+    justifyContent: "center",
+  },
   "&:hover [data-toast-progress], &:focus-within [data-toast-progress]": {
     animationPlayState: "paused",
   },
@@ -76,6 +82,7 @@ export const InlineError = styled(Alert, slot("InlineError"))(({ theme }) => ({
   "--LoginToast-accent": (theme.vars?.palette ?? theme.palette).error.main,
   marginTop: theme.spacing(2),
   marginBottom: theme.spacing(-1),
+  [theme.breakpoints.down("md")]: { display: "none" },
 }));
 
 export const ToastProgress = styled("span", slot("Progress"))({
