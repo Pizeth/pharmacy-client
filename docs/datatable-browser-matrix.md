@@ -1,5 +1,20 @@
 # DataTable browser matrix runbook
 
+## October 26 — 2.2.3.6 internal callback-context proof
+
+**Outcome B: production integration deferred.** The new internal proof retains
+the genuine full-state feature-bound hook context and places callback invocation
+inside a stable boundary before nullable output. Global detail can update below
+a row-local parent that skips its commit; snapshot guards, all card slots and
+controlled/off-page selection pass focused DOM regressions. The historical narrow
+owner remains an unsafe negative probe. No production subscriptions or public
+opt-in API change; physical nullable-slot omission and owner/context fan-out still
+require bounded production design and browser acceptance. Density profiling is
+skipped until that gate passes. See [the complete report](datatable-selection-callback-context-2-2-3-6.md)
+for results, unchanged master test failures, browser evidence and limitations.
+Historical measurements below remain unchanged; virtualization is unapproved.
+
+
 PR #47's final HRD/login/dependency acceptance is recorded in
 [pr47-final-acceptance.md](pr47-final-acceptance.md). This does not restart
 Matrix A or replace the geometry/profiling evidence below. Outcome B remains;
