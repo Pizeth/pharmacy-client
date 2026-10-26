@@ -20,27 +20,35 @@ function mount() {
   render(<QueryClientProvider client={client}><ThemeProvider theme={createTheme()}><SocialProviderPage /></ThemeProvider></QueryClientProvider>);
   return client;
 }
+async function selectProviderRow() {
+  const checkbox = await screen.findByLabelText("Select row 1");
+  const row = checkbox.closest("tr");
+  if (!row) throw new Error("Provider selection must belong to a table row");
+  fireEvent.click(checkbox);
+  return within(row);
+}
 it("edits a provider through the contract and refreshes footer data", async () => {
   const save = jest.spyOn(socialApi, "saveProvider").mockResolvedValue({ ...provider, name: "Updated" });
   const client = mount();
   const invalidate = jest.spyOn(client, "invalidateQueries");
-  fireEvent.click(await screen.findByRole("checkbox", { name: "Select row 1" }));
-  fireEvent.click(screen.getByRole("button", { name: "Edit for row 1" }));
-  fireEvent.change(within(screen.getByRole("dialog")).getByLabelText(/Name/), { target: { value: "Updated" } });
-  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  const row = await selectProviderRow();
+  fireEvent.click(row.getByRole("button", { name: "Edit for row 1" }));
+  const dialog = within(screen.getByRole("dialog"));
+  fireEvent.change(dialog.getByLabelText(/Name/), { target: { value: "Updated" } });
+  fireEvent.click(dialog.getByRole("button", { name: "Save changes" }));
   await waitFor(() => expect(save).toHaveBeenCalledWith(expect.objectContaining({ name: "Updated" }), 1));
   await waitFor(() => expect(invalidate).toHaveBeenCalledWith({ queryKey: ["site-footer"] }));
 });
 it("shows delete conflicts without removing the row", async () => {
   jest.spyOn(socialApi, "deleteProvider").mockRejectedValue(new Error("Provider is in use"));
   mount();
-  fireEvent.click(await screen.findByRole("checkbox", { name: "Select row 1" }));
-  fireEvent.click(screen.getByRole("button", { name: "Delete for row 1" }));
+  const row = await selectProviderRow();
+  fireEvent.click(row.getByRole("button", { name: "Delete for row 1" }));
   const dialog = screen.getByRole("dialog");
   fireEvent.click(within(dialog).getByRole("button", { name: "Delete provider" }));
   expect(await within(dialog).findByText("Provider is in use")).toBeInTheDocument();
   fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
-  expect(await screen.findByRole("button", { name: "Edit for row 1" })).toBeInTheDocument();
+  expect(await row.findByRole("button", { name: "Edit for row 1" })).toBeInTheDocument();
 });
 it("does not load management data for unauthorized accounts", () => {
   jest.mocked(useAdminAccess).mockReturnValue({ allowed: false, isLoading: false } as ReturnType<typeof useAdminAccess>);
