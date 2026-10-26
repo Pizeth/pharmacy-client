@@ -109,7 +109,7 @@ production-resource browser evidence remains historical, not newly certified.
 - npm run typecheck: PASS (including generated feature synchronization).
 - Focused: 2 suites / 31 tests PASS.
 - Final full serial source suite: **150 suites / 874 tests PASS**. Initial runs
-  had148/150 suites and870/874 tests passing; see the separate CI repair below.
+  had 148/150 suites and 870/874 tests passing; see the separate CI repair below.
 - Changed-file ESLint: zero errors, one pre-existing exhaustive-deps warning in
   the fixture's columns memo (also present on master). Full repository:174 errors,
   508 warnings. Rules unchanged; lint is recorded separately from correctness.
@@ -133,10 +133,10 @@ footer or navigation logic changes.
 
 HrdCardCarousel's named HomeGalleryLink slot restores the white text explicitly
 required by its existing light/dark regression on the unchanged dark-blue button.
-Browser computed styles confirm white rgb(255,255,255) on rgb(38,36,123) for all11
+Browser computed styles confirm white rgb(255,255,255) on rgb(38,36,123) for all 11
 links. This is a one-line regression repair, not an HRD/contact/slideshow redesign.
 The existing assertions, timeout settings and lint rules remain intact.
 
-Repair-focused suites:4/4,38/38 tests PASS. Final full suite:150/150,874/874 tests
+Repair-focused: 4/4 suites, 38/38 tests PASS. Final full suite: 150/150 suites, 874/874 tests
 PASS. Typecheck PASS; repair-file ESLint clean. Historical initial failures above
 are retained in validation.txt. This CI cleanup does not promote Outcome B to A.
