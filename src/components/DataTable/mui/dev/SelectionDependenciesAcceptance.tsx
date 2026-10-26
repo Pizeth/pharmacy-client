@@ -10,12 +10,16 @@ import { DataTableRowActions } from "../columns/actions/DataTableRowActions";
 import type { DataTableRowAction } from "../columns/actions";
 import { DataTable } from "../components/DataTable";
 import { DataTableRenderDiagnosticsContext, type DataTableRenderDiagnostics } from "../diagnostics/renderDiagnostics";
+import { LiveCallbackBoundary } from "../diagnostics/LiveCallbackBoundary";
 import { SelectionDependencyBoundary } from "../diagnostics/SelectionDependencyBoundary";
 
 export type DependencyRecord = { id: string; name: string };
 export type DependencyTable = MuiDataTableInstance<DependencyRecord>;
 type DependencyRow = Row<MuiDataTableFeatures, DependencyRecord>;
-export type DependencyVariant = "default" | "boundaries";
+export type DependencyVariant = "default" | "boundaries" | "callbacks";
+function hasFullCallbackState(table: ReturnType<typeof useMuiDataTable<DependencyRecord, DependencyTable["state"] | { globalFilter: unknown }>>): table is DependencyTable {
+  return "rowSelection" in table.state;
+}
 export type OutputCommit = (id: string) => void;
 const records: DependencyRecord[] = [
   { id: "a", name: "Alpha" }, { id: "b", name: "Bravo" },
@@ -65,6 +69,26 @@ function LocalParent({ table, row, commit }: {
     rowId={row.id} render={render} />;
 }
 
+function NullableCallbackOutput({ Subscribe, row, commit, blocked, conditional, emptyOutput }: {
+  readonly Subscribe: DependencyTable["Subscribe"]; readonly row: DependencyRow;
+  readonly commit: OutputCommit; readonly blocked: boolean; readonly conditional: boolean;
+  readonly emptyOutput: "null" | "undefined" | "false" | "fragment";
+}) {
+  const render = useCallback(() => <>
+    <Output id={`detail-parent-${row.id}`} commit={commit}>{null}</Output>
+    <LiveCallbackBoundary<DependencyRecord> render={current => {
+      if (conditional && (blocked || !Object.values(current.state.rowSelection).some(Boolean))) {
+        if (emptyOutput === "undefined") return undefined;
+        if (emptyOutput === "false") return false;
+        if (emptyOutput === "fragment") return <></>;
+        return null;
+      }
+      return <Output id={`detail-${row.id}`} commit={commit}>{Object.values(current.state.rowSelection).filter(Boolean).length}</Output>;
+    }} />
+  </>, [row, commit, blocked, conditional, emptyOutput]);
+  return <SelectionDependencyBoundary Subscribe={Subscribe} selectionDependency="row" rowId={row.id} render={render} />;
+}
+
 export interface SelectionDependenciesFixtureProps {
   readonly variant?: DependencyVariant;
   readonly onTable?: (table: DependencyTable) => void;
@@ -75,12 +99,15 @@ export interface SelectionDependenciesFixtureProps {
   /** Adversarial existing callback API: reads the hook wrapper's snapshot. */
   readonly snapshotCallbacks?: boolean;
   readonly conditionalDetail?: boolean;
+  readonly emptyOutput?: "null" | "undefined" | "false" | "fragment";
+  readonly flip?: boolean;
+  readonly customSlots?: boolean;
 }
 
 /** Local fixture only: the full-state adapter below is NOT a production API. */
 export function SelectionDependenciesFixture({ variant = "default", onTable,
   commit = noCommit, diagnostics, direction = "ltr", controlled = false,
-  snapshotCallbacks = false, conditionalDetail = false }: SelectionDependenciesFixtureProps) {
+  snapshotCallbacks = false, conditionalDetail = false, emptyOutput = "null", flip = false, customSlots = false }: SelectionDependenciesFixtureProps) {
   const [selection, setSelection] = useState<RowSelectionState>({});
   const [blocked, setBlocked] = useState(false);
   const [mode, setMode] = useState<"table" | "card">("table");
@@ -120,10 +147,12 @@ export function SelectionDependenciesFixture({ variant = "default", onTable,
     getRowCanExpand: () => true, autoResetPageIndex: false,
     ...(controlled ? { state: { rowSelection: selection }, onRowSelectionChange: setSelection } : {}),
     initialState: { pagination: { pageIndex: 0, pageSize: 2 } },
-  }, state => variant === "default" ? state : { globalFilter: state.globalFilter });
+  }, state => variant !== "boundaries" ? state : { globalFilter: state.globalFilter });
   // Fixture-only full snapshot adaptation. A narrow hook's selected state is
   // NOT a full live TableState contract. This is a rollout blocker, not a cast.
-  const table: DependencyTable = Object.assign({}, subscribed, { state: subscribed.store.get() });
+  const table: DependencyTable = hasFullCallbackState(subscribed)
+    ? subscribed
+    : Object.assign({}, subscribed, { state: subscribed.store.get() });
   useLayoutEffect(() => { onTable?.(table); });
   useLayoutEffect(() => { diagnostics?.commit("owner", "selection-fixture"); });
   const observer = useMemo<DataTableRenderDiagnostics>(() => ({
@@ -132,6 +161,7 @@ export function SelectionDependenciesFixture({ variant = "default", onTable,
   }), [variant, diagnostics]);
   return <DataTableRenderDiagnosticsContext.Provider value={observer}>
     <button onClick={() => controlled ? setSelection({ a: true, b: true }) : table.setRowSelection({ a: true, b: true })}>External select A and B</button>
+    <button onClick={() => table.setRowSelection({ a: true, unloaded: true })}>External select A and unloaded</button>
     <button onClick={() => controlled ? setSelection({}) : table.setRowSelection({})}>External clear</button>
     <button onClick={() => setBlocked(value => !value)}>Toggle external policy</button>
     <button onClick={() => setMode(value => value === "table" ? "card" : "table")}>Switch presentation</button>
@@ -147,11 +177,19 @@ export function SelectionDependenciesFixture({ variant = "default", onTable,
       <output data-testid="filtered-count">{table.getFilteredSelectedRowModel().rows.length}</output>
     </>}</table.Subscribe>
     <div dir={direction}>
-      <DataTable key={generation} table={table} toolbar={false} displayMode={mode}
+      <DataTable<DependencyRecord> key={generation} table={table} toolbar={false} displayMode={mode}
         selectionBar={{}} pagination={{ pageSizeOptions: [2, 4] }}
         rowPinning={{ displayMode: "select-sticky" }}
         card={{ enableSelection: true, enableExpansion: true,
-          renderHeader: ({ row }) => row.original.name,
+          detailMode: flip ? "flip" : "inline", flip: { flipOnHover: false },
+          ...(variant === "callbacks" && customSlots ? {
+            renderDetail: ({row}) => <NullableCallbackOutput Subscribe={table.Subscribe} row={row} commit={commit} blocked={blocked} conditional={conditionalDetail} emptyOutput={emptyOutput} />,
+            renderSelection: ({row}) => <LiveCallbackBoundary<DependencyRecord> render={current => <output data-testid={`selection-${row.id}`}>{Object.keys(current.state.rowSelection).length}</output>} />,
+            renderExpansion: ({row}) => <LiveCallbackBoundary<DependencyRecord> render={current => <output data-testid={`expansion-${row.id}`}>{Object.keys(current.state.rowSelection).length}</output>} />,
+            renderMetadata: ({row}) => <LiveCallbackBoundary<DependencyRecord> render={current => <output data-testid={`metadata-${row.id}`}>{Object.keys(current.state.rowSelection).length}</output>} />,
+            renderActions: ({row}) => <LiveCallbackBoundary<DependencyRecord> render={current => <button data-testid={`custom-action-${row.id}`} disabled={blocked || Object.keys(current.state.rowSelection).length >= 2}>Custom guarded action</button>} />,
+          } : {}),
+          renderHeader: ({ row }) => variant === "callbacks" ? <LiveCallbackBoundary<DependencyRecord> render={current => <output data-testid={`header-${row.id}`}>{row.original.name}: {Object.keys(current.state.rowSelection).length}</output>} /> : row.original.name,
           renderBody: ({ row, table: callbackTable }) => <>
             {snapshotCallbacks && <output data-testid={`snapshot-${row.id}`}>
               Callback snapshot: {Object.values(callbackTable.state.rowSelection ?? {}).filter(Boolean).length}
@@ -160,8 +198,10 @@ export function SelectionDependenciesFixture({ variant = "default", onTable,
             <GlobalOutput table={table} row={row} commit={commit} />
             <LocalParent table={table} row={row} commit={commit} />
           </>, actions }}
-        renderDetailPanel={({ row }) => conditionalDetail && !Object.values(table.store.get().rowSelection).some(Boolean)
-          ? null : <GlobalOutput table={table} row={row} commit={commit} prefix="detail" />} />
+        renderDetailPanel={({ row }) => variant === "callbacks"
+          ? <NullableCallbackOutput Subscribe={table.Subscribe} row={row} commit={commit} blocked={blocked} conditional={conditionalDetail} emptyOutput={emptyOutput} />
+          : conditionalDetail && !Object.values(table.store.get().rowSelection).some(Boolean)
+            ? null : <GlobalOutput table={table} row={row} commit={commit} prefix="detail" />} />
     </div>
   </DataTableRenderDiagnosticsContext.Provider>;
 }
@@ -170,6 +210,8 @@ export function SelectionDependenciesAcceptance() {
   const [variant, setVariant] = useState<DependencyVariant>("default");
   const [direction, setDirection] = useState<"ltr" | "rtl">("ltr");
   const [snapshots, setSnapshots] = useState(false);
+  const [controlled, setControlled] = useState(false);
+  const [flip, setFlip] = useState(false);
   const [environment, setEnvironment] = useState("");
   useEffect(() => {
     const update = () => setEnvironment(`${navigator.userAgent}; viewport ${innerWidth}×${innerHeight}; development`);
@@ -182,13 +224,15 @@ export function SelectionDependenciesAcceptance() {
     <h1>Selection dependency acceptance — fixture only</h1>
     <p>Independent outputs; no production subscription defaults changed.</p>
     <p data-testid="environment">{environment}</p>
-    <label>Variant <select value={variant} onChange={event => setVariant(event.target.value === "boundaries" ? "boundaries" : "default")}>
-      <option value="default">Production default</option><option value="boundaries">Experimental output boundaries</option>
+    <label>Variant <select value={variant} onChange={event => setVariant(event.target.value === "boundaries" ? "boundaries" : event.target.value === "callbacks" ? "callbacks" : "default")}>
+      <option value="callbacks">Full callback context proof</option><option value="default">Production default</option><option value="boundaries">Experimental output boundaries</option>
     </select></label>
     <button onClick={() => setDirection(value => value === "ltr" ? "rtl" : "ltr")}>Toggle direction</button>
     <label><input type="checkbox" checked={snapshots} onChange={event => setSnapshots(event.target.checked)} />
       Existing callback snapshot probe (expected failure in experimental mode)</label>
-    <SelectionDependenciesFixture key={`${variant}/${snapshots}`} variant={variant} direction={direction}
-      snapshotCallbacks={snapshots} />
+    <label><input type="checkbox" checked={controlled} onChange={event => setControlled(event.target.checked)} />Controlled selection</label>
+    <label><input type="checkbox" checked={flip} onChange={event => setFlip(event.target.checked)} />Flip detail</label>
+    <SelectionDependenciesFixture key={`${variant}/${snapshots}/${controlled}/${flip}`} variant={variant} direction={direction}
+      snapshotCallbacks={snapshots} conditionalDetail={snapshots} customSlots={snapshots} controlled={controlled} flip={flip} />
   </ThemeProvider>;
 }

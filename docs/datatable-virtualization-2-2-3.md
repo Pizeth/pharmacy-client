@@ -1,5 +1,20 @@
 # Conditional DataTable virtualization architecture — 2.2.3
 
+## October 26 — 2.2.3.6 internal callback-context proof
+
+**Outcome B: production integration deferred.** The new internal proof retains
+the genuine full-state feature-bound hook context and places callback invocation
+inside a stable boundary before nullable output. Global detail can update below
+a row-local parent that skips its commit; snapshot guards, all card slots and
+controlled/off-page selection pass focused DOM regressions. The historical narrow
+owner remains an unsafe negative probe. No production subscriptions or public
+opt-in API change; physical nullable-slot omission and owner/context fan-out still
+require bounded production design and browser acceptance. Density profiling is
+skipped until that gate passes. See [the complete report](datatable-selection-callback-context-2-2-3-6.md)
+for results, unchanged master test failures, browser evidence and limitations.
+Historical measurements below remain unchanged; virtualization is unapproved.
+
+
 Status: architecture review justified by October 13 Matrix B; no virtualization
 implementation or dependency introduced.
 

@@ -19,7 +19,7 @@ function setup(variant: DependencyVariant, controlled = false, direction: "ltr" 
   };
 }
 
-describe.each<DependencyVariant>(["default", "boundaries"])("%s dependency contract", variant => {
+describe.each<DependencyVariant>(["default", "boundaries", "callbacks"])("%s dependency contract", variant => {
   it("D1–D8: count, cross-row guard and UNDECLARED callbacks update while local A can skip B", () => {
     const fixture = setup(variant);
     fixture.select("a");
@@ -46,10 +46,10 @@ describe.each<DependencyVariant>(["default", "boundaries"])("%s dependency contr
     expect(fixture.outputCommit).toHaveBeenCalledWith("nested-a");
     const rows = [...new Set(fixture.commit.mock.calls.filter(([layer]) => layer === "row").map(([, id]) => id))];
     const cells = new Set(fixture.commit.mock.calls.filter(([layer]) => layer === "cell").map(([, id]) => id));
-    expect(rows.sort()).toEqual(variant === "default" ? ["a", "b"] : ["b"]);
-    expect(cells.size).toBe(variant === "default" ? 14 : 7);
-    expect(fixture.commit.mock.calls.filter(([layer]) => layer === "owner")).toHaveLength(variant === "default" ? 1 : 0);
-    expect(fixture.commit.mock.calls.filter(([layer]) => layer === "body")).toHaveLength(variant === "default" ? 1 : 0);
+    expect(rows.sort()).toEqual(variant !== "boundaries" ? ["a", "b"] : ["b"]);
+    expect(cells.size).toBe(variant !== "boundaries" ? 14 : 7);
+    expect(fixture.commit.mock.calls.filter(([layer]) => layer === "owner")).toHaveLength(variant !== "boundaries" ? 1 : 0);
+    expect(fixture.commit.mock.calls.filter(([layer]) => layer === "body")).toHaveLength(variant !== "boundaries" ? 1 : 0);
     expect(fixture.outputCommit.mock.calls.filter(([id]) => id === "global-a")).toHaveLength(1);
     expect(fixture.outputCommit.mock.calls.filter(([id]) => id === "nested-a")).toHaveLength(1);
     fixture.select("b", false);
@@ -187,14 +187,14 @@ it("legacy D6/D21 callback snapshots remain fresh with the full production owner
   expect(within(fixture.row("a")!).getByRole("button", { name: /^Guarded action/ })).toBeDisabled();
 });
 
-it.each<DependencyVariant>(["default", "boundaries"])("D19 nullable callback integration gate: %s", variant => {
+it.each<DependencyVariant>(["default", "boundaries", "callbacks"])("D19 nullable callback integration gate: %s", variant => {
   const fixture = setup(variant, false, "ltr", false, true);
   fixture.button("Expand A");
   expect(fixture.table().getRow("a").getIsExpanded()).toBe(true);
   expect(screen.queryByTestId("detail-a")).not.toBeInTheDocument();
   fixture.select("a");
   expect(screen.getByTestId("global-a")).toHaveTextContent("1");
-  if (variant === "default") {
+  if (variant !== "boundaries") {
     expect(screen.getByTestId("detail-a")).toHaveTextContent("1");
   } else {
     // Nothing mounted means no descendant boundary can subscribe. The callback
