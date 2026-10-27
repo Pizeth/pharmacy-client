@@ -3,9 +3,10 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { DrawerAppBar } from "./DrawerAppBar";
 
-// Drawer coordination is isolated from the footer's application query/theme providers.
-jest.mock("@/components/layouts/SiteFooter", () => ({ SiteFooter: () => <footer /> }));
 jest.mock("@tsparticles/nextjs", () => ({ NextParticlesProvider: ({ children }: { children: React.ReactNode }) => children }));
+jest.mock("next/navigation", () => ({ usePathname: () => "/admin/social-provider" }));
+// Footer query behavior is covered separately; this fixture exercises shell coordination.
+jest.mock("@/components/layouts/SiteFooter", () => ({ SiteFooter: () => <footer>Site footer</footer> }));
 jest.mock("./Navigation/useHeaderScrollState", () => ({ useHeaderScrollState: () => ({ headerRef: { current: null }, scrolled: true, headerHeight: 156 }) }));
 jest.mock("./components/NavigationHeader", () => ({ NavigationHeader: ({ onToggle, open, compactDesktop, disabledMenu }: NavigationHeaderProps) =>
   <button onClick={onToggle} aria-expanded={open} data-compact={compactDesktop} data-disabled-menu={disabledMenu}>Toggle drawer</button> }));
@@ -23,6 +24,7 @@ it("coordinates drawer navigation without losing the measured main offset or bac
   fireEvent.click(screen.getByRole("button", { name: "Navigate" }));
   expect(screen.queryByRole("button", { name: "Navigate" })).not.toBeInTheDocument();
   expect(container.querySelector("h1")).toHaveTextContent("Page content");
+  expect(screen.getByRole("navigation", { name: "Breadcrumb" })).toBeInTheDocument();
 });
 
 it("keeps the compact desktop menu disabled when requested", () => {
@@ -30,4 +32,10 @@ it("keeps the compact desktop menu disabled when requested", () => {
   const toggle = screen.getByRole("button", { name: "Toggle drawer" });
   expect(toggle).toHaveAttribute("data-compact", "false");
   expect(toggle).toHaveAttribute("data-disabled-menu", "true");
+});
+
+it("lets feature layouts own their trail without a duplicate shell breadcrumb", () => {
+  render(<ThemeProvider theme={createTheme()}><DrawerAppBar breadcrumbs={null}><nav aria-label="Feature breadcrumb">Page</nav></DrawerAppBar></ThemeProvider>);
+  expect(screen.queryByRole("navigation", { name: "Breadcrumb" })).not.toBeInTheDocument();
+  expect(screen.getAllByRole("navigation")).toHaveLength(1);
 });

@@ -39,7 +39,7 @@ const Content = styled(
 export function HrdSiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <BackgroundRoot lang="km">
-      <DrawerAppBar backgroundColor="var(--Hrd-page-background)">
+      <DrawerAppBar backgroundColor="var(--Hrd-page-background)" breadcrumbs={null}>
         <Content>
           <HrdBreadcrumbs />
           {children}

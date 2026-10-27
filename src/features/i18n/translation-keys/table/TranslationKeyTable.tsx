@@ -16,13 +16,13 @@ import {
   Refresh,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
-import { DataTable } from "@/components/DataTable";
+import { ResourceDataTable as DataTable } from "@/components/Tables/ResourceDataTable";
 import type {
   DataTableBulkAction,
   DataTableRowAction,
   DataTableServerStateController,
 } from "@/components/DataTable";
-import { ResourceActionButton } from "@/components/buttons";
+import { ResourceTableCreateButton } from "@/components/Tables/ResourceTableCreateButton";
 import { TranslationKeyApiError } from "../api";
 import {
   TranslationKeyCreateDialog,
@@ -36,7 +36,7 @@ import type { TranslationKey, TranslationValue } from "../schemas";
 import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
 import { TranslationKeyTranslationsPanel } from "./TranslationKeyTranslationsPanel";
 import { createTranslationKeyCardConfig } from "./translationKeyCardConfig";
-import CloudLoader, { CloudLoaderMessage } from "@/components/effect/loaders/CloudLoader/CloudLoader";
+import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
 
 const COMPONENT_NAME = "RazethTranslationKeyTable";
 
@@ -44,18 +44,6 @@ const Root = styled("section", {
   name: COMPONENT_NAME,
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
-})({});
-
-const LoadingRoot = styled(Paper, {
-  name: COMPONENT_NAME,
-  slot: "Card",
-  overridesResolver: (_props, styles) => styles.card,
-})({});
-
-const LoadingContentRoot = styled(Box, {
-  name: COMPONENT_NAME,
-  slot: "Content",
-  overridesResolver: (_props, styles) => styles.content,
 })({});
 
 const TableRegionRoot = styled(Box, {
@@ -249,14 +237,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
    */
   if (server.isInitialLoading) {
     return (
-      <LoadingRoot variant="outlined">
-        <LoadingContentRoot role="status" aria-live="polite" aria-busy="true">
-          <CloudLoader />
-          <CloudLoaderMessage variant="body2">
-            Loading translation keys…
-          </CloudLoaderMessage>
-        </LoadingContentRoot>
-      </LoadingRoot>
+      <ResourceTableLoading message="Loading translation keys…" />
     );
   }
 
@@ -508,6 +489,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
         )}
 
         <DataTable
+          resourceId="admin/i18n/translation-keys"
           table={table}
           card={card}
           defaultDisplayMode="auto"
@@ -575,8 +557,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
             //   </Button>
             // ),
             startContent: (
-              <ResourceActionButton
-                variant="contained"
+              <ResourceTableCreateButton
                 color="error"
                 startIcon={<AddRounded />}
                 onClick={() => {
@@ -584,7 +565,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
                 }}
               >
                 Create key
-              </ResourceActionButton>
+              </ResourceTableCreateButton>
             ),
             search: true,
             /**

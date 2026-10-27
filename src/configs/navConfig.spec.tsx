@@ -24,3 +24,11 @@ describe("route navigation", () => {
     expect(getActiveNavIndex("/unrelated", items)).toBe(-1);
   });
 });
+
+it("keeps admin destinations and menu colors unique", () => {
+ const items = ROUTE_NAV_MAP["/admin"];
+ expect(items[0].href).toBe("/admin/dashboard");
+ expect(items[0].color).toBe("info");
+ expect(new Set(items.map(item => item.href)).size).toBe(items.length);
+ expect(new Set(items.map(item => item.color)).size).toBe(items.length);
+});

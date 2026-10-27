@@ -23,6 +23,8 @@ export function getSiteFooterConfig(pathname: string, adminContact?: PublicDocum
   if (matchesNavRoute(pathname, "/admin")) return {
     site: { ...admin, contact: { ...adminContact, ...sharedContact } },
     links: [
+      { href: "/admin/dashboard", label: "Dashboard" },
+      { href: "/admin/social-provider", label: "Social providers" },
       { href: "/admin/documents", label: "ឯកសារ" },
       { href: "/admin/i18n", label: "ការបកប្រែ" },
     ],

@@ -10,7 +10,7 @@ it("uses the super admin contact and real admin destinations", () => {
   expect(config.site.contact.email).toBe("admin@example.com");
   expect(config.site.contact.address).toEqual(HRD_SITE.contact.address);
   expect(config.site.contact.hours).toBe(HRD_SITE.contact.hours);
-  expect(config.links?.map(link => link.href)).toEqual(["/admin/documents", "/admin/i18n"]);
+  expect(config.links?.map(link => link.href)).toEqual(["/admin/dashboard", "/admin/social-provider", "/admin/documents", "/admin/i18n"]);
 });
 
 it("does not leak department or admin contacts into unrelated routes", () => {

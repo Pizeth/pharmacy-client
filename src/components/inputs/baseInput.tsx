@@ -353,7 +353,10 @@ export function BaseInput<TFieldValues extends FieldValues>(
    *
    *   start icon alone does not force the label to float.
    */
-  const shouldShrink = focused || hasValue;
+  // Native date/time controls show their own format hint even when empty.
+  // Keep the label above that hint, including after clearing or blurring.
+  const nativeDateInput = ["date", "datetime-local", "month", "time", "week"].includes(type);
+  const shouldShrink = focused || hasValue || nativeDateInput;
 
   // Compute spinner color from fieldState before passing to useInputAdornment
   const spinnerColor = fieldState.error ? "error" : "primary";

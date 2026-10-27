@@ -12,6 +12,21 @@ interface Values {
   officialId: string;
 }
 
+function DateFixture({ type }: { type: string }) {
+  const form = useForm({ defaultValues: { date: "" } });
+  return <FormProvider {...form}><TextField name="date" label="Optional date" type={type} /></FormProvider>;
+}
+
+it.each(["date", "datetime-local", "month", "time", "week"])("keeps an empty %s label above the native date hint", type => {
+  render(<DateFixture type={type} />);
+  const input = screen.getByLabelText("Optional date");
+  const label = document.querySelector(`label[for="${input.id}"]`);
+  expect(label).toHaveAttribute("data-shrink", "true");
+  fireEvent.focus(input);
+  fireEvent.blur(input);
+  expect(label).toHaveAttribute("data-shrink", "true");
+});
+
 function LucideFixture() {
   const form = useForm({ defaultValues: { name: "" } });
   return <ThemeProvider theme={createTheme({ palette: { primary: { main: "#123456" } } })}>

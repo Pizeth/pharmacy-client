@@ -6,6 +6,7 @@ import { useTheme } from "@mui/material/styles";
 import { NextParticlesProvider } from "@tsparticles/nextjs";
 import { initParticles } from "@/theme/effects/initParticles";
 import { SiteFooter } from "@/components/layouts/SiteFooter";
+import { SiteBreadcrumbs } from "@/components/layouts/SiteBreadcrumbs";
 import { NavigationHeader } from "./components/NavigationHeader";
 import { NavigationDrawer } from "./components/NavigationDrawer";
 import { useHeaderScrollState } from "./Navigation/useHeaderScrollState";
@@ -17,7 +18,8 @@ export type { DrawerAppBarProps } from "./types";
 export function DrawerAppBar({
   children,
   disabledMenu = false,
-  backgroundColor
+  backgroundColor,
+  breadcrumbs = <SiteBreadcrumbs />,
 }: DrawerAppBarProps) {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -37,7 +39,7 @@ export function DrawerAppBar({
     <NextParticlesProvider init={initParticles}>
       <NavigationHeader headerRef={headerRef} compactDesktop={compactDesktop} mobile={mobile} scrolled={scrolled} open={open} disabledMenu={disabledMenu} onToggle={toggleDrawer} />
       <NavigationDrawer open={open} geometry={geometry} compactDesktop={compactDesktop} mobileScrolled={mobile && scrolled} disabledMenu={disabledMenu} onToggle={toggleDrawer} onNavigate={closeDrawer} />
-      <Main open={open} backgroundColor={backgroundColor} style={geometry}>{children}<SiteFooter /></Main>
+      <Main open={open} backgroundColor={backgroundColor} style={geometry}>{breadcrumbs}{children}<SiteFooter /></Main>
     </NextParticlesProvider>
   </Root>;
 }

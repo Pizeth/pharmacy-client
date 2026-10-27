@@ -30,7 +30,7 @@ const HeaderLabelRoot = styled("span", {
   lineHeight: 1.7,
   fontSize: "1rem",
   fontFamily: [
-    "Roboto",
+    "var(--font-inter)",
     "Helvetica",
     "sans-serif",
     "var(--font-interkhmerloopless)",

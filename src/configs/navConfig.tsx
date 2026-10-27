@@ -1,4 +1,9 @@
 // src/config/navConfig.tsx
+import RazShare from "@/components/icons/share";
+import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
+import PolicyOutlined from "@mui/icons-material/PolicyOutlined";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import TranslateIcon from "@mui/icons-material/Translate";
 import RazHome from "@/components/icons/home";
 import RazPeople from "@/components/icons/people";
 import RazContact from "@/components/icons/contact";
@@ -21,6 +26,14 @@ export interface NavItemType {
 }
 
 export const ROUTE_NAV_MAP: Record<string, NavItemType[]> = {
+  "/admin": [
+    { label: "Dashboard", href: "/admin/dashboard", color: "info", Icon: <DashboardIcon color="info" /> },
+    { label: "Users", href: "/admin/users", color: "success", Icon: <PeopleOutlineIcon color="success" /> },
+    { label: "Roles", href: "/admin/roles", color: "primary", Icon: <PolicyOutlined color="primary" /> },
+    { label: "Social providers", href: "/admin/social-provider", color: "secondary", Icon: <RazShare color="secondary" /> },
+    { label: "Translations", href: "/admin/i18n", color: "warning", Icon: <TranslateIcon color="warning" /> },
+    { label: "Documents", href: "/admin/documents", color: "error", Icon: <FolderIcon color="error" /> },
+  ],
   "/hrd": [
     {
       label: "ទំព័រដើម",

@@ -41,6 +41,11 @@ unavoidable runtime geometry. Put variants on semantic data attributes rather
 than composing ad hoc classes. Keep typography on MUI variants so the theme's
 CSS font variables remain authoritative.
 
+Document table composition uses the application `ResourceDataTable` wrapper;
+see `docs/resource-table-standard.md` for the shared toolbar, responsive cards,
+persistence and CRUD conventions. Resource columns and document actions remain
+owned by HRD, and the underlying generic DataTable stays resource-agnostic.
+
 Register new slot keys in `styles/hrdSlotKeys.ts` and `src/theme.d.ts` so theme
 overrides are typed. Do not add theme defaultProps without a corresponding
 `useThemeProps` consumer, and do not put resource data into theme defaults.
@@ -56,12 +61,29 @@ contact details, and quick links are selected in `components/layouts/siteFooterC
 HRD retains its feature-owned content and footer presentation. Social links and
 copyright remain shared. Do not mount a second footer in `HrdSiteLayout`.
 
+The social-icon strip must use the same shared links from
+`components/icons/components/socials.tsx` on every route, including `/admin`.
+Never substitute an administrator's or user's social profiles into that strip.
+Backend social-provider/profile CRUD is separate from these shared site links.
+The contact block may still use route-specific contact information.
+
 Route loading uses Next.js `loading.tsx` boundaries. HRD's boundary sits below
 `HrdSiteLayout`, keeping navigation, breadcrumbs, and the footer available while
 page content streams. The shared `RouteContentLoading` skeleton uses typed
 `RazethRouteContentLoading` theme slots and the same `xl` content width; it also
 serves other routes in the `(app)` group. Instant cached navigation needs no
 artificial loading delay.
+
+## Operational document tracking
+
+`/admin/documents` is owned by `features/document-tracking`, separately from the
+public HRD download catalogue. See [document-tracking.md](document-tracking.md)
+for the shared route, database model, handler permissions and sheet import mapping.
+Reuse existing Profile/EmploymentHistory and versioned Department/Ministry data
+for work identity and routing; preserve receipt-time organizational context in history.
+Keep its operational fields and workflow out of the generic DataTable renderer.
+The original Google Sheet and root-page integration remain read-only sources;
+historical records must not acquire invented handoff events during migration.
 
 ## Verification
 

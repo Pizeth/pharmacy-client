@@ -5,20 +5,16 @@
 import { useCallback, useMemo, useState } from "react";
 import {
   Alert,
-  FormControlLabel,
   Menu,
   MenuItem,
-  IconButton,
-  Switch,
   Snackbar,
   Tab,
   Tabs,
   Typography,
-  useColorScheme,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-import { DataTable } from "@/components/DataTable/index";
+import { ResourceDataTable as DataTable } from "@/components/Tables/ResourceDataTable";
 
 import { createPublicDocumentCardConfig } from "./publicDocumentCardConfig";
 import { PUBLIC_DOCUMENT_CATEGORIES } from "../data/publicDocuments";
@@ -31,8 +27,7 @@ import type { PublicDocumentOpenResult } from "../actions/openPublicDocument";
 import type { PublicDocumentRecord } from "../../types/publicDocuments.types";
 import { publicDocumentsSlot } from "../../styles/styled";
 import { usePublicDocumentsDataTable } from "./usePublicDocumentsDataTable";
-import ThemeToggle from "../../../../components/effect/themes/themeToggle";
-import { ChevronDown, Moon, Sun } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 const CategoryTabsRoot = styled(
   "div",
@@ -101,9 +96,7 @@ interface OpenedNotice {
 export function PublicDocumentsTable({
   compactCard = true,
 }: { compactCard?: boolean } = {}) {
-  const { mode, setMode } = useColorScheme();
   const [notice, setNotice] = useState<OpenedNotice | null>(null);
-  const [useCompactCard, setUseCompactCard] = useState(compactCard);
   const [categoryAnchor, setCategoryAnchor] = useState<HTMLElement | null>(
     null,
   );
@@ -133,13 +126,14 @@ export function PublicDocumentsTable({
     });
 
   const card = useMemo(
-    () => createPublicDocumentCardConfig(actions, useCompactCard),
-    [actions, useCompactCard],
+    () => createPublicDocumentCardConfig(actions, compactCard),
+    [actions, compactCard],
   );
 
   return (
     <>
       <DataTable
+        resourceId="hrd/documents"
         table={table}
         pagination={{}}
         // Fill the container; the fixed column sizes stay as the
@@ -258,27 +252,6 @@ export function PublicDocumentsTable({
                 ))}
               </CategoryGroupMenu>
             </CategoryTabsRoot>
-          ),
-          endContent: (
-            <>
-              <FormControlLabel
-                label="Compact cards"
-                control={
-                  <Switch
-                    size="small"
-                    checked={useCompactCard}
-                    onChange={(_, checked) => setUseCompactCard(checked)}
-                  />
-                }
-              />
-              <IconButton
-                onClick={() => setMode(mode === "dark" ? "light" : "dark")}
-                aria-label="toggle dark/light theme"
-              >
-                {mode === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-              </IconButton>
-            </>
-            // <ThemeToggle />
           ),
           enableColumnManager: true,
           enableFilterToggle: true,

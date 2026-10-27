@@ -9,6 +9,8 @@ export interface DrawerAppBarProps {
   children: ReactNode;
   disabledMenu?: boolean;
   backgroundColor?: string;
+  /** Shared trail by default; a feature layout may render its own trail once. */
+  breadcrumbs?: ReactNode;
 }
 export interface NavigationHeaderProps {
   headerRef: RefObject<HTMLElement | null>;

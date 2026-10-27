@@ -1,0 +1,80 @@
+"use client";
+import { useState } from "react";
+import NextLink from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { Alert, Button } from "@mui/material";
+import AdminPanelSettingsOutlined from "@mui/icons-material/AdminPanelSettingsOutlined";
+import { FormDialog } from "@/components/forms/FormDialog";
+import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
+import {
+  rolesApi,
+  type ApplicationRole,
+  type RoleMode,
+  type RoleMetadata,
+} from "./api";
+import { RoleForm } from "./RoleForm";
+export function RoleEditor({
+  mode,
+  id,
+  metadata,
+  onClose,
+  onSuccess,
+}: {
+  readonly mode: RoleMode;
+  readonly id?: number;
+  readonly metadata: RoleMetadata;
+  readonly onClose: () => void;
+  readonly onSuccess: (record: ApplicationRole) => void;
+}) {
+  const [pending, setPending] = useState(false);
+  const record = useQuery({
+    queryKey: ["admin-roles", "editor", mode, id],
+    queryFn: ({ signal }) => rolesApi.get(id!, signal),
+    enabled: mode !== "create" && !!id,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+  });
+  const close = () => {
+    if (!pending) onClose();
+  };
+  return (
+    <FormDialog
+      open
+      title={`${mode === "create" ? "Create" : mode === "edit" ? "Edit" : "Delete"} role`}
+      subtitle={record.data?.name}
+      pending={pending}
+      icon={<AdminPanelSettingsOutlined />}
+      onClose={close}
+      maxWidth="md"
+    >
+      <Button
+        component={NextLink}
+        href={`/admin/roles/${mode}${id ? `/${id}` : ""}`}
+        disabled={pending}
+      >
+        Open dedicated {mode} page
+      </Button>
+      {record.isLoading ? (
+        <ResourceTableLoading message="Loading role…" />
+      ) : record.error ? (
+        <Alert
+          severity="error"
+          action={<Button onClick={() => record.refetch()}>Retry</Button>}
+        >
+          {record.error.message}
+        </Alert>
+      ) : (
+        (mode === "create" || record.data) && (
+          <RoleForm
+            mode={mode}
+            record={record.data}
+            metadata={metadata}
+            onCancel={close}
+            onSuccess={onSuccess}
+            onPendingChange={setPending}
+          />
+        )
+      )}
+    </FormDialog>
+  );
+}
