@@ -17,7 +17,9 @@ async function displayRequest<T>(path: string, schema: z.ZodType<T>, signal?: Ab
   const response = await fetch(`${origin}/api/v1/users/${path}`, { signal, credentials: "include", ...(payload ? { method: "POST", body: JSON.stringify(payload) } : {}), headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) } });
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) throw new Error(body && typeof body === "object" && "message" in body && typeof body.message === "string" ? body.message : "Could not load user details.");
-  return schema.parse(body && typeof body === "object" && "data" in body ? body.data : body);
+    const data = body && typeof body === "object" && "data" in body ? body.data : body;
+    if (data == null && path.endsWith("/admin-detail")) throw new Error("User not found.");
+    return schema.parse(data);
 }
 export type AdminUser = z.infer<typeof userSchema>;
 export type UserMode = "create" | "edit" | "delete";

@@ -23,6 +23,15 @@ function mount(children: React.ReactNode) {
     </QueryClientProvider>,
   );
 }
+it("shows a readable missing-note error without submitting progress", async () => {
+  const progress = jest.spyOn(trackingApi, "progress");
+  mount(<ProgressForm record={trackingRecord} metadata={trackingMetadata} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Action" }));
+  fireEvent.click(screen.getByRole("option", { name: "Put on hold" }));
+  fireEvent.click(screen.getByRole("button", { name: "Put on hold" }));
+  expect(await screen.findByText("A reason or comment is required for this action.")).toBeInTheDocument();
+  expect(progress).not.toHaveBeenCalled();
+});
 it("sends the selected receiving handler with the exact open-form version", async () => {
   const progress = jest
     .spyOn(trackingApi, "progress")

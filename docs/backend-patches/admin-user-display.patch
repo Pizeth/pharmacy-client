@@ -47,15 +47,16 @@ diff --git a/src/modules/users/controllers/users.controller.ts b/src/modules/use
 index f72e691..6be5351 100644
 --- a/src/modules/users/controllers/users.controller.ts
 +++ b/src/modules/users/controllers/users.controller.ts
-@@ -5,6 +5,7 @@ import {
+@@ -5,6 +5,8 @@ import {
    Post,
    Body,
    Logger,
 +  ParseIntPipe,
++  NotFoundException,
    UseInterceptors,
    //   Put,
    //   Delete,
-@@ -145,6 +146,18 @@ export class UserController {
+@@ -145,6 +147,20 @@ export class UserController {
    //   };
    // }
  
@@ -68,7 +69,9 @@ index f72e691..6be5351 100644
 +  @Get(':id/admin-detail')
 +  @Roles(['admin'])
 +  async getAdminDisplayDetail(@Param('id', ParseIntPipe) id: number) {
-+    return this.service.getAdminDisplayDetail(id);
++    const detail = await this.service.getAdminDisplayDetail(id);
++    if (!detail) throw new NotFoundException('User not found.');
++    return detail;
 +  }
 +
    @Get('contact/super-admin')

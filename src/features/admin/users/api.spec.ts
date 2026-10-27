@@ -2,6 +2,10 @@ import { usersApi } from "./api";
 jest.mock("@/lib/auth-client", () => ({ authClient: { admin: {} } }));
 const originalFetch = global.fetch;
 afterEach(() => { global.fetch = originalFetch; jest.restoreAllMocks(); });
+it("shows a readable not-found message for an empty detail response", async () => {
+ global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => null } as Response);
+ await expect(usersApi.detail("123")).rejects.toThrow("User not found.");
+});
 it("sends combined filters and sorting through the shared server-query contract", async () => {
  const fetch = jest.fn<Promise<Response>, Parameters<typeof global.fetch>>().mockResolvedValue({ ok: true, json: async () => ({ users: [], total: 0 }) } as Response);
  global.fetch = fetch;

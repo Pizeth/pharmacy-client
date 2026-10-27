@@ -93,6 +93,6 @@ export function DashboardSystemMonitor() {
         <S.MonitorMeters>{volumes.map(({ label, used, size }) => <S.MonitorMeter key={label}><span>{label} · {size}</span><span>{used}%</span><S.MonitorProgress aria-label={`${label} storage used`} value={used} max={100} /></S.MonitorMeter>)}</S.MonitorMeters>
       </div>
     </S.ChartGrid>
-    <Typography variant="caption" color="text.secondary">Demo only — these charts do not represent the application's infrastructure or actual usage.</Typography>
+    <Typography variant="caption" color="text.secondary">Demo only — these charts do not represent the application&apos;s infrastructure or actual usage.</Typography>
   </S.Panel>;
 }

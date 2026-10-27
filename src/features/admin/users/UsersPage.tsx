@@ -2,7 +2,7 @@
 import type { ColumnFiltersState, SortingState } from "@tanstack/table-core";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Alert, Button, Chip, Typography } from "@mui/material";
 import { AddRounded, DeleteOutline, EditOutlined, OpenInNew } from "@mui/icons-material";
@@ -36,11 +36,10 @@ export function UsersPage() {
   const [notice, setNotice] = useState("");
   const roles = useQuery({ queryKey: ["admin-users", "roles"], queryFn: ({ signal }) => usersApi.roles(signal), enabled: access.allowed });
   const users = useQuery({ queryKey: ["admin-users", pagination, search, columnFilters, sorting], queryFn: ({ signal }) => usersApi.list(pagination.pageIndex, pagination.pageSize, search, columnFilters, sorting, signal), enabled: access.allowed, placeholderData: keepPreviousData });
-  useEffect(() => {
-    if (users.data && !users.isPlaceholderData && pagination.pageIndex > 0 && pagination.pageIndex * pagination.pageSize >= users.data.total) {
-      setPagination(previous => ({ ...previous, pageIndex: Math.max(0, Math.ceil(users.data.total / previous.pageSize) - 1) }));
-    }
-  }, [users.data, users.isPlaceholderData, pagination.pageIndex, pagination.pageSize]);
+  if (users.data && !users.isPlaceholderData && pagination.pageIndex > 0 && pagination.pageIndex * pagination.pageSize >= users.data.total) {
+    const pageIndex = Math.max(0, Math.ceil(users.data.total / pagination.pageSize) - 1);
+    setPagination(previous => ({ ...previous, pageIndex }));
+  }
   const actions = useMemo<readonly DataTableRowAction<AdminUser>[]>(() => [
     { id: "edit", label: "Edit user", inline: true, renderIcon: () => <EditOutlined />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
     { id: "delete", label: "Delete user", inline: true, color: "error", renderIcon: () => <DeleteOutline />, isDisabled: ({ row }) => !row.getIsSelected() || row.id === String(access.data?.id), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },

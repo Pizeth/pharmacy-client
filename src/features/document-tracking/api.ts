@@ -51,9 +51,19 @@ async function request<T>(
       response.status,
     );
   }
-  return schema.parse(
+  const parsed = schema.safeParse(
     body && typeof body === "object" && "data" in body ? body.data : body,
   );
+  if (!parsed.success) {
+    const mutation = init.method && init.method !== "GET" && path !== "/query";
+    throw new TrackingRequestError(
+      mutation
+        ? "The server returned an unexpected response. Your change may have been saved. Reload the register before retrying."
+        : "The server returned an unexpected response. Reload the page to try again.",
+      response.status,
+    );
+  }
+  return parsed.data;
 }
 export function buildTrackingQuery(
   pageIndex: number,

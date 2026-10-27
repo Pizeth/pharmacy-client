@@ -64,7 +64,7 @@ export function ProgressForm({
   const mutation = useMutation({
     mutationFn: async () => {
       const values = form.getValues();
-      const data = progressInputSchema.parse({
+      const parsed = progressInputSchema.safeParse({
         version: initial.version,
         action,
         note: values.note.trim() || null,
@@ -99,6 +99,9 @@ export function ProgressForm({
             }
           : {}),
       });
+      if (!parsed.success)
+        throw new Error(parsed.error.issues[0]?.message ?? "Check the form values.");
+      const data = parsed.data;
       if (handoff && !data.assignedToId)
         throw new Error("Choose the person who will receive the document.");
       return trackingApi.progress(initial.id, data);

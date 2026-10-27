@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import { useEffect } from "react";
 import { ResourceDataTable } from "./ResourceDataTable";
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "@/components/DataTable/mui/table";
 import type { MuiDataTableInstance } from "@/components/DataTable/mui/table";
@@ -8,7 +9,7 @@ const data = [{ id: "a", name: "Alpha" }, { id: "b", name: "Beta" }];
 let api: MuiDataTableInstance<{ id: string; name: string }>;
 function Fixture({ loading = false }: { loading?: boolean }) {
   const table = useMuiDataTable({ data, columns, getRowId: row => row.id, enableGlobalFilter: true, enableRowSelection: true });
-  api = table;
+  useEffect(() => { api = table; }, [table]);
   return <ResourceDataTable resourceId="test/resource-standard" loading={loading} loadingMessage="Loading test records…" table={table} card={{ enableSelection: true, renderHeader: ({ row }) => row.original.name, renderBody: ({ row }) => row.original.name }} />;
 }
 beforeEach(() => localStorage.clear());
