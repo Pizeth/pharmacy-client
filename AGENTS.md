@@ -65,6 +65,24 @@ Do not stack an additional ResourcePage top margin or breadcrumb bottom padding.
 Table initial loading uses the shared ResourceTableLoading (i18n cloud loader),
 with resource-specific text only. Background refresh must preserve visible rows.
 
+## Application role authorization
+
+Application role administration uses the existing Role/RolePermission/Permission
+chain through User.roleId and CASL. Better Auth role strings do not authorize
+`/admin/roles` management. Preserve resource attribute/object policies, bootstrap
+role protections, version checks and transactional audit records. See
+`docs/application-roles.md`; do not add parallel role tables or claim unsupported
+ABAC condition editing.
+
+## Organization and HR reuse
+
+Organization and HR data are authoritative: document tracking must reuse the
+existing User/Profile/EmploymentHistory and versioned Department/Ministry models.
+Do not introduce parallel staff or office catalogues. Resolve effective assignments
+and organization versions; preserve receipt-time references and display snapshots
+so transfers and renames never rewrite handling history. See
+`docs/document-tracking.md` for the integration contract.
+
 ## Icon consistency
 
 Prefer `@mui/icons-material` wherever an equivalent exists. Keep icons within a

@@ -37,3 +37,13 @@ it("requires explicit form-dialog closure", () => {
 
   expect(onClose).toHaveBeenCalledTimes(1);
 });
+
+it("bounds long forms and keeps one accessible heading outside the scrolling content", () => {
+  render(<FormDialog open title="Role permissions" onClose={jest.fn()}><div>Long permission form</div></FormDialog>);
+  const dialog = screen.getByRole("dialog");
+  expect(dialog).toHaveStyle({ display: "flex", flexDirection: "column", maxHeight: "calc(100dvh - 64px)", overflow: "hidden" });
+  expect(screen.getAllByRole("heading", { name: "Role permissions" })).toHaveLength(1);
+  const content = screen.getByText("Long permission form").closest(".MuiDialogContent-root");
+  expect(content).toHaveStyle({ minHeight: "0", overflowY: "auto" });
+  expect(content).not.toContainElement(screen.getByRole("button", { name: "Close dialog" }));
+});

@@ -10,7 +10,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import type { DialogProps } from "@mui/material";
+import type { DialogProps, DialogTitleProps } from "@mui/material";
 import { CloseRounded } from "@mui/icons-material";
 import { styled, useThemeProps } from "@mui/material/styles";
 
@@ -26,13 +26,19 @@ const CardRoot = styled(Paper, {
   name: PREFIX,
   slot: "Card",
   overridesResolver: (_props, styles) => styles.card,
-})({});
+})({
+  display: "flex",
+  flexDirection: "column",
+  maxHeight: "calc(100dvh - 64px)",
+  minHeight: 0,
+  overflow: "hidden",
+});
 
 const HeaderRoot = styled(DialogTitle, {
   name: PREFIX,
   slot: "Heading",
   overridesResolver: (_props, styles) => styles.heading,
-})({});
+})<DialogTitleProps>({});
 
 const HeaderLayoutRoot = styled("div", {
   name: PREFIX,
@@ -89,7 +95,7 @@ const FormContentRoot = styled(DialogContent, {
   name: PREFIX,
   slot: "Footer",
   overridesResolver: (_props, styles) => styles.footer,
-})({});
+})({ minHeight: 0, overflowY: "auto" });
 
 export interface FormDialogProps {
   readonly open: boolean;
@@ -166,7 +172,7 @@ export function FormDialog(inProps: FormDialogProps) {
         paper: CardRoot,
       }}
     >
-      <HeaderRoot>
+      <HeaderRoot component="div">
         <HeaderLayoutRoot>
           <HeaderMainRoot>
             {icon && <HeaderIconRoot>{icon}</HeaderIconRoot>}

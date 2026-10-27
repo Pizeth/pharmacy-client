@@ -74,6 +74,17 @@ page content streams. The shared `RouteContentLoading` skeleton uses typed
 serves other routes in the `(app)` group. Instant cached navigation needs no
 artificial loading delay.
 
+## Operational document tracking
+
+`/admin/documents` is owned by `features/document-tracking`, separately from the
+public HRD download catalogue. See [document-tracking.md](document-tracking.md)
+for the shared route, database model, handler permissions and sheet import mapping.
+Reuse existing Profile/EmploymentHistory and versioned Department/Ministry data
+for work identity and routing; preserve receipt-time organizational context in history.
+Keep its operational fields and workflow out of the generic DataTable renderer.
+The original Google Sheet and root-page integration remain read-only sources;
+historical records must not acquire invented handoff events during migration.
+
 ## Verification
 
 Run the HRD feature tests and TypeScript checks after structural changes.

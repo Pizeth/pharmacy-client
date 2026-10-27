@@ -6,7 +6,7 @@ export interface SiteBreadcrumb {
 }
 const navigation = Object.values(ROUTE_NAV_MAP).flatMap(items => items.flatMap(item => [item, ...(item.children ?? [])]));
 const labels: Record<string, string> = {
-  users: "Users", admin: "Administration", dashboard: "Dashboard", "social-provider": "Social providers",
+  users: "Users", roles: "Roles", admin: "Administration", dashboard: "Dashboard", "social-provider": "Social providers",
   i18n: "Translations", documents: "Documents", login: "Sign in", signup: "Sign up",
   "verify-id": "Verify identity", "forgot-password": "Forgot password", "reset-password": "Reset password",
   create: "Create", edit: "Edit", delete: "Delete", about: "About", contact: "Contact",
