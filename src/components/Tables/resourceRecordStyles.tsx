@@ -33,4 +33,3 @@ export const Prose = styled(Typography, slot("Prose"))<TypographyProps>({ whiteS
 export const Actions = styled("div", slot("Actions"))(({ theme }) => ({ display: "flex", alignItems: "center", flexWrap: "wrap", gap: theme.spacing(1), [theme.breakpoints.down("sm")]: { '& > .MuiButton-root': { flex: "1 1 auto" } } }));
 
 export const Toolbar = styled("nav", slot("Toolbar"))(({ theme }) => ({ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: theme.spacing(1), minWidth: 0, '& .MuiButton-root': { ...resourceNeumorphicStyles(theme), whiteSpace: "nowrap", flexShrink: 0 }, [theme.breakpoints.down("sm")]: { gap: theme.spacing(0.5), '& .MuiButton-root': { paddingInline: theme.spacing(1), fontSize: "0.75rem" } } }));
-
