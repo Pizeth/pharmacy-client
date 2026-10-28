@@ -1,4 +1,5 @@
 "use client";
+import { useBreadcrumbLabel } from "@/components/layouts/breadcrumbLabels";
 
 import {
   Alert,
@@ -89,6 +90,7 @@ export function TranslationKeyEditPage(
     };
   }, [recordId, reloadVersion]);
 
+  useBreadcrumbLabel(`/admin/i18n/edit/${recordId}`, record ? `Edit ${record.key}` : undefined);
   const retry = useCallback(() => {
     setReloadVersion((value) => value + 1);
   }, []);

@@ -1,8 +1,10 @@
 "use client";
+import { ResourceBadge as Chip, ResourceStatusBadge } from "@/components/Tables/ResourceBadge";
+import { resourceViewAction } from "@/components/Tables/resourceViewAction";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Alert, Button, Chip, Typography } from "@mui/material";
+import { Alert, Button, Typography } from "@mui/material";
 import AddRounded from "@mui/icons-material/AddRounded";
 import EditOutlined from "@mui/icons-material/EditOutlined";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
@@ -49,6 +51,7 @@ export function RolesPage() {
   const [notice, setNotice] = useState("");
   const actions = useMemo<readonly DataTableRowAction<ApplicationRole>[]>(
     () => [
+      resourceViewAction<ApplicationRole>(router.push, record => `/admin/roles/${encodeURIComponent(String(record.id))}`),
       {
         id: "edit",
         label: "Edit role",
@@ -115,11 +118,7 @@ export function RolesPage() {
           size: 140,
           filterFn: "equals",
           cell: ({ getValue }) => (
-            <Chip
-              size="small"
-              color={getValue() === "Enabled" ? "success" : "default"}
-              label={getValue()}
-            />
+            <ResourceStatusBadge active={getValue() === "Enabled"} activeLabel="Enabled" inactiveLabel="Disabled" />
           ),
           meta: {
             label: "Status",
@@ -188,8 +187,8 @@ export function RolesPage() {
         }),
         createActionsColumn<ApplicationRole>({
           actions,
-          size: 112,
-          maxInlineActions: 2,
+          size: 152,
+          maxInlineActions: 3,
         }),
       ]),
     [actions],
@@ -244,7 +243,7 @@ export function RolesPage() {
           </Alert>
         )}
         {roles.data && metadata.data?.canManage && (
-          <ResourceDataTable
+          <ResourceDataTable onViewRecord={record => router.push(`/admin/roles/${encodeURIComponent(String(record.id))}`)}
             resourceId="admin/roles"
             table={table}
             persistence={{
@@ -261,7 +260,7 @@ export function RolesPage() {
               detailMode: "flip",
               flip: { flipOnHover: false },
               actions,
-              maxInlineActions: 2,
+              maxInlineActions: 3,
               renderHeader: ({ row }) => <RoleBadge role={row.original} />,
               renderBody: ({ row }) => (
                 <Typography variant="body2">
@@ -270,11 +269,7 @@ export function RolesPage() {
               ),
               renderMetadata: ({ row }) => (
                 <S.Actions>
-                  <Chip
-                    size="small"
-                    color={row.original.isEnabled ? "success" : "default"}
-                    label={row.original.isEnabled ? "Enabled" : "Disabled"}
-                  />
+                  <ResourceStatusBadge active={row.original.isEnabled} activeLabel="Enabled" inactiveLabel="Disabled" />
                   <Typography variant="caption">
                     {row.original.userCount} users ·{" "}
                     {row.original.permissions.length} grants

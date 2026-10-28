@@ -1,4 +1,5 @@
 "use client";
+import { useBreadcrumbLabel } from "@/components/layouts/breadcrumbLabels";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
@@ -33,6 +34,7 @@ export function RoleFormPage({
     gcTime: 0,
     refetchOnWindowFocus: false,
   });
+  useBreadcrumbLabel(`/admin/roles/${mode}/${recordId ?? ""}`, mode !== "create" && metadata.data?.canManage && record.data ? `${mode === "edit" ? "Edit" : "Delete"} ${record.data.name}` : undefined);
   const back = () => router.push("/admin/roles");
   return (
     <ResourcePage

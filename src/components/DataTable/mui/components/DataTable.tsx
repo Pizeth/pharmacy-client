@@ -220,6 +220,8 @@ export interface DataTableProps<TData extends RowData>
    * checkboxes) are ignored. Card presentation is unaffected.
    */
   readonly onRowClick?: DataTableRowClickHandler<TData>;
+  /** Restrict table-row surface activation and tab focus to explicitly selected rows. */
+  readonly rowClickSelectedOnly?: boolean;
 
   /**
    * Resource-owned card composition.
@@ -366,6 +368,8 @@ interface DataTablePresentationRegionProps<TData extends RowData> {
   >;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
   readonly onRowClick?: DataTableRowClickHandler<TData>;
+  /** Restrict table-row surface activation and tab focus to explicitly selected rows. */
+  readonly rowClickSelectedOnly?: boolean;
   readonly autoCardBreakpoint: NonNullable<
     DataTableDisplayModeConfig["autoCardBreakpoint"]
   >;
@@ -390,6 +394,7 @@ function DataTablePresentationRegion<TData extends RowData>(
     rowPinningDisplayMode,
     renderDetailPanel,
     onRowClick,
+    rowClickSelectedOnly,
     autoCardBreakpoint,
     tableWidth,
     tableMinWidth,
@@ -459,6 +464,7 @@ function DataTablePresentationRegion<TData extends RowData>(
                 rowPinningDisplayMode={rowPinningDisplayMode}
                 renderDetailPanel={renderDetailPanel}
                 onRowClick={onRowClick}
+                rowClickSelectedOnly={rowClickSelectedOnly}
               />
             </TableRoot>
           );
@@ -485,6 +491,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
 
     renderDetailPanel,
     onRowClick,
+    rowClickSelectedOnly,
     card,
     rowPinning,
     refreshing = false,
@@ -687,6 +694,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                         rowPinningDisplayMode={rowPinningDisplayMode}
                         renderDetailPanel={renderDetailPanel}
                         onRowClick={onRowClick}
+                        rowClickSelectedOnly={rowClickSelectedOnly}
                         autoCardBreakpoint={autoCardBreakpoint}
                         tableWidth={tableWidth}
                         tableMinWidth={tableMinWidth}

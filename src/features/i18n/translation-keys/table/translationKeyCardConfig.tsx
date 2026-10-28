@@ -1,7 +1,8 @@
 "use client";
+import { ResourceBadge as Chip } from "@/components/Tables/ResourceBadge";
+import { formatAdminDate } from "@/lib/utils/adminDate";
 
 import {
-  Chip,
   Stack,
   Typography,
   styled,
@@ -99,16 +100,7 @@ const MetadataRoot = styled(
     0,
 });
 
-const dateTimeFormatter =
-  new Intl.DateTimeFormat(
-    undefined,
-    {
-      dateStyle:
-        "medium",
-      timeStyle:
-        "short",
-    },
-  );
+
 
 function formatDateTime(
   value: string,
@@ -122,9 +114,7 @@ function formatDateTime(
     date.getTime(),
   )
     ? value
-    : dateTimeFormatter.format(
-        date,
-      );
+    : formatAdminDate(date);
 }
 
 export interface CreateTranslationKeyCardConfigOptions {

@@ -2,7 +2,7 @@
 
 import { styled } from "@mui/material/styles";
 import { useEffect, useRef, useState } from "react";
-import type { PointerEvent, ReactNode } from "react";
+import type { HTMLAttributes, PointerEvent, ReactNode } from "react";
 import type { Row, RowData } from "@tanstack/table-core";
 
 import { useDataTableAccessibility } from "../../accessibility";
@@ -40,6 +40,7 @@ const CardFlipRoot = styled("div", {
    */
   minWidth: 0,
   perspective: "1200px",
+  '&[data-row-clickable="true"]': { cursor: "pointer" },
 });
 
 const CardFlipInner = styled("div", {
@@ -115,6 +116,8 @@ const CardFlipControlRoot = styled("span", {
 export interface DataTableCardFlipItemProps<TData extends RowData> {
   readonly row: Row<MuiDataTableFeatures, TData>;
   readonly expanded: boolean;
+  readonly activationProps?: HTMLAttributes<HTMLDivElement>;
+  readonly clickable?: boolean;
   readonly selected: boolean;
   readonly density: string;
   readonly compactCard?: boolean;
@@ -149,6 +152,8 @@ export function DataTableCardFlipItem<TData extends RowData>(
   const {
     row,
     expanded,
+    activationProps,
+    clickable,
     selected,
     density,
     compactCard,
@@ -229,6 +234,8 @@ export function DataTableCardFlipItem<TData extends RowData>(
 
   return (
     <CardFlipRoot
+      {...activationProps}
+      data-row-clickable={clickable ? "true" : undefined}
       className={dataTableClasses.cardFlip}
       role="listitem"
       data-row-id={row.id}

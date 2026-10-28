@@ -51,7 +51,7 @@ const INTERACTIVE_DESCENDANT_SELECTOR = [
   "[data-row-click-ignore]",
 ].join(",");
 
-function isFromInteractiveDescendant(
+export function isFromInteractiveDescendant(
   event:
     | MouseEvent<HTMLElement>
     | KeyboardEvent<HTMLElement>
@@ -187,6 +187,7 @@ export interface DataTableBodyRowProps<TData extends RowData> {
    * Optional row activation handler. See DataTableRowClickHandler.
    */
   readonly onRowClick?: DataTableRowClickHandler<TData>;
+  readonly rowClickSelectedOnly?: boolean;
 
   /**
    * select-sticky presentation constrains the same top-pinned row against the
@@ -226,6 +227,7 @@ export function DataTableBodyRow<TData extends RowData>(
     dualEdgeStickyRowPinning,
     stickyPinnedRowIds,
     onRowClick,
+    rowClickSelectedOnly,
   } = props;
 
   const { density } = useDataTableDensity();
@@ -247,6 +249,7 @@ export function DataTableBodyRow<TData extends RowData>(
           ? state.rowSelection
           : Boolean(state.rowSelection?.[row.id]);
 
+        const clickable = !!onRowClick && (!rowClickSelectedOnly || selected);
         const pinnedPosition = row.getIsPinned();
 
         /**
@@ -310,10 +313,10 @@ export function DataTableBodyRow<TData extends RowData>(
             data-row-pinning-sticky={
               stickyRowPinning && pinnedPosition ? "true" : undefined
             }
-            data-row-clickable={onRowClick ? "true" : undefined}
-            tabIndex={onRowClick ? 0 : undefined}
+            data-row-clickable={clickable ? "true" : undefined}
+            tabIndex={clickable ? 0 : undefined}
             onClick={
-              onRowClick
+              clickable && onRowClick
                 ? (event) => {
                     if (
                       event.defaultPrevented ||
@@ -328,7 +331,7 @@ export function DataTableBodyRow<TData extends RowData>(
                 : undefined
             }
             onKeyDown={
-              onRowClick
+              clickable && onRowClick
                 ? (event) => {
                     if (
                       event.defaultPrevented ||

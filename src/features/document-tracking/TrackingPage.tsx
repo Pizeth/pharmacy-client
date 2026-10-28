@@ -121,8 +121,9 @@ export function TrackingPage() {
           setEditor({ mode: "delete", id: row.original.id }),
       },
       {
-        id: "open",
-        label: "Open tracking page",
+        id: "view",
+        label: "View details",
+        inline: true,
         renderIcon: () => <OpenInNew />,
         onClick: ({ row }) =>
           router.push(
@@ -274,7 +275,7 @@ export function TrackingPage() {
         createActionsColumn<TrackedDocument>({
           actions,
           size: 150,
-          maxInlineActions: 2,
+          maxInlineActions: 3,
         }),
       ]),
     [actions, metadata.data],
@@ -369,7 +370,7 @@ export function TrackingPage() {
           </Alert>
         )}
         {metadata.data && documents.data && (
-          <ResourceDataTable
+          <ResourceDataTable onViewRecord={record => router.push(`/admin/documents/${encodeURIComponent(record.id)}`)}
             resourceId="admin/document-tracking"
             persistence={{
               storageId: "admin/document-tracking",
@@ -384,7 +385,7 @@ export function TrackingPage() {
               enableSelection: true,
               enableExpansion: true,
               actions,
-              maxInlineActions: 2,
+              maxInlineActions: 3,
               renderHeader: ({ row }) => (
                 <>
                   <Typography variant="subtitle2">

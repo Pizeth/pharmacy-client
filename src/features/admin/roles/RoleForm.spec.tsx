@@ -11,6 +11,22 @@ import { RoleForm } from "./RoleForm";
 import { rolesApi, RoleRequestError } from "./api";
 import { applicationRole, roleMetadata } from "./role.test-fixtures";
 afterEach(() => jest.restoreAllMocks());
+it("keeps HEX entry and the badge color picker synchronized", async () => {
+  mount(<RoleForm mode="create" metadata={roleMetadata} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+  const hex = screen.getByRole("textbox", { name: "Badge color" });
+  const picker = screen.getByLabelText("Pick badge color");
+  fireEvent.change(hex, { target: { value: "#112233" } });
+  fireEvent.click(picker);
+  expect(screen.getByText("#112233")).toBeInTheDocument();
+  fireEvent.keyDown(screen.getByRole("slider", { name: "Color wheel" }), { key: "ArrowRight" });
+  expect(hex).not.toHaveValue("#112233");
+  await waitFor(() => expect((hex as HTMLInputElement).value).toMatch(/^#[0-9a-f]{6}$/));
+  fireEvent.click(screen.getByRole("button", { name: "Done" }));
+  fireEvent.change(hex, { target: { value: "" } });
+  expect(hex).toHaveValue("");
+  fireEvent.click(picker);
+  expect(screen.getByText("#1565C0")).toBeInTheDocument();
+});
 function mount(content: React.ReactNode) {
   return render(
     <QueryClientProvider
@@ -145,4 +161,29 @@ it.each([
   );
   expect(screen.getByRole("button", { name: "Delete role" })).toBeDisabled();
   expect(remove).not.toHaveBeenCalled();
+});
+
+it("prefills all stored role fields, including its exact custom HEX color", () => {
+  mount(<RoleForm mode="edit" record={{ ...applicationRole, name: "SUPER_ADMIN", description: "Saved description", icon: "shield", color: "#aB12Ef", isEnabled: false }} metadata={roleMetadata} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+  expect(screen.getByLabelText(/Role name/)).toHaveValue("SUPER_ADMIN");
+  expect(screen.getByLabelText("Description")).toHaveValue("Saved description");
+  expect(screen.getByLabelText(/Badge color/)).toHaveValue("#aB12Ef");
+  expect(screen.getByRole("checkbox", { name: "Enabled" })).not.toBeChecked();
+});
+it("shows a theme HEX default for an unset bootstrap color without saving it as DB data", async () => {
+  const record = { ...applicationRole, name: "SUPER_ADMIN", color: null };
+  const save = jest.spyOn(rolesApi, "save").mockResolvedValue(record);
+  mount(<RoleForm mode="edit" record={record} metadata={roleMetadata} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+  expect(screen.getByLabelText(/Badge color/)).toHaveValue("#1976d2");
+  expect(screen.getByText(/No custom color is stored/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(save).toHaveBeenCalledWith(expect.objectContaining({ color: null }), record));
+});
+it("persists an explicitly chosen custom color when the stored color was unset", async () => {
+  const record = { ...applicationRole, color: null };
+  const save = jest.spyOn(rolesApi, "save").mockResolvedValue(record);
+  mount(<RoleForm mode="edit" record={record} metadata={roleMetadata} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+  fireEvent.change(screen.getByLabelText(/Badge color/), { target: { value: "#123abc" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(save).toHaveBeenCalledWith(expect.objectContaining({ color: "#123abc" }), record));
 });

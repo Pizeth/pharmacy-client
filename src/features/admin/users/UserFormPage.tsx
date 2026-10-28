@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button, LinearProgress } from "@mui/material";
+import { useBreadcrumbLabel } from "@/components/layouts/breadcrumbLabels";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { useAdminAccess } from "../social/useAdminAccess";
 import { usersApi, type UserMode } from "./api";
@@ -10,7 +11,8 @@ import * as S from "../social/styles";
 export function UserFormPage({ mode, id }: { mode: UserMode; id?: string }) {
   const access = useAdminAccess(); const router = useRouter();
   const validId = !!id && /^[a-zA-Z0-9_-]+$/.test(id);
-  const user = useQuery({ queryKey: ["admin-users", "record", id], queryFn: () => usersApi.get(id!), enabled: access.allowed && mode !== "create" && validId, retry: false });
+  const user = useQuery({ queryKey: ["admin-users", "page-editor", mode, id], queryFn: () => usersApi.get(id!), enabled: access.allowed && mode !== "create" && validId, retry: false, gcTime: 0, refetchOnWindowFocus: false });
+  useBreadcrumbLabel(`/admin/users/${mode}/${encodeURIComponent(id ?? "")}`, access.allowed && mode !== "create" && user.data ? `${mode === "edit" ? "Edit" : "Delete"} ${user.data.name}` : undefined);
   const back = () => router.push("/admin/users");
   const selfDelete = mode === "delete" && id === String(access.data?.id);
   return <ResourcePage title={`${mode === "create" ? "Create" : mode === "edit" ? "Edit" : "Delete"} user`} maxWidth="xl"><S.Root>

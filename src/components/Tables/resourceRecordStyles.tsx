@@ -1,0 +1,36 @@
+"use client";
+import { resourceNeumorphicStyles } from "@/components/buttons/resourceNeumorphicStyles";
+import { styled } from "@mui/material/styles";
+import { Typography, type TypographyProps } from "@mui/material";
+import type { CSSInterpolation } from "@mui/system";
+
+export type ResourceRecordSlot = "toolbar" | "root" | "heading" | "fields" | "field" | "hero" | "heroIcon" | "heroBody" | "badges" | "metrics" | "metric" | "layout" | "main" | "aside" | "section" | "sectionHeader" | "sectionContent" | "list" | "listItem" | "prose" | "actions";
+function slot(name: Capitalize<ResourceRecordSlot>) {
+  const key = name.charAt(0).toLowerCase() + name.slice(1);
+  return { name: "RazethResourceRecord", slot: name, overridesResolver: (_: unknown, styles: Record<string, CSSInterpolation>) => styles[key] };
+}
+export const RecordSection = styled("div", slot("Root"))(({ theme }) => ({ display: "grid", gap: theme.spacing(2.5), minWidth: 0 }));
+export const RecordHeading = styled("header", slot("Heading"))(({ theme }) => ({ padding: theme.spacing(1.5, 2), borderRadius: theme.shape.borderRadius, backgroundColor: (theme.vars ?? theme).palette.action.hover }));
+export const RecordFields = styled("dl", slot("Fields"))(({ theme }) => ({ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: theme.spacing(2.5), margin: 0, minWidth: 0, '[data-record-sidebar] &': { gridTemplateColumns: "minmax(0, 1fr)" }, [theme.breakpoints.down("sm")]: { gridTemplateColumns: "minmax(0, 1fr)" } }));
+export const RecordField = styled("div", slot("Field"))(({ theme }) => ({ minWidth: 0, overflowWrap: "anywhere", '&[data-wide="true"]': { gridColumn: "1 / -1" }, "& dt": { ...theme.typography.caption, color: (theme.vars ?? theme).palette.text.secondary, marginBottom: theme.spacing(0.5) }, "& dd": { ...theme.typography.body2, margin: 0, whiteSpace: "pre-wrap" } }));
+export const Hero = styled("header", slot("Hero"))(({ theme }) => ({ display: "flex", alignItems: "flex-start", gap: theme.spacing(2.5), padding: theme.spacing(3), borderRadius: 24, color: (theme.vars ?? theme).palette.text.primary, border: `1px solid ${(theme.vars ?? theme).palette.divider}`, background: `linear-gradient(135deg, ${theme.alpha((theme.vars ?? theme).palette.primary.main, 0.12)}, ${theme.alpha((theme.vars ?? theme).palette.background.paper, 0.85)})`, boxShadow: (theme.vars ?? theme).palette.customShadows?.neumorphic ?? theme.shadows[1], [theme.breakpoints.down("sm")]: { flexDirection: "column", padding: theme.spacing(2.5) } }));
+export const HeroIcon = styled("div", slot("HeroIcon"))(({ theme }) => ({ display: "grid", placeItems: "center", flexShrink: 0, width: 64, height: 64, borderRadius: 20, color: (theme.vars ?? theme).palette.primary.main, backgroundColor: (theme.vars ?? theme).palette.background.paper, boxShadow: (theme.vars ?? theme).palette.customShadows?.neumorphic ?? theme.shadows[1], '& > svg': { width: 32, height: 32 }, '& .MuiAvatar-root': { width: 56, height: 56 } }));
+export const HeroBody = styled("div", slot("HeroBody"))(({ theme }) => ({ display: "grid", gap: theme.spacing(1), minWidth: 0, flex: 1, overflowWrap: "anywhere" }));
+export const Badges = styled("div", slot("Badges"))(({ theme }) => ({ display: "flex", alignItems: "center", flexWrap: "wrap", gap: theme.spacing(1) }));
+export const Metrics = styled("dl", slot("Metrics"))(({ theme }) => ({ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 160px), 1fr))", gap: theme.spacing(2), margin: 0, [theme.breakpoints.down("sm")]: { gridTemplateColumns: "repeat(2, minmax(0, 1fr))" } }));
+export const Metric = styled("div", slot("Metric"))(({ theme }) => ({ display: "grid", alignContent: "start", gap: theme.spacing(1), minWidth: 0, padding: theme.spacing(2.5), borderRadius: 20, backgroundColor: theme.alpha((theme.vars ?? theme).palette.background.paper, 0.8), border: `1px solid ${(theme.vars ?? theme).palette.divider}`, '& dt': { ...theme.typography.caption, color: (theme.vars ?? theme).palette.text.secondary }, '& dd': { ...theme.typography.h5, fontWeight: 600, margin: 0, overflowWrap: "anywhere" } }));
+export const Layout = styled("div", slot("Layout"))(({ theme }) => ({ display: "grid", gridTemplateColumns: "minmax(0, 2fr) minmax(260px, 1fr)", alignItems: "start", gap: theme.spacing(2.5), minWidth: 0, [theme.breakpoints.down("md")]: { gridTemplateColumns: "minmax(0, 1fr)" } }));
+export const Main = styled("div", slot("Main"))(({ theme }) => ({ display: "grid", gap: theme.spacing(2.5), minWidth: 0 }));
+export const Aside = styled("aside", slot("Aside"))(({ theme }) => ({ display: "grid", gap: theme.spacing(2.5), minWidth: 0 }));
+export const Section = styled("section", slot("Section"))(({ theme }) => ({ minWidth: 0, borderRadius: 22, border: `1px solid ${(theme.vars ?? theme).palette.divider}`, backgroundColor: theme.alpha((theme.vars ?? theme).palette.background.paper, 0.85), boxShadow: theme.shadows[1], overflow: "hidden",
+  '& .MuiButton-root': resourceNeumorphicStyles(theme),
+}));
+export const SectionHeader = styled("header", slot("SectionHeader"))(({ theme }) => ({ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: theme.spacing(1.5), padding: theme.spacing(2, 2.5), borderBottom: `1px solid ${(theme.vars ?? theme).palette.divider}`, '& > div': { minWidth: 0 }, '& h2': { display: "flex", alignItems: "center", gap: theme.spacing(1) }, '& h2 > svg': { color: (theme.vars ?? theme).palette.primary.main, flexShrink: 0 } }));
+export const SectionContent = styled("div", slot("SectionContent"))(({ theme }) => ({ display: "grid", gap: theme.spacing(2), padding: theme.spacing(2.5), minWidth: 0 }));
+export const List = styled("ul", slot("List"))(({ theme }) => ({ display: "grid", gap: theme.spacing(1.5), margin: 0, padding: 0, listStyle: "none" }));
+export const ListItem = styled("li", slot("ListItem"))(({ theme }) => ({ display: "grid", gap: theme.spacing(1), minWidth: 0, padding: theme.spacing(2), borderRadius: 16, backgroundColor: (theme.vars ?? theme).palette.action.hover, border: `1px solid ${(theme.vars ?? theme).palette.divider}`, '&[data-active="true"]': { borderColor: (theme.vars ?? theme).palette.primary.main } }));
+export const Prose = styled(Typography, slot("Prose"))<TypographyProps>({ whiteSpace: "pre-wrap", overflowWrap: "anywhere", lineHeight: 1.8 });
+export const Actions = styled("div", slot("Actions"))(({ theme }) => ({ display: "flex", alignItems: "center", flexWrap: "wrap", gap: theme.spacing(1), [theme.breakpoints.down("sm")]: { '& > .MuiButton-root': { flex: "1 1 auto" } } }));
+
+export const Toolbar = styled("nav", slot("Toolbar"))(({ theme }) => ({ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: theme.spacing(1), minWidth: 0, '& .MuiButton-root': { ...resourceNeumorphicStyles(theme), whiteSpace: "nowrap", flexShrink: 0 }, [theme.breakpoints.down("sm")]: { gap: theme.spacing(0.5), '& .MuiButton-root': { paddingInline: theme.spacing(1), fontSize: "0.75rem" } } }));
+

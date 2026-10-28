@@ -1,8 +1,9 @@
 "use client";
+import { ResourceBadge as Chip } from "@/components/Tables/ResourceBadge";
+import { formatAdminDate } from "@/lib/utils/adminDate";
 
 import {
   Box,
-  Chip,
   ChipProps,
   Stack,
   Tooltip,
@@ -192,10 +193,7 @@ export function TranslationKeyValuesCell({
  * Conversion to Date happens here at the presentation boundary.
  */
 
-const translationDateTimeFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
+
 
 export interface TranslationKeyDateTimeCellProps {
   readonly value: string;
@@ -213,7 +211,7 @@ export function TranslationKeyDateTimeCell({
   return (
     <Tooltip title={value}>
       <Typography component="span" variant="body2" noWrap>
-        {translationDateTimeFormatter.format(date)}
+        {formatAdminDate(date)}
       </Typography>
     </Tooltip>
   );

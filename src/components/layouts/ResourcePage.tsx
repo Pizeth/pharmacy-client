@@ -99,6 +99,8 @@ const FormatBadge = styled(Chip)(({ theme }) => ({
 
 export interface ResourcePageProps {
   readonly title: ReactNode;
+  readonly showHeader?: boolean;
+  readonly titleComponent?: "h1" | "h2" | "h3" | "h4";
   readonly subtitle?: ReactNode;
   readonly children: ReactNode;
   readonly maxWidth?: ContainerProps["maxWidth"];
@@ -130,6 +132,8 @@ export function ResourcePage(inProps: ResourcePageProps) {
 
   const {
     title,
+    titleComponent = "h4",
+    showHeader = true,
     subtitle,
     children,
     maxWidth = "xl",
@@ -147,7 +151,7 @@ export function ResourcePage(inProps: ResourcePageProps) {
       disableGutters={disableGutters}
       className={className}
     >
-      <HeaderRoot>
+      {showHeader && <HeaderRoot>
         {hero ? (
           <HeroBanner>
             <Box
@@ -237,7 +241,7 @@ export function ResourcePage(inProps: ResourcePageProps) {
                 </Grid>
               </Grid>
             </Box>
-            <TitleRoot component="h4" variant="h6" gutterBottom>
+            <TitleRoot component={titleComponent} variant="h6" gutterBottom>
               {title}
             </TitleRoot>
             {/* <Typography variant="body1" sx={{ opacity: 0.9, lineHeight: 1.6 }}>
@@ -256,7 +260,7 @@ export function ResourcePage(inProps: ResourcePageProps) {
           </HeroBanner>
         ) : (
           <>
-            <TitleRoot component="h4" variant="h6">
+            <TitleRoot component={titleComponent} variant="h6">
               {title}
             </TitleRoot>
             {subtitle && (
@@ -264,7 +268,7 @@ export function ResourcePage(inProps: ResourcePageProps) {
             )}
           </>
         )}
-      </HeaderRoot>
+      </HeaderRoot>}
 
       <ContentRoot>
         {surface ? (

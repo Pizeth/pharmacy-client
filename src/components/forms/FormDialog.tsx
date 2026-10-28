@@ -2,6 +2,7 @@
 
 import { useId } from "react";
 import type { ReactNode } from "react";
+import NextLink from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -9,9 +10,10 @@ import {
   IconButton,
   Paper,
   Typography,
+  Tooltip,
 } from "@mui/material";
-import type { DialogProps, DialogTitleProps } from "@mui/material";
-import { CloseRounded } from "@mui/icons-material";
+import type { DialogProps, DialogTitleProps, IconButtonProps } from "@mui/material";
+import { CloseRounded, OpenInNewRounded } from "@mui/icons-material";
 import { styled, useThemeProps } from "@mui/material/styles";
 
 const PREFIX = "RazethFormDialog";
@@ -85,11 +87,23 @@ const SubtitleRoot = styled(Typography, {
   overridesResolver: (_props, styles) => styles.caption,
 })({});
 
-const CloseButtonRoot = styled(IconButton, {
+const HeaderButtonRoot = styled(IconButton, {
   name: PREFIX,
   slot: "Button",
   overridesResolver: (_props, styles) => styles.button,
 })({});
+
+const HeaderLinkRoot = styled(IconButton, {
+  name: PREFIX,
+  slot: "Button",
+  overridesResolver: (_props, styles) => styles.button,
+})<IconButtonProps<"a">>({});
+
+const HeaderActionsRoot = styled("div", {
+  name: PREFIX,
+  slot: "Item",
+  overridesResolver: (_props, styles) => styles.item,
+})(({ theme }) => ({ display: "flex", alignItems: "center", flexShrink: 0, gap: theme.spacing(0.5) }));
 
 const FormContentRoot = styled(DialogContent, {
   name: PREFIX,
@@ -106,6 +120,8 @@ export interface FormDialogProps {
   readonly maxWidth?: DialogProps["maxWidth"];
   readonly fullWidth?: boolean;
   readonly closeAriaLabel?: string;
+  readonly dedicatedPageHref?: string;
+  readonly dedicatedPageLabel?: string;
   readonly onClose: () => void;
   readonly children: ReactNode;
 }
@@ -138,6 +154,8 @@ export function FormDialog(inProps: FormDialogProps) {
     maxWidth = "md",
     fullWidth = true,
     closeAriaLabel = "Close dialog",
+    dedicatedPageHref,
+    dedicatedPageLabel = "Open dedicated page",
     onClose,
     children,
   } = props;
@@ -190,13 +208,21 @@ export function FormDialog(inProps: FormDialogProps) {
             </HeaderTextRoot>
           </HeaderMainRoot>
 
-          <CloseButtonRoot
-            aria-label={closeAriaLabel}
-            disabled={pending}
-            onClick={onClose}
-          >
-            <CloseRounded />
-          </CloseButtonRoot>
+          <HeaderActionsRoot>
+            {dedicatedPageHref && <Tooltip title={dedicatedPageLabel}>
+              <span>
+                {pending ? <HeaderButtonRoot size="small" disabled aria-label={dedicatedPageLabel}><OpenInNewRounded fontSize="small" /></HeaderButtonRoot>
+                  : <HeaderLinkRoot size="small" component={NextLink} href={dedicatedPageHref} aria-label={dedicatedPageLabel}><OpenInNewRounded fontSize="small" /></HeaderLinkRoot>}
+              </span>
+            </Tooltip>}
+            <HeaderButtonRoot
+              aria-label={closeAriaLabel}
+              disabled={pending}
+              onClick={onClose}
+            >
+              <CloseRounded />
+            </HeaderButtonRoot>
+          </HeaderActionsRoot>
         </HeaderLayoutRoot>
       </HeaderRoot>
 

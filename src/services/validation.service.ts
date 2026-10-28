@@ -53,7 +53,7 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
       onResult({ message: "Checking...", status: "loading" });
       try {
         const { data } = await axios.get(
-          `${API_URL}/api/validate/${source}/${value}`,
+          `${API_URL}/api/validate/${encodeURIComponent(source)}/${encodeURIComponent(value)}`,
           { signal },
         );
 
@@ -145,6 +145,9 @@ export const createAsyncValidator = (source: string, debounceDelay = 500) => {
 
   return {
     validate: validator,
+    invalidate: () => {
+      for (const key of cache.keys()) if (key.startsWith(`${source}:`)) cache.delete(key);
+    },
     cancel: () => {
       validator.cancel();
       if (controller) {

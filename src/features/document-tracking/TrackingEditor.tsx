@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import NextLink from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
 import RouteOutlined from "@mui/icons-material/RouteOutlined";
@@ -42,7 +41,7 @@ export function TrackingEditor({
           ? "Archive document record"
           : mode === "progress"
             ? "Update progress"
-            : "Add attachment link";
+            : "Add attachment";
   const close = () => {
     if (!pending) onClose();
   };
@@ -55,16 +54,9 @@ export function TrackingEditor({
       pending={pending}
       onClose={close}
       maxWidth="md"
+      dedicatedPageHref={mode !== "progress" && mode !== "attachment" ? `/admin/documents/${mode}${id ? `/${encodeURIComponent(id)}` : ""}` : undefined}
+      dedicatedPageLabel={`Open dedicated ${mode === "delete" ? "archive" : mode} page`}
     >
-      {mode !== "progress" && mode !== "attachment" && (
-        <Button
-          component={NextLink}
-          disabled={pending}
-          href={`/admin/documents/${mode}${id ? `/${encodeURIComponent(id)}` : ""}`}
-        >
-          Open dedicated {mode === "delete" ? "archive" : mode} page
-        </Button>
-      )}
       {mode !== "create" && query.isLoading ? (
         <ResourceTableLoading message="Loading document tracking…" />
       ) : query.error ? (

@@ -1,4 +1,5 @@
 "use client";
+import { FormActions } from "@/components/forms/FormActions";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
@@ -11,6 +12,8 @@ import {
 } from "@mui/material";
 import BadgeOutlined from "@mui/icons-material/BadgeOutlined";
 import ColorLensOutlined from "@mui/icons-material/ColorLensOutlined";
+import DescriptionOutlined from "@mui/icons-material/DescriptionOutlined";
+import ImageOutlined from "@mui/icons-material/ImageOutlined";
 import { TextField, SelectField } from "@/components/inputs";
 import { RoleBadge } from "../users/UserIdentity";
 import {
@@ -23,6 +26,8 @@ import {
   type RoleInput,
 } from "./api";
 import * as S from "./styles";
+import { rgbToHex, useTheme } from "@mui/material/styles";
+import { BadgeColorPicker } from "./BadgeColorPicker";
 export function RoleForm({
   mode,
   record,
@@ -39,6 +44,11 @@ export function RoleForm({
   readonly onPendingChange?: (pending: boolean) => void;
 }) {
   const [initial] = useState(record);
+  const theme = useTheme();
+  const [defaultColor] = useState(() => rgbToHex(
+    /^(super|sys|system)[_-]?admin$/i.test(record?.name ?? "")
+      ? theme.palette.primary.main : theme.palette.text.secondary,
+  ).slice(0, 7));
   const client = useQueryClient();
   const inFlight = useRef(false);
   const form = useForm({
@@ -46,7 +56,7 @@ export function RoleForm({
       name: record?.name ?? "",
       description: record?.description ?? "",
       icon: record?.icon ?? "",
-      color: record?.color ?? "",
+      color: record ? record.color ?? defaultColor : "",
       isEnabled: record?.isEnabled ?? true,
       permissionIds:
         record?.permissions.map((permission) => permission.id) ?? [],
@@ -94,7 +104,8 @@ export function RoleForm({
             ...values,
             description: values.description.trim() || null,
             icon: values.icon || null,
-            color: values.color.trim() || null,
+            color: initial && initial.color == null && !form.getFieldState("color").isDirty
+              ? null : values.color.trim() || null,
           });
           if (mode !== "delete" && !parsed.success) {
             setValidation(parsed.error.issues[0].message);
@@ -154,6 +165,8 @@ export function RoleForm({
             />
             <TextField
               name="description"
+              iconStart={<DescriptionOutlined />}
+              iconStartAlignment="top"
               label="Description"
               fullWidth
               multiline
@@ -163,6 +176,7 @@ export function RoleForm({
             <S.Fields>
               <SelectField
                 name="icon"
+                iconStart={<ImageOutlined />}
                 label="Badge icon"
                 options={metadata.icons}
                 disabled={locked}
@@ -171,9 +185,16 @@ export function RoleForm({
                 name="color"
                 label="Badge color"
                 iconStart={<ColorLensOutlined />}
+                iconEnd={
+                  <BadgeColorPicker
+                    value={draft.color ?? ""}
+                    disabled={locked}
+                    onChange={(color) => form.setValue("color", color, { shouldDirty: true, shouldTouch: true, shouldValidate: true })}
+                  />
+                }
                 fullWidth
                 disabled={locked}
-                helperText="Optional six-digit hex color, for example #1565c0."
+                helperText={initial && initial.color == null ? "No custom color is stored. The current theme default is shown; changing it saves a custom HEX color." : "Enter a six-digit HEX color or choose one with the color picker. Leave empty for the default."}
               />
             </S.Fields>
             <S.Actions>
@@ -184,7 +205,7 @@ export function RoleForm({
                   name: draft.name || "ROLE",
                   icon: draft.icon || null,
                   color:
-                    draft.color && /^#[0-9a-fA-F]{6}$/.test(draft.color)
+                    !(initial && initial.color == null && !form.getFieldState("color").isDirty) && draft.color && /^#[0-9a-fA-F]{6}$/.test(draft.color)
                       ? draft.color
                       : null,
                 }}
@@ -265,7 +286,7 @@ export function RoleForm({
             {validation || mutation.error?.message}
           </Alert>
         )}
-        <S.Actions>
+        <FormActions>
           <Button onClick={onCancel} disabled={locked} variant="outlined">
             Cancel
           </Button>
@@ -282,7 +303,7 @@ export function RoleForm({
                 ? "Save changes"
                 : "Delete role"}
           </Button>
-        </S.Actions>
+        </FormActions>
       </S.Form>
     </FormProvider>
   );

@@ -1,8 +1,9 @@
 "use client";
+import { ResourceBadge as Chip } from "@/components/Tables/ResourceBadge";
+import { formatAdminDate } from "@/lib/utils/adminDate";
 
 import {
   Box,
-  Chip,
   Typography,
   TypographyProps,
   styled,
@@ -147,10 +148,7 @@ const CaptionRoot = styled(Typography, {
   overridesResolver: (_props, styles) => styles.caption,
 })<TypographyProps>({});
 
-const translationDateTimeFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
+
 
 export interface TranslationKeyTranslationsPanelProps {
   readonly record: TranslationKey;
@@ -173,7 +171,7 @@ function formatUpdatedAt(value: string): string {
     return value;
   }
 
-  return translationDateTimeFormatter.format(date);
+  return formatAdminDate(date);
 }
 
 /**

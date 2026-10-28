@@ -1,5 +1,9 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { Alert, Button } from "@mui/material";
+import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
+import { readTranslationKey } from "../api";
 import { useState } from "react";
 import { EditOutlined } from "@mui/icons-material";
 
@@ -38,6 +42,13 @@ export function TranslationValueEditDialog(
   const [pending, setPending] = useState(false);
 
   const open = record !== null && translation !== null;
+  const fresh = useQuery({ queryKey: ["translation-keys", "value-dialog-editor", record?.id, translation?.id],
+    queryFn: async ({ signal }) => {
+      const key = await readTranslationKey(Number(record!.id), signal);
+      const value = key.translations.find(item => item.id === translation?.id);
+      if (!value) throw new Error("Translation no longer exists.");
+      return { key, value };
+    }, enabled: open, gcTime: 0, refetchOnWindowFocus: false, retry: false });
 
   return (
     <FormDialog
@@ -56,11 +67,13 @@ export function TranslationValueEditDialog(
       closeAriaLabel="Close edit translation dialog"
       onClose={onClose}
     >
-      {record && translation && (
+      {open && fresh.isLoading && <ResourceTableLoading message="Loading translation…" />}
+      {fresh.error && <Alert severity="error" action={<Button onClick={() => fresh.refetch()}>Retry</Button>}>{fresh.error.message}</Alert>}
+      {record && translation && fresh.data && !fresh.error && (
         <TranslationValueEditForm
           key={`${record.id}:${translation.locale}`}
-          record={record}
-          translation={translation}
+          record={fresh.data.key}
+          translation={fresh.data.value}
           cancelLabel="Close"
           onPendingChange={setPending}
           onCancel={onClose}

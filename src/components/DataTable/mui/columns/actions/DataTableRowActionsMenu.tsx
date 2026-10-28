@@ -13,6 +13,7 @@ import { MoreVert } from "@mui/icons-material";
 import { useState } from "react";
 import type { MouseEvent } from "react";
 import type { RowData } from "@tanstack/table-core";
+import { ROW_ACTION_BUTTON_SIZE } from "./rowActionStyles";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { ResolvedDataTableRowAction } from "./resolvedTypes";
 
@@ -23,8 +24,9 @@ const MenuButtonRoot = styled(IconButton, {
 
   overridesResolver: (_props, styles) => styles.rowActionsMenuButton,
 })(({ theme }) => ({
-  width: 28,
-  height: 28,
+  flexShrink: 0, // Match the inline action buttons.
+  width: ROW_ACTION_BUTTON_SIZE,
+  height: ROW_ACTION_BUTTON_SIZE,
   "&:focus-visible": {
     outline: `2px solid ${theme.palette.primary.main}`,
     outlineOffset: 2,

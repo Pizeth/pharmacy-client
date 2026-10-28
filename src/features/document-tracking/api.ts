@@ -34,7 +34,7 @@ async function request<T>(
     ...init,
     credentials: "include",
     headers: {
-      "Content-Type": "application/json",
+      ...(!(init.body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   });
@@ -96,6 +96,14 @@ export function buildTrackingQuery(
   };
 }
 export const trackingApi = {
+  uploadAttachment: (id: string, version: number, input: { name: string; kind: "INCOMING" | "OUTGOING" | "SUPPORTING" }, file: File) => {
+    const body = new FormData();
+    body.set("version", String(version));
+    body.set("name", input.name);
+    body.set("kind", input.kind);
+    body.set("file", file);
+    return request(`/${encodeURIComponent(id)}/attachments/upload`, detailSchema, { method: "POST", body });
+  },
   metadata: (signal?: AbortSignal) =>
     request("/metadata", metadataSchema, { signal }),
   list: (

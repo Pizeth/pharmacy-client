@@ -1,0 +1,30 @@
+import { act, render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SocialProviderDialog } from "./SocialProviderDialog";
+import { socialApi, type SocialProvider } from "../api";
+const stale: SocialProvider = { id: 1, key: "old", name: "Old name", websiteUrl: null, icon: null, isEnabled: true };
+afterEach(() => jest.restoreAllMocks());
+it("waits for current server values before mounting the edit form and preserves the draft", async () => {
+  let resolve!: (records: SocialProvider[]) => void;
+  const get = jest.spyOn(socialApi, "providers").mockImplementationOnce(() => new Promise(done => { resolve = done; }));
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  client.setQueryData(["admin-social", "providers"], [stale]);
+  render(<QueryClientProvider client={client}><SocialProviderDialog mode="edit" record={stale} onClose={jest.fn()} onSuccess={jest.fn()} /></QueryClientProvider>);
+  expect(screen.getByText("Loading social provider…")).toBeInTheDocument();
+  expect(screen.queryByRole("textbox", { name: "Name" })).not.toBeInTheDocument();
+  await act(async () => resolve([{ ...stale, key: "current", name: "Current name", websiteUrl: "https://example.com", icon: "share", isEnabled: false }]));
+  expect(await screen.findByRole("textbox", { name: "Name" })).toHaveValue("Current name");
+  expect(screen.getByRole("textbox", { name: /Website/ })).toHaveValue("https://example.com");
+  expect(screen.getByRole("checkbox", { name: "Enabled" })).not.toBeChecked();
+  fireEvent.change(screen.getByRole("textbox", { name: "Name" }), { target: { value: "My draft" } });
+  get.mockResolvedValue([{ ...stale, name: "Another server update" }]);
+  await act(async () => { await client.invalidateQueries({ queryKey: ["admin-social"] }); });
+  expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("My draft");
+});
+it("does not expose editable stale values when the current record cannot load", async () => {
+  jest.spyOn(socialApi, "providers").mockRejectedValue(new Error("Could not read provider"));
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(<QueryClientProvider client={client}><SocialProviderDialog mode="edit" record={stale} onClose={jest.fn()} onSuccess={jest.fn()} /></QueryClientProvider>);
+  await waitFor(() => expect(screen.getByText("Could not read provider")).toBeInTheDocument());
+  expect(screen.queryByRole("textbox", { name: "Name" })).not.toBeInTheDocument();
+});

@@ -20,19 +20,7 @@ import {
 } from "./DocumentProgress";
 import * as S from "./styles";
 
-const eventLabels: Record<string, string> = {
-  REGISTERED: "Registered",
-  UPDATED: "Updated",
-  ASSIGNED: "Assigned",
-  FORWARDED: "Handed over",
-  RETURNED: "Returned for rework",
-  HELD: "Put on hold",
-  RESUMED: "Resumed",
-  COMPLETED: "Completed",
-  CANCELLED: "Cancelled",
-  COMMENTED: "Comment",
-  ARCHIVED: "Record archived",
-};
+import { documentEventLabels } from "./documentEventLabels";
 export function DocumentDetailContent({
   record,
   compact = false,
@@ -83,7 +71,7 @@ export function DocumentDetailContent({
           </Button>
           {onAttachment && (
             <Button startIcon={<DescriptionOutlined />} onClick={onAttachment}>
-              Add attachment link
+              Add attachment
             </Button>
           )}
         </S.Actions>
@@ -120,7 +108,7 @@ export function DocumentDetailContent({
                   <div>
                     <S.EventHeading>
                       <Typography variant="subtitle2">
-                        {eventLabels[event.kind] ?? event.kind}
+                        {documentEventLabels[event.kind] ?? event.kind}
                       </Typography>
                       <Typography
                         variant="caption"
@@ -171,7 +159,7 @@ export function DocumentDetailContent({
           </Typography>
           {record.attachments.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
-              No attachment links recorded.
+              No attachments recorded.
             </Typography>
           ) : (
             <ul>

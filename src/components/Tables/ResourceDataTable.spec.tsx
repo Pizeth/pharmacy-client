@@ -7,10 +7,10 @@ const helper = createMuiDataTableColumnHelper<{ id: string; name: string }>();
 const columns = helper.columns([helper.accessor("name", { header: "Name" })]);
 const data = [{ id: "a", name: "Alpha" }, { id: "b", name: "Beta" }];
 let api: MuiDataTableInstance<{ id: string; name: string }>;
-function Fixture({ loading = false }: { loading?: boolean }) {
-  const table = useMuiDataTable({ data, columns, getRowId: row => row.id, enableGlobalFilter: true, enableRowSelection: true });
+function Fixture({ loading = false, onViewRecord, flip = false }: { flip?: boolean; loading?: boolean; onViewRecord?: (record: { id: string; name: string }) => void }) {
+  const table = useMuiDataTable({ data, columns, getRowId: row => row.id, enableGlobalFilter: true, enableRowSelection: true, getRowCanExpand: () => true });
   useEffect(() => { api = table; }, [table]);
-  return <ResourceDataTable resourceId="test/resource-standard" loading={loading} loadingMessage="Loading test records…" table={table} card={{ enableSelection: true, renderHeader: ({ row }) => row.original.name, renderBody: ({ row }) => row.original.name }} />;
+  return <ResourceDataTable resourceId="test/resource-standard" onViewRecord={onViewRecord} loading={loading} loadingMessage="Loading test records…" table={table} card={{ detailMode: flip ? "flip" : "inline", flip: { flipOnHover: false }, renderDetail: () => "Expanded details", enableExpansion: true, enableSelection: true, renderHeader: ({ row }) => row.original.name, renderBody: ({ row }) => row.original.name }} />;
 }
 beforeEach(() => localStorage.clear());
 it("offers shared controls and retains semantic state across card changes", () => {
@@ -49,4 +49,41 @@ it("uses the universal loader before initial rows are ready", () => {
  rerender(<Fixture />);
  expect(screen.queryByText("Loading test records…")).not.toBeInTheDocument();
  expect(screen.getByRole("button", { name: "Manage table columns" })).toBeInTheDocument();
+});
+
+it("opens details only from selected table and card surfaces", () => {
+  const view = jest.fn();
+  const { container } = render(<Fixture onViewRecord={view} />);
+  let row = container.querySelector<HTMLElement>('tr[data-row-id="a"]')!;
+  fireEvent.click(row);
+  expect(view).not.toHaveBeenCalled();
+  act(() => api.setRowSelection({ a: true }));
+  fireEvent.keyDown(row, { key: "Enter" });
+  expect(view).toHaveBeenCalledWith(data[0]);
+  view.mockClear();
+  fireEvent.click(screen.getByRole("button", { name: "Switch to card view" }));
+  row = container.querySelector<HTMLElement>('[role="listitem"][data-row-id="a"]')!;
+  expect(row).toHaveAttribute("tabindex", "0");
+  fireEvent.click(screen.getByRole("checkbox", { name: "Select row a" }));
+  expect(view).not.toHaveBeenCalled();
+  expect(row).not.toHaveAttribute("tabindex");
+  fireEvent.click(row);
+  expect(view).not.toHaveBeenCalled();
+  act(() => api.setRowSelection({ a: true }));
+  fireEvent.click(row);
+  expect(view).toHaveBeenCalledWith(data[0]);
+});
+
+it("keeps flip-card controls independent from selected-card navigation on both faces", () => {
+  const view = jest.fn();
+  const { container } = render(<Fixture flip onViewRecord={view} />);
+  fireEvent.click(screen.getByRole("button", { name: "Switch to card view" }));
+  const card = container.querySelector<HTMLElement>('[role="listitem"][data-row-id="a"]')!;
+  fireEvent.click(card); expect(view).not.toHaveBeenCalled();
+  act(() => api.setRowSelection({ a: true }));
+  fireEvent.click(screen.getAllByRole("button", { name: "Show details" })[0]);
+  expect(view).not.toHaveBeenCalled();
+  expect(card).toHaveAttribute("data-flipped", "true");
+  fireEvent.keyDown(card, { key: "Enter" });
+  expect(view).toHaveBeenCalledWith(data[0]);
 });

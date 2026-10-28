@@ -1,8 +1,10 @@
 "use client";
-import { Chip, Typography } from "@mui/material";
+import { ResourceStatusBadge } from "@/components/Tables/ResourceBadge";
+import { Typography } from "@mui/material";
 import type { ApplicationRole } from "./api";
 import { RoleBadge } from "../users/UserIdentity";
 import * as S from "./styles";
+import { formatAdminDate } from "@/lib/utils/adminDate";
 export function RoleDetail({ record }: { readonly record: ApplicationRole }) {
   const groups = Map.groupBy(
     record.permissions,
@@ -12,18 +14,13 @@ export function RoleDetail({ record }: { readonly record: ApplicationRole }) {
     <S.Root>
       <S.Actions>
         <RoleBadge role={record} />
-        <Chip
-          size="small"
-          color={record.isEnabled ? "success" : "default"}
-          label={record.isEnabled ? "Enabled" : "Disabled"}
-        />
+        <ResourceStatusBadge active={record.isEnabled} activeLabel="Enabled" inactiveLabel="Disabled" />
       </S.Actions>
       <S.Facts>
         {[
           ["Description", record.description || "—"],
           ["Assigned users", String(record.userCount)],
-          ["Version", String(record.objectVersionId)],
-          ["Updated", new Date(record.updatedAt).toLocaleString()],
+                    ["Updated", formatAdminDate(record.updatedAt)],
           [
             "Role type",
             record.isProtected ? "Protected bootstrap role" : "Custom role",

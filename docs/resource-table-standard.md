@@ -8,6 +8,11 @@ The core DataTable remains transport- and resource-agnostic.
 
 ## Shared presentation
 
+Admin dates use `dd-MM-yyyy`, with `HH:mm` when a time is shown. Use
+`lib/utils/adminDate.ts` for display (Cambodia office time); keep transport
+timestamps as ISO strings. Date editors must use an explicit display format
+instead of relying on the browser's locale-dependent native date format.
+
 The wrapper supplies full-width sizing, sticky headers, pagination, desktop
 table/mobile card defaults at `md`, centered collapsible debounced search,
 filter status/toggle, column manager, density, fullscreen, table/card toggle,
@@ -42,6 +47,12 @@ for additional content; generic components must not know resource fields.
 
 ## CRUD
 
+Admin account forms reuse signup's structural name/username/email validators
+and debounced availability checks. Skip availability checks for unchanged
+identifiers during editing; the server's uniqueness constraint remains the
+authority for races. Temporary passwords retain the API's minimum length;
+they do not use signup's password-strength/confirmation workflow.
+
 For mutable resources, support dialogs and deep-linkable dedicated
 `create`, `edit/[id]` and `delete/[id]` pages. Reuse one validated form and mutation
 implementation across both surfaces. Use the shared `FormDialog`,
@@ -49,6 +60,14 @@ implementation across both surfaces. Use the shared `FormDialog`,
 Validate route IDs and input; show missing records and API conflicts; prevent
 duplicate submissions and closing during pending mutations. Delete requires
 explicit confirmation and a safe cancel action. Never delete on page navigation.
+Use `components/forms/FormActions` for form/dialog footers, following i18n:
+Cancel first and the primary action last in DOM order. Desktop uses a
+right-aligned row; below `sm`, full-width buttons stack with the primary action
+above Cancel. Keep general toolbar, badge and metadata rows separate.
+When a dedicated route exists, pass `dedicatedPageHref` and a descriptive
+`dedicatedPageLabel` to `FormDialog`. It renders a small title-bar icon beside
+Close, outside the scrolling form, and disables navigation while pending.
+Do not add a second full-size navigation button inside the form body.
 Only advertise bulk operations if the backend actually supports them.
 
 The translation-key and social-provider tables require explicit selection before
@@ -97,3 +116,27 @@ text/icons across color schemes and hover/focus/disabled states. Feature code ow
 the label, icon, color and handler; do not duplicate those styles per resource.
 Below `md`, the button becomes a 44px circle with only the plus icon visible.
 Keep the full label available to assistive technology; desktop retains icon and text.
+
+## Record details and edit snapshots
+
+Every admin resource table has a dedicated read-only `/<resource>/<id>` page and a visible **View details** action in both table and card presentations. Keep inline expansion available as a quick preview. Use `ResourceDataTable.onViewRecord` to enable row-surface navigation: only explicitly selected rows/cards are clickable or keyboard-focusable for navigation. Buttons, links, selection, expansion, and editable descendants must not activate the row. View details itself is available without selection. Public download tables retain their separate download behavior.
+
+Initialize modal and dedicated edit forms from a fresh resource read scoped to the record and editor session, rather than a cached table/list snapshot. Show loading/error states before mounting the form. Preserve the editing snapshot and draft during background refreshes; never reset dirty fields behind the user. Populate every editable saved value, including nullable display metadata. Password inputs intentionally remain empty. When a nullable badge color has no stored HEX value, identify the shown theme default explicitly and preserve database NULL until the user chooses a custom color.
+
+### Dedicated record workspaces
+
+A dedicated detail route is a full record workspace, not an expanded-row panel rendered alone. Use `ResourceRecordPage` and its named `RazethResourceRecord` slots for a record hero, status/summary metrics, responsive main/sidebar sections, related records, available actions and record metadata. Keep panel renderers compact and separate from page composition. Use feature-owned content for permission groups and assigned users, account/profile/provider connections, translation coverage and locale editing, and document stage assignments/attachments/history. Only display fields and relationships supplied by existing APIs; retain optional timestamps from responses, and explicitly identify missing data or unsupported counts. Never manufacture audit activity or statistics. Reuse existing validated mutation dialogs and dedicated confirmation routes from workspace actions.
+
+Record routes can publish an already-loaded display name with `useBreadcrumbLabel(path, label)` from `components/layouts/breadcrumbLabels`. Keep record fetching feature-owned; breadcrumb rendering must not make a duplicate API request. Scope labels to the full route and clean them up when the page unmounts. User profile/edit/delete breadcrumbs show the user's name, with a descriptive fallback while loading rather than a raw ID.
+
+### Display-only record details
+
+Never show internal database IDs, UUIDs, connection IDs, foreign keys or optimistic-lock versions as detail facts in panels or dedicated pages. Keep IDs internal to API requests, React keys and route destinations. Breadcrumbs use loaded display names with descriptive loading fallbacks. Preserve meaningful document reference numbers and locale codes.
+
+Social profiles render as colored, icon-only profile links using safe HTTP(S) URLs, descriptive accessible names and tooltips. Do not add visible handles, ID metadata or a separate Open profile action. Use `ResourceBadge` / `ResourceStatusBadge` for resource badge surfaces, including tables, cards and details; role and circular verification badges share the same base style. Active/Banned and Enabled/Disabled statuses must reuse the shared status component rather than filled MUI Chips or plain text in other views.
+
+Dedicated record pages omit redundant outer page titles and subtitles: the breadcrumb identifies the route, and the record name remains the accessible h1. Place Back to list and Edit inside the record hero/cover using RecordPageActions. Keep navigation available during loading and error states. Facebook profile links use the shared custom Meta icon.
+
+Resource forms share `resourceFormStyles`: 2-spacing field gaps, no accumulated input margins or form top padding, and shared FormDialog content padding (3 desktop / 2 mobile). Keep helper text for actionable constraints or validation; omit date-format/timezone captions when the date editor already presents the format. File uploads use a rounded MUI label button with a visually hidden native file input. Dedicated detail content actions use error for Edit/Manage and primary for Delete; cover navigation keeps its existing presentation.
+
+Use shared FormActions for every dialog and dedicated CRUD form footer. Its buttons use the shared rounded neumorphic idle/hover/focus treatment while preserving semantic colors and contained-button contrast; retain the mobile stacked primary-above-Cancel layout.

@@ -1,4 +1,5 @@
 "use client";
+import { useBreadcrumbLabel } from "@/components/layouts/breadcrumbLabels";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +10,8 @@ import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
 import { trackingApi } from "./api";
 import { documentReference } from "./contracts";
 import { DocumentForm, type DocumentFormMode } from "./DocumentForm";
-import { DocumentDetailContent } from "./DocumentDetail";
+import { DocumentRecordContent } from "./DocumentRecordContent";
+import { ResourceRecordPage } from "@/components/Tables/ResourceRecordPage";
 import { TrackingEditor, type TrackingEditorState } from "./TrackingEditor";
 import * as S from "./styles";
 export function TrackingRecordPage({
@@ -27,12 +29,14 @@ export function TrackingRecordPage({
     enabled: valid,
   });
   const record = useQuery({
-    queryKey: ["document-tracking", "detail", id],
+    queryKey: ["document-tracking", mode === "view" ? "detail" : "page-editor", mode, id],
     queryFn: ({ signal }) => trackingApi.get(id!, signal),
     enabled: valid && mode !== "create",
+    gcTime: mode === "view" ? 5 * 60_000 : 0,
     refetchOnWindowFocus: mode === "view",
     refetchInterval: mode === "view" ? 15_000 : false,
   });
+  useBreadcrumbLabel(mode === "view" ? `/admin/documents/${id ?? ""}` : `/admin/documents/${mode}/${id ?? ""}`, mode !== "create" && record.data ? `${mode === "view" ? "" : mode === "delete" ? "Archive " : "Edit "}${record.data.title}` : undefined);
   const [editor, setEditor] = useState<TrackingEditorState | null>(null);
   const back = () => router.push("/admin/documents");
   const title =
@@ -43,6 +47,12 @@ export function TrackingRecordPage({
         : mode === "delete"
           ? "Archive document record"
           : "Document tracking";
+  if (mode === "view") {
+    return <ResourceRecordPage title="Document tracking details" subtitle="Full route, responsibility, attachments and handling history." backHref="/admin/documents" editHref={record.data?.permissions.canManage ? `/admin/documents/edit/${encodeURIComponent(id!)}` : undefined} loading={valid && (metadata.isLoading || record.isLoading)} error={!valid ? "Invalid document reference." : metadata.error?.message ?? record.error?.message} onRetry={() => { if (valid) { void metadata.refetch(); void record.refetch(); } }}>
+      {record.data && <DocumentRecordContent record={record.data} onProgress={() => setEditor({ mode: "progress", id })} onAttachment={() => setEditor({ mode: "attachment", id })} />}
+      {editor && metadata.data && <TrackingEditor key={`${editor.mode}-${editor.id}`} {...editor} metadata={metadata.data} onClose={() => setEditor(null)} onSuccess={() => { setEditor(null); void record.refetch(); }} />}
+    </ResourceRecordPage>;
+  }
   return (
     <ResourcePage
       title={title}
@@ -80,15 +90,7 @@ export function TrackingRecordPage({
         ) : (
           metadata.data && (
             <>
-              {mode === "view" && record.data ? (
-                <S.Panel>
-                  <DocumentDetailContent
-                    record={record.data}
-                    onProgress={() => setEditor({ mode: "progress", id })}
-                    onAttachment={() => setEditor({ mode: "attachment", id })}
-                  />
-                </S.Panel>
-              ) : !metadata.data.actor.isAdmin ? (
+              {!metadata.data.actor.isAdmin ? (
                 <Alert severity="error">
                   Only administrators can register, edit or archive documents.
                   Assigned handlers can update progress from the tracking page.

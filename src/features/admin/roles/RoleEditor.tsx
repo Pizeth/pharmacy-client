@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import NextLink from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
 import AdminPanelSettingsOutlined from "@mui/icons-material/AdminPanelSettingsOutlined";
@@ -46,14 +45,9 @@ export function RoleEditor({
       icon={<AdminPanelSettingsOutlined />}
       onClose={close}
       maxWidth="md"
+      dedicatedPageHref={`/admin/roles/${mode}${id ? `/${id}` : ""}`}
+      dedicatedPageLabel={`Open dedicated ${mode} page`}
     >
-      <Button
-        component={NextLink}
-        href={`/admin/roles/${mode}${id ? `/${id}` : ""}`}
-        disabled={pending}
-      >
-        Open dedicated {mode} page
-      </Button>
       {record.isLoading ? (
         <ResourceTableLoading message="Loading role…" />
       ) : record.error ? (

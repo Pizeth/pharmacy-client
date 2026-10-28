@@ -8,6 +8,7 @@ import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import { useMuiDataTableContext } from "../../table";
 import { DataTableRowActionButton } from "./DataTableRowActionButton";
 import { DataTableRowActionsMenu } from "./DataTableRowActionsMenu";
+import { getRowActionGroupStyles } from "./rowActionStyles";
 import { resolveDataTableRowActions } from "./resolveRowActions";
 import type { DataTableRowAction, DataTableRowActionContext } from "./types";
 
@@ -15,11 +16,7 @@ const RowActionsRoot = styled(Stack, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "RowActions",
   overridesResolver: (_props, styles) => styles.rowActions,
-})(({ theme }) => ({
-  width: "100%",
-  minWidth: 0,
-  gap: theme.spacing(1.75),
-}));
+})(({ theme }) => getRowActionGroupStyles(theme));
 
 export interface DataTableRowActionsProps<TData extends RowData> {
   /**
@@ -122,7 +119,6 @@ export function DataTableRowActions<TData extends RowData>(
       direction="row"
       alignItems="center"
       justifyContent="center"
-      spacing={0.25}
     >
       {inlineActions.map((action) => (
         <DataTableRowActionButton<TData>

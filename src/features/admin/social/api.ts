@@ -4,6 +4,7 @@ import { API_URL, TOKEN_KEY } from "@/types/constants";
 export const providerSchema = z.object({
   id: z.number(), key: z.string(), name: z.string(), websiteUrl: z.string().nullable(),
   icon: z.string().nullable(), isEnabled: z.boolean(),
+  createdAt: z.string().optional(), updatedAt: z.string().optional(),
 });
 export const providerInputSchema = z.object({
   key: z.string().trim().toLowerCase().min(1).max(50).regex(/^[a-z][a-z0-9_-]*$/),
@@ -13,6 +14,7 @@ export const providerInputSchema = z.object({
 });
 export const profileSchema = z.object({
   id: z.number(), providerId: z.number(), handle: z.string(), url: z.string().nullable(), provider: providerSchema,
+  createdAt: z.string().optional(), updatedAt: z.string().optional(),
 });
 export const profileInputSchema = z.object({
   providerId: z.number().int().positive(), handle: z.string().trim().min(1).max(255),

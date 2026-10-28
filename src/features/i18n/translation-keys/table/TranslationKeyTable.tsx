@@ -1,5 +1,7 @@
 "use client";
+import { resourceViewAction } from "@/components/Tables/resourceViewAction";
 
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   Alert,
@@ -90,6 +92,7 @@ export interface TranslationKeyTableProps {
  * DataTable stack.
  */
 export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
+  const router = useRouter();
   const { queryController } = props;
   const [createOpen, setCreateOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<TranslationKey | null>(
@@ -114,6 +117,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
 
   const rowActions = useMemo<readonly DataTableRowAction<TranslationKey>[]>(
     () => [
+      resourceViewAction<TranslationKey>(router.push, record => `/admin/i18n/${encodeURIComponent(String(record.id))}`),
       {
         id: "edit",
         label: "Edit",
@@ -148,7 +152,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
         onClick: ({ row }) => setDeletingRecord(row.original),
       },
     ],
-    [],
+    [router],
   );
 
   const card = useMemo(
@@ -488,7 +492,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
           </Alert>
         )}
 
-        <DataTable
+        <DataTable onViewRecord={record => router.push(`/admin/i18n/${encodeURIComponent(String(record.id))}`)}
           resourceId="admin/i18n/translation-keys"
           table={table}
           card={card}

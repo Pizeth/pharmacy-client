@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import { usePathname } from "next/navigation";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { SiteBreadcrumbs } from "./SiteBreadcrumbs";
+import { useBreadcrumbLabel } from "./breadcrumbLabels";
 import { getSiteBreadcrumbs } from "./breadcrumbRoutes";
 jest.mock("next/navigation", () => ({ usePathname: jest.fn() }));
 
@@ -9,9 +10,9 @@ it.each([
   ["/admin/dashboard", "Dashboard"],
   ["/admin/social-provider", "Social providers"],
   ["/admin/social-provider/create", "Create"],
-  ["/admin/social-provider/edit/12", "Edit #12"],
-  ["/admin/social-provider/delete/12", "Delete #12"],
-  ["/admin/i18n/edit/7", "Edit #7"],
+  ["/admin/social-provider/edit/12", "Edit social provider"],
+  ["/admin/social-provider/delete/12", "Delete social provider"],
+  ["/admin/i18n/edit/7", "Edit translation key"],
   ["/", "Home"],
 ])("marks one current page for %s", (pathname, current) => {
   jest.mocked(usePathname).mockReturnValue(pathname);
@@ -62,4 +63,41 @@ it("uses an admin-panel icon for Administration and a dashboard icon for Dashboa
 it("does not show breadcrumbs on sign-in", () => {
  jest.mocked(usePathname).mockReturnValue("/login"); render(<SiteBreadcrumbs />);
  expect(screen.queryByRole("navigation", { name: "Breadcrumb" })).not.toBeInTheDocument();
+});
+
+function RecordLabel({ path, name }: { path: string; name?: string }) {
+  useBreadcrumbLabel(path, name);
+  return null;
+}
+it("shows the loaded user's exact name and updates it without changing the route", () => {
+  jest.mocked(usePathname).mockReturnValue("/admin/users/12");
+  const { rerender } = render(<><SiteBreadcrumbs /><RecordLabel path="/admin/users/12" name="Seth Razeth" /></>);
+  const nav = screen.getByRole("navigation", { name: "Breadcrumb" });
+  expect(within(nav).getByText("Seth Razeth")).toHaveAttribute("aria-current", "page");
+  expect(within(nav).queryByText("12")).not.toBeInTheDocument();
+  expect(within(nav).getByRole("link", { name: "Users" })).toHaveAttribute("href", "/admin/users");
+  rerender(<><SiteBreadcrumbs /><RecordLabel path="/admin/users/12" name="Updated name" /></>);
+  expect(within(nav).getByText("Updated name")).toHaveAttribute("aria-current", "page");
+});
+it("uses a loading fallback and removes a name when its page unmounts", () => {
+  jest.mocked(usePathname).mockReturnValue("/admin/users/12");
+  const { rerender } = render(<><SiteBreadcrumbs /><RecordLabel path="/admin/users/12" name="Previous user" /></>);
+  rerender(<SiteBreadcrumbs />);
+  const nav = screen.getByRole("navigation", { name: "Breadcrumb" });
+  expect(within(nav).getByText("User profile")).toHaveAttribute("aria-current", "page");
+  expect(within(nav).queryByText("Previous user")).not.toBeInTheDocument();
+  jest.mocked(usePathname).mockReturnValue("/admin/users/13");
+  rerender(<SiteBreadcrumbs />);
+  expect(within(nav).getByText("User profile")).toBeInTheDocument();
+});
+it("replaces user edit/delete IDs while preserving other resource labels", () => {
+  expect(getSiteBreadcrumbs("/admin/users/edit/12").at(-1)?.label).toBe("Edit user");
+  expect(getSiteBreadcrumbs("/admin/users/delete/12").at(-1)?.label).toBe("Delete user");
+  jest.mocked(usePathname).mockReturnValue("/admin/users/edit/12");
+  render(<><SiteBreadcrumbs /><RecordLabel path="/admin/users/edit/12" name="Edit Seth Razeth" /></>);
+  expect(within(screen.getByRole("navigation", { name: "Breadcrumb" })).getByText("Edit Seth Razeth")).toHaveAttribute("aria-current", "page");
+});
+
+it.each([["/admin/roles/987", "Role details"], ["/admin/social-provider/987", "Social provider details"], ["/admin/i18n/987", "Translation key details"], ["/admin/documents/secret-uuid", "Document tracking"]])("does not expose internal identifiers in %s breadcrumb labels", (path, fallback) => {
+  expect(getSiteBreadcrumbs(path).at(-1)?.label).toBe(fallback);
 });

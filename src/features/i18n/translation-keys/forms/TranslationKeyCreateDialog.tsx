@@ -177,6 +177,8 @@ export function TranslationKeyCreateDialog(
     <FormDialog
       open={open}
       title="Create translation key"
+      dedicatedPageHref="/admin/i18n/create"
+      dedicatedPageLabel="Open dedicated create page"
       subtitle="Add metadata first. Translation values can be managed separately."
       icon={<AddRounded />}
       pending={pending}

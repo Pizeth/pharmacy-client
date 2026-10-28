@@ -459,6 +459,7 @@ export interface SelectFieldProps {
   readonly options: readonly SelectFieldOption[];
 
   readonly placeholder?: ReactNode;
+  readonly includeEmptyOption?: boolean;
   readonly helperText?: ReactNode;
 
   readonly defaultValue?: string;

@@ -1,4 +1,6 @@
 "use client";
+import { ResourceStatusBadge } from "@/components/Tables/ResourceBadge";
+import { resourceViewAction } from "@/components/Tables/resourceViewAction";
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -28,6 +30,7 @@ export function SocialProviderPage() {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [notice, setNotice] = useState("");
   const rowActions = useMemo<readonly DataTableRowAction<SocialProvider>[]>(() => [
+      resourceViewAction<SocialProvider>(router.push, record => `/admin/social-provider/${encodeURIComponent(String(record.id))}`),
     { id: "edit", label: "Edit", color: "primary", inline: true, renderIcon: () => <EditOutlined fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
     { id: "delete", label: "Delete", color: "error", inline: true, renderIcon: () => <DeleteOutline fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
     { id: "edit-page", label: "Open edit page", renderIcon: () => <OpenInNew fontSize="small" />, onClick: ({ row }) => router.push(`/admin/social-provider/edit/${row.original.id}`) },
@@ -43,9 +46,9 @@ export function SocialProviderPage() {
   });
   const card = useMemo<DataTableCardConfig<SocialProvider>>(() => ({
     detailMode: "flip", flip: { flipOnHover: false }, enableSelection: true, enableExpansion: true,
-    actions: rowActions, maxInlineActions: 2,
+    actions: rowActions, maxInlineActions: 3,
     renderHeader: ({ row }) => <><Typography variant="subtitle2">{row.original.name}</Typography><Typography variant="caption">{row.original.key}</Typography></>,
-    renderBody: ({ row }) => <Typography>{row.original.isEnabled ? "Enabled" : "Disabled"}</Typography>,
+    renderBody: ({ row }) => <ResourceStatusBadge active={row.original.isEnabled} activeLabel="Enabled" inactiveLabel="Disabled" />,
     renderMetadata: ({ row }) => <Typography variant="caption"><ProviderWebsite url={row.original.websiteUrl} /></Typography>,
   }), [rowActions]);
   const selectionActions = useMemo<readonly DataTableBulkAction<SocialProvider>[]>(() => [
@@ -58,12 +61,12 @@ export function SocialProviderPage() {
       {providers.isLoading && <ResourceTableLoading message="Loading social providers…" />}
       {providers.error && <Alert severity="error" action={<Button onClick={() => providers.refetch()}>Retry</Button>}>{providers.error.message}</Alert>}
       {notice && <Alert severity="success" onClose={() => setNotice("")}>{notice}</Alert>}
-      {providers.data && <ResourceDataTable resourceId="admin/social-providers" persistence={{ storageId: "admin/social-providers", storage: adminTableStorage }} table={table} card={card}
+      {providers.data && <ResourceDataTable onViewRecord={record => router.push(`/admin/social-provider/${encodeURIComponent(String(record.id))}`)} resourceId="admin/social-providers" persistence={{ storageId: "admin/social-providers", storage: adminTableStorage }} table={table} card={card}
         refreshing={providers.isFetching && !providers.isLoading}
         rowPinning={{ displayMode: "select-sticky" }}
         selectionBar={{ clearable: true, actions: selectionActions }}
         toolbar={{ searchPlaceholder: "Search social providers…", startContent: <S.Actions><ResourceTableCreateButton color="error" startIcon={<AddRounded />} onClick={() => setEditor({ mode: "create" })}>Create provider</ResourceTableCreateButton></S.Actions> }}
-        renderDetailPanel={({ row }) => <S.Root><Typography variant="h6">{row.original.name}</Typography><Typography>Key: {row.original.key}</Typography><Typography>Status: {row.original.isEnabled ? "Enabled" : "Disabled"}</Typography><Typography>Website: <ProviderWebsite url={row.original.websiteUrl} /></Typography><Typography>Icon: {row.original.icon || "—"}</Typography></S.Root>}
+        renderDetailPanel={({ row }) => <S.Root><Typography variant="h6">{row.original.name}</Typography><Typography>Key: {row.original.key}</Typography><ResourceStatusBadge active={row.original.isEnabled} activeLabel="Enabled" inactiveLabel="Disabled" /><Typography>Website: <ProviderWebsite url={row.original.websiteUrl} /></Typography><Typography>Icon: {row.original.icon || "—"}</Typography></S.Root>}
       />}
       {editor && <SocialProviderDialog key={`${editor.mode}-${editor.record?.id ?? "new"}`} {...editor} onClose={() => setEditor(null)} onSuccess={record => {
         if (editor.mode === "delete") {
