@@ -24,7 +24,8 @@ export function AttachmentFields({ names = DEFAULT_NAMES, file, onFileChange, di
         <S.FileInput type="file" required aria-label="Attachment file" disabled={disabled} onChange={event => {
           const selected = event.target.files?.[0] ?? null;
           onFileChange(selected);
-          if (selected && !getValues(names.name)) setValue(names.name, selected.name, { shouldDirty: true });
+          const currentName = getValues(names.name);
+          if (selected && (!currentName || currentName === file?.name)) setValue(names.name, selected.name, { shouldDirty: true });
         }} />
       </S.UploadButton> : <TextField name={names.url} label="File URL" iconStart={<LinkOutlined />} type="url" required fullWidth disabled={disabled} />}
     </S.AttachmentSourceRow>

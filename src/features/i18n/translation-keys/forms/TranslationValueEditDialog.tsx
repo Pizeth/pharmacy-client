@@ -69,7 +69,7 @@ export function TranslationValueEditDialog(
     >
       {open && fresh.isLoading && <ResourceTableLoading message="Loading translation…" />}
       {fresh.error && <Alert severity="error" action={<Button onClick={() => fresh.refetch()}>Retry</Button>}>{fresh.error.message}</Alert>}
-      {record && translation && fresh.data && !fresh.error && (
+      {record && translation && fresh.data && (
         <TranslationValueEditForm
           key={`${record.id}:${translation.locale}`}
           record={fresh.data.key}

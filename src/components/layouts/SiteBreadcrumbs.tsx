@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Breadcrumbs, Container, Link, Typography } from "@mui/material";
 import type { LinkProps, TypographyProps } from "@mui/material";
 import { styled, type CSSInterpolation } from "@mui/material/styles";
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import LocalPoliceIcon from "@mui/icons-material/LocalPolice";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useBreadcrumbLabels } from "./breadcrumbLabels";
 import { getSiteBreadcrumbs } from "./breadcrumbRoutes";
@@ -33,7 +33,7 @@ export function SiteBreadcrumbs() {
   return <Root maxWidth="xl"><Trail aria-label="Breadcrumb" separator={<Separator aria-hidden="true" />}>
     {crumbs.map((crumb, index) => {
       const icon = index === 1 && pathname?.split("/")[1] === "admin"
-        ? <AdminPanelSettingsIcon color="primary" /> : navigation.find(item => item.href === crumb.href)?.Icon;
+        ? <LocalPoliceIcon color="primary" /> : navigation.find(item => item.href === crumb.href)?.Icon;
       const current = index === crumbs.length - 1;
       const content = <Current component="span" variant="body2" aria-current={current ? "page" : undefined}>
         {icon && <Icon aria-hidden="true">{icon}</Icon>}{recordLabels.get(crumb.href) ?? crumb.label}

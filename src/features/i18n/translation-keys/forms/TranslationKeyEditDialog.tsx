@@ -38,7 +38,7 @@ export function TranslationKeyEditDialog(props: TranslationKeyEditDialogProps) {
     >
       {record && fresh.isLoading && <ResourceTableLoading message="Loading translation key…" />}
       {fresh.error && <Alert severity="error" action={<Button onClick={() => fresh.refetch()}>Retry</Button>}>{fresh.error.message}</Alert>}
-      {record && fresh.data && !fresh.error && (
+      {record && fresh.data && (
         <TranslationKeyEditForm
           key={record.id}
           record={fresh.data}

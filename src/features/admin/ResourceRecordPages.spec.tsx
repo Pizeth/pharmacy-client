@@ -107,3 +107,16 @@ it("does not render internal record identifiers as detail facts", async () => {
   expect(container).not.toHaveTextContent("private-connection-id");
   expect(screen.queryByText(/^(User|Connection|Application role) ID$/)).not.toBeInTheDocument();
 });
+
+it("retains available user detail metadata when the secondary metadata request fails", async () => {
+  jest.mocked(usersApi.get).mockRejectedValue(new Error("Metadata unavailable"));
+  jest.spyOn(usersApi, "detail").mockResolvedValue({ id: "12", name: "Jane", email: "jane@example.com", accounts: [], banned: true,
+    createdAt: "2026-10-26T08:11:00Z", updatedAt: "2026-10-27T08:11:00Z", banReason: "Pending account review", banExpires: "2026-10-28T08:11:00Z" });
+  mount(<UserRecordPage id="12" />);
+  expect(await screen.findByText("Additional account metadata could not be loaded.")).toBeInTheDocument();
+  const info = within(screen.getByRole("region", { name: "Record information" }));
+  expect(info.getByText("26 October 2026")).toBeInTheDocument();
+  expect(info.getByText("27 October 2026")).toBeInTheDocument();
+  expect(info.getByText("28 October 2026")).toBeInTheDocument();
+  expect(info.getByText("Pending account review")).toBeInTheDocument();
+});

@@ -8,7 +8,7 @@ The core DataTable remains transport- and resource-agnostic.
 
 ## Shared presentation
 
-Admin dates use `dd-MM-yyyy`, with `HH:mm` when a time is shown. Use
+Admin display dates use `d MMMM yyyy` (for example, `26 October 2026`), without time by default. Explicit time displays append `HH:mm`. Date/time editors retain `dd-MM-yyyy HH:mm`. Use
 `lib/utils/adminDate.ts` for display (Cambodia office time); keep transport
 timestamps as ISO strings. Date editors must use an explicit display format
 instead of relying on the browser's locale-dependent native date format.

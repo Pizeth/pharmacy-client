@@ -83,3 +83,8 @@ it("uses HR work identity to distinguish handlers without requiring a profile", 
   ).toBe("Employee Name · Document officer · Specialist office");
   expect(handlerOptionLabel({ id: 1, name: "Admin" })).toBe("Admin");
 });
+
+it("lets schema validation handle incomplete dates without throwing a RangeError", () => {
+  expect(fromLocalDate("invalid")).toBe("invalid");
+  expect(fromLocalDate("2026-10-")).toBe("2026-10-");
+});

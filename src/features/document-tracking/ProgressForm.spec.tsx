@@ -237,3 +237,14 @@ it("renders the route and full return history in a compact detail without mutati
     screen.queryByRole("button", { name: "Update progress" }),
   ).not.toBeInTheDocument();
 });
+
+it("updates an inferred filename on replacement but preserves a custom attachment name", () => {
+  mount(<AttachmentForm record={trackingRecord} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+  const input = screen.getByLabelText("Attachment file");
+  fireEvent.change(input, { target: { files: [new File(["one"], "first.txt")] } });
+  fireEvent.change(input, { target: { files: [new File(["two"], "second.txt")] } });
+  expect(screen.getByLabelText(/Attachment name/)).toHaveValue("second.txt");
+  fireEvent.change(screen.getByLabelText(/Attachment name/), { target: { value: "Custom title" } });
+  fireEvent.change(input, { target: { files: [new File(["three"], "third.txt")] } });
+  expect(screen.getByLabelText(/Attachment name/)).toHaveValue("Custom title");
+});

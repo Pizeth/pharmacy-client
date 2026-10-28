@@ -22,8 +22,11 @@ import { getAttachmentDraft, type AttachmentKind } from "./attachmentDraft";
 export type DocumentFormMode = "create" | "edit" | "delete";
 export const toLocalDate = (date: string) =>
   new Date(new Date(date).getTime() + 7 * 3600_000).toISOString().slice(0, 16);
-export const fromLocalDate = (date: string) =>
-  date ? new Date(`${date}+07:00`).toISOString() : null;
+export const fromLocalDate = (date: string) => {
+  if (!date) return null;
+  const parsed = new Date(`${date}+07:00`);
+  return Number.isNaN(parsed.getTime()) ? date : parsed.toISOString();
+};
 const nullable = (value: string) => value.trim() || null;
 const number = (value: string) => (value ? Number(value) : null);
 export function DocumentForm({

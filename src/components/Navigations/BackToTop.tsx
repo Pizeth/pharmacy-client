@@ -47,11 +47,13 @@ function BackToTopFab() {
     disableHysteresis: true,
   });
 
+  const aboveTop = useScrollTrigger({ threshold: 0, disableHysteresis: true });
+
   const { isScrolling, scrollToTop } = useScrollToTop();
   const progressRef = useScrollProgress();
 
   return (
-    <Zoom in={trigger || isScrolling}>
+    <Zoom in={trigger || isScrolling} timeout={{ enter: 200, exit: 600 }}>
       <BackToTopButton
         ref={progressRef}
         size="small"
@@ -62,6 +64,8 @@ function BackToTopFab() {
         <ProgressGlow aria-hidden="true" />
         {isScrolling ? (
           <img src="/static/images/shoryuken.gif" alt="Scrolling..." />
+        ) : !aboveTop ? (
+          <img src="/static/images/logo.svg" alt="" aria-hidden="true" />
         ) : (
           <ArrowUpwardIcon />
         )}

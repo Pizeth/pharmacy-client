@@ -56,7 +56,7 @@ it("uses HRD's selected breadcrumb treatment and compact spacing", () => {
 it("uses an admin-panel icon for Administration and a dashboard icon for Dashboard", () => {
   jest.mocked(usePathname).mockReturnValue("/admin/dashboard");
   render(<SiteBreadcrumbs />);
-  expect(screen.getByTestId("AdminPanelSettingsIcon")).toBeInTheDocument();
+  expect(screen.getByTestId("LocalPoliceIcon")).toBeInTheDocument();
   expect(screen.getByTestId("DashboardIcon")).toBeInTheDocument();
 });
 

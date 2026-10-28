@@ -187,3 +187,12 @@ it("persists an explicitly chosen custom color when the stored color was unset",
   fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
   await waitFor(() => expect(save).toHaveBeenCalledWith(expect.objectContaining({ color: "#123abc" }), record));
 });
+
+it("keeps an unset neutral role color empty and saves it as null", async () => {
+  const record = { ...applicationRole, name: "EDITOR", color: null };
+  const save = jest.spyOn(rolesApi, "save").mockResolvedValue(record);
+  mount(<RoleForm mode="edit" record={record} metadata={roleMetadata} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+  expect(screen.getByLabelText(/Badge color/)).toHaveValue("");
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(save).toHaveBeenCalledWith(expect.objectContaining({ color: null }), record));
+});

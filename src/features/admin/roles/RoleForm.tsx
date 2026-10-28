@@ -45,10 +45,8 @@ export function RoleForm({
 }) {
   const [initial] = useState(record);
   const theme = useTheme();
-  const [defaultColor] = useState(() => rgbToHex(
-    /^(super|sys|system)[_-]?admin$/i.test(record?.name ?? "")
-      ? theme.palette.primary.main : theme.palette.text.secondary,
-  ).slice(0, 7));
+  const [defaultColor] = useState(() => /^(super|sys|system)[_-]?admin$/i.test(record?.name ?? "")
+    ? rgbToHex(theme.palette.primary.main).slice(0, 7) : "");
   const client = useQueryClient();
   const inFlight = useRef(false);
   const form = useForm({
@@ -194,7 +192,7 @@ export function RoleForm({
                 }
                 fullWidth
                 disabled={locked}
-                helperText={initial && initial.color == null ? "No custom color is stored. The current theme default is shown; changing it saves a custom HEX color." : "Enter a six-digit HEX color or choose one with the color picker. Leave empty for the default."}
+                helperText={initial && initial.color == null ? (defaultColor ? "No custom color is stored. The current theme default is shown; changing it saves a custom HEX color." : "No custom color is stored. Leave empty for the neutral badge style.") : "Enter a six-digit HEX color or choose one with the color picker. Leave empty for the default."}
               />
             </S.Fields>
             <S.Actions>

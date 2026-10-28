@@ -1,3 +1,4 @@
+import { useScrollTrigger } from "@mui/material";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { usePathname } from "next/navigation";
 import BackToTop from "./BackToTop";
@@ -5,7 +6,7 @@ import BackToTop from "./BackToTop";
 jest.mock("next/navigation", () => ({ usePathname: jest.fn() }));
 jest.mock("@mui/material", () => ({
   ...jest.requireActual("@mui/material"),
-  useScrollTrigger: () => true,
+  useScrollTrigger: jest.fn(() => true),
 }));
 
 it("fills the ring only at the bottom and recalculates after page height changes", () => {
@@ -92,5 +93,29 @@ it("releases the old route animation and resets the GIF/busy state on navigation
     if (originalY) Object.defineProperty(window, "scrollY", originalY);
     if (originalMedia) Object.defineProperty(window, "matchMedia", originalMedia);
     else Reflect.deleteProperty(window, "matchMedia");
+  }
+});
+
+it("shows the logo only on reaching the top, during the button exit", () => {
+  let y = 400;
+  const originalY = Object.getOwnPropertyDescriptor(window, "scrollY");
+  Object.defineProperty(window, "scrollY", { configurable: true, get: () => y });
+  jest.mocked(useScrollTrigger).mockImplementation(options => y > (options?.threshold ?? 100));
+  jest.mocked(usePathname).mockReturnValue("/admin/users/1");
+  const view = render(<BackToTop />);
+  try {
+    expect(screen.getByTestId("ArrowUpwardIcon")).toBeInTheDocument();
+    y = 60;
+    view.rerender(<BackToTop />);
+    expect(screen.getByTestId("ArrowUpwardIcon")).toBeInTheDocument();
+    y = 0;
+    view.rerender(<BackToTop />);
+    expect(screen.queryByTestId("ArrowUpwardIcon")).not.toBeInTheDocument();
+    expect(view.container.querySelector('img[src="/static/images/logo.svg"]')).toBeInTheDocument();
+  } finally {
+    view.unmount();
+    jest.mocked(useScrollTrigger).mockReturnValue(true);
+    if (originalY) Object.defineProperty(window, "scrollY", originalY);
+    else Reflect.deleteProperty(window, "scrollY");
   }
 });
