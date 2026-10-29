@@ -102,7 +102,7 @@ export function TrackingPage() {
           setEditor({ mode: "progress", id: row.original.id }),
       },
       {
-        id: "edit", color: "primary",
+        id: "edit", color: "error",
         label: "Edit document",
         inline: true,
         renderIcon: () => <EditOutlined />,
@@ -113,7 +113,7 @@ export function TrackingPage() {
       {
         id: "archive",
         label: "Archive record",
-        color: "error",
+        color: "primary",
         renderIcon: () => <ArchiveOutlined />,
         isDisabled: ({ row }) =>
           !row.getIsSelected() || !row.original.permissions.canManage,
@@ -122,7 +122,7 @@ export function TrackingPage() {
       },
       {
         id: "view",
-        color: "info",
+        color: "inherit",
         label: "View details",
         inline: true,
         renderIcon: () => <OpenInNew />,

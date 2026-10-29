@@ -53,7 +53,7 @@ export function RolesPage() {
     () => [
       resourceViewAction<ApplicationRole>(router.push, record => `/admin/roles/${encodeURIComponent(String(record.id))}`),
       {
-        id: "edit", color: "primary",
+        id: "edit", color: "error",
         label: "Edit role",
         inline: true,
         renderIcon: () => <EditOutlined />,
@@ -64,7 +64,7 @@ export function RolesPage() {
         id: "delete",
         label: "Delete role",
         inline: true,
-        color: "error",
+        color: "primary",
         renderIcon: () => <DeleteOutline />,
         isDisabled: ({ row }) =>
           !row.getIsSelected() ||

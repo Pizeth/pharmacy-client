@@ -156,3 +156,5 @@ Badges have intrinsic width and must never stretch across a grid track. Locale t
 - Resource tables and cards expose three inline actions with consistent shared icon geometry and explicit semantic colors. Additional actions use the overflow menu. Portal/menu dismissal must never trigger selected-row navigation.
 - Use ResourceFormLoading skeletons while loading form/edit snapshots. Reserve ResourceTableLoading for tables. Edit snapshots must come from the canonical database-backed record endpoint and preserve stored values.
 - Document management is an explicit backend-enforced manage/TrackedDocument grant. Role editors display permissions returned by the server catalog; never fabricate permission IDs.
+
+- Table/card action accents: delete/archive uses primary, edit uses error, and view uses the neutral foreground (white in dark mode, readable foreground in light mode). Apply the same mapping to selection toolbar actions.

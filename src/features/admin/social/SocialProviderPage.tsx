@@ -32,8 +32,8 @@ export function SocialProviderPage() {
   const [notice, setNotice] = useState("");
   const rowActions = useMemo<readonly DataTableRowAction<SocialProvider>[]>(() => [
       resourceViewAction<SocialProvider>(router.push, record => `/admin/social-provider/${encodeURIComponent(String(record.id))}`),
-    { id: "edit", label: "Edit", color: "primary", inline: true, renderIcon: () => <EditOutlined fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
-    { id: "delete", label: "Delete", color: "error", inline: true, renderIcon: () => <DeleteOutline fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
+    { id: "edit", label: "Edit", color: "error", inline: true, renderIcon: () => <EditOutlined fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
+    { id: "delete", label: "Delete", color: "primary", inline: true, renderIcon: () => <DeleteOutline fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
     { id: "edit-page", label: "Open edit page", renderIcon: () => <OpenInNew fontSize="small" />, onClick: ({ row }) => router.push(`/admin/social-provider/edit/${row.original.id}`) },
     { id: "delete-page", label: "Open delete page", renderIcon: () => <OpenInNew fontSize="small" />, onClick: ({ row }) => router.push(`/admin/social-provider/delete/${row.original.id}`) },
   ], [router]);
@@ -54,8 +54,8 @@ export function SocialProviderPage() {
     renderMetadata: ({ row }) => <Typography variant="caption"><ProviderWebsite url={row.original.websiteUrl} /></Typography>,
   }), [rowActions]);
   const selectionActions = useMemo<readonly DataTableBulkAction<SocialProvider>[]>(() => [
-    { id: "edit-selected", label: "Edit selected", color: "primary", renderIcon: () => <EditOutlined />, isDisabled: ({ selectedCount, selectedRows }) => selectedCount !== 1 || selectedRows.length !== 1, onClick: ({ selectedRows }) => { if (selectedRows.length === 1) setEditor({ mode: "edit", record: selectedRows[0].original }); } },
-    { id: "delete-selected", label: "Delete selected", color: "error", renderIcon: () => <DeleteOutline />, isDisabled: ({ selectedCount, selectedRows }) => selectedCount !== 1 || selectedRows.length !== 1, onClick: ({ selectedRows }) => { if (selectedRows.length === 1) setEditor({ mode: "delete", record: selectedRows[0].original }); } },
+    { id: "edit-selected", label: "Edit selected", color: "error", renderIcon: () => <EditOutlined />, isDisabled: ({ selectedCount, selectedRows }) => selectedCount !== 1 || selectedRows.length !== 1, onClick: ({ selectedRows }) => { if (selectedRows.length === 1) setEditor({ mode: "edit", record: selectedRows[0].original }); } },
+    { id: "delete-selected", label: "Delete selected", color: "primary", renderIcon: () => <DeleteOutline />, isDisabled: ({ selectedCount, selectedRows }) => selectedCount !== 1 || selectedRows.length !== 1, onClick: ({ selectedRows }) => { if (selectedRows.length === 1) setEditor({ mode: "delete", record: selectedRows[0].original }); } },
   ], []);
 
   return <ResourcePage showHeader={false} title="Social providers" subtitle="Manage platforms, metadata and availability. Select a row to edit or delete it." maxWidth="xl"><S.Root>

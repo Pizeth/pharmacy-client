@@ -16,7 +16,7 @@ const RowActionButtonRoot = styled(IconButton, {
   width: ROW_ACTION_BUTTON_SIZE,
   height: ROW_ACTION_BUTTON_SIZE,
   padding: 2,
-  "&&:not(.Mui-disabled)": { color: color && color !== "default" && color !== "inherit" ? (theme.vars ?? theme).palette[color].main : (theme.vars ?? theme).palette.text.secondary },
+  "&&:not(.Mui-disabled)": { color: color && color !== "default" && color !== "inherit" ? (theme.vars ?? theme).palette[color].main : color === "inherit" ? (theme.vars ?? theme).palette.text.primary : (theme.vars ?? theme).palette.text.secondary },
   "& .MuiSvgIcon-root": { fontSize: 24, width: 24, height: 24, color: "inherit" },
   "&:focus-visible": {
     outline: `2px solid ${theme.palette.primary.main}`,

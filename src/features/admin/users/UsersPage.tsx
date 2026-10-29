@@ -43,8 +43,8 @@ export function UsersPage() {
   }
   const actions = useMemo<readonly DataTableRowAction<AdminUser>[]>(() => [
       resourceViewAction<AdminUser>(router.push, record => `/admin/users/${encodeURIComponent(String(record.id))}`),
-    { id: "edit", color: "primary", label: "Edit user", inline: true, renderIcon: () => <EditOutlined />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
-    { id: "delete", label: "Delete user", inline: true, color: "error", renderIcon: () => <DeleteOutline />, isDisabled: ({ row }) => !row.getIsSelected() || row.id === String(access.data?.id), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
+    { id: "edit", color: "error", label: "Edit user", inline: true, renderIcon: () => <EditOutlined />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
+    { id: "delete", label: "Delete user", inline: true, color: "primary", renderIcon: () => <DeleteOutline />, isDisabled: ({ row }) => !row.getIsSelected() || row.id === String(access.data?.id), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
     { id: "edit-page", label: "Open edit page", renderIcon: () => <OpenInNew />, onClick: ({ row }) => { router.push(`/admin/users/edit/${encodeURIComponent(row.id)}`); } },
   ], [access.data?.id, router]);
   const columns = useMemo(() => helper.columns([

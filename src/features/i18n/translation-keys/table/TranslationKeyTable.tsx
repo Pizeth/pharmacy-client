@@ -122,7 +122,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
         id: "edit",
         label: "Edit",
         inline: true,
-        color: "primary",
+        color: "error",
         renderIcon: () => <EditOutlined fontSize="small" />,
 
         /**
@@ -140,7 +140,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
       {
         id: "delete",
         label: "Delete",
-        color: "error",
+        color: "primary",
         renderIcon: () => <DeleteOutline fontSize="small" />,
 
         /**
@@ -196,7 +196,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
       {
         id: "edit-selected",
         label: "Edit selected",
-        color: "primary",
+        color: "error",
         variant: "text",
         renderIcon: () => <EditOutlined fontSize="small" />,
         isDisabled: ({ selectedCount, selectedRows }) =>
@@ -212,7 +212,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
       {
         id: "delete-selected",
         label: "Delete selected",
-        color: "error",
+        color: "primary",
         variant: "text",
         renderIcon: () => <DeleteOutline fontSize="small" />,
         isDisabled: ({ selectedCount, selectedRows }) =>
