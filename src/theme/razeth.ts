@@ -30,6 +30,8 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"; // Optional
 
+const SIGNATURE_GOLD = "#FFD22B";
+
 const globalStyles = (theme: Theme) => ({
   "html, body, #__next": {
     height: "100%",
@@ -249,7 +251,7 @@ const standardizedFormComponents = {
 
       heading: ({ theme }: { theme: Theme }) => ({
         padding: theme.spacing(2, 3),
-        borderBottom: `1px solid ${theme.vars.palette.warning.main}`,
+        borderBottom: `1px solid ${SIGNATURE_GOLD}`,
       }),
 
       wrapper: ({ theme }: { theme: Theme }) => ({
@@ -260,13 +262,13 @@ const standardizedFormComponents = {
         gap: theme.spacing(1.5),
       }),
 
-      icon: ({ theme }: { theme: Theme }) => ({
+      icon: {
         width: 40,
         height: 40,
         borderRadius: "50%",
-        color: theme.palette.warning.contrastText,
-        backgroundColor: theme.vars.palette.warning.main,
-      }),
+        color: "#1a1a1a",
+        backgroundColor: SIGNATURE_GOLD,
+      },
 
       caption: ({ theme }: { theme: Theme }) => ({
         color: (theme.vars ?? theme).palette.text.secondary,

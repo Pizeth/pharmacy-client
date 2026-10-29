@@ -154,7 +154,9 @@ Badges have intrinsic width and must never stretch across a grid track. Locale t
 
 - Detail facts are left-aligned in both table expansion and cards; column alignment does not determine detail alignment. Account overview uses inline label/value facts.
 - Resource tables and cards expose three inline actions with consistent shared icon geometry and explicit semantic colors. Additional actions use the overflow menu. Portal/menu dismissal must never trigger selected-row navigation.
-- Use ResourceFormLoading skeletons while loading form/edit snapshots. Reserve ResourceTableLoading for tables. Edit snapshots must come from the canonical database-backed record endpoint and preserve stored values.
+- Use ResourceFormLoading skeletons while loading form/edit snapshots. Reserve ResourceTableLoading for tables. Edit snapshots must preserve stored values using the feature-owned API. User editing intentionally uses Better Auth usersApi.get; usersApi.detail supplies the richer dedicated profile view. Password-manager autofill can replace a correctly loaded username and is not a reason to switch API sources.
 - Document management is an explicit backend-enforced manage/TrackedDocument grant. Role editors display permissions returned by the server catalog; never fabricate permission IDs.
 
 - Table/card action accents: delete/archive uses primary, edit uses error, and view uses the neutral foreground (white in dark mode, readable foreground in light mode). Apply the same mapping to selection toolbar actions.
+
+- FormDialog heading dividers and circular resource-icon backgrounds use signature gold (#FFD22B), independent of warning colors. Icons on that gold surface use a dark foreground for contrast.
