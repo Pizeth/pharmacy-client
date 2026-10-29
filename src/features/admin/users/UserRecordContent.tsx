@@ -26,7 +26,7 @@ export function UserRecordContent({ user, isSelf, canManageRole }: { readonly us
   const name = user.profile ? `${user.profile.firstName} ${user.profile.lastName}`.trim() : null;
   return <>
     <UserProfileHeader user={user} isSelf={isSelf} />
-    <RecordCard title="Account overview" icon={<AccountCircleOutlined />}><RecordFacts items={[{ label: "Connected sign-in accounts", value: user.accounts.length }, { label: "Email verification", value: verified }, { label: "Profile", value: <Chip size="small" color={user.profile ? "info" : "default"} icon={user.profile ? <LinkOutlined /> : <LinkOffOutlined />} label={user.profile ? "Linked" : "Not linked"} /> }]} /></RecordCard>
+    <RecordCard title="Account overview" icon={<AccountCircleOutlined />}><RecordFacts inline items={[{ label: "Connected sign-in accounts", value: user.accounts.length }, { label: "Email verification", value: verified }, { label: "Profile", value: <Chip size="small" color={user.profile ? "info" : "default"} icon={user.profile ? <LinkOutlined /> : <LinkOffOutlined />} label={user.profile ? "Linked" : "Not linked"} /> }]} /></RecordCard>
     <S.Layout><S.Main>
       <RecordCard title="Account identity" icon={<Fingerprint />} description="Account identity and sign-in status."><RecordFacts items={[{ label: "Username", value: user.username || "Not set" }, { label: "Display name", value: user.name }, { label: "Email address", value: <Link href={`mailto:${encodeURIComponent(user.email)}`}>{user.email}</Link> }, { label: "Account status", value: <ResourceStatusBadge active={!user.banned} inactiveLabel="Banned" inactiveColor="error" /> }]} /></RecordCard>
       <RecordCard title="Profile & contact" icon={<PersonOutline />} description="Personal details attached to the account.">

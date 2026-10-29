@@ -242,7 +242,7 @@ export function RoleForm({
             <S.Permissions>
               {[...groups].map(([subject, permissions]) => (
                 <S.PermissionGroup key={subject}>
-                  <legend>{subject}</legend>
+                  <legend>{subject === "TrackedDocument" ? "Documents" : subject}</legend>
                   {permissions.map((permission) => {
                     const selected =
                       draft.permissionIds?.includes(permission.id) ?? false;

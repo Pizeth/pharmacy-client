@@ -102,7 +102,7 @@ export function TrackingPage() {
           setEditor({ mode: "progress", id: row.original.id }),
       },
       {
-        id: "edit",
+        id: "edit", color: "primary",
         label: "Edit document",
         inline: true,
         renderIcon: () => <EditOutlined />,
@@ -122,6 +122,7 @@ export function TrackingPage() {
       },
       {
         id: "view",
+        color: "info",
         label: "View details",
         inline: true,
         renderIcon: () => <OpenInNew />,
@@ -339,7 +340,7 @@ export function TrackingPage() {
     />
   );
   return (
-    <ResourcePage
+    <ResourcePage showHeader={false}
       title="Document tracking"
       subtitle="Follow documents from intake to physical filing. Select a document to update its progress."
       maxWidth="xl"

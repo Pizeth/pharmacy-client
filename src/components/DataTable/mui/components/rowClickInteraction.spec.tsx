@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { Table } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { act, fireEvent, render, screen } from "@testing-library/react";
@@ -22,6 +23,7 @@ const columns = helper.columns([
     cell: () => (
       <>
         <button type="button">Run</button>
+        {createPortal(<div data-testid="menu-dismiss-backdrop">Dismiss menu</div>, document.body)}
         <span contentEditable suppressContentEditableWarning>
           <span>Editable</span>
         </span>
@@ -183,4 +185,12 @@ it("only selected row surfaces activate, and updates immediately when selection 
   expect(row).not.toHaveAttribute("tabindex");
   fireEvent.click(row);
   expect(click).toHaveBeenCalledTimes(2);
+});
+
+it("does not navigate a selected row when its portaled menu backdrop is dismissed", () => {
+ const navigate = jest.fn();
+ const { table } = mount(navigate, true);
+ act(() => table.setRowSelection({ a: true }));
+ fireEvent.click(screen.getAllByTestId("menu-dismiss-backdrop")[0]);
+ expect(navigate).not.toHaveBeenCalled();
 });

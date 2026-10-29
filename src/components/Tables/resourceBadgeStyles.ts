@@ -5,7 +5,7 @@ export function resourceBadgeStyles(theme: Theme, main?: string) {
   const palette = (theme.vars ?? theme).palette;
   const tint = (color: string, opacity: number) => theme.alpha ? theme.alpha(color, opacity) : alpha(color, opacity);
   const base = {
-    display: "inline-flex", alignItems: "center", justifyContent: "center", gap: theme.spacing(0.5), maxWidth: "100%",
+    display: "inline-flex", width: "fit-content", maxWidth: "100%", justifySelf: "start", alignItems: "center", justifyContent: "center", gap: theme.spacing(0.5),
     minHeight: 20, boxSizing: "border-box" as const, fontSize: "0.6875rem", fontWeight: 700, lineHeight: 1.5,
     padding: "1px 6px", borderRadius: 999, fontFamily: "monospace", boxShadow: "none",
     "& svg": { width: 14, height: 14, flexShrink: 0, color: "inherit" },

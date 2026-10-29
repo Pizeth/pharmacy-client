@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Alert, Button, Typography } from "@mui/material";
-import { AddRounded, DeleteOutline, EditOutlined, OpenInNew } from "@mui/icons-material";
+import { PersonAddOutlined, AddRounded, DeleteOutline, EditOutlined, OpenInNew } from "@mui/icons-material";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { ResourceTableCreateButton } from "@/components/Tables/ResourceTableCreateButton";
 import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
@@ -43,7 +43,7 @@ export function UsersPage() {
   }
   const actions = useMemo<readonly DataTableRowAction<AdminUser>[]>(() => [
       resourceViewAction<AdminUser>(router.push, record => `/admin/users/${encodeURIComponent(String(record.id))}`),
-    { id: "edit", label: "Edit user", inline: true, renderIcon: () => <EditOutlined />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
+    { id: "edit", color: "primary", label: "Edit user", inline: true, renderIcon: () => <EditOutlined />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
     { id: "delete", label: "Delete user", inline: true, color: "error", renderIcon: () => <DeleteOutline />, isDisabled: ({ row }) => !row.getIsSelected() || row.id === String(access.data?.id), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
     { id: "edit-page", label: "Open edit page", renderIcon: () => <OpenInNew />, onClick: ({ row }) => { router.push(`/admin/users/edit/${encodeURIComponent(row.id)}`); } },
   ], [access.data?.id, router]);
@@ -66,7 +66,7 @@ export function UsersPage() {
     meta: { emptyContent: "No users found.", noResultsContent: "No users match your search." },
   });
   const back = () => { if (!pending) setEditor(null); };
-  return <ResourcePage title="Users" subtitle="Manage accounts. Select a user to edit or delete. Search by name, email or username." maxWidth="xl"><S.Root>
+  return <ResourcePage showHeader={false} title="Users" subtitle="Manage accounts. Select a user to edit or delete. Search by name, email or username." maxWidth="xl"><S.Root>
     {access.isLoading ? <ResourceTableLoading message="Loading users…" /> : !access.allowed ? <Alert severity="error">Administrator access is required.</Alert> : <>
       {users.isLoading && <ResourceTableLoading message="Loading users…" />}
       {users.error && <Alert severity="error" action={<Button onClick={() => users.refetch()}>Retry</Button>}>{users.error.message}</Alert>}
@@ -74,9 +74,9 @@ export function UsersPage() {
       {notice && <Alert severity="success" onClose={() => setNotice("")}>{notice}</Alert>}
       {users.data && <ResourceDataTable onViewRecord={record => router.push(`/admin/users/${encodeURIComponent(String(record.id))}`)} resourceId="admin/users" persistence={{ storageId: "admin/users", storage: adminTableStorage }} table={table} refreshing={users.isFetching}
         renderDetailPanel={({ row }) => <UserDetailPanel user={row.original} />}
-        card={{ renderDetail: ({ row }) => <UserDetailPanel user={row.original} view="card" />, enableSelection: true, enableExpansion: true, detailMode: "flip", flip: { flipOnHover: false }, actions, renderHeader: ({ row }) => <UserIdentity user={row.original} />, renderBody: ({ row }) => <Typography>{row.original.email}</Typography>, renderMetadata: ({ row }) => <S.Actions><RoleBadge role={findRole(roles.data, row.original.role, row.original.roleId)} fallback={row.original.role} /><ResourceStatusBadge active={!row.original.banned} inactiveLabel="Banned" inactiveColor="error" /></S.Actions> }}
+        card={{ renderDetail: ({ row }) => <UserDetailPanel user={row.original} view="card" />, enableSelection: true, enableExpansion: true, maxInlineActions: 3, detailMode: "flip", flip: { flipOnHover: false }, actions, renderHeader: ({ row }) => <UserIdentity user={row.original} />, renderBody: ({ row }) => <Typography>{row.original.email}</Typography>, renderMetadata: ({ row }) => <S.Actions><RoleBadge role={findRole(roles.data, row.original.role, row.original.roleId)} fallback={row.original.role} /><ResourceStatusBadge active={!row.original.banned} inactiveLabel="Banned" inactiveColor="error" /></S.Actions> }}
         toolbar={{ searchPlaceholder: "Search users…", startContent: <S.Actions><ResourceTableCreateButton startIcon={<AddRounded />} onClick={() => setEditor({ mode: "create" })}>Create user</ResourceTableCreateButton></S.Actions> }} />}
-      {editor && <FormDialog open title={`${editor.mode === "create" ? "Create" : editor.mode === "edit" ? "Edit" : "Delete"} user`} pending={pending} onClose={back} icon={<EditOutlined />}
+      {editor && <FormDialog open title={`${editor.mode === "create" ? "Create" : editor.mode === "edit" ? "Edit" : "Delete"} user`} pending={pending} onClose={back} icon={editor.mode === "create" ? <PersonAddOutlined /> : editor.mode === "edit" ? <EditOutlined /> : <DeleteOutline />}
         dedicatedPageHref={`/admin/users/${editor.mode}${editor.record ? `/${encodeURIComponent(editor.record.id)}` : ""}`} dedicatedPageLabel={`Open dedicated ${editor.mode} page`}>
         <UserEditorForm key={`${editor.mode}-${editor.record?.id ?? "new"}`} {...editor} onCancel={back} onPendingChange={setPending} onSuccess={() => {
           if (editor.mode === "delete" && editor.record) table.setRowSelection(previous => { const next = { ...previous }; delete next[editor.record!.id]; return next; });

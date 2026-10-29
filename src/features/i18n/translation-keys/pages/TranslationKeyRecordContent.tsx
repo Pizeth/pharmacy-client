@@ -6,7 +6,7 @@ import { TranslateOutlined, LanguageOutlined, CategoryOutlined, AddRounded, Edit
 import { RecordHero, RecordCard, RecordFacts, RecordMetrics } from "@/components/Tables/ResourceRecordPage";
 import * as S from "@/components/Tables/resourceRecordStyles";
 import { formatAdminDate } from "@/lib/utils/adminDate";
-import { getTranslationKeyLocaleLabel, TRANSLATION_KEY_LOCALE_OPTIONS } from "../locales";
+import { getTranslationKeyLocaleLabel, getTranslationKeyLocaleColor, TRANSLATION_KEY_LOCALE_OPTIONS } from "../locales";
 import type { TranslationKey, TranslationValue } from "../schemas";
 import { TranslationValueCreateDialog } from "../forms/TranslationValueCreateDialog";
 import { TranslationValueEditDialog } from "../forms/TranslationValueEditDialog";
@@ -32,7 +32,7 @@ export function TranslationKeyRecordContent({ record, onChanged }: { readonly re
       </RecordCard>
       <RecordCard title="Locale values" icon={<TranslateOutlined />} description="Full translation text and per-locale timestamps." action={<Button startIcon={<AddRounded />} onClick={() => setCreating(true)} disabled={!available.length}>Add translation</Button>}>
         {record.translations.length ? <S.List>{record.translations.map(value => <S.ListItem key={value.id}>
-          <S.Badges><Typography component="h3" variant="h6">{getTranslationKeyLocaleLabel(value.locale)} translation</Typography><Chip size="small" color="info" variant="outlined" label={value.locale} /></S.Badges>
+          <S.Badges><Typography component="h3" variant="h6">{getTranslationKeyLocaleLabel(value.locale)} translation</Typography><Chip size="small" color={getTranslationKeyLocaleColor(value.locale)} variant="outlined" label={value.locale} /></S.Badges>
           <S.Prose component="p" lang={value.locale} variant="body1">{value.value || "No text recorded."}</S.Prose>
           <RecordFacts items={[{ label: "Created", value: formatAdminDate(value.createdAt) }, { label: "Last updated", value: formatAdminDate(value.updatedAt) }]} />
           <S.Actions><Button color="error" startIcon={<EditOutlined />} aria-label={`Edit ${getTranslationKeyLocaleLabel(value.locale)} translation`} onClick={() => setEditing(value)}>Edit translation</Button><Button color="primary" startIcon={<DeleteOutline />} aria-label={`Delete ${getTranslationKeyLocaleLabel(value.locale)} translation`} onClick={() => setDeleting(value)}>Delete translation</Button></S.Actions>

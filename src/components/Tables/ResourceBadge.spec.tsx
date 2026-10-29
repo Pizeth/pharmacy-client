@@ -1,3 +1,4 @@
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { render, screen } from "@testing-library/react";
 import { ResourceBadge, ResourceStatusBadge } from "./ResourceBadge";
 import { RoleBadge } from "@/features/admin/users/UserIdentity";
@@ -15,4 +16,11 @@ it("uses the same pill geometry for roles, statuses and other resource badges", 
 it("uses a consistent icon and label for inactive accounts", () => {
   render(<ResourceStatusBadge active={false} inactiveLabel="Banned" inactiveColor="error" />);
   expect(screen.getByText("Banned").closest(".MuiChip-root")?.querySelector("svg")).toBeInTheDocument();
+});
+
+it("keeps status pills content-sized rather than stretching across grid tracks", () => {
+  render(<ThemeProvider theme={createTheme()}><ResourceStatusBadge active activeLabel="Enabled" /></ThemeProvider>);
+  const badge = screen.getByText("Enabled").closest(".MuiChip-root");
+  expect(badge).not.toBeNull();
+  expect(getComputedStyle(badge!).width).toBe("fit-content");
 });

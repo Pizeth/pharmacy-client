@@ -140,3 +140,19 @@ Dedicated record pages omit redundant outer page titles and subtitles: the bread
 Resource forms share `resourceFormStyles`: 2-spacing field gaps, no accumulated input margins or form top padding, and shared FormDialog content padding (3 desktop / 2 mobile). Keep helper text for actionable constraints or validation; omit date-format/timezone captions when the date editor already presents the format. File uploads use a rounded MUI label button with a visually hidden native file input. Dedicated detail content actions use error for Edit/Manage and primary for Delete; cover navigation keeps its existing presentation.
 
 Use shared FormActions for every dialog and dedicated CRUD form footer. Its buttons use the shared rounded neumorphic idle/hover/focus treatment while preserving semantic colors and contained-button contrast; retain the mobile stacked primary-above-Cancel layout.
+
+### Table pages and inline detail presentation
+
+Table landing pages omit ResourcePage headings and subtitles (`showHeader={false}`); the shared breadcrumb supplies location. Keep dialog and dedicated form headings. Create headings use a resource-specific MUI icon (person, role shield, share, translation, document), falling back to Add when no suitable icon exists. Edit headings use Edit; delete/archive headings use Delete/Archive.
+
+Use ResourceDetailPanel, ResourceDetailSection and ResourceDetailFacts for new inline expansion content. Follow Users/i18n: each section has an icon/title and separate content region; table mode uses a 220px heading rail with grouped facts, while card mode stacks sections and renders left-aligned `Label: value` facts. Match status/role badge alignment to the Users panel (centered in tables, left in cards). Retain feature-owned queries and actions; panels stay compact and dedicated record pages remain full workspaces. Existing Users/i18n named slots remain the visual references.
+
+Badges have intrinsic width and must never stretch across a grid track. Locale tones are resolved by getTranslationKeyLocaleColor in columns, card previews, panels and record pages: English primary, Khmer secondary, with stable fallback colors for other locales. Never derive locale colors from row order.
+
+
+### Detail alignment, actions and loading
+
+- Detail facts are left-aligned in both table expansion and cards; column alignment does not determine detail alignment. Account overview uses inline label/value facts.
+- Resource tables and cards expose three inline actions with consistent shared icon geometry and explicit semantic colors. Additional actions use the overflow menu. Portal/menu dismissal must never trigger selected-row navigation.
+- Use ResourceFormLoading skeletons while loading form/edit snapshots. Reserve ResourceTableLoading for tables. Edit snapshots must come from the canonical database-backed record endpoint and preserve stored values.
+- Document management is an explicit backend-enforced manage/TrackedDocument grant. Role editors display permissions returned by the server catalog; never fabricate permission IDs.

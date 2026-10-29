@@ -15,6 +15,7 @@ import type {
 
 import {
   getTranslationKeyLocaleLabel,
+  getTranslationKeyLocaleColor,
 } from "../locales";
 import type {
   TranslationKey,
@@ -165,7 +166,7 @@ export function createTranslationKeyCardConfig(
       rowActions,
 
     maxInlineActions:
-      2,
+      3,
 
     renderHeader: ({
       row,
@@ -268,6 +269,7 @@ export function createTranslationKeyCardConfig(
                   >
                     <Chip
                       size="small"
+                      color={getTranslationKeyLocaleColor(translation.locale)}
                       variant="outlined"
                       label={
                         getTranslationKeyLocaleLabel(

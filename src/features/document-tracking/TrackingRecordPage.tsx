@@ -1,4 +1,5 @@
 "use client";
+import { DescriptionOutlined, EditOutlined, ArchiveOutlined } from "@mui/icons-material";
 import { useBreadcrumbLabel } from "@/components/layouts/breadcrumbLabels";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -6,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
 import { z } from "zod";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
-import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
+import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import { trackingApi } from "./api";
 import { documentReference } from "./contracts";
 import { DocumentForm, type DocumentFormMode } from "./DocumentForm";
@@ -55,6 +56,7 @@ export function TrackingRecordPage({
   }
   return (
     <ResourcePage
+      titleIcon={mode === "create" ? <DescriptionOutlined /> : mode === "edit" ? <EditOutlined /> : <ArchiveOutlined />}
       title={title}
       subtitle={
         record.data
@@ -70,7 +72,7 @@ export function TrackingRecordPage({
         {!valid ? (
           <Alert severity="error">Invalid document reference.</Alert>
         ) : metadata.isLoading || (mode !== "create" && record.isLoading) ? (
-          <ResourceTableLoading message="Loading document tracking…" />
+          <ResourceFormLoading message="Loading document tracking…" />
         ) : metadata.error || record.error ? (
           <Alert
             severity="error"

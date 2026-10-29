@@ -104,6 +104,7 @@ export function DataTableRowActionsMenu<TData extends RowData>(
       </Tooltip>
 
       <Menu
+        onClick={event => event.stopPropagation()}
         dir={direction}
         anchorEl={anchorEl}
         open={open}

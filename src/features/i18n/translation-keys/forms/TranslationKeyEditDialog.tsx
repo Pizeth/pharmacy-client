@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
-import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
+import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import { readTranslationKey } from "../api";
 import { useState } from "react";
 import { EditOutlined } from "@mui/icons-material";
@@ -36,7 +36,7 @@ export function TranslationKeyEditDialog(props: TranslationKeyEditDialogProps) {
       closeAriaLabel="Close edit translation key dialog"
       onClose={onClose}
     >
-      {record && fresh.isLoading && <ResourceTableLoading message="Loading translation key…" />}
+      {record && fresh.isLoading && <ResourceFormLoading message="Loading translation key…" />}
       {fresh.error && <Alert severity="error" action={<Button onClick={() => fresh.refetch()}>Retry</Button>}>{fresh.error.message}</Alert>}
       {record && fresh.data && (
         <TranslationKeyEditForm

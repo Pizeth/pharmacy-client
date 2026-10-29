@@ -53,7 +53,7 @@ export function RolesPage() {
     () => [
       resourceViewAction<ApplicationRole>(router.push, record => `/admin/roles/${encodeURIComponent(String(record.id))}`),
       {
-        id: "edit",
+        id: "edit", color: "primary",
         label: "Edit role",
         inline: true,
         renderIcon: () => <EditOutlined />,
@@ -212,7 +212,7 @@ export function RolesPage() {
     },
   });
   return (
-    <ResourcePage
+    <ResourcePage showHeader={false}
       title="Roles"
       subtitle="Manage application roles and their policy grants. Select a role to edit or delete it."
       maxWidth="xl"
@@ -276,7 +276,7 @@ export function RolesPage() {
                   </Typography>
                 </S.Actions>
               ),
-              renderDetail: ({ row }) => <RoleDetail record={row.original} />,
+              renderDetail: ({ row }) => <RoleDetail record={row.original} view="card" />,
             }}
             toolbar={{
               searchPlaceholder: "Search roles…",

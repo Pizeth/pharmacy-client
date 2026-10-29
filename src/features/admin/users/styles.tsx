@@ -41,7 +41,7 @@ export const DetailFields = styled("dl", slot("DetailFields"))(({ theme }) => ({
   [theme.breakpoints.down("sm")]: { gridTemplateColumns: "minmax(0, 1fr)" },
 }));
 export const DetailField = styled("div", slot("DetailField"))(({ theme }) => ({
-  minWidth: 0, '& dt': { ...theme.typography.caption, color: (theme.vars ?? theme).palette.text.secondary, marginBottom: theme.spacing(0.5) },
+  minWidth: 0, textAlign: "left", '& dt': { ...theme.typography.caption, color: (theme.vars ?? theme).palette.text.secondary, marginBottom: theme.spacing(0.5) },
   '& dd': { ...theme.typography.body2, color: (theme.vars ?? theme).palette.text.primary, margin: 0, whiteSpace: "pre-wrap" },
   '&[data-wide="true"]': { gridColumn: "1 / -1" },
   '&[data-centered="true"]': { textAlign: "center", '& dd': { display: "flex", justifyContent: "center", alignItems: "center", minHeight: 24 } },

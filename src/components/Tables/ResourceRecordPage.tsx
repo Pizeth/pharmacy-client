@@ -8,7 +8,7 @@ import NextLink from "next/link";
 import { Alert, Button } from "@mui/material";
 import EditOutlined from "@mui/icons-material/EditOutlined";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
-import { ResourceTableLoading } from "./ResourceTableLoading";
+import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import ArrowBackOutlined from "@mui/icons-material/ArrowBackOutlined";
 import { RecordPageActionsProvider, RecordPageActions } from "./recordPageActions";
 export function ResourceRecordPage({
@@ -33,7 +33,7 @@ export function ResourceRecordPage({
     <RecordPageActionsProvider value={!loading && !error ? navigation : null}>
       <S.RecordSection>
         {(loading || error) && <><Typography component="h1" variant="h6">{title}</Typography><S.Toolbar aria-label="Record actions">{navigation}</S.Toolbar></>}
-        {loading ? <ResourceTableLoading message="Loading details..." /> : error ? <Alert severity="error" action={<Button onClick={onRetry}>Retry</Button>}>{error}</Alert> : children}
+        {loading ? <ResourceFormLoading message="Loading details..." /> : error ? <Alert severity="error" action={<Button onClick={onRetry}>Retry</Button>}>{error}</Alert> : children}
       </S.RecordSection>
     </RecordPageActionsProvider>
   </ResourcePage>;
@@ -64,8 +64,8 @@ export function RecordCard({ title, description, icon, action, children }: {
     {description && <Typography variant="body2" color="text.secondary">{description}</Typography>}
   </div>{action}</S.SectionHeader><S.SectionContent>{children}</S.SectionContent></S.Section>;
 }
-export function RecordFacts({ items }: { readonly items: readonly { label: string; value: ReactNode; wide?: boolean }[] }) {
-  return <S.RecordFields>{items.map(item => <S.RecordField key={item.label} data-wide={item.wide || undefined}><dt>{item.label}</dt><dd>{item.value ?? "Not provided"}</dd></S.RecordField>)}</S.RecordFields>;
+export function RecordFacts({ items, inline = false }: { readonly inline?: boolean; readonly items: readonly { label: string; value: ReactNode; wide?: boolean }[] }) {
+  return <S.RecordFields data-inline={inline || undefined}>{items.map(item => <S.RecordField key={item.label} data-wide={item.wide || undefined}><dt>{item.label}</dt><dd>{item.value ?? "Not provided"}</dd></S.RecordField>)}</S.RecordFields>;
 }
 export function RecordMetrics({ items }: { readonly items: readonly { label: string; value: ReactNode }[] }) {
   return <S.Metrics>{items.map(item => <S.Metric key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></S.Metric>)}</S.Metrics>;

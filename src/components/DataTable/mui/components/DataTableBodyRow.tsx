@@ -59,6 +59,8 @@ export function isFromInteractiveDescendant(
 ): boolean {
   const target = event.target;
 
+  // React portal events bubble through the row even when their DOM target is outside it.
+  if (target instanceof Node && !event.currentTarget.contains(target)) return true;
   if (!(target instanceof Element)) {
     return false;
   }

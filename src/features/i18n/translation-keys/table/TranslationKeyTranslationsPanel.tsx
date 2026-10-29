@@ -19,6 +19,7 @@ import type { TranslationKey, TranslationValue } from "../schemas";
 
 import {
   getTranslationKeyLocaleLabel,
+  getTranslationKeyLocaleColor,
   TRANSLATION_KEY_LOCALE_OPTIONS,
 } from "../locales";
 
@@ -267,7 +268,7 @@ export function TranslationKeyTranslationsPanel(
             >
               <LocaleRoot
                 size="small"
-                color="primary"
+                color={getTranslationKeyLocaleColor(translation.locale)}
                 variant="outlined"
                 label={getTranslationKeyLocaleLabel(translation.locale)}
               />

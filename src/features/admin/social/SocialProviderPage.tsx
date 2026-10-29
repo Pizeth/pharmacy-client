@@ -17,6 +17,7 @@ import { useAdminAccess } from "./useAdminAccess";
 import { SocialProviderDialog } from "./forms/SocialProviderDialog";
 import type { ProviderFormMode } from "./forms/SocialProviderForm";
 import { providerColumns } from "./table/providerColumns";
+import { SocialProviderDetail } from "./table/SocialProviderDetail";
 import { ProviderWebsite } from "./table/ProviderWebsite";
 import { adminTableStorage, adminUtilityColumnPinning } from "../adminTablePresentation";
 import * as S from "./styles";
@@ -45,6 +46,7 @@ export function SocialProviderPage() {
     meta: { emptyContent: "No social providers yet.", noResultsContent: "No providers match your search." },
   });
   const card = useMemo<DataTableCardConfig<SocialProvider>>(() => ({
+    renderDetail: ({ row }) => <SocialProviderDetail record={row.original} view="card" />,
     detailMode: "flip", flip: { flipOnHover: false }, enableSelection: true, enableExpansion: true,
     actions: rowActions, maxInlineActions: 3,
     renderHeader: ({ row }) => <><Typography variant="subtitle2">{row.original.name}</Typography><Typography variant="caption">{row.original.key}</Typography></>,
@@ -56,7 +58,7 @@ export function SocialProviderPage() {
     { id: "delete-selected", label: "Delete selected", color: "error", renderIcon: () => <DeleteOutline />, isDisabled: ({ selectedCount, selectedRows }) => selectedCount !== 1 || selectedRows.length !== 1, onClick: ({ selectedRows }) => { if (selectedRows.length === 1) setEditor({ mode: "delete", record: selectedRows[0].original }); } },
   ], []);
 
-  return <ResourcePage title="Social providers" subtitle="Manage platforms, metadata and availability. Select a row to edit or delete it." maxWidth="xl"><S.Root>
+  return <ResourcePage showHeader={false} title="Social providers" subtitle="Manage platforms, metadata and availability. Select a row to edit or delete it." maxWidth="xl"><S.Root>
     {access.isLoading ? <ResourceTableLoading message="Loading social providers…" /> : !access.allowed ? <Alert severity="error">Administrator access is required.</Alert> : <>
       {providers.isLoading && <ResourceTableLoading message="Loading social providers…" />}
       {providers.error && <Alert severity="error" action={<Button onClick={() => providers.refetch()}>Retry</Button>}>{providers.error.message}</Alert>}
@@ -66,7 +68,7 @@ export function SocialProviderPage() {
         rowPinning={{ displayMode: "select-sticky" }}
         selectionBar={{ clearable: true, actions: selectionActions }}
         toolbar={{ searchPlaceholder: "Search social providers…", startContent: <S.Actions><ResourceTableCreateButton color="error" startIcon={<AddRounded />} onClick={() => setEditor({ mode: "create" })}>Create provider</ResourceTableCreateButton></S.Actions> }}
-        renderDetailPanel={({ row }) => <S.Root><Typography variant="h6">{row.original.name}</Typography><Typography>Key: {row.original.key}</Typography><ResourceStatusBadge active={row.original.isEnabled} activeLabel="Enabled" inactiveLabel="Disabled" /><Typography>Website: <ProviderWebsite url={row.original.websiteUrl} /></Typography><Typography>Icon: {row.original.icon || "—"}</Typography></S.Root>}
+        renderDetailPanel={({ row }) => <SocialProviderDetail record={row.original} />}
       />}
       {editor && <SocialProviderDialog key={`${editor.mode}-${editor.record?.id ?? "new"}`} {...editor} onClose={() => setEditor(null)} onSuccess={record => {
         if (editor.mode === "delete") {
