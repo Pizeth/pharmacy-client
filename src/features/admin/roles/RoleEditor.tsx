@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
-import NextLink from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
+import { EditOutlined, DeleteOutline } from "@mui/icons-material";
 import AdminPanelSettingsOutlined from "@mui/icons-material/AdminPanelSettingsOutlined";
 import { FormDialog } from "@/components/forms/FormDialog";
-import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
+import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import {
   rolesApi,
   type ApplicationRole,
@@ -43,19 +43,14 @@ export function RoleEditor({
       title={`${mode === "create" ? "Create" : mode === "edit" ? "Edit" : "Delete"} role`}
       subtitle={record.data?.name}
       pending={pending}
-      icon={<AdminPanelSettingsOutlined />}
+      icon={mode === "edit" ? <EditOutlined /> : mode === "delete" ? <DeleteOutline /> : <AdminPanelSettingsOutlined />}
       onClose={close}
       maxWidth="md"
+      dedicatedPageHref={`/admin/roles/${mode}${id ? `/${id}` : ""}`}
+      dedicatedPageLabel={`Open dedicated ${mode} page`}
     >
-      <Button
-        component={NextLink}
-        href={`/admin/roles/${mode}${id ? `/${id}` : ""}`}
-        disabled={pending}
-      >
-        Open dedicated {mode} page
-      </Button>
       {record.isLoading ? (
-        <ResourceTableLoading message="Loading role…" />
+        <ResourceFormLoading message="Loading role…" />
       ) : record.error ? (
         <Alert
           severity="error"

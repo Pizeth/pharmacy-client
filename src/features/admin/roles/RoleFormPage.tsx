@@ -1,9 +1,11 @@
 "use client";
+import { AdminPanelSettingsOutlined, EditOutlined, DeleteOutline } from "@mui/icons-material";
+import { useBreadcrumbLabel } from "@/components/layouts/breadcrumbLabels";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
-import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
+import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import { rolesApi, type RoleMode } from "./api";
 import { RoleForm } from "./RoleForm";
 import * as S from "./styles";
@@ -33,9 +35,10 @@ export function RoleFormPage({
     gcTime: 0,
     refetchOnWindowFocus: false,
   });
+  useBreadcrumbLabel(`/admin/roles/${mode}/${recordId ?? ""}`, mode !== "create" && metadata.data?.canManage && record.data ? `${mode === "edit" ? "Edit" : "Delete"} ${record.data.name}` : undefined);
   const back = () => router.push("/admin/roles");
   return (
-    <ResourcePage
+    <ResourcePage titleIcon={mode === "create" ? <AdminPanelSettingsOutlined /> : mode === "edit" ? <EditOutlined /> : <DeleteOutline />}
       title={`${mode === "create" ? "Create" : mode === "edit" ? "Edit" : "Delete"} role`}
       subtitle={record.data?.name}
       maxWidth="xl"
@@ -44,7 +47,7 @@ export function RoleFormPage({
         {!valid ? (
           <Alert severity="error">Invalid role ID.</Alert>
         ) : metadata.isLoading || record.isLoading ? (
-          <ResourceTableLoading message="Loading role…" />
+          <ResourceFormLoading message="Loading role…" />
         ) : metadata.error || record.error ? (
           <Alert
             severity="error"

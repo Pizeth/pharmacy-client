@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
-import NextLink from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
+import { EditOutlined, DescriptionOutlined, ArchiveOutlined, AttachFileOutlined } from "@mui/icons-material";
 import RouteOutlined from "@mui/icons-material/RouteOutlined";
 import { FormDialog } from "@/components/forms/FormDialog";
-import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
+import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import { trackingApi } from "./api";
 import type { DocumentDetail, TrackingMetadata } from "./contracts";
 import { DocumentForm, type DocumentFormMode } from "./DocumentForm";
@@ -42,7 +42,7 @@ export function TrackingEditor({
           ? "Archive document record"
           : mode === "progress"
             ? "Update progress"
-            : "Add attachment link";
+            : "Add attachment";
   const close = () => {
     if (!pending) onClose();
   };
@@ -51,22 +51,15 @@ export function TrackingEditor({
       open
       title={title}
       subtitle={query.data?.title}
-      icon={<RouteOutlined />}
+      icon={mode === "create" ? <DescriptionOutlined /> : mode === "edit" ? <EditOutlined /> : mode === "delete" ? <ArchiveOutlined /> : mode === "attachment" ? <AttachFileOutlined /> : <RouteOutlined />}
       pending={pending}
       onClose={close}
       maxWidth="md"
+      dedicatedPageHref={mode !== "progress" && mode !== "attachment" ? `/admin/documents/${mode}${id ? `/${encodeURIComponent(id)}` : ""}` : undefined}
+      dedicatedPageLabel={`Open dedicated ${mode === "delete" ? "archive" : mode} page`}
     >
-      {mode !== "progress" && mode !== "attachment" && (
-        <Button
-          component={NextLink}
-          disabled={pending}
-          href={`/admin/documents/${mode}${id ? `/${encodeURIComponent(id)}` : ""}`}
-        >
-          Open dedicated {mode === "delete" ? "archive" : mode} page
-        </Button>
-      )}
       {mode !== "create" && query.isLoading ? (
-        <ResourceTableLoading message="Loading document tracking…" />
+        <ResourceFormLoading message="Loading document tracking…" />
       ) : query.error ? (
         <Alert
           severity="error"

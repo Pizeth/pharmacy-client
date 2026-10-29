@@ -1,4 +1,6 @@
 "use client";
+import { FormActions } from "@/components/forms/FormActions";
+import { AccountTreeOutlined, ArchiveOutlined, ArticleOutlined, CallMade, CallReceived, CategoryOutlined, DescriptionOutlined, FlagOutlined, FormatListNumbered, Inventory2Outlined, LabelOutlined, NotesOutlined, PersonOutline } from "@mui/icons-material";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
@@ -13,12 +15,18 @@ import {
   type TrackingMetadata,
 } from "./contracts";
 import * as S from "./styles";
+import { TrackingDateTimeField } from "./TrackingDateTimeField";
+import { AttachmentFields } from "./AttachmentFields";
+import { getAttachmentDraft, type AttachmentKind } from "./attachmentDraft";
 
 export type DocumentFormMode = "create" | "edit" | "delete";
 export const toLocalDate = (date: string) =>
   new Date(new Date(date).getTime() + 7 * 3600_000).toISOString().slice(0, 16);
-export const fromLocalDate = (date: string) =>
-  date ? new Date(`${date}+07:00`).toISOString() : null;
+export const fromLocalDate = (date: string) => {
+  if (!date) return null;
+  const parsed = new Date(`${date}+07:00`);
+  return Number.isNaN(parsed.getTime()) ? date : parsed.toISOString();
+};
 const nullable = (value: string) => value.trim() || null;
 const number = (value: string) => (value ? Number(value) : null);
 export function DocumentForm({
@@ -59,9 +67,15 @@ export function DocumentForm({
       archiveSequence: String(record?.archiveSequence ?? ""),
       notes: record?.notes ?? "",
       reason: "",
+      attachmentSource: "upload",
+      attachmentName: "",
+      attachmentUrl: "",
+      attachmentKind: "INCOMING" as AttachmentKind,
     },
   });
   const [validation, setValidation] = useState("");
+  const [registered, setRegistered] = useState<DocumentDetail | null>(null);
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const mutation = useMutation({
     mutationFn: async () => {
       const values = form.getValues();
@@ -74,26 +88,37 @@ export function DocumentForm({
           values.reason.trim(),
         );
       }
-      const data = documentInputSchema.parse({
-        ...values,
-        subtype: nullable(values.subtype),
-        incomingNumber: nullable(values.incomingNumber),
-        outgoingNumber: nullable(values.outgoingNumber),
-        receivedAt: fromLocalDate(values.receivedAt),
-        dueAt: fromLocalDate(values.dueAt),
-        responsibleDepartmentId: number(values.responsibleDepartmentId),
-        assignedToId: number(values.assignedToId),
-        storageLocationCode: nullable(values.storageLocationCode),
-        chronologicalCode: nullable(values.chronologicalCode),
-        archiveSequence: number(values.archiveSequence),
-        notes: nullable(values.notes),
-      });
-      if (data.dueAt && new Date(data.dueAt) < new Date(data.receivedAt))
-        throw new Error("Due time cannot be before receipt time.");
-      return trackingApi.save(
-        data,
-        mode === "edit" ? initial.current : undefined,
-      );
+      const attachment = mode === "create" ? getAttachmentDraft({ source: values.attachmentSource, name: values.attachmentName, url: values.attachmentUrl, kind: values.attachmentKind }, attachmentFile, values.title) : null;
+      let saved = registered;
+      if (!saved) {
+        const data = documentInputSchema.parse({
+          ...values,
+          subtype: nullable(values.subtype),
+          incomingNumber: nullable(values.incomingNumber),
+          outgoingNumber: nullable(values.outgoingNumber),
+          receivedAt: fromLocalDate(values.receivedAt),
+          dueAt: fromLocalDate(values.dueAt),
+          responsibleDepartmentId: number(values.responsibleDepartmentId),
+          assignedToId: number(values.assignedToId),
+          storageLocationCode: nullable(values.storageLocationCode),
+          chronologicalCode: nullable(values.chronologicalCode),
+          archiveSequence: number(values.archiveSequence),
+          notes: nullable(values.notes),
+        });
+        if (data.dueAt && new Date(data.dueAt) < new Date(data.receivedAt))
+          throw new Error("Due time cannot be before receipt time.");
+        saved = await trackingApi.save(
+          data,
+          mode === "edit" ? initial.current : undefined,
+        );
+        if (mode === "create") {
+          setRegistered(saved);
+          await client.invalidateQueries({ queryKey: ["document-tracking"] });
+        }
+      }
+      if (attachment?.source === "upload") return trackingApi.uploadAttachment(saved.id, saved.version, { name: attachment.name, kind: attachment.kind }, attachment.file);
+      if (attachment?.source === "link") return trackingApi.attachment(saved.id, saved.version, { name: attachment.name, kind: attachment.kind, url: attachment.url });
+      return saved;
     },
     onSuccess: async (result) => {
       await client.invalidateQueries({ queryKey: ["document-tracking"] });
@@ -104,6 +129,7 @@ export function DocumentForm({
     onPendingChange?.(mutation.isPending);
   }, [mutation.isPending, onPendingChange]);
   const pending = mutation.isPending;
+  const metadataLocked = pending || !!registered;
   const conflict =
     mutation.error instanceof TrackingRequestError &&
     mutation.error.status === 409;
@@ -140,99 +166,106 @@ export function DocumentForm({
             </Alert>
             <TextField
               name="reason"
+              iconStart={<NotesOutlined />}
+              iconStartAlignment="top"
               label="Reason"
               required
               fullWidth
-              disabled={pending}
+              disabled={metadataLocked}
             />
           </>
         ) : (
           <>
             <TextField
               name="title"
+              iconStart={<DescriptionOutlined />}
               label="Document title"
               required
               fullWidth
-              disabled={pending}
+              disabled={metadataLocked}
             />
+            {mode === "create" && <>
+              <Typography component="h3" variant="h6">Document file (required)</Typography>
+              <AttachmentFields names={{ source: "attachmentSource", name: "attachmentName", url: "attachmentUrl", kind: "attachmentKind" }} useDocumentTitle file={attachmentFile} onFileChange={setAttachmentFile} disabled={pending} />
+            </>}
             <S.FieldGrid>
               <SelectField
                 name="categoryId"
+                iconStart={<CategoryOutlined />}
                 label="Category"
                 required
                 options={metadata.categories.map((item) => ({
                   value: item.id,
                   label: item.name,
                 }))}
-                disabled={pending}
+                disabled={metadataLocked}
               />
               <SelectField
                 name="typeId"
+                iconStart={<ArticleOutlined />}
                 label="Document type"
                 required
                 options={metadata.types.map((item) => ({
                   value: item.id,
                   label: item.name,
                 }))}
-                disabled={pending}
+                disabled={metadataLocked}
               />
               <TextField
                 name="subtype"
+                iconStart={<LabelOutlined />}
                 label="Subtype / leave type"
                 fullWidth
-                disabled={pending}
+                disabled={metadataLocked}
               />
               <SelectField
                 name="priority"
+                iconStart={<FlagOutlined />}
                 label="Priority"
                 options={[
                   { value: "NORMAL", label: "Normal" },
                   { value: "URGENT", label: "Urgent" },
                 ]}
-                disabled={pending}
+                disabled={metadataLocked}
               />
               <TextField
                 name="incomingNumber"
+                iconStart={<CallReceived />}
                 label="Incoming number"
                 fullWidth
-                disabled={pending}
+                disabled={metadataLocked}
               />
               <TextField
                 name="outgoingNumber"
+                iconStart={<CallMade />}
                 label="Outgoing number"
                 fullWidth
-                disabled={pending}
+                disabled={metadataLocked}
               />
-              <TextField
+              <TrackingDateTimeField
                 name="receivedAt"
                 label="Received at"
-                type="datetime-local"
                 required
-                fullWidth
-                helperText="Cambodia time (UTC+7)."
-                disabled={pending}
-                slotProps={{ inputLabel: { shrink: true } }}
+                disabled={metadataLocked}
               />
-              <TextField
+              <TrackingDateTimeField
                 name="dueAt"
                 label="Due at"
-                type="datetime-local"
-                fullWidth
-                helperText="Optional; Cambodia time (UTC+7)."
-                disabled={pending}
-                slotProps={{ inputLabel: { shrink: true } }}
+                disabled={metadataLocked}
               />
               <SelectField
                 name="responsibleDepartmentId"
+                iconStart={<AccountTreeOutlined />}
                 label="Responsible office"
                 options={metadata.departments.map((item) => ({
                   value: String(item.id),
                   label: item.name,
                 }))}
-                disabled={pending}
+                disabled={metadataLocked}
               />
               <SelectField
                 name="assignedToId"
+                iconStart={<PersonOutline />}
                 label={
                   mode === "create" ? "Initial handler" : "Current handler"
                 }
@@ -240,43 +273,46 @@ export function DocumentForm({
                   value: String(item.id),
                   label: handlerOptionLabel(item),
                 }))}
-                disabled={pending || mode === "edit"}
-                helperText={
-                  mode === "edit"
-                    ? "Use Update progress to reassign or hand over."
-                    : "Receives the initial intake stage."
-                }
+                disabled={metadataLocked || mode === "edit"}
+                placeholder="Receives the initial intake stage."
+                helperText={mode === "edit" ? "Use Update progress to reassign or hand over." : undefined}
               />
               <TextField
                 name="storageLocationCode"
+                iconStart={<Inventory2Outlined />}
                 label="Cabinet / storage code"
                 fullWidth
-                disabled={pending}
+                disabled={metadataLocked}
               />
               <TextField
                 name="chronologicalCode"
+                iconStart={<ArchiveOutlined />}
                 label="Chronological archive code"
                 fullWidth
-                disabled={pending}
+                disabled={metadataLocked}
               />
               <TextField
                 name="archiveSequence"
+                iconStart={<FormatListNumbered />}
                 label="Archive sequence"
                 type="number"
                 fullWidth
-                disabled={pending}
+                disabled={metadataLocked}
               />
             </S.FieldGrid>
             <TextField
               name="notes"
+              iconStart={<NotesOutlined />}
+              iconStartAlignment="top"
               label="Notes"
               multiline
               minRows={2}
               fullWidth
-              disabled={pending}
+              disabled={metadataLocked}
             />
           </>
         )}
+        {registered && mutation.error && <Alert severity="warning">The document is saved, but its required attachment could not be confirmed. Retry the upload or provide a file URL to complete registration.</Alert>}
         {(validation || mutation.error) && (
           <Alert severity="error">
             {conflict
@@ -284,9 +320,9 @@ export function DocumentForm({
               : validation || mutation.error?.message}
           </Alert>
         )}
-        <S.Actions>
+        <FormActions>
           <Button variant="outlined" onClick={onCancel} disabled={pending}>
-            Cancel
+            {registered ? "Close" : "Cancel"}
           </Button>
           <Button
             type="submit"
@@ -299,9 +335,9 @@ export function DocumentForm({
               ? "Archive record"
               : mode === "edit"
                 ? "Save changes"
-                : "Register document"}
+                : registered ? "Retry attachment" : "Register document"}
           </Button>
-        </S.Actions>
+        </FormActions>
       </S.Form>
     </FormProvider>
   );

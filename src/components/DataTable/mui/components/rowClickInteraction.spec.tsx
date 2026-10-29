@@ -1,6 +1,7 @@
+import { createPortal } from "react-dom";
 import { Table } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { DataTableDensityProvider } from "../density";
 import { dataTableClasses } from "../styles";
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "../table";
@@ -22,6 +23,7 @@ const columns = helper.columns([
     cell: () => (
       <>
         <button type="button">Run</button>
+        {createPortal(<div data-testid="menu-dismiss-backdrop">Dismiss menu</div>, document.body)}
         <span contentEditable suppressContentEditableWarning>
           <span>Editable</span>
         </span>
@@ -44,7 +46,7 @@ const data: Row[] = [
   { id: "b", name: "beta" },
 ];
 
-function mount(onRowClick?: DataTableRowClickHandler<Row>) {
+function mount(onRowClick?: DataTableRowClickHandler<Row>, selectedOnly = false) {
   let table!: MuiDataTableInstance<Row>;
 
   function Fixture() {
@@ -52,24 +54,26 @@ function mount(onRowClick?: DataTableRowClickHandler<Row>) {
       columns,
       data,
       getRowId: (row) => row.id,
+      enableRowSelection: true,
     });
 
     return (
       <table.AppTable>
         <DataTableDensityProvider density="comfortable">
           <Table>
-            <DataTableBody table={table} onRowClick={onRowClick} />
+            <DataTableBody table={table} onRowClick={onRowClick} rowClickSelectedOnly={selectedOnly} />
           </Table>
         </DataTableDensityProvider>
       </table.AppTable>
     );
   }
 
-  return render(
+  const result = render(
     <ThemeProvider theme={createTheme()}>
       <Fixture />
     </ThemeProvider>,
   );
+  return { ...result, table };
 }
 
 function getRowElement(container: HTMLElement, rowId: string): HTMLElement {
@@ -161,4 +165,32 @@ describe("DataTable row click", () => {
 
     expect(onRowClick).toHaveBeenCalledTimes(2);
   });
+});
+
+it("only selected row surfaces activate, and updates immediately when selection changes", () => {
+  const click = jest.fn();
+  const { container, table } = mount(click, true);
+  const row = getRowElement(container, "a");
+  expect(row).not.toHaveAttribute("tabindex");
+  fireEvent.click(row); fireEvent.keyDown(row, { key: "Enter" });
+  expect(click).not.toHaveBeenCalled();
+  act(() => table.setRowSelection({ a: true }));
+  expect(row).toHaveAttribute("data-row-clickable", "true");
+  expect(row).toHaveAttribute("tabindex", "0");
+  fireEvent.click(screen.getAllByRole("button", { name: "Run" })[0]);
+  expect(click).not.toHaveBeenCalled();
+  fireEvent.click(row); fireEvent.keyDown(row, { key: "Enter" });
+  expect(click).toHaveBeenCalledTimes(2);
+  act(() => table.setRowSelection({}));
+  expect(row).not.toHaveAttribute("tabindex");
+  fireEvent.click(row);
+  expect(click).toHaveBeenCalledTimes(2);
+});
+
+it("does not navigate a selected row when its portaled menu backdrop is dismissed", () => {
+ const navigate = jest.fn();
+ const { table } = mount(navigate, true);
+ act(() => table.setRowSelection({ a: true }));
+ fireEvent.click(screen.getAllByTestId("menu-dismiss-backdrop")[0]);
+ expect(navigate).not.toHaveBeenCalled();
 });

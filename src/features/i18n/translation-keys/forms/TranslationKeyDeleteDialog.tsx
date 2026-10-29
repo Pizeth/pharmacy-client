@@ -1,4 +1,5 @@
 "use client";
+import { FormActions } from "@/components/forms/FormActions";
 
 import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Typography, styled } from "@mui/material";
@@ -13,7 +14,7 @@ const ContentRoot = styled("div", {
   overridesResolver: (_props, styles) => styles.root,
 })({});
 
-const ActionsRoot = styled("div", {
+const ActionsRoot = styled(FormActions, {
   name: "RazethTranslationKeyForm",
   slot: "Footer",
   overridesResolver: (_props, styles) => styles.footer,

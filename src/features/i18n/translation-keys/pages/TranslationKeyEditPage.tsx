@@ -1,14 +1,14 @@
 "use client";
+import { useBreadcrumbLabel } from "@/components/layouts/breadcrumbLabels";
 
 import {
   Alert,
   Button,
-  CircularProgress,
   Stack,
-  Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 
+import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
 
 import { getTranslationKey } from "../api";
@@ -89,6 +89,7 @@ export function TranslationKeyEditPage(
     };
   }, [recordId, reloadVersion]);
 
+  useBreadcrumbLabel(`/admin/i18n/edit/${recordId}`, record ? `Edit ${record.key}` : undefined);
   const retry = useCallback(() => {
     setReloadVersion((value) => value + 1);
   }, []);
@@ -105,18 +106,7 @@ export function TranslationKeyEditPage(
       surface
     >
       {loading ? (
-        <Stack
-          role="status"
-          aria-live="polite"
-          aria-busy="true"
-          spacing={2}
-          alignItems="center"
-        >
-          <CircularProgress size={28} />
-          <Typography variant="body2" color="text.secondary">
-            Loading translation key…
-          </Typography>
-        </Stack>
+        <ResourceFormLoading message="Loading translation key…" />
       ) : loadError ? (
         <Stack spacing={2}>
           <Alert severity="error">{loadError}</Alert>

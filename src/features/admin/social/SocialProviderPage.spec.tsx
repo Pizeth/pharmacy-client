@@ -34,7 +34,7 @@ it("edits a provider through the contract and refreshes footer data", async () =
   const row = await selectProviderRow();
   fireEvent.click(row.getByRole("button", { name: "Edit for row 1" }));
   const dialog = within(screen.getByRole("dialog"));
-  fireEvent.change(dialog.getByLabelText(/Name/), { target: { value: "Updated" } });
+  fireEvent.change(await dialog.findByLabelText(/Name/), { target: { value: "Updated" } });
   fireEvent.click(dialog.getByRole("button", { name: "Save changes" }));
   await waitFor(() => expect(save).toHaveBeenCalledWith(expect.objectContaining({ name: "Updated" }), 1));
   await waitFor(() => expect(invalidate).toHaveBeenCalledWith({ queryKey: ["site-footer"] }));
@@ -45,7 +45,7 @@ it("shows delete conflicts without removing the row", async () => {
   const row = await selectProviderRow();
   fireEvent.click(row.getByRole("button", { name: "Delete for row 1" }));
   const dialog = screen.getByRole("dialog");
-  fireEvent.click(within(dialog).getByRole("button", { name: "Delete provider" }));
+  fireEvent.click(await within(dialog).findByRole("button", { name: "Delete provider" }));
   expect(await within(dialog).findByText("Provider is in use")).toBeInTheDocument();
   fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
   expect(await row.findByRole("button", { name: "Edit for row 1" })).toBeInTheDocument();

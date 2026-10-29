@@ -26,7 +26,7 @@ const TitleRoot = styled(Typography, {
   name: PREFIX,
   slot: "Heading",
   overridesResolver: (_props, styles) => styles.heading,
-})<TypographyProps>({});
+})<TypographyProps>(({ theme }) => ({ display: "flex", alignItems: "center", justifyContent: "center", gap: theme.spacing(1) }));
 
 const SubtitleRoot = styled(Typography, {
   name: PREFIX,
@@ -99,6 +99,9 @@ const FormatBadge = styled(Chip)(({ theme }) => ({
 
 export interface ResourcePageProps {
   readonly title: ReactNode;
+  readonly titleIcon?: ReactNode;
+  readonly showHeader?: boolean;
+  readonly titleComponent?: "h1" | "h2" | "h3" | "h4";
   readonly subtitle?: ReactNode;
   readonly children: ReactNode;
   readonly maxWidth?: ContainerProps["maxWidth"];
@@ -130,6 +133,9 @@ export function ResourcePage(inProps: ResourcePageProps) {
 
   const {
     title,
+    titleIcon,
+    titleComponent = "h4",
+    showHeader = true,
     subtitle,
     children,
     maxWidth = "xl",
@@ -147,7 +153,7 @@ export function ResourcePage(inProps: ResourcePageProps) {
       disableGutters={disableGutters}
       className={className}
     >
-      <HeaderRoot>
+      {showHeader && <HeaderRoot>
         {hero ? (
           <HeroBanner>
             <Box
@@ -237,8 +243,8 @@ export function ResourcePage(inProps: ResourcePageProps) {
                 </Grid>
               </Grid>
             </Box>
-            <TitleRoot component="h4" variant="h6" gutterBottom>
-              {title}
+            <TitleRoot component={titleComponent} variant="h6" gutterBottom>
+              {titleIcon}{title}
             </TitleRoot>
             {/* <Typography variant="body1" sx={{ opacity: 0.9, lineHeight: 1.6 }}>
               {subtitle}
@@ -256,15 +262,15 @@ export function ResourcePage(inProps: ResourcePageProps) {
           </HeroBanner>
         ) : (
           <>
-            <TitleRoot component="h4" variant="h6">
-              {title}
+            <TitleRoot component={titleComponent} variant="h6">
+              {titleIcon}{title}
             </TitleRoot>
             {subtitle && (
               <SubtitleRoot variant="body2">{subtitle}</SubtitleRoot>
             )}
           </>
         )}
-      </HeaderRoot>
+      </HeaderRoot>}
 
       <ContentRoot>
         {surface ? (

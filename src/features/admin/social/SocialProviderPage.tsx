@@ -1,4 +1,6 @@
 "use client";
+import { ResourceStatusBadge } from "@/components/Tables/ResourceBadge";
+import { resourceViewAction } from "@/components/Tables/resourceViewAction";
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -15,6 +17,7 @@ import { useAdminAccess } from "./useAdminAccess";
 import { SocialProviderDialog } from "./forms/SocialProviderDialog";
 import type { ProviderFormMode } from "./forms/SocialProviderForm";
 import { providerColumns } from "./table/providerColumns";
+import { SocialProviderDetail } from "./table/SocialProviderDetail";
 import { ProviderWebsite } from "./table/ProviderWebsite";
 import { adminTableStorage, adminUtilityColumnPinning } from "../adminTablePresentation";
 import * as S from "./styles";
@@ -28,8 +31,9 @@ export function SocialProviderPage() {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [notice, setNotice] = useState("");
   const rowActions = useMemo<readonly DataTableRowAction<SocialProvider>[]>(() => [
-    { id: "edit", label: "Edit", color: "primary", inline: true, renderIcon: () => <EditOutlined fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
-    { id: "delete", label: "Delete", color: "error", inline: true, renderIcon: () => <DeleteOutline fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
+      resourceViewAction<SocialProvider>(router.push, record => `/admin/social-provider/${encodeURIComponent(String(record.id))}`),
+    { id: "edit", label: "Edit", color: "error", inline: true, renderIcon: () => <EditOutlined fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
+    { id: "delete", label: "Delete", color: "primary", inline: true, renderIcon: () => <DeleteOutline fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
     { id: "edit-page", label: "Open edit page", renderIcon: () => <OpenInNew fontSize="small" />, onClick: ({ row }) => router.push(`/admin/social-provider/edit/${row.original.id}`) },
     { id: "delete-page", label: "Open delete page", renderIcon: () => <OpenInNew fontSize="small" />, onClick: ({ row }) => router.push(`/admin/social-provider/delete/${row.original.id}`) },
   ], [router]);
@@ -42,28 +46,29 @@ export function SocialProviderPage() {
     meta: { emptyContent: "No social providers yet.", noResultsContent: "No providers match your search." },
   });
   const card = useMemo<DataTableCardConfig<SocialProvider>>(() => ({
+    renderDetail: ({ row }) => <SocialProviderDetail record={row.original} view="card" />,
     detailMode: "flip", flip: { flipOnHover: false }, enableSelection: true, enableExpansion: true,
-    actions: rowActions, maxInlineActions: 2,
+    actions: rowActions, maxInlineActions: 3,
     renderHeader: ({ row }) => <><Typography variant="subtitle2">{row.original.name}</Typography><Typography variant="caption">{row.original.key}</Typography></>,
-    renderBody: ({ row }) => <Typography>{row.original.isEnabled ? "Enabled" : "Disabled"}</Typography>,
+    renderBody: ({ row }) => <ResourceStatusBadge active={row.original.isEnabled} activeLabel="Enabled" inactiveLabel="Disabled" />,
     renderMetadata: ({ row }) => <Typography variant="caption"><ProviderWebsite url={row.original.websiteUrl} /></Typography>,
   }), [rowActions]);
   const selectionActions = useMemo<readonly DataTableBulkAction<SocialProvider>[]>(() => [
-    { id: "edit-selected", label: "Edit selected", color: "primary", renderIcon: () => <EditOutlined />, isDisabled: ({ selectedCount, selectedRows }) => selectedCount !== 1 || selectedRows.length !== 1, onClick: ({ selectedRows }) => { if (selectedRows.length === 1) setEditor({ mode: "edit", record: selectedRows[0].original }); } },
-    { id: "delete-selected", label: "Delete selected", color: "error", renderIcon: () => <DeleteOutline />, isDisabled: ({ selectedCount, selectedRows }) => selectedCount !== 1 || selectedRows.length !== 1, onClick: ({ selectedRows }) => { if (selectedRows.length === 1) setEditor({ mode: "delete", record: selectedRows[0].original }); } },
+    { id: "edit-selected", label: "Edit selected", color: "error", renderIcon: () => <EditOutlined />, isDisabled: ({ selectedCount, selectedRows }) => selectedCount !== 1 || selectedRows.length !== 1, onClick: ({ selectedRows }) => { if (selectedRows.length === 1) setEditor({ mode: "edit", record: selectedRows[0].original }); } },
+    { id: "delete-selected", label: "Delete selected", color: "primary", renderIcon: () => <DeleteOutline />, isDisabled: ({ selectedCount, selectedRows }) => selectedCount !== 1 || selectedRows.length !== 1, onClick: ({ selectedRows }) => { if (selectedRows.length === 1) setEditor({ mode: "delete", record: selectedRows[0].original }); } },
   ], []);
 
-  return <ResourcePage title="Social providers" subtitle="Manage platforms, metadata and availability. Select a row to edit or delete it." maxWidth="xl"><S.Root>
+  return <ResourcePage showHeader={false} title="Social providers" subtitle="Manage platforms, metadata and availability. Select a row to edit or delete it." maxWidth="xl"><S.Root>
     {access.isLoading ? <ResourceTableLoading message="Loading social providers…" /> : !access.allowed ? <Alert severity="error">Administrator access is required.</Alert> : <>
       {providers.isLoading && <ResourceTableLoading message="Loading social providers…" />}
       {providers.error && <Alert severity="error" action={<Button onClick={() => providers.refetch()}>Retry</Button>}>{providers.error.message}</Alert>}
       {notice && <Alert severity="success" onClose={() => setNotice("")}>{notice}</Alert>}
-      {providers.data && <ResourceDataTable resourceId="admin/social-providers" persistence={{ storageId: "admin/social-providers", storage: adminTableStorage }} table={table} card={card}
+      {providers.data && <ResourceDataTable onViewRecord={record => router.push(`/admin/social-provider/${encodeURIComponent(String(record.id))}`)} resourceId="admin/social-providers" persistence={{ storageId: "admin/social-providers", storage: adminTableStorage }} table={table} card={card}
         refreshing={providers.isFetching && !providers.isLoading}
         rowPinning={{ displayMode: "select-sticky" }}
         selectionBar={{ clearable: true, actions: selectionActions }}
         toolbar={{ searchPlaceholder: "Search social providers…", startContent: <S.Actions><ResourceTableCreateButton color="error" startIcon={<AddRounded />} onClick={() => setEditor({ mode: "create" })}>Create provider</ResourceTableCreateButton></S.Actions> }}
-        renderDetailPanel={({ row }) => <S.Root><Typography variant="h6">{row.original.name}</Typography><Typography>Key: {row.original.key}</Typography><Typography>Status: {row.original.isEnabled ? "Enabled" : "Disabled"}</Typography><Typography>Website: <ProviderWebsite url={row.original.websiteUrl} /></Typography><Typography>Icon: {row.original.icon || "—"}</Typography></S.Root>}
+        renderDetailPanel={({ row }) => <SocialProviderDetail record={row.original} />}
       />}
       {editor && <SocialProviderDialog key={`${editor.mode}-${editor.record?.id ?? "new"}`} {...editor} onClose={() => setEditor(null)} onSuccess={record => {
         if (editor.mode === "delete") {

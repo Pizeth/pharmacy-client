@@ -1,4 +1,7 @@
 "use client";
+import { ResourceDetailPanel, ResourceDetailSection, ResourceDetailFacts } from "@/components/Tables/ResourceDetailPanel";
+import AttachFileOutlined from "@mui/icons-material/AttachFileOutlined";
+import HistoryOutlined from "@mui/icons-material/HistoryOutlined";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button, Link, Typography } from "@mui/material";
 import AssignmentIndOutlined from "@mui/icons-material/AssignmentIndOutlined";
@@ -20,19 +23,7 @@ import {
 } from "./DocumentProgress";
 import * as S from "./styles";
 
-const eventLabels: Record<string, string> = {
-  REGISTERED: "Registered",
-  UPDATED: "Updated",
-  ASSIGNED: "Assigned",
-  FORWARDED: "Handed over",
-  RETURNED: "Returned for rework",
-  HELD: "Put on hold",
-  RESUMED: "Resumed",
-  COMPLETED: "Completed",
-  CANCELLED: "Cancelled",
-  COMMENTED: "Comment",
-  ARCHIVED: "Record archived",
-};
+import { documentEventLabels } from "./documentEventLabels";
 export function DocumentDetailContent({
   record,
   compact = false,
@@ -69,8 +60,8 @@ export function DocumentDetailContent({
     ],
   ];
   return (
-    <S.Root>
-      <DocumentProgress record={record} compact={compact} />
+    <ResourceDetailPanel view={compact ? "card" : "table"}>
+      <ResourceDetailSection title="Handling progress" icon={<RouteOutlined />}><DocumentProgress record={record} compact={compact} />
       {record.archivedAt && (
         <Alert severity="info">
           This record was archived. Its handling history is preserved.
@@ -82,26 +73,18 @@ export function DocumentDetailContent({
             Update progress
           </Button>
           {onAttachment && (
-            <Button startIcon={<DescriptionOutlined />} onClick={onAttachment}>
-              Add attachment link
+            <Button startIcon={<AttachFileOutlined />} onClick={onAttachment}>
+              Add attachment
             </Button>
           )}
         </S.Actions>
       )}
-      <S.Facts data-compact={compact ? "true" : undefined}>
-        {facts.map(([label, value]) => (
-          <S.Fact key={label}>
-            <dt>{label}</dt>
-            <dd>{value}</dd>
-          </S.Fact>
-        ))}
-      </S.Facts>
+      </ResourceDetailSection>
+      <ResourceDetailSection title="Document registration" icon={<DescriptionOutlined />}>
+      <ResourceDetailFacts items={facts.map(([label, value]) => ({ label, value }))} />
       {record.notes && <Typography variant="body2">{record.notes}</Typography>}
-      <S.DetailGrid data-compact={compact ? "true" : undefined}>
-        <section aria-label="Handling history">
-          <Typography component="h3" variant="h6">
-            Handling history
-          </Typography>
+      </ResourceDetailSection>
+        <ResourceDetailSection title="Handling history" icon={<HistoryOutlined />}>
           <S.Timeline>
             {record.events.map((event) => {
               const Icon =
@@ -120,7 +103,7 @@ export function DocumentDetailContent({
                   <div>
                     <S.EventHeading>
                       <Typography variant="subtitle2">
-                        {eventLabels[event.kind] ?? event.kind}
+                        {documentEventLabels[event.kind] ?? event.kind}
                       </Typography>
                       <Typography
                         variant="caption"
@@ -164,14 +147,11 @@ export function DocumentDetailContent({
               );
             })}
           </S.Timeline>
-        </section>
-        <section aria-label="Document attachments">
-          <Typography component="h3" variant="h6">
-            Attachments
-          </Typography>
+        </ResourceDetailSection>
+        <ResourceDetailSection title="Document attachments" icon={<AttachFileOutlined />}>
           {record.attachments.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
-              No attachment links recorded.
+              No attachments recorded.
             </Typography>
           ) : (
             <ul>
@@ -192,9 +172,8 @@ export function DocumentDetailContent({
               ))}
             </ul>
           )}
-        </section>
-      </S.DetailGrid>
-    </S.Root>
+        </ResourceDetailSection>
+    </ResourceDetailPanel>
   );
 }
 export function DocumentDetail({

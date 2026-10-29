@@ -1,4 +1,5 @@
 "use client";
+import { ROW_ACTION_CELL_PADDING } from "../columns/actions/rowActionStyles";
 
 import { styled, TableCell, useTheme } from "@mui/material";
 import type { CSSProperties } from "react";
@@ -68,6 +69,10 @@ const BodyCellRoot = styled(TableCell, {
    * ellipsis marker itself. This avoids the tiny trailing dot that can
    * otherwise appear beside a checkbox in compact density.
    */
+  // Keep action controls inset at every density without consuming their button space.
+  '&&[data-column-id="__dataTableActions"]': {
+    paddingInline: theme.spacing(ROW_ACTION_CELL_PADDING),
+  },
   '&[data-truncate="false"]': {
     textOverflow: "clip",
   },

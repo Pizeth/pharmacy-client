@@ -7,6 +7,7 @@ import PendingOutlined from "@mui/icons-material/PendingOutlined";
 import CancelOutlined from "@mui/icons-material/CancelOutlined";
 import { activeStep, type TrackedDocument } from "./contracts";
 import * as S from "./styles";
+import { formatAdminDate } from "@/lib/utils/adminDate";
 
 const labels = {
   ACTIVE: "In progress",
@@ -31,19 +32,14 @@ export function DocumentStatus({
     <S.Status
       size="small"
       data-status={status}
+      color={status === "COMPLETED" ? "success" : status === "ON_HOLD" ? "warning" : status === "CANCELLED" ? "error" : "info"}
       icon={<Icon color="inherit" />}
       label={labels[status]}
     />
   );
 }
 export function formatTrackingDate(value: string | null | undefined) {
-  return value
-    ? new Intl.DateTimeFormat("en-GB", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: "Asia/Phnom_Penh",
-      }).format(new Date(value))
-    : "—";
+  return formatAdminDate(value);
 }
 export function processingDays(record: TrackedDocument, now = Date.now()) {
   return Math.max(

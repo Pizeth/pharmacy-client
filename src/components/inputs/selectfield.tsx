@@ -54,6 +54,7 @@ export function SelectField(inProps: SelectFieldProps) {
     label,
     options,
     placeholder = "Choose an option",
+    includeEmptyOption = true,
     helperText,
     defaultValue = "",
     required = false,
@@ -147,7 +148,7 @@ export function SelectField(inProps: SelectFieldProps) {
                 clearErrors(name);
               }}
             >
-              <MenuItem value="">{placeholder}</MenuItem>
+              {includeEmptyOption && <MenuItem value="">{placeholder}</MenuItem>}
 
               {options.map((option) => (
                 <MenuItem
@@ -160,12 +161,12 @@ export function SelectField(inProps: SelectFieldProps) {
               ))}
             </Select>
 
-            <FormHelperText>
+            {(helperText || fieldState.error?.message) && <FormHelperText>
               <InputHelperText
                 helperText={helperText}
                 error={fieldState.error?.message}
               />
-            </FormHelperText>
+            </FormHelperText>}
           </Root>
         );
       }}

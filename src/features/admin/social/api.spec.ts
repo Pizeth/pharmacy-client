@@ -34,3 +34,9 @@ it("only publishes enabled profiles with safe explicit URLs", () => {
   expect(links[0]).toMatchObject({ id: 5, href: "https://t.me/admin" });
   expect(adminSocialLinks(null)).toEqual([]);
 });
+
+it("retains provider timestamps supplied by the existing list endpoint", async () => {
+ const stored = { ...provider, createdAt: "2026-10-27T00:00:00Z", updatedAt: "2026-10-28T00:00:00Z" };
+ global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [stored] }) });
+ expect(await socialApi.providers()).toEqual([stored]);
+});

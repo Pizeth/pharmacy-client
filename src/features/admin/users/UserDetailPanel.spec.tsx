@@ -10,12 +10,12 @@ it.each(["table", "card"] as const)("separates role, accounts and profile in %s 
   expect(screen.getByRole("region", { name: "User accounts" })).toBeInTheDocument();
   expect(within(screen.getByRole("region", { name: "User profile" })).getByText("Jane Doe")).toBeInTheDocument();
   const active = screen.getByText("Active");
-  expect(getComputedStyle(active.parentElement!).justifyContent).toBe(view === "card" ? "flex-start" : "center");
+  expect(getComputedStyle(active.closest("dd")!.parentElement!).textAlign).toBe("left");
   const verification = screen.getByRole("img", { name: "Email verified" });
   expect(verification).toHaveTextContent(""); expect(screen.queryByText(/^Verified$/)).not.toBeInTheDocument();
-  expect(getComputedStyle(verification.parentElement!).justifyContent).toBe(view === "card" ? "flex-start" : "center");
+  expect(getComputedStyle(verification.closest("dd")!.parentElement!).textAlign).toBe("left");
   const providers = screen.getByRole("list", { name: "Linked sign-in providers" });
-  expect(getComputedStyle(providers).paddingTop).toBe("16px"); expect(within(providers).getByText("google")).toBeInTheDocument();
+  expect(getComputedStyle(providers).paddingTop).toBe("16px"); expect(within(providers).getByText("Google")).toBeInTheDocument();
 });
 it("provides an accessible unverified icon and empty profile message", () => {
   render(<UserDetailContent data={{ ...data, emailVerified: false, profile: null, accounts: [] }} view="card" />);

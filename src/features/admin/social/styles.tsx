@@ -1,4 +1,5 @@
 "use client";
+import { resourceFormStyles } from "@/components/forms/resourceFormStyles";
 import { Typography, type TypographyProps } from "@mui/material";
 import { alpha, styled } from "@mui/material/styles";
 import type { CSSInterpolation } from "@mui/system";
@@ -19,7 +20,7 @@ export const Panel = styled("section", slot("Panel"))(({ theme }) => {
     [theme.breakpoints.down("sm")]: { padding: theme.spacing(2) },
   };
 });
-export const Form = styled("form", slot("Form"))(({ theme }) => ({ display: "grid", gap: theme.spacing(2), marginTop: theme.spacing(2) }));
+export const Form = styled("form", slot("Form"))(({ theme }) => resourceFormStyles(theme));
 export const Actions = styled("div", slot("Actions"))(({ theme }) => ({ display: "flex", alignItems: "center", flexWrap: "wrap", gap: theme.spacing(1) }));
 export const TableContainer = styled("div", slot("TableContainer"))({ overflowX: "auto", maxWidth: "100%" });
 export const Overview = styled("div", slot("Overview"))(({ theme }) => ({ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: theme.spacing(2.5), [theme.breakpoints.down("lg")]: { gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }, [theme.breakpoints.down("sm")]: { gap: theme.spacing(1.5) } }));

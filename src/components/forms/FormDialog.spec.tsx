@@ -2,6 +2,21 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 import { FormDialog } from "./FormDialog";
 
+it("puts the dedicated-page icon link in the title outside scrolling form content", () => {
+  render(<FormDialog open title="Create record" dedicatedPageHref="/admin/users/create" dedicatedPageLabel="Open dedicated create page" onClose={jest.fn()}><div>Record fields</div></FormDialog>);
+  const link = screen.getByRole("link", { name: "Open dedicated create page" });
+  expect(link).toHaveAttribute("href", "/admin/users/create");
+  expect(screen.getByRole("heading", { name: "Create record" }).closest(".MuiDialogTitle-root")).toContainElement(link);
+  expect(screen.getByText("Record fields").closest(".MuiDialogContent-root")).not.toContainElement(link);
+});
+
+it("removes the navigation link while pending and keeps its icon button disabled", () => {
+  render(<FormDialog open pending title="Edit record" dedicatedPageHref="/admin/users/edit/12" dedicatedPageLabel="Open dedicated edit page" onClose={jest.fn()}><div>Record fields</div></FormDialog>);
+  expect(screen.queryByRole("link", { name: "Open dedicated edit page" })).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Open dedicated edit page" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Close dialog" })).toBeDisabled();
+});
+
 it("requires explicit form-dialog closure", () => {
   const onClose = jest.fn();
 

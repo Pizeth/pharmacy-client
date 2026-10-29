@@ -1,6 +1,9 @@
 "use client";
+import { resourceFormStyles } from "@/components/forms/resourceFormStyles";
+import { ROW_ACTION_CARD_PADDING } from "@/components/DataTable/mui/columns/actions/rowActionStyles";
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 import { deepmerge } from "@mui/utils";
+import { formActionsStyles } from "@/components/forms/formActionsStyles";
 import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
 import { red, blue } from "@mui/material/colors";
 import {
@@ -26,6 +29,8 @@ import {
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"; // Optional
+
+const SIGNATURE_GOLD = "#FFD22B";
 
 const globalStyles = (theme: Theme) => ({
   "html, body, #__next": {
@@ -246,7 +251,7 @@ const standardizedFormComponents = {
 
       heading: ({ theme }: { theme: Theme }) => ({
         padding: theme.spacing(2, 3),
-        borderBottom: `1px solid ${theme.vars.palette.warning.main}`,
+        borderBottom: `1px solid ${SIGNATURE_GOLD}`,
       }),
 
       wrapper: ({ theme }: { theme: Theme }) => ({
@@ -257,13 +262,13 @@ const standardizedFormComponents = {
         gap: theme.spacing(1.5),
       }),
 
-      icon: ({ theme }: { theme: Theme }) => ({
+      icon: {
         width: 40,
         height: 40,
         borderRadius: "50%",
-        color: theme.palette.warning.contrastText,
-        backgroundColor: theme.vars.palette.warning.main,
-      }),
+        color: "#1a1a1a",
+        backgroundColor: SIGNATURE_GOLD,
+      },
 
       caption: ({ theme }: { theme: Theme }) => ({
         color: (theme.vars ?? theme).palette.text.secondary,
@@ -271,6 +276,7 @@ const standardizedFormComponents = {
 
       footer: ({ theme }: { theme: Theme }) => ({
         padding: theme.spacing(3),
+        [theme.breakpoints.down("sm")]: { padding: theme.spacing(2) },
       }),
     },
   },
@@ -486,20 +492,9 @@ const standardizedFormComponents = {
    */
   RazethTranslationKeyForm: {
     styleOverrides: {
-      root: ({ theme }: { theme: Theme }) => ({
-        display: "flex",
-        flexDirection: "column",
-        gap: theme.spacing(3),
-      }),
+      root: ({ theme }: { theme: Theme }) => resourceFormStyles(theme),
 
-      footer: ({ theme }: { theme: Theme }) => ({
-        display: "flex",
-        justifyContent: "flex-end",
-        gap: theme.spacing(1),
-        [theme.breakpoints.down("sm")]: {
-          flexDirection: "column-reverse",
-        },
-      }),
+      footer: ({ theme }: { theme: Theme }) => formActionsStyles(theme),
     },
   },
 
@@ -1013,7 +1008,7 @@ const defaultThemeInvariants = {
           display: "flex",
           justifyContent: "flex-end",
           gap: theme.spacing(0.75),
-          padding: theme.spacing(1.25, 2, 1.75),
+          padding: theme.spacing(...ROW_ACTION_CARD_PADDING),
           backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.025),
           borderTop: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.06)}`,
 

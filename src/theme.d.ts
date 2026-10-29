@@ -111,6 +111,9 @@ declare module "@mui/material/styles" {
     RazethDataTable: DataTableSlotKey;
     RazethSiteBreadcrumbs: import("@/components/layouts/SiteBreadcrumbs").SiteBreadcrumbSlot;
     RazethTableCreateButton: "root";
+    RazethFormActions: "root";
+    RazethResourceBadge: "root";
+    RazethResourceRecord: import("@/components/Tables/resourceRecordStyles").ResourceRecordSlot;
     RazethDocumentTracking: import("@/features/document-tracking/styles").DocumentTrackingSlot;
     RazethCompactCardToggle: import("@/components/Tables/CompactCardToggle").CompactCardToggleSlot;
     RazethResourceTableLoading: import("@/components/Tables/ResourceTableLoading").ResourceTableLoadingSlot;
@@ -145,6 +148,9 @@ declare module "@mui/material/styles" {
   interface ComponentsPropsList extends RazethComponentsPropsList {
     RazethSiteBreadcrumbs: Record<string, unknown>;
     RazethTableCreateButton: Record<string, unknown>;
+    RazethFormActions: Record<string, unknown>;
+    RazethResourceBadge: Record<string, unknown>;
+    RazethResourceRecord: Record<string, unknown>;
     RazethDocumentTracking: Record<string, unknown>;
     RazethCompactCardToggle: Record<string, unknown>;
     RazethResourceTableLoading: Record<string, unknown>;
@@ -174,6 +180,9 @@ declare module "@mui/material/styles" {
   interface Components extends CustomComponents {
     RazethSiteBreadcrumbs?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSiteBreadcrumbs"] };
     RazethTableCreateButton?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethTableCreateButton"] };
+    RazethFormActions?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethFormActions"] };
+    RazethResourceBadge?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethResourceBadge"] };
+    RazethResourceRecord?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethResourceRecord"] };
     RazethDocumentTracking?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDocumentTracking"] };
     RazethCompactCardToggle?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethCompactCardToggle"] };
     RazethResourceTableLoading?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethResourceTableLoading"] };

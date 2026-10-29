@@ -1,4 +1,5 @@
 "use client";
+import { FormActions } from "@/components/forms/FormActions";
 import NextLink from "next/link";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -55,13 +56,13 @@ export function AdminDashboard() {
           <TextField name="url" iconStart={<Globe fontSize="small" />} fullWidth label="Profile URL" type="url" disabled={pending} helperText="Use the full https:// profile URL." />
           {(validation || save.error) && <Alert severity="error">{validation || save.error?.message}</Alert>}
           {save.isSuccess && <Alert severity="success">Social profile saved.</Alert>}
-          <S.Actions><Button type="submit" variant="contained" disabled={pending || !validUser || !providers.data?.some(p => p.isEnabled)}>{save.isPending ? "Saving…" : editing ? "Save profile" : "Add profile"}</Button>{editing && <Button disabled={pending} onClick={reset}>Cancel edit</Button>}</S.Actions>
+          <FormActions>{editing && <Button disabled={pending} onClick={reset}>Cancel edit</Button>}<Button type="submit" variant="contained" disabled={pending || !validUser || !providers.data?.some(p => p.isEnabled)}>{save.isPending ? "Saving…" : editing ? "Save profile" : "Add profile"}</Button></FormActions>
         </S.Form></FormProvider>
       </S.Panel>
       {profiles.data?.length === 0 && <Alert severity="info">This user has no social profiles.</Alert>}
       {profiles.data?.map(profile => <S.Panel key={profile.id}><Typography variant="h6">{profile.provider.name}</Typography><Typography>{profile.handle}</Typography><Typography>{profile.url || "No profile URL"}</Typography><S.Actions><Button disabled={pending} onClick={() => { setEditing(profile); setDraft({ providerId: profile.providerId, handle: profile.handle, url: profile.url }); setValidation(""); save.reset(); }}>Edit {profile.provider.name} profile</Button><Button color="error" disabled={pending} onClick={() => { remove.reset(); setDeleting(profile); }}>Delete {profile.provider.name} profile</Button></S.Actions></S.Panel>)}
       </S.Root></S.ProfileSettings>
-      <Dialog open={!!deleting} onClose={() => { if (!pending) setDeleting(null); }} aria-labelledby="delete-profile-title"><DialogTitle id="delete-profile-title">Delete social profile?</DialogTitle><DialogContent>This removes the profile link from this user.{remove.error && <Alert severity="error">{remove.error.message}</Alert>}</DialogContent><DialogActions><Button disabled={pending} onClick={() => setDeleting(null)}>Cancel</Button><Button color="error" disabled={pending} onClick={() => deleting && remove.mutate(deleting)}>Delete profile</Button></DialogActions></Dialog>
+      <Dialog open={!!deleting} onClose={() => { if (!pending) setDeleting(null); }} aria-labelledby="delete-profile-title"><DialogTitle id="delete-profile-title">Delete social profile?</DialogTitle><DialogContent>This removes the profile link from this user.{remove.error && <Alert severity="error">{remove.error.message}</Alert>}</DialogContent><DialogActions disableSpacing><FormActions><Button disabled={pending} onClick={() => setDeleting(null)}>Cancel</Button><Button color="error" disabled={pending} onClick={() => deleting && remove.mutate(deleting)}>Delete profile</Button></FormActions></DialogActions></Dialog>
     </>}
   </S.Root></ResourcePage>;
 }

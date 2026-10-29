@@ -11,8 +11,8 @@ import type { DataTableProps } from "@/components/DataTable";
 
 /** Application policy only. Queries, mutations and row content stay resource-owned. */
 export function ResourceDataTable<TData extends RowData>({
-  resourceId, toolbar, card, tableProps, persistence, loading = false, loadingMessage, ...props
-}: DataTableProps<TData> & { readonly resourceId: string; readonly loading?: boolean; readonly loadingMessage?: string }) {
+  resourceId, onViewRecord, toolbar, card, tableProps, persistence, loading = false, loadingMessage, ...props
+}: DataTableProps<TData> & { readonly resourceId: string; readonly onViewRecord?: (record: TData) => void; readonly loading?: boolean; readonly loadingMessage?: string }) {
   const { mode, systemMode, setMode } = useColorScheme();
   const [compact, setCompact] = useState(card?.compactCard ?? false);
   const dark = (mode === "system" ? systemMode : mode) === "dark";
@@ -26,9 +26,15 @@ export function ResourceDataTable<TData extends RowData>({
     defaultShowColumnFilters={false}
     columnFilterDisplayMode="subheader"
     {...props}
+    rowClickSelectedOnly={onViewRecord ? true : props.rowClickSelectedOnly}
+    onRowClick={onViewRecord ? (row) => onViewRecord(row.original) : props.onRowClick}
     tableProps={{ stickyHeader: true, ...tableProps }}
     persistence={persistence ?? { storageId: resourceId }}
-    card={card ? { ...card, compactCard: compact } : undefined}
+    card={card ? {
+      ...card, compactCard: compact,
+      clickSelectedOnly: onViewRecord ? true : card.clickSelectedOnly,
+      onClick: onViewRecord ? ({ row }) => onViewRecord(row.original) : card.onClick,
+    } : undefined}
     toolbar={toolbar === false ? false : {
       searchMode: "collapsible", defaultSearchOpen: true, searchPosition: "center",
       searchDebounceMs: 300, enableFilterToggle: true, showFilterStatus: true,

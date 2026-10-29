@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import type { Row, RowData } from "@tanstack/table-core";
 
 import type { MuiDataTableFeatures } from "../../features";
@@ -55,6 +55,11 @@ export interface DataTableCardFlipConfig {
  * content that makes sense for one domain record.
  */
 export interface DataTableCardConfig<TData extends RowData> {
+  /** Optional activation of the card surface; interactive descendants are ignored. */
+  readonly onClick?: (context: DataTableCardRenderContext<TData>, event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) => void;
+  /** Only selected cards become clickable and keyboard-focusable. */
+  readonly clickSelectedOnly?: boolean;
+
   /** Minimal front: header (or body when no header), selection and actions in one row.
    * Body teasers and metadata are omitted; detail content is unchanged. Default false.
    */

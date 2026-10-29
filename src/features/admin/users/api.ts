@@ -2,7 +2,9 @@ import type { ColumnFiltersState, SortingState } from "@tanstack/table-core";
 import { z } from "zod";
 import { API_URL, TOKEN_KEY } from "@/types/constants";
 import { authClient } from "@/lib/auth-client";
-export const userSchema = z.object({ id: z.coerce.string(), name: z.string(), email: z.string(), role: z.string().nullish(), banned: z.boolean().nullish(), emailVerified: z.boolean().optional(), image: z.string().nullish(), roleId: z.number().nullish(), username: z.string().nullish() });
+import { registerSchema } from "@/schema/auth.schema";
+const optionalDate = z.union([z.string(), z.date().transform(value => value.toISOString())]).nullish();
+export const userSchema = z.object({ createdAt: optionalDate, updatedAt: optionalDate, banReason: z.string().nullish(), banExpires: optionalDate, id: z.coerce.string(), name: z.string(), email: z.string(), role: z.string().nullish(), banned: z.boolean().nullish(), emailVerified: z.boolean().optional(), image: z.string().nullish(), roleId: z.number().nullish(), username: z.string().nullish() });
 export const roleSchema = z.object({ id: z.number(), name: z.string(), description: z.string().nullish(), icon: z.string().nullish(), color: z.string().nullish() });
 export type UserRole = z.infer<typeof roleSchema>;
 export const userDetailSchema = userSchema.extend({
@@ -23,7 +25,17 @@ async function displayRequest<T>(path: string, schema: z.ZodType<T>, signal?: Ab
 }
 export type AdminUser = z.infer<typeof userSchema>;
 export type UserMode = "create" | "edit" | "delete";
-export const userInputSchema = z.object({ name: z.string().trim().min(1).max(100), email: z.email(), password: z.string() });
+export const userInputSchema = z.object({
+  name: registerSchema.shape.name,
+  username: z.union([registerSchema.shape.username, z.literal("")]).default(""),
+  email: registerSchema.shape.email,
+  password: z.string(),
+});
+export const createUserInputSchema = userInputSchema.extend({
+  username: registerSchema.shape.username,
+  password: z.string().min(8, "Use a password with at least 8 characters.").max(128),
+});
+export type AdminUserInput = z.infer<typeof userInputSchema>;
 function unwrap<T>(result: { data: T; error: null } | { data: null; error: { message?: string } }): NonNullable<T> {
   if (result.error) throw new Error(result.error.message || "User request failed.");
   if (result.data == null) throw new Error("The server returned an empty response.");
@@ -50,13 +62,13 @@ export const usersApi = {
       if (!record) throw new Error("User not found.");
       unwrap(await authClient.admin.removeUser({ userId: record.id })); return record;
     }
-    const fields = userInputSchema.parse(input);
+    const fields = (mode === "create" ? createUserInputSchema : userInputSchema).parse(input);
     if (mode === "create") {
-      if (fields.password.length < 8) throw new Error("Use a password with at least 8 characters.");
-      const data = unwrap(await authClient.admin.createUser(fields)); return userSchema.parse(data.user);
+      const { username, ...identity } = fields;
+      const data = unwrap(await authClient.admin.createUser({ ...identity, data: { username: username.toLowerCase(), displayUsername: username } })); return userSchema.parse(data.user);
     }
     if (!record) throw new Error("User not found.");
-    const data = unwrap(await authClient.admin.updateUser({ userId: record.id, data: { name: fields.name, email: fields.email } }));
+    const data = unwrap(await authClient.admin.updateUser({ userId: record.id, data: { name: fields.name, email: fields.email, ...(fields.username ? { username: fields.username.toLowerCase(), displayUsername: fields.username } : {}) } }));
     return userSchema.parse(data);
   },
 };

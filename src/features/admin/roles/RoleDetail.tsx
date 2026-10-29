@@ -1,43 +1,30 @@
 "use client";
-import { Chip, Typography } from "@mui/material";
+import { ResourceStatusBadge } from "@/components/Tables/ResourceBadge";
+import { AdminPanelSettingsOutlined, PolicyOutlined } from "@mui/icons-material";
+import { ResourceDetailPanel, ResourceDetailSection, ResourceDetailFacts } from "@/components/Tables/ResourceDetailPanel";
+import { Typography } from "@mui/material";
 import type { ApplicationRole } from "./api";
 import { RoleBadge } from "../users/UserIdentity";
 import * as S from "./styles";
-export function RoleDetail({ record }: { readonly record: ApplicationRole }) {
+import { formatAdminDate } from "@/lib/utils/adminDate";
+export function RoleDetail({ record, view = "table" }: { readonly record: ApplicationRole; readonly view?: "table" | "card" }) {
   const groups = Map.groupBy(
     record.permissions,
     (permission) => permission.subject,
   );
   return (
-    <S.Root>
-      <S.Actions>
-        <RoleBadge role={record} />
-        <Chip
-          size="small"
-          color={record.isEnabled ? "success" : "default"}
-          label={record.isEnabled ? "Enabled" : "Disabled"}
-        />
-      </S.Actions>
-      <S.Facts>
-        {[
-          ["Description", record.description || "—"],
-          ["Assigned users", String(record.userCount)],
-          ["Version", String(record.objectVersionId)],
-          ["Updated", new Date(record.updatedAt).toLocaleString()],
-          [
-            "Role type",
-            record.isProtected ? "Protected bootstrap role" : "Custom role",
-          ],
-        ].map(([label, value]) => (
-          <S.Fact key={label}>
-            <dt>{label}</dt>
-            <dd>{value}</dd>
-          </S.Fact>
-        ))}
-      </S.Facts>
-      <Typography component="h3" variant="h6">
-        Application permissions ({record.permissions.length})
-      </Typography>
+    <ResourceDetailPanel view={view}>
+      <ResourceDetailSection title="Role & access" description={record.name} icon={<AdminPanelSettingsOutlined />}>
+        <ResourceDetailFacts items={[
+          { label: "Role", value: <RoleBadge role={record} /> },
+          { label: "Status", value: <ResourceStatusBadge active={record.isEnabled} activeLabel="Enabled" inactiveLabel="Disabled" /> },
+          { label: "Description", value: record.description || "—" },
+          { label: "Assigned users", value: record.userCount },
+          { label: "Updated", value: formatAdminDate(record.updatedAt) },
+          { label: "Role type", value: record.isProtected ? "Protected bootstrap role" : "Custom role" },
+        ]} />
+      </ResourceDetailSection>
+      <ResourceDetailSection title="Application permissions" description={`${record.permissions.length} grants`} icon={<PolicyOutlined />}>
       {record.permissions.length === 0 ? (
         <Typography color="text.secondary">
           No application permissions granted.
@@ -61,6 +48,7 @@ export function RoleDetail({ record }: { readonly record: ApplicationRole }) {
           ))}
         </S.Permissions>
       )}
-    </S.Root>
+      </ResourceDetailSection>
+    </ResourceDetailPanel>
   );
 }

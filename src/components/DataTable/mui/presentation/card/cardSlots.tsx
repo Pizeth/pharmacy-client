@@ -23,6 +23,7 @@ export const CardItemRoot = styled(Paper, {
   minWidth: 0,
   overflow: "hidden",
   backgroundImage: "none",
+  '&[data-row-clickable="true"]': { cursor: "pointer" },
   '&&[data-card-side="back"]': {
     height: "auto",
     maxHeight: "none",
@@ -126,6 +127,7 @@ export const CardActionsRoot = styled("footer", {
   gap: theme.spacing(0.5),
   padding: theme.spacing(1, 2),
   borderTop: `1px solid ${(theme.vars ?? theme).palette.divider}`,
+  [`& .${dataTableClasses.rowActions}`]: { gap: theme.spacing(1.5) },
 }));
 
 export const CardExpansionRoot = styled("div", {

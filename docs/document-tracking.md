@@ -8,6 +8,16 @@ This register is separate from the public downloadable-document catalogue at
 
 ## Initial shared route
 
+The registration form requires a file (up to 32 MB) or an HTTP(S) file URL,
+with controls directly below the title. There is no no-attachment or skip option.
+Attachment input is validated before creating the record. A single submit
+saves the record and then its attachment; success is reported only after both.
+The same attachment dialog is available from document details afterward.
+Uploads use the NestJS document-scoped multipart endpoint and its R2/scan
+policy, deployed from backend PR #3.
+An attachment failure preserves the registered record and attachment draft;
+retrying saves only the attachment and never repeats document registration.
+
 All document types use one route, as requested. The route definition is stored
 in the database and copied into each document's seven stage instances, preserving
 the meaning of existing records when future definitions change.
@@ -55,8 +65,9 @@ Existing integer User and versioned Department identities are reused. New
 document identities use UUIDs; a generated registry number is displayed as
 `DOC-000001`. Source system/record identity is reserved for idempotent imports.
 Elapsed days are derived from receipt and completion, never stored as a counter.
-Attachment records store validated HTTP(S) links; file upload and sharing
-permissions remain the responsibility of the existing storage system.
+Attachment records store validated HTTP(S) links, including URLs returned by
+the existing R2 upload service. Upload authorization belongs to document
+tracking; storage sharing permissions remain with the existing storage system.
 
 Only one stage per document can be ACTIVE (partial unique index). Sequence and
 stage position are unique within a document. Mutations claim an expected version
@@ -145,7 +156,8 @@ detection via source identity, and a rejected-row report before writing records.
 
 The versioned route is `/api/v1/document-tracking`: GET `metadata`, POST `query`,
 GET `:id`, POST registration, PATCH `:id`, POST `:id/progress`, POST
-`:id/attachments`, DELETE `:id` (soft archive with expected version and reason).
+`:id/attachments`, multipart POST `:id/attachments/upload`, DELETE `:id`
+(soft archive with expected version and reason).
 Query uses the shared DataTable policy/Prisma translator with allowlisted filters,
 server pagination/sort/search, deterministic ordering and matching count scope.
 

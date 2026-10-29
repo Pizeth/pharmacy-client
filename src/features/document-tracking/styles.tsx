@@ -1,8 +1,15 @@
 "use client";
-import { Chip, Stepper } from "@mui/material";
-import { alpha, styled } from "@mui/material/styles";
+import { resourceNeumorphicStyles } from "@/components/buttons/resourceNeumorphicStyles";
+import { resourceFormStyles } from "@/components/forms/resourceFormStyles";
+import { ResourceBadge } from "@/components/Tables/ResourceBadge";
+import { Button, type ButtonProps, Stepper } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { visuallyHidden } from "@mui/utils";
 import type { CSSInterpolation } from "@mui/system";
 export type DocumentTrackingSlot =
+  | "attachmentSourceRow"
+  | "uploadButton"
+  | "fileInput"
   | "root"
   | "panel"
   | "actions"
@@ -64,12 +71,7 @@ export const FieldGrid = styled(
 export const Form = styled(
   "form",
   slot("Form"),
-)(({ theme }) => ({
-  display: "grid",
-  gap: theme.spacing(2.5),
-  paddingTop: theme.spacing(1),
-  minWidth: 0,
-}));
+)(({ theme }) => resourceFormStyles(theme));
 export const Progress = styled(
   Stepper,
   slot("Progress"),
@@ -183,29 +185,14 @@ export const DetailGrid = styled(
   '&[data-compact="true"]': { gridTemplateColumns: "minmax(0,1fr)" },
   [theme.breakpoints.down("md")]: { gridTemplateColumns: "minmax(0,1fr)" },
 }));
-export const Status = styled(
-  Chip,
-  slot("Status"),
-)(({ theme }) => {
-  const palette = (theme.vars ?? theme).palette;
-  const tint = (value: string) =>
-    theme.alpha ? theme.alpha(value, 0.13) : alpha(value, 0.13);
-  return {
-    borderRadius: 999,
-    fontWeight: 600,
-    color: palette.info.main,
-    background: tint(palette.info.main),
-    '&[data-status="ON_HOLD"]': {
-      color: palette.warning.main,
-      background: tint(palette.warning.main),
-    },
-    '&[data-status="COMPLETED"]': {
-      color: palette.success.main,
-      background: tint(palette.success.main),
-    },
-    '&[data-status="CANCELLED"]': {
-      color: palette.error.main,
-      background: tint(palette.error.main),
-    },
-  };
-});
+export const Status = styled(ResourceBadge, slot("Status"))({});
+
+export const UploadButton = styled(Button, slot("UploadButton"))<ButtonProps<"label">>(({ theme }) => ({
+  ...resourceNeumorphicStyles(theme), width: "100%", minWidth: 0, padding: theme.spacing(1, 1.5),
+  '&:focus-within': { outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`, outlineOffset: 3 },
+}));
+export const FileInput = styled("input", slot("FileInput"))({ ...visuallyHidden });
+
+export const AttachmentSourceRow = styled("div", slot("AttachmentSourceRow"))(({ theme }) => ({
+  display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: theme.spacing(2), alignItems: "start", minWidth: 0,
+}));

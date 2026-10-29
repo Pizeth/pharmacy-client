@@ -102,7 +102,7 @@ export function TrackingPage() {
           setEditor({ mode: "progress", id: row.original.id }),
       },
       {
-        id: "edit",
+        id: "edit", color: "error",
         label: "Edit document",
         inline: true,
         renderIcon: () => <EditOutlined />,
@@ -113,7 +113,7 @@ export function TrackingPage() {
       {
         id: "archive",
         label: "Archive record",
-        color: "error",
+        color: "primary",
         renderIcon: () => <ArchiveOutlined />,
         isDisabled: ({ row }) =>
           !row.getIsSelected() || !row.original.permissions.canManage,
@@ -121,8 +121,10 @@ export function TrackingPage() {
           setEditor({ mode: "delete", id: row.original.id }),
       },
       {
-        id: "open",
-        label: "Open tracking page",
+        id: "view",
+        color: "inherit",
+        label: "View details",
+        inline: true,
         renderIcon: () => <OpenInNew />,
         onClick: ({ row }) =>
           router.push(
@@ -274,7 +276,7 @@ export function TrackingPage() {
         createActionsColumn<TrackedDocument>({
           actions,
           size: 150,
-          maxInlineActions: 2,
+          maxInlineActions: 3,
         }),
       ]),
     [actions, metadata.data],
@@ -338,7 +340,7 @@ export function TrackingPage() {
     />
   );
   return (
-    <ResourcePage
+    <ResourcePage showHeader={false}
       title="Document tracking"
       subtitle="Follow documents from intake to physical filing. Select a document to update its progress."
       maxWidth="xl"
@@ -369,7 +371,7 @@ export function TrackingPage() {
           </Alert>
         )}
         {metadata.data && documents.data && (
-          <ResourceDataTable
+          <ResourceDataTable onViewRecord={record => router.push(`/admin/documents/${encodeURIComponent(record.id)}`)}
             resourceId="admin/document-tracking"
             persistence={{
               storageId: "admin/document-tracking",
@@ -384,7 +386,7 @@ export function TrackingPage() {
               enableSelection: true,
               enableExpansion: true,
               actions,
-              maxInlineActions: 2,
+              maxInlineActions: 3,
               renderHeader: ({ row }) => (
                 <>
                   <Typography variant="subtitle2">

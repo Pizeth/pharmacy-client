@@ -1,7 +1,8 @@
 "use client";
+import { FormActions } from "@/components/forms/FormActions";
 
 import type { ReactNode, SubmitEventHandler } from "react";
-import { Box, Button, styled, Typography } from "@mui/material";
+import { Button, styled, Typography } from "@mui/material";
 import { CloseRounded, SaveRounded } from "@mui/icons-material";
 
 const COMPONENT_NAME = "RazethTranslationKeyForm";
@@ -12,7 +13,7 @@ const FormRoot = styled("form", {
   overridesResolver: (_props, styles) => styles.root,
 })({});
 
-const FooterRoot = styled(Box, {
+const FooterRoot = styled(FormActions, {
   name: COMPONENT_NAME,
   slot: "Footer",
   overridesResolver: (_props, styles) => styles.footer,

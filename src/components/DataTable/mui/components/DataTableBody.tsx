@@ -27,6 +27,7 @@ export interface DataTableBodyProps<TData extends RowData> {
   readonly rowPinningDisplayMode?: DataTableRowPinningDisplayMode;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
   readonly onRowClick?: DataTableRowClickHandler<TData>;
+  readonly rowClickSelectedOnly?: boolean;
 }
 
 /**
@@ -58,6 +59,7 @@ export function DataTableBody<TData extends RowData>(
     rowPinningDisplayMode = "sticky",
     renderDetailPanel,
     onRowClick,
+    rowClickSelectedOnly,
   } = props;
 
   const { density } = useDataTableDensity();
@@ -213,6 +215,7 @@ export function DataTableBody<TData extends RowData>(
                 stickyPinnedRowIds={stickyPinnedRowIds[row.getIsPinned() || "top"]}
                 renderDetailPanel={renderDetailPanel}
                 onRowClick={onRowClick}
+                rowClickSelectedOnly={rowClickSelectedOnly}
               />
             ))}
           </DataTableStickyRowMeasurements>

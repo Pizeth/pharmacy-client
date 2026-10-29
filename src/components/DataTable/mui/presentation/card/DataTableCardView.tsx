@@ -7,7 +7,8 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Fragment, type ReactNode } from "react";
+import { isFromInteractiveDescendant } from "../../components/DataTableBodyRow";
+import { Fragment, type HTMLAttributes } from "react";
 import { DataTableDiagnosticCommit, useDataTableRenderDiagnostics } from "../../diagnostics/renderDiagnostics";
 import type { RowData } from "@tanstack/table-core";
 
@@ -246,6 +247,18 @@ export function DataTableCardView<TData extends RowData>(
               };
 
               const selected = Boolean(state.rowSelection?.[row.id]);
+              const clickable = !!config.onClick && (!config.clickSelectedOnly || selected);
+              const activationProps: HTMLAttributes<HTMLDivElement> = clickable ? {
+                tabIndex: 0,
+                onClick: event => {
+                  if (event.defaultPrevented || event.button !== 0 || isFromInteractiveDescendant(event)) return;
+                  config.onClick?.(context, event);
+                },
+                onKeyDown: event => {
+                  if (event.defaultPrevented || event.repeat || event.target !== event.currentTarget || !["Enter", " "].includes(event.key)) return;
+                  event.preventDefault(); config.onClick?.(context, event);
+                },
+              } : {};
 
               const selection =
                 config.renderSelection?.(context) ??
@@ -296,6 +309,8 @@ export function DataTableCardView<TData extends RowData>(
                   {diagnostics && <DataTableDiagnosticCommit layer="row" id={row.id} />}
                   <DataTableCardFlipItem
                     row={row}
+                    activationProps={activationProps}
+                    clickable={clickable}
                     expanded={row.getIsExpanded()}
                     selected={selected}
                     density={density}
@@ -324,6 +339,8 @@ export function DataTableCardView<TData extends RowData>(
               return (
                 <CardItemRoot
                   key={row.id}
+                  {...activationProps}
+                  data-row-clickable={clickable ? "true" : undefined}
                   variant="outlined"
                   className={dataTableClasses.cardItem}
                   role="listitem"

@@ -1,9 +1,13 @@
 "use client";
+import { FormActions } from "@/components/forms/FormActions";
+import { AccountTreeOutlined, ArchiveOutlined, CallMade, FormatListNumbered, Inventory2Outlined, NotesOutlined, PersonOutline, SwapHorizOutlined, UndoOutlined } from "@mui/icons-material";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { Alert, Button, Typography } from "@mui/material";
 import { TextField, SelectField } from "@/components/inputs";
+import { AttachmentFields } from "./AttachmentFields";
+import { getAttachmentDraft } from "./attachmentDraft";
 import {
   activeStep,
   progressInputSchema,
@@ -170,6 +174,7 @@ export function ProgressForm({
         </Typography>
         <SelectField
           name="action"
+          iconStart={<SwapHorizOutlined />}
           label="Action"
           required
           disabled={mutation.isPending}
@@ -183,6 +188,7 @@ export function ProgressForm({
         {action === "RETURN" && (
           <SelectField
             name="targetPosition"
+            iconStart={<UndoOutlined />}
             label="Return to stage"
             required
             disabled={mutation.isPending}
@@ -201,6 +207,7 @@ export function ProgressForm({
           <S.FieldGrid>
             <SelectField
               name="assignedToId"
+              iconStart={<PersonOutline />}
               label="Receiving handler"
               required
               disabled={mutation.isPending}
@@ -211,6 +218,7 @@ export function ProgressForm({
             />
             <SelectField
               name="departmentId"
+              iconStart={<AccountTreeOutlined />}
               label="Receiving office"
               helperText="Leave blank to use the handler’s current HR office, or the stage office when no HR assignment exists."
               disabled={mutation.isPending}
@@ -225,6 +233,7 @@ export function ProgressForm({
           (current?.key === "STAMPING" || current?.key === "DISPATCH") && (
             <TextField
               name="outgoingNumber"
+              iconStart={<CallMade />}
               label="Outgoing number"
               fullWidth
               required={current.key === "DISPATCH"}
@@ -239,6 +248,7 @@ export function ProgressForm({
             </Alert>
             <TextField
               name="storageLocationCode"
+              iconStart={<Inventory2Outlined />}
               label="Cabinet / storage code"
               fullWidth
               required
@@ -247,12 +257,14 @@ export function ProgressForm({
             <S.FieldGrid>
               <TextField
                 name="chronologicalCode"
+                iconStart={<ArchiveOutlined />}
                 label="Chronological archive code"
                 fullWidth
                 disabled={mutation.isPending}
               />
               <TextField
                 name="archiveSequence"
+                iconStart={<FormatListNumbered />}
                 label="Archive sequence"
                 type="number"
                 fullWidth
@@ -263,6 +275,8 @@ export function ProgressForm({
         )}
         <TextField
           name="note"
+          iconStart={<NotesOutlined />}
+          iconStartAlignment="top"
           label="Reason / handling note"
           fullWidth
           multiline
@@ -277,7 +291,7 @@ export function ProgressForm({
               : mutation.error.message}
           </Alert>
         )}
-        <S.Actions>
+        <FormActions>
           <Button
             variant="outlined"
             onClick={onCancel}
@@ -294,7 +308,7 @@ export function ProgressForm({
           >
             {labels[action] ?? "Save progress"}
           </Button>
-        </S.Actions>
+        </FormActions>
       </S.Form>
     </FormProvider>
   );
@@ -305,25 +319,35 @@ export function AttachmentForm({
   onCancel,
   onSuccess,
   onPendingChange,
+  cancelLabel = "Cancel",
 }: {
   readonly record: DocumentDetail;
   readonly onCancel: () => void;
   readonly onSuccess: (record: DocumentDetail) => void;
   readonly onPendingChange?: (pending: boolean) => void;
+  readonly cancelLabel?: string;
 }) {
   const [initial] = useState(record);
+  const [file, setFile] = useState<File | null>(null);
+
   const form = useForm({
     defaultValues: {
+      source: "upload",
       name: "",
       url: "",
       kind: "SUPPORTING" as "INCOMING" | "OUTGOING" | "SUPPORTING",
     },
   });
+  const source = useWatch({ control: form.control, name: "source" });
   const client = useQueryClient();
   const inFlight = useRef(false);
   const mutation = useMutation({
-    mutationFn: () =>
-      trackingApi.attachment(initial.id, initial.version, form.getValues()),
+    mutationFn: () => {
+      const draft = getAttachmentDraft(form.getValues(), file);
+      return draft.source === "upload"
+        ? trackingApi.uploadAttachment(initial.id, initial.version, { name: draft.name, kind: draft.kind }, draft.file)
+        : trackingApi.attachment(initial.id, initial.version, { name: draft.name, kind: draft.kind, url: draft.url });
+    },
     onSuccess: async (result) => {
       await client.invalidateQueries({ queryKey: ["document-tracking"] });
       onSuccess(result);
@@ -352,45 +376,17 @@ export function AttachmentForm({
           }
         }}
       >
-        <Alert severity="info">
-          Link an existing secure file. This form does not upload files or
-          change their sharing permissions.
-        </Alert>
-        <TextField
-          name="name"
-          label="Attachment name"
-          required
-          fullWidth
-          disabled={mutation.isPending}
-        />
-        <TextField
-          name="url"
-          label="File URL"
-          type="url"
-          required
-          fullWidth
-          disabled={mutation.isPending}
-        />
-        <SelectField
-          name="kind"
-          label="Attachment type"
-          disabled={mutation.isPending}
-          options={[
-            { value: "INCOMING", label: "Incoming document" },
-            { value: "OUTGOING", label: "Final document" },
-            { value: "SUPPORTING", label: "Supporting document" },
-          ]}
-        />
+        <AttachmentFields file={file} onFileChange={setFile} disabled={mutation.isPending} />
         {mutation.error && (
           <Alert severity="error">
             {conflict
-              ? "Document changed. Close and reopen the form before adding the link."
+              ? "Document changed. Close and reopen the form before adding an attachment."
               : mutation.error.message}
           </Alert>
         )}
-        <S.Actions>
+        <FormActions>
           <Button onClick={onCancel} disabled={mutation.isPending}>
-            Cancel
+            {cancelLabel}
           </Button>
           <Button
             variant="contained"
@@ -398,9 +394,9 @@ export function AttachmentForm({
             disabled={mutation.isPending || conflict}
             loading={mutation.isPending}
           >
-            Add attachment link
+            {source === "upload" ? "Upload attachment" : "Add attachment link"}
           </Button>
-        </S.Actions>
+        </FormActions>
       </S.Form>
     </FormProvider>
   );

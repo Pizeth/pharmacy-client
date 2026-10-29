@@ -1,4 +1,5 @@
 "use client";
+import { FormActions } from "@/components/forms/FormActions";
 
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -61,11 +62,11 @@ export function SocialProviderForm({ mode, record, onCancel, onSuccess, onPendin
       <FormControlLabel label="Enabled" control={<Checkbox checked={draft.isEnabled} onChange={(_, checked) => form.setValue("isEnabled", checked)} disabled={pending} />} />
     </>}
     {(validation || mutation.error) && <Alert severity="error">{validation || mutation.error?.message}</Alert>}
-    <S.Actions>
+    <FormActions>
       <Button autoFocus={destructive} variant="outlined" disabled={pending} onClick={onCancel}>Cancel</Button>
       <Button variant="contained" color={destructive ? "error" : "success"} type="submit" disabled={pending || (mode !== "create" && !record)} loading={pending}>
         {destructive ? "Delete provider" : mode === "edit" ? "Save changes" : "Create provider"}
       </Button>
-    </S.Actions>
+    </FormActions>
   </S.Form></FormProvider>;
 }
