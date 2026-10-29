@@ -56,7 +56,7 @@ export const usersApi = {
     };
     return displayRequest("query", z.object({ users: z.array(userSchema), total: z.number().int().nonnegative() }), signal, query);
   },
-  get: (id: string) => displayRequest(`${encodeURIComponent(id)}/admin-detail`, userSchema),
+  async get(id: string) { return userSchema.parse(unwrap(await authClient.admin.getUser({ query: { id } }))); },
   async save(mode: UserMode, input: z.infer<typeof userInputSchema>, record?: AdminUser) {
     if (mode === "delete") {
       if (!record) throw new Error("User not found.");

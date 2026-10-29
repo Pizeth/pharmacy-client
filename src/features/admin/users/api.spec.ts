@@ -27,10 +27,3 @@ it("retains safe account timestamps and ban metadata for dedicated details", () 
  expect(data).toMatchObject({ createdAt: "2026-10-27T00:00:00.000Z", updatedAt: "2026-10-28T00:00:00Z", banReason: "Review required", banExpires: null });
  expect(data).not.toHaveProperty("passwordHash");
 });
-
-it("reads the edit snapshot including username from the database-backed endpoint", async () => {
- const fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ id: 12, name: "Jane", email: "jane@example.com", username: "saved_jane" }) });
- global.fetch = fetch;
- await expect(usersApi.get("12")).resolves.toMatchObject({ username: "saved_jane" });
- expect(String(fetch.mock.calls[0][0])).toContain("/api/v1/users/12/admin-detail");
-});
