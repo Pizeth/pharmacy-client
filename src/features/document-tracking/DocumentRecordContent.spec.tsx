@@ -14,7 +14,7 @@ it("renders a complete document workspace with stage responsibility, storage and
   fireEvent.click(screen.getByRole("button", { name: "Add attachment" })); expect(attachment).toHaveBeenCalledTimes(1);
 });
 it("shows recorded history newest first and hides handler commands without permission", () => {
-  render(<DocumentRecordContent record={{ ...trackingRecord, permissions: { canManage: false, canUpdateProgress: false }, events: [...trackingRecord.events, { ...trackingRecord.events[0], id: "later", sequence: 2, kind: "COMMENTED", note: "Newest note" }] }} onProgress={jest.fn()} onAttachment={jest.fn()} />);
+  render(<DocumentRecordContent record={{ ...trackingRecord, permissions: { canManage: false, canAttach: false, canUpdateProgress: false }, events: [...trackingRecord.events, { ...trackingRecord.events[0], id: "later", sequence: 2, kind: "COMMENTED", note: "Newest note" }] }} onProgress={jest.fn()} onAttachment={jest.fn()} />);
   const history = screen.getByRole("region", { name: "Handling history" });
   const entries = within(history).getAllByRole("listitem");
   expect(entries[0]).toHaveTextContent("Newest note");

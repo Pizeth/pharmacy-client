@@ -1,6 +1,6 @@
 import type { DocumentDetail, TrackingMetadata } from "./contracts";
 export const trackingMetadata: TrackingMetadata = {
-  actor: { id: 1, name: "Admin", isAdmin: true },
+  actor: { id: 1, name: "Admin", isAdmin: true, isTrackingAdmin: true },
   handlers: [
     { id: 1, name: "Admin" },
     { id: 2, name: "Receiving handler" },
@@ -64,7 +64,7 @@ export const trackingRecord: DocumentDetail = {
     startedAt: step.position === 0 ? "2026-10-20T01:00:00.000Z" : null,
     completedAt: null,
   })),
-  permissions: { canManage: true, canUpdateProgress: true },
+  permissions: { canManage: true, canAttach: true, canUpdateProgress: true },
   events: [
     {
       id: "event-1",

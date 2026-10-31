@@ -67,16 +67,10 @@ export function DocumentDetailContent({
           This record was archived. Its handling history is preserved.
         </Alert>
       )}
-      {record.permissions.canUpdateProgress && onProgress && (
+      {(record.permissions.canUpdateProgress || record.permissions.canAttach) && (
         <S.Actions>
-          <Button startIcon={<RouteOutlined />} onClick={onProgress}>
-            Update progress
-          </Button>
-          {onAttachment && (
-            <Button startIcon={<AttachFileOutlined />} onClick={onAttachment}>
-              Add attachment
-            </Button>
-          )}
+          {record.permissions.canUpdateProgress && onProgress && <Button startIcon={<RouteOutlined />} onClick={onProgress}>Update progress</Button>}
+          {record.permissions.canAttach && onAttachment && <Button startIcon={<AttachFileOutlined />} onClick={onAttachment}>Add attachment</Button>}
         </S.Actions>
       )}
       </ResourceDetailSection>

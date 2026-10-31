@@ -95,7 +95,7 @@ it("allows handlers to see their register but hides admin creation and editing",
     documents: [
       {
         ...trackingRecord,
-        permissions: { canManage: false, canUpdateProgress: true },
+        permissions: { canManage: false, canAttach: false, canUpdateProgress: true },
       },
     ],
     total: 1,

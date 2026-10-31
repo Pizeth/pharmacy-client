@@ -213,7 +213,7 @@ it("renders the route and full return history in a compact detail without mutati
       compact
       record={{
         ...trackingRecord,
-        permissions: { canManage: false, canUpdateProgress: false },
+        permissions: { canManage: false, canAttach: false, canUpdateProgress: false },
         events: [
           ...trackingRecord.events,
           {
@@ -247,4 +247,34 @@ it("updates an inferred filename on replacement but preserves a custom attachmen
   fireEvent.change(screen.getByLabelText(/Attachment name/), { target: { value: "Custom title" } });
   fireEvent.change(input, { target: { files: [new File(["three"], "third.txt")] } });
   expect(screen.getByLabelText(/Attachment name/)).toHaveValue("Custom title");
+});
+
+it.each([
+ ["administrator", true, true],
+ ["delegated assigned manager", true, false],
+ ["assigned handler", false, false],
+])("renders progress actions for %s without promoting delegated access", (_, isAdmin, isTrackingAdmin) => {
+ mount(<ProgressForm record={trackingRecord} metadata={{...trackingMetadata, actor:{...trackingMetadata.actor,isAdmin,isTrackingAdmin}}} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+ fireEvent.mouseDown(screen.getByRole("combobox",{name:/Action/}));
+ expect(screen.getByRole("option",{name:"Hand over to next stage"})).toBeInTheDocument();
+ expect(screen.getByRole("option",{name:"Put on hold"})).toBeInTheDocument();
+ expect(!!screen.queryByRole("option",{name:"Cancel document"})).toBe(isTrackingAdmin);
+});
+it.each([true,false])("completed Return requires tracking administrator=%s", isTrackingAdmin => {
+ mount(<ProgressForm record={{...trackingRecord,status:"COMPLETED",permissions:{...trackingRecord.permissions,canUpdateProgress:isTrackingAdmin}}} metadata={{...trackingMetadata,actor:{...trackingMetadata.actor,isTrackingAdmin}}} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+ fireEvent.mouseDown(screen.getByRole("combobox",{name:/Action/}));
+ expect(!!screen.queryByRole("option",{name:"Return for rework"})).toBe(isTrackingAdmin);
+ expect(screen.queryByRole("option",{name:"Cancel document"})).not.toBeInTheDocument();
+});
+it("does not render progress actions for a read-only delegated manager",()=>{
+ mount(<ProgressForm record={{...trackingRecord,permissions:{...trackingRecord.permissions,canUpdateProgress:false}}} metadata={{...trackingMetadata,actor:{...trackingMetadata.actor,isTrackingAdmin:false}}} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+ expect(screen.getByRole("button",{name:"Hand over to next stage"})).toBeDisabled();
+ fireEvent.mouseDown(screen.getByRole("combobox",{name:/Action/}));
+ expect(screen.queryByRole("option",{name:"Cancel document"})).not.toBeInTheDocument();
+ expect(screen.queryByRole("option",{name:"Hand over to next stage"})).not.toBeInTheDocument();
+});
+it("offers attachments independently of another handler's progress permission",()=>{
+ mount(<DocumentDetailContent compact record={{...trackingRecord,permissions:{canManage:true,canAttach:true,canUpdateProgress:false}}} onProgress={jest.fn()} onAttachment={jest.fn()} />);
+ expect(screen.getByRole("button",{name:"Add attachment"})).toBeInTheDocument();
+ expect(screen.queryByRole("button",{name:"Update progress"})).not.toBeInTheDocument();
 });

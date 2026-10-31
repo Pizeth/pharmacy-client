@@ -1,11 +1,12 @@
 import { buildTrackingQuery, trackingUrl } from "./api";
 import {
   detailSchema,
+  metadataSchema,
   handlerOptionLabel,
   progressInputSchema,
 } from "./contracts";
 import { fromLocalDate, toLocalDate } from "./DocumentForm";
-import { trackingRecord } from "./tracking.test-fixtures";
+import { trackingRecord, trackingMetadata } from "./tracking.test-fixtures";
 it("converts table filters and pagination to the shared server query contract", () => {
   expect(
     buildTrackingQuery(
@@ -87,4 +88,16 @@ it("uses HR work identity to distinguish handlers without requiring a profile", 
 it("lets schema validation handle incomplete dates without throwing a RangeError", () => {
   expect(fromLocalDate("invalid")).toBe("invalid");
   expect(fromLocalDate("2026-10-")).toBe("2026-10-");
+});
+
+it("preserves the administrator boundary and fails closed for old metadata", () => {
+ const delegated = { ...trackingMetadata, actor: { ...trackingMetadata.actor, isAdmin: true, isTrackingAdmin: false } };
+ expect(metadataSchema.parse(delegated).actor.isTrackingAdmin).toBe(false);
+ expect(metadataSchema.parse(trackingMetadata).actor.isTrackingAdmin).toBe(true);
+ const { isTrackingAdmin: omitted, ...legacy } = trackingMetadata.actor;
+ expect(omitted).toBe(true);
+ expect(metadataSchema.parse({ ...trackingMetadata, actor: legacy }).actor.isTrackingAdmin).toBe(false);
+ const { canAttach: missing, ...oldPermissions } = trackingRecord.permissions;
+ expect(missing).toBe(true);
+ expect(detailSchema.parse({ ...trackingRecord, permissions: oldPermissions }).permissions.canAttach).toBe(false);
 });

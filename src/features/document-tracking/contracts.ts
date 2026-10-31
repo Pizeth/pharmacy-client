@@ -78,6 +78,7 @@ export const documentSchema = z.object({
   steps: z.array(stepSchema),
   permissions: z.object({
     canManage: z.boolean(),
+    canAttach: z.boolean().default(false),
     canUpdateProgress: z.boolean(),
   }),
 });
@@ -107,7 +108,7 @@ export const detailSchema = documentSchema.extend({
   attachments: z.array(attachmentSchema),
 });
 export const metadataSchema = z.object({
-  actor: handlerSchema.extend({ isAdmin: z.boolean() }),
+  actor: handlerSchema.extend({ isAdmin: z.boolean(), isTrackingAdmin: z.boolean().default(false) }),
   categories: z.array(optionSchema),
   types: z.array(optionSchema),
   handlers: z.array(handlerSchema),

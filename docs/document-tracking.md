@@ -175,3 +175,13 @@ hold/resume, return, all seven stages, storage, querying and soft archive.
 Use the normal Prisma deployment pipeline on other environments; never reset the
 database. The development DB migration was applied alone in a transaction after
 checking that no unrelated migrations were pending, with a Prisma checksum entry.
+
+## Delegated document authorization closeout
+
+Management (`actor.isAdmin`) includes the explicit manage/TrackedDocument grant. It is separate from `actor.isTrackingAdmin`, which alone permits administrator progress overrides. The client preserves the latter flag; missing flags fail closed. Cancel and completed-document Return require actual tracking-administrator authority, while ordinary assigned handlers retain their active-stage actions.
+
+Attachments have their own `permissions.canAttach`: actual tracking administrators, delegated document managers and the currently assigned active-stage handler may attach files or URL links to unarchived records. Upload preflight and the URL-link transaction use the same rule. The transaction re-reads account/role status and stage assignment before claiming the expected version. Failed linking removes an uploaded object; scan and storage behavior remains in the existing R2 service. Missing attachment permission from an older server fails closed in the client. Deploy the backend before the frontend so delegated managers receive attachment controls.
+
+The additive 20261029090000_document_management_permission migration was verified/applied to target Supabase project jkfyjxttbddnwcpyjrpc on 31 October 2026. Its checksum is 383085eb3a7fdbbdef769969ea8fa4feaa57f727ecbcef77fde5bf10d7c49ef1. Both the permission and successful Prisma history entry were verified; all 15 pre-existing role-grant links remained unchanged. No reset or seed was run.
+
+The cross-repository smoke harness is `pharmacy-api/scripts/tracking-authorization-closeout-smoke.ts`. It bundles this feature's real client API/contract code, calls the actual versioned Nest controller over loopback HTTP with the production validation pipe, and exercises real database/service authorization using disposable actors and documents inside a rollback-only transaction. Only the test identity adapter and external storage/scanner are mocked. It does not claim to verify deployed Better Auth sessions or live R2/VirusTotal. Never run mutation smoke tests against existing operational documents.
