@@ -261,7 +261,7 @@ it.each([
  expect(!!screen.queryByRole("option",{name:"Cancel document"})).toBe(isTrackingAdmin);
 });
 it.each([true,false])("completed Return requires tracking administrator=%s", isTrackingAdmin => {
- mount(<ProgressForm record={{...trackingRecord,status:"COMPLETED",permissions:{...trackingRecord.permissions,canUpdateProgress:isTrackingAdmin}}} metadata={{...trackingMetadata,actor:{...trackingMetadata.actor,isTrackingAdmin}}} onCancel={jest.fn()} onSuccess={jest.fn()} />);
+ mount(<ProgressForm record={{...trackingRecord,status:"COMPLETED",permissions:{...trackingRecord.permissions,canUpdateProgress:true}}} metadata={{...trackingMetadata,actor:{...trackingMetadata.actor,isTrackingAdmin}}} onCancel={jest.fn()} onSuccess={jest.fn()} />);
  fireEvent.mouseDown(screen.getByRole("combobox",{name:/Action/}));
  expect(!!screen.queryByRole("option",{name:"Return for rework"})).toBe(isTrackingAdmin);
  expect(screen.queryByRole("option",{name:"Cancel document"})).not.toBeInTheDocument();

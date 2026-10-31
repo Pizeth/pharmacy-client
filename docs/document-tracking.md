@@ -36,9 +36,9 @@ A read-only stepper shows current route progress. An ordered event timeline
 shows what actually happened, including repeated passes through a stage.
 Handlers explicitly confirm the receiving person on a handoff. Forward moves
 one stage; Return requires a reason and an earlier stage. Hold requires a reason,
-and Resume is required before movement. Cancellation is restricted to admins.
+and Resume is required before movement. Cancellation is restricted to actual tracking administrators (`actor.isTrackingAdmin`).
 Dispatch requires an outgoing number; completing physical filing requires a
-storage/cabinet code. Reopening a completed document requires an admin Return.
+storage/cabinet code. Reopening a completed document requires a tracking-administrator Return.
 Returning clears downstream stage completion and downstream stamp/dispatch
 timestamps, while keeping earlier chronological events.
 
@@ -104,8 +104,11 @@ All endpoints require the existing Better Auth session. Admin status is resolved
 from the current database role, not accepted from client input. Disabled, locked,
 banned, deleted and explicitly unactivated accounts cannot use the tracker.
 
-Admins can register/edit/archive documents and update any progress. The current
-assigned handler can update progress and add attachment links. Previous handlers
+Management authority (`actor.isAdmin`), including delegated manage/TrackedDocument
+grants, permits registration, editing, archiving and attachments. Only actual
+tracking administrators (`actor.isTrackingAdmin`) may override another handler,
+cancel, or reopen a completed document. The current assigned handler retains
+ordinary active-stage progress actions and attachments. Previous handlers
 can read records they participated in but cannot update a later handler's stage.
 Other authenticated users cannot read arbitrary documents. The list, its count,
 and detail reads use the same participation scope (creator, stage assignee or
