@@ -36,9 +36,9 @@ A read-only stepper shows current route progress. An ordered event timeline
 shows what actually happened, including repeated passes through a stage.
 Handlers explicitly confirm the receiving person on a handoff. Forward moves
 one stage; Return requires a reason and an earlier stage. Hold requires a reason,
-and Resume is required before movement. Cancellation is restricted to admins.
+and Resume is required before movement. Cancellation is restricted to actual tracking administrators (`actor.isTrackingAdmin`).
 Dispatch requires an outgoing number; completing physical filing requires a
-storage/cabinet code. Reopening a completed document requires an admin Return.
+storage/cabinet code. Reopening a completed document requires a tracking-administrator Return.
 Returning clears downstream stage completion and downstream stamp/dispatch
 timestamps, while keeping earlier chronological events.
 
@@ -104,8 +104,11 @@ All endpoints require the existing Better Auth session. Admin status is resolved
 from the current database role, not accepted from client input. Disabled, locked,
 banned, deleted and explicitly unactivated accounts cannot use the tracker.
 
-Admins can register/edit/archive documents and update any progress. The current
-assigned handler can update progress and add attachment links. Previous handlers
+Management authority (`actor.isAdmin`), including delegated manage/TrackedDocument
+grants, permits registration, editing, archiving and attachments. Only actual
+tracking administrators (`actor.isTrackingAdmin`) may override another handler,
+cancel, or reopen a completed document. The current assigned handler retains
+ordinary active-stage progress actions and attachments. Previous handlers
 can read records they participated in but cannot update a later handler's stage.
 Other authenticated users cannot read arbitrary documents. The list, its count,
 and detail reads use the same participation scope (creator, stage assignee or
@@ -175,3 +178,13 @@ hold/resume, return, all seven stages, storage, querying and soft archive.
 Use the normal Prisma deployment pipeline on other environments; never reset the
 database. The development DB migration was applied alone in a transaction after
 checking that no unrelated migrations were pending, with a Prisma checksum entry.
+
+## Delegated document authorization closeout
+
+Management (`actor.isAdmin`) includes the explicit manage/TrackedDocument grant. It is separate from `actor.isTrackingAdmin`, which alone permits administrator progress overrides. The client preserves the latter flag; missing flags fail closed. Cancel and completed-document Return require actual tracking-administrator authority, while ordinary assigned handlers retain their active-stage actions.
+
+Attachments have their own `permissions.canAttach`: actual tracking administrators, delegated document managers and the currently assigned active-stage handler may attach files or URL links to unarchived records. Upload preflight and the URL-link transaction use the same rule. The transaction re-reads account/role status and stage assignment before claiming the expected version. Failed linking removes an uploaded object; scan and storage behavior remains in the existing R2 service. Missing attachment permission from an older server fails closed in the client. Deploy the backend before the frontend so delegated managers receive attachment controls.
+
+The additive 20261029090000_document_management_permission migration was verified/applied to target Supabase project jkfyjxttbddnwcpyjrpc on 31 October 2026. Its checksum is 383085eb3a7fdbbdef769969ea8fa4feaa57f727ecbcef77fde5bf10d7c49ef1. Both the permission and successful Prisma history entry were verified; all 15 pre-existing role-grant links remained unchanged. No reset or seed was run.
+
+The cross-repository smoke harness is `pharmacy-api/scripts/tracking-authorization-closeout-smoke.ts`. It bundles this feature's real client API/contract code, calls the actual versioned Nest controller over loopback HTTP with the production validation pipe, and exercises real database/service authorization using disposable actors and documents inside a rollback-only transaction. Only the test identity adapter and external storage/scanner are mocked. It does not claim to verify deployed Better Auth sessions or live R2/VirusTotal. Never run mutation smoke tests against existing operational documents.

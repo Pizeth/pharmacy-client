@@ -67,6 +67,7 @@ export function ProgressForm({
   const inFlight = useRef(false);
   const mutation = useMutation({
     mutationFn: async () => {
+      if (!options.includes(action)) throw new Error("This progress action is not available to your account.");
       const values = form.getValues();
       const parsed = progressInputSchema.safeParse({
         version: initial.version,
@@ -122,10 +123,10 @@ export function ProgressForm({
     mutation.error instanceof TrackingRequestError &&
     mutation.error.status === 409;
   const options =
-    initial.status === "CANCELLED"
+    (!initial.permissions.canUpdateProgress || initial.status === "CANCELLED")
       ? []
       : initial.status === "COMPLETED"
-        ? ["COMMENT", ...(metadata.actor.isAdmin ? ["RETURN"] : [])]
+        ? ["COMMENT", ...(metadata.actor.isTrackingAdmin ? ["RETURN"] : [])]
         : initial.status === "ON_HOLD"
           ? ["RESUME", "ASSIGN", "COMMENT"]
           : [
@@ -136,7 +137,8 @@ export function ProgressForm({
               "COMMENT",
             ];
   if (
-    metadata.actor.isAdmin &&
+    initial.permissions.canUpdateProgress &&
+    metadata.actor.isTrackingAdmin &&
     initial.status !== "CANCELLED" &&
     initial.status !== "COMPLETED"
   )
