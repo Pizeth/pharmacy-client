@@ -1,10 +1,9 @@
-import { ROUTE_NAV_MAP } from "@/configs/navConfig";
+import { getRouteNavigationItem } from "@/configs/navConfig";
 
 export interface SiteBreadcrumb {
   readonly href: string;
   readonly label: string;
 }
-const navigation = Object.values(ROUTE_NAV_MAP).flatMap(items => items.flatMap(item => [item, ...(item.children ?? [])]));
 const labels: Record<string, string> = {
   users: "Users", roles: "Roles", admin: "Administration", dashboard: "Dashboard", "social-provider": "Social providers",
   i18n: "Translations", documents: "Documents", login: "Sign in", signup: "Sign up",
@@ -41,7 +40,7 @@ export function getSiteBreadcrumbs(pathname: string): readonly SiteBreadcrumb[] 
       href: href === "/admin" ? "/admin/dashboard" : href,
       label: segments[0] === "admin" && recordResources[segments[1]] && index === 2 && segment !== "create"
         ? recordResources[segments[1]].fallback
-        : segment === "admin" ? labels.admin : navigation.find(item => item.href === href)?.label ?? labelFor(segment),
+        : segment === "admin" ? labels.admin : getRouteNavigationItem(href)?.label ?? labelFor(segment),
     });
   }
   return crumbs;

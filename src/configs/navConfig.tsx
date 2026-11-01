@@ -208,6 +208,16 @@ export function getDynamicNavItems(pathname: string): NavItemType[] {
   return section ? ROUTE_NAV_MAP[section] : DEFAULT_NAV_ITEMS;
 }
 
+const allNavigationItems = Object.values(ROUTE_NAV_MAP).flatMap(items =>
+  items.flatMap(item => [item, ...(item.children ?? [])]),
+);
+
+/** Cross-section shortcuts must not replace a destination's own label or icon. */
+export function getRouteNavigationItem(href: string): NavItemType | undefined {
+  const ownedItems = getDynamicNavItems(href).flatMap(item => [item, ...(item.children ?? [])]);
+  return ownedItems.find(item => item.href === href) ?? allNavigationItems.find(item => item.href === href);
+}
+
 export function getActiveNavIndex(
   pathname: string,
   items: NavItemType[],

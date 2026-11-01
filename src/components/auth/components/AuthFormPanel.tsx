@@ -23,6 +23,7 @@ interface AuthFormPanelProps {
 export function AuthFormPanel({
   mode, onToggle, enableToggle, avatar, navigation, divider, social, children,
 }: AuthFormPanelProps) {
+  const recoveryUrl = process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL?.trim();
   return (
     <Grid size={{ xs: 12, md: 6 }}>
       <ParticleHexBackground
@@ -34,7 +35,10 @@ export function AuthFormPanel({
           <Box>
             {avatar}
             <FormTransition key={mode} mode={mode}>
-              {children ?? <AuthForm mode={mode} />}
+              {children ?? <AuthForm mode={mode}
+                forgotPasswordUrl={recoveryUrl || "/hrd/contact"}
+                forgotPassword={recoveryUrl ? "Forgot your password?" : "Need sign-in help?"}
+              />}
             </FormTransition>
             {enableToggle && (navigation ?? <AuthNavigationLink mode={mode} onToggle={onToggle} />)}
             {divider}

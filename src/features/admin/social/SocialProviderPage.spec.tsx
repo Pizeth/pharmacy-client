@@ -48,7 +48,8 @@ it("shows delete conflicts without removing the row", async () => {
   fireEvent.click(await within(dialog).findByRole("button", { name: "Delete provider" }));
   expect(await within(dialog).findByText("Provider is in use")).toBeInTheDocument();
   fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
-  expect(await row.findByRole("button", { name: "Edit for row 1" })).toBeInTheDocument();
+  await waitFor(() => expect(dialog).not.toBeInTheDocument());
+  expect(row.getByRole("button", { name: "Edit for row 1" })).toBeInTheDocument();
 });
 it("does not load management data for unauthorized accounts", () => {
   jest.mocked(useAdminAccess).mockReturnValue({ allowed: false, isLoading: false } as ReturnType<typeof useAdminAccess>);

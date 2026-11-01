@@ -40,12 +40,15 @@ it("requires selection and edits through the shared modal and current version", 
   const save = jest.spyOn(rolesApi, "save").mockResolvedValue(applicationRole);
   const client = mount();
   const invalidate = jest.spyOn(client, "invalidateQueries");
-  const select = await screen.findByRole("checkbox", { name: "Select row 5" });
+  const select = await screen.findByLabelText("Select row 5");
+  const rowElement = select.closest("tr");
+  if (!rowElement) throw new Error("Role selection must belong to a table row");
+  const row = within(rowElement);
   expect(
-    screen.getByRole("button", { name: "Edit role for row 5" }),
+    row.getByRole("button", { name: "Edit role for row 5" }),
   ).toBeDisabled();
   fireEvent.click(select);
-  fireEvent.click(screen.getByRole("button", { name: "Edit role for row 5" }));
+  fireEvent.click(row.getByRole("button", { name: "Edit role for row 5" }));
   const dialog = within(await screen.findByRole("dialog"));
   const input = await dialog.findByLabelText("Description");
   expect(

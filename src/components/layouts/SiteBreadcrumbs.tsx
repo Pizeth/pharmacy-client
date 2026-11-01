@@ -9,7 +9,7 @@ import LocalPoliceIcon from "@mui/icons-material/LocalPolice";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useBreadcrumbLabels } from "./breadcrumbLabels";
 import { getSiteBreadcrumbs } from "./breadcrumbRoutes";
-import { ROUTE_NAV_MAP } from "@/configs/navConfig";
+import { getRouteNavigationItem } from "@/configs/navConfig";
 import { breadcrumbRootStyles, breadcrumbTrailStyles, breadcrumbItemStyles, breadcrumbSeparatorStyles, breadcrumbIconStyles } from "./breadcrumbStyles";
 
 export type SiteBreadcrumbSlot = "root" | "trail" | "link" | "current" | "icon" | "separator";
@@ -23,7 +23,6 @@ const Ancestor = styled(Link, slot("Link"))<LinkProps>({});
 const Current = styled(Typography, slot("Current"))<TypographyProps>(({ theme }) => breadcrumbItemStyles(theme));
 const Separator = styled(ChevronRightIcon, slot("Separator"))(({ theme }) => breadcrumbSeparatorStyles(theme));
 const Icon = styled("span", slot("Icon"))(({ theme }) => breadcrumbIconStyles(theme));
-const navigation = Object.values(ROUTE_NAV_MAP).flatMap(items => items.flatMap(item => [item, ...(item.children ?? [])]));
 
 export function SiteBreadcrumbs() {
   const pathname = usePathname();
@@ -33,7 +32,7 @@ export function SiteBreadcrumbs() {
   return <Root maxWidth="xl"><Trail aria-label="Breadcrumb" separator={<Separator aria-hidden="true" />}>
     {crumbs.map((crumb, index) => {
       const icon = index === 1 && pathname?.split("/")[1] === "admin"
-        ? <LocalPoliceIcon color="primary" /> : navigation.find(item => item.href === crumb.href)?.Icon;
+        ? <LocalPoliceIcon color="primary" /> : getRouteNavigationItem(crumb.href)?.Icon;
       const current = index === crumbs.length - 1;
       const content = <Current component="span" variant="body2" aria-current={current ? "page" : undefined}>
         {icon && <Icon aria-hidden="true">{icon}</Icon>}{recordLabels.get(crumb.href) ?? crumb.label}

@@ -17,7 +17,7 @@ const Root = styled("button", {
     color: palette.text.secondary, boxShadow: palette.customShadows?.neumorphic ?? theme.shadows[1],
     transition: theme.transitions.create("box-shadow", { duration: 200 }),
     "& > svg": {
-      position: "relative", width: 20, height: 20, zIndex: 1, opacity: 0.6,
+      position: "relative", width: 20, height: 20, zIndex: 1, opacity: 0.75,
       transition: theme.transitions.create(["transform", "filter", "opacity"], { duration: 200 }),
     },
     '&[aria-checked="false"] > svg:first-of-type, &[aria-checked="true"] > svg:last-of-type': {
