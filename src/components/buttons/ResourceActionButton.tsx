@@ -18,7 +18,7 @@ const Root = styled(Button, {
   boxShadow: theme.shadows[2],
 }));
 
-export interface ResourceActionButtonProps extends Omit<ButtonProps, "sx"> {}
+export type ResourceActionButtonProps = Omit<ButtonProps, "sx">;
 
 /**
  * Resource-level action button.

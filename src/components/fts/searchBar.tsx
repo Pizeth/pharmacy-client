@@ -117,7 +117,7 @@ const SearchInputWithIcon = ({
     getOptionLabel: (option) => option,
     filterOptions: (options) => {
       if (options === undefined) return [];
-      let newOptions = options.filter((option) => {
+      const newOptions = options.filter((option) => {
         return option.toLowerCase().includes(internalValue.toLowerCase());
       });
       return newOptions.slice(0, 5);
@@ -183,14 +183,18 @@ const SearchInputWithIcon = ({
 
         {groupedOptions.length > 0 && internalValue.length ? (
           <Listbox {...getListboxProps()}>
-            {groupedOptions.map((option, index) => (
-              <li
-                {...getOptionProps({ option, index })}
-                onClick={handleClickOption}
-              >
-                <strong>{option}</strong>
-              </li>
-            ))}
+            {groupedOptions.map((option, index) => {
+              const { key, ...optionProps } = getOptionProps({ option, index });
+              return (
+                <li
+                  key={key}
+                  {...optionProps}
+                  onClick={handleClickOption}
+                >
+                  <strong>{option}</strong>
+                </li>
+              );
+            })}
           </Listbox>
         ) : null}
       </Search>

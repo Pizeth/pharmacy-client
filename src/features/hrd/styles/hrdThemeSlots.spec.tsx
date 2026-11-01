@@ -17,9 +17,9 @@ const theme = createTheme({ cssVariables: true,
 });
 
 it.each([
-  ["home", <HrdHomePage />, "region", "ព័ត៌មានសំខាន់"],
-  ["contact", <HrdContactPage />, "article", "លោកស្រី សន ម៉ាលី"],
-  ["about", <HrdAboutPage section="overview" />, "article", "ព័ត៌មានសង្ខេបនាយកដ្ឋាន"],
+  ["home", <HrdHomePage key="home" />, "region", "ព័ត៌មានសំខាន់"],
+  ["contact", <HrdContactPage key="contact" />, "article", "លោកស្រី សន ម៉ាលី"],
+  ["about", <HrdAboutPage key="about" section="overview" />, "article", "ព័ត៌មានសង្ខេបនាយកដ្ឋាន"],
 ] as const)("allows the theme to override the %s presentation slot", (_name, page, role, label) => {
   render(<ThemeProvider theme={theme}>{page}</ThemeProvider>);
   const element = screen.getByRole(role, { name: label });

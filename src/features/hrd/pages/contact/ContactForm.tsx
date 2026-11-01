@@ -27,7 +27,7 @@ export function ContactForm({ email }: { email?: string }) {
     if (!email) return;
     const subject = fields.subject.trim();
     const body = `${fields.message}\n\nName: ${fields.name}\nEmail: ${fields.email}\nPhone / Telegram: ${fields.phone}`;
-    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.assign(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
     setDraftOpened(true);
   }
   return <S.FormSection aria-labelledby="hrd-contact-form-title">

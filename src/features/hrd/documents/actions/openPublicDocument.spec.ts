@@ -17,14 +17,14 @@ const base: PublicDocumentRecord = {
 
 describe("openPublicDocument", () => {
   let clickSpy: jest.SpyInstance;
-  let lastAnchor: HTMLAnchorElement | undefined;
+  const clickedAnchors: HTMLAnchorElement[] = [];
 
   beforeEach(() => {
-    lastAnchor = undefined;
+    clickedAnchors.length = 0;
     clickSpy = jest
       .spyOn(HTMLAnchorElement.prototype, "click")
       .mockImplementation(function (this: HTMLAnchorElement) {
-        lastAnchor = this;
+        clickedAnchors.push(this);
       });
 
     Object.defineProperty(URL, "createObjectURL", {
@@ -67,15 +67,15 @@ describe("openPublicDocument", () => {
 
     expect(result).toBe("download");
     expect(window.open).not.toHaveBeenCalled();
-    expect(lastAnchor?.getAttribute("href")).toBe("/files/sample.docx?v=3#top");
+    expect(clickedAnchors.at(-1)?.getAttribute("href")).toBe("/files/sample.docx?v=3#top");
     // Primary type is PDF, but the URL points at a .docx file.
-    expect(lastAnchor?.download).toBe("doc-1_sample_form_guide.docx");
+    expect(clickedAnchors.at(-1)?.download).toBe("doc-1_sample_form_guide.docx");
   });
 
   it("falls back to the primary file type when the URL has no extension", () => {
     openPublicDocument({ ...base, fileUrl: "/files/download" });
 
-    expect(lastAnchor?.download).toBe("doc-1_sample_form_guide.pdf");
+    expect(clickedAnchors.at(-1)?.download).toBe("doc-1_sample_form_guide.pdf");
   });
 
   it("names a generated placeholder after the primary file type", () => {
@@ -83,7 +83,7 @@ describe("openPublicDocument", () => {
 
     expect(result).toBe("download");
     expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
-    expect(lastAnchor?.download).toBe("doc-1_sample_form_guide.pdf");
+    expect(clickedAnchors.at(-1)?.download).toBe("doc-1_sample_form_guide.pdf");
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:placeholder");
   });
 

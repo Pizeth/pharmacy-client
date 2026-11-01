@@ -1,7 +1,7 @@
 "use client";
 import { resourceFormStyles } from "@/components/forms/resourceFormStyles";
 import { ROW_ACTION_CARD_PADDING } from "@/components/DataTable/mui/columns/actions/rowActionStyles";
-/* eslint-disable @typescript-eslint/no-empty-object-type */
+
 import { deepmerge } from "@mui/utils";
 import { formActionsStyles } from "@/components/forms/formActionsStyles";
 import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";

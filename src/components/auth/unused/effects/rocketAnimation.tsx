@@ -77,9 +77,9 @@ export default function Rocket({
     const rect = svgRef.current.getBoundingClientRect();
     const cX = rect.left + rect.width / 2;
     const cY = rect.top + rect.height / 2;
-    let clientX =
+    const clientX =
       "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
-    let clientY =
+    const clientY =
       "touches" in e ? e.touches[0].clientY : (e as MouseEvent).clientY;
     return { x: clientX, y: clientY, cX, cY };
   };

@@ -178,7 +178,7 @@ export function NotFoundUI() {
       <p className="title">Oh no!!</p>
       <p className="subtitle">
         You’re either misspelling the URL <br />
-        or requesting a page that's no longer here.
+        or requesting a page that&apos;s no longer here.
       </p>
       {/* <div className="flex justify-center">
         <a className="btn-back" href="#">
