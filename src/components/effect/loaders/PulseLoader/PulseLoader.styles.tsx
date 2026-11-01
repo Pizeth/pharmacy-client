@@ -37,7 +37,7 @@ export const Root = styled("div", slot("Root"))(({ theme }) => ({
   position: "fixed", top: 0, left: 0, right: 0, height: "100dvh", boxSizing: "border-box", zIndex: theme.zIndex.modal + 1,
   "--PulseLoader-accent": "#ff0000",
   display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
-  gap: theme.spacing(4), padding: theme.spacing(3),
+  gap: theme.spacing(4), padding: 0, margin: 0, borderRadius: 0,
   backgroundColor: theme.alpha((theme.vars ?? theme).palette.background.default, 0.92),
   color: (theme.vars ?? theme).palette.text.primary,
   "@media (prefers-reduced-motion: reduce)": {
@@ -46,7 +46,7 @@ export const Root = styled("div", slot("Root"))(({ theme }) => ({
 }));
 // Inner glow inspired by Ana Tudor's CodePen WNVPdJg.
 export const Frame = styled("div", slot("Frame"))(({ theme }) => ({
-  position: "absolute", inset: theme.spacing(1), borderRadius: theme.spacing(3),
+  position: "absolute", inset: 0, borderRadius: 0,
   overflow: "hidden", pointerEvents: "none", zIndex: 0,
   "&::before": { content: '""', position: "absolute", inset: "-1em",
     border: "solid 1.25em transparent",

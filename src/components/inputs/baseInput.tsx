@@ -317,7 +317,7 @@ export function BaseInput<TFieldValues extends FieldValues>(
     rootRef,
     type = "text",
     iconStart,
-    iconStartAlignment = "center",
+    iconStartAlignment = "top",
     iconEnd,
     resettable = true,
     clearAlwaysVisible,

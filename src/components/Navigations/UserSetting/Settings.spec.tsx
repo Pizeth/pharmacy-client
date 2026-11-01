@@ -19,8 +19,8 @@ const theme = createTheme({ cssVariables: true, palette: { customShadows: {
   circleWell: "inset 2px 2px 4px black", dataTableCard: "none", dataTableInset: "none",
 } } });
 const identity = { name: "Test Member", email: "member@example.com", role: "member" };
-function mount(authenticated: boolean, authLoading = false) {
-  return render(<ThemeProvider theme={theme}><UserMenu open anchorEl={document.body} onClose={mockClose} authenticated={authenticated} authLoading={authLoading} data={identity} /></ThemeProvider>);
+function mount(authenticated: boolean, authLoading = false, role = identity.role) {
+  return render(<ThemeProvider theme={theme}><UserMenu open anchorEl={document.body} onClose={mockClose} authenticated={authenticated} authLoading={authLoading} data={{ ...identity, role }} /></ThemeProvider>);
 }
 beforeEach(() => {
   jest.clearAllMocks();
@@ -59,4 +59,11 @@ test("authentication loading prevents premature navigation", () => {
   mount(false, true);
   expect(screen.queryByRole("img", { name: "Guest avatar" })).not.toBeInTheDocument();
   expect(screen.getByText("Loading…").closest("li")).toHaveAttribute("aria-disabled", "true");
+});
+
+test.each([["member", "/dashboard"], ["admin", "/dashboard"], ["SYS_ADMIN", "/admin/dashboard"]])("opens the right dashboard for %s", (role, href) => {
+  mount(true, false, role);
+  fireEvent.click(screen.getByText("Dashboard"));
+  expect(mockClose).toHaveBeenCalledTimes(1);
+  expect(mockPush).toHaveBeenCalledWith(href);
 });

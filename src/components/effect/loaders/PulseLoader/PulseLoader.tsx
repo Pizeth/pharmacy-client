@@ -25,18 +25,18 @@ export default function PulseLoader() {
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const particleId = useId().replace(/:/g, "");
   const emblemRef = useRef<HTMLDivElement>(null);
-  const [messageIndex, setMessageIndex] = useState<number | null>(null);
+  // Portal content mounts only in the browser, so this seed cannot mismatch server markup.
+  const [messageIndex, setMessageIndex] = useState(() => Math.floor(Math.random() * LOADING_MESSAGES.length));
   useEffect(() => {
-    setMessageIndex(Math.floor(Math.random() * LOADING_MESSAGES.length));
     const timer = window.setInterval(() => {
-      setMessageIndex(current => ((current ?? 0) + 1) % LOADING_MESSAGES.length);
+      setMessageIndex(current => (current + 1) % LOADING_MESSAGES.length);
     }, 2500);
     return () => window.clearInterval(timer);
   }, []);
   return (
     <Portal>
-      <GlobalStyles styles={'@property --PulseLoader-frame-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }'} />
-      <S.Root role="status" aria-label="Loading…" aria-live="polite" aria-busy="true">
+      <GlobalStyles styles={'@property --PulseLoader-frame-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; } body:has(> [data-pulse-loader]) { overflow: hidden; }'} />
+      <S.Root data-pulse-loader role="status" aria-label="Loading…" aria-live="polite" aria-busy="true">
         <S.Background aria-hidden="true">
           {!reducedMotion && <ParticleField emblemRef={emblemRef} main={palette.primary.main} light={palette.primary.light} />}
         </S.Background>
@@ -65,7 +65,7 @@ export default function PulseLoader() {
           <S.Avatar src="/static/images/logo.svg" alt="" neumorphic softGlow />
           <S.Progress>{[0, 1, 2, 3, 4, 5, 6].map(index => <S.Orbit key={index} />)}</S.Progress>
           <S.Message variant="h6">
-            {messageIndex === null ? "Loading…" : LOADING_MESSAGES[messageIndex]}
+            {LOADING_MESSAGES[messageIndex]}
           </S.Message>
         </S.Emblem>
       </S.Root>

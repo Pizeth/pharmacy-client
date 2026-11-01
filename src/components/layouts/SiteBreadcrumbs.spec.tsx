@@ -6,6 +6,17 @@ import { useBreadcrumbLabel } from "./breadcrumbLabels";
 import { getSiteBreadcrumbs } from "./breadcrumbRoutes";
 jest.mock("next/navigation", () => ({ usePathname: jest.fn() }));
 
+it("keeps HRD labels and icons when the dashboard has shortcuts to the same routes", () => {
+  jest.mocked(usePathname).mockReturnValue("/hrd/documents");
+  render(<SiteBreadcrumbs />);
+  const nav = screen.getByRole("navigation", { name: "Breadcrumb" });
+  expect(within(nav).getByRole("link", { name: "ទំព័រដើម" })).toHaveAttribute("href", "/hrd");
+  expect(within(nav).getByText("បណ្ដុំឯកសារ")).toHaveAttribute("aria-current", "page");
+  expect(within(nav).getByTestId("FolderIcon")).toHaveClass("MuiSvgIcon-colorSecondary");
+  expect(within(nav).queryByText("HRD home")).not.toBeInTheDocument();
+  expect(getSiteBreadcrumbs("/hrd/contact").at(-1)?.label).toBe("ទំនាក់ទំនង");
+});
+
 it.each([
   ["/admin/dashboard", "Dashboard"],
   ["/admin/social-provider", "Social providers"],

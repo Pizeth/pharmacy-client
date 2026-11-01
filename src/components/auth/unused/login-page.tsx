@@ -9,7 +9,7 @@
 // // import { Input } from "@/components/ui/input";
 // import { Label } from "@/components/ui/label";
 // import Image from "next/image";
-// import placeholder from "../../../public/placeholder.svg";
+// import placeholder from "@/public/placeholder.svg";
 
 // export const LoginPage = (props: { redirectTo?: string }) => {
 //   const { redirectTo } = props;
@@ -316,10 +316,10 @@ import {
 import { styled, useTheme, useThemeProps } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import Image from "next/image";
-import IconInput from "../CustomInputs/IconInput";
+import IconInput from "@/components/CustomInputs/IconInput";
 import { PermIdentity, Password, Login } from "@mui/icons-material";
 import { useRequired } from "@/utils/validator";
-import PasswordValidationInput from "../CustomInputs/PasswordValidationInput";
+import PasswordValidationInput from "@/components/CustomInputs/PasswordValidationInput";
 import { LogIn, LogInIcon } from "lucide-react";
 import { LoginFormProps, LoginProps } from "react-admin";
 import { LoginParams } from "@/interfaces/auth.interface";
@@ -333,7 +333,7 @@ import {
   Meta,
   Microsoft,
   X,
-} from "../icons/socialIcons";
+} from "@/components/icons/socialIcons";
 
 const PREFIX = "RazethLoginForm";
 

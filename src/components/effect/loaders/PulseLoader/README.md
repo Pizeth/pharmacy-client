@@ -39,6 +39,8 @@ another border or ring. The red orbit dots sit outside this circle with theme.sp
 while retaining their original size. The existing red pulse, logo, and cycling messages are retained.
 The emblem scales to keep that outer orbit within both viewport dimensions.
 The fixed root uses 100dvh and border-box sizing to center against the mobile viewport.
+The root and glow frame are edge-to-edge, with no outer padding, inset or rounded corners.
+While the portal is mounted, its scoped body rule hides background scrolling and the scrollbar gutter; unmounting restores the page's normal scrolling.
 The `gradientRing` slot adds aadium's thin, round-capped gradient arc in the narrow
 gap around the logo, above its frame: primary head to transparent error tail, a 0.75-unit
 stroke, rotating every 1.2s.

@@ -5,8 +5,8 @@ import {
   Login as LoginIcon,
   PersonAdd as SignUpIcon,
 } from "@mui/icons-material";
-import SocialLogin from "./socialLogin";
-import Divider from "./divider";
+import SocialLogin from "@/components/auth/socialLogin";
+import Divider from "@/components/auth/divider";
 
 interface AuthTabsProps {
   loginForm: React.ReactNode;

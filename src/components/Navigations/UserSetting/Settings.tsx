@@ -14,6 +14,7 @@ import CircularProgressStatic from "@/components/CustomComponents/CircularProgre
 import MiniDashboard from "./MiniDashboard";
 import { useRouter } from "next/navigation";
 import { useLogout } from "@refinedev/core";
+import { getDashboardDestination } from "@/lib/auth/dashboardDestination";
 import { PublicAction, Header, Wrapper } from "./Settings.styles";
 const PREFIX = "RazethUserSetting";
 const containerVariants = {
@@ -167,7 +168,10 @@ export const UserMenu = (inProps: UserMenuProps) => {
             label: "Settings",
             icon: <SettingsOutlined fontSize="small" />
           }].map(item => <motion.div key={item.label} variants={itemVariants}>
-                  <Action onClick={onClose}>
+                  <Action onClick={() => {
+                    onClose();
+                    if (item.label === "Dashboard") router.push(getDashboardDestination(data?.role));
+                  }}>
                     <ListItemIcon>{item.icon}</ListItemIcon>
                     <Typography variant="body2" fontWeight={500}>
                       {item.label}

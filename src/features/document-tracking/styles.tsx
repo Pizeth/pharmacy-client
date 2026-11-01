@@ -1,4 +1,5 @@
 "use client";
+import { SIGNATURE_GOLD } from "@/theme/brandColors";
 import { resourceNeumorphicStyles } from "@/components/buttons/resourceNeumorphicStyles";
 import { resourceFormStyles } from "@/components/forms/resourceFormStyles";
 import { ResourceBadge } from "@/components/Tables/ResourceBadge";
@@ -189,7 +190,13 @@ export const Status = styled(ResourceBadge, slot("Status"))({});
 
 export const UploadButton = styled(Button, slot("UploadButton"))<ButtonProps<"label">>(({ theme }) => ({
   ...resourceNeumorphicStyles(theme), width: "100%", minWidth: 0, padding: theme.spacing(1, 1.5),
-  '&:focus-within': { outline: `2px solid ${(theme.vars ?? theme).palette.primary.main}`, outlineOffset: 3 },
+  '&&:not(.Mui-disabled)': {
+    color: "#1a1a1a", backgroundColor: SIGNATURE_GOLD, border: `1px solid ${SIGNATURE_GOLD}`,
+  },
+  '&&:hover:not(.Mui-disabled), &&.Mui-focusVisible:not(.Mui-disabled)': {
+    color: "#1a1a1a", backgroundColor: `color-mix(in srgb, ${SIGNATURE_GOLD} 90%, #1a1a1a)`,
+  },
+  '&:focus-visible, &:focus-within': { outline: `2px solid ${(theme.vars ?? theme).palette.text.primary}`, outlineOffset: 3 },
 }));
 export const FileInput = styled("input", slot("FileInput"))({ ...visuallyHidden });
 

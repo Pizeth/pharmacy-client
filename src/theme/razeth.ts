@@ -18,6 +18,7 @@ import {
 // import { makePulseVars } from "@/utils/themeUtils";
 import { getMeteorConfig, getSideImageConfig } from "@/configs/themeConfig";
 import { shake } from "./keyframes";
+import { SIGNATURE_BLUE, SIGNATURE_GOLD } from "./brandColors";
 import {
   RazethAvatarOptimized,
   RazethLoginOptimized,
@@ -30,7 +31,7 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"; // Optional
 
-const SIGNATURE_GOLD = "#FFD22B";
+
 
 const globalStyles = (theme: Theme) => ({
   "html, body, #__next": {
@@ -252,6 +253,8 @@ const standardizedFormComponents = {
       heading: ({ theme }: { theme: Theme }) => ({
         padding: theme.spacing(2, 3),
         borderBottom: `1px solid ${SIGNATURE_GOLD}`,
+        backgroundColor: SIGNATURE_BLUE,
+        color: "#fff",
       }),
 
       wrapper: ({ theme }: { theme: Theme }) => ({
@@ -270,9 +273,15 @@ const standardizedFormComponents = {
         backgroundColor: SIGNATURE_GOLD,
       },
 
-      caption: ({ theme }: { theme: Theme }) => ({
-        color: (theme.vars ?? theme).palette.text.secondary,
-      }),
+      caption: {
+        color: "rgba(255, 255, 255, 0.8)",
+      },
+
+      button: {
+        color: "#fff",
+        "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.12)" },
+        "&:focus-visible": { outline: `2px solid ${SIGNATURE_GOLD}`, outlineOffset: 2 },
+      },
 
       footer: ({ theme }: { theme: Theme }) => ({
         padding: theme.spacing(3),

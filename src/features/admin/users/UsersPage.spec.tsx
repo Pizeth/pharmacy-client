@@ -59,10 +59,13 @@ it("restores Details and Selection to the left even with an older saved layout",
 
 it("combines text and status filters using the shared i18n filter controls", async () => {
  const list = jest.spyOn(usersApi, "list").mockResolvedValue({ users: [record], total: 1 }); mount();
- await screen.findByText("Jane");
+ const name = await screen.findByText("Jane");
+ const tableElement = name.closest("table");
+ if (!tableElement) throw new Error("User filters must belong to the user table");
+ const table = within(tableElement);
  fireEvent.click(screen.getByRole("button", { name: "Show column filters" }));
- fireEvent.change(screen.getByRole("textbox", { name: "Name" }), { target: { value: "Jane" } });
- fireEvent.mouseDown(screen.getByRole("combobox", { name: "Status" }));
+ fireEvent.change(table.getByRole("textbox", { name: "Name" }), { target: { value: "Jane" } });
+ fireEvent.mouseDown(table.getByRole("combobox", { name: "Status" }));
  fireEvent.click(screen.getByRole("option", { name: "Active" }));
  await waitFor(() => expect(list).toHaveBeenLastCalledWith(0, 25, "", expect.arrayContaining([{ id: "name", value: "Jane" }, { id: "banned", value: "false" }]), [], expect.any(AbortSignal)));
  expect(screen.getByRole("button", { name: "Hide column filters" })).toBeInTheDocument();

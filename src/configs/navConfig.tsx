@@ -26,6 +26,12 @@ export interface NavItemType {
 }
 
 export const ROUTE_NAV_MAP: Record<string, NavItemType[]> = {
+  "/dashboard": [
+    { label: "Dashboard", href: "/dashboard", color: "info", Icon: <DashboardIcon color="info" /> },
+    { label: "Documents", href: "/hrd/documents", color: "primary", Icon: <FolderIcon color="primary" /> },
+    { label: "HRD home", href: "/hrd", color: "secondary", Icon: <RazHome color="secondary" /> },
+    { label: "Contact", href: "/hrd/contact", color: "warning", Icon: <RazContact color="warning" /> },
+  ],
   "/admin": [
     { label: "Dashboard", href: "/admin/dashboard", color: "info", Icon: <DashboardIcon color="info" /> },
     { label: "Users", href: "/admin/users", color: "success", Icon: <PeopleOutlineIcon color="success" /> },
@@ -200,6 +206,16 @@ export function getDynamicNavItems(pathname: string): NavItemType[] {
     .filter((route) => matchesNavRoute(pathname, route))
     .sort((a, b) => b.length - a.length)[0];
   return section ? ROUTE_NAV_MAP[section] : DEFAULT_NAV_ITEMS;
+}
+
+const allNavigationItems = Object.values(ROUTE_NAV_MAP).flatMap(items =>
+  items.flatMap(item => [item, ...(item.children ?? [])]),
+);
+
+/** Cross-section shortcuts must not replace a destination's own label or icon. */
+export function getRouteNavigationItem(href: string): NavItemType | undefined {
+  const ownedItems = getDynamicNavItems(href).flatMap(item => [item, ...(item.children ?? [])]);
+  return ownedItems.find(item => item.href === href) ?? allNavigationItems.find(item => item.href === href);
 }
 
 export function getActiveNavIndex(
