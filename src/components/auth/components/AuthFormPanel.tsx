@@ -26,7 +26,7 @@ export function AuthFormPanel({
 }: AuthFormPanelProps) {
   const theme = useTheme();
   const defaults = theme.components?.RazethAuthForm?.defaultProps;
-  const recoveryUrl = defaults?.forgotPasswordUrl ?? process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL?.trim();
+  const recoveryUrl = defaults?.forgotPasswordUrl?.trim() || process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL?.trim();
   return (
     <Grid size={{ xs: 12, md: 6 }}>
       <ParticleHexBackground
