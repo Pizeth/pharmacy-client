@@ -96,20 +96,45 @@ exposes the new raw production option. No application server was restarted.
   Back-to-front keyboard activation returns focus to Show details; back is inert.
   RTL retains selected identities and live callbacks. No fixture warnings/errors.
 - [Settled desktop RTL flip](evidence/datatable-production-2-2-3-7/desktop-rtl-flip.png).
+- Controlled A/unloaded selection gives raw2 vs filtered1 and native detail2.
+  Filtering Bravo gives filtered0 without losing either ID; clearing and sorting
+  retain a,unloaded. [Native controlled detail](evidence/datatable-production-2-2-3-7/native-controlled-detail.png).
+- Actual current-source HRD public documents: table→11 compact cards; keyboard
+  flip exposes the first document description/type/file badges, marks front inert,
+  and focuses the Khmer return control. Return and table switch work; no-match
+  search shows the empty state and Clear restores11 native data rows. Download
+  controls remain present; none was invoked. No errors; the pre-existing logo.svg
+  fill/static-parent warning remains. [Resource compact detail](evidence/datatable-production-2-2-3-7/hrd-compact-detail.png).
 - Viewport override was attempted but actual DOM width remained1265px with
   environment1280×720. It was reset. **No narrow/mobile acceptance is claimed.**
-- Current-source localhost admin resources require sign-in; browser verification
-  is pending. The older Refine Document proof no longer owns `/admin/documents`:
-  that route now belongs to tracked documents. Do not reuse its historical browser
-  certification as current acceptance or invent selection controls there.
+- After user sign-in, actual TranslationKey: selecting10 enables its Edit;
+  selecting7 too disables bulk Edit/Delete. Deep-row keyboard focus scrolls the
+  container:10 bounds125.4765625–176.3046875,7 bounds176.3046875–227.1328125,
+  both50.828125px; overlap0. Expanded10 has one native spanning td/colspan11 and
+  both locale controls. Table→card retains checked10/7, the flipped10 detail,
+  and disabled bulk guards; Back to key and table return work. Search common
+  hides both selected IDs but retains count2/disabled guards; Clear restores
+  both checks. Test selection/search and table presentation restored; no mutation.
+- The older Refine Document proof no longer owns `/admin/documents`; that route
+  now belongs to tracked documents. Current tracking UI reports no registered
+  documents, so record-level browser progress/attachment actions are not certified.
+  Authorization contracts remain unchanged and are covered by existing tests.
+- A development-only `/dev/datatable/document-provider` route reuses the existing
+  resource-owned fixture/Refine provider, with no backend requests. Page2 settles
+  to DOC-0026/25 rows; switching to cards and Refresh retain that page. DOC-0026
+  search settles to one card/1–1 of1; clearing and descending Document No. sort
+  yields DOC-0060 first. This fixture exposes no selection controls. Exact request
+  counts/live reconciliation remain automated evidence, not inferred from UI.
+  [Refine filtered card](evidence/datatable-production-2-2-3-7/refine-filtered-card.png).
 
 ## Rollout decision
 
 **B — production invocation boundaries integrated; row-local rollout deferred.**
 The full-state owner and AppTable context still broadcast. A safe production
 row-local opt-in is not exposed. S6/C2 locality remains internal scoped evidence,
-not a public guarantee. Browser resource/narrow checks and public owner narrowing
-remain incomplete. The expensive density matrix is skipped because there is no
+not a public guarantee. Narrow/full geometry browser certification, tracked-record
+actions on a non-empty dataset and public owner narrowing remain incomplete.
+The expensive density matrix is skipped because there is no
 correctness-approved optimized candidate. No production performance success or
 virtualization approval follows from this phase.
 
@@ -117,5 +142,22 @@ Next 2.2.3.8 is conditional: first establish a compatible full-context owner wit
 bounded output dependencies and complete browser acceptance, then compare ordinary
 production and profiling builds. Keep historical timings unchanged.
 
-Full strict-install/test results, resource regressions, final code SHA and PR/CI
-review status will be appended after the final validation run.
+## Final local validation
+
+Production integration source: `f7334c5`; subsequent changes add acceptance fixtures
+and records. A separate detached checkout avoids replacing the running development
+server's dependencies.
+
+- Sandboxed npm failed before dependency installation (`Exit handler never called`).
+  Approved isolated `npm ci --strict-peer-deps` retry: PASS,1010 packages installed,
+  postinstall feature audit passes. No manifest/lockfile changes. npm audit reports
+  47 findings (3 low/32 moderate/12 high), recorded separately; no audit-fix applied.
+- Fresh-install typecheck / generated feature synchronization: PASS.
+- Full default-timeout serial source suite at `f7334c5`: **195 suites /1,133 tests
+  PASS**,483.672s. Includes real TranslationKey controller/query/selection/card,
+  independent Refine Document lifecycle/live reconciliation, tracked-document
+  authorization contracts, row-model/pinning/geometry/RTL/keyboard/footer suites.
+- Changed production/test files ESLint: zero errors; one existing fixture columns
+  exhaustive-deps warning. Full repository:138 errors/468 warnings, unchanged from
+  the merged lint-cleanup baseline. No rules, assertions or timeouts weakened.
+- Whitespace checks: PASS. Final CI/review links and SHA are reported with the PR.

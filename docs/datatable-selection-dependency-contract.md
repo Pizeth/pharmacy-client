@@ -1,5 +1,16 @@
 # Selection dependency contract — scoped proof, production deferred
 
+## 2.2.3.7 — production invocation integration, outcome B
+
+Production detail invocation now owns a broad subscription before deciding whether
+to mount its native row. Card composition has a corresponding broad per-item
+boundary. Both receive the actual full AppTable context, not a rewritten state
+snapshot. The production D19 physical appearance case is now a positive assertion;
+D6/D21 still reject narrowed owners. The internal row/global declaration remains
+diagnostic-only; no public selection optimization is exported. Grouped card
+composition does not promise independent row-local slot subscriptions.
+See [the integration report](datatable-production-subscriptions-2-2-3-7.md).
+
 ## October 26 — 2.2.3.6 internal callback-context proof
 
 **Outcome B: production integration deferred.** The new internal proof retains
