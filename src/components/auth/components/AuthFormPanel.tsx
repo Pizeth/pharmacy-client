@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Box, CardContent, Grid } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import type { AuthAction } from "@/types/auth";
 import ThemeToggle from "@/components/effect/themes/themeToggle";
 import ParticleHexBackground from "@/components/effect/backgrounds/particleHex";
@@ -23,7 +24,9 @@ interface AuthFormPanelProps {
 export function AuthFormPanel({
   mode, onToggle, enableToggle, avatar, navigation, divider, social, children,
 }: AuthFormPanelProps) {
-  const recoveryUrl = process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL?.trim();
+  const theme = useTheme();
+  const defaults = theme.components?.RazethAuthForm?.defaultProps;
+  const recoveryUrl = defaults?.forgotPasswordUrl ?? process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL?.trim();
   return (
     <Grid size={{ xs: 12, md: 6 }}>
       <ParticleHexBackground
@@ -37,7 +40,7 @@ export function AuthFormPanel({
             <FormTransition key={mode} mode={mode}>
               {children ?? <AuthForm mode={mode}
                 forgotPasswordUrl={recoveryUrl || "/hrd/contact"}
-                forgotPassword={recoveryUrl ? "Forgot your password?" : "Need sign-in help?"}
+                forgotPassword={defaults?.forgotPassword ?? (recoveryUrl ? "Forgot your password?" : "Need sign-in help?")}
               />}
             </FormTransition>
             {enableToggle && (navigation ?? <AuthNavigationLink mode={mode} onToggle={onToggle} />)}
