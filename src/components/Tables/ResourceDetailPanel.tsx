@@ -4,7 +4,7 @@ import { Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 const prefix = "RazethResourceRecord";
 const Root = styled("div", { name: prefix, slot: "PanelRoot", overridesResolver: (_, styles) => styles.panelRoot })(({ theme }) => ({
-  minWidth: 0, border: `1px solid ${(theme.vars ?? theme).palette.divider}`, borderRadius: 16, overflow: "hidden", overflowWrap: "anywhere",
+  minWidth: 0, border: `1px solid ${(theme.vars ?? theme).palette.divider}`, borderRadius: 0, overflow: "hidden", overflowWrap: "anywhere",
   '&[data-view="card"]': { border: 0, borderRadius: 0 },
 }));
 const Section = styled("section", { name: prefix, slot: "PanelSection", overridesResolver: (_, styles) => styles.panelSection })(({ theme }) => ({

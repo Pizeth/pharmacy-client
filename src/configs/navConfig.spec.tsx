@@ -1,6 +1,13 @@
 import { getActiveNavIndex, getDynamicNavItems, matchesNavRoute, ROUTE_NAV_MAP } from "./navConfig";
 
 describe("route navigation", () => {
+  it("gives the personal dashboard real non-admin destinations", () => {
+    const items = getDynamicNavItems("/dashboard");
+    expect(items).toBe(ROUTE_NAV_MAP["/dashboard"]);
+    expect(items[0].href).toBe("/dashboard");
+    expect(getActiveNavIndex("/dashboard", items)).toBe(0);
+    expect(items.every(item => !item.href.startsWith("/admin"))).toBe(true);
+  });
   it.each(["/hrd", "/hrd/about/director", "/hrd/news/article-slug"])(
     "uses the HRD menu for %s", (pathname) => {
       expect(getDynamicNavItems(pathname)).toBe(ROUTE_NAV_MAP["/hrd"]);

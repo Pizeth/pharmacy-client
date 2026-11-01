@@ -26,6 +26,12 @@ export interface NavItemType {
 }
 
 export const ROUTE_NAV_MAP: Record<string, NavItemType[]> = {
+  "/dashboard": [
+    { label: "Dashboard", href: "/dashboard", color: "info", Icon: <DashboardIcon color="info" /> },
+    { label: "Documents", href: "/hrd/documents", color: "primary", Icon: <FolderIcon color="primary" /> },
+    { label: "HRD home", href: "/hrd", color: "secondary", Icon: <RazHome color="secondary" /> },
+    { label: "Contact", href: "/hrd/contact", color: "warning", Icon: <RazContact color="warning" /> },
+  ],
   "/admin": [
     { label: "Dashboard", href: "/admin/dashboard", color: "info", Icon: <DashboardIcon color="info" /> },
     { label: "Users", href: "/admin/users", color: "success", Icon: <PeopleOutlineIcon color="success" /> },

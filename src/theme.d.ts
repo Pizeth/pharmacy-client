@@ -120,6 +120,7 @@ declare module "@mui/material/styles" {
     RazethAdminUsers: import("@/features/admin/users/styles").AdminUserSlot;
     RazethAdminSocial: import("@/features/admin/social/styles").AdminSocialSlot;
     RazethAdminRoles: import("@/features/admin/roles/styles").AdminRoleSlot;
+    RazethDashboard: import("@/features/dashboard/styles").DashboardSlot;
     RazethHrd: HrdSlotKey;
     RazethLoader: PulseLoaderSlot;
     RazethCloudLoader: "root" | "message";
@@ -157,6 +158,7 @@ declare module "@mui/material/styles" {
     RazethAdminUsers: Record<string, unknown>;
     RazethAdminSocial: Record<string, unknown>;
     RazethAdminRoles: Record<string, unknown>;
+    RazethDashboard: Record<string, unknown>;
     RazethDrawer: Record<string, unknown>;
     RazethLoginFeedback: Record<string, unknown>;
     RazethNav: Record<string, unknown>;
@@ -189,6 +191,7 @@ declare module "@mui/material/styles" {
     RazethAdminUsers?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAdminUsers"] };
     RazethAdminSocial?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAdminSocial"] };
     RazethAdminRoles?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAdminRoles"] };
+    RazethDashboard?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDashboard"] };
     RazethLoginFeedback?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethLoginFeedback"] };
     RazethSideImagePreview?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSideImagePreview"] };
     RazethDrawer?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDrawer"] };

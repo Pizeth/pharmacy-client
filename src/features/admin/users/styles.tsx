@@ -18,7 +18,7 @@ export const RoleBadge = styled("span", { ...slot("RoleBadge"), shouldForwardPro
 });
 export const Details = styled("div", slot("Details"))(({ theme }) => ({
   display: "grid", minWidth: 0, overflowWrap: "anywhere", color: (theme.vars ?? theme).palette.text.primary,
-  border: "1px solid " + (theme.vars ?? theme).palette.divider, borderRadius: 16, overflow: "hidden",
+  border: "1px solid " + (theme.vars ?? theme).palette.divider, borderRadius: 0, overflow: "hidden",
   '&[data-view="card"]': { border: 0, borderRadius: 0 },
 }));
 export const DetailHero = styled("header", slot("DetailHero"))(({ theme }) => ({ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: theme.spacing(2), padding: theme.spacing(2.5), backgroundColor: (theme.vars ?? theme).palette.action.hover }));

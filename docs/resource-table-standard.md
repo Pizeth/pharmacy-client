@@ -24,7 +24,7 @@ Switching presentation must retain the same controller, filters and row identiti
 
 The compact-card setting uses the shared `CompactCardToggle`: a two-icon pill
 with a sliding selected indicator, descriptive tooltip, keyboard focus and
-accessible switch state. Do not restore a text-labeled toolbar switch per page.
+accessible switch state. Its hover uses an inset neumorphic track and a raised sliding thumb; the selected icon pops through neutral foreground contrast, depth and scale, without a primary-color border or icon tint. Do not restore a text-labeled toolbar switch per page.
 
 For every resource with card content, use `defaultDisplayMode="auto"` and
 `autoCardBreakpoint="md"`: below `md` starts in cards, while desktop starts in
@@ -160,3 +160,9 @@ Badges have intrinsic width and must never stretch across a grid track. Locale t
 - Table/card action accents: delete/archive uses primary, edit uses error, and view uses the neutral foreground (white in dark mode, readable foreground in light mode). Apply the same mapping to selection toolbar actions.
 
 - FormDialog heading dividers and circular resource-icon backgrounds use signature gold (#FFD22B), independent of warning colors. Icons on that gold surface use a dark foreground for contrast.
+
+Upload-file picker buttons use the shared signature gold surface with dark text/icons and a neumorphic hover, making them distinct from neutral Cancel/Close controls. Use theme/brandColors.ts for signature accents rather than warning or primary palette colors.
+
+Inline detail-panel surfaces use square corners (borderRadius: 0) so section backgrounds sit flush within table expansions and card backs. Outer cards and dedicated record-page surfaces retain their own rounding.
+
+Shared multiline TextField start icons default to first-line/top alignment, including Description, translation values and notes. Single-line input icons stay centered. Do not rely on each form opting in to the multiline alignment rule.
