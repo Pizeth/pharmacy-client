@@ -2,6 +2,7 @@
 
 // src/components/DataTable/mui/components/detail-panel/DataTableDetailPanelRow.tsx
 
+import { DataTableCallbackBoundary } from "../DataTableCallbackBoundary";
 import { Box, styled, TableCell, TableRow } from "@mui/material";
 import type { Row, RowData } from "@tanstack/table-core";
 import { useDataTableAccessibility } from "../../accessibility";
@@ -127,7 +128,7 @@ export interface DataTableDetailPanelRowProps<TData extends RowData> {
 export function DataTableDetailPanelRow<TData extends RowData>(
   props: DataTableDetailPanelRowProps<TData>,
 ) {
-  const { table, row, renderDetailPanel } = props;
+  const { row, renderDetailPanel } = props;
 
   const { getExpandButtonId, getDetailPanelId } = useDataTableAccessibility();
 
@@ -136,29 +137,7 @@ export function DataTableDetailPanelRow<TData extends RowData>(
   const detailPanelId = getDetailPanelId(row.id);
 
   return (
-    <table.Subscribe
-      selector={(state) => ({
-        /**
-         * colSpan depends on currently visible leaf columns.
-         */
-        columnVisibility: state.columnVisibility,
-
-        /**
-         * Keep the existing subscription contract intact in 6E.4.
-         *
-         * Pinning does not currently alter colSpan, but removing this
-         * dependency is an optimization/audit concern rather than part
-         * of the presentation migration.
-         */
-        columnPinning: state.columnPinning,
-
-        /**
-         * The row exists only while TanStack considers it expanded.
-         */
-        expanded: state.expanded,
-      })}
-    >
-      {() => {
+    <DataTableCallbackBoundary<TData> render={(table) => {
         /**
          * Important:
          *
@@ -223,6 +202,6 @@ export function DataTableDetailPanelRow<TData extends RowData>(
           </DetailPanelRowRoot>
         );
       }}
-    </table.Subscribe>
+    />
   );
 }

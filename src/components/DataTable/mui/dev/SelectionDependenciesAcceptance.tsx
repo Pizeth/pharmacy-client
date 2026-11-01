@@ -16,7 +16,7 @@ import { SelectionDependencyBoundary } from "../diagnostics/SelectionDependencyB
 export type DependencyRecord = { id: string; name: string };
 export type DependencyTable = MuiDataTableInstance<DependencyRecord>;
 type DependencyRow = Row<MuiDataTableFeatures, DependencyRecord>;
-export type DependencyVariant = "default" | "boundaries" | "callbacks";
+export type DependencyVariant = "default" | "boundaries" | "callbacks" | "production";
 function hasFullCallbackState(table: ReturnType<typeof useMuiDataTable<DependencyRecord, DependencyTable["state"] | { globalFilter: unknown }>>): table is DependencyTable {
   return "rowSelection" in table.state;
 }
@@ -159,6 +159,17 @@ export function SelectionDependenciesFixture({ variant = "default", onTable,
     narrowRowSelection: variant === "boundaries", commit: diagnostics?.commit ?? (() => {}),
     measureRowModel: diagnostics?.measureRowModel ?? (read => read()),
   }), [variant, diagnostics]);
+  // Production acceptance uses raw callbacks, not the diagnostic LiveCallbackBoundary.
+  const snapshotCount = (current: DependencyTable) => Object.values(current.state.rowSelection).filter(Boolean).length;
+  const rawDetail = ({ table: current, row }: { table: DependencyTable; row: DependencyRow }): ReactNode => {
+    if (conditionalDetail && (blocked || snapshotCount(current) === 0)) {
+      if (emptyOutput === "undefined") return undefined;
+      if (emptyOutput === "false") return false;
+      if (emptyOutput === "fragment") return <></>;
+      return null;
+    }
+    return <Output id={`detail-${row.id}`} commit={commit}>{snapshotCount(current)}</Output>;
+  };
   return <DataTableRenderDiagnosticsContext.Provider value={observer}>
     <button onClick={() => controlled ? setSelection({ a: true, b: true }) : table.setRowSelection({ a: true, b: true })}>External select A and B</button>
     <button onClick={() => table.setRowSelection({ a: true, unloaded: true })}>External select A and unloaded</button>
@@ -182,6 +193,13 @@ export function SelectionDependenciesFixture({ variant = "default", onTable,
         rowPinning={{ displayMode: "select-sticky" }}
         card={{ enableSelection: true, enableExpansion: true,
           detailMode: flip ? "flip" : "inline", flip: { flipOnHover: false },
+          ...(variant === "production" && customSlots ? {
+            renderDetail: rawDetail,
+            renderSelection: ({ table: current, row }) => <output data-testid={`selection-${row.id}`}>{snapshotCount(current)}</output>,
+            renderExpansion: ({ table: current, row }) => <output data-testid={`expansion-${row.id}`}>{snapshotCount(current)}</output>,
+            renderMetadata: ({ table: current, row }) => <output data-testid={`metadata-${row.id}`}>{snapshotCount(current)}</output>,
+            renderActions: ({ table: current, row }) => <button data-testid={`custom-action-${row.id}`} disabled={blocked || snapshotCount(current) >= 2}>Custom guarded action</button>,
+          } : {}),
           ...(variant === "callbacks" && customSlots ? {
             renderDetail: ({row}) => <NullableCallbackOutput Subscribe={table.Subscribe} row={row} commit={commit} blocked={blocked} conditional={conditionalDetail} emptyOutput={emptyOutput} />,
             renderSelection: ({row}) => <LiveCallbackBoundary<DependencyRecord> render={current => <output data-testid={`selection-${row.id}`}>{Object.keys(current.state.rowSelection).length}</output>} />,
@@ -189,7 +207,7 @@ export function SelectionDependenciesFixture({ variant = "default", onTable,
             renderMetadata: ({row}) => <LiveCallbackBoundary<DependencyRecord> render={current => <output data-testid={`metadata-${row.id}`}>{Object.keys(current.state.rowSelection).length}</output>} />,
             renderActions: ({row}) => <LiveCallbackBoundary<DependencyRecord> render={current => <button data-testid={`custom-action-${row.id}`} disabled={blocked || Object.keys(current.state.rowSelection).length >= 2}>Custom guarded action</button>} />,
           } : {}),
-          renderHeader: ({ row }) => variant === "callbacks" ? <LiveCallbackBoundary<DependencyRecord> render={current => <output data-testid={`header-${row.id}`}>{row.original.name}: {Object.keys(current.state.rowSelection).length}</output>} /> : row.original.name,
+          renderHeader: ({ row, table: current }) => variant === "production" ? <output data-testid={`header-${row.id}`}>{row.original.name}: {snapshotCount(current)}</output> : variant === "callbacks" ? <LiveCallbackBoundary<DependencyRecord> render={current => <output data-testid={`header-${row.id}`}>{row.original.name}: {Object.keys(current.state.rowSelection).length}</output>} /> : row.original.name,
           renderBody: ({ row, table: callbackTable }) => <>
             {snapshotCallbacks && <output data-testid={`snapshot-${row.id}`}>
               Callback snapshot: {Object.values(callbackTable.state.rowSelection ?? {}).filter(Boolean).length}
@@ -198,7 +216,7 @@ export function SelectionDependenciesFixture({ variant = "default", onTable,
             <GlobalOutput table={table} row={row} commit={commit} />
             <LocalParent table={table} row={row} commit={commit} />
           </>, actions }}
-        renderDetailPanel={({ row }) => variant === "callbacks"
+        renderDetailPanel={({ row, table: current }) => variant === "production" ? rawDetail({ row, table: current }) : variant === "callbacks"
           ? <NullableCallbackOutput Subscribe={table.Subscribe} row={row} commit={commit} blocked={blocked} conditional={conditionalDetail} emptyOutput={emptyOutput} />
           : conditionalDetail && !Object.values(table.store.get().rowSelection).some(Boolean)
             ? null : <GlobalOutput table={table} row={row} commit={commit} prefix="detail" />} />
@@ -222,10 +240,10 @@ export function SelectionDependenciesAcceptance() {
   const theme = useMemo(() => createTheme({ direction }), [direction]);
   return <ThemeProvider theme={theme}>
     <h1>Selection dependency acceptance — fixture only</h1>
-    <p>Independent outputs; no production subscription defaults changed.</p>
+    <p>Broad production callback boundaries; row-local owner optimization remains unapproved.</p>
     <p data-testid="environment">{environment}</p>
-    <label>Variant <select value={variant} onChange={event => setVariant(event.target.value === "boundaries" ? "boundaries" : event.target.value === "callbacks" ? "callbacks" : "default")}>
-      <option value="callbacks">Full callback context proof</option><option value="default">Production default</option><option value="boundaries">Experimental output boundaries</option>
+    <label>Variant <select value={variant} onChange={event => setVariant(event.target.value === "boundaries" ? "boundaries" : event.target.value === "callbacks" ? "callbacks" : event.target.value === "production" ? "production" : "default")}>
+      <option value="production">Production invocation boundaries (broad owner)</option><option value="callbacks">Full callback context proof</option><option value="default">Production default</option><option value="boundaries">Experimental output boundaries</option>
     </select></label>
     <button onClick={() => setDirection(value => value === "ltr" ? "rtl" : "ltr")}>Toggle direction</button>
     <label><input type="checkbox" checked={snapshots} onChange={event => setSnapshots(event.target.checked)} />

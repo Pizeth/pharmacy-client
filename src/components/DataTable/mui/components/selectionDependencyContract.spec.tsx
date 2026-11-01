@@ -19,7 +19,7 @@ function setup(variant: DependencyVariant, controlled = false, direction: "ltr" 
   };
 }
 
-describe.each<DependencyVariant>(["default", "boundaries", "callbacks"])("%s dependency contract", variant => {
+describe.each<DependencyVariant>(["default", "boundaries", "callbacks", "production"])("%s dependency contract", variant => {
   it("D1–D8: count, cross-row guard and UNDECLARED callbacks update while local A can skip B", () => {
     const fixture = setup(variant);
     fixture.select("a");
@@ -187,18 +187,16 @@ it("legacy D6/D21 callback snapshots remain fresh with the full production owner
   expect(within(fixture.row("a")!).getByRole("button", { name: /^Guarded action/ })).toBeDisabled();
 });
 
-it.each<DependencyVariant>(["default", "boundaries", "callbacks"])("D19 nullable callback integration gate: %s", variant => {
+it.each<DependencyVariant>(["default", "boundaries", "callbacks", "production"])("D19 nullable callback integration gate: %s", variant => {
   const fixture = setup(variant, false, "ltr", false, true);
   fixture.button("Expand A");
   expect(fixture.table().getRow("a").getIsExpanded()).toBe(true);
   expect(screen.queryByTestId("detail-a")).not.toBeInTheDocument();
   fixture.select("a");
   expect(screen.getByTestId("global-a")).toHaveTextContent("1");
-  if (variant !== "boundaries") {
-    expect(screen.getByTestId("detail-a")).toHaveTextContent("1");
-  } else {
-    // Nothing mounted means no descendant boundary can subscribe. The callback
-    // invocation itself needs an independent boundary before owner narrowing.
-    expect(screen.queryByTestId("detail-a")).not.toBeInTheDocument();
-  }
+  // 2.2.3.7 places the production invocation subscription before physical row
+  // omission. This live-store renderer now appears even under the historical
+  // narrow owner. D6/D21 still reject that owner's callback snapshot contract.
+  expect(screen.getByTestId("detail-a")).toHaveTextContent("1");
+  expect(screen.getByTestId("detail-a").closest("tr")).toHaveAttribute("data-detail-panel-row", "a");
 });
