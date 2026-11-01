@@ -1137,7 +1137,7 @@ Login.image = ({ src, alt }: { src: string; alt: string }) => (
     />
   </Astronaut>
 );
-Login.effect = ({ shootingStarCount, twinkleStarCount }: EffectProps) => {
+Login.effect = function LoginEffect({ shootingStarCount, twinkleStarCount }: EffectProps) {
   const theme = useTheme();
   // Get configurations from theme
   const meteorConfig = theme.custom?.meteor;

@@ -20,7 +20,7 @@ import {
   translationKeyDataTableServerAdapter,
 } from "@/features/i18n/translation-keys";
 
-export default async function ApiTester() {
+export default function ApiTester() {
   const [url, setUrl] = useState(`${API_URL}/api/v1/i18n/keys/query`);
   const [method, setMethod] = useState("POST");
   const [headers, setHeaders] = useState(
@@ -73,20 +73,18 @@ export default async function ApiTester() {
 
   console.log(request);
 
-  const result = await loadTranslationKeyDataTableResult({
-    pagination: {
-      pageIndex: 0,
-      pageSize: 25,
-    },
-
-    sorting: [],
-
-    columnFilters: [],
-
-    globalFilter: "Login",
-  });
-
-  console.log(result);
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadTranslationKeyDataTableResult({
+      pagination: { pageIndex: 0, pageSize: 25 },
+      sorting: [], columnFilters: [], globalFilter: "Login",
+    }, controller.signal).then((result) => {
+      if (!controller.signal.aborted) console.log(result);
+    }).catch((error: unknown) => {
+      if (!controller.signal.aborted) console.error(error);
+    });
+    return () => controller.abort();
+  }, []);
 
   const handleSend = async () => {
     setLoading(true);

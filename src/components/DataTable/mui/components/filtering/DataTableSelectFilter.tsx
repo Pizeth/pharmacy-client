@@ -12,7 +12,7 @@ import {
   useThemeProps,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
 import {
   decodeDataTableSelectFilterValue,
@@ -81,9 +81,7 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
 
   // A background refresh may begin while the menu is open. Close it and
   // require a new user action after recovery, without changing filter state.
-  useEffect(() => {
-    if (unavailable) setOpen(false);
-  }, [unavailable]);
+  if (unavailable && open) setOpen(false);
 
   const selectedValue =
     value === undefined ? "" : encodeDataTableSelectFilterValue(value);
