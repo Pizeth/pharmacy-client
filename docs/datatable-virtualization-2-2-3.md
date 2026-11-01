@@ -1,5 +1,15 @@
 # Conditional DataTable virtualization architecture — 2.2.3
 
+## 2.2.3.7 — boundary integration is not a performance gate pass
+
+Outcome **B** integrates broad production callback invocation before physical
+nullable detail/card decisions. The full owner/context still broadcast; no public
+row-local candidate is approved. Therefore the expensive production/profiling
+comparison is skipped, historical numbers stay unchanged, and virtualization
+implementation remains unapproved. See [the integration report](datatable-production-subscriptions-2-2-3-7.md).
+Proposed 2.2.3.8 acceptance is conditional on a safe optimized owner and completed
+browser correctness; 2.2.3.9 would be a separate virtualization decision.
+
 ## October 26 — 2.2.3.6 internal callback-context proof
 
 **Outcome B: production integration deferred.** The new internal proof retains

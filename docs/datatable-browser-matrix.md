@@ -1,5 +1,19 @@
 # DataTable browser matrix runbook
 
+## 2.2.3.7 — production boundary continuation
+
+**Outcome B; production row-local rollout deferred.** Continue the existing run
+with the new raw **Production invocation boundaries (broad owner)** option at
+`/dev/datatable/selection-dependencies`. The default full owner remains intact.
+Native empty-slot insertion/removal and card composition are production paths;
+the old callback/narrow-owner diagnostics remain distinct historical proofs.
+Current-source localhost observations, exact native row/colspan checks, RTL flip,
+resource sign-in and ineffective viewport override limitations are recorded in
+[the integration report](datatable-production-subscriptions-2-2-3-7.md).
+Do not treat an old public-host fixture, historical resource routes, or a successful
+viewport command without changed DOM geometry as current browser acceptance.
+No new density profiling or virtualization rollout follows from this result.
+
 ## October 26 — 2.2.3.6 internal callback-context proof
 
 **Outcome B: production integration deferred.** The new internal proof retains

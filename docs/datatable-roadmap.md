@@ -1,5 +1,20 @@
 # TanStack v9 + MUI DataTable roadmap
 
+## 2.2.3.7 — production invocation boundary integration
+
+**Outcome B — row-local production rollout deferred.** Native detail invocation
+now subscribes before physical tr/td omission, and each card has a mounted broad
+composition boundary before nullable slot decisions. Genuine full AppTable callback
+context is preserved; the full owner still broadcasts. No public opt-in or production
+performance improvement is claimed. See [the integration report](datatable-production-subscriptions-2-2-3-7.md)
+for current DOM tests, browser evidence and remaining gates. Historical results below
+remain unchanged.
+
+The proposed continuation labels are now recorded as: **2.2.3.8**, conditional
+performance acceptance after a compatible optimized owner and browser correctness;
+**2.2.3.9**, a separate evidence-based virtualization decision, not approved for
+implementation. Do not run the expensive matrix for the broad-boundary integration.
+
 ## October 26 — 2.2.3.6 internal callback-context proof
 
 **Outcome B: production integration deferred.** The new internal proof retains
