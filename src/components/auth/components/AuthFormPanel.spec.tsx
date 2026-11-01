@@ -27,7 +27,7 @@ it.each(["signin", "signup"] as const)("preserves the configured recovery URL in
 it("preserves themed recovery URL and label ahead of the environment fallback", () => {
   process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL = "https://accounts.example.com/recovery";
   mount("signin", createTheme({ cssVariables: true, components: {
-    RazethAuthForm: { defaultProps: { forgotPasswordUrl: "/custom-recovery", forgotPassword: "Recover account" } },
+    RazethAuthForm: { defaultProps: { forgotPasswordUrl: " /custom-recovery ", forgotPassword: "Recover account" } },
   } }));
   expect(screen.getByRole("link", { name: "Recover account" })).toHaveAttribute("href", "/custom-recovery");
 });
@@ -42,5 +42,19 @@ it.each([undefined, "", "  "])("offers real support instead of an absent recover
   if (value === undefined) delete process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL;
   else process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL = value;
   mount();
+  expect(screen.getByRole("link", { name: "Need sign-in help?" })).toHaveAttribute("href", "/hrd/contact");
+});
+it.each(["", "  "])("falls back to the environment when the themed URL is %j", forgotPasswordUrl => {
+  process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL = " https://accounts.example.com/recovery ";
+  mount("signin", createTheme({ cssVariables: true, components: {
+    RazethAuthForm: { defaultProps: { forgotPasswordUrl } },
+  } }));
+  expect(screen.getByRole("link", { name: "Forgot your password?" })).toHaveAttribute("href", "https://accounts.example.com/recovery");
+});
+it("offers support when both recovery URL sources are blank", () => {
+  process.env.NEXT_PUBLIC_FORGOT_PASSWORD_URL = " ";
+  mount("signin", createTheme({ cssVariables: true, components: {
+    RazethAuthForm: { defaultProps: { forgotPasswordUrl: " " } },
+  } }));
   expect(screen.getByRole("link", { name: "Need sign-in help?" })).toHaveAttribute("href", "/hrd/contact");
 });
