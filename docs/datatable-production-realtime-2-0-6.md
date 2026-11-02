@@ -7,7 +7,7 @@ Backend base: `6397beb2e34a75f631228896fa65898f5b013b65`.
 Separate `codex/production-realtime` branches; the backend runs in an isolated
 worktree without changing the user's running development server.
 
-**Rollout gated.** The existing 2.0.1–2.0.5 generic event, reconciliation,
+**Outcome B — implementation complete, rollout gated.** The existing 2.0.1–2.0.5 generic event, reconciliation,
 table-state safety and Refine fixture proof are preserved. This phase adds the
 missing backend delivery and TranslationKey production subscription. Simulated
 provider tests are not evidence of production cross-client delivery.
@@ -165,5 +165,28 @@ and [backend CI](https://github.com/Pizeth/pharmacy-api/actions/runs/41430120123
 Review follow-up heads and final checks are tracked in those PRs.
 
 Disposable database/two authenticated client acceptance: **BLOCKED**, no explicit
-test database configured. Existing `.env` database credentials were not used.
-No migration, production mutation, merge or deployment was performed by this task.
+test database is available to the acceptance process yet. The user configured
+the test URL in Infisical; its environment/path and executable integration access
+are still needed. Existing `.env` database credentials were not used.
+The user subsequently authorized backend merge/Northflank deployment after green
+CI/review. That authorization does not enable realtime or redirect the regular API
+to a test database. Migration, enabled cross-client delivery and infrastructure
+acceptance remain separate gates; current deployment status is tracked in API PR #6.
+
+Final source validation:
+
+- Client `6314d0eadebd91af20a523d0f4ea9c0975c70c1c`: isolated strict lockfile
+  install, generated feature audit and typecheck PASS. **197 suites / 1,147 tests
+  PASS**, 562.806 s. [Final source CI](https://github.com/Pizeth/pharmacy-client/actions/runs/41438272170),
+  CodeRabbit and Vercel pass; both lifecycle findings are fixed and resolved.
+- API `bb50b7ac2192ae231d5e2e0a83837f07b426b367`: fresh install, Prisma generation,
+  typecheck, changed-file lint, **42 suites / 272 tests PASS**, 60.799 s, and
+  production build PASS. [Final source CI](https://github.com/Pizeth/pharmacy-api/actions/runs/41446977261)
+  passes. Outside-diff request-close and trigger-identity findings are fixed.
+- A real Nest module-graph regression rejects the reported AuthService visibility
+  failure: the installed async library module is global by default and exports
+  AuthService. Importing RealtimeModule first still resolves it. No auth wiring
+  change was necessary. This is not a live-session acceptance test.
+- Both feature gates default off and were not activated by this task. No
+  dependency/lockfile update, timeout increase, lint disable, role-grant change,
+  virtualization or broad subscription optimization was introduced.
