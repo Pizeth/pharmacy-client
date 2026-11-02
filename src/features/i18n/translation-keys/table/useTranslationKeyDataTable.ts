@@ -23,6 +23,7 @@ import {
   useTranslationKeyRefineDataTableServerResult,
 } from "../refine";
 import { useTranslationKeyFilterOptions } from "./useTranslationKeyFilterOptions";
+import { useTranslationKeyLiveResult, useTranslationKeyLiveSubscription } from "../refine/useTranslationKeyLive";
 import type { TranslationKeyFilterOptionsState } from "./useTranslationKeyFilterOptions";
 import type { DataTableRowAction } from "@/components/DataTable/mui/columns/actions";
 import {
@@ -326,8 +327,8 @@ export function useTranslationKeyDataTable(
       query.state,
     );
 
-  const server =
-    refine.server;
+  const live = useTranslationKeyLiveResult(query.state, refine.server, refine.request.refresh);
+  const server = live.server;
 
   /**
    * ================================================================
@@ -607,6 +608,7 @@ export function useTranslationKeyDataTable(
    *
    * Page-index recovery and expanded-row reconciliation remain enabled.
    */
+  useTranslationKeyLiveSubscription(table, live.handleEvent);
   useDataTableLiveTableStateSafety({
     table,
     query,

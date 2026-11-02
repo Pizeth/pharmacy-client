@@ -100,7 +100,8 @@ const DetailPanelRoot = styled(Box, {
 });
 
 export interface DataTableDetailPanelRowProps<TData extends RowData> {
-  readonly table: MuiDataTableInstance<TData>;
+  /** @deprecated The nearest AppTable context is authoritative; retained for source compatibility. */
+  readonly table?: MuiDataTableInstance<TData>;
   readonly row: Row<MuiDataTableFeatures, TData>;
   readonly renderDetailPanel: DataTableDetailPanelRenderer<TData>;
 }

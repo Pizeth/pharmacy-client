@@ -11,11 +11,15 @@ import { Refine } from "@refinedev/core";
 import dataProvider from "@refinedev/nestjsx-crud";
 import routerProvider from "@refinedev/nextjs-router";
 import { Suspense } from "react";
+import { createProductionLiveProvider } from "@/lib/realtime/productionLiveProvider";
+
+const liveProvider = createProductionLiveProvider();
 
 // const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 export const RefineContext = ({ children }: { children: React.ReactNode }) => {
   return (
     <Refine
+      liveProvider={liveProvider}
       i18nProvider={i18nProvider}
       routerProvider={routerProvider}
       /**
@@ -32,6 +36,7 @@ export const RefineContext = ({ children }: { children: React.ReactNode }) => {
       }}
       authProvider={authProvider}
       options={{
+        liveMode: "off",
         syncWithLocation: true,
         warnWhenUnsavedChanges: true,
         // Tell Refine where your auth pages live

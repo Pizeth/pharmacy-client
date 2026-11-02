@@ -1,5 +1,14 @@
 # Selection dependency contract — scoped proof, production deferred
 
+## 2.0.6 review follow-up — callback compatibility unchanged
+
+Expanded native detail callbacks intentionally remain broad during transient
+column resizing: a regression verifies current resize values and committed output.
+Undeclared callbacks may depend on that slice; no blanket exclusion is safe.
+The low-level detail row's table prop is optional/deprecated for source
+compatibility. The nearest AppTable remains authoritative, including nested tables.
+These changes introduce no public row-local optimization guarantee.
+
 ## 2.2.3.7 — production invocation integration, outcome B
 
 Production detail invocation now owns a broad subscription before deciding whether

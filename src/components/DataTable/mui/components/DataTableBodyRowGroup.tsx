@@ -60,7 +60,6 @@ export function DataTableBodyRowGroup<TData extends RowData>(
 
       {renderDetailPanel && (
         <DataTableDetailPanelRow
-          table={table}
           row={row}
           renderDetailPanel={renderDetailPanel}
         />
