@@ -60,8 +60,10 @@ export function createProductionLiveProvider({ enabled = productionRealtimeEnabl
         const event = decodeLiveEvent(data);
         if (!event) return;
         attempts = 0;
-        for (const subscription of subscribers) {
-          if (subscription.types.includes("*") || subscription.types.includes(event.type)) subscription.callback(event);
+        for (const subscription of [...subscribers]) {
+          if (!subscription.types.includes("*") && !subscription.types.includes(event.type)) continue;
+          try { subscription.callback(event); }
+          catch { /* One consumer must not interrupt the other consumers or shared stream. */ }
         }
       });
     } catch { /* Network/idle failure: resync on the next authenticated connection. */ }

@@ -1,6 +1,6 @@
 import { Refine, type DataProvider, type LiveEvent, type LiveProvider } from "@refinedev/core";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { useLayoutEffect, useState } from "react";
+import { Activity, useLayoutEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { useTranslationKeyDataTable } from "../table/useTranslationKeyDataTable";
 import { queryTranslationKeys } from "../api";
@@ -34,10 +34,15 @@ function Fixture() {
       card={{ renderBody: ({ row }) => row.original.key }} />
     <output data-testid="selection">{JSON.stringify(controller.table.state.rowSelection)}</output></>;
 }
-function mount() {
+function ActivityFixture() {
+  const [visible, setVisible] = useState(true);
+  return <><button onClick={() => setVisible(value => !value)}>Toggle activity</button>
+    <Activity mode={visible ? "visible" : "hidden"}><Fixture /></Activity></>;
+}
+function mount(activity = false) {
   return render(<Refine liveProvider={provider} dataProvider={{ default: fallback,
     [TRANSLATION_KEY_REFINE_DATA_PROVIDER_NAME]: translationKeyRefineDataProvider }}
-    options={{ disableTelemetry: true, liveMode: "off" }}><Fixture /></Refine>);
+    options={{ disableTelemetry: true, liveMode: "off" }}>{activity ? <ActivityFixture /> : <Fixture />}</Refine>);
 }
 const event = (id: string, type = "updated", recordId = "1"): LiveEvent => ({ channel: "resources/translations",
   type, date: new Date(), payload: { eventId: id, id: recordId } });
@@ -99,5 +104,17 @@ it("performs a trailing canonical refresh when an event arrives during a stale i
     data: { data: [row(1, "Stale response")], metadata: { currentPage: 1, pageSize: 25,
       totalItems: 1, totalPages: 1, hasNextPage: false, hasPreviousPage: false } } }));
   await screen.findByText("After in-flight mutation");
+  view.unmount();
+});
+
+it("resumes scheduling when Activity cleans up and restores effects while keeping refs", async () => {
+  const view = mount(true); await screen.findByText("Original");
+  act(() => notify!(event("before-hide", "invalidate")));
+  fireEvent.click(screen.getByText("Toggle activity"));
+  fireEvent.click(screen.getByText("Toggle activity"));
+  await screen.findByText("Original");
+  rows = [row(1, "After activity restore")];
+  act(() => notify!(event("after-show", "invalidate")));
+  await screen.findByText("After activity restore");
   view.unmount();
 });

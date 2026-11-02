@@ -98,3 +98,17 @@ it("does not open a connection when gated off", () => {
   expect(provider.subscribe(subscription())).toBeUndefined();
   expect(fetcher).not.toHaveBeenCalled();
 });
+
+it("isolates throwing subscribers without dropping delivery or reconnecting the shared stream", async () => {
+  const fetcher = jest.fn().mockResolvedValue(response());
+  const provider = createProductionLiveProvider({ enabled: true, fetcher });
+  const first = provider.subscribe(subscription(jest.fn(() => { throw new Error("broken consumer"); })));
+  const healthy = subscription();
+  const second = provider.subscribe(healthy);
+  await flush();
+  expect(healthy.callback).toHaveBeenCalledTimes(1);
+  expect(fetcher).toHaveBeenCalledTimes(1);
+  expect((fetcher.mock.calls[0][1] as RequestInit).signal?.aborted).toBe(false);
+  provider.unsubscribe(first); provider.unsubscribe(second);
+  await flush();
+});

@@ -36,7 +36,10 @@ export function useTranslationKeyLiveResult(query: DataTableServerQueryState,
   useEffect(() => {
     if (!server.isFetching && dirty.current) schedule();
   }, [server.isFetching, schedule]);
-  useEffect(() => () => { clearTimeout(timer.current); }, []);
+  useEffect(() => () => {
+    clearTimeout(timer.current);
+    timer.current = undefined;
+  }, []);
   return useDataTableLiveServerResult({ resource: "translations", query, server,
     refresh: schedule, getRowId: row => row.id });
 }

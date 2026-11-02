@@ -141,6 +141,29 @@ Backend fresh `npm ci`, Prisma generation, typecheck and production build passed
 Full backend suite: **41 suites / 267 tests passed**. Frontend validation, browser
 observations and review links are recorded below as they complete.
 
+Initial frontend full suite: **197 suites / 1,144 tests passed** (default timeouts).
+Additional focused coverage proves trailing refetch after a stale in-flight query,
+Activity effect cleanup/restoration, and isolation of throwing stream consumers.
+CodeRabbit's two frontend lifecycle findings were reproduced and corrected;
+backend review additionally requested explicit disconnect/lifetime cleanup tests.
+New frontend files pass ESLint; the existing controller expansion-effect lint
+finding is unchanged. No lint rule or timeout was changed.
+
+Gate-off current-source browser (`http://localhost:8080/admin/i18n`): authenticated
+30-record list, row 8 selection enables Edit, expansion creates one physical detail
+row, card switching preserves selection and the open back face. Returning to the
+table and clearing selection disables Edit again. No browser errors, no mutations,
+and preferences restored. [Screenshot](evidence/datatable-realtime-2-0-6/gated-card-continuity.png).
+This does not validate enabled realtime delivery or a second authenticated client.
+
+Paired draft PRs: [frontend #55](https://github.com/Pizeth/pharmacy-client/pull/55)
+and [backend #6](https://github.com/Pizeth/pharmacy-api/pull/6). Initial integration
+heads `593275ae51fb1422657c7b060fb25aac34e3ca54` and
+`971f31e219662b211b68604d4b86da8b42f12208` passed
+[frontend CI](https://github.com/Pizeth/pharmacy-client/actions/runs/41430133545)
+and [backend CI](https://github.com/Pizeth/pharmacy-api/actions/runs/41430120123).
+Review follow-up heads and final checks are tracked in those PRs.
+
 Disposable database/two authenticated client acceptance: **BLOCKED**, no explicit
 test database configured. Existing `.env` database credentials were not used.
 No migration, production mutation, merge or deployment was performed by this task.
