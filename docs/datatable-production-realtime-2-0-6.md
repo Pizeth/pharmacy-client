@@ -210,3 +210,33 @@ for interactive login, then inject the test environment into the explicit
 acceptance script. Alternatively execute the packaged script in a separate
 Northflank job with that test secret. No production `.env` fallback is allowed.
 Frontend PR #55 remains draft; backend merge does not approve realtime activation.
+
+## PR recheck, visual follow-up and deployment pause
+
+Frontend PR #55 passed CI, CodeRabbit and Vercel at report head
+`383c240c02fa19c149c25d287e223be398f8ffe4`, with no unresolved threads.
+Two late Qodo findings were subsequently posted on merged API PR #6: synchronous
+shutdown during SSE setup and failure cleanup in the database harness. Both are
+fixed and regression-tested in [API PR #7](https://github.com/Pizeth/pharmacy-api/pull/7),
+head `f56f2d9d62355cd3649d20974766d3dcf83db210`. Full local follow-up validation:
+**43 suites / 278 tests**, typecheck, changed-file lint and production build PASS.
+This follow-up is not merged/deployed.
+
+The user reported a Northflank security concern and revoked its Infisical access.
+Further Northflank deployment and testing are paused; tests use the local
+Infisical CLI. Login now succeeds and the test URL is injected without displaying
+it. The corrected harness preserves the primary hostname-resolution failure,
+closes clients and does not queue cleanup SQL before connection. That run failed
+before creating any schema. Read-only DNS-over-HTTPS with system CA verification
+confirms no IPv4 A record and one IPv6 AAAA record for the configured direct
+Supabase hostname. Local acceptance needs the test project's session-pooler URL
+on port 5432, or working IPv6 connectivity. Transaction pooling is unsuitable.
+
+Current-source desktop visual check at 1280 px in dark mode: selection and native
+detail render correctly without visible row overlap; selected IDs and the open
+detail survive table/card switching. Enter on Back to key restores focus to Show
+translations. Filtering to common retains both hidden selected identities and
+keeps the bulk single-record commands disabled. Search, table mode and selection
+were restored; no browser errors or data mutations. The agent-created tab was
+closed when cloud testing was paused. This is desktop compatibility evidence,
+not mobile or enabled realtime cross-client acceptance.
