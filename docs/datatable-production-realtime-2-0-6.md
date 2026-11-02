@@ -190,3 +190,23 @@ Final source validation:
 - Both feature gates default off and were not activated by this task. No
   dependency/lockfile update, timeout increase, lint disable, role-grant change,
   virtualization or broad subscription optimization was introduced.
+
+## Backend deployment observation
+
+After final CI/CodeRabbit passed, the user authorized merging API PR #6.
+Backend master is `90d2039197c3ef21944b3260208e6d97c216db55`.
+[Northflank build focused-quince-7964](https://app.northflank.com/t/razeths-team/project/razeth-api/services/api/builds/focused-quince-7964)
+reports success for that commit. The live
+`https://api.razeth.com/api/v1/live/translations` changed from HTTP 404 before
+deployment to HTTP 401 without credentials afterward. This proves the protected
+route is deployed and rejects an unauthenticated request; it does **not** prove
+an authorized stream, applied production triggers or cross-client delivery.
+
+The user placed `REALTIME_TEST_DATABASE_URL` in Infisical. Local injection was
+attempted without printing values, but the CLI has no valid login session.
+The installed npm shim targets a zero-byte extensionless file; the usable CLI is
+`%APPDATA%/npm/node_modules/@infisical/cli/bin/infisical.exe`. Use that executable
+for interactive login, then inject the test environment into the explicit
+acceptance script. Alternatively execute the packaged script in a separate
+Northflank job with that test secret. No production `.env` fallback is allowed.
+Frontend PR #55 remains draft; backend merge does not approve realtime activation.
