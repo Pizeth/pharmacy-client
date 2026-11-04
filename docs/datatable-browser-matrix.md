@@ -1,5 +1,17 @@
 # DataTable browser matrix runbook
 
+## 2.0.6 — production realtime acceptance
+
+Keep both transport gates off until the backend migration, dedicated PostgreSQL
+session listener and proxy streaming are ready. Use a disposable database and two
+independent authenticated sessions: client B commits key/value mutations while
+client A's actual TranslationKey table/card updates by canonical refetch. Exercise
+active sort/filter/page, selected deletion/off-page IDs, bursts/duplicates, sleep,
+disconnect/reconnect, logout/revocation and unauthorized subscription. Existing
+fixture proofs and mocked rendered-output tests are separate evidence. Without
+that integration environment these cases are BLOCKED, never a simulated PASS.
+See [the production realtime record](datatable-production-realtime-2-0-6.md).
+
 ## 2.2.3.7 — production boundary continuation
 
 **Outcome B; production row-local rollout deferred.** Continue the existing run

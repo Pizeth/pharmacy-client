@@ -32,9 +32,9 @@ const columns = helper.columns([
 const emptyOutputs = { null: null, undefined, false: false, fragment: <></>, zero: 0, text: "" };
 type Empty = keyof typeof emptyOutputs;
 
-function setup({ empty = "null", mode = "table", flip = false, custom = false, controlled = false, strict = false, compact = false }: {
+function setup({ empty = "null", mode = "table", flip = false, custom = false, controlled = false, strict = false, compact = false, resize = false }: {
   empty?: Empty; mode?: "table" | "card"; flip?: boolean; custom?: boolean;
-  controlled?: boolean; strict?: boolean; compact?: boolean;
+  controlled?: boolean; strict?: boolean; compact?: boolean; resize?: boolean;
 } = {}) {
   let current: Table;
   const invoked = jest.fn();
@@ -57,7 +57,7 @@ function setup({ empty = "null", mode = "table", flip = false, custom = false, c
     const detail: DataTableCardConfig<RecordRow>["renderDetail"] = ({ table: callback, row }) => {
       invoked(row.id, callback);
       if (row.id !== "a" || !policy || count(callback) === 0) return emptyOutputs[empty];
-      return <Detail>{count(callback)}</Detail>;
+      return <Detail>{count(callback)}{resize && <span data-testid="resize-offset">{callback.state.columnResizing.deltaOffset ?? 0}</span>}</Detail>;
     };
     const slot = (name: string): DataTableCardConfig<RecordRow>["renderBody"] =>
       function renderSlot({ table: callback, row }) {
@@ -89,6 +89,43 @@ function setup({ empty = "null", mode = "table", flip = false, custom = false, c
     card: () => view.container.querySelector<HTMLElement>('[role="listitem"][data-row-id="a"]')!,
   };
 }
+
+it("Q1: broad detail callbacks observe transient resize state; collapsed callbacks stay uninvoked", () => {
+  const f = setup({ resize: true });
+  act(() => f.table().setColumnResizing(previous => ({ ...previous, deltaOffset: 3 })));
+  expect(f.invoked).not.toHaveBeenCalled();
+  f.select("a"); f.expand();
+  f.invoked.mockClear(); f.committed.mockClear();
+  for (const deltaOffset of [10, 20, 30]) {
+    act(() => f.table().setColumnResizing(previous => ({ ...previous, deltaOffset })));
+    expect(screen.getByTestId("resize-offset")).toHaveTextContent(String(deltaOffset));
+  }
+  expect(f.invoked.mock.calls.length).toBeGreaterThanOrEqual(3);
+  expect(f.committed.mock.calls.length).toBeGreaterThanOrEqual(3);
+});
+
+it("Q2: native detail uses the nearest AppTable even with a deprecated outer table prop", () => {
+  let outer: Table, inner: Table;
+  const callback = jest.fn(({ table }: { table: Table }) => <output data-testid="nearest">{count(table)}</output>);
+  function Inner({ outerTable }: { outerTable: Table }) {
+    const table = useMuiDataTable({ data, columns, getRowId: row => row.id,
+      getRowCanExpand: () => true, initialState: { expanded: { a: true } } });
+    useLayoutEffect(() => { inner = table; });
+    return <table.AppTable><DataTableAccessibilityProvider><DataTableDensityProvider>
+      <table><tbody><DataTableDetailPanelRow table={outerTable} row={table.getRow("a")} renderDetailPanel={callback} /></tbody></table>
+    </DataTableDensityProvider></DataTableAccessibilityProvider></table.AppTable>;
+  }
+  function Outer() {
+    const table = useMuiDataTable({ data, columns, getRowId: row => row.id });
+    useLayoutEffect(() => { outer = table; });
+    return <table.AppTable><Inner outerTable={table} /></table.AppTable>;
+  }
+  render(<ThemeProvider theme={createTheme()}><Outer /></ThemeProvider>);
+  act(() => inner!.getRow("b").toggleSelected(true));
+  expect(screen.getByTestId("nearest")).toHaveTextContent("1");
+  expect(callback.mock.calls.at(-1)?.[0].table).toBe(inner!);
+  expect(outer!.state.rowSelection).toEqual({});
+});
 
 it.each<Empty>(["null", "undefined", "false"])("N1–N4/N7/N10: %s physically inserts/removes a native detail row on B-only selection", empty => {
   const f = setup({ empty });

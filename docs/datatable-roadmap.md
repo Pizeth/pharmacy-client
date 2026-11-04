@@ -1,5 +1,20 @@
 # TanStack v9 + MUI DataTable roadmap
 
+## 2.0.6–2.0.7 — production realtime continuation
+
+The completed 2.0.1–2.0.5 generic live contracts and fixture proof remain complete.
+**2.0.6** adds a gated PostgreSQL transactional NOTIFY → authenticated SSE → Refine
+bridge → generic executor vertical slice for TranslationKey. Production rollout
+requires disposable-database/two-session acceptance and deployment topology checks;
+it is not approved by mocked transport tests. See [the integration record](datatable-production-realtime-2-0-6.md).
+**2.0.7** follows for authorization-scoped Document Tracking; no document stream is
+enabled in 2.0.6. Complete realtime consistency before returning to conditional
+2.2.3.8 owner/subscription optimization. 2.2.3.9 virtualization remains unapproved.
+
+PR #54 follow-up retains broad resize invalidation for undeclared callbacks and
+deprecates the redundant native-detail table prop without breaking source callers.
+Historical performance/browser records below are unchanged.
+
 ## 2.2.3.7 — production invocation boundary integration
 
 **Outcome B — row-local production rollout deferred.** Native detail invocation
