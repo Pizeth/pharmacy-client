@@ -1,0 +1,14 @@
+version = 1
+
+test_patterns = ["**/*.spec.ts", "**/*.spec.tsx", "**/*.test.ts", "**/*.test.tsx", "**/__tests__/**"]
+exclude_patterns = ["node_modules/**", ".next/**", ".open-next/**", "out/**", "build/**", "coverage/**"]
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+  [analyzers.meta]
+  plugins = ["react"]
+  environment = ["browser", "nodejs", "jest"]
+  module_system = "es-modules"
+  dialect = "typescript"
