@@ -52,6 +52,7 @@ const NORMAL: ReadonlyArray<readonly [number, number, Mode]> = [
   [100, 16, "card"], [200, 8, "table"], [200, 16, "table"], [200, 16, "card"],
 ];
 
+/** Local opt-in benchmark with rendered-output assertions and exported samples. */
 export function ProductionProfiling({ buildMode }: { readonly buildMode: "browser" | "react" }) {
   const [fixture, setFixture] = useState<Case | null>(null);
   const [status, setStatus] = useState("Ready");
@@ -160,9 +161,18 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
         };
         const firstWindowRow = () => surfaceRef.current?.querySelector("tbody tr[data-row-id]");
         const count = () => surfaceRef.current?.querySelectorAll(mode === "table" ? "tbody tr[data-row-id]" : `.${dataTableClasses.cardItem}`).length;
+        /** Reject partial windows that leave blank space in the visible body. */
         const validMountedCount = () => {
           const mounted = count() ?? 0;
-          return integratedWindow ? mounted > 0 && mounted < pageSize : mounted === expectedMounted;
+          if (!integratedWindow) return mounted === expectedMounted;
+          const view = viewport();
+          const bodyRows = view?.querySelectorAll("tbody tr[data-row-id]");
+          const first = bodyRows?.[0]?.getBoundingClientRect();
+          const last = bodyRows?.[bodyRows.length - 1]?.getBoundingClientRect();
+          const bounds = view?.getBoundingClientRect();
+          const headerHeight = view?.querySelector("thead")?.getBoundingClientRect().height ?? 0;
+          return !!view && !!first && !!last && !!bounds && mounted > 0 && mounted < pageSize &&
+            first.top <= bounds.top + headerHeight + 1 && last.bottom >= bounds.top + view.clientHeight - 1;
         };
         try {
           for (let repeat = 0; repeat <= 3; repeat++) {
@@ -198,6 +208,15 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
                 const last = mounted?.[mounted.length - 1];
                 return !!mounted && mounted.length < rows && last?.getAttribute("data-row-id") === String(rows) &&
                   last.getAttribute("aria-rowindex") === String(rows);
+              });
+            }
+            if (track === "integrated") {
+              await measure("scroll-to-end", repeat, () => {
+                const view = viewport();
+                if (view) view.scrollTop = view.scrollHeight;
+              }, () => {
+                const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
+                return mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
               });
             }
             if (track === "sort" || track === "integrated" || windowed) continue;

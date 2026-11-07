@@ -426,7 +426,7 @@ function DataTablePresentationRegion<TData extends RowData>(
     );
   }
 
-  const windowBody = windowRows && (windowRows === "interactive" || (!renderDetailPanel && !onRowClick)) && !showColumnFilters;
+  const windowBody = windowRows && (windowRows === "interactive" || (!renderDetailPanel && !onRowClick)) && tableProps?.stickyHeader && !showColumnFilters;
 
   return (
     <ContainerRoot
@@ -457,9 +457,9 @@ function DataTablePresentationRegion<TData extends RowData>(
             "--DataTable-table-min-width": resolvedTableMinWidth,
           };
 
-          const rowCount = windowBody && !table.getIsSomeRowsPinned() ? table.getRowModel().rows.length : 0;
+          const rowCount = windowBody ? table.getRowModel().rows.length : 0;
           const windowActive = rowCount > 25 && !table.options.meta?.loading && !table.options.meta?.error;
-          const indexRows = windowActive && !(renderDetailPanel && table.getIsSomeRowsExpanded());
+          const indexRows = windowActive && !table.getIsSomeRowsPinned() && !(renderDetailPanel && table.getIsSomeRowsExpanded());
 
           return (
             <TableRoot

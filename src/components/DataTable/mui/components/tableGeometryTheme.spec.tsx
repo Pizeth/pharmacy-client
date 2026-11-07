@@ -1,5 +1,5 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { render } from "@testing-library/react";
+import { act, fireEvent, render } from "@testing-library/react";
 
 import { dataTableClasses } from "../styles";
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "../table";
@@ -193,11 +193,24 @@ const windowingRows = Array.from({ length: 30 }, (_, index) => ({
   status: "Enabled",
 }));
 
+const windowingColumns = helper.columns([
+  ...columns,
+  helper.display({
+    id: "pin",
+    cell: ({ row }) => <input
+      type="checkbox"
+      aria-label={"Pin " + row.id}
+      onChange={() => row.pin(row.getIsPinned() ? false : "top")}
+    />,
+  }),
+]);
+
+/** Exercises the same stable row body with and without active pins. */
 function WindowingFallbackFixture({ reason }: {
-  readonly reason: "detail" | "activation" | "pin";
+  readonly reason: "detail" | "activation" | "pin" | "eligible" | "nonsticky";
 }) {
   const table = useMuiDataTable({
-    columns,
+    columns: reason === "eligible" ? windowingColumns : columns,
     data: windowingRows,
     getRowId: row => row.name,
     enableRowPinning: true,
@@ -210,6 +223,7 @@ function WindowingFallbackFixture({ reason }: {
   return <DataTable
     table={table}
     windowRows
+    tableProps={{ stickyHeader: reason !== "nonsticky" }}
     toolbar={false}
     pagination={false}
     renderDetailPanel={reason === "detail" ? ({ row }) => row.original.name : undefined}
@@ -217,7 +231,7 @@ function WindowingFallbackFixture({ reason }: {
   />;
 }
 
-it.each(["detail", "activation", "pin"] as const)(
+it.each(["detail", "activation", "pin", "nonsticky"] as const)(
   "keeps the full renderer when the windowing opt-in encounters %s",
   reason => {
     const { container } = render(<WindowingFallbackFixture reason={reason} />);
@@ -234,3 +248,46 @@ it.each(["detail", "activation", "pin"] as const)(
     }
   },
 );
+
+/** Verifies that scrolling changes the mounted range and Tab restores native order. */
+it("mounts a bounded row range and moves it when the table scrolls", () => {
+  const originalObserver = window.ResizeObserver;
+  window.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+  const viewportHeight = jest.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(185);
+  const rowHeight = jest.spyOn(HTMLTableRowElement.prototype, "getBoundingClientRect")
+    .mockReturnValue(new DOMRect(0, 0, 300, 37));
+
+  try {
+    const { container, getByRole, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
+    const table = getTable(container);
+    const viewport = table.closest<HTMLElement>("." + dataTableClasses.container)!;
+    const mounted = () => Array.from(table.querySelectorAll("tbody tr[data-row-id]"))
+      .map(row => row.getAttribute("data-row-id"));
+
+    expect(mounted().length).toBeLessThan(30);
+    expect(mounted()[0]).toBe("Record 1");
+    viewport.scrollTop = 1000;
+    fireEvent.scroll(viewport);
+    expect(mounted()).toContain("Record 30");
+    expect(mounted()).not.toContain("Record 1");
+    fireEvent.keyDown(viewport, { key: "Tab" });
+    expect(mounted()).toHaveLength(30);
+    const checkbox = getByRole("checkbox", { name: "Pin Record 30" });
+    act(() => checkbox.focus());
+    fireEvent.click(checkbox);
+    expect(checkbox).toHaveFocus();
+    expect(checkbox.closest("tr")).toHaveAttribute("data-row-pinned", "top");
+    fireEvent.click(checkbox);
+    expect(checkbox).toHaveFocus();
+    expect(checkbox.closest("tr")).not.toHaveAttribute("data-row-pinned");
+    unmount();
+  } finally {
+    rowHeight.mockRestore();
+    viewportHeight.mockRestore();
+    window.ResizeObserver = originalObserver;
+  }
+});

@@ -199,7 +199,7 @@ export function DataTableBody<TData extends RowData>(
           );
         }
 
-        if (windowRows && rows.length > 25 && !table.getIsSomeRowsPinned() && !showColumnFilters) {
+        if (windowRows && rows.length > 25 && !showColumnFilters) {
           return <DataTableWindowedBody
             key={density}
             table={table}
@@ -207,7 +207,11 @@ export function DataTableBody<TData extends RowData>(
             rowHeight={densityMetrics.bodyRowHeight}
             headerHeight={normalHeaderHeight}
             colSpan={colSpan}
-            interactive={windowRows === "interactive"}
+            pinned={table.getIsSomeRowsPinned()}
+            stickyRowPinning={stickyRowPinning}
+            pinnedRowStickyTop={pinnedRowStickyTop}
+            dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
+            stickyPinnedRowIds={stickyPinnedRowIds}
             renderDetailPanel={renderDetailPanel && table.getIsSomeRowsExpanded() ? renderDetailPanel : undefined}
             onRowClick={onRowClick}
             rowClickSelectedOnly={rowClickSelectedOnly}

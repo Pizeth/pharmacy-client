@@ -10,25 +10,26 @@ import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
 import { dataTableClasses } from "../styles";
 import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
-import { BodyRoot } from "./DataTableStickyRowMeasurements";
+import { DataTableStickyRowMeasurements } from "./DataTableStickyRowMeasurements";
 
-const WindowBody = styled(BodyRoot)({
-  "& > tr[data-row-id]": { height: "var(--DataTable-window-row-height)" },
-});
 const SpacerCell = styled("td")({ padding: 0, border: 0 });
-const noPins: readonly string[] = [];
 const overscan = 4;
 const initialViewportRows = 12;
 
+/** Keeps the same row subtree when pinning or keyboard focus requires a full body. */
 export function DataTableWindowedBody<TData extends RowData>({
-  table, rows, rowHeight, headerHeight, colSpan, interactive, onRowClick, rowClickSelectedOnly, renderDetailPanel,
+  table, rows, rowHeight, headerHeight, colSpan, pinned, stickyRowPinning, pinnedRowStickyTop, dualEdgeStickyRowPinning, stickyPinnedRowIds, onRowClick, rowClickSelectedOnly, renderDetailPanel,
 }: {
   readonly table: MuiDataTableInstance<TData>;
   readonly rows: readonly Row<MuiDataTableFeatures, TData>[];
   readonly rowHeight: number;
   readonly headerHeight: number;
   readonly colSpan: number;
-  readonly interactive: boolean;
+  readonly pinned: boolean;
+  readonly stickyRowPinning: boolean;
+  readonly pinnedRowStickyTop: number;
+  readonly dualEdgeStickyRowPinning: boolean;
+  readonly stickyPinnedRowIds: Readonly<Record<"top" | "bottom", readonly string[]>>;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
   readonly onRowClick?: DataTableRowClickHandler<TData>;
   readonly rowClickSelectedOnly?: boolean;
@@ -42,7 +43,6 @@ export function DataTableWindowedBody<TData extends RowData>({
   const [bodyFocused, setBodyFocused] = useState(false);
 
   useLayoutEffect(() => {
-    if (!interactive) return;
     const body = ref.current;
     if (!body) return;
     const doc = body.ownerDocument;
@@ -62,7 +62,7 @@ export function DataTableWindowedBody<TData extends RowData>({
       doc.removeEventListener("keydown", prepareTab, true);
       doc.removeEventListener("pointerdown", resumePointerWindow, true);
     };
-  }, [interactive, keyboardMode]);
+  }, [keyboardMode]);
 
   useLayoutEffect(() => {
     const container = ref.current?.closest<HTMLElement>(`.${dataTableClasses.container}`);
@@ -88,7 +88,7 @@ export function DataTableWindowedBody<TData extends RowData>({
   const available = viewport.height > 0
     ? Math.max(0, viewport.height - headerHeight)
     : initialViewportRows * itemHeight;
-  const canWindow = !unsafeHeight && !renderDetailPanel && (!interactive || (!keyboardMode && !bodyFocused));
+  const canWindow = !unsafeHeight && !pinned && !renderDetailPanel && !keyboardMode && !bodyFocused;
   const top = Math.min(viewport.top, Math.max(0, rows.length * itemHeight - available));
   const start = canWindow ? Math.max(0, Math.floor(top / itemHeight) - overscan) : 0;
   const end = canWindow ? Math.min(rows.length, Math.ceil((top + available) / itemHeight) + overscan) : rows.length;
@@ -115,13 +115,19 @@ export function DataTableWindowedBody<TData extends RowData>({
   }, [canWindow, start, end, rows, measuredHeight]);
 
   const headerCount = table.getHeaderGroups().length;
-  return <WindowBody
-    ref={ref}
-    onFocusCapture={interactive ? () => setBodyFocused(true) : undefined}
-    onBlurCapture={interactive ? event => {
-      if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) setBodyFocused(false);
-    } : undefined}
-    className={dataTableClasses.body} style={unsafeHeight || renderDetailPanel ? undefined : { "--DataTable-window-row-height": `${rowHeight}px` } as React.CSSProperties}>
+  return <DataTableStickyRowMeasurements
+    forwardedRef={ref}
+    enabled={pinned && stickyRowPinning}
+    top={pinnedRowStickyTop}
+    fallbackHeight={rowHeight}
+    dualEdge={dualEdgeStickyRowPinning}
+    bodyProps={{
+      onFocusCapture: () => setBodyFocused(true),
+      onBlurCapture: event => {
+        if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) setBodyFocused(false);
+      },
+      style: unsafeHeight || pinned || renderDetailPanel ? undefined : { "--DataTable-window-row-height": `${rowHeight}px` } as React.CSSProperties,
+    }}>
     {start > 0 && <tr aria-hidden="true"><SpacerCell colSpan={colSpan} style={{ height: start * itemHeight }} /></tr>}
     {rows.slice(start, end).map((row, index) => <DataTableBodyRowGroup
       key={row.id}
@@ -129,13 +135,13 @@ export function DataTableWindowedBody<TData extends RowData>({
       row={row}
       onRowClick={onRowClick}
       rowClickSelectedOnly={rowClickSelectedOnly}
-      ariaRowIndex={renderDetailPanel ? undefined : headerCount + start + index + 1}
+      ariaRowIndex={pinned || renderDetailPanel ? undefined : headerCount + start + index + 1}
       renderDetailPanel={renderDetailPanel}
-      pinnedRowStickyTop={headerHeight}
-      stickyRowPinning={false}
-      dualEdgeStickyRowPinning={false}
-      stickyPinnedRowIds={noPins}
+      pinnedRowStickyTop={pinnedRowStickyTop}
+      stickyRowPinning={stickyRowPinning}
+      dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
+      stickyPinnedRowIds={stickyPinnedRowIds[row.getIsPinned() || "top"]}
     />)}
     {end < rows.length && <tr aria-hidden="true"><SpacerCell colSpan={colSpan} style={{ height: (rows.length - end) * itemHeight }} /></tr>}
-  </WindowBody>;
+  </DataTableStickyRowMeasurements>;
 }

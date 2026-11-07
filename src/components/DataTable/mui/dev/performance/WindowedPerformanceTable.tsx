@@ -33,6 +33,7 @@ function rowOffset(index: number) {
 const detailRecords = [{ id: "1", label: "first" }, { id: "3", label: "third" }] as const;
 type DetailHeights = Readonly<Record<string, number>>;
 
+/** Computes row and detail offsets for the profiling-only mixed-height fixture. */
 function windowGeometry(rows: readonly { id: string }[], heights: DetailHeights, mixedHeights: boolean) {
   const offsets = [0];
   rows.forEach((row, index) => {
@@ -76,6 +77,7 @@ const DetailContent = styled("div")(({ theme }) => ({ padding: theme.spacing(2) 
 
 const SpacerCell = styled("td")({ padding: 0, border: 0 });
 
+/** Isolated scrolling experiment. Live pages use DataTableWindowedBody. */
 export function WindowedPerformanceTable({ table, detailControls = false }: {
   readonly table: MuiDataTableInstance<DataTablePerformanceRow>;
   readonly detailControls?: boolean;

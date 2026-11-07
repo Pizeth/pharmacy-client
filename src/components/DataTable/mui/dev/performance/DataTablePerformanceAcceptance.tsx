@@ -607,6 +607,7 @@ export const PerformanceTable =
                 table={
                   table
                 }
+                tableProps={props.integratedWindow !== undefined ? { stickyHeader: true } : undefined}
                 windowRows={props.integratedInteractive ? "interactive" : props.integratedWindow}
                 onRowClick={props.integratedInteractive ? row => row.toggleSelected() : undefined}
                 persistence={props.integratedPersistence ? { storageId: "profile-integrated-window" } : false}
