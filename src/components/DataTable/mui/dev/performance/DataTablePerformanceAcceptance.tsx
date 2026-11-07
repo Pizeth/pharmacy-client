@@ -248,6 +248,18 @@ function createRows(
   );
 }
 
+/** Applies the fixture's select-sticky policy to every custom selection control. */
+function togglePinnedSelection(row: {
+  getIsSelected: () => boolean;
+  pin: (position: false | "top") => void;
+  toggleSelected: (selected?: boolean) => void;
+}) {
+  const selected = !row.getIsSelected();
+  row.pin(selected ? "top" : false);
+  row.toggleSelected(selected);
+}
+
+/** Builds consistent columns for the baseline and interactive acceptance tracks. */
 function createColumns(
   columnCount: number,
   interactive = false,
@@ -306,7 +318,7 @@ function createColumns(
         cell: interactive ? ({ row }) => <>
           <DataTableSelectRowCheckbox />
           <DataTableExpandRowButton />
-          <Button size="small" onClick={() => row.toggleSelected()}>Select {row.id}</Button>
+          <Button size="small" onClick={() => togglePinnedSelection(row)}>Select {row.id}</Button>
         </> : undefined,
         size:
           140,
@@ -612,7 +624,7 @@ export const PerformanceTable =
                 tableProps={props.integratedWindow !== undefined ? { stickyHeader: true } : undefined}
                 rowPinning={props.integratedInteractive ? { displayMode: "select-sticky" } : undefined}
                 windowRows={props.integratedInteractive ? "interactive" : props.integratedWindow}
-                onRowClick={props.integratedInteractive ? row => row.toggleSelected() : undefined}
+                onRowClick={props.integratedInteractive ? togglePinnedSelection : undefined}
                 persistence={props.integratedPersistence ? { storageId: "profile-integrated-window" } : false}
                 card={
                   cardConfig

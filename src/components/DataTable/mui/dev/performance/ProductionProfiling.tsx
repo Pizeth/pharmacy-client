@@ -76,6 +76,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
     return () => { cancelled.current = true; };
   }, [buildMode]);
 
+  /** Runs warmed samples only after rendered order and viewport checks pass. */
   const run = async (track: "integrated" | "window" | "sort" | "normal" | "compare" | "500" | "1000") => {
     if (running) return;
     setRunning(true);
@@ -216,7 +217,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
                 if (view) view.scrollTop = view.scrollHeight;
               }, () => {
                 const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
-                return mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
+                return validMountedCount() && mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
               });
             }
             if (track === "sort" || track === "integrated" || windowed) continue;

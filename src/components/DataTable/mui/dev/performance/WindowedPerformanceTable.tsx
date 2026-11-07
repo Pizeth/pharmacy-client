@@ -25,7 +25,7 @@ const pinFixtures = [
   { id: "199", label: "record 199 to bottom", edge: "bottom" },
 ] as const;
 
-// Alternating fixture heights let the range and spacer geometry share exact offsets.
+/** Returns the cumulative offset for the alternating fixed-height fixture rows. */
 function rowOffset(index: number) {
   return Math.floor(index / 2) * pairHeight + (index % 2) * shortRowHeight;
 }
@@ -95,10 +95,12 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
     detailRecords.filter(({ id }) => expanded === true || expanded[id]).map(({ id }) => [id, detailHeights[id] ?? 0]),
   ), [expanded, detailHeights]);
 
+  /** Excludes pinned identities from the scrolling range. */
   function scrollingRows() {
     return detailControls ? table.getCenterRows() : table.getRowModel().rows;
   }
 
+  /** Combines the current final order with cached expanded-detail measurements. */
   function geometry() {
     return windowGeometry(scrollingRows(), activeHeights, !detailControls);
   }
@@ -119,6 +121,7 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
     }
   }, [activeHeights, detailControls, scrollTop, table]);
 
+  /** Tracks content-driven detail-row height changes until the panel unmounts. */
   const observeDetail = useCallback((content: HTMLDivElement | null) => {
     const detail = content?.closest("tr");
     const id = detail?.dataset.detailPanelRow;
@@ -143,6 +146,7 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
     row.focus({ preventScroll: true });
   }, [focusRequest]);
 
+  /** Mounts an offscreen keyboard target before transferring focus to its row. */
   function moveFocus(event: KeyboardEvent<HTMLDivElement>) {
     const viewport = event.currentTarget;
     const target = event.target;
