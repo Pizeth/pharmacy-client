@@ -1,6 +1,7 @@
 "use client";
 
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type ComponentPropsWithoutRef, type Ref, type ReactNode } from "react";
+import { useForkRef } from "@mui/material/utils";
 import { styled, TableBody } from "@mui/material";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import { getStickyRowOffsets } from "../row-pinning/stickyHeights";
@@ -11,19 +12,22 @@ interface Props {
   readonly top: number;
   readonly fallbackHeight: number;
   readonly dualEdge: boolean;
+  readonly forwardedRef?: Ref<HTMLTableSectionElement>;
+  readonly bodyProps?: ComponentPropsWithoutRef<"tbody">;
 }
 
 export const BodyRoot = styled(TableBody, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Body",
   overridesResolver: (_props, styles) => styles.body,
-})({});
+})({ "& > tr[data-row-id]": { height: "var(--DataTable-window-row-height)" } });
 
 /** Renderer geometry only. TanStack remains the sole owner of pin identity/order. */
 export function DataTableStickyRowMeasurements({
-  children, enabled = true, top, fallbackHeight, dualEdge,
+  children, enabled = true, top, fallbackHeight, dualEdge, forwardedRef, bodyProps,
 }: Props) {
   const bodyRef = useRef<HTMLTableSectionElement>(null);
+  const mergedRef = useForkRef(bodyRef, forwardedRef);
   const heightsRef = useRef(new Map<HTMLTableRowElement, number>());
   useLayoutEffect(() => () => heightsRef.current.clear(), []);
   // Reconcile after every parent commit: sorting/filtering/paging may replace or
@@ -103,5 +107,5 @@ export function DataTableStickyRowMeasurements({
       observer.disconnect();
     };
   });
-  return <BodyRoot ref={bodyRef} className={dataTableClasses.body}>{children}</BodyRoot>;
+  return <BodyRoot {...bodyProps} ref={mergedRef} className={dataTableClasses.body}>{children}</BodyRoot>;
 }

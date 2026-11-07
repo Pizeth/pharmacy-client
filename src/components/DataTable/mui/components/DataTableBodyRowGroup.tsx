@@ -19,6 +19,7 @@ export interface DataTableBodyRowGroupProps<TData extends RowData> {
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
   readonly onRowClick?: DataTableRowClickHandler<TData>;
   readonly rowClickSelectedOnly?: boolean;
+  readonly ariaRowIndex?: number;
 }
 
 /**
@@ -43,6 +44,7 @@ export function DataTableBodyRowGroup<TData extends RowData>(
     renderDetailPanel,
     onRowClick,
     rowClickSelectedOnly,
+    ariaRowIndex,
   } = props;
 
   return (
@@ -54,6 +56,7 @@ export function DataTableBodyRowGroup<TData extends RowData>(
         stickyRowPinning={stickyRowPinning}
         onRowClick={onRowClick}
         rowClickSelectedOnly={rowClickSelectedOnly}
+        ariaRowIndex={ariaRowIndex}
         dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
         stickyPinnedRowIds={stickyPinnedRowIds}
       />

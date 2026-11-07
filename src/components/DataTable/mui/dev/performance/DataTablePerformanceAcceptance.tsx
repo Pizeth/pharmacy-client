@@ -26,6 +26,8 @@ import {
 } from "@mui/material";
 import {
   styled,
+  ThemeProvider,
+  type Theme,
 } from "@mui/material/styles";
 
 import {
@@ -50,8 +52,13 @@ import type {
   DataTablePerformanceMetrics,
 } from "./performanceMetrics";
 import { DataTableDiagnosticCommit, DataTableRenderDiagnosticsContext } from "../../diagnostics/renderDiagnostics";
+import { DataTableSelectRowCheckbox } from "../../columns/selection/DataTableSelectRowCheckbox";
+import { DataTableExpandRowButton } from "../../columns/expansion/DataTableExpandRowButton";
+import { WindowedPerformanceTable } from "./WindowedPerformanceTable";
 import { createRenderDiagnosticCollector, type RenderDiagnosticCollector } from "./renderDiagnosticCollector";
 import type { MuiDataTableInstance } from "../../table";
+
+const withRtlDirection = (theme: Theme): Theme => ({ ...theme, direction: "rtl" });
 
 const COMPONENT_NAME =
   "RazethDataTablePerformance";
@@ -241,8 +248,21 @@ function createRows(
   );
 }
 
+/** Applies the fixture's select-sticky policy to every custom selection control. */
+function togglePinnedSelection(row: {
+  getIsSelected: () => boolean;
+  pin: (position: false | "top") => void;
+  toggleSelected: (selected?: boolean) => void;
+}) {
+  const selected = !row.getIsSelected();
+  row.pin(selected ? "top" : false);
+  row.toggleSelected(selected);
+}
+
+/** Builds consistent columns for the baseline and interactive acceptance tracks. */
 function createColumns(
   columnCount: number,
+  interactive = false,
 ) {
   const valueColumnCount =
     Math.max(
@@ -295,6 +315,11 @@ function createColumns(
       {
         header:
           "Status",
+        cell: interactive ? ({ row }) => <>
+          <DataTableSelectRowCheckbox />
+          <DataTableExpandRowButton />
+          <Button size="small" onClick={() => togglePinnedSelection(row)}>Select {row.id}</Button>
+        </> : undefined,
         size:
           140,
       },
@@ -353,6 +378,13 @@ export interface PerformanceTableProps {
   readonly narrowOwner: boolean;
   readonly diagnostics: RenderDiagnosticCollector | null;
   readonly rowCount: number;
+  readonly pageSize?: number;
+  readonly windowed?: boolean;
+  readonly integratedWindow?: boolean;
+  readonly integratedPersistence?: boolean;
+  readonly integratedInteractive?: boolean;
+  readonly windowedDetails?: boolean;
+  readonly windowedRtl?: boolean;
   readonly columnCount: number;
   readonly displayMode: DataTableDisplayMode;
   readonly onProfile: ProfilerOnRenderCallback;
@@ -370,6 +402,7 @@ export const PerformanceTable =
         narrowOwner,
         diagnostics,
         rowCount,
+        pageSize = rowCount,
         columnCount,
         displayMode,
         onProfile,
@@ -381,9 +414,11 @@ export const PerformanceTable =
           () =>
             createColumns(
               columnCount,
+              props.integratedInteractive,
             ),
           [
             columnCount,
+            props.integratedInteractive,
           ],
         );
 
@@ -408,6 +443,7 @@ export const PerformanceTable =
         useMuiDataTable({
           columns,
           data,
+          columnResizeDirection: props.windowedRtl ? "rtl" : undefined,
 
           getRowId: (
             row,
@@ -436,8 +472,7 @@ export const PerformanceTable =
             pagination: {
               pageIndex:
                 0,
-              pageSize:
-                rowCount,
+              pageSize,
             },
 
             columnPinning: {
@@ -578,24 +613,28 @@ export const PerformanceTable =
                 onProfile
               }
             >
-              <DataTable
+              {props.windowedRtl ? (
+                <ThemeProvider theme={withRtlDirection}>
+                  <div dir="rtl"><WindowedPerformanceTable table={table} detailControls /></div>
+                </ThemeProvider>
+              ) : props.windowed ? <WindowedPerformanceTable table={table} detailControls={props.windowedDetails} /> : <DataTable
                 table={
                   table
                 }
+                tableProps={props.integratedWindow !== undefined ? { stickyHeader: true } : undefined}
+                rowPinning={props.integratedInteractive ? { displayMode: "select-sticky" } : undefined}
+                windowRows={props.integratedInteractive ? "interactive" : props.integratedWindow}
+                onRowClick={props.integratedInteractive ? togglePinnedSelection : undefined}
+                persistence={props.integratedPersistence ? { storageId: "profile-integrated-window" } : false}
                 card={
                   cardConfig
                 }
-                displayMode={
-                  displayMode
-                }
-                toolbar={
-                  false
-                }
-                pagination={
-                  false
-                }
+                displayMode={props.integratedWindow !== undefined ? undefined : displayMode}
+                defaultDisplayMode="table"
+                toolbar={props.integratedWindow !== undefined ? {} : false}
+                pagination={props.integratedWindow !== undefined ? {} : false}
                 selectionBar={{}}
-                renderDetailPanel={({
+                renderDetailPanel={props.integratedWindow !== undefined && !props.integratedInteractive ? undefined : ({
                   row,
                 }) => (
                   <DetailRoot>
@@ -619,7 +658,7 @@ export const PerformanceTable =
                   "aria-label":
                     "Performance table scroll viewport",
                 }}
-              />
+              />}
             </Profiler>
           </TableSurfaceRoot>
         </>

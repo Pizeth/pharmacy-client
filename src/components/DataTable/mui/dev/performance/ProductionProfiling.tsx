@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ProfilerOnRenderCallback } from "react";
+import { createSortedRowModel } from "@tanstack/react-table";
 import { Button, Stack, Typography, styled } from "@mui/material";
 import { PerformanceTable, type DataTablePerformanceRow } from "./DataTablePerformanceAcceptance";
 import { createRenderDiagnosticCollector } from "./renderDiagnosticCollector";
 import { DataTableRenderDiagnosticsContext } from "../../diagnostics/renderDiagnostics";
+import type { muiDataTableFeatures } from "../../features/muiDataTableFeatures";
 import type { MuiDataTableInstance } from "../../table";
 import { dataTableClasses } from "../../styles";
 import { afterTwoFrames, summarizeSamples } from "./browserMeasurements";
@@ -21,7 +23,7 @@ const Report = styled("pre", { name: "RazethDataTablePerformance", slot: "Report
 
 type Mode = "table" | "card";
 type Probe = "off" | "default" | "owner" | "row";
-interface Case { rows: number; columns: number; mode: Mode; probe: Probe; serial: number }
+interface Case { rows: number; pageSize?: number; windowed?: boolean; windowedDetails?: boolean; windowedRtl?: boolean; integratedWindow?: boolean; integratedPersistence?: boolean; integratedInteractive?: boolean; columns: number; mode: Mode; probe: Probe; serial: number }
 interface Sample {
   action: string;
   repeat: number;
@@ -33,6 +35,7 @@ interface Sample {
   ownerCommits: number | null;
   bodyCommits: number | null;
   modelMs: number | null;
+  sortRecomputeMs: number | null;
   dispatchMs: number | null;
   elements: number;
   rows: number;
@@ -49,6 +52,7 @@ const NORMAL: ReadonlyArray<readonly [number, number, Mode]> = [
   [100, 16, "card"], [200, 8, "table"], [200, 16, "table"], [200, 16, "card"],
 ];
 
+/** Local opt-in benchmark with rendered-output assertions and exported samples. */
 export function ProductionProfiling({ buildMode }: { readonly buildMode: "browser" | "react" }) {
   const [fixture, setFixture] = useState<Case | null>(null);
   const [status, setStatus] = useState("Ready");
@@ -72,12 +76,19 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
     return () => { cancelled.current = true; };
   }, [buildMode]);
 
-  const run = async (track: "normal" | "compare" | "500" | "1000") => {
+  /** Runs warmed samples only after rendered order and viewport checks pass. */
+  const run = async (track: "integrated" | "window" | "sort" | "normal" | "compare" | "500" | "1000") => {
     if (running) return;
     setRunning(true);
     cancelled.current = false;
-    const cases: Array<readonly [number, number, Mode, Probe]> = track === "normal"
+    const cases: Array<readonly [number, number, Mode, Probe, number?]> = track === "normal"
       ? NORMAL.map(([rows, columns, mode]) => [rows, columns, mode, "off"])
+      : track === "integrated"
+        ? [[200, 16, "table", "off"], [200, 16, "table", "off"]]
+      : track === "window"
+        ? [[200, 16, "table", "off"]]
+      : track === "sort"
+        ? [[200, 16, "table", "off"], [200, 16, "table", "off", 25], [200, 16, "card", "off"]]
       : track === "compare"
         ? NORMAL.filter(([rows, , mode]) => rows !== 25 || mode === "table")
           .flatMap(([rows, columns, mode], index) => {
@@ -87,8 +98,11 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
           })
         : [[track === "500" ? 500 : 1000, track === "500" ? 16 : 32, "table", "off"]];
     try {
-      for (const [rows, columns, initialMode, probe] of cases) {
-        const result: Result = { label: `${rows}x${columns} ${initialMode} ${probe}`, status: "RUNNING", samples: [] };
+      for (const [caseIndex, [rows, columns, initialMode, probe, pageSize = rows]] of cases.entries()) {
+        const windowed = track === "window";
+        const integratedWindow = track === "integrated" ? caseIndex === 1 : undefined;
+        const expectedMounted = windowed ? 13 : pageSize;
+        const result: Result = { label: `${integratedWindow === undefined ? (windowed ? "Windowed " : "") : integratedWindow ? "Integrated windowed " : "Integrated reference "}${rows}x${columns} ${initialMode} ${probe}${pageSize === rows ? "" : ` / ${pageSize} mounted`}`, status: "RUNNING", samples: [] };
         const tasks: PerformanceEntry[] = [];
         const supportsTasks = typeof PerformanceObserver !== "undefined" && PerformanceObserver.supportedEntryTypes.includes("longtask");
         const taskObserver = supportsTasks ? new PerformanceObserver((list) => tasks.push(...list.getEntries())) : null;
@@ -110,14 +124,25 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
           assertProfilingRunActive(cancelled.current, document.visibilityState);
           const end = performance.now();
           if (end - start > 15_000) throw new Error(`BLOCKED: ${action} exceeded 15 seconds`);
-          if (!verify()) throw new Error(`BLOCKED: ${action} output mismatch`);
+          if (!verify()) throw new Error(`BLOCKED: ${action} output mismatch (model first: ${tableRef.current?.getRowModel().rows[0]?.id}, rendered first: ${surfaceRef.current?.querySelector("tbody tr[data-row-id]")?.getAttribute("data-row-id")}, mounted: ${count()}, scroll: ${viewport()?.scrollTop})`);
           const snapshot = collector.snapshot();
+          let sortRecomputeMs: number | null = null;
+          if (track === "sort" && action.startsWith("sort-")) {
+            // Use a fresh memo over the settled table without warming the live row-model cache.
+            const instance = table();
+            const recompute = createSortedRowModel<typeof muiDataTableFeatures, DataTablePerformanceRow>()(instance);
+            const modelStart = performance.now();
+            const sorted = recompute();
+            sortRecomputeMs = performance.now() - modelStart;
+            if (sorted.rows[0]?.id !== (action === "sort-desc" ? String(rows) : "1"))
+              throw new Error("BLOCKED: isolated sort output mismatch");
+          }
           const root = surfaceRef.current;
           // Reads/reporting occur after the measured frame interval.
           tasks.push(...(taskObserver?.takeRecords() ?? []));
           const relevant = tasks.filter((entry) => entry.startTime < end && entry.startTime + entry.duration > start);
           if (repeat > 0) result.samples.push({
-            action, repeat, elapsedMs: +(end - start).toFixed(2),
+            action, repeat, sortRecomputeMs, elapsedMs: +(end - start).toFixed(2),
             reactMs: snapshot.reactCommits ? snapshot.reactActualMs : null,
             reactCommits: snapshot.reactCommits || null,
             rowsCommitted: probe === "off" ? null : snapshot.uniqueRows,
@@ -135,7 +160,21 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
             scrollTop: viewport()?.scrollTop ?? null, scrollLeft: viewport()?.scrollLeft ?? null,
           });
         };
+        const firstWindowRow = () => surfaceRef.current?.querySelector("tbody tr[data-row-id]");
         const count = () => surfaceRef.current?.querySelectorAll(mode === "table" ? "tbody tr[data-row-id]" : `.${dataTableClasses.cardItem}`).length;
+        /** Reject partial windows that leave blank space in the visible body. */
+        const validMountedCount = () => {
+          const mounted = count() ?? 0;
+          if (!integratedWindow) return mounted === expectedMounted;
+          const view = viewport();
+          const bodyRows = view?.querySelectorAll("tbody tr[data-row-id]");
+          const first = bodyRows?.[0]?.getBoundingClientRect();
+          const last = bodyRows?.[bodyRows.length - 1]?.getBoundingClientRect();
+          const bounds = view?.getBoundingClientRect();
+          const headerHeight = view?.querySelector("thead")?.getBoundingClientRect().height ?? 0;
+          return !!view && !!first && !!last && !!bounds && mounted > 0 && mounted < pageSize &&
+            first.top <= bounds.top + headerHeight + 1 && last.bottom >= bounds.top + view.clientHeight - 1;
+        };
         try {
           for (let repeat = 0; repeat <= 3; repeat++) {
             setStatus(`${result.label}: ${repeat === 0 ? "warm-up" : `repeat ${repeat}`}`);
@@ -144,20 +183,44 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
             mode = initialMode;
             await measure("mount", repeat, () => {
               tableRef.current = null;
-              setFixture({ rows, columns, mode, probe, serial: ++serial.current });
-            }, () => count() === rows);
-            for (const selected of [true, false]) await measure(selected ? "select" : "deselect", repeat,
-              () => table().getRow("1").toggleSelected(selected),
-              () => table().getRow("1").getIsSelected() === selected &&
-                hasRenderedRowState(surfaceRef.current, mode, "1", selected, false));
-            for (const expanded of [true, false]) await measure(expanded ? "expand" : "collapse", repeat,
-              () => table().getRow("1").toggleExpanded(expanded),
-              () => table().getRow("1").getIsExpanded() === expanded &&
-                hasRenderedRowState(surfaceRef.current, mode, "1", false, expanded));
+              setFixture({ rows, pageSize, windowed, integratedWindow, columns, mode, probe, serial: ++serial.current });
+            }, () => validMountedCount() && (!windowed || firstWindowRow()?.getAttribute("aria-rowindex") === "1"));
+            if (track !== "sort" && track !== "integrated" && !windowed) {
+              for (const selected of [true, false]) await measure(selected ? "select" : "deselect", repeat,
+                () => table().getRow("1").toggleSelected(selected),
+                () => table().getRow("1").getIsSelected() === selected &&
+                  hasRenderedRowState(surfaceRef.current, mode, "1", selected, false));
+              for (const expanded of [true, false]) await measure(expanded ? "expand" : "collapse", repeat,
+                () => table().getRow("1").toggleExpanded(expanded),
+                () => table().getRow("1").getIsExpanded() === expanded &&
+                  hasRenderedRowState(surfaceRef.current, mode, "1", false, expanded));
+            }
             for (const desc of [true, false]) await measure(desc ? "sort-desc" : "sort-asc", repeat,
               () => table().setSorting([{ id: "name", desc }]),
               () => table().getRowModel().rows[0]?.id === (desc ? String(rows) : "1") &&
-                hasRenderedFirstRow(surfaceRef.current, mode, desc ? String(rows) : "1"));
+                hasRenderedFirstRow(surfaceRef.current, mode, desc ? String(rows) : "1") && validMountedCount() &&
+                (!windowed || firstWindowRow()?.getAttribute("aria-rowindex") === "1"));
+            if (windowed) {
+              await measure("scroll-to-end", repeat, () => {
+                const view = viewport();
+                if (view) view.scrollTop = view.scrollHeight;
+              }, () => {
+                const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
+                const last = mounted?.[mounted.length - 1];
+                return !!mounted && mounted.length < rows && last?.getAttribute("data-row-id") === String(rows) &&
+                  last.getAttribute("aria-rowindex") === String(rows);
+              });
+            }
+            if (track === "integrated") {
+              await measure("scroll-to-end", repeat, () => {
+                const view = viewport();
+                if (view) view.scrollTop = view.scrollHeight;
+              }, () => {
+                const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
+                return validMountedCount() && mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
+              });
+            }
+            if (track === "sort" || track === "integrated" || windowed) continue;
             for (const filter of ["Record 0001", ""]) await measure(filter ? "filter" : "clear-filter", repeat,
               () => table().setGlobalFilter(filter), () => count() === (filter ? 1 : rows));
             await measure("scroll-vertical", repeat, () => {
@@ -208,6 +271,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
     actions: [...new Set(result.samples.map((sample) => sample.action))].map((action) => {
       const samples = result.samples.filter((sample) => sample.action === action);
       return { action, ms: summarizeSamples(samples.map((sample) => sample.elapsedMs)),
+        sortRecomputeMs: summarizeSamples(samples.flatMap((sample) => sample.sortRecomputeMs === null ? [] : [sample.sortRecomputeMs])),
         reactMs: summarizeSamples(samples.flatMap((sample) => sample.reactMs === null ? [] : [sample.reactMs])),
         affected: samples.map((sample) => [sample.ownerCommits, sample.bodyCommits, sample.rowsCommitted, sample.cellsCommitted]),
         elements: samples.map((sample) => sample.elements),
@@ -216,9 +280,17 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
   }));
   return <Root>
     <Typography component="h1" variant="h4">Local production profiling</Typography>
-    <Typography>{buildMode} build. Dispatch-to-two-frame intervals are responsiveness proxies, not INP or exact paint durations. One warm-up and three samples. Diagnostics only in comparison track.</Typography>
+    <Typography>{buildMode} build. Dispatch-to-two-frame intervals are responsiveness proxies, not INP or exact paint durations. One warm-up and three samples. Focused sort also times a fresh sorted-model read after the visible update, with warm upstream models. The 25-mounted case uses pagination over the same 200 rows as a rendering comparison.</Typography>
     <Typography>Environment: {environment}</Typography>
     <Stack direction="row" spacing={1}>
+      <Button disabled={running} onClick={() => setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowed: true, serial: ++serial.current })}>Open windowed fixture</Button>
+      <Button disabled={running} onClick={() => setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowed: true, windowedDetails: true, serial: ++serial.current })}>Open windowed details</Button>
+      <Button disabled={running} onClick={() => setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowedRtl: true, serial: ++serial.current })}>Open RTL windowed details</Button>
+      <Button disabled={running} onClick={() => setFixture({ rows: 200, pageSize: 100, columns: 16, mode: "table", probe: "off", integratedWindow: true, integratedPersistence: true, serial: ++serial.current })}>Open integrated window</Button>
+      <Button disabled={running} onClick={() => setFixture({ rows: 200, pageSize: 100, columns: 16, mode: "table", probe: "off", integratedWindow: true, integratedInteractive: true, serial: ++serial.current })}>Open interactive window</Button>
+      <Button disabled={running} onClick={() => void run("integrated")}>Compare integrated window</Button>
+      <Button disabled={running} onClick={() => void run("window")}>Run windowed prototype</Button>
+      <Button disabled={running} onClick={() => void run("sort")}>Run focused sort</Button>
       <Button disabled={running} onClick={() => void run("normal")}>Run normal matrix</Button>
       <Button disabled={running} onClick={() => void run("compare")}>Compare subscriptions</Button>
       <Button disabled={running} onClick={() => void run("500")}>Run 500 stress</Button>
@@ -234,7 +306,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }}>Download raw samples</Button>
     {fixture && <DataTableRenderDiagnosticsContext.Provider value={fixture.probe === "off" ? null : observer}>
-      <PerformanceTable key={fixture.serial} rowCount={fixture.rows} columnCount={fixture.columns}
+      <PerformanceTable key={fixture.serial} rowCount={fixture.rows} columnCount={fixture.columns} pageSize={fixture.pageSize} windowed={fixture.windowed} windowedDetails={fixture.windowedDetails} windowedRtl={fixture.windowedRtl} integratedWindow={fixture.integratedWindow} integratedPersistence={fixture.integratedPersistence} integratedInteractive={fixture.integratedInteractive}
         displayMode={fixture.mode} narrowOwner={fixture.probe === "owner" || fixture.probe === "row"}
         diagnostics={fixture.probe === "off" ? null : collector} onProfile={onProfile}
         surfaceRef={surfaceRef} onTable={onTable} />
