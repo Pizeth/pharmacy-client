@@ -187,3 +187,50 @@ describe("DataTable table geometry", () => {
     );
   });
 });
+
+const windowingRows = Array.from({ length: 30 }, (_, index) => ({
+  name: `Record ${index + 1}`,
+  status: "Enabled",
+}));
+
+function WindowingFallbackFixture({ reason }: {
+  readonly reason: "detail" | "activation" | "pin";
+}) {
+  const table = useMuiDataTable({
+    columns,
+    data: windowingRows,
+    getRowId: row => row.name,
+    enableRowPinning: true,
+    initialState: {
+      pagination: { pageIndex: 0, pageSize: 30 },
+      rowPinning: { top: reason === "pin" ? ["Record 1"] : [], bottom: [] },
+    },
+  });
+
+  return <DataTable
+    table={table}
+    windowRows
+    toolbar={false}
+    pagination={false}
+    renderDetailPanel={reason === "detail" ? ({ row }) => row.original.name : undefined}
+    onRowClick={reason === "activation" ? () => {} : undefined}
+  />;
+}
+
+it.each(["detail", "activation", "pin"] as const)(
+  "keeps the full renderer when the windowing opt-in encounters %s",
+  reason => {
+    const { container } = render(<WindowingFallbackFixture reason={reason} />);
+    const table = getTable(container);
+
+    expect(table.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    expect(table.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+    expect(table).not.toHaveAttribute("aria-rowcount");
+    if (reason === "activation") {
+      expect(table.querySelectorAll('tbody tr[data-row-clickable="true"]')).toHaveLength(30);
+    }
+    if (reason === "pin") {
+      expect(table.querySelectorAll('tbody tr[data-row-pinned="top"]')).toHaveLength(1);
+    }
+  },
+);
