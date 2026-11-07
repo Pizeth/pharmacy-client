@@ -52,6 +52,7 @@ import type {
   DataTablePerformanceMetrics,
 } from "./performanceMetrics";
 import { DataTableDiagnosticCommit, DataTableRenderDiagnosticsContext } from "../../diagnostics/renderDiagnostics";
+import { DataTableSelectRowCheckbox } from "../../columns/selection/DataTableSelectRowCheckbox";
 import { DataTableExpandRowButton } from "../../columns/expansion/DataTableExpandRowButton";
 import { WindowedPerformanceTable } from "./WindowedPerformanceTable";
 import { createRenderDiagnosticCollector, type RenderDiagnosticCollector } from "./renderDiagnosticCollector";
@@ -303,6 +304,7 @@ function createColumns(
         header:
           "Status",
         cell: interactive ? ({ row }) => <>
+          <DataTableSelectRowCheckbox />
           <DataTableExpandRowButton />
           <Button size="small" onClick={() => row.toggleSelected()}>Select {row.id}</Button>
         </> : undefined,
@@ -608,6 +610,7 @@ export const PerformanceTable =
                   table
                 }
                 tableProps={props.integratedWindow !== undefined ? { stickyHeader: true } : undefined}
+                rowPinning={props.integratedInteractive ? { displayMode: "select-sticky" } : undefined}
                 windowRows={props.integratedInteractive ? "interactive" : props.integratedWindow}
                 onRowClick={props.integratedInteractive ? row => row.toggleSelected() : undefined}
                 persistence={props.integratedPersistence ? { storageId: "profile-integrated-window" } : false}
