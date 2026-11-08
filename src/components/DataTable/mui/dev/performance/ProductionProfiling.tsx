@@ -283,18 +283,18 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
     <Typography>{buildMode} build. Dispatch-to-two-frame intervals are responsiveness proxies, not INP or exact paint durations. One warm-up and three samples. Focused sort also times a fresh sorted-model read after the visible update, with warm upstream models. The 25-mounted case uses pagination over the same 200 rows as a rendering comparison.</Typography>
     <Typography>Environment: {environment}</Typography>
     <Stack direction="row" spacing={1}>
-      <Button disabled={running} onClick={() => setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowed: true, serial: ++serial.current })}>Open windowed fixture</Button>
-      <Button disabled={running} onClick={() => setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowed: true, windowedDetails: true, serial: ++serial.current })}>Open windowed details</Button>
-      <Button disabled={running} onClick={() => setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowedRtl: true, serial: ++serial.current })}>Open RTL windowed details</Button>
-      <Button disabled={running} onClick={() => setFixture({ rows: 200, pageSize: 100, columns: 16, mode: "table", probe: "off", integratedWindow: true, integratedPersistence: true, serial: ++serial.current })}>Open integrated window</Button>
-      <Button disabled={running} onClick={() => setFixture({ rows: 200, pageSize: 100, columns: 16, mode: "table", probe: "off", integratedWindow: true, integratedInteractive: true, serial: ++serial.current })}>Open interactive window</Button>
-      <Button disabled={running} onClick={() => void run("integrated")}>Compare integrated window</Button>
-      <Button disabled={running} onClick={() => void run("window")}>Run windowed prototype</Button>
-      <Button disabled={running} onClick={() => void run("sort")}>Run focused sort</Button>
-      <Button disabled={running} onClick={() => void run("normal")}>Run normal matrix</Button>
-      <Button disabled={running} onClick={() => void run("compare")}>Compare subscriptions</Button>
-      <Button disabled={running} onClick={() => void run("500")}>Run 500 stress</Button>
-      <Button disabled={running || !stressAllowed} onClick={() => void run("1000")}>Run 1000 stress</Button>
+      <Button disabled={running} onClick={() => { setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowed: true, serial: ++serial.current }); }}>Open windowed fixture</Button>
+      <Button disabled={running} onClick={() => { setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowed: true, windowedDetails: true, serial: ++serial.current }); }}>Open windowed details</Button>
+      <Button disabled={running} onClick={() => { setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowedRtl: true, serial: ++serial.current }); }}>Open RTL windowed details</Button>
+      <Button disabled={running} onClick={() => { setFixture({ rows: 200, pageSize: 100, columns: 16, mode: "table", probe: "off", integratedWindow: true, integratedPersistence: true, serial: ++serial.current }); }}>Open integrated window</Button>
+      <Button disabled={running} onClick={() => { setFixture({ rows: 200, pageSize: 100, columns: 16, mode: "table", probe: "off", integratedWindow: true, integratedInteractive: true, serial: ++serial.current }); }}>Open interactive window</Button>
+      <Button disabled={running} onClick={() => { void run("integrated"); }}>Compare integrated window</Button>
+      <Button disabled={running} onClick={() => { void run("window"); }}>Run windowed prototype</Button>
+      <Button disabled={running} onClick={() => { void run("sort"); }}>Run focused sort</Button>
+      <Button disabled={running} onClick={() => { void run("normal"); }}>Run normal matrix</Button>
+      <Button disabled={running} onClick={() => { void run("compare"); }}>Compare subscriptions</Button>
+      <Button disabled={running} onClick={() => { void run("500"); }}>Run 500 stress</Button>
+      <Button disabled={running || !stressAllowed} onClick={() => { void run("1000"); }}>Run 1000 stress</Button>
       <Button disabled={!running} onClick={() => { cancelled.current = true; }}>Stop</Button>
     </Stack>
     <Typography role="status">{status}</Typography>

@@ -193,6 +193,8 @@ const windowingRows = Array.from({ length: 30 }, (_, index) => ({
   status: "Enabled",
 }));
 
+const reversedWindowingRows = [...windowingRows].reverse();
+
 const windowingColumns = helper.columns([
   ...columns,
   helper.display({
@@ -206,12 +208,14 @@ const windowingColumns = helper.columns([
 ]);
 
 /** Exercises the same stable row body with and without active pins. */
-function WindowingFallbackFixture({ reason }: {
-  readonly reason: "detail" | "activation" | "pin" | "eligible" | "nonsticky";
+function WindowingFallbackFixture({ reason, reverse = false }: {
+  readonly reverse?: boolean;
+  readonly reason: "detail" | "activation" | "pin" | "eligible" | "nonsticky" | "filters" | "loading" | "error" | "interactive";
 }) {
   const table = useMuiDataTable({
-    columns: reason === "eligible" ? windowingColumns : columns,
-    data: windowingRows,
+    columns: reason === "eligible" || reason === "interactive" ? windowingColumns : columns,
+    data: reverse ? reversedWindowingRows : windowingRows,
+    meta: { loading: reason === "loading", error: reason === "error" ? "Fixture error" : undefined },
     getRowId: row => row.name,
     enableRowPinning: true,
     initialState: {
@@ -222,16 +226,17 @@ function WindowingFallbackFixture({ reason }: {
 
   return <DataTable
     table={table}
-    windowRows
+    windowRows={reason === "interactive" ? "interactive" : true}
+    showColumnFilters={reason === "filters"}
     tableProps={{ stickyHeader: reason !== "nonsticky" }}
     toolbar={false}
     pagination={false}
-    renderDetailPanel={reason === "detail" ? ({ row }) => row.original.name : undefined}
-    onRowClick={reason === "activation" ? () => {} : undefined}
+    renderDetailPanel={(reason === "detail" || reason === "interactive") ? ({ row }) => row.original.name : undefined}
+    onRowClick={(reason === "activation" || reason === "interactive") ? () => {} : undefined}
   />;
 }
 
-it.each(["detail", "activation", "pin", "nonsticky"] as const)(
+it.each(["detail", "activation", "pin", "nonsticky", "filters"] as const)(
   "keeps the full renderer when the windowing opt-in encounters %s",
   reason => {
     const { container } = render(<WindowingFallbackFixture reason={reason} />);
@@ -257,14 +262,14 @@ it("mounts a bounded row range and moves it when the table scrolls", () => {
     unobserve() {}
     disconnect() {}
   };
-  const viewportHeight = jest.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(185);
-  const rowHeight = jest.spyOn(HTMLTableRowElement.prototype, "getBoundingClientRect")
+  const viewportHeight = jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(185);
+  const rowHeight = jest.spyOn(Element.prototype, "getBoundingClientRect")
     .mockReturnValue(new DOMRect(0, 0, 300, 37));
 
   try {
     const { container, getByRole, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
     const table = getTable(container);
-    const viewport = table.closest<HTMLElement>("." + dataTableClasses.container)!;
+    const viewport = getViewport(table);
     const mounted = () => Array.from(table.querySelectorAll("tbody tr[data-row-id]"))
       .map(row => row.getAttribute("data-row-id"));
 
@@ -277,7 +282,7 @@ it("mounts a bounded row range and moves it when the table scrolls", () => {
     fireEvent.keyDown(viewport, { key: "Tab" });
     expect(mounted()).toHaveLength(30);
     const checkbox = getByRole("checkbox", { name: "Pin Record 30" });
-    act(() => checkbox.focus());
+    act(() => { checkbox.focus(); });
     fireEvent.click(checkbox);
     expect(checkbox).toHaveFocus();
     expect(checkbox.closest("tr")).toHaveAttribute("data-row-pinned", "top");
@@ -290,4 +295,132 @@ it("mounts a bounded row range and moves it when the table scrolls", () => {
     viewportHeight.mockRestore();
     window.ResizeObserver = originalObserver;
   }
+});
+
+/** Supplies DOM measurements while keeping observer cleanup observable. */
+function mockWindowMeasurements(height: (row: HTMLTableRowElement) => number) {
+  const originalObserver = window.ResizeObserver;
+  const disconnects: jest.Mock[] = [];
+  window.ResizeObserver = class {
+    disconnect = jest.fn();
+    constructor() { disconnects.push(this.disconnect); }
+    observe() {}
+    unobserve() {}
+  };
+  const viewport = jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(185);
+  const row = jest.spyOn(Element.prototype, "getBoundingClientRect")
+    .mockImplementation(function (this: HTMLTableRowElement) {
+      return new DOMRect(0, 0, 300, height(this));
+    });
+  return {
+    disconnects,
+    restore() {
+      row.mockRestore();
+      viewport.mockRestore();
+      window.ResizeObserver = originalObserver;
+    },
+  };
+}
+
+it("uses the full body when ResizeObserver is unavailable", () => {
+  const originalObserver = window.ResizeObserver;
+  // The browser capability is optional, even though DOM types declare it.
+  Object.defineProperty(window, "ResizeObserver", { configurable: true, writable: true, value: undefined });
+  try {
+    const { container, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
+    expect(container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    expect(container.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+    unmount();
+  } finally { window.ResizeObserver = originalObserver; }
+});
+
+it.each(["mixed", "missing"] as const)("uses the full body for %s row measurements", kind => {
+  const measurements = mockWindowMeasurements(row => kind === "missing" ? 0 : row.dataset.rowId === "Record 2" ? 60 : 37);
+  try {
+    const { container, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
+    expect(container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    expect(container.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+    unmount();
+  } finally { measurements.restore(); }
+});
+
+it("keeps spacer heights and row indices aligned with the current order after scrolling", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const { container, rerender, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
+    const table = getTable(container);
+    const viewport = getViewport(table);
+    viewport.scrollTop = 740;
+    fireEvent.scroll(viewport);
+    const check = (reverse: boolean) => {
+      const rows = [...table.querySelectorAll("tbody tr[data-row-id]")];
+      expect(rows.length).toBeLessThan(30);
+      const firstIndex = Number(rows[0].getAttribute("aria-rowindex")) - 2;
+      expect(firstIndex).toBeGreaterThan(0);
+      rows.forEach((row, index) => {
+        expect(row).toHaveAttribute("aria-rowindex", String(firstIndex + index + 2));
+        expect(row).toHaveAttribute("data-row-id", "Record " + (reverse ? 30 - firstIndex - index : firstIndex + index + 1));
+      });
+      const spacers = table.querySelectorAll<HTMLTableCellElement>("tbody tr[aria-hidden] td");
+      expect(spacers[0].style.height).toBe(firstIndex * 37 + "px");
+      expect(spacers[1].style.height).toBe((30 - firstIndex - rows.length) * 37 + "px");
+    };
+    check(false);
+    rerender(<WindowingFallbackFixture reason="eligible" reverse />);
+    check(true);
+    unmount();
+  } finally { measurements.restore(); }
+});
+
+it("removes viewport and keyboard listeners and disconnects observers on unmount", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  const removeDocumentListener = jest.spyOn(document, "removeEventListener");
+  try {
+    const { container, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
+    const viewport = getViewport(getTable(container));
+    const removeScrollListener = jest.spyOn(viewport, "removeEventListener");
+    unmount();
+    expect(removeScrollListener).toHaveBeenCalledWith("scroll", expect.any(Function));
+    expect(removeDocumentListener).toHaveBeenCalledWith("keydown", expect.any(Function), true);
+    expect(removeDocumentListener).toHaveBeenCalledWith("pointerdown", expect.any(Function), true);
+    expect(measurements.disconnects.length).toBeGreaterThan(0);
+    measurements.disconnects.forEach(disconnect => { expect(disconnect).toHaveBeenCalled(); });
+  } finally {
+    removeDocumentListener.mockRestore();
+    measurements.restore();
+  }
+});
+
+function getViewport(table: HTMLTableElement): HTMLElement {
+  const viewport = table.closest<HTMLElement>("." + dataTableClasses.container);
+  if (!viewport) throw new Error("Missing table viewport");
+  return viewport;
+}
+
+
+it.each(["loading", "error"] as const)("does not expose windowed row geometry during %s", reason => {
+  const { container, unmount } = render(<WindowingFallbackFixture reason={reason} />);
+  const table = getTable(container);
+  expect(table.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(0);
+  expect(table.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+  expect(table).not.toHaveAttribute("aria-rowcount");
+  if (reason === "error") expect(container).toHaveTextContent("Fixture error");
+  unmount();
+});
+
+it("windows interactive rows with detail and activation handlers, then preserves focused controls", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const { container, getByRole, unmount } = render(<WindowingFallbackFixture reason="interactive" />);
+    const mountedCount = () => container.querySelectorAll("tbody tr[data-row-id]").length;
+    expect(mountedCount()).toBeLessThan(30);
+    const checkbox = getByRole("checkbox", { name: "Pin Record 1" });
+    act(() => { checkbox.focus(); });
+    expect(mountedCount()).toBe(30);
+    getViewport(getTable(container)).scrollTop = 1000;
+    fireEvent.scroll(getViewport(getTable(container)));
+    expect(checkbox).toHaveFocus();
+    expect(mountedCount()).toBe(30);
+    unmount();
+  } finally { measurements.restore(); }
 });

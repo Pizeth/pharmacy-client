@@ -31,27 +31,27 @@ function rowOffset(index: number) {
 }
 
 const detailRecords = [{ id: "1", label: "first" }, { id: "3", label: "third" }] as const;
-type DetailHeights = Readonly<Record<string, number>>;
+type DetailHeights = ReadonlyMap<string, number>;
 
 /** Computes row and detail offsets for the profiling-only mixed-height fixture. */
 function windowGeometry(rows: readonly { id: string }[], heights: DetailHeights, mixedHeights: boolean) {
   const offsets = [0];
   rows.forEach((row, index) => {
     const height = mixedHeights ? rowOffset(index + 1) - rowOffset(index) : shortRowHeight;
-    offsets.push(offsets[index] + height + (heights[row.id] ?? 0));
+    offsets.push((offsets.at(-1) ?? 0) + height + (heights.get(row.id) ?? 0));
   });
   const indexAt = (pixel: number) => {
     let low = 0;
     let high = rows.length;
     while (low < high) {
       const mid = Math.floor((low + high) / 2);
-      if (offsets[mid + 1] <= pixel) low = mid + 1;
+      if ((offsets.at(mid + 1) ?? 0) <= pixel) low = mid + 1;
       else high = mid;
     }
     return low;
   };
   return {
-    offset: (index: number) => offsets[index],
+    offset: (index: number) => offsets.at(index) ?? 0,
     indexAt,
     range: (scrollTop: number) => ({
       start: Math.max(0, Math.min(rows.length - 1, indexAt(scrollTop)) - overscan),
@@ -88,12 +88,13 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
   const [focusRequest, setFocusRequest] = useState<{ id: string } | null>(null);
 
   const expanded = table.state.expanded;
+  const expandedIds = useMemo(() => expanded === true ? undefined : new Map(Object.entries(expanded)), [expanded]);
   const [longDetail, setLongDetail] = useState(false);
-  const [detailHeights, setDetailHeights] = useState<DetailHeights>({});
-  const previousHeights = useRef<DetailHeights>({});
-  const activeHeights = useMemo(() => Object.fromEntries(
-    detailRecords.filter(({ id }) => expanded === true || expanded[id]).map(({ id }) => [id, detailHeights[id] ?? 0]),
-  ), [expanded, detailHeights]);
+  const [detailHeights, setDetailHeights] = useState<DetailHeights>(new Map());
+  const previousHeights = useRef<DetailHeights>(new Map());
+  const activeHeights = useMemo(() => new Map(
+    detailRecords.filter(({ id }) => expanded === true || expandedIds?.get(id) === true).map(({ id }) => [id, detailHeights.get(id) ?? 0]),
+  ), [expanded, expandedIds, detailHeights]);
 
   /** Excludes pinned identities from the scrolling range. */
   function scrollingRows() {
@@ -128,12 +129,12 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
     if (!detail || !id) return;
     const measure = () => {
       const height = detail.getBoundingClientRect().height;
-      setDetailHeights(previous => previous[id] === height ? previous : { ...previous, [id]: height });
+      setDetailHeights(previous => previous.get(id) === height ? previous : new Map(previous).set(id, height));
     };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(detail);
-    return () => observer.disconnect();
+    return () => { observer.disconnect(); };
   }, []);
 
   useLayoutEffect(() => {
@@ -186,12 +187,12 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
       <DataTableFilterDisplayProvider showColumnFilters={false}>
       {detailControls && <Stack direction="row" spacing={1}>
         {detailRecords.map(({ id, label }) => {
-          const isExpanded = expanded === true || !!expanded[id];
+          const isExpanded = expanded === true || expandedIds?.get(id) === true;
           return <Button key={id} aria-expanded={isExpanded} onClick={() => {
             table.getRow(id, true).toggleExpanded(!isExpanded);
           }}>{isExpanded ? "Collapse" : "Expand"} {label} record</Button>;
         })}
-        <Button disabled={expanded !== true && !expanded["1"]} onClick={() => setLongDetail(value => !value)}>{longDetail ? "Show less detail" : "Show more detail"}</Button>
+        <Button disabled={expanded !== true && !expandedIds?.get("1")} onClick={() => { setLongDetail(value => !value); }}>{longDetail ? "Show less detail" : "Show more detail"}</Button>
         <table.Subscribe selector={state => state.rowPinning}>
           {() => pinFixtures.map(({ id, label, edge }) => {
             const row = table.getRow(id, true);

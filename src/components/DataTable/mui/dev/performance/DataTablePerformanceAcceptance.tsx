@@ -318,7 +318,7 @@ function createColumns(
         cell: interactive ? ({ row }) => <>
           <DataTableSelectRowCheckbox />
           <DataTableExpandRowButton />
-          <Button size="small" onClick={() => togglePinnedSelection(row)}>Select {row.id}</Button>
+          <Button size="small" onClick={() => { togglePinnedSelection(row); }}>Select {row.id}</Button>
         </> : undefined,
         size:
           140,

@@ -49,7 +49,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     const prepareTab = (event: KeyboardEvent) => {
       if (event.key === "Tab" && !event.defaultPrevented && !keyboardMode) {
         // Native tab order must see every row before the browser moves focus.
-        flushSync(() => setKeyboardMode(true));
+        flushSync(() => { setKeyboardMode(true); });
       }
     };
     const resumePointerWindow = () => {
@@ -100,7 +100,10 @@ export function DataTableWindowedBody<TData extends RowData>({
     const mounted = [...body.querySelectorAll<HTMLTableRowElement>(":scope > tr[data-row-id]")];
     const check = () => {
       const firstHeight = mounted[0]?.getBoundingClientRect().height;
-      if (!firstHeight) return;
+      if (!firstHeight || !Number.isFinite(firstHeight)) {
+        setUnsafeHeight(true);
+        return;
+      }
       const expected = measuredHeight ?? firstHeight;
       if (mounted.some(row => Math.abs(row.getBoundingClientRect().height - expected) > 1)) {
         setUnsafeHeight(true);
@@ -111,7 +114,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     check();
     const observer = new ResizeObserver(check);
     for (const row of mounted) observer.observe(row);
-    return () => observer.disconnect();
+    return () => { observer.disconnect(); };
   }, [canWindow, start, end, rows, measuredHeight]);
 
   const headerCount = table.getHeaderGroups().length;
@@ -122,7 +125,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     fallbackHeight={rowHeight}
     dualEdge={dualEdgeStickyRowPinning}
     bodyProps={{
-      onFocusCapture: () => setBodyFocused(true),
+      onFocusCapture: () => { setBodyFocused(true); },
       onBlurCapture: event => {
         if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) setBodyFocused(false);
       },
