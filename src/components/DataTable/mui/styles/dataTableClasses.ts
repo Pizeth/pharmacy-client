@@ -139,6 +139,7 @@ export const dataTableClasses = generateUtilityClasses(
     "refreshingIndicator",
     "body",
     "bodyRow",
+    "windowSpacerCell",
     "bodyCell",
 
     /**

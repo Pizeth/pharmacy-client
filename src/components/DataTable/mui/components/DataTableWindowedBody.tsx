@@ -8,11 +8,14 @@ import { styled } from "@mui/material";
 import type { Row, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
-import { dataTableClasses } from "../styles";
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
 import { DataTableStickyRowMeasurements } from "./DataTableStickyRowMeasurements";
 
-const SpacerCell = styled("td")({ padding: 0, border: 0 });
+const SpacerCell = styled("td", {
+  name: DATA_TABLE_COMPONENT_NAME, slot: "WindowSpacerCell",
+  overridesResolver: (_props, styles) => styles.windowSpacerCell,
+})({ padding: 0, border: 0 });
 const overscan = 4;
 const initialViewportRows = 12;
 
@@ -56,9 +59,14 @@ export function DataTableWindowedBody<TData extends RowData>({
       setKeyboardMode(false);
       // React focus events also cover row-owned portals. Blur releases this guard.
     };
+    const releaseOutsideKeyboardMode = (event: FocusEvent) => {
+      if (event.target instanceof Node && !body.contains(event.target)) setKeyboardMode(false);
+    };
+    doc.addEventListener("focusin", releaseOutsideKeyboardMode, true);
     doc.addEventListener("keydown", prepareTab, true);
     doc.addEventListener("pointerdown", resumePointerWindow, true);
     return () => {
+      doc.removeEventListener("focusin", releaseOutsideKeyboardMode, true);
       doc.removeEventListener("keydown", prepareTab, true);
       doc.removeEventListener("pointerdown", resumePointerWindow, true);
     };
@@ -88,7 +96,7 @@ export function DataTableWindowedBody<TData extends RowData>({
   const available = viewport.height > 0
     ? Math.max(0, viewport.height - headerHeight)
     : initialViewportRows * itemHeight;
-  const canWindow = !unsafeHeight && !pinned && !renderDetailPanel && !keyboardMode && !bodyFocused;
+  const canWindow = rows.length > 25 && !unsafeHeight && !pinned && !renderDetailPanel && !keyboardMode && !bodyFocused;
   const top = Math.min(viewport.top, Math.max(0, rows.length * itemHeight - available));
   const start = canWindow ? Math.max(0, Math.floor(top / itemHeight) - overscan) : 0;
   const end = canWindow ? Math.min(rows.length, Math.ceil((top + available) / itemHeight) + overscan) : rows.length;

@@ -20,7 +20,7 @@ export const BodyRoot = styled(TableBody, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Body",
   overridesResolver: (_props, styles) => styles.body,
-})({ '&[data-window-row-height="true"] > tr[data-row-id]': { height: "var(--DataTable-window-row-height)" } });
+})({ ':where(&[data-window-row-height="true"]) > :where(tr[data-row-id])': { height: "var(--DataTable-window-row-height)" } });
 
 /** Renderer geometry only. TanStack remains the sole owner of pin identity/order. */
 export function DataTableStickyRowMeasurements({

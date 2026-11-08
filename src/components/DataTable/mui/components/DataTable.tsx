@@ -474,7 +474,7 @@ function DataTablePresentationRegion<TData extends RowData>(
               <DataTableHead table={table} indexRows={indexRows} />
               <DataTableBody
                 table={table}
-                windowRows={windowActive ? windowRows : false}
+                windowRows={windowBody ? windowRows : false}
                 rowPinningDisplayMode={rowPinningDisplayMode}
                 renderDetailPanel={renderDetailPanel}
                 onRowClick={onRowClick}

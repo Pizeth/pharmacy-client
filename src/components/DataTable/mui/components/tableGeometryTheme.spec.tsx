@@ -195,6 +195,7 @@ const windowingRows = Array.from({ length: 30 }, (_, index) => ({
   status: "Enabled",
 }));
 
+const shortWindowingRows = windowingRows.slice(0, 20);
 const reversedWindowingRows = [...windowingRows].reverse();
 
 const windowingColumns = helper.columns([
@@ -211,14 +212,22 @@ const windowingColumns = helper.columns([
   }),
 ]);
 
+const groupedWindowingColumns = helper.columns([helper.group({ id: "outer", header: "Outer", columns: [
+  helper.group({ id: "middle", header: "Middle", columns: [
+    helper.group({ id: "inner", header: "Inner", columns: windowingColumns }),
+  ] }),
+] })]);
+
 /** Exercises the same stable row body with and without active pins. */
-function WindowingFallbackFixture({ reason, reverse = false }: {
+function WindowingFallbackFixture({ reason, reverse = false, short = false, grouped = false }: {
   readonly reverse?: boolean;
+  readonly short?: boolean;
+  readonly grouped?: boolean;
   readonly reason: "detail" | "activation" | "pin" | "eligible" | "nonsticky" | "filters" | "loading" | "error" | "interactive";
 }) {
   const table = useMuiDataTable({
-    columns: reason === "eligible" || reason === "interactive" ? windowingColumns : columns,
-    data: reverse ? reversedWindowingRows : windowingRows,
+    columns: grouped ? groupedWindowingColumns : reason === "eligible" || reason === "interactive" ? windowingColumns : columns,
+    data: short ? shortWindowingRows : reverse ? reversedWindowingRows : windowingRows,
     meta: { loading: reason === "loading", error: reason === "error" ? "Fixture error" : undefined },
     getRowId: row => row.name,
     enableRowPinning: true,
@@ -464,4 +473,58 @@ it("preserves theme row heights outside windowed bodies", () => {
   expect(row).toHaveStyle({ height: "120px" });
   expect(container.querySelector("tbody")).not.toHaveAttribute("data-window-row-height");
   unmount();
+});
+
+it("retains focused row controls when the data falls below the windowing threshold", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" />);
+    const control = view.getByRole("checkbox", { name: "Pin Record 1" });
+    act(() => { control.focus(); });
+    view.rerender(<WindowingFallbackFixture reason="eligible" short />);
+    expect(view.getByRole("checkbox", { name: "Pin Record 1" })).toBe(control);
+    expect(control).toHaveFocus();
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(20);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("resumes windowing after keyboard focus moves outside the table", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<><button>Outside table</button><WindowingFallbackFixture reason="eligible" /></>);
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    act(() => { view.getByRole("button", { name: "Outside table" }).focus(); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("lets the theme override the default windowed row height", () => {
+  const measurements = mockWindowMeasurements(() => 120);
+  const theme = createTheme({ components: { RazethDataTable: { styleOverrides: { bodyRow: { height: 120 } } } } });
+  try {
+    const view = render(<ThemeProvider theme={theme}><WindowingFallbackFixture reason="eligible" /></ThemeProvider>);
+    expect(view.container.querySelector("tbody tr[data-row-id]")).toHaveStyle({ height: "120px" });
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("keeps the body-relative scroll range with a tall sticky grouped header", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  const viewportHeight = jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(600);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" grouped />);
+    const table = getTable(view.container);
+    expect(table.querySelectorAll("thead tr")).toHaveLength(4);
+    const viewport = getViewport(table);
+    viewport.scrollTop = 370;
+    fireEvent.scroll(viewport);
+    // Sticky header offset cancels its flow offset: the first visible body row
+    // is index 10; four overscan rows means mounting starts at index 6.
+    expect(table.querySelector("tbody tr[data-row-id]")).toHaveAttribute("data-row-id", "Record 7");
+    expect(view.getByRole("checkbox", { name: "Pin Record 11" })).toBeInTheDocument();
+    view.unmount();
+  } finally { viewportHeight.mockRestore(); measurements.restore(); }
 });

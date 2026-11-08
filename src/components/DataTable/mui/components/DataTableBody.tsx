@@ -199,7 +199,7 @@ export function DataTableBody<TData extends RowData>(
           );
         }
 
-        if (windowRows && rows.length > 25 && !showColumnFilters) {
+        if (windowRows && !showColumnFilters) {
           return <DataTableWindowedBody
             key={density}
             table={table}
