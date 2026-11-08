@@ -167,8 +167,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
                 (!windowed || firstWindowRow()?.getAttribute("aria-rowindex") === "1"));
             if (windowed) {
               await measure("scroll-to-end", repeat, () => {
-                const view = viewport();
-                if (view) view.scrollTop = view.scrollHeight;
+                scrollViewportToEnd(viewport(), "vertical");
               }, () => {
                 const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
                 const last = mounted?.[mounted.length - 1];
@@ -178,8 +177,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
             }
             if (track === "integrated") {
               await measure("scroll-to-end", repeat, () => {
-                const view = viewport();
-                if (view) view.scrollTop = view.scrollHeight;
+                scrollViewportToEnd(viewport(), "vertical");
               }, () => {
                 const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
                 return validMountedCount() && mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
@@ -189,10 +187,10 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
             for (const filter of ["Record 0001", ""]) await measure(filter ? "filter" : "clear-filter", repeat,
               () => table().setGlobalFilter(filter), () => count() === (filter ? 1 : rows));
             await measure("scroll-vertical", repeat, () => {
-              const view = viewport(); if (view) view.scrollTop = view.scrollHeight;
+              scrollViewportToEnd(viewport(), "vertical");
             }, () => { const view = viewport(); return view != null && (view.scrollHeight <= view.clientHeight || view.scrollTop > 0); });
             await measure("scroll-horizontal", repeat, () => {
-              const view = viewport(); if (view) view.scrollLeft = view.scrollWidth;
+              scrollViewportToEnd(viewport(), "horizontal");
             }, () => { const view = viewport(); return view != null && (view.scrollWidth <= view.clientWidth || view.scrollLeft > 0); });
             if (track === "normal") {
               // Seed shared state outside switching samples and verify both views retain it.
@@ -219,8 +217,8 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
           taskObserver?.disconnect();
           setResults((previous) => [...previous, result]);
         }
-        if (track === "500") setStressAllowed(result.status === "PASS" && result.samples.every((sample) => sample.elapsedMs < 5000));
-        if (result.status !== "PASS") throw new Error(result.status);
+        updateStressEligibility(track, result, setStressAllowed);
+        assertSuccessfulResult(result);
       }
       assertProfilingRunActive(cancelled.current, document.visibilityState);
       setStatus("Complete");
@@ -357,4 +355,17 @@ function renderedSample(root: HTMLElement | null) {
     cells: root?.querySelectorAll("tbody td").length ?? 0,
     cards: root?.querySelectorAll(`.${dataTableClasses.cardItem}`).length ?? 0,
   };
+}
+
+function scrollViewportToEnd(view: HTMLElement | null | undefined, axis: "vertical" | "horizontal") {
+  if (!view) return;
+  if (axis === "vertical") view.scrollTop = view.scrollHeight;
+  else view.scrollLeft = view.scrollWidth;
+}
+
+function updateStressEligibility(track: ProfilingTrack, result: Result, update: (allowed: boolean) => void) {
+  if (track === "500") update(result.status === "PASS" && result.samples.every(sample => sample.elapsedMs < 5000));
+}
+function assertSuccessfulResult(result: Result) {
+  if (result.status !== "PASS") throw new Error(result.status);
 }

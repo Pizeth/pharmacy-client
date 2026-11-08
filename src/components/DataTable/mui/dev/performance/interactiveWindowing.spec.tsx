@@ -33,4 +33,3 @@ it("keeps first-row selection and reset consistent with select-sticky pinning", 
   expect(instance.getIsSomeRowsPinned()).toBe(false);
   unmount();
 });
-
