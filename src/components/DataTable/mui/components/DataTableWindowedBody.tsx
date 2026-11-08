@@ -59,8 +59,9 @@ export function DataTableWindowedBody<TData extends RowData>({
         !element.closest('[hidden],[inert],[aria-hidden="true"]') &&
         getComputedStyle(element).display !== "none" && getComputedStyle(element).visibility !== "hidden")
         .sort((a, b) => (a.tabIndex || Infinity) - (b.tabIndex || Infinity));
-      const current = stops.indexOf(doc.activeElement as HTMLElement);
-      const next = stops[current < 0 ? (event.shiftKey ? stops.length - 1 : 0) : current + (event.shiftKey ? -1 : 1)];
+      const current = stops.findIndex(element => element === doc.activeElement);
+      const nextIndex = current < 0 ? (event.shiftKey ? stops.length - 1 : 0) : current + (event.shiftKey ? -1 : 1);
+      const next = nextIndex < 0 ? undefined : stops.at(nextIndex);
       if ((target instanceof Node && container?.contains(target)) || (next && body.contains(next))) {
         // Native tab order must see every row before the browser moves focus.
         flushSync(() => { setKeyboardMode(true); });

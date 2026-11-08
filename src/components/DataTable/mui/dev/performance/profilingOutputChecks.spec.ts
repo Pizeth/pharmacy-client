@@ -63,7 +63,14 @@ it("rejects interior gaps and stale order even when window endpoints cover the v
 it("rejects near-full rendering despite continuous viewport coverage", () => {
   const view = document.createElement("div");
   const ids = Array.from({ length: 200 }, (_, index) => String(index + 1));
-  view.innerHTML = `<table><tbody>${ids.slice(1).map(id => `<tr data-row-id="${id}"><td>${id}</td></tr>`).join("")}</tbody></table>`;
+  const table = document.createElement("table");
+  const body = table.createTBody();
+  for (const id of ids.slice(1)) {
+    const row = body.insertRow();
+    row.dataset.rowId = id;
+    row.insertCell().textContent = id;
+  }
+  view.append(table);
   Object.defineProperty(view, "clientHeight", { value: 150 });
   view.getBoundingClientRect = () => new DOMRect(0, 0, 300, 150);
   Array.from(view.querySelectorAll("tr")).forEach((row, index) => {
