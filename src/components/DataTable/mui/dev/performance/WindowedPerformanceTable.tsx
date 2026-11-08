@@ -2,6 +2,7 @@
 
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Button, Stack, styled, Table, TableContainer } from "@mui/material";
+import type { ExpandedState } from "@tanstack/react-table";
 import { DataTableColumnGroup } from "../../components/DataTableColumnGroup";
 import { DataTableHead } from "../../components/DataTableHead";
 import { DataTableFilterDisplayProvider } from "../../filter-display";
@@ -82,12 +83,21 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
   readonly table: MuiDataTableInstance<DataTablePerformanceRow>;
   readonly detailControls?: boolean;
 }) {
+  return <table.Subscribe selector={state => state.expanded}>
+    {expanded => <WindowedPerformanceContent table={table} detailControls={detailControls} expanded={expanded} />}
+  </table.Subscribe>;
+}
+
+function WindowedPerformanceContent({ table, detailControls, expanded }: {
+  readonly table: MuiDataTableInstance<DataTablePerformanceRow>;
+  readonly detailControls: boolean;
+  readonly expanded: ExpandedState;
+}) {
   const headerHeight = detailControls ? table.getHeaderGroups().length * getDataTableDensityMetrics("compact").headerHeight : 0;
   const viewportRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [focusRequest, setFocusRequest] = useState<{ id: string } | null>(null);
 
-  const expanded = table.state.expanded;
   const expandedIds = useMemo(() => expanded === true ? undefined : new Map(Object.entries(expanded)), [expanded]);
   const [longDetail, setLongDetail] = useState(false);
   const [detailHeights, setDetailHeights] = useState<DetailHeights>(new Map());

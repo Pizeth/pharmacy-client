@@ -1,5 +1,5 @@
 import { dataTableClasses } from "../../styles";
-import { assertProfilingRunActive, hasRenderedFirstRow, hasRenderedRowState } from "./profilingOutputChecks";
+import { assertProfilingRunActive, hasRenderedFirstRow, hasRenderedRowState, hasViewportCoverage } from "./profilingOutputChecks";
 
 function fixture() {
   const root = document.createElement("section");
@@ -35,4 +35,22 @@ it("blocks cancellation or visibility changes even after a measured frame interv
   expect(() => assertProfilingRunActive(false, "visible")).not.toThrow();
   expect(() => assertProfilingRunActive(true, "visible")).toThrow("BLOCKED");
   expect(() => assertProfilingRunActive(false, "hidden")).toThrow("BLOCKED");
+});
+
+it("rejects interior gaps and stale order even when window endpoints cover the viewport", () => {
+  const view = document.createElement("div");
+  view.innerHTML = '<table><thead><tr><th>Title</th></tr></thead><tbody><tr data-row-id="1"><td>One</td></tr><tr data-row-id="2"><td>Two</td></tr><tr data-row-id="3"><td>Three</td></tr></tbody></table>';
+  Object.defineProperty(view, "clientHeight", { value: 150 });
+  view.getBoundingClientRect = () => new DOMRect(0, 0, 300, 150);
+  const head = view.querySelector("thead");
+  if (!head) throw new Error("Header missing");
+  head.getBoundingClientRect = () => new DOMRect(0, 0, 300, 30);
+  const rows = Array.from(view.querySelectorAll<HTMLTableRowElement>("tbody tr"));
+  rows.forEach((row, index) => { row.getBoundingClientRect = () => new DOMRect(0, 30 + index * 40, 300, 40); });
+  expect(hasViewportCoverage(view, 3, 50, ["1", "2", "3"])).toBe(true);
+  expect(hasViewportCoverage(view, 3, 50, ["1", "3", "2"])).toBe(false);
+  const middle = rows.at(1);
+  if (!middle) throw new Error("Middle row missing");
+  middle.getBoundingClientRect = () => new DOMRect(0, 80, 300, 30);
+  expect(hasViewportCoverage(view, 3, 50, ["1", "2", "3"])).toBe(false);
 });

@@ -11,7 +11,7 @@ import type { muiDataTableFeatures } from "../../features/muiDataTableFeatures";
 import type { MuiDataTableInstance } from "../../table";
 import { dataTableClasses } from "../../styles";
 import { afterTwoFrames, summarizeSamples } from "./browserMeasurements";
-import { assertProfilingRunActive, hasRenderedFirstRow, hasRenderedRowState } from "./profilingOutputChecks";
+import { assertProfilingRunActive, hasRenderedFirstRow, hasRenderedRowState, hasViewportCoverage } from "./profilingOutputChecks";
 
 const Root = styled("main", { name: "RazethDataTablePerformance", slot: "Root" })(({ theme }) => ({
   padding: theme.spacing(2), color: (theme.vars ?? theme).palette.text.primary,
@@ -138,7 +138,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
         const validMountedCount = () => {
           const mounted = count() ?? 0;
           if (!integratedWindow) return mounted === expectedMounted;
-          return hasViewportCoverage(viewport(), mounted, pageSize);
+          return hasViewportCoverage(viewport(), mounted, pageSize, table().getRowModel().rows.map(row => row.id));
         };
         try {
           for (let repeat = 0; repeat <= 3; repeat++) {
@@ -304,18 +304,6 @@ function profilingCaseLabel(integrated: boolean | undefined, windowed: boolean, 
   const prefix = integrated === undefined ? (windowed ? "Windowed " : "") : integrated ? "Integrated windowed " : "Integrated reference ";
   const suffix = pageSize === rows ? "" : ` / ${pageSize} mounted`;
   return `${prefix}${rows}x${columns} ${mode} ${probe}${suffix}`;
-}
-
-
-function hasViewportCoverage(view: HTMLElement | null | undefined, mounted: number, pageSize: number) {
-          const bodyRows = view?.querySelectorAll("tbody tr[data-row-id]");
-          const first = bodyRows?.[0]?.getBoundingClientRect();
-          const last = bodyRows?.[bodyRows.length - 1]?.getBoundingClientRect();
-          const bounds = view?.getBoundingClientRect();
-          const headerHeight = view?.querySelector("thead")?.getBoundingClientRect().height ?? 0;
-          if (!view || !first || !last || !bounds) return false;
-          return mounted > 0 && mounted < pageSize &&
-            first.top <= bounds.top + headerHeight + 1 && last.bottom >= bounds.top + view.clientHeight - 1;
 }
 
 
