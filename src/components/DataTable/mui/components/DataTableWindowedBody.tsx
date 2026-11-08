@@ -40,6 +40,8 @@ export function DataTableWindowedBody<TData extends RowData>({
   const ref = useRef<HTMLTableSectionElement>(null);
   const [viewport, setViewport] = useState({ top: 0, height: 0 });
   const [unsafeHeight, setUnsafeHeight] = useState(false);
+  const [unsafeHeader, setUnsafeHeader] = useState(true);
+  const headerGroups = table.getHeaderGroups();
   const [measuredHeight, setMeasuredHeight] = useState<number>();
   const itemHeight = measuredHeight ?? rowHeight;
   const [keyboardMode, setKeyboardMode] = useState(false);
@@ -53,12 +55,21 @@ export function DataTableWindowedBody<TData extends RowData>({
       if (event.key !== "Tab" || event.defaultPrevented || keyboardMode) return;
       const target = event.target;
       const container = body.closest(`.${dataTableClasses.container}`);
-      const stops = Array.from(doc.querySelectorAll<HTMLElement>(
+      const candidates = Array.from(doc.querySelectorAll<HTMLElement>(
         'a[href],button,input,select,textarea,[tabindex],summary',
       )).filter(element => element.tabIndex >= 0 && !element.matches(":disabled") &&
         !element.closest('[hidden],[inert],[aria-hidden="true"]') &&
         getComputedStyle(element).display !== "none" && getComputedStyle(element).visibility !== "hidden")
-        .sort((a, b) => (a.tabIndex || Infinity) - (b.tabIndex || Infinity));
+        .sort((a, b) => (a.tabIndex || Number.MAX_SAFE_INTEGER) - (b.tabIndex || Number.MAX_SAFE_INTEGER));
+      const stops = candidates.filter(element => {
+        if (!(element instanceof HTMLInputElement) || element.type !== "radio" || !element.name) return true;
+        const group = candidates.filter((candidate): candidate is HTMLInputElement =>
+          candidate instanceof HTMLInputElement && candidate.type === "radio" &&
+          candidate.name === element.name && candidate.form === element.form &&
+          candidate.getRootNode() === element.getRootNode());
+        const selected = group.find(radio => radio.checked);
+        return element === (selected ?? (event.shiftKey ? group.at(-1) : group.at(0)));
+      });
       const current = stops.findIndex(element => element === doc.activeElement);
       const nextIndex = current < 0 ? (event.shiftKey ? stops.length - 1 : 0) : current + (event.shiftKey ? -1 : 1);
       const next = nextIndex < 0 ? undefined : stops.at(nextIndex);
@@ -92,9 +103,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     }
     const update = () => {
       const headers = ref.current?.closest("table")?.querySelectorAll("thead th");
-      if (!headers?.length || Array.from(headers).some(cell => getComputedStyle(cell).position !== "sticky")) {
-        setUnsafeHeight(true);
-      }
+      setUnsafeHeader(!headers?.length || Array.from(headers).some(cell => getComputedStyle(cell).position !== "sticky"));
       const top = container.scrollTop;
       const height = container.clientHeight;
       setViewport(current => current.top === top && current.height === height ? current : { top, height });
@@ -107,12 +116,12 @@ export function DataTableWindowedBody<TData extends RowData>({
       observer.disconnect();
       container.removeEventListener("scroll", update);
     };
-  }, []);
+  }, [headerGroups]);
 
   const available = viewport.height > 0
     ? Math.max(0, viewport.height - headerHeight)
     : initialViewportRows * itemHeight;
-  const canWindow = rows.length > 25 && !unsafeHeight && !pinned && !renderDetailPanel && !keyboardMode && !bodyFocused;
+  const canWindow = rows.length > 25 && !unsafeHeight && !unsafeHeader && !pinned && !renderDetailPanel && !keyboardMode && !bodyFocused;
   const top = Math.min(viewport.top, Math.max(0, rows.length * itemHeight - available));
   const start = canWindow ? Math.max(0, Math.floor(top / itemHeight) - overscan) : 0;
   const end = canWindow ? Math.min(rows.length, Math.ceil((top + available) / itemHeight) + overscan) : rows.length;
@@ -123,6 +132,8 @@ export function DataTableWindowedBody<TData extends RowData>({
     if (!body) return undefined;
     const mounted = [...body.querySelectorAll<HTMLTableRowElement>(":scope > tr[data-row-id]")];
     const check = () => {
+      // Empty headers can temporarily yield zero-height rows; header safety is recoverable.
+      if (!body.closest("table")?.querySelector("thead th")) return;
       const firstHeight = mounted[0]?.getBoundingClientRect().height;
       if (!firstHeight || !Number.isFinite(firstHeight)) {
         setUnsafeHeight(true);
@@ -131,7 +142,7 @@ export function DataTableWindowedBody<TData extends RowData>({
       const expected = measuredHeight ?? firstHeight;
       if (mounted.some(row => Math.abs(row.getBoundingClientRect().height - expected) > 1)) {
         setUnsafeHeight(true);
-      } else if (measuredHeight === undefined) {
+      } else if (measuredHeight !== firstHeight) {
         setMeasuredHeight(firstHeight);
       }
     };
@@ -141,8 +152,8 @@ export function DataTableWindowedBody<TData extends RowData>({
     return () => { observer.disconnect(); };
   }, [canWindow, start, end, rows, measuredHeight]);
 
-  const useWindowRowHeight = rows.length > 25 && !unsafeHeight && !pinned && !renderDetailPanel;
-  const headerCount = table.getHeaderGroups().length;
+  const useWindowRowHeight = rows.length > 25 && !unsafeHeight && !unsafeHeader && !pinned && !renderDetailPanel;
+  const headerCount = headerGroups.length;
   return <DataTableStickyRowMeasurements
     forwardedRef={ref}
     enabled={pinned && stickyRowPinning}

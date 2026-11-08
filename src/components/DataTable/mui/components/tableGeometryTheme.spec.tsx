@@ -219,10 +219,11 @@ const groupedWindowingColumns = helper.columns([helper.group({ id: "outer", head
 ] })]);
 
 /** Exercises the same stable row body with and without active pins. */
-function WindowingFallbackFixture({ reason, reverse = false, short = false, grouped = false }: {
+function WindowingFallbackFixture({ reason, reverse = false, short = false, grouped = false, hidden = false }: {
   readonly reverse?: boolean;
   readonly short?: boolean;
   readonly grouped?: boolean;
+  readonly hidden?: boolean;
   readonly reason: "detail" | "activation" | "pin" | "eligible" | "nonsticky" | "filters" | "loading" | "error" | "interactive";
 }) {
   const table = useMuiDataTable({
@@ -231,6 +232,7 @@ function WindowingFallbackFixture({ reason, reverse = false, short = false, grou
     meta: { loading: reason === "loading", error: reason === "error" ? "Fixture error" : undefined },
     getRowId: row => row.name,
     enableRowPinning: true,
+    state: { columnVisibility: hidden ? { name: false, status: false, pin: false } : {} },
     initialState: {
       pagination: { pageIndex: 0, pageSize: 30 },
       rowPinning: { top: reason === "pin" ? ["Record 1"] : [], bottom: [] },
@@ -565,6 +567,47 @@ it("falls back when theme header cells are no longer sticky", () => {
     const view = render(<ThemeProvider theme={theme}><WindowingFallbackFixture reason="eligible" grouped /></ThemeProvider>);
     expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
     expect(view.container.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("restores windowing when hidden columns become visible", () => {
+  const measurements = mockWindowMeasurements(row => row.querySelector("td") ? 37 : 0);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" hidden />);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.rerender(<WindowingFallbackFixture reason="eligible" />);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("synchronizes a subpixel height change with spacer geometry", () => {
+  let height = 37;
+  const measurements = mockWindowMeasurements(() => height);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" />);
+    const viewport = getViewport(getTable(view.container));
+    height = 37.5;
+    viewport.scrollTop = 370;
+    fireEvent.scroll(viewport);
+    const table = getTable(view.container);
+    const rows = table.querySelectorAll("tbody tr[data-row-id]");
+    const firstIndex = Number(rows[0]?.getAttribute("aria-rowindex")) - 2;
+    expect(table.querySelector<HTMLTableCellElement>("tbody tr[aria-hidden] td")?.style.height).toBe(`${firstIndex * height}px`);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("restores the last rows before reverse Tab from a checked radio group", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<><WindowingFallbackFixture reason="eligible" /><input type="radio" name="after" aria-label="Unchecked after" /><input type="radio" name="after" aria-label="Checked after" defaultChecked /></>);
+    expect(view.container.querySelector('[data-row-id="Record 30"]')).not.toBeInTheDocument();
+    const radio = view.getByRole("radio", { name: "Checked after" });
+    act(() => { radio.focus(); });
+    fireEvent.keyDown(radio, { key: "Tab", shiftKey: true });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
     view.unmount();
   } finally { measurements.restore(); }
 });

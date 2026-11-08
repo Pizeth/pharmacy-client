@@ -77,4 +77,10 @@ it("rejects near-full rendering despite continuous viewport coverage", () => {
     row.getBoundingClientRect = () => new DOMRect(0, (index - 195) * 40, 300, 40);
   });
   expect(hasViewportCoverage(view, 199, 200, ids)).toBe(false);
+  Array.from(view.querySelectorAll("tr")).forEach((row, index) => {
+    const height = index === 0 ? 0.75 : 40;
+    const top = index === 0 ? -7800 : -7799.25 + (index - 1) * 40;
+    row.getBoundingClientRect = () => new DOMRect(0, top, 300, height);
+  });
+  expect(hasViewportCoverage(view, 199, 200, ids)).toBe(false);
 });

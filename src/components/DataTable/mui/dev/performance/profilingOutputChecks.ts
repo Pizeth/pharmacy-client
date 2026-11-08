@@ -51,7 +51,9 @@ export function hasViewportCoverage(view: HTMLElement | null | undefined, mounte
     (index === 0 || Math.abs(box.top - (boxes.at(index - 1)?.bottom ?? NaN)) <= 1))) return false;
   const bounds = view.getBoundingClientRect();
   const headerHeight = view.querySelector("thead")?.getBoundingClientRect().height ?? 0;
-  const rowHeight = Math.min(...boxes.map(box => box.height));
+  const rowHeight = boxes[0]?.height ?? 0;
+  // Integrated windowing requires uniform rows; a tiny outlier must not inflate the limit.
+  if (boxes.some(box => Math.abs(box.height - rowHeight) > 1)) return false;
   // Four overscan rows on each side, plus one partially visible row.
   const maximumMounted = Math.ceil(Math.max(0, view.clientHeight - headerHeight) / rowHeight) + 9;
   if (mounted > maximumMounted) return false;
