@@ -49,8 +49,25 @@ it("rejects interior gaps and stale order even when window endpoints cover the v
   rows.forEach((row, index) => { row.getBoundingClientRect = () => new DOMRect(0, 30 + index * 40, 300, 40); });
   expect(hasViewportCoverage(view, 3, 50, ["1", "2", "3"])).toBe(true);
   expect(hasViewportCoverage(view, 3, 50, ["1", "3", "2"])).toBe(false);
+  rows.forEach((row, index) => { row.getBoundingClientRect = () => new DOMRect(0, 35 + index * 40, 300, 40); });
+  expect(hasViewportCoverage(view, 3, 50, ["1", "2", "3"])).toBe(false);
+  rows.forEach((row, index) => { row.getBoundingClientRect = () => new DOMRect(0, 25 + index * 40, 300, 40); });
+  expect(hasViewportCoverage(view, 3, 50, ["1", "2", "3"])).toBe(false);
+  rows.forEach((row, index) => { row.getBoundingClientRect = () => new DOMRect(0, 30 + index * 40, 300, 40); });
   const middle = rows.at(1);
   if (!middle) throw new Error("Middle row missing");
   middle.getBoundingClientRect = () => new DOMRect(0, 80, 300, 30);
   expect(hasViewportCoverage(view, 3, 50, ["1", "2", "3"])).toBe(false);
+});
+
+it("rejects near-full rendering despite continuous viewport coverage", () => {
+  const view = document.createElement("div");
+  const ids = Array.from({ length: 200 }, (_, index) => String(index + 1));
+  view.innerHTML = `<table><tbody>${ids.slice(1).map(id => `<tr data-row-id="${id}"><td>${id}</td></tr>`).join("")}</tbody></table>`;
+  Object.defineProperty(view, "clientHeight", { value: 150 });
+  view.getBoundingClientRect = () => new DOMRect(0, 0, 300, 150);
+  Array.from(view.querySelectorAll("tr")).forEach((row, index) => {
+    row.getBoundingClientRect = () => new DOMRect(0, (index - 195) * 40, 300, 40);
+  });
+  expect(hasViewportCoverage(view, 199, 200, ids)).toBe(false);
 });

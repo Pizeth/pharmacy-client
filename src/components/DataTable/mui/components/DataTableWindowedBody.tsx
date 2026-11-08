@@ -50,7 +50,18 @@ export function DataTableWindowedBody<TData extends RowData>({
     if (!body) return undefined;
     const doc = body.ownerDocument;
     const prepareTab = (event: KeyboardEvent) => {
-      if (event.key === "Tab" && !event.defaultPrevented && !keyboardMode) {
+      if (event.key !== "Tab" || event.defaultPrevented || keyboardMode) return;
+      const target = event.target;
+      const container = body.closest(`.${dataTableClasses.container}`);
+      const stops = Array.from(doc.querySelectorAll<HTMLElement>(
+        'a[href],button,input,select,textarea,[tabindex],summary',
+      )).filter(element => element.tabIndex >= 0 && !element.matches(":disabled") &&
+        !element.closest('[hidden],[inert],[aria-hidden="true"]') &&
+        getComputedStyle(element).display !== "none" && getComputedStyle(element).visibility !== "hidden")
+        .sort((a, b) => (a.tabIndex || Infinity) - (b.tabIndex || Infinity));
+      const current = stops.indexOf(doc.activeElement as HTMLElement);
+      const next = stops[current < 0 ? (event.shiftKey ? stops.length - 1 : 0) : current + (event.shiftKey ? -1 : 1)];
+      if ((target instanceof Node && container?.contains(target)) || (next && body.contains(next))) {
         // Native tab order must see every row before the browser moves focus.
         flushSync(() => { setKeyboardMode(true); });
       }
@@ -79,6 +90,10 @@ export function DataTableWindowedBody<TData extends RowData>({
       return undefined;
     }
     const update = () => {
+      const headers = ref.current?.closest("table")?.querySelectorAll("thead th");
+      if (!headers?.length || Array.from(headers).some(cell => getComputedStyle(cell).position !== "sticky")) {
+        setUnsafeHeight(true);
+      }
       const top = container.scrollTop;
       const height = container.clientHeight;
       setViewport(current => current.top === top && current.height === height ? current : { top, height });

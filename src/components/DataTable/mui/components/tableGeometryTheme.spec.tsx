@@ -494,7 +494,7 @@ it("resumes windowing after keyboard focus moves outside the table", () => {
   const measurements = mockWindowMeasurements(() => 37);
   try {
     const view = render(<><button>Outside table</button><WindowingFallbackFixture reason="eligible" /></>);
-    fireEvent.keyDown(document, { key: "Tab" });
+    fireEvent.keyDown(getViewport(getTable(view.container)), { key: "Tab" });
     expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
     act(() => { view.getByRole("button", { name: "Outside table" }).focus(); });
     expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
@@ -526,6 +526,45 @@ it("keeps the body-relative scroll range with a tall sticky grouped header", () 
     // is index 10; four overscan rows means mounting starts at index 6.
     expect(table.querySelector("tbody tr[data-row-id]")).toHaveAttribute("data-row-id", "Record 7");
     expect(view.getByRole("checkbox", { name: "Pin Record 11" })).toBeInTheDocument();
+    expect(table.querySelectorAll("tbody tr[data-row-id]").item(table.querySelectorAll("tbody tr[data-row-id]").length - 1)).toHaveAttribute("data-row-id", "Record 27");
     view.unmount();
   } finally { viewportHeight.mockRestore(); measurements.restore(); }
+});
+
+it("does not expand rows for unrelated outside Tab navigation", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<><button>First outside</button><button>Second outside</button><WindowingFallbackFixture reason="eligible" /><button>After table</button></>);
+    const mounted = () => view.container.querySelectorAll("tbody tr[data-row-id]").length;
+    const first = view.getByRole("button", { name: "First outside" });
+    act(() => { first.focus(); });
+    fireEvent.keyDown(first, { key: "Tab" });
+    expect(mounted()).toBeLessThan(30);
+    const second = view.getByRole("button", { name: "Second outside" });
+    act(() => { second.focus(); });
+    fireEvent.keyDown(second, { key: "Tab" });
+    expect(mounted()).toBeLessThan(30); // The next stop is in the header.
+    const headerControl = view.container.querySelector<HTMLElement>("thead input, thead button");
+    if (!headerControl) throw new Error("Missing header tab stop");
+    act(() => { headerControl.focus(); });
+    fireEvent.keyDown(headerControl, { key: "Tab" });
+    expect(mounted()).toBe(30);
+    const after = view.getByRole("button", { name: "After table" });
+    act(() => { after.focus(); });
+    expect(mounted()).toBeLessThan(30);
+    fireEvent.keyDown(after, { key: "Tab", shiftKey: true });
+    expect(mounted()).toBe(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("falls back when theme header cells are no longer sticky", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  const theme = createTheme({ components: { RazethDataTable: { styleOverrides: { headerCell: { position: "static" } } } } });
+  try {
+    const view = render(<ThemeProvider theme={theme}><WindowingFallbackFixture reason="eligible" grouped /></ThemeProvider>);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    expect(view.container.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+    view.unmount();
+  } finally { measurements.restore(); }
 });

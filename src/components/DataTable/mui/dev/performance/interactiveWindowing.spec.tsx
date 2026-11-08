@@ -52,12 +52,21 @@ it("updates experimental detail controls with a narrow owner subscription", () =
     const view = render(<PerformanceTable rowCount={200} columnCount={4} displayMode="table"
       narrowOwner diagnostics={null} onProfile={jest.fn()} surfaceRef={createRef<HTMLElement>()}
       windowed windowedDetails />);
+    const geometryHeight = () => Array.from(view.container.querySelectorAll<HTMLTableRowElement>("tbody > tr"))
+      .reduce((total, row) => total + (row.hasAttribute("aria-hidden")
+        ? Number.parseFloat(row.querySelector<HTMLTableCellElement>("td")?.style.height ?? "0")
+        : row.getBoundingClientRect().height), 0);
+    const initialHeight = geometryHeight();
     fireEvent.click(view.getByRole("button", { name: "Expand first record" }));
     expect(view.getByRole("button", { name: "Collapse first record" })).toHaveAttribute("aria-expanded", "true");
     expect(view.getByRole("button", { name: "Show more detail" })).toBeEnabled();
+    expect(view.container.querySelector('[data-detail-panel-row="1"]')).toBeInTheDocument();
+    expect(geometryHeight()).toBe(initialHeight + 48);
     fireEvent.click(view.getByRole("button", { name: "Collapse first record" }));
     expect(view.getByRole("button", { name: "Expand first record" })).toHaveAttribute("aria-expanded", "false");
     expect(view.getByRole("button", { name: "Show more detail" })).toBeDisabled();
+    expect(view.container.querySelector('[data-detail-panel-row="1"]')).not.toBeInTheDocument();
+    expect(geometryHeight()).toBe(initialHeight);
     view.unmount();
 
 });
