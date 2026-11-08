@@ -125,6 +125,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     return () => { observer.disconnect(); };
   }, [canWindow, start, end, rows, measuredHeight]);
 
+  const useWindowRowHeight = rows.length > 25 && !unsafeHeight && !pinned && !renderDetailPanel;
   const headerCount = table.getHeaderGroups().length;
   return <DataTableStickyRowMeasurements
     forwardedRef={ref}
@@ -133,12 +134,12 @@ export function DataTableWindowedBody<TData extends RowData>({
     fallbackHeight={rowHeight}
     dualEdge={dualEdgeStickyRowPinning}
     bodyProps={{
-      "data-window-row-height": unsafeHeight || pinned || renderDetailPanel ? undefined : true,
+      "data-window-row-height": useWindowRowHeight ? true : undefined,
       onFocusCapture: () => { setBodyFocused(true); },
       onBlurCapture: event => {
         if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) setBodyFocused(false);
       },
-      style: unsafeHeight || pinned || renderDetailPanel ? undefined : { "--DataTable-window-row-height": `${rowHeight}px` } as React.CSSProperties,
+      style: useWindowRowHeight ? { "--DataTable-window-row-height": `${rowHeight}px` } as React.CSSProperties : undefined,
     }}>
     {start > 0 && <tr aria-hidden="true"><SpacerCell colSpan={colSpan} style={{ height: start * itemHeight }} /></tr>}
     {rows.slice(start, end).map((row, index) => <DataTableBodyRowGroup

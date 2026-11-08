@@ -485,6 +485,7 @@ it("retains focused row controls when the data falls below the windowing thresho
     expect(view.getByRole("checkbox", { name: "Pin Record 1" })).toBe(control);
     expect(control).toHaveFocus();
     expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(20);
+    expect(view.container.querySelector("tbody")).not.toHaveAttribute("data-window-row-height");
     view.unmount();
   } finally { measurements.restore(); }
 });
