@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { act, fireEvent, render } from "@testing-library/react";
 
@@ -199,11 +201,13 @@ const windowingColumns = helper.columns([
   ...columns,
   helper.display({
     id: "pin",
-    cell: ({ row }) => <input
+    cell: ({ row }) => <>
+      {row.id === "Record 1" && <PortalRowControl />}
+      <input
       type="checkbox"
-      aria-label={"Pin " + row.id}
-      onChange={() => row.pin(row.getIsPinned() ? false : "top")}
-    />,
+      aria-label={`Pin ${row.id}`}
+      onChange={() => { row.pin(row.getIsPinned() ? false : "top"); }}
+    /></>,
   }),
 ]);
 
@@ -232,7 +236,7 @@ function WindowingFallbackFixture({ reason, reverse = false }: {
     toolbar={false}
     pagination={false}
     renderDetailPanel={(reason === "detail" || reason === "interactive") ? ({ row }) => row.original.name : undefined}
-    onRowClick={(reason === "activation" || reason === "interactive") ? () => {} : undefined}
+    onRowClick={(reason === "activation" || reason === "interactive") ? () => { /* This fixture only exercises activation eligibility. */ } : undefined}
   />;
 }
 
@@ -258,9 +262,9 @@ it.each(["detail", "activation", "pin", "nonsticky", "filters"] as const)(
 it("mounts a bounded row range and moves it when the table scrolls", () => {
   const originalObserver = window.ResizeObserver;
   window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
+    observe = jest.fn();
+    unobserve = jest.fn();
+    disconnect = jest.fn();
   };
   const viewportHeight = jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(185);
   const rowHeight = jest.spyOn(Element.prototype, "getBoundingClientRect")
@@ -304,8 +308,8 @@ function mockWindowMeasurements(height: (row: HTMLTableRowElement) => number) {
   window.ResizeObserver = class {
     disconnect = jest.fn();
     constructor() { disconnects.push(this.disconnect); }
-    observe() {}
-    unobserve() {}
+    observe = jest.fn();
+    unobserve = jest.fn();
   };
   const viewport = jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(185);
   const row = jest.spyOn(Element.prototype, "getBoundingClientRect")
@@ -359,11 +363,11 @@ it("keeps spacer heights and row indices aligned with the current order after sc
       expect(firstIndex).toBeGreaterThan(0);
       rows.forEach((row, index) => {
         expect(row).toHaveAttribute("aria-rowindex", String(firstIndex + index + 2));
-        expect(row).toHaveAttribute("data-row-id", "Record " + (reverse ? 30 - firstIndex - index : firstIndex + index + 1));
+        expect(row).toHaveAttribute("data-row-id", `Record ${reverse ? 30 - firstIndex - index : firstIndex + index + 1}`);
       });
       const spacers = table.querySelectorAll<HTMLTableCellElement>("tbody tr[aria-hidden] td");
-      expect(spacers[0].style.height).toBe(firstIndex * 37 + "px");
-      expect(spacers[1].style.height).toBe((30 - firstIndex - rows.length) * 37 + "px");
+      expect(spacers[0].style.height).toBe(`${firstIndex * 37}px`);
+      expect(spacers[1].style.height).toBe(`${(30 - firstIndex - rows.length) * 37}px`);
     };
     check(false);
     rerender(<WindowingFallbackFixture reason="eligible" reverse />);
@@ -392,7 +396,7 @@ it("removes viewport and keyboard listeners and disconnects observers on unmount
 });
 
 function getViewport(table: HTMLTableElement): HTMLElement {
-  const viewport = table.closest<HTMLElement>("." + dataTableClasses.container);
+  const viewport = table.closest<HTMLElement>(`.${dataTableClasses.container}`);
   if (!viewport) throw new Error("Missing table viewport");
   return viewport;
 }
@@ -423,4 +427,41 @@ it("windows interactive rows with detail and activation handlers, then preserves
     expect(mountedCount()).toBe(30);
     unmount();
   } finally { measurements.restore(); }
+});
+
+
+function PortalRowControl() {
+  const [open, setOpen] = useState(false);
+  return <>
+    <button onClick={() => { setOpen(true); }}>Open row portal</button>
+    {open && createPortal(<button onClick={() => { setOpen(false); }}>Portaled row action</button>, document.body)}
+  </>;
+}
+
+it("keeps the owning row mounted while a portaled action has focus", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const { container, getByRole, rerender, unmount } = render(<WindowingFallbackFixture reason="interactive" />);
+    fireEvent.click(getByRole("button", { name: "Open row portal" }));
+    const action = getByRole("button", { name: "Portaled row action" });
+    act(() => { action.focus(); });
+    fireEvent.pointerDown(action);
+    rerender(<WindowingFallbackFixture reason="interactive" reverse />);
+    const viewport = getViewport(getTable(container));
+    viewport.scrollTop = 1000;
+    fireEvent.scroll(viewport);
+    expect(action).toHaveFocus();
+    expect(action.isConnected).toBe(true);
+    expect(container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    unmount();
+  } finally { measurements.restore(); }
+});
+
+it("preserves theme row heights outside windowed bodies", () => {
+  const theme = createTheme({ components: { RazethDataTable: { styleOverrides: { bodyRow: { height: 120 } } } } });
+  const { container, unmount } = render(<ThemeProvider theme={theme}><WindowingFallbackFixture reason="nonsticky" /></ThemeProvider>);
+  const row = container.querySelector("tbody tr[data-row-id]");
+  expect(row).toHaveStyle({ height: "120px" });
+  expect(container.querySelector("tbody")).not.toHaveAttribute("data-window-row-height");
+  unmount();
 });

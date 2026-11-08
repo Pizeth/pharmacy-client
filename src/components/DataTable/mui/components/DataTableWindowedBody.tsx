@@ -44,7 +44,7 @@ export function DataTableWindowedBody<TData extends RowData>({
 
   useLayoutEffect(() => {
     const body = ref.current;
-    if (!body) return;
+    if (!body) return undefined;
     const doc = body.ownerDocument;
     const prepareTab = (event: KeyboardEvent) => {
       if (event.key === "Tab" && !event.defaultPrevented && !keyboardMode) {
@@ -54,7 +54,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     };
     const resumePointerWindow = () => {
       setKeyboardMode(false);
-      if (!body.contains(doc.activeElement)) setBodyFocused(false);
+      // React focus events also cover row-owned portals. Blur releases this guard.
     };
     doc.addEventListener("keydown", prepareTab, true);
     doc.addEventListener("pointerdown", resumePointerWindow, true);
@@ -68,7 +68,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     const container = ref.current?.closest<HTMLElement>(`.${dataTableClasses.container}`);
     if (!container || typeof ResizeObserver === "undefined") {
       setUnsafeHeight(true);
-      return;
+      return undefined;
     }
     const update = () => {
       const top = container.scrollTop;
@@ -94,9 +94,9 @@ export function DataTableWindowedBody<TData extends RowData>({
   const end = canWindow ? Math.min(rows.length, Math.ceil((top + available) / itemHeight) + overscan) : rows.length;
 
   useLayoutEffect(() => {
-    if (!canWindow || typeof ResizeObserver === "undefined") return;
+    if (!canWindow || typeof ResizeObserver === "undefined") return undefined;
     const body = ref.current;
-    if (!body) return;
+    if (!body) return undefined;
     const mounted = [...body.querySelectorAll<HTMLTableRowElement>(":scope > tr[data-row-id]")];
     const check = () => {
       const firstHeight = mounted[0]?.getBoundingClientRect().height;
@@ -125,6 +125,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     fallbackHeight={rowHeight}
     dualEdge={dualEdgeStickyRowPinning}
     bodyProps={{
+      "data-window-row-height": unsafeHeight || pinned || renderDetailPanel ? undefined : true,
       onFocusCapture: () => { setBodyFocused(true); },
       onBlurCapture: event => {
         if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) setBodyFocused(false);

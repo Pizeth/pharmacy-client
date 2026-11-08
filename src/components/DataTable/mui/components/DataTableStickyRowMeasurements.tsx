@@ -13,14 +13,14 @@ interface Props {
   readonly fallbackHeight: number;
   readonly dualEdge: boolean;
   readonly forwardedRef?: Ref<HTMLTableSectionElement>;
-  readonly bodyProps?: ComponentPropsWithoutRef<"tbody">;
+  readonly bodyProps?: ComponentPropsWithoutRef<"tbody"> & { readonly "data-window-row-height"?: boolean };
 }
 
 export const BodyRoot = styled(TableBody, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Body",
   overridesResolver: (_props, styles) => styles.body,
-})({ "& > tr[data-row-id]": { height: "var(--DataTable-window-row-height)" } });
+})({ '&[data-window-row-height="true"] > tr[data-row-id]': { height: "var(--DataTable-window-row-height)" } });
 
 /** Renderer geometry only. TanStack remains the sole owner of pin identity/order. */
 export function DataTableStickyRowMeasurements({

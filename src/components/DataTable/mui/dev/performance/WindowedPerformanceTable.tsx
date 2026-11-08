@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Button, Stack, styled, Table, TableContainer } from "@mui/material";
 import { DataTableColumnGroup } from "../../components/DataTableColumnGroup";
 import { DataTableHead } from "../../components/DataTableHead";
@@ -126,7 +126,7 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
   const observeDetail = useCallback((content: HTMLDivElement | null) => {
     const detail = content?.closest("tr");
     const id = detail?.dataset.detailPanelRow;
-    if (!detail || !id) return;
+    if (!detail || !id) return undefined;
     const measure = () => {
       const height = detail.getBoundingClientRect().height;
       setDetailHeights(previous => previous.get(id) === height ? previous : new Map(previous).set(id, height));
@@ -183,10 +183,7 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
     setFocusRequest({ id: targetRow.id });
   }
 
-  return <DataTableDensityProvider density="compact">
-    <table.AppTable>
-      <DataTableAccessibilityProvider>
-      <DataTableFilterDisplayProvider showColumnFilters={false}>
+  return <WindowedFixtureProviders table={table}>
       {detailControls && <Stack direction="row" spacing={1}>
         {detailRecords.map(({ id, label }) => {
           const isExpanded = expanded === true || expandedIds?.get(id) === true;
@@ -272,7 +269,18 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
           }}
         </table.Subscribe>
       </Viewport>
-      </DataTableFilterDisplayProvider>
+  </WindowedFixtureProviders>;
+}
+
+
+function WindowedFixtureProviders({ table, children }: {
+  readonly table: MuiDataTableInstance<DataTablePerformanceRow>;
+  readonly children: ReactNode;
+}) {
+  return <DataTableDensityProvider density="compact">
+    <table.AppTable>
+      <DataTableAccessibilityProvider>
+        <DataTableFilterDisplayProvider showColumnFilters={false}>{children}</DataTableFilterDisplayProvider>
       </DataTableAccessibilityProvider>
     </table.AppTable>
   </DataTableDensityProvider>;

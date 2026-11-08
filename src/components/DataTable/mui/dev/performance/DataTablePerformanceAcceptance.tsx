@@ -504,9 +504,10 @@ export const PerformanceTable =
               "1",
             );
 
-          dispatch(() => first.toggleSelected(
-            !first.getIsSelected(),
-          ));
+          dispatch(() => {
+            if (props.integratedInteractive) togglePinnedSelection(first);
+            else first.toggleSelected(!first.getIsSelected());
+          });
         };
 
       const toggleFirstExpansion =
@@ -590,6 +591,7 @@ export const PerformanceTable =
                 diagnostics?.begin("reset");
                 table.resetSorting();
                 table.resetRowSelection();
+                table.resetRowPinning();
                 table.resetExpanded();
                 table.resetGlobalFilter();
               }}
