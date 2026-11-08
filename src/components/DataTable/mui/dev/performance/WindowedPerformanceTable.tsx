@@ -173,12 +173,14 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
     }
     event.preventDefault();
     const index = Math.max(0, Math.min(rows.length - 1, next));
+    const targetRow = rows.at(index);
+    if (!targetRow) return;
     const top = offset(index);
     const bottom = top + (detailControls ? shortRowHeight : rowOffset(index + 1) - rowOffset(index));
     if (top < viewport.scrollTop) viewport.scrollTop = top;
     else if (bottom > viewport.scrollTop + page) viewport.scrollTop = bottom - page;
     setScrollTop(viewport.scrollTop);
-    setFocusRequest({ id: rows[index].id });
+    setFocusRequest({ id: targetRow.id });
   }
 
   return <DataTableDensityProvider density="compact">
