@@ -593,7 +593,7 @@ it("synchronizes a subpixel height change with spacer geometry", () => {
     fireEvent.scroll(viewport);
     const table = getTable(view.container);
     const rows = table.querySelectorAll("tbody tr[data-row-id]");
-    const firstIndex = Number(rows[0]?.getAttribute("aria-rowindex")) - 2;
+    const firstIndex = Number(rows[0].getAttribute("aria-rowindex")) - 2;
     expect(table.querySelector<HTMLTableCellElement>("tbody tr[aria-hidden] td")?.style.height).toBe(`${firstIndex * height}px`);
     view.unmount();
   } finally { measurements.restore(); }
