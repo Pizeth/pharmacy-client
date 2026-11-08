@@ -40,7 +40,7 @@ export function DataTableWindowedBody<TData extends RowData>({
   const ref = useRef<HTMLTableSectionElement>(null);
   const [viewport, setViewport] = useState({ top: 0, height: 0 });
   const [unsafeHeight, setUnsafeHeight] = useState(false);
-  const [unsafeHeader, setUnsafeHeader] = useState(true);
+  const [unsafeHeader, setUnsafeHeader] = useState(false);
   const headerGroups = table.getHeaderGroups();
   const [measuredHeight, setMeasuredHeight] = useState<number>();
   const itemHeight = measuredHeight ?? rowHeight;
