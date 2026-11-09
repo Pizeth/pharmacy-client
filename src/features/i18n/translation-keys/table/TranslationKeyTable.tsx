@@ -492,7 +492,11 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
           </Alert>
         )}
 
-        <DataTable windowRows="interactive" onViewRecord={record => router.push(`/admin/i18n/${encodeURIComponent(String(record.id))}`)}
+        <DataTable
+          windowRows="interactive"
+          onViewRecord={record => {
+            router.push(`/admin/i18n/${encodeURIComponent(String(record.id))}`);
+          }}
           resourceId="admin/i18n/translation-keys"
           table={table}
           card={card}
