@@ -19,6 +19,19 @@ const SpacerCell = styled("td", {
 const overscan = 4;
 const initialViewportRows = 12;
 
+function isRenderedControl(element: HTMLElement): boolean {
+  for (let ancestor: HTMLElement | null = element; ancestor; ancestor = ancestor.parentElement) {
+    if (getComputedStyle(ancestor).display === "none") return false;
+  }
+  return getComputedStyle(element).visibility !== "hidden";
+}
+
+function isImplicitEditingHost(element: HTMLElement): boolean {
+  return !element.hasAttribute("tabindex") &&
+    element.matches('[contenteditable=""],[contenteditable="true"],[contenteditable="plaintext-only"]') &&
+    !element.parentElement?.isContentEditable;
+}
+
 /** Keeps the same row subtree when pinning or keyboard focus requires a full body. */
 export function DataTableWindowedBody<TData extends RowData>({
   table, rows, rowHeight, headerHeight, colSpan, pinned, stickyRowPinning, pinnedRowStickyTop, dualEdgeStickyRowPinning, stickyPinnedRowIds, onRowClick, rowClickSelectedOnly, renderDetailPanel,
@@ -38,7 +51,7 @@ export function DataTableWindowedBody<TData extends RowData>({
   readonly rowClickSelectedOnly?: boolean;
 }) {
   const ref = useRef<HTMLTableSectionElement>(null);
-  const [viewport, setViewport] = useState({ top: 0, height: 0 });
+  const [viewport, setViewport] = useState({ top: 0, height: 0, header: headerHeight });
   const [unsafeHeight, setUnsafeHeight] = useState(false);
   const [unsafeHeader, setUnsafeHeader] = useState(false);
   const headerGroups = table.getHeaderGroups();
@@ -46,6 +59,15 @@ export function DataTableWindowedBody<TData extends RowData>({
   const itemHeight = measuredHeight ?? rowHeight;
   const [keyboardMode, setKeyboardMode] = useState(false);
   const [bodyFocused, setBodyFocused] = useState(false);
+  const focusedControl = useRef<EventTarget | null>(null);
+
+  useLayoutEffect(() => {
+    if (focusedControl.current instanceof Node && !focusedControl.current.isConnected) {
+      focusedControl.current = null;
+      setBodyFocused(false);
+      setKeyboardMode(false);
+    }
+  }, [rows]);
 
   useLayoutEffect(() => {
     const body = ref.current;
@@ -56,11 +78,11 @@ export function DataTableWindowedBody<TData extends RowData>({
       const target = event.target;
       const container = body.closest(`.${dataTableClasses.container}`);
       const candidates = Array.from(doc.querySelectorAll<HTMLElement>(
-        'a[href],button,input,select,textarea,[tabindex],summary',
-      )).filter(element => element.tabIndex >= 0 && !element.matches(":disabled") &&
-        !element.closest('[hidden],[inert],[aria-hidden="true"]') &&
-        getComputedStyle(element).display !== "none" && getComputedStyle(element).visibility !== "hidden")
-        .sort((a, b) => (a.tabIndex || Number.MAX_SAFE_INTEGER) - (b.tabIndex || Number.MAX_SAFE_INTEGER));
+        'a[href],button,input,select,textarea,[tabindex],summary,[contenteditable]',
+      )).filter(element => (element.tabIndex >= 0 || isImplicitEditingHost(element)) && !element.matches(":disabled") &&
+        !element.closest('[hidden],[inert],[aria-hidden="true"]') && isRenderedControl(element))
+        .sort((a, b) => (a.tabIndex > 0 ? a.tabIndex : Number.MAX_SAFE_INTEGER) -
+          (b.tabIndex > 0 ? b.tabIndex : Number.MAX_SAFE_INTEGER));
       const stops = candidates.filter(element => {
         if (!(element instanceof HTMLInputElement) || element.type !== "radio" || !element.name) return true;
         const group = candidates.filter((candidate): candidate is HTMLInputElement =>
@@ -102,16 +124,21 @@ export function DataTableWindowedBody<TData extends RowData>({
       return undefined;
     }
     const update = () => {
-      const headers = ref.current?.closest("table")?.querySelectorAll("thead th");
-      setUnsafeHeader(!headers?.length || Array.from(headers).some(cell => getComputedStyle(cell).position !== "sticky"));
+      const head = ref.current?.closest("table")?.querySelector("thead");
+      const headers = head?.querySelectorAll("th");
+      const header = head?.getBoundingClientRect().height ?? 0;
+      setUnsafeHeader(!headers?.length || !Number.isFinite(header) || header <= 0 ||
+        Array.from(headers).some(cell => getComputedStyle(cell).position !== "sticky"));
       const top = container.scrollTop;
       const height = container.clientHeight;
-      setViewport(current => current.top === top && current.height === height ? current : { top, height });
+      setViewport(current => current.top === top && current.height === height && current.header === header ? current : { top, height, header });
     };
     update();
     container.addEventListener("scroll", update, { passive: true });
     const observer = new ResizeObserver(update);
     observer.observe(container);
+    const head = ref.current?.closest("table")?.querySelector("thead");
+    if (head) observer.observe(head);
     return () => {
       observer.disconnect();
       container.removeEventListener("scroll", update);
@@ -119,7 +146,7 @@ export function DataTableWindowedBody<TData extends RowData>({
   }, [headerGroups]);
 
   const available = viewport.height > 0
-    ? Math.max(0, viewport.height - headerHeight)
+    ? Math.max(0, viewport.height - viewport.header)
     : initialViewportRows * itemHeight;
   const canWindow = rows.length > 25 && !unsafeHeight && !unsafeHeader && !pinned && !renderDetailPanel && !keyboardMode && !bodyFocused;
   const top = Math.min(viewport.top, Math.max(0, rows.length * itemHeight - available));
@@ -162,9 +189,12 @@ export function DataTableWindowedBody<TData extends RowData>({
     dualEdge={dualEdgeStickyRowPinning}
     bodyProps={{
       "data-window-row-height": useWindowRowHeight ? true : undefined,
-      onFocusCapture: () => { setBodyFocused(true); },
+      onFocusCapture: event => { focusedControl.current = event.target; setBodyFocused(true); },
       onBlurCapture: event => {
-        if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) setBodyFocused(false);
+        if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) {
+          focusedControl.current = null;
+          setBodyFocused(false);
+        }
       },
       style: useWindowRowHeight ? { "--DataTable-window-row-height": `${rowHeight}px` } as React.CSSProperties : undefined,
     }}>
