@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { shouldRestoreWindowForTab } from "./windowingFocus";
 import type { DataTableDetailPanelRenderer } from "./detail-panel";
 import type { DataTableRowClickHandler } from "./DataTableBodyRow";
 import { styled, useTheme } from "@mui/material";
@@ -18,20 +19,6 @@ const SpacerCell = styled("td", {
 })({ padding: 0, border: 0 });
 const overscan = 4;
 const initialViewportRows = 12;
-
-function isRenderedControl(element: HTMLElement): boolean {
-  for (let ancestor: HTMLElement | null = element; ancestor; ancestor = ancestor.parentElement) {
-    if (getComputedStyle(ancestor).display === "none") return false;
-  }
-  const visibility = getComputedStyle(element).visibility;
-  return visibility !== "hidden" && visibility !== "collapse";
-}
-
-function isImplicitEditingHost(element: HTMLElement): boolean {
-  return !element.hasAttribute("tabindex") &&
-    element.matches('[contenteditable=""],[contenteditable="true"],[contenteditable="plaintext-only"]') &&
-    !element.parentElement?.isContentEditable;
-}
 
 /** Keeps the same row subtree when pinning or keyboard focus requires a full body. */
 export function DataTableWindowedBody<TData extends RowData>({
@@ -86,39 +73,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     const doc = body.ownerDocument;
     const prepareTab = (event: KeyboardEvent) => {
       if (event.key !== "Tab" || event.defaultPrevented || keyboardMode) return;
-      const target = event.target;
-      const container = body.closest(`.${dataTableClasses.container}`);
-      const candidates = Array.from(doc.querySelectorAll<HTMLElement>(
-        'a[href],button,input,select,textarea,[tabindex],summary,[contenteditable]',
-      )).filter(element => (element.tabIndex >= 0 || isImplicitEditingHost(element)) && !element.matches(":disabled") &&
-        !element.closest('[hidden],[inert],[aria-hidden="true"]') && isRenderedControl(element));
-      const stops = candidates.filter(element => {
-        if (!(element instanceof HTMLInputElement) || element.type !== "radio" || !element.name) return true;
-        const group = candidates.filter((candidate): candidate is HTMLInputElement =>
-          candidate instanceof HTMLInputElement && candidate.type === "radio" &&
-          candidate.name === element.name && candidate.form === element.form &&
-          candidate.getRootNode() === element.getRootNode());
-        const selected = group.find(radio => radio.checked);
-        return element === (selected ?? (event.shiftKey ? group.at(-1) : group.at(0)));
-      }).sort((a, b) => (a.tabIndex > 0 ? a.tabIndex : Number.MAX_SAFE_INTEGER) -
-        (b.tabIndex > 0 ? b.tabIndex : Number.MAX_SAFE_INTEGER));
-      const current = stops.findIndex(element => element === doc.activeElement);
-      const nextIndex = current < 0 ? (event.shiftKey ? stops.length - 1 : 0) : current + (event.shiftKey ? -1 : 1);
-      const active = doc.activeElement;
-      const direction = event.shiftKey ? Node.DOCUMENT_POSITION_PRECEDING : Node.DOCUMENT_POSITION_FOLLOWING;
-      const adjacent = current < 0 && active && active !== doc.body
-        ? candidates.filter(element => stops.includes(element) && (active.compareDocumentPosition(element) & direction) !== 0)
-        : undefined;
-      const next = adjacent ? adjacent.at(event.shiftKey ? -1 : 0) : nextIndex < 0 ? undefined : stops.at(nextIndex);
-      const activePosition = active ? body.compareDocumentPosition(active) : 0;
-      const nextPosition = next ? body.compareDocumentPosition(next) : 0;
-      const enteringFrom = event.shiftKey ? Node.DOCUMENT_POSITION_FOLLOWING : Node.DOCUMENT_POSITION_PRECEDING;
-      const leavingToward = event.shiftKey ? Node.DOCUMENT_POSITION_PRECEDING : Node.DOCUMENT_POSITION_FOLLOWING;
-      // Omitted rows may contain the only controls: expand whenever native Tab
-      // crosses the body's document position, even without a mounted tab stop.
-      const crossesBody = (activePosition & enteringFrom) !== 0 &&
-        (!next || body.contains(next) || (nextPosition & leavingToward) !== 0);
-      if ((target instanceof Node && container?.contains(target)) || crossesBody || (next && body.contains(next))) {
+      if (shouldRestoreWindowForTab(body, event)) {
         // Native tab order must see every row before the browser moves focus.
         flushSync(() => { setKeyboardMode(true); });
       }
