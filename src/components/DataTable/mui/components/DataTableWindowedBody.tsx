@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { DataTableDetailPanelRenderer } from "./detail-panel";
 import type { DataTableRowClickHandler } from "./DataTableBodyRow";
-import { styled } from "@mui/material";
+import { styled, useTheme } from "@mui/material";
 import type { Row, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
@@ -23,7 +23,8 @@ function isRenderedControl(element: HTMLElement): boolean {
   for (let ancestor: HTMLElement | null = element; ancestor; ancestor = ancestor.parentElement) {
     if (getComputedStyle(ancestor).display === "none") return false;
   }
-  return getComputedStyle(element).visibility !== "hidden";
+  const visibility = getComputedStyle(element).visibility;
+  return visibility !== "hidden" && visibility !== "collapse";
 }
 
 function isImplicitEditingHost(element: HTMLElement): boolean {
@@ -50,6 +51,7 @@ export function DataTableWindowedBody<TData extends RowData>({
   readonly onRowClick?: DataTableRowClickHandler<TData>;
   readonly rowClickSelectedOnly?: boolean;
 }) {
+  const theme = useTheme();
   const ref = useRef<HTMLTableSectionElement>(null);
   const [viewport, setViewport] = useState({ top: 0, height: 0, header: headerHeight });
   const [unsafeHeight, setUnsafeHeight] = useState(false);
@@ -62,12 +64,21 @@ export function DataTableWindowedBody<TData extends RowData>({
   const focusedControl = useRef<EventTarget | null>(null);
 
   useLayoutEffect(() => {
-    if (focusedControl.current instanceof Node && !focusedControl.current.isConnected) {
-      focusedControl.current = null;
-      setBodyFocused(false);
-      setKeyboardMode(false);
-    }
-  }, [rows]);
+    if (!bodyFocused) return undefined;
+    const releaseRemovedControl = () => {
+      if (focusedControl.current instanceof Node && !focusedControl.current.isConnected) {
+        focusedControl.current = null;
+        setBodyFocused(false);
+        setKeyboardMode(false);
+      }
+    };
+    releaseRemovedControl();
+    const root = ref.current?.ownerDocument.body;
+    if (!root || typeof MutationObserver === "undefined") return undefined;
+    const observer = new MutationObserver(releaseRemovedControl);
+    observer.observe(root, { childList: true, subtree: true });
+    return () => { observer.disconnect(); };
+  }, [bodyFocused, rows]);
 
   useLayoutEffect(() => {
     const body = ref.current;
@@ -80,9 +91,7 @@ export function DataTableWindowedBody<TData extends RowData>({
       const candidates = Array.from(doc.querySelectorAll<HTMLElement>(
         'a[href],button,input,select,textarea,[tabindex],summary,[contenteditable]',
       )).filter(element => (element.tabIndex >= 0 || isImplicitEditingHost(element)) && !element.matches(":disabled") &&
-        !element.closest('[hidden],[inert],[aria-hidden="true"]') && isRenderedControl(element))
-        .sort((a, b) => (a.tabIndex > 0 ? a.tabIndex : Number.MAX_SAFE_INTEGER) -
-          (b.tabIndex > 0 ? b.tabIndex : Number.MAX_SAFE_INTEGER));
+        !element.closest('[hidden],[inert],[aria-hidden="true"]') && isRenderedControl(element));
       const stops = candidates.filter(element => {
         if (!(element instanceof HTMLInputElement) || element.type !== "radio" || !element.name) return true;
         const group = candidates.filter((candidate): candidate is HTMLInputElement =>
@@ -91,10 +100,16 @@ export function DataTableWindowedBody<TData extends RowData>({
           candidate.getRootNode() === element.getRootNode());
         const selected = group.find(radio => radio.checked);
         return element === (selected ?? (event.shiftKey ? group.at(-1) : group.at(0)));
-      });
+      }).sort((a, b) => (a.tabIndex > 0 ? a.tabIndex : Number.MAX_SAFE_INTEGER) -
+        (b.tabIndex > 0 ? b.tabIndex : Number.MAX_SAFE_INTEGER));
       const current = stops.findIndex(element => element === doc.activeElement);
       const nextIndex = current < 0 ? (event.shiftKey ? stops.length - 1 : 0) : current + (event.shiftKey ? -1 : 1);
-      const next = nextIndex < 0 ? undefined : stops.at(nextIndex);
+      const active = doc.activeElement;
+      const direction = event.shiftKey ? Node.DOCUMENT_POSITION_PRECEDING : Node.DOCUMENT_POSITION_FOLLOWING;
+      const adjacent = current < 0 && active && active !== doc.body
+        ? candidates.filter(element => stops.includes(element) && (active.compareDocumentPosition(element) & direction) !== 0)
+        : undefined;
+      const next = adjacent ? adjacent.at(event.shiftKey ? -1 : 0) : nextIndex < 0 ? undefined : stops.at(nextIndex);
       if ((target instanceof Node && container?.contains(target)) || (next && body.contains(next))) {
         // Native tab order must see every row before the browser moves focus.
         flushSync(() => { setKeyboardMode(true); });
@@ -143,7 +158,7 @@ export function DataTableWindowedBody<TData extends RowData>({
       observer.disconnect();
       container.removeEventListener("scroll", update);
     };
-  }, [headerGroups]);
+  }, [headerGroups, theme]);
 
   const available = viewport.height > 0
     ? Math.max(0, viewport.height - viewport.header)

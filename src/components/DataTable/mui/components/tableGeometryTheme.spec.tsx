@@ -621,11 +621,11 @@ it("restores the last rows before reverse Tab from a checked radio group", () =>
   } finally { measurements.restore(); }
 });
 
-it.each(["editor", "hidden-wrapper"] as const)("restores reverse Tab order around an outside %s", kind => {
+it.each(["editor", "hidden-wrapper", "collapsed-control"] as const)("restores reverse Tab order around an outside %s", kind => {
   const measurements = mockWindowMeasurements(() => 37);
   try {
     const view = render(<><WindowingFallbackFixture reason="eligible" />
-      {kind === "editor" ? <div contentEditable suppressContentEditableWarning aria-label="Outside editor">Editor</div> : <div style={{ display: "none" }}><button>Hidden control</button></div>}
+      {kind === "editor" ? <div contentEditable suppressContentEditableWarning aria-label="Outside editor">Editor</div> : kind === "hidden-wrapper" ? <div style={{ display: "none" }}><button>Hidden control</button></div> : <button style={{ visibility: "collapse" }}>Collapsed control</button>}
       <button>Visible after table</button></>);
     const target = kind === "editor" ? view.getByLabelText("Outside editor") : view.getByRole("button", { name: "Visible after table" });
     // jsdom does not implement native contenteditable focusability.
@@ -677,6 +677,47 @@ it("updates spacer geometry from row resize notifications without scrolling", ()
     mixed = true;
     measurements.resize(row);
     expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("rechecks sticky-header safety when the theme changes without a resize", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  const sticky = createTheme();
+  const nonsticky = createTheme({ components: { RazethDataTable: { styleOverrides: { headerCell: { position: "static" } } } } });
+  try {
+    const view = render(<ThemeProvider theme={sticky}><WindowingFallbackFixture reason="eligible" /></ThemeProvider>);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.rerender(<ThemeProvider theme={nonsticky}><WindowingFallbackFixture reason="eligible" /></ThemeProvider>);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.rerender(<ThemeProvider theme={sticky}><WindowingFallbackFixture reason="eligible" /></ThemeProvider>);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("restores reverse Tab order from a programmatically focused heading", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<><WindowingFallbackFixture reason="eligible" /><h2 tabIndex={-1}>Outside heading</h2><button>After heading</button></>);
+    const heading = view.getByRole("heading", { name: "Outside heading" });
+    act(() => { heading.focus(); });
+    fireEvent.keyDown(heading, { key: "Tab", shiftKey: true });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("releases focus protection when a row-owned portal closes without changing rows", async () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<WindowingFallbackFixture reason="interactive" />);
+    fireEvent.click(view.getByRole("button", { name: "Open row portal" }));
+    const action = view.getByRole("button", { name: "Portaled row action" });
+    act(() => { action.focus(); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    await act(async () => { fireEvent.click(action); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
     view.unmount();
   } finally { measurements.restore(); }
 });
