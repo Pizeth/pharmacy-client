@@ -324,7 +324,7 @@ function mockWindowMeasurements(height: (row: HTMLTableRowElement) => number, he
     disconnect = jest.fn(() => { this.targets.clear(); });
     constructor(callback: ResizeObserverCallback) {
       disconnects.push(this.disconnect);
-      observers.push({ targets: this.targets, notify: () => callback([], this as unknown as ResizeObserver) });
+      observers.push({ targets: this.targets, notify: () => { callback([], this as unknown as ResizeObserver); } });
     }
     observe = jest.fn((target: Element) => { this.targets.add(target); });
     unobserve = jest.fn((target: Element) => { this.targets.delete(target); });
