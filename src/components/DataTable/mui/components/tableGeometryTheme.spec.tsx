@@ -716,7 +716,45 @@ it("releases focus protection when a row-owned portal closes without changing ro
     const action = view.getByRole("button", { name: "Portaled row action" });
     act(() => { action.focus(); });
     expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
-    await act(async () => { fireEvent.click(action); });
+    await act(async () => { fireEvent.click(action); await Promise.resolve(); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+const sparseColumns = helper.columns([helper.accessor("name", {
+  header: "Name", enableSorting: false, enableColumnFilter: false, enableResizing: false,
+  meta: { enableColumnMenu: false },
+  cell: ({ row }) => row.original.name === "Record 30" ? <button>Only omitted control</button> : row.original.name,
+})]);
+function SparseWindowFixture() {
+  const table = useMuiDataTable({ columns: sparseColumns, data: windowingRows,
+    getRowId: row => row.name, initialState: { pagination: { pageIndex: 0, pageSize: 30 } } });
+  return <><button>Before sparse table</button><DataTable table={table} windowRows="interactive" toolbar={false} pagination={false} tableProps={{ stickyHeader: true }} /><h2 tabIndex={-1}>After sparse table</h2><button>Last outside stop</button></>;
+}
+it.each([false, true])("restores omitted-only controls for native Tab direction reverse=%s", reverse => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<SparseWindowFixture />);
+    expect(view.queryByRole("button", { name: "Only omitted control" })).not.toBeInTheDocument();
+    const source = reverse ? view.getByRole("heading", { name: "After sparse table" }) : view.getByRole("button", { name: "Before sparse table" });
+    act(() => { source.focus(); });
+    fireEvent.keyDown(source, { key: "Tab", shiftKey: reverse });
+    expect(view.getByRole("button", { name: "Only omitted control" })).toBeInTheDocument();
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("rechecks header safety after a non-theme style mutation", async () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" />);
+    const header = view.container.querySelector<HTMLTableCellElement>("thead th");
+    if (!header) throw new Error("Missing header");
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    await act(async () => { header.style.position = "static"; await Promise.resolve(); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    await act(async () => { header.style.position = ""; await Promise.resolve(); });
     expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
     view.unmount();
   } finally { measurements.restore(); }

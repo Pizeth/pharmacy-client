@@ -110,7 +110,15 @@ export function DataTableWindowedBody<TData extends RowData>({
         ? candidates.filter(element => stops.includes(element) && (active.compareDocumentPosition(element) & direction) !== 0)
         : undefined;
       const next = adjacent ? adjacent.at(event.shiftKey ? -1 : 0) : nextIndex < 0 ? undefined : stops.at(nextIndex);
-      if ((target instanceof Node && container?.contains(target)) || (next && body.contains(next))) {
+      const activePosition = active ? body.compareDocumentPosition(active) : 0;
+      const nextPosition = next ? body.compareDocumentPosition(next) : 0;
+      const enteringFrom = event.shiftKey ? Node.DOCUMENT_POSITION_FOLLOWING : Node.DOCUMENT_POSITION_PRECEDING;
+      const leavingToward = event.shiftKey ? Node.DOCUMENT_POSITION_PRECEDING : Node.DOCUMENT_POSITION_FOLLOWING;
+      // Omitted rows may contain the only controls: expand whenever native Tab
+      // crosses the body's document position, even without a mounted tab stop.
+      const crossesBody = (activePosition & enteringFrom) !== 0 &&
+        (!next || body.contains(next) || (nextPosition & leavingToward) !== 0);
+      if ((target instanceof Node && container?.contains(target)) || crossesBody || (next && body.contains(next))) {
         // Native tab order must see every row before the browser moves focus.
         flushSync(() => { setKeyboardMode(true); });
       }
@@ -154,7 +162,15 @@ export function DataTableWindowedBody<TData extends RowData>({
     observer.observe(container);
     const head = ref.current?.closest("table")?.querySelector("thead");
     if (head) observer.observe(head);
+    const doc = container.ownerDocument;
+    const styleObserver = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(records => {
+      if (records.some(record => record.type !== "attributes" || doc.head.contains(record.target) ||
+        (head && record.target instanceof Element && (record.target.contains(head) || head.contains(record.target))))) update();
+    });
+    styleObserver?.observe(doc.documentElement, { attributes: true, attributeFilter: ["class", "style"], subtree: true });
+    styleObserver?.observe(doc.head, { attributes: true, attributeFilter: ["media", "disabled"], childList: true, characterData: true, subtree: true });
     return () => {
+      styleObserver?.disconnect();
       observer.disconnect();
       container.removeEventListener("scroll", update);
     };
