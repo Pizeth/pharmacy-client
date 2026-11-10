@@ -8,11 +8,10 @@ import {
   adminClient,
   jwtClient, // 👈 add this — it adds role to the inferred type
 } from "better-auth/client/plugins";
-import { sentinelClient } from "@better-auth/infra/client";
+import { createSentinelClientPlugin } from "@/lib/auth/sentinelClient";
 
 import { passkeyClient } from "@better-auth/passkey/client";
 import { API_URL, COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
-import { BetterAuthClientPlugin } from "better-auth/client";
 import { beginLoginAttempt, isLoginRequest, reportLoginFailure, reportLoginResponse, shouldReportLoginError } from "@/lib/auth/loginFeedback";
 
 export const authClient = createAuthClient({
@@ -58,14 +57,7 @@ export const authClient = createAuthClient({
     passkeyClient(),
     multiSessionClient(),
     adminClient(), // 👈 this is what adds role to the session type
-    sentinelClient({
-      identifyUrl: process.env.NEXT_PUBLIC_BETTER_AUTH_IDENTIFY_URL,
-      autoSolveChallenge: true,
-      identifyOptions: {
-        timeout: 2000,
-        retry: { attempts: 2, baseDelay: 400, maxDelay: 1000 },
-      },
-    }),
+    createSentinelClientPlugin(),
     oneTapClient({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string,
       // Optional client configuration:

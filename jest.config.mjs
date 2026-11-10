@@ -88,8 +88,8 @@ export default async () => {
     ...config,
 
     /**
-     * Ignore every node_modules package EXCEPT the two TanStack Table
-     * runtime packages used by our real table implementation.
+     * Ignore node_modules except the table runtimes and the narrowly scoped
+     * ESM dependencies used by the real Sentinel transport regression.
      *
      * These packages will therefore flow through Next's existing SWC
      * Jest transformer.
@@ -97,7 +97,7 @@ export default async () => {
      * Do not broadly transpile all node_modules.
      */
     transformIgnorePatterns: [
-      "/node_modules/(?!(@tanstack/(?:table-core|react-table)|jotai)/)",
+      "/node_modules/(?!(@tanstack/(?:table-core|react-table)|jotai|@better-auth/(?:infra|core|utils)|@better-fetch/fetch|@noble/hashes)/)",
 
       ...remainingTransformIgnorePatterns,
     ],
