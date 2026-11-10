@@ -18,12 +18,14 @@ import { normalizeDataTableGlobalFilter } from "../utils";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
 import { useOptionalDataTableFilterDisplay } from "../filter-display";
 import { DataTableDetailPanelRenderer } from "./detail-panel";
+import { DataTableWindowedBody } from "./DataTableWindowedBody";
 import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
 import type { DataTableRowClickHandler } from "./DataTableBodyRow";
 import { DataTableDiagnosticCommit, useDataTableRenderDiagnostics } from "../diagnostics/renderDiagnostics";
 
 export interface DataTableBodyProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
+  readonly windowRows?: boolean | "interactive";
   readonly rowPinningDisplayMode?: DataTableRowPinningDisplayMode;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
   readonly onRowClick?: DataTableRowClickHandler<TData>;
@@ -57,6 +59,7 @@ export function DataTableBody<TData extends RowData>(
   const {
     table,
     rowPinningDisplayMode = "sticky",
+    windowRows,
     renderDetailPanel,
     onRowClick,
     rowClickSelectedOnly,
@@ -104,6 +107,7 @@ export function DataTableBody<TData extends RowData>(
       })}
     >
       {(selected) => {
+        /** Reads the current body rows for the subscribed render pass. */
         const readRows = () => getDataTableRowsForPinningDisplay(
           table,
           rowPinningDisplayMode,
@@ -194,6 +198,25 @@ export function DataTableBody<TData extends RowData>(
               </DataTableEmptyState>
             </BodyRoot>
           );
+        }
+
+        if (windowRows && !showColumnFilters) {
+          return <DataTableWindowedBody
+            key={density}
+            table={table}
+            rows={rows}
+            rowHeight={densityMetrics.bodyRowHeight}
+            headerHeight={normalHeaderHeight}
+            colSpan={colSpan}
+            pinned={table.getIsSomeRowsPinned()}
+            stickyRowPinning={stickyRowPinning}
+            pinnedRowStickyTop={pinnedRowStickyTop}
+            dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
+            stickyPinnedRowIds={stickyPinnedRowIds}
+            renderDetailPanel={renderDetailPanel && table.getIsSomeRowsExpanded() ? renderDetailPanel : undefined}
+            onRowClick={onRowClick}
+            rowClickSelectedOnly={rowClickSelectedOnly}
+          />;
         }
 
         return (

@@ -1,5 +1,7 @@
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { render } from "@testing-library/react";
+import { act, fireEvent, render } from "@testing-library/react";
 
 import { dataTableClasses } from "../styles";
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "../table";
@@ -47,6 +49,7 @@ interface FixtureProps {
   readonly tableMinWidth?: React.CSSProperties["minWidth"];
 }
 
+/** Builds the native table geometry fixture with optional width constraints. */
 function Fixture(props: FixtureProps) {
   const { tableWidth, tableMinWidth } = props;
 
@@ -67,6 +70,7 @@ function Fixture(props: FixtureProps) {
   );
 }
 
+/** Requires the rendered native table so geometry assertions fail clearly when it is missing. */
 function getTable(container: HTMLElement): HTMLTableElement {
   const table = container.querySelector<HTMLTableElement>(
     `.${dataTableClasses.table}`,
@@ -186,4 +190,581 @@ describe("DataTable table geometry", () => {
       "720px",
     );
   });
+});
+
+const windowingRows = Array.from({ length: 30 }, (_, index) => ({
+  name: `Record ${index + 1}`,
+  status: "Enabled",
+}));
+
+const shortWindowingRows = windowingRows.slice(0, 20);
+const remainingWindowingRows = windowingRows.slice(1);
+const reversedWindowingRows = [...windowingRows].reverse();
+
+const windowingColumns = helper.columns([
+  ...columns,
+  helper.display({
+    id: "pin",
+    cell: ({ row }) => <>
+      {row.id === "Record 1" && <PortalRowControl />}
+      <input
+      type="checkbox"
+      aria-label={`Pin ${row.id}`}
+      onChange={() => { row.pin(row.getIsPinned() ? false : "top"); }}
+    /></>,
+  }),
+]);
+
+const groupedWindowingColumns = helper.columns([helper.group({ id: "outer", header: "Outer", columns: [
+  helper.group({ id: "middle", header: "Middle", columns: [
+    helper.group({ id: "inner", header: "Inner", columns: windowingColumns }),
+  ] }),
+] })]);
+
+/** Exercises the same stable row body with and without active pins. */
+function WindowingFallbackFixture({ reason, reverse = false, short = false, grouped = false, hidden = false, omitFirst = false }: {
+  readonly reverse?: boolean;
+  readonly short?: boolean;
+  readonly grouped?: boolean;
+  readonly hidden?: boolean;
+  readonly omitFirst?: boolean;
+  readonly reason: "detail" | "activation" | "pin" | "eligible" | "nonsticky" | "filters" | "loading" | "error" | "interactive";
+}) {
+  const table = useMuiDataTable({
+    columns: grouped ? groupedWindowingColumns : reason === "eligible" || reason === "interactive" ? windowingColumns : columns,
+    data: omitFirst ? remainingWindowingRows : short ? shortWindowingRows : reverse ? reversedWindowingRows : windowingRows,
+    meta: { loading: reason === "loading", error: reason === "error" ? "Fixture error" : undefined },
+    getRowId: row => row.name,
+    enableRowPinning: true,
+    state: { columnVisibility: hidden ? { name: false, status: false, pin: false } : {} },
+    initialState: {
+      pagination: { pageIndex: 0, pageSize: 30 },
+      rowPinning: { top: reason === "pin" ? ["Record 1"] : [], bottom: [] },
+    },
+  });
+
+  return <DataTable
+    table={table}
+    windowRows={reason === "interactive" ? "interactive" : true}
+    showColumnFilters={reason === "filters"}
+    tableProps={{ stickyHeader: reason !== "nonsticky" }}
+    toolbar={false}
+    pagination={false}
+    renderDetailPanel={(reason === "detail" || reason === "interactive") ? ({ row }) => row.original.name : undefined}
+    onRowClick={(reason === "activation" || reason === "interactive") ? () => { /* This fixture only exercises activation eligibility. */ } : undefined}
+  />;
+}
+
+it.each(["detail", "activation", "pin", "nonsticky", "filters"] as const)(
+  "keeps the full renderer when the windowing opt-in encounters %s",
+  reason => {
+    const { container } = render(<WindowingFallbackFixture reason={reason} />);
+    const table = getTable(container);
+
+    expect(table.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    expect(table.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+    expect(table).not.toHaveAttribute("aria-rowcount");
+    if (reason === "activation") {
+      expect(table.querySelectorAll('tbody tr[data-row-clickable="true"]')).toHaveLength(30);
+    }
+    if (reason === "pin") {
+      expect(table.querySelectorAll('tbody tr[data-row-pinned="top"]')).toHaveLength(1);
+    }
+  },
+);
+
+/** Verifies that scrolling changes the mounted range and Tab restores native order. */
+it("mounts a bounded row range and moves it when the table scrolls", () => {
+  const originalObserver = window.ResizeObserver;
+  window.ResizeObserver = class {
+    observe = jest.fn();
+    unobserve = jest.fn();
+    disconnect = jest.fn();
+  };
+  const viewportHeight = jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(185);
+  const rowHeight = jest.spyOn(Element.prototype, "getBoundingClientRect")
+    .mockReturnValue(new DOMRect(0, 0, 300, 37));
+
+  try {
+    const { container, getByRole, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
+    const table = getTable(container);
+    const viewport = getViewport(table);
+    /** Reads the currently mounted data rows for regression assertions. */
+    const mounted = () => Array.from(table.querySelectorAll("tbody tr[data-row-id]"))
+      .map(row => row.getAttribute("data-row-id"));
+
+    expect(mounted().length).toBeLessThan(30);
+    expect(mounted()[0]).toBe("Record 1");
+    viewport.scrollTop = 1000;
+    fireEvent.scroll(viewport);
+    expect(mounted()).toContain("Record 30");
+    expect(mounted()).not.toContain("Record 1");
+    fireEvent.keyDown(viewport, { key: "Tab" });
+    expect(mounted()).toHaveLength(30);
+    const checkbox = getByRole("checkbox", { name: "Pin Record 30" });
+    act(() => { checkbox.focus(); });
+    fireEvent.click(checkbox);
+    expect(checkbox).toHaveFocus();
+    expect(checkbox.closest("tr")).toHaveAttribute("data-row-pinned", "top");
+    fireEvent.click(checkbox);
+    expect(checkbox).toHaveFocus();
+    expect(checkbox.closest("tr")).not.toHaveAttribute("data-row-pinned");
+    unmount();
+  } finally {
+    rowHeight.mockRestore();
+    viewportHeight.mockRestore();
+    window.ResizeObserver = originalObserver;
+  }
+});
+
+/** Supplies DOM measurements while keeping observer cleanup observable. */
+function mockWindowMeasurements(height: (row: HTMLTableRowElement) => number, headerHeight?: number) {
+  const originalObserver = window.ResizeObserver;
+  const disconnects: jest.Mock[] = [];
+  const observers: { targets: Set<Element>; notify: () => void }[] = [];
+  window.ResizeObserver = class {
+    targets = new Set<Element>();
+    disconnect = jest.fn(() => { this.targets.clear(); });
+    constructor(callback: ResizeObserverCallback) {
+      disconnects.push(this.disconnect);
+      observers.push({ targets: this.targets, notify: () => { callback([], this as unknown as ResizeObserver); } });
+    }
+    observe = jest.fn((target: Element) => { this.targets.add(target); });
+    unobserve = jest.fn((target: Element) => { this.targets.delete(target); });
+  };
+  const viewport = jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(185);
+  const row = jest.spyOn(Element.prototype, "getBoundingClientRect")
+    .mockImplementation(function (this: HTMLTableRowElement) {
+      const measured = this.tagName === "THEAD" ? headerHeight ?? this.querySelectorAll("tr").length * 37 : height(this);
+      return new DOMRect(0, 0, 300, measured);
+    });
+  return {
+    disconnects,
+    resize(target: Element) { act(() => { observers.filter(observer => observer.targets.has(target)).forEach(observer => { observer.notify(); }); }); },
+    restore() {
+      row.mockRestore();
+      viewport.mockRestore();
+      window.ResizeObserver = originalObserver;
+    },
+  };
+}
+
+it("uses the full body when ResizeObserver is unavailable", () => {
+  const originalObserver = window.ResizeObserver;
+  // The browser capability is optional, even though DOM types declare it.
+  Object.defineProperty(window, "ResizeObserver", { configurable: true, writable: true, value: undefined });
+  try {
+    const { container, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
+    expect(container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    expect(container.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+    unmount();
+  } finally { window.ResizeObserver = originalObserver; }
+});
+
+it.each(["mixed", "missing"] as const)("uses the full body for %s row measurements", kind => {
+  const measurements = mockWindowMeasurements(row => kind === "missing" ? 0 : row.dataset.rowId === "Record 2" ? 60 : 37);
+  try {
+    const { container, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
+    expect(container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    expect(container.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+    unmount();
+  } finally { measurements.restore(); }
+});
+
+it("keeps spacer heights and row indices aligned with the current order after scrolling", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const { container, rerender, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
+    const table = getTable(container);
+    const viewport = getViewport(table);
+    viewport.scrollTop = 740;
+    fireEvent.scroll(viewport);
+    /** Checks row identities, accessibility positions and spacer heights for the current order. */
+    const check = (reverse: boolean) => {
+      const rows = [...table.querySelectorAll("tbody tr[data-row-id]")];
+      expect(rows.length).toBeLessThan(30);
+      const firstIndex = Number(rows[0].getAttribute("aria-rowindex")) - 2;
+      expect(firstIndex).toBeGreaterThan(0);
+      rows.forEach((row, index) => {
+        expect(row).toHaveAttribute("aria-rowindex", String(firstIndex + index + 2));
+        expect(row).toHaveAttribute("data-row-id", `Record ${reverse ? 30 - firstIndex - index : firstIndex + index + 1}`);
+      });
+      const spacers = table.querySelectorAll<HTMLTableCellElement>("tbody tr[aria-hidden] td");
+      expect(spacers[0].style.height).toBe(`${firstIndex * 37}px`);
+      expect(spacers[1].style.height).toBe(`${(30 - firstIndex - rows.length) * 37}px`);
+    };
+    check(false);
+    rerender(<WindowingFallbackFixture reason="eligible" reverse />);
+    check(true);
+    unmount();
+  } finally { measurements.restore(); }
+});
+
+it("removes viewport and keyboard listeners and disconnects observers on unmount", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  const removeDocumentListener = jest.spyOn(document, "removeEventListener");
+  try {
+    const { container, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
+    const viewport = getViewport(getTable(container));
+    const removeScrollListener = jest.spyOn(viewport, "removeEventListener");
+    unmount();
+    expect(removeScrollListener).toHaveBeenCalledWith("scroll", expect.any(Function));
+    expect(removeDocumentListener).toHaveBeenCalledWith("keydown", expect.any(Function), true);
+    expect(removeDocumentListener).toHaveBeenCalledWith("pointerdown", expect.any(Function), true);
+    expect(measurements.disconnects.length).toBeGreaterThan(0);
+    measurements.disconnects.forEach(disconnect => { expect(disconnect).toHaveBeenCalled(); });
+  } finally {
+    removeDocumentListener.mockRestore();
+    measurements.restore();
+  }
+});
+
+/** Requires the table scroll container used by geometry and keyboard regressions. */
+function getViewport(table: HTMLTableElement): HTMLElement {
+  const viewport = table.closest<HTMLElement>(`.${dataTableClasses.container}`);
+  if (!viewport) throw new Error("Missing table viewport");
+  return viewport;
+}
+
+
+it.each(["loading", "error"] as const)("does not expose windowed row geometry during %s", reason => {
+  const { container, unmount } = render(<WindowingFallbackFixture reason={reason} />);
+  const table = getTable(container);
+  expect(table.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(0);
+  expect(table.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+  expect(table).not.toHaveAttribute("aria-rowcount");
+  if (reason === "error") expect(container).toHaveTextContent("Fixture error");
+  unmount();
+});
+
+it("windows interactive rows with detail and activation handlers, then preserves focused controls", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const { container, getByRole, unmount } = render(<WindowingFallbackFixture reason="interactive" />);
+    /** Counts data rows without including decorative spacer rows. */
+    const mountedCount = () => container.querySelectorAll("tbody tr[data-row-id]").length;
+    expect(mountedCount()).toBeLessThan(30);
+    const checkbox = getByRole("checkbox", { name: "Pin Record 1" });
+    act(() => { checkbox.focus(); });
+    expect(mountedCount()).toBe(30);
+    getViewport(getTable(container)).scrollTop = 1000;
+    fireEvent.scroll(getViewport(getTable(container)));
+    expect(checkbox).toHaveFocus();
+    expect(mountedCount()).toBe(30);
+    unmount();
+  } finally { measurements.restore(); }
+});
+
+
+/** Creates a row-owned portal to exercise focus preservation outside the table DOM. */
+function PortalRowControl() {
+  const [open, setOpen] = useState(false);
+  return <>
+    <button onClick={() => { setOpen(true); }}>Open row portal</button>
+    {open && createPortal(<button onClick={() => { setOpen(false); }}>Portaled row action</button>, document.body)}
+  </>;
+}
+
+it("keeps the owning row mounted while a portaled action has focus", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const { container, getByRole, rerender, unmount } = render(<WindowingFallbackFixture reason="interactive" />);
+    fireEvent.click(getByRole("button", { name: "Open row portal" }));
+    const action = getByRole("button", { name: "Portaled row action" });
+    act(() => { action.focus(); });
+    fireEvent.pointerDown(action);
+    rerender(<WindowingFallbackFixture reason="interactive" reverse />);
+    const viewport = getViewport(getTable(container));
+    viewport.scrollTop = 1000;
+    fireEvent.scroll(viewport);
+    expect(action).toHaveFocus();
+    expect(action.isConnected).toBe(true);
+    expect(container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    unmount();
+  } finally { measurements.restore(); }
+});
+
+it("preserves theme row heights outside windowed bodies", () => {
+  const theme = createTheme({ components: { RazethDataTable: { styleOverrides: { bodyRow: { height: 120 } } } } });
+  const { container, unmount } = render(<ThemeProvider theme={theme}><WindowingFallbackFixture reason="nonsticky" /></ThemeProvider>);
+  const row = container.querySelector("tbody tr[data-row-id]");
+  expect(row).toHaveStyle({ height: "120px" });
+  expect(container.querySelector("tbody")).not.toHaveAttribute("data-window-row-height");
+  unmount();
+});
+
+it("retains focused row controls when the data falls below the windowing threshold", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" />);
+    const control = view.getByRole("checkbox", { name: "Pin Record 1" });
+    act(() => { control.focus(); });
+    view.rerender(<WindowingFallbackFixture reason="eligible" short />);
+    expect(view.getByRole("checkbox", { name: "Pin Record 1" })).toBe(control);
+    expect(control).toHaveFocus();
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(20);
+    expect(view.container.querySelector("tbody")).not.toHaveAttribute("data-window-row-height");
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("resumes windowing after keyboard focus moves outside the table", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<><button>Outside table</button><WindowingFallbackFixture reason="eligible" /></>);
+    fireEvent.keyDown(getViewport(getTable(view.container)), { key: "Tab" });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    act(() => { view.getByRole("button", { name: "Outside table" }).focus(); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("lets the theme override the default windowed row height", () => {
+  const measurements = mockWindowMeasurements(() => 120);
+  const theme = createTheme({ components: { RazethDataTable: { styleOverrides: { bodyRow: { height: 120 } } } } });
+  try {
+    const view = render(<ThemeProvider theme={theme}><WindowingFallbackFixture reason="eligible" /></ThemeProvider>);
+    expect(view.container.querySelector("tbody tr[data-row-id]")).toHaveStyle({ height: "120px" });
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("keeps the body-relative scroll range with a tall sticky grouped header", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  const viewportHeight = jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(600);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" grouped />);
+    const table = getTable(view.container);
+    expect(table.querySelectorAll("thead tr")).toHaveLength(4);
+    const viewport = getViewport(table);
+    viewport.scrollTop = 370;
+    fireEvent.scroll(viewport);
+    // Sticky header offset cancels its flow offset: the first visible body row
+    // is index 10; four overscan rows means mounting starts at index 6.
+    expect(table.querySelector("tbody tr[data-row-id]")).toHaveAttribute("data-row-id", "Record 7");
+    expect(view.getByRole("checkbox", { name: "Pin Record 11" })).toBeInTheDocument();
+    expect(table.querySelectorAll("tbody tr[data-row-id]").item(table.querySelectorAll("tbody tr[data-row-id]").length - 1)).toHaveAttribute("data-row-id", "Record 27");
+    view.unmount();
+  } finally { viewportHeight.mockRestore(); measurements.restore(); }
+});
+
+it("does not expand rows for unrelated outside Tab navigation", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<><button>First outside</button><button>Second outside</button><WindowingFallbackFixture reason="eligible" /><button>After table</button></>);
+    /** Reads the currently mounted data rows for regression assertions. */
+    const mounted = () => view.container.querySelectorAll("tbody tr[data-row-id]").length;
+    const first = view.getByRole("button", { name: "First outside" });
+    act(() => { first.focus(); });
+    fireEvent.keyDown(first, { key: "Tab" });
+    expect(mounted()).toBeLessThan(30);
+    const second = view.getByRole("button", { name: "Second outside" });
+    act(() => { second.focus(); });
+    fireEvent.keyDown(second, { key: "Tab" });
+    expect(mounted()).toBeLessThan(30); // The next stop is in the header.
+    const headerControl = view.container.querySelector<HTMLElement>("thead input, thead button");
+    if (!headerControl) throw new Error("Missing header tab stop");
+    act(() => { headerControl.focus(); });
+    fireEvent.keyDown(headerControl, { key: "Tab" });
+    expect(mounted()).toBe(30);
+    const after = view.getByRole("button", { name: "After table" });
+    act(() => { after.focus(); });
+    expect(mounted()).toBeLessThan(30);
+    fireEvent.keyDown(after, { key: "Tab", shiftKey: true });
+    expect(mounted()).toBe(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("falls back when theme header cells are no longer sticky", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  const theme = createTheme({ components: { RazethDataTable: { styleOverrides: { headerCell: { position: "static" } } } } });
+  try {
+    const view = render(<ThemeProvider theme={theme}><WindowingFallbackFixture reason="eligible" grouped /></ThemeProvider>);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    expect(view.container.querySelectorAll("tbody tr[aria-hidden]")).toHaveLength(0);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("restores windowing when hidden columns become visible", () => {
+  const measurements = mockWindowMeasurements(row => row.querySelector("td") ? 37 : 0);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" hidden />);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.rerender(<WindowingFallbackFixture reason="eligible" />);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("synchronizes a subpixel height change with spacer geometry", () => {
+  let height = 37;
+  const measurements = mockWindowMeasurements(() => height);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" />);
+    const viewport = getViewport(getTable(view.container));
+    height = 37.5;
+    viewport.scrollTop = 370;
+    fireEvent.scroll(viewport);
+    const table = getTable(view.container);
+    const rows = table.querySelectorAll("tbody tr[data-row-id]");
+    const firstIndex = Number(rows[0].getAttribute("aria-rowindex")) - 2;
+    expect(table.querySelector<HTMLTableCellElement>("tbody tr[aria-hidden] td")?.style.height).toBe(`${firstIndex * height}px`);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("restores the last rows before reverse Tab from a checked radio group", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<><WindowingFallbackFixture reason="eligible" /><input type="radio" name="after" aria-label="Unchecked after" /><input type="radio" name="after" aria-label="Checked after" defaultChecked /></>);
+    expect(view.container.querySelector('[data-row-id="Record 30"]')).not.toBeInTheDocument();
+    const radio = view.getByRole("radio", { name: "Checked after" });
+    act(() => { radio.focus(); });
+    fireEvent.keyDown(radio, { key: "Tab", shiftKey: true });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it.each(["editor", "hidden-wrapper", "collapsed-control"] as const)("restores reverse Tab order around an outside %s", kind => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<><WindowingFallbackFixture reason="eligible" />
+      {kind === "editor" ? <div contentEditable suppressContentEditableWarning aria-label="Outside editor">Editor</div> : kind === "hidden-wrapper" ? <div style={{ display: "none" }}><button>Hidden control</button></div> : <button style={{ visibility: "collapse" }}>Collapsed control</button>}
+      <button>Visible after table</button></>);
+    const target = kind === "editor" ? view.getByLabelText("Outside editor") : view.getByRole("button", { name: "Visible after table" });
+    // jsdom does not implement native contenteditable focusability.
+    const activeElement = jest.spyOn(document, "activeElement", "get").mockReturnValue(target);
+    try { fireEvent.keyDown(target, { key: "Tab", shiftKey: true }); }
+    finally { activeElement.mockRestore(); }
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("uses the rendered grouped-header height for viewport coverage", () => {
+  const measurements = mockWindowMeasurements(() => 37, 10);
+  const viewportHeight = jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(600);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" grouped />);
+    const viewport = getViewport(getTable(view.container));
+    viewport.scrollTop = 185;
+    fireEvent.scroll(viewport);
+    expect(view.container.querySelector('[data-row-id="Record 25"]')).toBeInTheDocument();
+    view.unmount();
+  } finally { viewportHeight.mockRestore(); measurements.restore(); }
+});
+
+it("releases focus protection when the owning row is removed without blur", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" />);
+    act(() => { view.getByRole("checkbox", { name: "Pin Record 1" }).focus(); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.rerender(<WindowingFallbackFixture reason="eligible" omitFirst />);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(29);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("updates spacer geometry from row resize notifications without scrolling", () => {
+  let rowHeight = 37;
+  let mixed = false;
+  const measurements = mockWindowMeasurements(row => mixed && row.dataset.rowId === "Record 2" ? 60 : rowHeight);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" />);
+    const row = view.container.querySelector("tbody tr[data-row-id]");
+    if (!row) throw new Error("Missing observed row");
+    rowHeight = 37.5;
+    measurements.resize(row);
+    const mounted = view.container.querySelectorAll("tbody tr[data-row-id]").length;
+    expect(view.container.querySelector<HTMLTableCellElement>("tbody tr[aria-hidden] td")?.style.height).toBe(`${(30 - mounted) * rowHeight}px`);
+    mixed = true;
+    measurements.resize(row);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("rechecks sticky-header safety when the theme changes without a resize", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  const sticky = createTheme();
+  const nonsticky = createTheme({ components: { RazethDataTable: { styleOverrides: { headerCell: { position: "static" } } } } });
+  try {
+    const view = render(<ThemeProvider theme={sticky}><WindowingFallbackFixture reason="eligible" /></ThemeProvider>);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.rerender(<ThemeProvider theme={nonsticky}><WindowingFallbackFixture reason="eligible" /></ThemeProvider>);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.rerender(<ThemeProvider theme={sticky}><WindowingFallbackFixture reason="eligible" /></ThemeProvider>);
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("restores reverse Tab order from a programmatically focused heading", () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<><WindowingFallbackFixture reason="eligible" /><h2 tabIndex={-1}>Outside heading</h2><button>After heading</button></>);
+    const heading = view.getByRole("heading", { name: "Outside heading" });
+    act(() => { heading.focus(); });
+    fireEvent.keyDown(heading, { key: "Tab", shiftKey: true });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("releases focus protection when a row-owned portal closes without changing rows", async () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<WindowingFallbackFixture reason="interactive" />);
+    fireEvent.click(view.getByRole("button", { name: "Open row portal" }));
+    const action = view.getByRole("button", { name: "Portaled row action" });
+    act(() => { action.focus(); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    await act(async () => { fireEvent.click(action); await Promise.resolve(); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+const sparseColumns = helper.columns([helper.accessor("name", {
+  header: "Name", enableSorting: false, enableColumnFilter: false, enableResizing: false,
+  meta: { enableColumnMenu: false },
+  cell: ({ row }) => row.original.name === "Record 30" ? <button>Only omitted control</button> : row.original.name,
+})]);
+/** Creates a window whose only row control starts outside the mounted range. */
+function SparseWindowFixture() {
+  const table = useMuiDataTable({ columns: sparseColumns, data: windowingRows,
+    getRowId: row => row.name, initialState: { pagination: { pageIndex: 0, pageSize: 30 } } });
+  return <><button>Before sparse table</button><DataTable table={table} windowRows="interactive" toolbar={false} pagination={false} tableProps={{ stickyHeader: true }} /><h2 tabIndex={-1}>After sparse table</h2><button>Last outside stop</button></>;
+}
+it.each([false, true])("restores omitted-only controls for native Tab direction reverse=%s", reverse => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<SparseWindowFixture />);
+    expect(view.queryByRole("button", { name: "Only omitted control" })).not.toBeInTheDocument();
+    const source = reverse ? view.getByRole("heading", { name: "After sparse table" }) : view.getByRole("button", { name: "Before sparse table" });
+    act(() => { source.focus(); });
+    fireEvent.keyDown(source, { key: "Tab", shiftKey: reverse });
+    expect(view.getByRole("button", { name: "Only omitted control" })).toBeInTheDocument();
+    view.unmount();
+  } finally { measurements.restore(); }
+});
+
+it("rechecks header safety after a non-theme style mutation", async () => {
+  const measurements = mockWindowMeasurements(() => 37);
+  try {
+    const view = render(<WindowingFallbackFixture reason="eligible" />);
+    const header = view.container.querySelector<HTMLTableCellElement>("thead th");
+    if (!header) throw new Error("Missing header");
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    await act(async () => { header.style.position = "static"; await Promise.resolve(); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]")).toHaveLength(30);
+    await act(async () => { header.style.position = ""; await Promise.resolve(); });
+    expect(view.container.querySelectorAll("tbody tr[data-row-id]").length).toBeLessThan(30);
+    view.unmount();
+  } finally { measurements.restore(); }
 });

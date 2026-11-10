@@ -51,6 +51,7 @@ const INTERACTIVE_DESCENDANT_SELECTOR = [
   "[data-row-click-ignore]",
 ].join(",");
 
+/** Recognizes interactive descendants so their clicks do not activate the owning row. */
 export function isFromInteractiveDescendant(
   event:
     | MouseEvent<HTMLElement>
@@ -190,6 +191,7 @@ export interface DataTableBodyRowProps<TData extends RowData> {
    */
   readonly onRowClick?: DataTableRowClickHandler<TData>;
   readonly rowClickSelectedOnly?: boolean;
+  readonly ariaRowIndex?: number;
 
   /**
    * select-sticky presentation constrains the same top-pinned row against the
@@ -230,6 +232,7 @@ export function DataTableBodyRow<TData extends RowData>(
     stickyPinnedRowIds,
     onRowClick,
     rowClickSelectedOnly,
+    ariaRowIndex,
   } = props;
 
   const { density } = useDataTableDensity();
@@ -308,6 +311,7 @@ export function DataTableBodyRow<TData extends RowData>(
             className={dataTableClasses.bodyRow}
             hover
             selected={selected}
+            aria-rowindex={ariaRowIndex}
             data-row-id={row.id}
             data-selected={selected ? "true" : undefined}
             data-density={density}

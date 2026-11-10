@@ -1,6 +1,7 @@
 "use client";
 
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type ComponentPropsWithoutRef, type Ref, type ReactNode } from "react";
+import { useForkRef } from "@mui/material/utils";
 import { styled, TableBody } from "@mui/material";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import { getStickyRowOffsets } from "../row-pinning/stickyHeights";
@@ -11,19 +12,22 @@ interface Props {
   readonly top: number;
   readonly fallbackHeight: number;
   readonly dualEdge: boolean;
+  readonly forwardedRef?: Ref<HTMLTableSectionElement>;
+  readonly bodyProps?: ComponentPropsWithoutRef<"tbody"> & { readonly "data-window-row-height"?: boolean };
 }
 
 export const BodyRoot = styled(TableBody, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Body",
   overridesResolver: (_props, styles) => styles.body,
-})({});
+})({ ':where(&[data-window-row-height="true"]) > :where(tr[data-row-id])': { height: "var(--DataTable-window-row-height)" } });
 
 /** Renderer geometry only. TanStack remains the sole owner of pin identity/order. */
 export function DataTableStickyRowMeasurements({
-  children, enabled = true, top, fallbackHeight, dualEdge,
+  children, enabled = true, top, fallbackHeight, dualEdge, forwardedRef, bodyProps,
 }: Props) {
   const bodyRef = useRef<HTMLTableSectionElement>(null);
+  const mergedRef = useForkRef(bodyRef, forwardedRef);
   const heightsRef = useRef(new Map<HTMLTableRowElement, number>());
   useLayoutEffect(() => () => heightsRef.current.clear(), []);
   // Reconcile after every parent commit: sorting/filtering/paging may replace or
@@ -43,6 +47,7 @@ export function DataTableStickyRowMeasurements({
       if (!mounted.has(row)) heights.delete(row);
     }
     if (!rows.length) return;
+    /** Returns a usable measured row height, leaving invalid measurements to the fallback. */
     const readHeight = (row: HTMLTableRowElement) => {
       const height = row.getBoundingClientRect().height;
       return Number.isFinite(height) && height > 0 ? height : undefined;
@@ -54,6 +59,7 @@ export function DataTableStickyRowMeasurements({
         if (height !== undefined) heights.set(row, height);
       }
     }
+    /** Applies cumulative sticky offsets from the cached heights of mounted pinned rows. */
     const apply = () => {
       const offsets = getStickyRowOffsets(rows.map((row) => ({
         id: row.dataset.rowId!,
@@ -63,6 +69,7 @@ export function DataTableStickyRowMeasurements({
       for (const row of rows) {
         const offset = offsets.get(row.dataset.rowId!);
         if (!offset) continue;
+        /** Writes a sticky geometry variable only when its pixel value has changed. */
         const set = (name: string, value: number) => {
           const next = `${value}px`;
           if (row.style.getPropertyValue(name) !== next) row.style.setProperty(name, next);
@@ -103,5 +110,5 @@ export function DataTableStickyRowMeasurements({
       observer.disconnect();
     };
   });
-  return <BodyRoot ref={bodyRef} className={dataTableClasses.body}>{children}</BodyRoot>;
+  return <BodyRoot {...bodyProps} ref={mergedRef} className={dataTableClasses.body}>{children}</BodyRoot>;
 }

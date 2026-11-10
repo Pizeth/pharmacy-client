@@ -7,7 +7,7 @@ import type { RowData } from "@tanstack/table-core";
 import { DataTableAccessibilityProvider } from "../accessibility";
 import { DataTableDensityProvider } from "../density";
 import type { DataTableDensityConfig } from "../density";
-import { DataTableFilterDisplayProvider } from "../filter-display";
+import { DataTableFilterDisplayProvider, useDataTableFilterDisplay } from "../filter-display";
 import type { DataTableFilterDisplayConfig } from "../filter-display";
 import { DataTableFullscreenProvider } from "../fullscreen";
 import {
@@ -194,6 +194,9 @@ export interface DataTableProps<TData extends RowData>
    */
   readonly tableProps?: Omit<TableProps, "children">;
 
+  /** Experimental fixed-height windowing. Interactive mode restores all rows during keyboard navigation. */
+  readonly windowRows?: boolean | "interactive";
+
   /**
    * Props forwarded to MUI's <TableContainer>.
    */
@@ -361,6 +364,7 @@ export interface DataTableProps<TData extends RowData>
 interface DataTablePresentationRegionProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
   readonly tableProps?: Omit<TableProps, "children">;
+  readonly windowRows?: boolean | "interactive";
   readonly containerProps?: Omit<TableContainerProps, "children">;
   readonly card?: DataTableCardConfig<TData>;
   readonly rowPinningDisplayMode: NonNullable<
@@ -389,6 +393,7 @@ function DataTablePresentationRegion<TData extends RowData>(
   const {
     table,
     tableProps,
+    windowRows,
     containerProps,
     card,
     rowPinningDisplayMode,
@@ -402,6 +407,7 @@ function DataTablePresentationRegion<TData extends RowData>(
 
   const resolvedDisplayMode =
     useDataTableResolvedDisplayMode(autoCardBreakpoint);
+  const { showColumnFilters } = useDataTableFilterDisplay();
 
   if (resolvedDisplayMode === "card") {
     if (!card) {
@@ -420,6 +426,8 @@ function DataTablePresentationRegion<TData extends RowData>(
     );
   }
 
+  const windowBody = windowRows && (windowRows === "interactive" || (!renderDetailPanel && !onRowClick)) && tableProps?.stickyHeader && !showColumnFilters;
+
   return (
     <ContainerRoot
       {...containerProps}
@@ -428,7 +436,7 @@ function DataTablePresentationRegion<TData extends RowData>(
         .join(" ")}
     >
       <table.Subscribe
-        selector={(state) => ({
+        selector={(state) => windowBody ? state : ({
           columnSizing: state.columnSizing,
           columnVisibility: state.columnVisibility,
         })}
@@ -449,18 +457,24 @@ function DataTablePresentationRegion<TData extends RowData>(
             "--DataTable-table-min-width": resolvedTableMinWidth,
           };
 
+          const rowCount = windowBody ? table.getRowModel().rows.length : 0;
+          const windowActive = rowCount > 25 && !table.options.meta?.loading && !table.options.meta?.error;
+          const indexRows = windowActive && !table.getIsSomeRowsPinned() && !(renderDetailPanel && table.getIsSomeRowsExpanded());
+
           return (
             <TableRoot
               {...tableProps}
+              aria-rowcount={indexRows ? rowCount + table.getHeaderGroups().length : tableProps?.["aria-rowcount"]}
               className={[dataTableClasses.table, tableProps?.className]
                 .filter(Boolean)
                 .join(" ")}
               style={tableStyle}
             >
               <DataTableColumnGroup table={table} />
-              <DataTableHead table={table} />
+              <DataTableHead table={table} indexRows={indexRows} />
               <DataTableBody
                 table={table}
+                windowRows={windowBody ? windowRows : false}
                 rowPinningDisplayMode={rowPinningDisplayMode}
                 renderDetailPanel={renderDetailPanel}
                 onRowClick={onRowClick}
@@ -474,11 +488,13 @@ function DataTablePresentationRegion<TData extends RowData>(
   );
 }
 
+/** Renders the configured table with shared providers and automatic display-mode handling. */
 export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
   const themeDefaults = useDataTableThemeDefaults();
   const {
     table,
     tableProps,
+    windowRows,
     containerProps,
 
     /**
@@ -689,6 +705,7 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
                       <DataTablePresentationRegion
                         table={table}
                         tableProps={tableProps}
+                        windowRows={windowRows}
                         containerProps={containerProps}
                         card={card}
                         rowPinningDisplayMode={rowPinningDisplayMode}
