@@ -1,5 +1,6 @@
 import { dataTableClasses } from "../styles";
 
+/** Excludes controls hidden by ancestor display or their computed visibility. */
 function isRenderedControl(element: HTMLElement): boolean {
   for (let ancestor: HTMLElement | null = element; ancestor; ancestor = ancestor.parentElement) {
     if (getComputedStyle(ancestor).display === "none") return false;
@@ -8,12 +9,14 @@ function isRenderedControl(element: HTMLElement): boolean {
   return visibility !== "hidden" && visibility !== "collapse";
 }
 
+/** Recognizes editable hosts that participate in native Tab order without an explicit tabindex. */
 function isImplicitEditingHost(element: HTMLElement): boolean {
   return !element.hasAttribute("tabindex") &&
     element.matches('[contenteditable=""],[contenteditable="true"],[contenteditable="plaintext-only"]') &&
     !element.parentElement?.isContentEditable;
 }
 
+/** Collects enabled, rendered native focus candidates in document order. */
 function candidateControls(doc: Document): HTMLElement[] {
   return Array.from(doc.querySelectorAll<HTMLElement>(
     'a[href],button,input,select,textarea,[tabindex],summary,[contenteditable]',
@@ -21,6 +24,7 @@ function candidateControls(doc: Document): HTMLElement[] {
     !element.matches(":disabled") && !element.closest('[hidden],[inert],[aria-hidden="true"]') && isRenderedControl(element));
 }
 
+/** Chooses the checked radio or the direction-specific entry point for an unchecked group. */
 function isRadioStop(element: HTMLElement, candidates: readonly HTMLElement[], reverse: boolean): boolean {
   if (!(element instanceof HTMLInputElement) || element.type !== "radio" || !element.name) return true;
   const group = candidates.filter((candidate): candidate is HTMLInputElement =>
@@ -31,12 +35,14 @@ function isRadioStop(element: HTMLElement, candidates: readonly HTMLElement[], r
   return element === (selected ?? (reverse ? group.at(-1) : group.at(0)));
 }
 
+/** Orders native tab stops by positive tabindex, preserving document order for ordinary stops. */
 function sequentialStops(candidates: readonly HTMLElement[], reverse: boolean): HTMLElement[] {
   return candidates.filter(element => isRadioStop(element, candidates, reverse))
     .sort((a, b) => (a.tabIndex > 0 ? a.tabIndex : Number.MAX_SAFE_INTEGER) -
       (b.tabIndex > 0 ? b.tabIndex : Number.MAX_SAFE_INTEGER));
 }
 
+/** Predicts adjacent native focus, using document position for programmatically focused elements. */
 function adjacentStop(doc: Document, candidates: readonly HTMLElement[], stops: readonly HTMLElement[], reverse: boolean): HTMLElement | undefined {
   const active = doc.activeElement;
   const current = stops.findIndex(element => element === active);
@@ -50,6 +56,7 @@ function adjacentStop(doc: Document, candidates: readonly HTMLElement[], stops: 
   return adjacent.at(reverse ? -1 : 0);
 }
 
+/** Detects traversal across the body even when omitted rows contain its only controls. */
 function crossesBody(body: HTMLTableSectionElement, next: HTMLElement | undefined, reverse: boolean): boolean {
   const active = body.ownerDocument.activeElement;
   const activePosition = active ? body.compareDocumentPosition(active) : 0;

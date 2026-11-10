@@ -488,6 +488,7 @@ function DataTablePresentationRegion<TData extends RowData>(
   );
 }
 
+/** Renders the configured table with shared providers and automatic display-mode handling. */
 export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
   const themeDefaults = useDataTableThemeDefaults();
   const {

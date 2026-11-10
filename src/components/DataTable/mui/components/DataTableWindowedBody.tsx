@@ -52,6 +52,7 @@ export function DataTableWindowedBody<TData extends RowData>({
 
   useLayoutEffect(() => {
     if (!bodyFocused) return undefined;
+    /** Releases keyboard fallback when the focused row control or owned portal is disconnected. */
     const releaseRemovedControl = () => {
       if (focusedControl.current instanceof Node && !focusedControl.current.isConnected) {
         focusedControl.current = null;
@@ -71,6 +72,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     const body = ref.current;
     if (!body) return undefined;
     const doc = body.ownerDocument;
+    /** Restores omitted rows before native Tab navigation can move focus into the body. */
     const prepareTab = (event: KeyboardEvent) => {
       if (event.key !== "Tab" || event.defaultPrevented || keyboardMode) return;
       if (shouldRestoreWindowForTab(body, event)) {
@@ -78,10 +80,12 @@ export function DataTableWindowedBody<TData extends RowData>({
         flushSync(() => { setKeyboardMode(true); });
       }
     };
+    /** Clears keyboard fallback while the separate focus guard protects active row controls. */
     const resumePointerWindow = () => {
       setKeyboardMode(false);
       // React focus events also cover row-owned portals. Blur releases this guard.
     };
+    /** Resumes bounded rendering after keyboard focus leaves the body. */
     const releaseOutsideKeyboardMode = (event: FocusEvent) => {
       if (event.target instanceof Node && !body.contains(event.target)) setKeyboardMode(false);
     };
@@ -101,6 +105,7 @@ export function DataTableWindowedBody<TData extends RowData>({
       setUnsafeHeight(true);
       return undefined;
     }
+    /** Refreshes viewport and rendered-header geometry after resize, scrolling or relevant style changes. */
     const update = () => {
       const head = ref.current?.closest("table")?.querySelector("thead");
       const headers = head?.querySelectorAll("th");
@@ -144,6 +149,7 @@ export function DataTableWindowedBody<TData extends RowData>({
     const body = ref.current;
     if (!body) return undefined;
     const mounted = [...body.querySelectorAll<HTMLTableRowElement>(":scope > tr[data-row-id]")];
+    /** Synchronizes uniform row heights and falls back when measurements are missing or inconsistent. */
     const check = () => {
       // Empty headers can temporarily yield zero-height rows; header safety is recoverable.
       if (!body.closest("table")?.querySelector("thead th")) return;

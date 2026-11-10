@@ -47,6 +47,7 @@ export function DataTableStickyRowMeasurements({
       if (!mounted.has(row)) heights.delete(row);
     }
     if (!rows.length) return;
+    /** Returns a usable measured row height, leaving invalid measurements to the fallback. */
     const readHeight = (row: HTMLTableRowElement) => {
       const height = row.getBoundingClientRect().height;
       return Number.isFinite(height) && height > 0 ? height : undefined;
@@ -58,6 +59,7 @@ export function DataTableStickyRowMeasurements({
         if (height !== undefined) heights.set(row, height);
       }
     }
+    /** Applies cumulative sticky offsets from the cached heights of mounted pinned rows. */
     const apply = () => {
       const offsets = getStickyRowOffsets(rows.map((row) => ({
         id: row.dataset.rowId!,
@@ -67,6 +69,7 @@ export function DataTableStickyRowMeasurements({
       for (const row of rows) {
         const offset = offsets.get(row.dataset.rowId!);
         if (!offset) continue;
+        /** Writes a sticky geometry variable only when its pixel value has changed. */
         const set = (name: string, value: number) => {
           const next = `${value}px`;
           if (row.style.getPropertyValue(name) !== next) row.style.setProperty(name, next);

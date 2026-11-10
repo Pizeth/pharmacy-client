@@ -58,6 +58,7 @@ import { WindowedPerformanceTable } from "./WindowedPerformanceTable";
 import { createRenderDiagnosticCollector, type RenderDiagnosticCollector } from "./renderDiagnosticCollector";
 import type { MuiDataTableInstance } from "../../table";
 
+/** Creates an RTL variant of the fixture theme without mutating the original theme. */
 const withRtlDirection = (theme: Theme): Theme => ({ ...theme, direction: "rtl" });
 
 const COMPONENT_NAME =
@@ -199,6 +200,7 @@ const COLUMN_COUNT_OPTIONS =
 const columnHelper =
   createMuiDataTableColumnHelper<DataTablePerformanceRow>();
 
+/** Creates deterministic synthetic records for repeatable rendering and sorting measurements. */
 function createRows(
   rowCount: number,
   valueColumnCount: number,
@@ -492,10 +494,12 @@ export const PerformanceTable =
       const table = Object.assign({}, subscribedTable, { state: subscribedTable.store.get() });
       useLayoutEffect(() => { props.onTable?.(table); });
 
+      /** Dispatches a fixture interaction through the selected diagnostic owner. */
       const dispatch = (update: () => void) => diagnostics
         ? diagnostics.measureDispatch(update)
         : update();
 
+      /** Toggles the first fixture record while preserving integrated select-sticky behavior. */
       const toggleFirstSelection =
         (): void => {
           diagnostics?.begin("selection");
@@ -510,6 +514,7 @@ export const PerformanceTable =
           });
         };
 
+      /** Toggles the first fixture record detail state for interaction measurements. */
       const toggleFirstExpansion =
         (): void => {
           diagnostics?.begin("expansion");
@@ -523,6 +528,7 @@ export const PerformanceTable =
           ));
         };
 
+      /** Advances the fixture sorting state for a repeatable visible-sort measurement. */
       const toggleSort =
         (): void => {
           diagnostics?.begin("sorting");
@@ -668,6 +674,7 @@ export const PerformanceTable =
     },
   );
 
+/** Formats measured durations consistently in the fixture report. */
 function formatDuration(
   duration: number,
 ): string {
@@ -811,6 +818,7 @@ export function DataTablePerformanceAcceptance() {
       ],
     );
 
+  /** Clears collected measurements before another fixture run. */
   const resetMeasurements =
     (): void => {
       collector.begin("mount");

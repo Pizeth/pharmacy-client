@@ -90,15 +90,20 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
         const taskObserver = observeLongTasks(tasks);
         const supportsTasks = taskObserver !== null;
         let mode = initialMode;
+        /** Locates the currently mounted table for a profiling action. */
         const table = () => {
           if (!tableRef.current) throw new Error("Table did not mount");
           return tableRef.current;
         };
+        /** Locates the current scroll viewport used for rendered-output measurements. */
         const viewport = () => surfaceRef.current?.querySelector<HTMLElement>(
           mode === "table" ? '[aria-label="Performance table scroll viewport"]' : `.${dataTableClasses.cardContainer}`,
         );
+        /** Reads the first mounted record identity for scroll and ordering checks. */
         const firstWindowRow = () => surfaceRef.current?.querySelector("tbody tr[data-row-id]");
+        /** Counts rendered data rows for the current profiling sample. */
         const count = () => surfaceRef.current?.querySelectorAll(mode === "table" ? "tbody tr[data-row-id]" : `.${dataTableClasses.cardItem}`).length;
+        /** Measures a UI action while checking run visibility and collecting rendered-output evidence. */
         const measure = async (action: string, repeat: number, update: () => void, verify: () => boolean) => {
           assertProfilingRunActive(cancelled.current, document.visibilityState);
           collector.begin(action);
@@ -280,6 +285,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
 
 type ProfilingTrack = "integrated" | "window" | "sort" | "normal" | "compare" | "500" | "1000";
 
+/** Builds the matched fixture cases and counterbalanced diagnostic order for a profiling track. */
 function profilingCases(track: ProfilingTrack): Array<readonly [number, number, Mode, Probe, number?]> {
   return track === "normal"
       ? NORMAL.map(([rows, columns, mode]) => [rows, columns, mode, "off"])
@@ -300,6 +306,7 @@ function profilingCases(track: ProfilingTrack): Array<readonly [number, number, 
 }
 
 
+/** Labels windowed and reference cases without conflating page size with total records. */
 function profilingCaseLabel(integrated: boolean | undefined, windowed: boolean, rows: number, columns: number, mode: Mode, probe: Probe, pageSize: number) {
   const prefix = integrated === undefined ? (windowed ? "Windowed " : "") : integrated ? "Integrated windowed " : "Integrated reference ";
   const suffix = pageSize === rows ? "" : ` / ${pageSize} mounted`;
@@ -307,15 +314,18 @@ function profilingCaseLabel(integrated: boolean | undefined, windowed: boolean, 
 }
 
 
+/** Selects integrated windowing and expected mounted-row policy for a profiling case. */
 function profilingCaseOptions(track: ProfilingTrack, caseIndex: number, pageSize: number) {
   const windowed = track === "window";
   return { windowed, integratedWindow: track === "integrated" ? caseIndex === 1 : undefined, expectedMounted: windowed ? 13 : pageSize };
 }
 
+/** Distinguishes ordinary rendering tracks from specialized sorting and windowing probes. */
 function isRegularTrack(track: ProfilingTrack) {
   return track !== "sort" && track !== "integrated" && track !== "window";
 }
 
+/** Collects browser long-task entries only when the performance API supports them. */
 function observeLongTasks(tasks: PerformanceEntry[]) {
   if (typeof PerformanceObserver === "undefined" || !PerformanceObserver.supportedEntryTypes.includes("longtask")) return null;
   const observer = new PerformanceObserver(list => { tasks.push(...list.getEntries()); });
@@ -323,6 +333,7 @@ function observeLongTasks(tasks: PerformanceEntry[]) {
   return observer;
 }
 
+/** Converts diagnostic counters to a sample without inventing unavailable measurements. */
 function diagnosticSample(snapshot: ReturnType<RenderDiagnosticCollector["snapshot"]>, probe: Probe, mode: Mode) {
   return {
     reactMs: snapshot.reactCommits ? snapshot.reactActualMs : null,
@@ -336,6 +347,7 @@ function diagnosticSample(snapshot: ReturnType<RenderDiagnosticCollector["snapsh
   };
 }
 
+/** Counts actual rendered elements, rows, cells and cards for a profiling sample. */
 function renderedSample(root: HTMLElement | null) {
   return {
     elements: root?.querySelectorAll("*").length ?? 0,
@@ -345,15 +357,18 @@ function renderedSample(root: HTMLElement | null) {
   };
 }
 
+/** Scrolls the selected viewport axis to its end for rendered coverage checks. */
 function scrollViewportToEnd(view: HTMLElement | null | undefined, axis: "vertical" | "horizontal") {
   if (!view) return;
   if (axis === "vertical") view.scrollTop = view.scrollHeight;
   else view.scrollLeft = view.scrollWidth;
 }
 
+/** Allows the next stress tier only after the smaller stress track meets its timing gate. */
 function updateStressEligibility(track: ProfilingTrack, result: Result, update: (allowed: boolean) => void) {
   if (track === "500") update(result.status === "PASS" && result.samples.every(sample => sample.elapsedMs < 5000));
 }
+/** Rejects blocked or failed profiling results before they can be accepted as measurements. */
 function assertSuccessfulResult(result: Result) {
   if (result.status !== "PASS") throw new Error(result.status);
 }

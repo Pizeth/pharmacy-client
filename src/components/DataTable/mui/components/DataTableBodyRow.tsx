@@ -51,6 +51,7 @@ const INTERACTIVE_DESCENDANT_SELECTOR = [
   "[data-row-click-ignore]",
 ].join(",");
 
+/** Recognizes interactive descendants so their clicks do not activate the owning row. */
 export function isFromInteractiveDescendant(
   event:
     | MouseEvent<HTMLElement>

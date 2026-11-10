@@ -49,6 +49,7 @@ interface FixtureProps {
   readonly tableMinWidth?: React.CSSProperties["minWidth"];
 }
 
+/** Builds the native table geometry fixture with optional width constraints. */
 function Fixture(props: FixtureProps) {
   const { tableWidth, tableMinWidth } = props;
 
@@ -69,6 +70,7 @@ function Fixture(props: FixtureProps) {
   );
 }
 
+/** Requires the rendered native table so geometry assertions fail clearly when it is missing. */
 function getTable(container: HTMLElement): HTMLTableElement {
   const table = container.querySelector<HTMLTableElement>(
     `.${dataTableClasses.table}`,
@@ -287,6 +289,7 @@ it("mounts a bounded row range and moves it when the table scrolls", () => {
     const { container, getByRole, unmount } = render(<WindowingFallbackFixture reason="eligible" />);
     const table = getTable(container);
     const viewport = getViewport(table);
+    /** Reads the currently mounted data rows for regression assertions. */
     const mounted = () => Array.from(table.querySelectorAll("tbody tr[data-row-id]"))
       .map(row => row.getAttribute("data-row-id"));
 
@@ -376,6 +379,7 @@ it("keeps spacer heights and row indices aligned with the current order after sc
     const viewport = getViewport(table);
     viewport.scrollTop = 740;
     fireEvent.scroll(viewport);
+    /** Checks row identities, accessibility positions and spacer heights for the current order. */
     const check = (reverse: boolean) => {
       const rows = [...table.querySelectorAll("tbody tr[data-row-id]")];
       expect(rows.length).toBeLessThan(30);
@@ -415,6 +419,7 @@ it("removes viewport and keyboard listeners and disconnects observers on unmount
   }
 });
 
+/** Requires the table scroll container used by geometry and keyboard regressions. */
 function getViewport(table: HTMLTableElement): HTMLElement {
   const viewport = table.closest<HTMLElement>(`.${dataTableClasses.container}`);
   if (!viewport) throw new Error("Missing table viewport");
@@ -436,6 +441,7 @@ it("windows interactive rows with detail and activation handlers, then preserves
   const measurements = mockWindowMeasurements(() => 37);
   try {
     const { container, getByRole, unmount } = render(<WindowingFallbackFixture reason="interactive" />);
+    /** Counts data rows without including decorative spacer rows. */
     const mountedCount = () => container.querySelectorAll("tbody tr[data-row-id]").length;
     expect(mountedCount()).toBeLessThan(30);
     const checkbox = getByRole("checkbox", { name: "Pin Record 1" });
@@ -450,6 +456,7 @@ it("windows interactive rows with detail and activation handlers, then preserves
 });
 
 
+/** Creates a row-owned portal to exercise focus preservation outside the table DOM. */
 function PortalRowControl() {
   const [open, setOpen] = useState(false);
   return <>
@@ -546,6 +553,7 @@ it("does not expand rows for unrelated outside Tab navigation", () => {
   const measurements = mockWindowMeasurements(() => 37);
   try {
     const view = render(<><button>First outside</button><button>Second outside</button><WindowingFallbackFixture reason="eligible" /><button>After table</button></>);
+    /** Reads the currently mounted data rows for regression assertions. */
     const mounted = () => view.container.querySelectorAll("tbody tr[data-row-id]").length;
     const first = view.getByRole("button", { name: "First outside" });
     act(() => { first.focus(); });
@@ -727,6 +735,7 @@ const sparseColumns = helper.columns([helper.accessor("name", {
   meta: { enableColumnMenu: false },
   cell: ({ row }) => row.original.name === "Record 30" ? <button>Only omitted control</button> : row.original.name,
 })]);
+/** Creates a window whose only row control starts outside the mounted range. */
 function SparseWindowFixture() {
   const table = useMuiDataTable({ columns: sparseColumns, data: windowingRows,
     getRowId: row => row.name, initialState: { pagination: { pageIndex: 0, pageSize: 30 } } });

@@ -1,6 +1,7 @@
 import { dataTableClasses } from "../../styles";
 import { assertProfilingRunActive, hasRenderedFirstRow, hasRenderedRowState, hasViewportCoverage } from "./profilingOutputChecks";
 
+/** Builds stale-order, selection and detail DOM states for rendered-output regressions. */
 function fixture() {
   const root = document.createElement("section");
   root.innerHTML = `

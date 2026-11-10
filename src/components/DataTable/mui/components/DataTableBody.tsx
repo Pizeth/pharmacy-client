@@ -107,6 +107,7 @@ export function DataTableBody<TData extends RowData>(
       })}
     >
       {(selected) => {
+        /** Reads the current body rows for the subscribed render pass. */
         const readRows = () => getDataTableRowsForPinningDisplay(
           table,
           rowPinningDisplayMode,

@@ -41,6 +41,7 @@ function windowGeometry(rows: readonly { id: string }[], heights: DetailHeights,
     const height = mixedHeights ? rowOffset(index + 1) - rowOffset(index) : shortRowHeight;
     offsets.push((offsets.at(-1) ?? 0) + height + (heights.get(row.id) ?? 0));
   });
+  /** Finds the record containing a pixel offset using the cumulative row and detail heights. */
   const indexAt = (pixel: number) => {
     let low = 0;
     let high = rows.length;
@@ -88,6 +89,7 @@ export function WindowedPerformanceTable({ table, detailControls = false }: {
   </table.Subscribe>;
 }
 
+/** Renders the experimental window while tracking expanded-detail geometry and pending focus. */
 function WindowedPerformanceContent({ table, detailControls, expanded }: {
   readonly table: MuiDataTableInstance<DataTablePerformanceRow>;
   readonly detailControls: boolean;
@@ -137,6 +139,7 @@ function WindowedPerformanceContent({ table, detailControls, expanded }: {
     const detail = content?.closest("tr");
     const id = detail?.dataset.detailPanelRow;
     if (!detail || !id) return undefined;
+    /** Caches the current expanded-detail height so subsequent windows include it. */
     const measure = () => {
       const height = detail.getBoundingClientRect().height;
       setDetailHeights(previous => previous.get(id) === height ? previous : new Map(previous).set(id, height));
@@ -238,6 +241,7 @@ function WindowedPerformanceContent({ table, detailControls, expanded }: {
             const columns = table.getVisibleLeafColumns();
             const topRows = detailControls ? table.getTopRows() : [];
             const bottomRows = detailControls ? table.getBottomRows() : [];
+            /** Renders pinned fixture rows outside the scrolling window with shared sticky measurements. */
             const renderPinned = (pinnedRows: typeof topRows) => {
               const pinnedIds = pinnedRows.map(row => row.id);
               return pinnedRows.map(row => <DataTableBodyRowGroup
@@ -283,6 +287,7 @@ function WindowedPerformanceContent({ table, detailControls, expanded }: {
 }
 
 
+/** Supplies required DataTable contexts to the isolated experimental windowing fixture. */
 function WindowedFixtureProviders({ table, children }: {
   readonly table: MuiDataTableInstance<DataTablePerformanceRow>;
   readonly children: ReactNode;

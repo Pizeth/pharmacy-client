@@ -27,6 +27,7 @@ it("keeps first-row selection and reset consistent with select-sticky pinning", 
   />);
   if (!instance) throw new Error("Performance table did not mount");
   const first = instance.getRow("1");
+  /** Reads mounted records for pinning and interaction regression assertions. */
   const mounted = () => container.querySelectorAll("tbody tr[data-row-id]");
   expect(mounted().length).toBeLessThan(50);
   const toggle = getByRole("button", { name: "Toggle first-row selection" });
@@ -52,6 +53,7 @@ it("updates experimental detail controls with a narrow owner subscription", () =
     const view = render(<PerformanceTable rowCount={200} columnCount={4} displayMode="table"
       narrowOwner diagnostics={null} onProfile={jest.fn()} surfaceRef={createRef<HTMLElement>()}
       windowed windowedDetails />);
+    /** Combines rendered rows and spacer heights to verify expanded-detail geometry. */
     const geometryHeight = () => Array.from(view.container.querySelectorAll<HTMLTableRowElement>("tbody > tr"))
       .reduce((total, row) => total + (row.hasAttribute("aria-hidden")
         ? Number.parseFloat(row.querySelector<HTMLTableCellElement>("td")?.style.height ?? "0")
