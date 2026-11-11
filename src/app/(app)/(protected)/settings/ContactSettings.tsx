@@ -11,19 +11,25 @@ const settingsSchema = z.object({
   phone: z.string().nullable(),
   providers: z.array(z.object({ id: z.number(), name: z.string() })),
   links: z.array(z.object({
-    id: z.number(),
+    id: z.number().int().positive(),
     handle: z.string(),
     url: z.string().nullish(),
     provider: z.object({ name: z.string() }),
   })),
 });
 
-async function request(path: string, method: string, body?: object, signal?: AbortSignal) {
+type SettingsPath = "" | "/phone" | "/social-links" | `/social-links/${number}`;
+
+async function request(path: SettingsPath, method: string, body?: object, signal?: AbortSignal) {
+  if (path !== "" && path !== "/phone" && !/^\/social-links(?:\/[1-9]\d*)?$/.test(path)) {
+    throw new Error("Invalid account settings route.");
+  }
   const token = sessionStorage.getItem(TOKEN_KEY);
   const endpoint = new URL("/api/account/settings", API_URL);
   endpoint.pathname += path;
   const response = await fetch(endpoint, {
     method,
+    redirect: "error",
     signal,
     credentials: "include",
     headers: {
@@ -45,7 +51,7 @@ export function ContactSettings({ userId }: { readonly userId: string }) {
     queryFn: async ({ signal }) => settingsSchema.parse(await request("", "GET", undefined, signal)),
   });
   const mutation = useMutation({
-    mutationFn: ({ path, method, body }: { path: string; method: string; body?: object }) => request(path, method, body),
+    mutationFn: ({ path, method, body }: { path: SettingsPath; method: string; body?: object }) => request(path, method, body),
     onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   });
 
@@ -72,7 +78,7 @@ export function ContactSettings({ userId }: { readonly userId: string }) {
   }
 
   if (settings.isPending) return <Typography role="status">Loading contact settings…</Typography>;
-  if (settings.isError) return <Alert severity="error" action={<Button onClick={() => { void settings.refetch(); }}>Retry</Button>}>Could not load contact settings.</Alert>;
+  if (settings.isError) return <Alert severity="error" action={<Button onClick={() => { settings.refetch().catch(() => { console.error("Account settings request failed."); }); }}>Retry</Button>}>Could not load contact settings.</Alert>;
   const { phone, providers, links } = settings.data;
   return <>
     {mutation.error && <Alert severity="error">{mutation.error.message}</Alert>}

@@ -242,27 +242,10 @@ export default function VerifyIdPage() {
     // }
   };
 
-  return (
-    <Root>
-      <Alert severity="info" action={<Button onClick={() => logout()} disabled={signingOut}>Sign out</Button>}>
-        If your officer ID is already linked, sign in with the method you used for that account.
-        You can manage connected sign-in methods in Account settings.
-      </Alert>
-      {needsEmail ? (
-        <Stack component="form" spacing={2} onSubmit={event => { void sendEmailVerification(event); }}>
-          <Alert severity="info">Verify your email before linking your officer ID.</Alert>
-          {emailFeedback && <Alert severity={emailFeedback.severity}>{emailFeedback.message}</Alert>}
-          <MuiTextField name="email" type="email" label="Email address" required defaultValue={hasPlaceholder ? "" : user?.email} />
-          <Button type="submit" variant="contained" loading={sendingEmail}>Send verification email</Button>
-        </Stack>
-      ) : awaitingSignInMethods ? (
-        <Alert severity="info">Checking your sign-in methods…</Alert>
-      ) : accounts.isError ? (
-        <Alert severity="error" action={<Button onClick={() => { void accounts.refetch(); }}>Retry</Button>}>Could not check your sign-in methods.</Alert>
-      ) : (
+  const officerIdForm = (
       <FormProvider {...form}>
         <FormContainer
-          onSubmit={event => { void handleSubmit(onSubmit)(event); }}
+          onSubmit={event => { handleSubmit(onSubmit)(event).catch(() => { console.error("Account settings request failed."); }); }}
           // className={className}
           // sx={sx}
           // {...rest}
@@ -333,6 +316,27 @@ export default function VerifyIdPage() {
           </ButtonContainer>
         </FormContainer>
       </FormProvider>
+  );
+
+  return (
+    <Root>
+      <Alert severity="info" action={<Button onClick={() => logout()} disabled={signingOut}>Sign out</Button>}>
+        If your officer ID is already linked, sign in with the method you used for that account.
+        You can manage connected sign-in methods in Account settings.
+      </Alert>
+      {needsEmail ? (
+        <Stack component="form" spacing={2} onSubmit={event => { sendEmailVerification(event).catch(() => { console.error("Account settings request failed."); }); }}>
+          <Alert severity="info">Verify your email before linking your officer ID.</Alert>
+          {emailFeedback && <Alert severity={emailFeedback.severity}>{emailFeedback.message}</Alert>}
+          <MuiTextField name="email" type="email" label="Email address" required defaultValue={hasPlaceholder ? "" : user?.email} />
+          <Button type="submit" variant="contained" loading={sendingEmail}>Send verification email</Button>
+        </Stack>
+      ) : awaitingSignInMethods ? (
+        <Alert severity="info">Checking your sign-in methods…</Alert>
+      ) : accounts.isError ? (
+        <Alert severity="error" action={<Button onClick={() => { accounts.refetch().catch(() => { console.error("Account settings request failed."); }); }}>Retry</Button>}>Could not check your sign-in methods.</Alert>
+      ) : (
+        officerIdForm
       )}
     </Root>
   );

@@ -107,14 +107,14 @@ export default function AccountSettingsPage() {
         {!isPending && !user && <Alert severity="error">Your session could not be loaded.</Alert>}
         {user && <>
           <RecordCard title="Profile">
-            <Stack component="form" key={user.id} spacing={2} onSubmit={event => { void saveProfile(event); }}>
+            <Stack component="form" key={user.id} spacing={2} onSubmit={event => { saveProfile(event).catch(() => { console.error("Account settings request failed."); }); }}>
               <TextField name="name" label="Display name" required defaultValue={user.name} />
               <TextField name="username" label="Username" defaultValue={user.username ?? ""} />
               <Button type="submit" variant="contained" disabled={pending}>Save profile</Button>
             </Stack>
           </RecordCard>
           <RecordCard title="Email address" description={`Current email: ${user.email}`}>
-            <Stack component="form" spacing={2} onSubmit={event => { void changeEmail(event); }}>
+            <Stack component="form" spacing={2} onSubmit={event => { changeEmail(event).catch(() => { console.error("Account settings request failed."); }); }}>
               <TextField name="email" type="email" label="New email address" required />
               <Button type="submit" variant="contained" disabled={pending}>Send verification email</Button>
             </Stack>
@@ -122,7 +122,7 @@ export default function AccountSettingsPage() {
           <ContactSettings userId={user.id} />
           <RecordCard title="Connected sign-in accounts">
             {accounts.isPending && <Typography role="status">Loading connected accounts…</Typography>}
-            {accounts.isError && <Alert severity="error" action={<Button onClick={() => { void accounts.refetch(); }}>Retry</Button>}>Could not load connected accounts.</Alert>}
+            {accounts.isError && <Alert severity="error" action={<Button onClick={() => { accounts.refetch().catch(() => { console.error("Account settings request failed."); }); }}>Retry</Button>}>Could not load connected accounts.</Alert>}
             {accounts.data && <>
               {accounts.data.length === 0 && <Typography>No connected accounts.</Typography>}
               {Array.from(linkedProviders).map(provider =>
@@ -131,7 +131,7 @@ export default function AccountSettingsPage() {
               {(["google", "facebook", "telegram"] as const).filter(provider =>
                 providers.data?.includes(provider) && !linkedProviders.has(provider)
               ).map(provider => (
-                <Button key={provider} variant="outlined" disabled={pending} onClick={() => { void connect(provider); }}>
+                <Button key={provider} variant="outlined" disabled={pending} onClick={() => { connect(provider).catch(() => { console.error("Account settings request failed."); }); }}>
                   Connect {provider.charAt(0).toUpperCase() + provider.slice(1)}
                 </Button>
               ))}
