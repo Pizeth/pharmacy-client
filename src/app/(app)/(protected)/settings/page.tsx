@@ -6,14 +6,16 @@ import { useSearchParams } from "next/navigation";
 import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { RecordCard, RecordSection } from "@/components/Tables/ResourceRecordPage";
-import { authClient } from "@/lib/auth-client";
+import { authClient, type ClientUser } from "@/lib/auth-client";
 import { API_URL } from "@/types/constants";
 import { ContactSettings } from "./ContactSettings";
 
 export default function AccountSettingsPage() {
-  const linkError = useSearchParams().get("error");
+  const searchParams = useSearchParams();
+  const callbackError = searchParams.get("error");
+  const emailCallback = searchParams.get("flow") === "email-change";
   const { data: session, isPending } = authClient.useSession();
-  const user = session?.user;
+  const user: ClientUser | undefined = session?.user;
   const accounts = useQuery({
     queryKey: ["settings-linked-accounts", user?.id],
     enabled: Boolean(user),
@@ -45,6 +47,7 @@ export default function AccountSettingsPage() {
       const name = String(fields.get("name") ?? "").trim();
       const username = String(fields.get("username") ?? "").trim();
       if (!name) throw new Error("Enter a display name.");
+      if (user?.username && !username) throw new Error("Enter a username or keep your existing username.");
       const result = await authClient.updateUser({
         name,
         ...(username && username !== user?.username ? { username } : {}),
@@ -83,7 +86,7 @@ export default function AccountSettingsPage() {
     try {
       const result = await authClient.changeEmail({
         newEmail: String(data.get("email") ?? "").trim(),
-        callbackURL: new URL("/settings", window.location.origin).href,
+        callbackURL: new URL("/settings?flow=email-change", window.location.origin).href,
       });
       if (result.error) throw new Error(result.error.message);
       setFeedback({ message: "Check your new email address for the verification link.", severity: "success" });
@@ -97,8 +100,10 @@ export default function AccountSettingsPage() {
   return (
     <ResourcePage title="Account settings" titleComponent="h1" maxWidth="md">
       <RecordSection>
-        {linkError && <Alert severity="error">
-          {linkError === "account_already_linked_to_different_user"
+        {callbackError && <Alert severity="error">
+          {emailCallback
+            ? "The email change link could not be verified. Request a new link."
+            : callbackError === "account_already_linked_to_different_user"
             ? "This sign-in method is already connected to another account."
             : "Could not connect the sign-in method. Please try again."}
         </Alert>}
@@ -119,10 +124,11 @@ export default function AccountSettingsPage() {
               <Button type="submit" variant="contained" disabled={pending}>Send verification email</Button>
             </Stack>
           </RecordCard>
-          <ContactSettings userId={user.id} />
+          {user.isLinked === true && <ContactSettings userId={user.id} />}
           <RecordCard title="Connected sign-in accounts">
             {accounts.isPending && <Typography role="status">Loading connected accounts…</Typography>}
             {accounts.isError && <Alert severity="error" action={<Button onClick={() => { accounts.refetch().catch(() => { console.error("Account settings request failed."); }); }}>Retry</Button>}>Could not load connected accounts.</Alert>}
+            {providers.isError && <Alert severity="error" action={<Button onClick={() => { providers.refetch().catch(() => { console.error("Could not reload sign-in providers."); }); }}>Retry providers</Button>}>Could not load available sign-in providers.</Alert>}
             {accounts.data && <>
               {accounts.data.length === 0 && <Typography>No connected accounts.</Typography>}
               {Array.from(linkedProviders).map(provider =>

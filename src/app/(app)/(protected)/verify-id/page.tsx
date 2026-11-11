@@ -165,11 +165,17 @@ export default function VerifyIdPage() {
     setEmailFeedback(null);
     try {
       const callbackURL = new URL(window.location.pathname + window.location.search, window.location.origin).href;
-      const result = email.toLowerCase() === user?.email.toLowerCase()
+      const verifyingCurrentEmail = email.toLowerCase() === user?.email.toLowerCase();
+      const result = verifyingCurrentEmail
         ? await authClient.sendVerificationEmail({ email, callbackURL })
         : await authClient.changeEmail({ newEmail: email, callbackURL });
       if (result.error) throw new Error(result.error.message);
-      setEmailFeedback({ severity: "info", message: "Open the verification link in your inbox, then return here to enter your officer ID." });
+      setEmailFeedback({
+        severity: "info",
+        message: verifyingCurrentEmail
+          ? "Open the verification link in your inbox, then return here to enter your officer ID."
+          : "Open the email change link. Then return here and request a verification link for the new address.",
+      });
     } catch (error) {
       setEmailFeedback({ severity: "error", message: error instanceof Error ? error.message : "Could not send verification email." });
     } finally {
@@ -321,7 +327,7 @@ export default function VerifyIdPage() {
       </Alert>
       {needsEmail ? (
         <Stack component="form" spacing={2} onSubmit={event => { sendEmailVerification(event).catch(() => { console.error("Account settings request failed."); }); }}>
-          <Alert severity="info">Verify your email before linking your officer ID.</Alert>
+          <Alert severity="info">Add a real email address, confirm the change from your inbox, then verify that address before linking your officer ID.</Alert>
           {emailFeedback && <Alert severity={emailFeedback.severity}>{emailFeedback.message}</Alert>}
           <MuiTextField name="email" type="email" label="Email address" required defaultValue={hasPlaceholder ? "" : user?.email} />
           <Button type="submit" variant="contained" loading={sendingEmail}>Send verification email</Button>

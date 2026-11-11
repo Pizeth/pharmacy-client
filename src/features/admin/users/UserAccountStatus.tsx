@@ -4,8 +4,10 @@ import type { AdminUser } from "./api";
 export function UserAccountStatus({ user }: {
   readonly user: Pick<AdminUser, "banned" | "isLinked">;
 }) {
-  if (user.banned) return <ResourceBadge size="small" color="error" label="Banned" />;
-  if (user.isLinked === false) return <ResourceBadge size="small" color="warning" label="Pending ID verification" />;
-  if (user.isLinked === true) return <ResourceBadge size="small" color="success" label="Verified ID" />;
-  return <ResourceBadge size="small" label="Not banned" />;
+  return <>
+    {user.banned && <ResourceBadge size="small" color="error" label="Banned" />}
+    {user.isLinked === false && <ResourceBadge size="small" color="warning" label="Pending ID verification" />}
+    {user.isLinked === true && <ResourceBadge size="small" color="success" label="Verified ID" />}
+    {typeof user.isLinked !== "boolean" && <ResourceBadge size="small" label="ID status unavailable" />}
+  </>;
 }

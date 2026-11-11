@@ -4,7 +4,7 @@ import { API_URL, TOKEN_KEY } from "@/types/constants";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/schema/auth.schema";
 const optionalDate = z.union([z.string(), z.date().transform(value => value.toISOString())]).nullish();
-export const userSchema = z.object({ createdAt: optionalDate, updatedAt: optionalDate, banReason: z.string().nullish(), banExpires: optionalDate, id: z.coerce.string(), name: z.string(), email: z.string(), role: z.string().nullish(), banned: z.boolean().nullish(), isLinked: z.boolean().optional(), emailVerified: z.boolean().optional(), image: z.string().nullish(), roleId: z.number().nullish(), username: z.string().nullish() });
+export const userSchema = z.object({ createdAt: optionalDate, updatedAt: optionalDate, banReason: z.string().nullish(), banExpires: optionalDate, id: z.coerce.string(), name: z.string(), email: z.string(), role: z.string().nullish(), banned: z.boolean().nullish(), isLinked: z.boolean().nullish(), emailVerified: z.boolean().optional(), image: z.string().nullish(), roleId: z.number().nullish(), username: z.string().nullish() });
 export const roleSchema = z.object({ id: z.number(), name: z.string(), description: z.string().nullish(), icon: z.string().nullish(), color: z.string().nullish() });
 export type UserRole = z.infer<typeof roleSchema>;
 export const userDetailSchema = userSchema.extend({
