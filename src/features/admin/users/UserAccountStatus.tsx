@@ -8,7 +8,7 @@ export function UserAccountStatus({ user }: {
     return <ResourceBadge size="small" color="error" label="Banned" />;
   }
   if (user.role !== "sys-admin" && user.emailVerified === false) {
-    return <ResourceBadge size="small" color="warning" label="Email not verified" />;
+    return <ResourceBadge size="small" color="error" label="Email not verified" />;
   }
   return <ResourceBadge size="small" color="success" label="Active" />;
 }
