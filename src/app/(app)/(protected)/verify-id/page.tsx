@@ -93,6 +93,45 @@ const ButtonContainer = styled(Box, {
   flexDirection: "column", // Stack the input, error, and button h
 }));
 
+function OfficerIdInput() {
+  return (
+    <TextField
+      name="officialId"
+      label="អត្តលេខមន្រ្តីរាជការ"
+      required
+      iconStart={<AccountBoxIcon />}
+      fullWidth
+      slotProps={{
+        htmlInput: {
+          inputMode: "numeric",
+          pattern: "[0-9]*",
+        },
+      }} // Brings up the numeric keypad on mobile devices
+      onKeyDown={(e) => {
+        if (
+          e.ctrlKey ||
+          e.metaKey ||
+          [
+            "Backspace",
+            "Delete",
+            "Tab",
+            "ArrowLeft",
+            "ArrowRight",
+            "Home",
+            "End",
+          ].includes(e.key)
+        ) {
+          return;
+        }
+
+        if (!/^\d$/.test(e.key)) {
+          e.preventDefault();
+        }
+      }}
+    />
+  );
+}
+
 export default function VerifyIdPage() {
   const { mutate: logout, isPending: signingOut } = useLogout();
   const { refetch: refreshIdentity } = useGetIdentity();
@@ -262,64 +301,16 @@ export default function VerifyIdPage() {
   );
 
   const officerIdForm = (
-      <FormProvider {...form}>
-        <FormContainer
-          onSubmit={event => { handleSubmit(onSubmit)(event).catch(() => { console.error("Account settings request failed."); }); }}
-          // className={className}
-          // sx={sx}
-          // {...rest}
-        >
-          <TextField
-            name="officialId"
-            label="អត្តលេខមន្រ្តីរាជការ"
-            required
-            iconStart={<AccountBoxIcon />}
-            fullWidth
-            slotProps={{
-              htmlInput: {
-                inputMode: "numeric",
-                pattern: "[0-9]*",
-              },
-            }} // Brings up the numeric keypad on mobile devices
-            onKeyDown={(e) => {
-              // if (!/[0-9]|Backspace|Delete|Arrow/.test(e.key)) {
-              //   e.preventDefault();
-              // }
-
-              if (
-                e.ctrlKey ||
-                e.metaKey ||
-                [
-                  "Backspace",
-                  "Delete",
-                  "Tab",
-                  "ArrowLeft",
-                  "ArrowRight",
-                  "Home",
-                  "End",
-                ].includes(e.key)
-              ) {
-                return;
-              }
-
-              if (!/^\d$/.test(e.key)) {
-                e.preventDefault();
-              }
-            }}
-          />
-          {/* <input
-          value={officialId}
-          onChange={(e) => setOfficialId(e.target.value)}
-          placeholder="Enter your 10-digit Employee ID"
-          maxLength={10}
-        /> */}
-          {/* {error && <p style={{ color: "red" }}>{error}</p>} */}
-          {/* <button type="submit" disabled={loading}>
-          {loading ? "Verifying..." : "Verify"}
-        </button> */}
-          {submitControl}
-        </FormContainer>
-      </FormProvider>
+    <FormProvider {...form}>
+      <FormContainer onSubmit={event => {
+        handleSubmit(onSubmit)(event).catch(() => {
+          form.setError("officialId", { type: "server", message: "Verification failed." });
+        });
+      }}>
+        <OfficerIdInput />
+        {submitControl}
+      </FormContainer>
+    </FormProvider>
   );
 
   return (
