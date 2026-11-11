@@ -9,7 +9,7 @@ it.each(["table", "card"] as const)("separates role, accounts and profile in %s 
   expect(screen.getByRole("region", { name: "User role" })).toBeInTheDocument();
   expect(screen.getByRole("region", { name: "User accounts" })).toBeInTheDocument();
   expect(within(screen.getByRole("region", { name: "User profile" })).getByText("Jane Doe")).toBeInTheDocument();
-  const status = screen.getByText("ID status unavailable");
+  const status = screen.getByText("Active");
   expect(getComputedStyle(status.closest("dd")!.parentElement!).textAlign).toBe("left");
   const verification = screen.getByRole("img", { name: "Email verified" });
   expect(verification).toHaveTextContent(""); expect(screen.queryByText(/^Verified$/)).not.toBeInTheDocument();
@@ -17,10 +17,10 @@ it.each(["table", "card"] as const)("separates role, accounts and profile in %s 
   const providers = screen.getByRole("list", { name: "Linked sign-in providers" });
   expect(getComputedStyle(providers).paddingTop).toBe("16px"); expect(within(providers).getByText("Google")).toBeInTheDocument();
 });
-it("shows ban status alongside pending ID verification", () => {
+it("preserves banned status when email is unverified", () => {
   render(<UserDetailContent data={{ ...data, banned: true, isLinked: false, emailVerified: false, profile: null, accounts: [] }} view="card" />);
   expect(screen.getByText("Banned")).toBeInTheDocument();
-  expect(screen.getByText("Pending ID verification")).toBeInTheDocument();
+  expect(screen.queryByText("Active")).not.toBeInTheDocument();
   expect(screen.getByRole("img", { name: "Email not verified" })).toBeInTheDocument();
   expect(screen.getByText("No linked accounts.")).toBeInTheDocument();
   expect(screen.getByText("No profile linked to this user.")).toBeInTheDocument();
@@ -29,7 +29,7 @@ it("shows ban status alongside pending ID verification", () => {
 it("accepts an unknown ID status from the API", () => {
   const record = userDetailSchema.parse({ ...data, isLinked: null });
   render(<UserDetailContent data={record} view="table" />);
-  expect(screen.getByText("ID status unavailable")).toBeInTheDocument();
+  expect(screen.getByText("Active")).toBeInTheDocument();
 });
 
 it("keeps the verification badge circular and card labels inline", () => {
@@ -40,4 +40,10 @@ it("keeps the verification badge circular and card labels inline", () => {
   const email = screen.getByText("jane@example.com");
   expect(getComputedStyle(email).display).toBe("inline");
   expect(getComputedStyle(email.previousElementSibling!).display).toBe("inline");
+});
+
+it("shows unverified email for a Telegram account without an ID status", () => {
+  render(<UserDetailContent data={{ ...data, role: "user", isLinked: null, emailVerified: false, accounts: [{ id: "3", providerId: "telegram" }] }} view="table" />);
+  expect(screen.getByText("Email not verified")).toBeInTheDocument();
+  expect(screen.queryByText("Active")).not.toBeInTheDocument();
 });
