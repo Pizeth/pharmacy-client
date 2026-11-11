@@ -275,7 +275,6 @@ export function TrackingPage() {
         }),
         createActionsColumn<TrackedDocument>({
           actions,
-          size: 150,
           maxInlineActions: 3,
         }),
       ]),

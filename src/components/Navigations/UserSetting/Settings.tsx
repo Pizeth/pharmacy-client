@@ -171,6 +171,7 @@ export const UserMenu = (inProps: UserMenuProps) => {
                   <Action onClick={() => {
                     onClose();
                     if (item.label === "Dashboard") router.push(getDashboardDestination(data?.role));
+                    if (item.label === "Profile" || item.label === "Settings") router.push("/settings");
                   }}>
                     <ListItemIcon>{item.icon}</ListItemIcon>
                     <Typography variant="body2" fontWeight={500}>

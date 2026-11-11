@@ -2,6 +2,7 @@
 import PulseLoader from "@/components/effect/loaders/loader";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
 import { VERIFY_ID_PATH } from "@/types/constants";
+import { normalizeInternalRedirectTarget } from "@/lib/auth/redirectTarget";
 import { Authenticated, useGetIdentity } from "@refinedev/core";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
@@ -49,7 +50,7 @@ function ProfileGate({ children }: { children: React.ReactNode }) {
       redirectedFromPath.current = pathname;
       const callbackUrl = searchParams.get("callbackUrl");
       // router.replace(callbackUrl ? decodeURIComponent(callbackUrl) : "/fts");
-      router.replace(callbackUrl || "/fts");
+      router.replace(normalizeInternalRedirectTarget(callbackUrl, "/fts"));
       return;
     }
 

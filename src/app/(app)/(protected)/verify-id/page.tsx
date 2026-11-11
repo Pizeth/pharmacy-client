@@ -1,6 +1,7 @@
 // src/app/(protected)/verify-id/page.tsx — simplified sketch
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { verifySchema, VerifyValues } from "@/schema/auth.schema";
 import { FormProvider, useForm } from "react-hook-form";
@@ -11,7 +12,12 @@ import { styled } from "@mui/material/styles";
 import TextField from "@/components/inputs/textfield";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import Button from "@mui/material/Button";
-import { useCreate } from "@refinedev/core";
+import { useCreate, useGetIdentity, useLogout } from "@refinedev/core";
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
+import MuiTextField from "@mui/material/TextField";
+import { authClient } from "@/lib/auth-client";
+import { normalizeInternalRedirectTarget } from "@/lib/auth/redirectTarget";
 import Box from "@mui/material/Box";
 import FormHelperText from "@mui/material/FormHelperText";
 
@@ -98,8 +104,49 @@ const ButtonWrapper = styled(Box, {
 }));
 
 export default function VerifyIdPage() {
+  const { mutate: logout, isPending: signingOut } = useLogout();
+  const { refetch: refreshIdentity } = useGetIdentity();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const hasPlaceholder = user?.email.toLowerCase().endsWith("@telegram.placeholder.invalid") ?? false;
+  const accounts = useQuery({
+    queryKey: ["verify-id-sign-in-methods", user?.id],
+    enabled: Boolean(user && !user.emailVerified && !hasPlaceholder),
+    queryFn: async () => {
+      const result = await authClient.listAccounts();
+      if (result.error) throw new Error(result.error.message);
+      return result.data;
+    },
+  });
+  const needsEmail = hasPlaceholder || (!user?.emailVerified && accounts.data?.some(account => account.providerId === "telegram"));
+  const [emailFeedback, setEmailFeedback] = useState<{ message: string; severity: "info" | "error" }>();
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const awaitingSignInMethods = !user || (!user.emailVerified && !hasPlaceholder && accounts.isPending);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  async function sendEmailVerification(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const email = String(new FormData(event.currentTarget).get("email") ?? "").trim();
+    if (email.toLowerCase().endsWith("@telegram.placeholder.invalid")) {
+      setEmailFeedback({ severity: "error", message: "Enter an email address you can receive mail at." });
+      return;
+    }
+    setSendingEmail(true);
+    setEmailFeedback(undefined);
+    try {
+      const callbackURL = new URL(window.location.pathname + window.location.search, window.location.origin).href;
+      const result = email.toLowerCase() === user?.email.toLowerCase()
+        ? await authClient.sendVerificationEmail({ email, callbackURL })
+        : await authClient.changeEmail({ newEmail: email, callbackURL });
+      if (result.error) throw new Error(result.error.message);
+      setEmailFeedback({ severity: "info", message: "Open the verification link in your inbox, then return here to enter your officer ID." });
+    } catch (error) {
+      setEmailFeedback({ severity: "error", message: error instanceof Error ? error.message : "Could not send verification email." });
+    } finally {
+      setSendingEmail(false);
+    }
+  }
   // const [officialId, setOfficialId] = useState("");
   // const [error, setError] = useState<string | null>(null);
   // const [loading, setLoading] = useState(false);
@@ -160,7 +207,6 @@ export default function VerifyIdPage() {
   // Check if officialId field has an error
   const hasError = Boolean(errors.officialId);
   // console.log("hasError", hasError);
-  console.log("errors", errors);
 
   const onSubmit = async (values: VerifyValues) => {
     // e.preventDefault();
@@ -173,7 +219,7 @@ export default function VerifyIdPage() {
         values: values,
       },
       {
-        onSuccess: (data) => {
+        onSuccess: async () => {
           // if (!data.success) {
           //   // handle error
           //   console.error("Registration failed:", data.error);
@@ -181,12 +227,13 @@ export default function VerifyIdPage() {
           // }
 
           const callbackUrl = searchParams.get("callbackUrl");
+          await refreshIdentity();
           router.replace(
-            callbackUrl ? decodeURIComponent(callbackUrl) : "/fts",
+            normalizeInternalRedirectTarget(callbackUrl, "/fts"),
           );
         },
-        onError: (err: any) => {
-          // setError(err?.message ?? "Verification failed");
+        onError: (error) => {
+          form.setError("officialId", { type: "server", message: error.message || "Verification failed." });
         },
       },
     );
@@ -207,6 +254,22 @@ export default function VerifyIdPage() {
 
   return (
     <Root>
+      <Alert severity="info" action={<Button onClick={() => logout()} disabled={signingOut}>Sign out</Button>}>
+        If your officer ID is already linked, sign in with the method you used for that account.
+        You can manage connected sign-in methods in Account settings.
+      </Alert>
+      {needsEmail ? (
+        <Stack component="form" spacing={2} onSubmit={sendEmailVerification}>
+          <Alert severity="info">Verify your email before linking your officer ID.</Alert>
+          {emailFeedback && <Alert severity={emailFeedback.severity}>{emailFeedback.message}</Alert>}
+          <MuiTextField name="email" type="email" label="Email address" required defaultValue={hasPlaceholder ? "" : user?.email} />
+          <Button type="submit" variant="contained" loading={sendingEmail}>Send verification email</Button>
+        </Stack>
+      ) : awaitingSignInMethods ? (
+        <Alert severity="info">Checking your sign-in methods…</Alert>
+      ) : accounts.isError ? (
+        <Alert severity="error" action={<Button onClick={() => accounts.refetch()}>Retry</Button>}>Could not check your sign-in methods.</Alert>
+      ) : (
       <FormProvider {...form}>
         <FormContainer
           onSubmit={handleSubmit(onSubmit)}
@@ -282,6 +345,7 @@ export default function VerifyIdPage() {
           </ButtonContainer>
         </FormContainer>
       </FormProvider>
+      )}
     </Root>
   );
 }

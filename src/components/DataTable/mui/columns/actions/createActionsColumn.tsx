@@ -20,7 +20,7 @@ export function createActionsColumn<TData extends RowData>(
   const {
     actions,
     header = "Actions",
-    size = 120,
+    size = 150,
     maxInlineActions = 2,
     enablePinning = true,
   } = options;

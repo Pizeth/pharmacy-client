@@ -1,5 +1,6 @@
 "use client";
-import { ResourceBadge as Chip, ResourceStatusBadge } from "@/components/Tables/ResourceBadge";
+import { ResourceBadge as Chip } from "@/components/Tables/ResourceBadge";
+import { UserAccountStatus } from "./UserAccountStatus";
 import NextLink from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button, Link, Typography } from "@mui/material";
@@ -28,7 +29,7 @@ export function UserRecordContent({ user, isSelf, canManageRole }: { readonly us
     <UserProfileHeader user={user} isSelf={isSelf} />
     <RecordCard title="Account overview" icon={<AccountCircleOutlined />}><RecordFacts inline items={[{ label: "Connected sign-in accounts", value: user.accounts.length }, { label: "Email verification", value: verified }, { label: "Profile", value: <Chip size="small" color={user.profile ? "info" : "default"} icon={user.profile ? <LinkOutlined /> : <LinkOffOutlined />} label={user.profile ? "Linked" : "Not linked"} /> }]} /></RecordCard>
     <S.Layout><S.Main>
-      <RecordCard title="Account identity" icon={<Fingerprint />} description="Account identity and sign-in status."><RecordFacts items={[{ label: "Username", value: user.username || "Not set" }, { label: "Display name", value: user.name }, { label: "Email address", value: <Link href={`mailto:${encodeURIComponent(user.email)}`}>{user.email}</Link> }, { label: "Account status", value: <ResourceStatusBadge active={!user.banned} inactiveLabel="Banned" inactiveColor="error" /> }]} /></RecordCard>
+      <RecordCard title="Account identity" icon={<Fingerprint />} description="Account identity and sign-in status."><RecordFacts items={[{ label: "Username", value: user.username || "Not set" }, { label: "Display name", value: user.name }, { label: "Email address", value: <Link href={`mailto:${encodeURIComponent(user.email)}`}>{user.email}</Link> }, { label: "Account status", value: <UserAccountStatus user={user} /> }]} /></RecordCard>
       <RecordCard title="Profile & contact" icon={<PersonOutline />} description="Personal details attached to the account.">
         {user.profile ? <><RecordFacts items={[{ label: "Full name", value: name || "Not set" }, { label: "Phone", value: user.profile.phone || "Not set" }, { label: "Profile email", value: user.profile.email || "Not set" }]} /><div><Typography component="h3" variant="subtitle2">Biography</Typography><S.Prose variant="body2" color="text.secondary">{user.profile.bio || "No biography has been provided."}</S.Prose></div></> : <Alert severity="info">No profile linked to this user.</Alert>}
       </RecordCard>

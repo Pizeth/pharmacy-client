@@ -96,6 +96,7 @@ export interface DividerProps extends HtmlHTMLAttributes<HTMLDivElement> {
 }
 
 export interface SocialLoginProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  allowTelegramSignup?: boolean;
   className?: string;
   children?: ReactNode;
   sx?: SxProps<Theme>;

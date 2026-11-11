@@ -66,7 +66,7 @@ it("combines text and status filters using the shared i18n filter controls", asy
  fireEvent.click(screen.getByRole("button", { name: "Show column filters" }));
  fireEvent.change(table.getByRole("textbox", { name: "Name" }), { target: { value: "Jane" } });
  fireEvent.mouseDown(table.getByRole("combobox", { name: "Status" }));
- fireEvent.click(screen.getByRole("option", { name: "Active" }));
+ fireEvent.click(screen.getByRole("option", { name: "Not banned" }));
  await waitFor(() => expect(list).toHaveBeenLastCalledWith(0, 25, "", expect.arrayContaining([{ id: "name", value: "Jane" }, { id: "banned", value: "false" }]), [], expect.any(AbortSignal)));
  expect(screen.getByRole("button", { name: "Hide column filters" })).toBeInTheDocument();
 });

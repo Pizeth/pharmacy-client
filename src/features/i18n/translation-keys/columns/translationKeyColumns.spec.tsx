@@ -159,7 +159,7 @@ describe("TranslationKey columns", () => {
     expect(expansion?.meta?.label).toBe("Details");
 
     expect(actions?.header).toBe("Actions");
-    expect(actions?.size).toBe(104);
+    expect(actions?.size).toBe(150);
     expect(actions?.meta?.label).toBe("Actions");
   });
 

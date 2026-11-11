@@ -1,4 +1,4 @@
-import { CircularProgress, Grid, styled, useThemeProps } from "@mui/material";
+import { CircularProgress, Grid, Typography, styled, useThemeProps } from "@mui/material";
 import {
   Apple,
   Discord,
@@ -117,7 +117,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
     name: PREFIX,
   });
 
-  const { children, className, sx, ...rest } = props;
+  const { children, className, sx, allowTelegramSignup = false, ...rest } = props;
   const searchParams = useSearchParams();
   // const destination =
   //   searchParams?.get("to") ?? searchParams?.get("callbackUrl") ?? "/fts";
@@ -152,6 +152,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
           provider: provider as Parameters<
             typeof authClient.signIn.social
           >[0]["provider"],
+          ...(provider === "telegram" && { requestSignUp: allowTelegramSignup }),
           // 👈 where to redirect after OAuth
           /**
            * A URL to redirect after the user authenticates with the provider
@@ -200,7 +201,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
         // }
       }
     },
-    [destination],
+    [destination, allowTelegramSignup],
   );
 
   const isLoading = useCallback((type: string) => loading === type, [loading]);
@@ -231,13 +232,20 @@ const SocialLogin = (inProps: SocialLoginProps) => {
                 {loading === key ? (
                   <CircularProgress color="inherit" size="1rem" thickness={3} />
                 ) : (
-                  entry.name
+                  key === "telegram" && allowTelegramSignup ? "Sign up with Telegram" : entry.name
                 )}
               </SocialButton>
             )}
           </SocialLogin.children>
         );
       })}
+      {activeProviders.includes("telegram") && (
+        <Grid size={12}>
+          <Typography variant="caption" color="text.secondary">
+            Already have an account? Sign in with your existing method and connect Telegram in Account settings first.
+          </Typography>
+        </Grid>
+      )}
     </Root>
   );
 };

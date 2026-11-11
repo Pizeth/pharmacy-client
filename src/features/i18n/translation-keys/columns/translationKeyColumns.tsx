@@ -615,7 +615,6 @@ export function createTranslationKeyColumns(
           createActionsColumn<TranslationKey>({
             actions: rowActions,
             header: "Actions",
-            size: 104,
             maxInlineActions: 3,
             enablePinning: true,
           }),

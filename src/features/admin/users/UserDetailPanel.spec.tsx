@@ -9,7 +9,7 @@ it.each(["table", "card"] as const)("separates role, accounts and profile in %s 
   expect(screen.getByRole("region", { name: "User role" })).toBeInTheDocument();
   expect(screen.getByRole("region", { name: "User accounts" })).toBeInTheDocument();
   expect(within(screen.getByRole("region", { name: "User profile" })).getByText("Jane Doe")).toBeInTheDocument();
-  const active = screen.getByText("Active");
+  const active = screen.getByText("Not banned");
   expect(getComputedStyle(active.closest("dd")!.parentElement!).textAlign).toBe("left");
   const verification = screen.getByRole("img", { name: "Email verified" });
   expect(verification).toHaveTextContent(""); expect(screen.queryByText(/^Verified$/)).not.toBeInTheDocument();
@@ -18,7 +18,8 @@ it.each(["table", "card"] as const)("separates role, accounts and profile in %s 
   expect(getComputedStyle(providers).paddingTop).toBe("16px"); expect(within(providers).getByText("Google")).toBeInTheDocument();
 });
 it("provides an accessible unverified icon and empty profile message", () => {
-  render(<UserDetailContent data={{ ...data, emailVerified: false, profile: null, accounts: [] }} view="card" />);
+  render(<UserDetailContent data={{ ...data, isLinked: false, emailVerified: false, profile: null, accounts: [] }} view="card" />);
+  expect(screen.getByText("Pending ID verification")).toBeInTheDocument();
   expect(screen.getByRole("img", { name: "Email not verified" })).toBeInTheDocument();
   expect(screen.getByText("No linked accounts.")).toBeInTheDocument();
   expect(screen.getByText("No profile linked to this user.")).toBeInTheDocument();

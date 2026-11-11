@@ -40,6 +40,9 @@ Do not pretend that a list-only backend implements server query pagination.
 Loading, retry, empty/no-results, stale-data/background-refresh and mutation
 errors must be visible. Preserve prior usable rows while refetching.
 
+Use the shared 150 px default from `createActionsColumn` for resource action columns.
+Keep this size at the shared factory so resource tables use consistent spacing.
+
 Cards use the same row actions and selection state as the table. Keep actions
 on the front, detail content on the back and a manual return control. Compact
 cards keep essential identity and actions visible. Use resource detail renderers

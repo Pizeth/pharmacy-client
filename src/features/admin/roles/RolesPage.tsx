@@ -187,7 +187,6 @@ export function RolesPage() {
         }),
         createActionsColumn<ApplicationRole>({
           actions,
-          size: 152,
           maxInlineActions: 3,
         }),
       ]),

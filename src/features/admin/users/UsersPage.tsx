@@ -1,5 +1,5 @@
 "use client";
-import { ResourceStatusBadge } from "@/components/Tables/ResourceBadge";
+import { UserAccountStatus } from "./UserAccountStatus";
 import { resourceViewAction } from "@/components/Tables/resourceViewAction";
 import type { ColumnFiltersState, SortingState } from "@tanstack/table-core";
 import { useRouter } from "next/navigation";
@@ -52,8 +52,8 @@ export function UsersPage() {
     createSelectionColumn<AdminUser>(),
     helper.accessor("name", { header: "Name", meta: { label: "Name", filterLabel: "Name", filterVariant: "text" }, cell: ({ row }) => <UserIdentity user={row.original} /> }), helper.accessor("email", { header: "Email", meta: { label: "Email", filterLabel: "Email", filterVariant: "text" } }),
     helper.accessor("role", { header: "Role", cell: context => <RoleBadge role={findRole(roles.data, context.getValue(), context.row.original.roleId)} fallback={context.getValue()} />, meta: { label: "Role", filterLabel: "Role", filterOptionsLoading: roles.isLoading, filterOptionsError: roles.error?.message, align: "center", headerAlign: "center", filterVariant: "select", filterOptions: (roles.data ?? []).map(role => ({ value: String(role.id), label: role.name })) } }),
-    helper.accessor("banned", { header: "Status", cell: context => <ResourceStatusBadge active={!context.getValue()} inactiveLabel="Banned" inactiveColor="error" />, meta: { label: "Status", filterLabel: "Status", align: "center", headerAlign: "center", filterVariant: "select", filterOptions: [{ value: "false", label: "Active" }, { value: "true", label: "Banned" }] } }),
-    createActionsColumn<AdminUser>({ actions, size: 152, maxInlineActions: 3 }),
+    helper.accessor("banned", { header: "Status", cell: context => <UserAccountStatus user={context.row.original} />, meta: { label: "Status", filterLabel: "Status", align: "center", headerAlign: "center", filterVariant: "select", filterOptions: [{ value: "false", label: "Not banned" }, { value: "true", label: "Banned" }] } }),
+    createActionsColumn<AdminUser>({ actions, maxInlineActions: 3 }),
   ]), [actions, roles.data, roles.isLoading, roles.error]);
   const table = useMuiDataTable({ data: users.data?.users ?? EMPTY, columns, getRowId: row => row.id,
     getRowCanExpand: () => true, enableRowSelection: true, enableGlobalFilter: true, manualFiltering: true, manualPagination: true,
@@ -74,7 +74,7 @@ export function UsersPage() {
       {notice && <Alert severity="success" onClose={() => setNotice("")}>{notice}</Alert>}
       {users.data && <ResourceDataTable onViewRecord={record => router.push(`/admin/users/${encodeURIComponent(String(record.id))}`)} resourceId="admin/users" persistence={{ storageId: "admin/users", storage: adminTableStorage }} table={table} refreshing={users.isFetching}
         renderDetailPanel={({ row }) => <UserDetailPanel user={row.original} />}
-        card={{ renderDetail: ({ row }) => <UserDetailPanel user={row.original} view="card" />, enableSelection: true, enableExpansion: true, maxInlineActions: 3, detailMode: "flip", flip: { flipOnHover: false }, actions, renderHeader: ({ row }) => <UserIdentity user={row.original} />, renderBody: ({ row }) => <Typography>{row.original.email}</Typography>, renderMetadata: ({ row }) => <S.Actions><RoleBadge role={findRole(roles.data, row.original.role, row.original.roleId)} fallback={row.original.role} /><ResourceStatusBadge active={!row.original.banned} inactiveLabel="Banned" inactiveColor="error" /></S.Actions> }}
+        card={{ renderDetail: ({ row }) => <UserDetailPanel user={row.original} view="card" />, enableSelection: true, enableExpansion: true, maxInlineActions: 3, detailMode: "flip", flip: { flipOnHover: false }, actions, renderHeader: ({ row }) => <UserIdentity user={row.original} />, renderBody: ({ row }) => <Typography>{row.original.email}</Typography>, renderMetadata: ({ row }) => <S.Actions><RoleBadge role={findRole(roles.data, row.original.role, row.original.roleId)} fallback={row.original.role} /><UserAccountStatus user={row.original} /></S.Actions> }}
         toolbar={{ searchPlaceholder: "Search users…", startContent: <S.Actions><ResourceTableCreateButton startIcon={<AddRounded />} onClick={() => setEditor({ mode: "create" })}>Create user</ResourceTableCreateButton></S.Actions> }} />}
       {editor && <FormDialog open title={`${editor.mode === "create" ? "Create" : editor.mode === "edit" ? "Edit" : "Delete"} user`} pending={pending} onClose={back} icon={editor.mode === "create" ? <PersonAddOutlined /> : editor.mode === "edit" ? <EditOutlined /> : <DeleteOutline />}
         dedicatedPageHref={`/admin/users/${editor.mode}${editor.record ? `/${encodeURIComponent(editor.record.id)}` : ""}`} dedicatedPageLabel={`Open dedicated ${editor.mode} page`}>
