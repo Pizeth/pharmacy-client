@@ -20,7 +20,9 @@ const settingsSchema = z.object({
 
 async function request(path: string, method: string, body?: object, signal?: AbortSignal) {
   const token = sessionStorage.getItem(TOKEN_KEY);
-  const response = await fetch(`${API_URL.replace(/\/$/, "")}/api/account/settings${path}`, {
+  const endpoint = new URL("/api/account/settings", API_URL);
+  endpoint.pathname += path;
+  const response = await fetch(endpoint, {
     method,
     signal,
     credentials: "include",
@@ -70,7 +72,7 @@ export function ContactSettings({ userId }: { readonly userId: string }) {
   }
 
   if (settings.isPending) return <Typography role="status">Loading contact settings…</Typography>;
-  if (settings.isError) return <Alert severity="error" action={<Button onClick={() => settings.refetch()}>Retry</Button>}>Could not load contact settings.</Alert>;
+  if (settings.isError) return <Alert severity="error" action={<Button onClick={() => { void settings.refetch(); }}>Retry</Button>}>Could not load contact settings.</Alert>;
   const { phone, providers, links } = settings.data;
   return <>
     {mutation.error && <Alert severity="error">{mutation.error.message}</Alert>}
@@ -83,18 +85,18 @@ export function ContactSettings({ userId }: { readonly userId: string }) {
     </RecordCard>
     <RecordCard title="Social profile links">
       {links.map(link => (
-        <Stack component="form" key={link.id} spacing={2} onSubmit={event => saveLink(event, link.id)}>
+        <Stack component="form" key={link.id} spacing={2} onSubmit={event => { saveLink(event, link.id); }}>
           <Typography component="h3" variant="subtitle2">{link.provider.name}</Typography>
           <TextField name="handle" label="Profile handle" required defaultValue={link.handle} />
           <TextField name="url" label="Profile URL" type="url" defaultValue={link.url ?? ""} />
           <Stack direction="row" spacing={1}>
             <Button type="submit" disabled={mutation.isPending}>Save link</Button>
-            <Button color="error" disabled={mutation.isPending} onClick={() => mutation.mutate({ path: `/social-links/${link.id}`, method: "DELETE" })}>Remove link</Button>
+            <Button color="error" disabled={mutation.isPending} onClick={() => { mutation.mutate({ path: `/social-links/${link.id}`, method: "DELETE" }); }}>Remove link</Button>
           </Stack>
         </Stack>
       ))}
       {providers.length > 0 && (
-        <Stack component="form" spacing={2} onSubmit={event => saveLink(event)}>
+        <Stack component="form" spacing={2} onSubmit={event => { saveLink(event); }}>
           <TextField select name="providerId" label="Social network" defaultValue={providers[0].id}>
             {providers.map(provider => <MenuItem key={provider.id} value={provider.id}>{provider.name}</MenuItem>)}
           </TextField>

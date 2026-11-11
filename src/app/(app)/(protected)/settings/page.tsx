@@ -32,7 +32,7 @@ export default function AccountSettingsPage() {
       return [...(result.data?.social ?? []), ...(result.data?.generic ?? [])];
     },
   });
-  const [feedback, setFeedback] = useState<{ message: string; severity: "success" | "error" }>();
+  const [feedback, setFeedback] = useState<{ message: string; severity: "success" | "error" } | null>(null);
   const [pending, setPending] = useState(false);
   const linkedProviders = new Set(accounts.data?.map(account => account.providerId));
 
@@ -40,7 +40,7 @@ export default function AccountSettingsPage() {
     event.preventDefault();
     const fields = new FormData(event.currentTarget);
     setPending(true);
-    setFeedback(undefined);
+    setFeedback(null);
     try {
       const name = String(fields.get("name") ?? "").trim();
       const username = String(fields.get("username") ?? "").trim();
@@ -60,7 +60,7 @@ export default function AccountSettingsPage() {
 
   async function connect(provider: "google" | "facebook" | "telegram") {
     setPending(true);
-    setFeedback(undefined);
+    setFeedback(null);
     try {
       const result = await authClient.linkSocial({
         provider,
@@ -79,7 +79,7 @@ export default function AccountSettingsPage() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     setPending(true);
-    setFeedback(undefined);
+    setFeedback(null);
     try {
       const result = await authClient.changeEmail({
         newEmail: String(data.get("email") ?? "").trim(),
@@ -107,14 +107,14 @@ export default function AccountSettingsPage() {
         {!isPending && !user && <Alert severity="error">Your session could not be loaded.</Alert>}
         {user && <>
           <RecordCard title="Profile">
-            <Stack component="form" key={user.id} spacing={2} onSubmit={saveProfile}>
+            <Stack component="form" key={user.id} spacing={2} onSubmit={event => { void saveProfile(event); }}>
               <TextField name="name" label="Display name" required defaultValue={user.name} />
               <TextField name="username" label="Username" defaultValue={user.username ?? ""} />
               <Button type="submit" variant="contained" disabled={pending}>Save profile</Button>
             </Stack>
           </RecordCard>
           <RecordCard title="Email address" description={`Current email: ${user.email}`}>
-            <Stack component="form" spacing={2} onSubmit={changeEmail}>
+            <Stack component="form" spacing={2} onSubmit={event => { void changeEmail(event); }}>
               <TextField name="email" type="email" label="New email address" required />
               <Button type="submit" variant="contained" disabled={pending}>Send verification email</Button>
             </Stack>
@@ -122,7 +122,7 @@ export default function AccountSettingsPage() {
           <ContactSettings userId={user.id} />
           <RecordCard title="Connected sign-in accounts">
             {accounts.isPending && <Typography role="status">Loading connected accounts…</Typography>}
-            {accounts.isError && <Alert severity="error" action={<Button onClick={() => accounts.refetch()}>Retry</Button>}>Could not load connected accounts.</Alert>}
+            {accounts.isError && <Alert severity="error" action={<Button onClick={() => { void accounts.refetch(); }}>Retry</Button>}>Could not load connected accounts.</Alert>}
             {accounts.data && <>
               {accounts.data.length === 0 && <Typography>No connected accounts.</Typography>}
               {Array.from(linkedProviders).map(provider =>
@@ -131,7 +131,7 @@ export default function AccountSettingsPage() {
               {(["google", "facebook", "telegram"] as const).filter(provider =>
                 providers.data?.includes(provider) && !linkedProviders.has(provider)
               ).map(provider => (
-                <Button key={provider} variant="outlined" disabled={pending} onClick={() => connect(provider)}>
+                <Button key={provider} variant="outlined" disabled={pending} onClick={() => { void connect(provider); }}>
                   Connect {provider.charAt(0).toUpperCase() + provider.slice(1)}
                 </Button>
               ))}

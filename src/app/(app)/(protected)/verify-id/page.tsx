@@ -93,16 +93,6 @@ const ButtonContainer = styled(Box, {
   flexDirection: "column", // Stack the input, error, and button h
 }));
 
-const ButtonWrapper = styled(Box, {
-  name: PREFIX,
-  slot: "ButtonWrapper",
-  overridesResolver: (_props, styles) => styles.buttonWrapper,
-})(({ theme }) => ({
-  height: "100%",
-  display: "flex",
-  alignItems: "center",
-}));
-
 export default function VerifyIdPage() {
   const { mutate: logout, isPending: signingOut } = useLogout();
   const { refetch: refreshIdentity } = useGetIdentity();
@@ -119,7 +109,7 @@ export default function VerifyIdPage() {
     },
   });
   const needsEmail = hasPlaceholder || (!user?.emailVerified && accounts.data?.some(account => account.providerId === "telegram"));
-  const [emailFeedback, setEmailFeedback] = useState<{ message: string; severity: "info" | "error" }>();
+  const [emailFeedback, setEmailFeedback] = useState<{ message: string; severity: "info" | "error" } | null>(null);
   const [sendingEmail, setSendingEmail] = useState(false);
   const awaitingSignInMethods = !user || (!user.emailVerified && !hasPlaceholder && accounts.isPending);
   const router = useRouter();
@@ -133,7 +123,7 @@ export default function VerifyIdPage() {
       return;
     }
     setSendingEmail(true);
-    setEmailFeedback(undefined);
+    setEmailFeedback(null);
     try {
       const callbackURL = new URL(window.location.pathname + window.location.search, window.location.origin).href;
       const result = email.toLowerCase() === user?.email.toLowerCase()
@@ -259,7 +249,7 @@ export default function VerifyIdPage() {
         You can manage connected sign-in methods in Account settings.
       </Alert>
       {needsEmail ? (
-        <Stack component="form" spacing={2} onSubmit={sendEmailVerification}>
+        <Stack component="form" spacing={2} onSubmit={event => { void sendEmailVerification(event); }}>
           <Alert severity="info">Verify your email before linking your officer ID.</Alert>
           {emailFeedback && <Alert severity={emailFeedback.severity}>{emailFeedback.message}</Alert>}
           <MuiTextField name="email" type="email" label="Email address" required defaultValue={hasPlaceholder ? "" : user?.email} />
@@ -268,11 +258,11 @@ export default function VerifyIdPage() {
       ) : awaitingSignInMethods ? (
         <Alert severity="info">Checking your sign-in methods…</Alert>
       ) : accounts.isError ? (
-        <Alert severity="error" action={<Button onClick={() => accounts.refetch()}>Retry</Button>}>Could not check your sign-in methods.</Alert>
+        <Alert severity="error" action={<Button onClick={() => { void accounts.refetch(); }}>Retry</Button>}>Could not check your sign-in methods.</Alert>
       ) : (
       <FormProvider {...form}>
         <FormContainer
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={event => { void handleSubmit(onSubmit)(event); }}
           // className={className}
           // sx={sx}
           // {...rest}
@@ -326,7 +316,6 @@ export default function VerifyIdPage() {
           {loading ? "Verifying..." : "Verify"}
         </button> */}
           <ButtonContainer>
-            <ButtonWrapper>
               <Button
                 loading={isPending}
                 disabled={!isReady}
@@ -335,7 +324,6 @@ export default function VerifyIdPage() {
               >
                 {isPending ? "កំពុងផ្ទៀងផ្ទាត់..." : "ផ្ទៀងផ្ទាត់"}
               </Button>
-            </ButtonWrapper>
             {/* Dummy spacer matches MUI's error text height perfectly */}
             {hasError && (
               <FormHelperText sx={{ visibility: "hidden" }}>
