@@ -237,7 +237,7 @@ export default function VerifyIdPage() {
   const hasError = Boolean(errors.officialId);
   // console.log("hasError", hasError);
 
-  const onSubmit = async (values: VerifyValues) => {
+  const onSubmit = (values: VerifyValues) => {
     // e.preventDefault();
     // setLoading(true);
     // setError(null);
