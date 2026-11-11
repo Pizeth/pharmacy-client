@@ -242,6 +242,25 @@ export default function VerifyIdPage() {
     // }
   };
 
+  const submitControl = (
+    <ButtonContainer>
+        <Button
+          loading={isPending}
+          disabled={!isReady}
+          type="submit" // Crucial fix: explicitly enables form submission
+          variant="contained" // Gives the button background color
+        >
+          {isPending ? "កំពុងផ្ទៀងផ្ទាត់..." : "ផ្ទៀងផ្ទាត់"}
+        </Button>
+      {/* Dummy spacer matches MUI's error text height perfectly */}
+      {hasError && (
+        <FormHelperText sx={{ visibility: "hidden" }}>
+          &nbsp;
+        </FormHelperText>
+      )}
+    </ButtonContainer>
+  );
+
   const officerIdForm = (
       <FormProvider {...form}>
         <FormContainer
@@ -298,22 +317,7 @@ export default function VerifyIdPage() {
           {/* <button type="submit" disabled={loading}>
           {loading ? "Verifying..." : "Verify"}
         </button> */}
-          <ButtonContainer>
-              <Button
-                loading={isPending}
-                disabled={!isReady}
-                type="submit" // Crucial fix: explicitly enables form submission
-                variant="contained" // Gives the button background color
-              >
-                {isPending ? "កំពុងផ្ទៀងផ្ទាត់..." : "ផ្ទៀងផ្ទាត់"}
-              </Button>
-            {/* Dummy spacer matches MUI's error text height perfectly */}
-            {hasError && (
-              <FormHelperText sx={{ visibility: "hidden" }}>
-                &nbsp;
-              </FormHelperText>
-            )}
-          </ButtonContainer>
+          {submitControl}
         </FormContainer>
       </FormProvider>
   );

@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent } from "react";
 import { z } from "zod";
 import { RecordCard } from "@/components/Tables/ResourceRecordPage";
-import { API_URL, TOKEN_KEY } from "@/types/constants";
+import { TOKEN_KEY } from "@/types/constants";
 
 const settingsSchema = z.object({
   phone: z.string().nullable(),
@@ -18,16 +18,11 @@ const settingsSchema = z.object({
   })),
 });
 
-type SettingsPath = "" | "/phone" | "/social-links" | `/social-links/${number}`;
+type SettingsPath = "" | "/phone" | "/social-links";
 
 async function request(path: SettingsPath, method: string, body?: object, signal?: AbortSignal) {
-  if (path !== "" && path !== "/phone" && !/^\/social-links(?:\/[1-9]\d*)?$/.test(path)) {
-    throw new Error("Invalid account settings route.");
-  }
   const token = sessionStorage.getItem(TOKEN_KEY);
-  const endpoint = new URL("/api/account/settings", API_URL);
-  endpoint.pathname += path;
-  const response = await fetch(endpoint, {
+  const options: RequestInit = {
     method,
     redirect: "error",
     signal,
@@ -37,7 +32,18 @@ async function request(path: SettingsPath, method: string, body?: object, signal
       ...(token && { Authorization: `Bearer ${token}` }),
     },
     ...(body && { body: JSON.stringify(body) }),
-  });
+  };
+  let response: Response;
+  switch (path) {
+    case "/phone":
+      response = await fetch("/api/account/settings/phone", options);
+      break;
+    case "/social-links":
+      response = await fetch("/api/account/settings/social-links", options);
+      break;
+    default:
+      response = await fetch("/api/account/settings", options);
+  }
   const result = await response.json();
   if (!response.ok) throw new Error(result?.message || "Could not save account settings.");
   return result?.data ?? result;
@@ -71,9 +77,9 @@ export function ContactSettings({ userId }: { readonly userId: string }) {
       ...(id === undefined ? { providerId: Number(data.get("providerId")) } : {}),
     };
     mutation.mutate({
-      path: id === undefined ? "/social-links" : `/social-links/${id}`,
+      path: "/social-links",
       method: id === undefined ? "POST" : "PATCH",
-      body,
+      body: id === undefined ? body : { id, changes: body },
     }, { onSuccess: () => { if (id === undefined) form.reset(); } });
   }
 
@@ -97,7 +103,7 @@ export function ContactSettings({ userId }: { readonly userId: string }) {
           <TextField name="url" label="Profile URL" type="url" defaultValue={link.url ?? ""} />
           <Stack direction="row" spacing={1}>
             <Button type="submit" disabled={mutation.isPending}>Save link</Button>
-            <Button color="error" disabled={mutation.isPending} onClick={() => { mutation.mutate({ path: `/social-links/${link.id}`, method: "DELETE" }); }}>Remove link</Button>
+            <Button color="error" disabled={mutation.isPending} onClick={() => { mutation.mutate({ path: "/social-links", method: "DELETE", body: { id: link.id } }); }}>Remove link</Button>
           </Stack>
         </Stack>
       ))}
