@@ -13,6 +13,7 @@ import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { ResourceTableCreateButton } from "@/components/Tables/ResourceTableCreateButton";
 import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
 import { ResourceDataTable } from "@/components/Tables/ResourceDataTable";
+import { resourceRecordMenuActions } from "@/components/Tables/resourceRecordMenuActions";
 import {
   createMuiDataTableColumnHelper,
   useMuiDataTable,
@@ -131,6 +132,13 @@ export function TrackingPage() {
             `/admin/documents/${encodeURIComponent(row.original.id)}`,
           ),
       },
+      ...resourceRecordMenuActions<TrackedDocument>({
+        basePath: "/admin/documents",
+        navigate: router.push,
+        canEdit: record => record.permissions.canManage,
+        canDelete: record => record.permissions.canManage,
+        deleteLabel: "Open archive page",
+      }),
     ],
     [router],
   );

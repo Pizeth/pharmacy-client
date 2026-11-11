@@ -1,4 +1,5 @@
 "use client";
+import { setFormIssues, showFieldIssue } from "@/components/forms/formValidationFeedback";
 import { FormActions } from "@/components/forms/FormActions";
 import { AccountTreeOutlined, ArchiveOutlined, ArticleOutlined, CallMade, CallReceived, CategoryOutlined, DescriptionOutlined, FlagOutlined, FormatListNumbered, Inventory2Outlined, LabelOutlined, NotesOutlined, PersonOutline } from "@mui/icons-material";
 import { useEffect, useRef, useState } from "react";
@@ -17,7 +18,7 @@ import {
 import * as S from "./styles";
 import { TrackingDateTimeField } from "./TrackingDateTimeField";
 import { AttachmentFields } from "./AttachmentFields";
-import { getAttachmentDraft, type AttachmentKind } from "./attachmentDraft";
+import { AttachmentValidationError, getAttachmentDraft, isAttachmentDraftValid, type AttachmentKind } from "./attachmentDraft";
 
 export type DocumentFormMode = "create" | "edit" | "delete";
 export const toLocalDate = (date: string) =>
@@ -70,43 +71,40 @@ export function DocumentForm({
       attachmentSource: "upload",
       attachmentName: "",
       attachmentUrl: "",
+      attachmentFile: "",
       attachmentKind: "INCOMING" as AttachmentKind,
     },
   });
-  const [validation, setValidation] = useState("");
+  const draft = form.watch();
+  function parseDocument(values: typeof draft) {
+    return documentInputSchema.safeParse({
+      ...values,
+      subtype: nullable(values.subtype),
+      incomingNumber: nullable(values.incomingNumber),
+      outgoingNumber: nullable(values.outgoingNumber),
+      receivedAt: fromLocalDate(values.receivedAt),
+      dueAt: fromLocalDate(values.dueAt),
+      responsibleDepartmentId: number(values.responsibleDepartmentId),
+      assignedToId: number(values.assignedToId),
+      storageLocationCode: nullable(values.storageLocationCode),
+      chronologicalCode: nullable(values.chronologicalCode),
+      archiveSequence: number(values.archiveSequence),
+      notes: nullable(values.notes),
+    });
+  }
   const [registered, setRegistered] = useState<DocumentDetail | null>(null);
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const mutation = useMutation({
-    mutationFn: async () => {
-      const values = form.getValues();
-      if (mode === "delete") {
-        if (!values.reason.trim())
-          throw new Error("Give a reason for archiving this record.");
-        return trackingApi.archive(
-          initial.current!.id,
-          initial.current!.version,
-          values.reason.trim(),
-        );
+    mutationFn: async (input:
+      | { reason: string }
+      | { data: ReturnType<typeof documentInputSchema.parse> | null; attachment: ReturnType<typeof getAttachmentDraft> | null }
+    ) => {
+      if ("reason" in input) {
+        return trackingApi.archive(initial.current!.id, initial.current!.version, input.reason);
       }
-      const attachment = mode === "create" ? getAttachmentDraft({ source: values.attachmentSource, name: values.attachmentName, url: values.attachmentUrl, kind: values.attachmentKind }, attachmentFile, values.title) : null;
+      const { data, attachment } = input;
       let saved = registered;
-      if (!saved) {
-        const data = documentInputSchema.parse({
-          ...values,
-          subtype: nullable(values.subtype),
-          incomingNumber: nullable(values.incomingNumber),
-          outgoingNumber: nullable(values.outgoingNumber),
-          receivedAt: fromLocalDate(values.receivedAt),
-          dueAt: fromLocalDate(values.dueAt),
-          responsibleDepartmentId: number(values.responsibleDepartmentId),
-          assignedToId: number(values.assignedToId),
-          storageLocationCode: nullable(values.storageLocationCode),
-          chronologicalCode: nullable(values.chronologicalCode),
-          archiveSequence: number(values.archiveSequence),
-          notes: nullable(values.notes),
-        });
-        if (data.dueAt && new Date(data.dueAt) < new Date(data.receivedAt))
-          throw new Error("Due time cannot be before receipt time.");
+      if (data) {
         saved = await trackingApi.save(
           data,
           mode === "edit" ? initial.current : undefined,
@@ -116,6 +114,7 @@ export function DocumentForm({
           await client.invalidateQueries({ queryKey: ["document-tracking"] });
         }
       }
+      if (!saved) throw new Error("Document registration has not completed.");
       if (attachment?.source === "upload") return trackingApi.uploadAttachment(saved.id, saved.version, { name: attachment.name, kind: attachment.kind }, attachment.file);
       if (attachment?.source === "link") return trackingApi.attachment(saved.id, saved.version, { name: attachment.name, kind: attachment.kind, url: attachment.url });
       return saved;
@@ -129,6 +128,15 @@ export function DocumentForm({
     onPendingChange?.(mutation.isPending);
   }, [mutation.isPending, onPendingChange]);
   const pending = mutation.isPending;
+  const parsedDraft = !registered && mode !== "delete" ? parseDocument(draft) : null;
+  const datesValid = !parsedDraft?.success || !parsedDraft.data.dueAt ||
+    new Date(parsedDraft.data.dueAt) >= new Date(parsedDraft.data.receivedAt);
+  const valid = mode === "delete" ? !!draft.reason.trim() :
+    (registered || (parsedDraft?.success && datesValid)) &&
+    (mode !== "create" || isAttachmentDraftValid({
+      source: draft.attachmentSource, name: draft.attachmentName,
+      url: draft.attachmentUrl, kind: draft.attachmentKind,
+    }, attachmentFile, draft.title));
   const metadataLocked = pending || !!registered;
   const conflict =
     mutation.error instanceof TrackingRequestError &&
@@ -138,18 +146,67 @@ export function DocumentForm({
       <S.Form
         noValidate
         aria-busy={pending}
+        onBlur={event => {
+          const values = form.getValues();
+          if (mode === "delete") {
+            if (!values.reason.trim()) showFieldIssue(form, event.target, [{ path: ["reason"], message: "Give a reason for archiving this record." }]);
+            return;
+          }
+          if (!registered) {
+            const result = parseDocument(values);
+            if (!result.success) showFieldIssue(form, event.target, result.error.issues);
+            else if (result.data.dueAt && new Date(result.data.dueAt) < new Date(result.data.receivedAt)) {
+              showFieldIssue(form, event.target, [{ path: ["dueAt"], message: "Due time cannot be before receipt time." }]);
+            }
+          }
+          if (mode === "create") {
+            try {
+              getAttachmentDraft({ source: values.attachmentSource, name: values.attachmentName, url: values.attachmentUrl, kind: values.attachmentKind }, attachmentFile, values.title);
+            } catch (error) {
+              if (!(error instanceof AttachmentValidationError)) throw error;
+              const fields = { name: "attachmentName", url: "attachmentUrl", file: "attachmentFile" };
+              showFieldIssue(form, event.target, [{ path: [fields[error.field]], message: error.message }]);
+            }
+          }
+        }}
         onSubmit={async (event) => {
           event.preventDefault();
           if (inFlight.current || conflict) return;
+          form.clearErrors();
+          const values = form.getValues();
+          if (mode === "delete" && !values.reason.trim()) {
+            setFormIssues(form, [{ path: ["reason"], message: "Give a reason for archiving this record." }]);
+            return;
+          }
+          let data: ReturnType<typeof documentInputSchema.parse> | null = null;
+          if (mode !== "delete" && !registered) {
+            const parsed = parseDocument(values);
+            if (!parsed.success) {
+              setFormIssues(form, parsed.error.issues);
+              return;
+            }
+            data = parsed.data;
+            if (data.dueAt && new Date(data.dueAt) < new Date(data.receivedAt)) {
+              setFormIssues(form, [{ path: ["dueAt"], message: "Due time cannot be before receipt time." }]);
+              return;
+            }
+          }
+          let attachment: ReturnType<typeof getAttachmentDraft> | null = null;
+          if (mode === "create") {
+            try {
+              attachment = getAttachmentDraft({ source: values.attachmentSource, name: values.attachmentName, url: values.attachmentUrl, kind: values.attachmentKind }, attachmentFile, values.title);
+            } catch (error) {
+              if (!(error instanceof AttachmentValidationError)) throw error;
+              const fields = { name: "attachmentName", url: "attachmentUrl", file: "attachmentFile" };
+              setFormIssues(form, [{ path: [fields[error.field]], message: error.message }]);
+              return;
+            }
+          }
           inFlight.current = true;
-          setValidation("");
           try {
-            await mutation.mutateAsync();
-          } catch (error) {
-            if (error && typeof error === "object" && "issues" in error)
-              setValidation(
-                "Check the required fields, dates and positive archive number.",
-              );
+            await mutation.mutateAsync(mode === "delete" ? { reason: values.reason.trim() } : { data, attachment });
+          } catch {
+            // The form presents request errors.
           } finally {
             inFlight.current = false;
           }
@@ -186,7 +243,7 @@ export function DocumentForm({
             />
             {mode === "create" && <>
               <Typography component="h3" variant="h6">Document file (required)</Typography>
-              <AttachmentFields names={{ source: "attachmentSource", name: "attachmentName", url: "attachmentUrl", kind: "attachmentKind" }} useDocumentTitle file={attachmentFile} onFileChange={setAttachmentFile} disabled={pending} />
+              <AttachmentFields names={{ source: "attachmentSource", name: "attachmentName", url: "attachmentUrl", file: "attachmentFile", kind: "attachmentKind" }} useDocumentTitle file={attachmentFile} onFileChange={setAttachmentFile} disabled={pending} />
             </>}
             <S.FieldGrid>
               <SelectField
@@ -313,11 +370,11 @@ export function DocumentForm({
           </>
         )}
         {registered && mutation.error && <Alert severity="warning">The document is saved, but its required attachment could not be confirmed. Retry the upload or provide a file URL to complete registration.</Alert>}
-        {(validation || mutation.error) && (
+        {mutation.error && (
           <Alert severity="error">
             {conflict
               ? "This document changed while the form was open. Close and reopen it to review the latest version before saving."
-              : validation || mutation.error?.message}
+              : mutation.error.message}
           </Alert>
         )}
         <FormActions>
@@ -329,7 +386,7 @@ export function DocumentForm({
             variant="contained"
             color={mode === "delete" ? "error" : "success"}
             loading={pending}
-            disabled={pending || conflict}
+            disabled={pending || conflict || !valid}
           >
             {mode === "delete"
               ? "Archive record"

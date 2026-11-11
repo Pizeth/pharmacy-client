@@ -8,7 +8,7 @@ function slot(name: Capitalize<AdminSocialSlot>) {
   const key = name.charAt(0).toLowerCase() + name.slice(1);
   return { name: "RazethAdminSocial", slot: name, overridesResolver: (_: unknown, styles: Record<string, CSSInterpolation>) => styles[key] };
 }
-export const Root = styled("div", slot("Root"))(({ theme }) => ({ display: "grid", gap: theme.spacing(3), paddingBlock: theme.spacing(2) }));
+export const Root = styled("div", slot("Root"))(({ theme }) => ({ display: "grid", gap: theme.spacing(3), paddingBlock: theme.spacing(2), '&[data-page-content]': { paddingBlock: 0 } }));
 export const Panel = styled("section", slot("Panel"))(({ theme }) => {
   const palette = (theme.vars ?? theme).palette;
   const tint = (color: string, amount: number) => theme.alpha ? theme.alpha(color, amount) : alpha(color, amount);

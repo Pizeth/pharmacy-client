@@ -3,6 +3,7 @@
 import type { RowData } from "@tanstack/table-core";
 import { createMuiDataTableColumnHelper } from "../../table";
 import { DataTableRowActions } from "./DataTableRowActions";
+import { STANDARD_ROW_ACTION_COLUMN_SIZE } from "./rowActionStyles";
 import { DATA_TABLE_ACTIONS_COLUMN_ID } from "./types";
 import type { CreateActionsColumnOptions } from "./types";
 
@@ -20,7 +21,7 @@ export function createActionsColumn<TData extends RowData>(
   const {
     actions,
     header = "Actions",
-    size = 150,
+    size = STANDARD_ROW_ACTION_COLUMN_SIZE,
     maxInlineActions = 2,
     enablePinning = true,
   } = options;

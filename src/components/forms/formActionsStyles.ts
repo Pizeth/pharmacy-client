@@ -10,6 +10,12 @@ export function formActionsStyles(theme: Theme): CSSObject {
     justifyContent: "flex-end",
     gap: theme.spacing(1.5),
     "& > .MuiButton-root": { ...resourceNeumorphicStyles(theme), minHeight: 40 },
+    "& > .MuiButton-root.MuiButton-contained[type='submit']": {
+      color: theme.palette.common.white,
+      "&:hover, &.Mui-focusVisible, &.Mui-disabled": {
+        color: theme.palette.common.white,
+      },
+    },
     [theme.breakpoints.down("sm")]: {
       flexDirection: "column-reverse",
       alignItems: "stretch",

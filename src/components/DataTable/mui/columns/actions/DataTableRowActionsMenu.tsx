@@ -69,38 +69,49 @@ export function DataTableRowActionsMenu<TData extends RowData>(
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const open = anchorEl !== null;
+  const row = actions[0]?.context.row;
+  const disabled = !row?.getIsSelected();
+  const open = !disabled && anchorEl !== null;
+
+  if (disabled && anchorEl !== null) {
+    setAnchorEl(null);
+  }
 
   const handleOpen = (event: MouseEvent<HTMLButtonElement>): void => {
     event.preventDefault();
     event.stopPropagation();
 
-    setAnchorEl(event.currentTarget);
+    if (!disabled) {
+      setAnchorEl(event.currentTarget);
+    }
   };
 
   const handleClose = (): void => {
     setAnchorEl(null);
   };
 
-  if (actions.length === 0) {
+  if (!row) {
     return null;
   }
 
-  const rowId = actions[0].context.row.id;
+  const rowId = row.id;
 
   return (
     <>
-      <Tooltip title="More actions">
-        <MenuButtonRoot
-          className={dataTableClasses.rowActionsMenuButton}
-          size="small"
-          aria-label={`More actions for row ${rowId}`}
-          aria-haspopup="menu"
-          aria-expanded={open ? "true" : undefined}
-          onClick={handleOpen}
-        >
-          <MoreVert fontSize="small" />
-        </MenuButtonRoot>
+      <Tooltip title={disabled ? "Select this row to use more actions" : "More actions"}>
+        <span onClick={(event) => event.stopPropagation()}>
+          <MenuButtonRoot
+            className={dataTableClasses.rowActionsMenuButton}
+            size="small"
+            disabled={disabled}
+            aria-label={`More actions for row ${rowId}`}
+            aria-haspopup="menu"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleOpen}
+          >
+            <MoreVert fontSize="small" />
+          </MenuButtonRoot>
+        </span>
       </Tooltip>
 
       <Menu

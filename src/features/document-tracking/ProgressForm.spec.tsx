@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { ProgressForm, AttachmentForm } from "./ProgressForm";
-import { DocumentForm } from "./DocumentForm";
+import { DocumentForm } from "./DocumentTrackingForm";
 import { DocumentDetailContent } from "./DocumentDetail";
 import { trackingApi, TrackingRequestError } from "./api";
 import { trackingMetadata, trackingRecord } from "./tracking.test-fixtures";
@@ -57,9 +57,16 @@ it("requires an attachment before creating the document record", async () => {
   mount(<DocumentForm mode="create" metadata={trackingMetadata} onCancel={jest.fn()} onSuccess={success} />);
   expect(screen.getByLabelText("Attachment file").closest("label")).toHaveTextContent("Upload file");
   expect(screen.getByRole("combobox", { name: "Attachment source" })).toBeInTheDocument();
+  const submit = screen.getByRole("button", { name: "Register document" });
+  expect(submit).toBeDisabled();
+  fireEvent.blur(screen.getByRole("textbox", { name: /Document title/ }));
+  expect(screen.getByText("Document title is required.")).toBeInTheDocument();
   fillRegistration();
-  fireEvent.click(screen.getByRole("button", { name: "Register document" }));
+  expect(submit).toBeDisabled();
+  fireEvent.submit(submit.closest("form")!);
   expect(await screen.findByText("Choose a non-empty file to upload.")).toBeInTheDocument();
+  expect(screen.getByLabelText("Attachment file")).toHaveAccessibleDescription("Choose a non-empty file to upload.");
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   expect(save).not.toHaveBeenCalled();
   expect(success).not.toHaveBeenCalled();
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Attachment source" }));
@@ -107,7 +114,9 @@ it("blocks registration when the link option has an empty URL", async () => {
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Attachment source" }));
   fireEvent.click(screen.getByRole("option", { name: "File URL" }));
   expect(screen.getByRole("textbox", { name: /File URL/ })).toBeRequired();
-  fireEvent.click(screen.getByRole("button", { name: "Register document" }));
+  const submit = screen.getByRole("button", { name: "Register document" });
+  expect(submit).toBeDisabled();
+  fireEvent.blur(screen.getByRole("textbox", { name: /File URL/ }));
   expect(await screen.findByText("Enter an HTTP or HTTPS file URL.")).toBeInTheDocument();
   expect(save).not.toHaveBeenCalled();
 });
@@ -118,7 +127,9 @@ it("rejects an invalid attachment URL before registering the document", async ()
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Attachment source" }));
   fireEvent.click(screen.getByRole("option", { name: "File URL" }));
   fireEvent.change(screen.getByRole("textbox", { name: /File URL/ }), { target: { value: "javascript:alert(1)" } });
-  fireEvent.click(screen.getByRole("button", { name: "Register document" }));
+  const submit = screen.getByRole("button", { name: "Register document" });
+  expect(submit).toBeDisabled();
+  fireEvent.blur(screen.getByRole("textbox", { name: /File URL/ }));
   expect(await screen.findByText("Enter an HTTP or HTTPS file URL.")).toBeInTheDocument();
   expect(save).not.toHaveBeenCalled();
 });
@@ -199,7 +210,9 @@ it("requires an archive reason and makes no request on navigation or cancel", as
     />,
   );
   expect(archive).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole("button", { name: "Archive record" }));
+  const submit = screen.getByRole("button", { name: "Archive record" });
+  expect(submit).toBeDisabled();
+  fireEvent.submit(submit.closest("form")!);
   expect(
     await screen.findByText("Give a reason for archiving this record."),
   ).toBeInTheDocument();

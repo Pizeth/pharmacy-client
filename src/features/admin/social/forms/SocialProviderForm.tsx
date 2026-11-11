@@ -1,7 +1,8 @@
 "use client";
+import { setFormIssues, showFieldIssue } from "@/components/forms/formValidationFeedback";
 import { FormActions } from "@/components/forms/FormActions";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert, Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import { providerInputSchema, socialApi, type ProviderInput, type SocialProvider } from "../api";
@@ -27,7 +28,6 @@ export function SocialProviderForm({ mode, record, onCancel, onSuccess, onPendin
     key: record.key, name: record.name, websiteUrl: record.websiteUrl, icon: record.icon, isEnabled: record.isEnabled,
   } : empty });
   const draft = form.watch();
-  const [validation, setValidation] = useState("");
   const inFlight = useRef(false);
   const mutation = useMutation({
     mutationFn: (data: ProviderInput) => mode === "delete"
@@ -41,12 +41,17 @@ export function SocialProviderForm({ mode, record, onCancel, onSuccess, onPendin
   useEffect(() => { onPendingChange?.(mutation.isPending); }, [mutation.isPending, onPendingChange]);
   const pending = mutation.isPending;
   const destructive = mode === "delete";
-  return <FormProvider {...form}><S.Form noValidate aria-busy={pending} onSubmit={async event => {
+  const parse = (values: ProviderInput) => providerInputSchema.safeParse({
+    ...values, websiteUrl: values.websiteUrl || null, icon: values.icon || null,
+  });
+  const valid = destructive || parse(draft).success;
+  return <FormProvider {...form}><S.Form noValidate aria-busy={pending} onBlur={event => { const result = parse(form.getValues()); if (!destructive && !result.success) showFieldIssue(form, event.target, result.error.issues); }} onSubmit={async event => {
     event.preventDefault();
     if (inFlight.current || (mode !== "create" && !record)) return;
-    const parsed = providerInputSchema.safeParse({ ...form.getValues(), websiteUrl: form.getValues("websiteUrl") || null, icon: form.getValues("icon") || null });
-    if (!destructive && !parsed.success) { setValidation(parsed.error.issues[0].message); return; }
-    setValidation(""); inFlight.current = true;
+    form.clearErrors();
+    const parsed = parse(form.getValues());
+    if (!destructive && !parsed.success) { setFormIssues(form, parsed.error.issues); return; }
+    inFlight.current = true;
     try { await mutation.mutateAsync(parsed.success ? parsed.data : draft); }
     catch { /* Mutation state presents the API error without dismissing the form. */ }
     finally { inFlight.current = false; }
@@ -61,10 +66,10 @@ export function SocialProviderForm({ mode, record, onCancel, onSuccess, onPendin
       <TextField name="icon" iconStart={<Image fontSize="small" />} fullWidth label="Icon key" helperText="For example: telegram, facebook, instagram or youtube." disabled={pending} />
       <FormControlLabel label="Enabled" control={<Checkbox checked={draft.isEnabled} onChange={(_, checked) => form.setValue("isEnabled", checked)} disabled={pending} />} />
     </>}
-    {(validation || mutation.error) && <Alert severity="error">{validation || mutation.error?.message}</Alert>}
+    {mutation.error && <Alert severity="error">{mutation.error.message}</Alert>}
     <FormActions>
       <Button autoFocus={destructive} variant="outlined" disabled={pending} onClick={onCancel}>Cancel</Button>
-      <Button variant="contained" color={destructive ? "error" : "success"} type="submit" disabled={pending || (mode !== "create" && !record)} loading={pending}>
+      <Button variant="contained" color={destructive ? "error" : "success"} type="submit" disabled={pending || !valid || (mode !== "create" && !record)} loading={pending}>
         {destructive ? "Delete provider" : mode === "edit" ? "Save changes" : "Create provider"}
       </Button>
     </FormActions>

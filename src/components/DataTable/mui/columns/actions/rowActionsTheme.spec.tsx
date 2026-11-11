@@ -11,6 +11,7 @@ import { dataTableClasses } from "../../styles";
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "../../table";
 
 import { createActionsColumn } from "./createActionsColumn";
+import { createSelectionColumn } from "../selection";
 
 import type { DataTableRowAction } from "./types";
 
@@ -45,6 +46,7 @@ const actions: readonly DataTableRowAction<Row>[] = [
 ];
 
 const columns = helper.columns([
+  createSelectionColumn<Row>(),
   helper.accessor("name", {
     header: "Name",
   }),
@@ -69,6 +71,7 @@ function Fixture() {
     ],
 
     getRowId: (row) => row.id,
+    enableRowSelection: true,
   });
 
   return <DataTable table={table} toolbar={false} pagination={false} />;
@@ -130,6 +133,12 @@ it("exposes row-action surfaces as named RazethDataTable theme slots", () => {
   });
 
   expect(more).toHaveClass(dataTableClasses.rowActionsMenuButton);
+  expect(more).toBeDisabled();
+  fireEvent.click(more);
+  expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("checkbox", { name: "Select row alpha" }));
+  expect(more).toBeEnabled();
 
   fireEvent.click(more);
 

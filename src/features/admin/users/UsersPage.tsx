@@ -1,12 +1,13 @@
 "use client";
 import { UserAccountStatus } from "./UserAccountStatus";
 import { resourceViewAction } from "@/components/Tables/resourceViewAction";
+import { resourceRecordMenuActions } from "@/components/Tables/resourceRecordMenuActions";
 import type { ColumnFiltersState, SortingState } from "@tanstack/table-core";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Alert, Button, Typography } from "@mui/material";
-import { PersonAddOutlined, AddRounded, DeleteOutline, EditOutlined, OpenInNew } from "@mui/icons-material";
+import { PersonAddOutlined, AddRounded, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { ResourceTableCreateButton } from "@/components/Tables/ResourceTableCreateButton";
 import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
@@ -45,7 +46,11 @@ export function UsersPage() {
       resourceViewAction<AdminUser>(router.push, record => `/admin/users/${encodeURIComponent(String(record.id))}`),
     { id: "edit", color: "error", label: "Edit user", inline: true, renderIcon: () => <EditOutlined />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
     { id: "delete", label: "Delete user", inline: true, color: "primary", renderIcon: () => <DeleteOutline />, isDisabled: ({ row }) => !row.getIsSelected() || row.id === String(access.data?.id), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
-    { id: "edit-page", label: "Open edit page", renderIcon: () => <OpenInNew />, onClick: ({ row }) => { router.push(`/admin/users/edit/${encodeURIComponent(row.id)}`); } },
+    ...resourceRecordMenuActions<AdminUser>({
+      basePath: "/admin/users",
+      navigate: router.push,
+      canDelete: record => String(record.id) !== String(access.data?.id),
+    }),
   ], [access.data?.id, router]);
   const columns = useMemo(() => helper.columns([
     createExpansionColumn<AdminUser>({ showExpandAll: false }),
@@ -66,7 +71,7 @@ export function UsersPage() {
     meta: { emptyContent: "No users found.", noResultsContent: "No users match your search." },
   });
   const back = () => { if (!pending) setEditor(null); };
-  return <ResourcePage showHeader={false} title="Users" subtitle="Manage accounts. Select a user to edit or delete. Search by name, email or username." maxWidth="xl"><S.Root>
+  return <ResourcePage showHeader={false} title="Users" subtitle="Manage accounts. Select a user to edit or delete. Search by name, email or username." maxWidth="xl"><S.Root data-page-content>
     {access.isLoading ? <ResourceTableLoading message="Loading users…" /> : !access.allowed ? <Alert severity="error">Administrator access is required.</Alert> : <>
       {users.isLoading && <ResourceTableLoading message="Loading users…" />}
       {users.error && <Alert severity="error" action={<Button onClick={() => users.refetch()}>Retry</Button>}>{users.error.message}</Alert>}

@@ -1,6 +1,7 @@
 "use client";
 import { ResourceBadge as Chip, ResourceStatusBadge } from "@/components/Tables/ResourceBadge";
 import { resourceViewAction } from "@/components/Tables/resourceViewAction";
+import { resourceRecordMenuActions } from "@/components/Tables/resourceRecordMenuActions";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +9,6 @@ import { Alert, Button, Typography } from "@mui/material";
 import AddRounded from "@mui/icons-material/AddRounded";
 import EditOutlined from "@mui/icons-material/EditOutlined";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
-import OpenInNew from "@mui/icons-material/OpenInNew";
 import LockOutlined from "@mui/icons-material/LockOutlined";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { ResourceTableCreateButton } from "@/components/Tables/ResourceTableCreateButton";
@@ -73,20 +73,11 @@ export function RolesPage() {
         onClick: ({ row }) =>
           setEditor({ mode: "delete", id: row.original.id }),
       },
-      {
-        id: "edit-page",
-        label: "Open edit page",
-        renderIcon: () => <OpenInNew />,
-        onClick: ({ row }) =>
-          router.push(`/admin/roles/edit/${row.original.id}`),
-      },
-      {
-        id: "delete-page",
-        label: "Open delete page",
-        renderIcon: () => <OpenInNew />,
-        onClick: ({ row }) =>
-          router.push(`/admin/roles/delete/${row.original.id}`),
-      },
+      ...resourceRecordMenuActions<ApplicationRole>({
+        basePath: "/admin/roles",
+        navigate: router.push,
+        canDelete: record => !record.isProtected && record.userCount === 0,
+      }),
     ],
     [router],
   );

@@ -7,12 +7,14 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format, parseISO } from "date-fns";
 import { Controller, useFormContext } from "react-hook-form";
+import { useInvalidLabelShake } from "@/components/inputs/useInvalidLabelShake";
 import { BaseInput } from "@/components/inputs";
 import CalendarMonthOutlined from "@mui/icons-material/CalendarMonthOutlined";
 
 /** Keep the application input styling while the picker owns date section editing. */
 function PickerInput(inProps: TextFieldProps) {
   const { value, onChange, onBlur, inputRef, InputProps, ...props } = useThemeProps({ props: { ...inProps, size: undefined }, name: "RazethTextField" });
+  const labelRef = useInvalidLabelShake(!!props.error);
   const handleInputRef = useForkRef(inputRef, null);
   return <BaseInput
     {...props}
@@ -22,7 +24,7 @@ function PickerInput(inProps: TextFieldProps) {
     iconStart={<CalendarMonthOutlined />}
     iconEnd={InputProps?.endAdornment}
     resettable={false}
-    slotProps={{ ...props.slotProps, input: mergeSlotProps(InputProps ?? {}, props.slotProps?.input ?? {}) }}
+    slotProps={{ ...props.slotProps, input: mergeSlotProps(InputProps ?? {}, props.slotProps?.input ?? {}), inputLabel: mergeSlotProps({ ref: labelRef }, props.slotProps?.inputLabel ?? {}) }}
   />;
 }
 
@@ -30,18 +32,21 @@ function PickerInput(inProps: TextFieldProps) {
 export function TrackingDateTimeField({ name, label, required = false, disabled = false }: {
   readonly name: string; readonly label: string; readonly required?: boolean; readonly disabled?: boolean;
 }) {
-  const { control } = useFormContext();
+  const { control, clearErrors } = useFormContext();
   return <LocalizationProvider dateAdapter={AdapterDateFns}>
-    <Controller name={name} control={control} render={({ field }) => <DateTimePicker
+    <Controller name={name} control={control} render={({ field, fieldState }) => <DateTimePicker
       label={label}
       value={field.value ? parseISO(field.value) : null}
-      onChange={value => field.onChange(value ? Number.isNaN(value.getTime()) ? "invalid" : format(value, "yyyy-MM-dd'T'HH:mm") : "")}
+      onChange={value => {
+        if (fieldState.error?.type === "submitValidation") clearErrors(name);
+        field.onChange(value ? Number.isNaN(value.getTime()) ? "invalid" : format(value, "yyyy-MM-dd'T'HH:mm") : "");
+      }}
       format="dd-MM-yyyy HH:mm"
       ampm={false}
       disabled={disabled}
       enableAccessibleFieldDOMStructure={false}
       slots={{ textField: PickerInput }}
-      slotProps={{ textField: { name, required, fullWidth: true, onBlur: field.onBlur, inputRef: field.ref } }}
+      slotProps={{ textField: { name, required, error: fieldState.invalid, helperText: fieldState.error?.message, fullWidth: true, onBlur: field.onBlur, inputRef: field.ref } }}
     />} />
   </LocalizationProvider>;
 }

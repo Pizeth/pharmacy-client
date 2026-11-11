@@ -1,12 +1,13 @@
 "use client";
 import { ResourceStatusBadge } from "@/components/Tables/ResourceBadge";
 import { resourceViewAction } from "@/components/Tables/resourceViewAction";
+import { resourceRecordMenuActions } from "@/components/Tables/resourceRecordMenuActions";
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button, Typography } from "@mui/material";
-import { AddRounded, DeleteOutline, EditOutlined, OpenInNew } from "@mui/icons-material";
+import { AddRounded, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { ResourceTableCreateButton } from "@/components/Tables/ResourceTableCreateButton";
 import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
@@ -34,8 +35,10 @@ export function SocialProviderPage() {
       resourceViewAction<SocialProvider>(router.push, record => `/admin/social-provider/${encodeURIComponent(String(record.id))}`),
     { id: "edit", label: "Edit", color: "error", inline: true, renderIcon: () => <EditOutlined fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "edit", record: row.original }) },
     { id: "delete", label: "Delete", color: "primary", inline: true, renderIcon: () => <DeleteOutline fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
-    { id: "edit-page", label: "Open edit page", renderIcon: () => <OpenInNew fontSize="small" />, onClick: ({ row }) => router.push(`/admin/social-provider/edit/${row.original.id}`) },
-    { id: "delete-page", label: "Open delete page", renderIcon: () => <OpenInNew fontSize="small" />, onClick: ({ row }) => router.push(`/admin/social-provider/delete/${row.original.id}`) },
+    ...resourceRecordMenuActions<SocialProvider>({
+      basePath: "/admin/social-provider",
+      navigate: router.push,
+    }),
   ], [router]);
   const columns = useMemo(() => providerColumns(rowActions), [rowActions]);
   const table = useMuiDataTable({
@@ -58,7 +61,7 @@ export function SocialProviderPage() {
     { id: "delete-selected", label: "Delete selected", color: "primary", renderIcon: () => <DeleteOutline />, isDisabled: ({ selectedCount, selectedRows }) => selectedCount !== 1 || selectedRows.length !== 1, onClick: ({ selectedRows }) => { if (selectedRows.length === 1) setEditor({ mode: "delete", record: selectedRows[0].original }); } },
   ], []);
 
-  return <ResourcePage showHeader={false} title="Social providers" subtitle="Manage platforms, metadata and availability. Select a row to edit or delete it." maxWidth="xl"><S.Root>
+  return <ResourcePage showHeader={false} title="Social providers" subtitle="Manage platforms, metadata and availability. Select a row to edit or delete it." maxWidth="xl"><S.Root data-page-content>
     {access.isLoading ? <ResourceTableLoading message="Loading social providers…" /> : !access.allowed ? <Alert severity="error">Administrator access is required.</Alert> : <>
       {providers.isLoading && <ResourceTableLoading message="Loading social providers…" />}
       {providers.error && <Alert severity="error" action={<Button onClick={() => providers.refetch()}>Retry</Button>}>{providers.error.message}</Alert>}

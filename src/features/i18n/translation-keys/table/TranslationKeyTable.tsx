@@ -1,5 +1,6 @@
 "use client";
 import { resourceViewAction } from "@/components/Tables/resourceViewAction";
+import { resourceRecordMenuActions } from "@/components/Tables/resourceRecordMenuActions";
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -140,6 +141,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
       {
         id: "delete",
         label: "Delete",
+        inline: true,
         color: "primary",
         renderIcon: () => <DeleteOutline fontSize="small" />,
 
@@ -151,6 +153,10 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
 
         onClick: ({ row }) => setDeletingRecord(row.original),
       },
+      ...resourceRecordMenuActions<TranslationKey>({
+        basePath: "/admin/i18n",
+        navigate: router.push,
+      }),
     ],
     [router],
   );

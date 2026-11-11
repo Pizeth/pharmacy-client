@@ -85,3 +85,16 @@ it("offers View details without selection and enables surface navigation only af
   fireEvent.click(row);
   expect(mockPush).toHaveBeenCalledWith("/admin/users/12");
 });
+
+it("opens the selected user's detail page with a print request", async () => {
+  jest.spyOn(usersApi, "list").mockResolvedValue({ users: [record], total: 1 });
+  mount();
+  const more = await screen.findByRole("button", { name: "More actions for row 12" });
+  expect(more).toBeDisabled();
+  fireEvent.click(screen.getByRole("checkbox", { name: "Select row 12" }));
+  const selectedMore = screen.getByRole("button", { name: "More actions for row 12" });
+  expect(selectedMore).toBeEnabled();
+  fireEvent.click(selectedMore);
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Print details" }));
+  expect(mockPush).toHaveBeenCalledWith("/admin/users/12?print=1");
+});

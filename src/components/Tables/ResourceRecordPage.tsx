@@ -1,16 +1,18 @@
 "use client";
-import { useId } from "react";
+import { useEffect, useId, useRef } from "react";
 import { Typography } from "@mui/material";
 import * as S from "./resourceRecordStyles";
 export { RecordSection, RecordHeading, RecordFields, RecordField } from "./resourceRecordStyles";
 import type { ReactNode } from "react";
 import NextLink from "next/link";
-import { Alert, Button } from "@mui/material";
+import { Alert, Button, GlobalStyles, IconButton, Tooltip } from "@mui/material";
 import EditOutlined from "@mui/icons-material/EditOutlined";
+import PrintOutlined from "@mui/icons-material/PrintOutlined";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import ArrowBackOutlined from "@mui/icons-material/ArrowBackOutlined";
 import { RecordPageActionsProvider, RecordPageActions } from "./recordPageActions";
+import { recordPrintStyles } from "./recordPrintStyles";
 export function ResourceRecordPage({
   title, subtitle, backHref, editHref, loading, error, onRetry, children, actions,
 }: {
@@ -24,14 +26,58 @@ export function ResourceRecordPage({
   readonly onRetry: () => void;
   readonly children: ReactNode;
 }) {
+  const printable = !loading && !error && Boolean(children);
+  const printSection = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const section = printSection.current;
+    if (!printable || !section) return;
+    const href = window.location.href;
+    const url = new URL(href);
+    if (url.searchParams.get("print") !== "1") return;
+
+    let cancelled = false;
+    let frame: number | undefined;
+    const printWhenReady = () => {
+      if (section.querySelector("[data-record-print-pending]")) return;
+      observer.disconnect();
+      void Promise.resolve(document.fonts?.ready).then(() => {
+        if (cancelled) return;
+        frame = requestAnimationFrame(() => {
+          if (window.location.href !== href) return;
+          url.searchParams.delete("print");
+          window.history.replaceState(null, "", url);
+          window.print();
+        });
+      });
+    };
+    const observer = new MutationObserver(printWhenReady);
+    observer.observe(section, {
+      childList: true,
+      subtree: true,
+      attributeFilter: ["data-record-print-pending"],
+    });
+    printWhenReady();
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      if (frame !== undefined) cancelAnimationFrame(frame);
+    };
+  }, [printable]);
+
   const navigation = <>
     <Button component={NextLink} href={backHref} color="inherit" startIcon={<ArrowBackOutlined />}>Back to list</Button>
     {!loading && !error && actions}
     {!loading && !error && editHref && <Button component={NextLink} href={editHref} variant="contained" startIcon={<EditOutlined />}>Edit</Button>}
+    {printable && <Tooltip title="Print details">
+      <IconButton size="small" aria-label="Print details" onClick={() => window.print()}>
+        <PrintOutlined fontSize="small" />
+      </IconButton>
+    </Tooltip>}
   </>;
   return <ResourcePage title={title} titleComponent="h1" showHeader={false} subtitle={subtitle} maxWidth="xl">
     <RecordPageActionsProvider value={!loading && !error ? navigation : null}>
-      <S.RecordSection>
+      <S.RecordSection ref={printSection} data-record-print={printable ? "" : undefined}>
+        {printable && <GlobalStyles styles={recordPrintStyles} />}
         {(loading || error) && <><Typography component="h1" variant="h6">{title}</Typography><S.Toolbar aria-label="Record actions">{navigation}</S.Toolbar></>}
         {loading ? <ResourceFormLoading message="Loading details..." /> : error ? <Alert severity="error" action={<Button onClick={onRetry}>Retry</Button>}>{error}</Alert> : children}
       </S.RecordSection>
