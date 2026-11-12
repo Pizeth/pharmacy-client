@@ -31,6 +31,7 @@ function ProfileGate({ children }: { children: React.ReactNode }) {
 
     // Already redirected away from this exact pathname — don't refire
     if (redirectedFromPath.current === pathname) return;
+    redirectedFromPath.current = null;
 
     // Unlinked, and not already on the verify page → send there,
     // remembering where the user actually wanted to go

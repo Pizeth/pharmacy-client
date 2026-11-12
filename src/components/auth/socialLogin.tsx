@@ -171,7 +171,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
           /**
            * A URL to redirect if the user is newly registered
            */
-          newUserCallbackURL: `${window.location.origin}/welcome`,
+          newUserCallbackURL: `${window.location.origin}/verify-id?callbackUrl=${encodeURIComponent(destination)}`,
           /**
            * disable the automatic redirect to the provider.
            * @default false
