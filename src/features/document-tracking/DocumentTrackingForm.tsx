@@ -30,6 +30,40 @@ export const fromLocalDate = (date: string) => {
 };
 const nullable = (value: string) => value.trim() || null;
 const number = (value: string) => (value ? Number(value) : null);
+function documentAssignmentDefaults(record: DocumentDetail | undefined, actorId: TrackingMetadata["actor"]["id"]) {
+  return {
+    responsibleDepartmentId: String(record?.responsibleDepartmentId ?? ""),
+    assignedToId: String(
+      record ? (activeStep(record)?.assignedToId ?? "") : actorId,
+    ),
+    storageLocationCode: record?.storageLocation?.code ?? "",
+    chronologicalCode: record?.chronologicalCode ?? "",
+    archiveSequence: String(record?.archiveSequence ?? ""),
+    notes: record?.notes ?? "",
+  };
+}
+
+function documentDefaults(record: DocumentDetail | undefined, actorId: TrackingMetadata["actor"]["id"]) {
+  return {
+    title: record?.title ?? "",
+    categoryId: record?.categoryId ?? "",
+    typeId: record?.typeId ?? "",
+    subtype: record?.subtype ?? "",
+    priority: record?.priority ?? "NORMAL",
+    incomingNumber: record?.incomingNumber ?? "",
+    outgoingNumber: record?.outgoingNumber ?? "",
+    receivedAt: toLocalDate(record?.receivedAt ?? new Date().toISOString()),
+    dueAt: record?.dueAt ? toLocalDate(record.dueAt) : "",
+    ...documentAssignmentDefaults(record, actorId),
+    reason: "",
+    attachmentSource: "upload",
+    attachmentName: "",
+    attachmentUrl: "",
+    attachmentFile: "",
+    attachmentKind: "INCOMING" as AttachmentKind,
+  };
+}
+
 export function DocumentForm({
   mode,
   record,
@@ -49,31 +83,7 @@ export function DocumentForm({
   const initial = useRef(record);
   const inFlight = useRef(false);
   const form = useForm({
-    defaultValues: {
-      title: record?.title ?? "",
-      categoryId: record?.categoryId ?? "",
-      typeId: record?.typeId ?? "",
-      subtype: record?.subtype ?? "",
-      priority: record?.priority ?? "NORMAL",
-      incomingNumber: record?.incomingNumber ?? "",
-      outgoingNumber: record?.outgoingNumber ?? "",
-      receivedAt: toLocalDate(record?.receivedAt ?? new Date().toISOString()),
-      dueAt: record?.dueAt ? toLocalDate(record.dueAt) : "",
-      responsibleDepartmentId: String(record?.responsibleDepartmentId ?? ""),
-      assignedToId: String(
-        record ? (activeStep(record)?.assignedToId ?? "") : metadata.actor.id,
-      ),
-      storageLocationCode: record?.storageLocation?.code ?? "",
-      chronologicalCode: record?.chronologicalCode ?? "",
-      archiveSequence: String(record?.archiveSequence ?? ""),
-      notes: record?.notes ?? "",
-      reason: "",
-      attachmentSource: "upload",
-      attachmentName: "",
-      attachmentUrl: "",
-      attachmentFile: "",
-      attachmentKind: "INCOMING" as AttachmentKind,
-    },
+    defaultValues: documentDefaults(record, metadata.actor.id),
   });
   const draft = form.watch();
   function parseDocument(values: typeof draft) {
@@ -235,140 +245,7 @@ export function DocumentForm({
           </>
         ) : (
           <>
-            <TextField
-              name="title"
-              iconStart={<DescriptionOutlined />}
-              label="Document title"
-              required
-              fullWidth
-              disabled={metadataLocked}
-            />
-            {mode === "create" && <>
-              <Typography component="h3" variant="h6">Document file (required)</Typography>
-              <AttachmentFields names={{ source: "attachmentSource", name: "attachmentName", url: "attachmentUrl", file: "attachmentFile", kind: "attachmentKind" }} useDocumentTitle file={attachmentFile} onFileChange={setAttachmentFile} disabled={pending} />
-            </>}
-            <FieldGrid>
-              <SelectField
-                name="categoryId"
-                iconStart={<CategoryOutlined />}
-                label="Category"
-                required
-                options={metadata.categories.map((item) => ({
-                  value: item.id,
-                  label: item.name,
-                }))}
-                disabled={metadataLocked}
-              />
-              <SelectField
-                name="typeId"
-                iconStart={<ArticleOutlined />}
-                label="Document type"
-                required
-                options={metadata.types.map((item) => ({
-                  value: item.id,
-                  label: item.name,
-                }))}
-                disabled={metadataLocked}
-              />
-              <TextField
-                name="subtype"
-                iconStart={<LabelOutlined />}
-                label="Subtype / leave type"
-                fullWidth
-                disabled={metadataLocked}
-              />
-              <SelectField
-                name="priority"
-                iconStart={<FlagOutlined />}
-                label="Priority"
-                options={[
-                  { value: "NORMAL", label: "Normal" },
-                  { value: "URGENT", label: "Urgent" },
-                ]}
-                disabled={metadataLocked}
-              />
-              <TextField
-                name="incomingNumber"
-                iconStart={<CallReceived />}
-                label="Incoming number"
-                fullWidth
-                disabled={metadataLocked}
-              />
-              <TextField
-                name="outgoingNumber"
-                iconStart={<CallMade />}
-                label="Outgoing number"
-                fullWidth
-                disabled={metadataLocked}
-              />
-              <TrackingDateTimeField
-                name="receivedAt"
-                label="Received at"
-                required
-                disabled={metadataLocked}
-              />
-              <TrackingDateTimeField
-                name="dueAt"
-                label="Due at"
-                disabled={metadataLocked}
-              />
-              <SelectField
-                name="responsibleDepartmentId"
-                iconStart={<AccountTreeOutlined />}
-                label="Responsible office"
-                options={metadata.departments.map((item) => ({
-                  value: String(item.id),
-                  label: item.name,
-                }))}
-                disabled={metadataLocked}
-              />
-              <SelectField
-                name="assignedToId"
-                iconStart={<PersonOutline />}
-                label={
-                  mode === "create" ? "Initial handler" : "Current handler"
-                }
-                options={metadata.handlers.map((item) => ({
-                  value: String(item.id),
-                  label: handlerOptionLabel(item),
-                }))}
-                disabled={metadataLocked || mode === "edit"}
-                placeholder="Receives the initial intake stage."
-                helperText={mode === "edit" ? "Use Update progress to reassign or hand over." : undefined}
-              />
-              <TextField
-                name="storageLocationCode"
-                iconStart={<Inventory2Outlined />}
-                label="Cabinet / storage code"
-                fullWidth
-                disabled={metadataLocked}
-              />
-              <TextField
-                name="chronologicalCode"
-                iconStart={<ArchiveOutlined />}
-                label="Chronological archive code"
-                fullWidth
-                disabled={metadataLocked}
-              />
-              <TextField
-                name="archiveSequence"
-                iconStart={<FormatListNumbered />}
-                label="Archive sequence"
-                type="number"
-                fullWidth
-                disabled={metadataLocked}
-              />
-            </FieldGrid>
-            <TextField
-              name="notes"
-              iconStart={<NotesOutlined />}
-              iconStartAlignment="top"
-              label="Notes"
-              multiline
-              minRows={2}
-              fullWidth
-              disabled={metadataLocked}
-            />
+            <DocumentFields mode={mode} metadata={metadata} metadataLocked={metadataLocked} pending={pending} attachmentFile={attachmentFile} setAttachmentFile={setAttachmentFile} />
           </>
         )}
         {registered && mutation.error && <Alert severity="warning">The document is saved, but its required attachment could not be confirmed. Retry the upload or provide a file URL to complete registration.</Alert>}
@@ -379,25 +256,185 @@ export function DocumentForm({
               : mutation.error.message}
           </Alert>
         )}
-        <FormActions>
-          <Button variant="outlined" onClick={onCancel} disabled={pending}>
-            {registered ? "Close" : "Cancel"}
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            color={mode === "delete" ? "error" : "success"}
-            loading={pending}
-            disabled={pending || conflict || !valid}
-          >
-            {mode === "delete"
-              ? "Archive record"
-              : mode === "edit"
-                ? "Save changes"
-                : registered ? "Retry attachment" : "Register document"}
-          </Button>
-        </FormActions>
+        <DocumentFormActions mode={mode} registered={Boolean(registered)} pending={pending} disabled={pending || conflict || !valid} onCancel={onCancel} />
       </Form>
     </FormProvider>
+  );
+}
+
+function DocumentFields({ mode, metadata, metadataLocked, pending, attachmentFile, setAttachmentFile }: {
+  readonly mode: "create" | "edit";
+  readonly metadata: TrackingMetadata;
+  readonly metadataLocked: boolean;
+  readonly pending: boolean;
+  readonly attachmentFile: File | null;
+  readonly setAttachmentFile: (file: File | null) => void;
+}) {
+  return (
+    <>
+      <TextField
+        name="title"
+        iconStart={<DescriptionOutlined />}
+        label="Document title"
+        required
+        fullWidth
+        disabled={metadataLocked}
+      />
+      {mode === "create" && <>
+        <Typography component="h3" variant="h6">Document file (required)</Typography>
+        <AttachmentFields names={{ source: "attachmentSource", name: "attachmentName", url: "attachmentUrl", file: "attachmentFile", kind: "attachmentKind" }} useDocumentTitle file={attachmentFile} onFileChange={setAttachmentFile} disabled={pending} />
+      </>}
+      <FieldGrid>
+        <SelectField
+          name="categoryId"
+          iconStart={<CategoryOutlined />}
+          label="Category"
+          required
+          options={metadata.categories.map((item) => ({
+            value: item.id,
+            label: item.name,
+          }))}
+          disabled={metadataLocked}
+        />
+        <SelectField
+          name="typeId"
+          iconStart={<ArticleOutlined />}
+          label="Document type"
+          required
+          options={metadata.types.map((item) => ({
+            value: item.id,
+            label: item.name,
+          }))}
+          disabled={metadataLocked}
+        />
+        <TextField
+          name="subtype"
+          iconStart={<LabelOutlined />}
+          label="Subtype / leave type"
+          fullWidth
+          disabled={metadataLocked}
+        />
+        <SelectField
+          name="priority"
+          iconStart={<FlagOutlined />}
+          label="Priority"
+          options={[
+            { value: "NORMAL", label: "Normal" },
+            { value: "URGENT", label: "Urgent" },
+          ]}
+          disabled={metadataLocked}
+        />
+        <TextField
+          name="incomingNumber"
+          iconStart={<CallReceived />}
+          label="Incoming number"
+          fullWidth
+          disabled={metadataLocked}
+        />
+        <TextField
+          name="outgoingNumber"
+          iconStart={<CallMade />}
+          label="Outgoing number"
+          fullWidth
+          disabled={metadataLocked}
+        />
+        <TrackingDateTimeField
+          name="receivedAt"
+          label="Received at"
+          required
+          disabled={metadataLocked}
+        />
+        <TrackingDateTimeField
+          name="dueAt"
+          label="Due at"
+          disabled={metadataLocked}
+        />
+        <SelectField
+          name="responsibleDepartmentId"
+          iconStart={<AccountTreeOutlined />}
+          label="Responsible office"
+          options={metadata.departments.map((item) => ({
+            value: String(item.id),
+            label: item.name,
+          }))}
+          disabled={metadataLocked}
+        />
+        <SelectField
+          name="assignedToId"
+          iconStart={<PersonOutline />}
+          label={
+            mode === "create" ? "Initial handler" : "Current handler"
+          }
+          options={metadata.handlers.map((item) => ({
+            value: String(item.id),
+            label: handlerOptionLabel(item),
+          }))}
+          disabled={metadataLocked || mode === "edit"}
+          placeholder="Receives the initial intake stage."
+          helperText={mode === "edit" ? "Use Update progress to reassign or hand over." : undefined}
+        />
+        <TextField
+          name="storageLocationCode"
+          iconStart={<Inventory2Outlined />}
+          label="Cabinet / storage code"
+          fullWidth
+          disabled={metadataLocked}
+        />
+        <TextField
+          name="chronologicalCode"
+          iconStart={<ArchiveOutlined />}
+          label="Chronological archive code"
+          fullWidth
+          disabled={metadataLocked}
+        />
+        <TextField
+          name="archiveSequence"
+          iconStart={<FormatListNumbered />}
+          label="Archive sequence"
+          type="number"
+          fullWidth
+          disabled={metadataLocked}
+        />
+      </FieldGrid>
+      <TextField
+        name="notes"
+        iconStart={<NotesOutlined />}
+        iconStartAlignment="top"
+        label="Notes"
+        multiline
+        minRows={2}
+        fullWidth
+        disabled={metadataLocked}
+      />
+    </>
+  );
+}
+
+function DocumentFormActions({ mode, registered, pending, disabled, onCancel }: {
+  readonly mode: DocumentFormMode;
+  readonly registered: boolean;
+  readonly pending: boolean;
+  readonly disabled: boolean;
+  readonly onCancel: () => void;
+}) {
+  return (
+    <FormActions>
+      <Button variant="outlined" onClick={onCancel} disabled={pending}>
+        {registered ? "Close" : "Cancel"}
+      </Button>
+      <Button
+        type="submit"
+        variant="contained"
+        color={mode === "delete" ? "error" : "success"}
+        loading={pending}
+        disabled={disabled}
+      >
+        {mode === "delete"
+          ? "Archive record"
+          : mode === "edit"
+            ? "Save changes"
+            : registered ? "Retry attachment" : "Register document"}
+      </Button>
+    </FormActions>
   );
 }
