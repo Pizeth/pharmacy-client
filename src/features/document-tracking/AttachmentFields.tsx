@@ -25,7 +25,7 @@ export function AttachmentFields({ names = DEFAULT_NAMES, file, onFileChange, di
       <SelectField name={names.source} label="Attachment source" required includeEmptyOption={false} iconStart={<AttachFileOutlined />} disabled={disabled}
         options={[{ value: "upload", label: "Upload file" }, { value: "link", label: "File URL" }]} />
       {source === "upload" ? <S.UploadButton component="label" role={undefined} tabIndex={-1} variant="text" startIcon={<CloudUploadOutlined />} disabled={disabled}>Upload file
-        <S.FileInput name={names.file} type="file" required aria-label="Attachment file" aria-invalid={!!fileError} aria-describedby={fileError ? fileErrorId : undefined} disabled={disabled} onChange={event => {
+        <S.FileInput name={names.file} type="file" required aria-label="Attachment file" aria-invalid={Boolean(fileError)} aria-describedby={fileError ? fileErrorId : undefined} disabled={disabled} onChange={event => {
           const selected = event.target.files?.[0] ?? null;
           clearErrors(names.file);
           onFileChange(selected);

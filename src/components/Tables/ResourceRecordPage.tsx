@@ -30,10 +30,10 @@ export function ResourceRecordPage({
   const printSection = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const section = printSection.current;
-    if (!printable || !section) return;
+    if (!printable || !section) return undefined;
     const href = window.location.href;
     const url = new URL(href);
-    if (url.searchParams.get("print") !== "1") return;
+    if (url.searchParams.get("print") !== "1") return undefined;
 
     let cancelled = false;
     let frame: number | undefined;

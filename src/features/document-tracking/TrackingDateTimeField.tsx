@@ -14,12 +14,12 @@ import CalendarMonthOutlined from "@mui/icons-material/CalendarMonthOutlined";
 /** Keep the application input styling while the picker owns date section editing. */
 function PickerInput(inProps: TextFieldProps) {
   const { value, onChange, onBlur, inputRef, InputProps, ...props } = useThemeProps({ props: { ...inProps, size: undefined }, name: "RazethTextField" });
-  const labelRef = useInvalidLabelShake(!!props.error);
+  const labelRef = useInvalidLabelShake(Boolean(props.error));
   const handleInputRef = useForkRef(inputRef, null);
   return <BaseInput
     {...props}
     field={{ name: props.name ?? "", value, onChange: onChange ?? (() => {}), onBlur: () => {}, ref: handleInputRef ?? (() => {}) }}
-    fieldState={{ invalid: !!props.error, error: props.error ? { type: "validate" } : undefined, isDirty: false, isTouched: false, isValidating: false }}
+    fieldState={{ invalid: Boolean(props.error), error: props.error ? { type: "validate" } : undefined, isDirty: false, isTouched: false, isValidating: false }}
     onBlur={onBlur}
     iconStart={<CalendarMonthOutlined />}
     iconEnd={InputProps?.endAdornment}

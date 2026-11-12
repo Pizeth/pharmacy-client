@@ -25,7 +25,7 @@ export function TranslationKeyDeletePage({ recordId }: { readonly recordId: numb
     <ResourcePage title="Delete translation key" subtitle="This action cannot be undone." maxWidth="md" surface>
       {query.isPending ? <ResourceFormLoading message="Loading translation key…" /> :
         query.isError ? (
-          <Alert severity="error" action={<Button onClick={() => void query.refetch()}>Retry</Button>}>
+          <Alert severity="error" action={<Button onClick={() => { query.refetch().catch(console.error); }}>Retry</Button>}>
             {query.error.message}
           </Alert>
         ) : record ? (

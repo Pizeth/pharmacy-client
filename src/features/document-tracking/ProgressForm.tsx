@@ -67,7 +67,7 @@ export function ProgressForm({
   const client = useQueryClient();
   const inFlight = useRef(false);
   const mutation = useMutation({
-    mutationFn: async (data: ReturnType<typeof progressInputSchema.parse>) => {
+    mutationFn: (data: ReturnType<typeof progressInputSchema.parse>) => {
       return trackingApi.progress(initial.id, data);
     },
     onSuccess: async (result) => {

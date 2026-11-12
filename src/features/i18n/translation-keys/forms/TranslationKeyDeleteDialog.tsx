@@ -53,6 +53,7 @@ export function TranslationKeyDeleteConfirmation({
 
   useEffect(() => {
     mounted.current = true;
+    cancelButton.current?.focus();
     // Let the closing overflow menu finish restoring focus before choosing the
     // safe initial action in the newly mounted modal.
     const frame = requestAnimationFrame(() => cancelButton.current?.focus());
@@ -104,7 +105,6 @@ export function TranslationKeyDeleteConfirmation({
       <ActionsRoot>
         <Button
           ref={cancelButton}
-          autoFocus
           variant="outlined"
           disabled={pending}
           onClick={close}
@@ -119,7 +119,7 @@ export function TranslationKeyDeleteConfirmation({
           loadingPosition="start"
           disabled={pending}
           onClick={() => {
-            void confirm();
+            confirm().catch(console.error);
           }}
         >
           {pending ? "Deleting…" : "Delete key"}

@@ -15,7 +15,7 @@ import {
   type DocumentDetail,
   type TrackingMetadata,
 } from "./contracts";
-import * as S from "./styles";
+import { FieldGrid, Form } from "./styles";
 import { TrackingDateTimeField } from "./TrackingDateTimeField";
 import { AttachmentFields } from "./AttachmentFields";
 import { AttachmentValidationError, getAttachmentDraft, isAttachmentDraftValid, type AttachmentKind } from "./attachmentDraft";
@@ -133,19 +133,19 @@ export function DocumentForm({
   const parsedDraft = !registered && mode !== "delete" ? parseDocument(draft) : null;
   const datesValid = !parsedDraft?.success || !parsedDraft.data.dueAt ||
     new Date(parsedDraft.data.dueAt) >= new Date(parsedDraft.data.receivedAt);
-  const valid = mode === "delete" ? !!draft.reason.trim() :
+  const valid = mode === "delete" ? Boolean(draft.reason.trim()) :
     (registered || (parsedDraft?.success && datesValid)) &&
     (mode !== "create" || isAttachmentDraftValid({
       source: draft.attachmentSource, name: draft.attachmentName,
       url: draft.attachmentUrl, kind: draft.attachmentKind,
     }, attachmentFile, draft.title));
-  const metadataLocked = pending || !!registered;
+  const metadataLocked = pending || Boolean(registered);
   const conflict =
     mutation.error instanceof TrackingRequestError &&
     mutation.error.status === 409;
   return (
     <FormProvider {...form}>
-      <S.Form
+      <Form
         noValidate
         aria-busy={pending}
         onBlur={event => {
@@ -247,7 +247,7 @@ export function DocumentForm({
               <Typography component="h3" variant="h6">Document file (required)</Typography>
               <AttachmentFields names={{ source: "attachmentSource", name: "attachmentName", url: "attachmentUrl", file: "attachmentFile", kind: "attachmentKind" }} useDocumentTitle file={attachmentFile} onFileChange={setAttachmentFile} disabled={pending} />
             </>}
-            <S.FieldGrid>
+            <FieldGrid>
               <SelectField
                 name="categoryId"
                 iconStart={<CategoryOutlined />}
@@ -358,7 +358,7 @@ export function DocumentForm({
                 fullWidth
                 disabled={metadataLocked}
               />
-            </S.FieldGrid>
+            </FieldGrid>
             <TextField
               name="notes"
               iconStart={<NotesOutlined />}
@@ -397,7 +397,7 @@ export function DocumentForm({
                 : registered ? "Retry attachment" : "Register document"}
           </Button>
         </FormActions>
-      </S.Form>
+      </Form>
     </FormProvider>
   );
 }
