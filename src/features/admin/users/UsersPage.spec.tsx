@@ -66,7 +66,7 @@ it("combines text and status filters using the shared i18n filter controls", asy
  fireEvent.click(screen.getByRole("button", { name: "Show column filters" }));
  fireEvent.change(table.getByRole("textbox", { name: "Name" }), { target: { value: "Jane" } });
  fireEvent.mouseDown(table.getByRole("combobox", { name: "Status" }));
- fireEvent.click(screen.getByRole("option", { name: "Active" }));
+ fireEvent.click(screen.getByRole("option", { name: "Not banned" }));
  await waitFor(() => expect(list).toHaveBeenLastCalledWith(0, 25, "", expect.arrayContaining([{ id: "name", value: "Jane" }, { id: "banned", value: "false" }]), [], expect.any(AbortSignal)));
  expect(screen.getByRole("button", { name: "Hide column filters" })).toBeInTheDocument();
 });
@@ -84,4 +84,17 @@ it("offers View details without selection and enables surface navigation only af
   expect(mockPush).not.toHaveBeenCalled();
   fireEvent.click(row);
   expect(mockPush).toHaveBeenCalledWith("/admin/users/12");
+});
+
+it("opens the selected user's detail page with a print request", async () => {
+  jest.spyOn(usersApi, "list").mockResolvedValue({ users: [record], total: 1 });
+  mount();
+  const more = await screen.findByRole("button", { name: "More actions for row 12" });
+  expect(more).toBeDisabled();
+  fireEvent.click(screen.getByRole("checkbox", { name: "Select row 12" }));
+  const selectedMore = screen.getByRole("button", { name: "More actions for row 12" });
+  expect(selectedMore).toBeEnabled();
+  fireEvent.click(selectedMore);
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Print details" }));
+  expect(mockPush).toHaveBeenCalledWith("/admin/users/12?print=1");
 });

@@ -13,6 +13,7 @@ import {
 import { useTheme, useThemeProps } from "@mui/material/styles";
 import { Controller, useFormContext } from "react-hook-form";
 import type { SelectFieldProps } from "@/interfaces/component-props.interface";
+import { useInvalidLabelShake } from "./useInvalidLabelShake";
 import { InputHelperText } from "./helpers/inputHelperText";
 
 const PREFIX = "RazethSelectField";
@@ -43,6 +44,11 @@ const StartAdornmentRoot = styled(InputAdornment, {
   overridesResolver: (_props, styles) => styles.icon,
 })({});
 
+function SelectLabel({ invalid, children, ...props }: React.ComponentProps<typeof InputLabel> & { invalid: boolean }) {
+  const ref = useInvalidLabelShake(invalid);
+  return <InputLabel {...props} ref={ref}><span>{children}</span></InputLabel>;
+}
+
 export function SelectField(inProps: SelectFieldProps) {
   const props = useThemeProps({
     props: inProps,
@@ -71,6 +77,7 @@ export function SelectField(inProps: SelectFieldProps) {
   const { direction } = useTheme();
 
   const labelId = useId();
+  const helperTextId = useId();
 
   const { control, clearErrors } = useFormContext();
 
@@ -100,15 +107,17 @@ export function SelectField(inProps: SelectFieldProps) {
             data-start-icon={iconStart ? "true" : "false"}
             data-label-shrunk={shouldShrink ? "true" : "false"}
             data-size={size}
+            data-form-field={field.name}
           >
-            <InputLabel id={labelId} required={required} shrink={shouldShrink}>
+            <SelectLabel invalid={fieldState.invalid} id={labelId} required={required} shrink={shouldShrink}>
               {label}
-            </InputLabel>
+            </SelectLabel>
 
             <Select<string>
               name={field.name}
               inputRef={field.ref}
               labelId={labelId}
+              aria-describedby={helperText || fieldState.error?.message ? helperTextId : undefined}
               /**
                * OutlinedInput uses Select's label prop to size the notch.
                *
@@ -161,7 +170,7 @@ export function SelectField(inProps: SelectFieldProps) {
               ))}
             </Select>
 
-            {(helperText || fieldState.error?.message) && <FormHelperText>
+            {(helperText || fieldState.error?.message) && <FormHelperText id={helperTextId}>
               <InputHelperText
                 helperText={helperText}
                 error={fieldState.error?.message}

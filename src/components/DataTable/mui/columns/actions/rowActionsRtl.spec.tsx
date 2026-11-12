@@ -39,6 +39,7 @@ function Fixture() {
     data: [...data],
 
     getRowId: (row) => row.id,
+    initialState: { rowSelection: { alpha: true } },
   });
 
   const row = table.getRowModel().rows[0];

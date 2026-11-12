@@ -24,7 +24,7 @@ export const Auth = (inProps: AuthProps) => {
     avatarIcon = defaultAvatar,
     children,
     divider = defaultDivider,
-    social = defaultSocial,
+    social,
     authNavigationLinks,
     footer = defaultFooter,
     variant = "full",
@@ -57,7 +57,7 @@ export const Auth = (inProps: AuthProps) => {
               avatar={avatarIcon}
               navigation={authNavigationLinks}
               divider={divider}
-              social={social}
+              social={social === undefined ? <SocialLogin allowTelegramSignup={currentMode === "signup"} /> : social}
             >{children}</AuthFormPanel>
           </Grid>
         </Auth.card>
@@ -75,7 +75,6 @@ const defaultSideImage = (<SideImage src={process.env.NEXT_PUBLIC_PLACEHOLDER} /
 const defaultAvatar = (<AvatarHeader src={process.env.NEXT_PUBLIC_EARTH_IMAGE_URL ||
   "https://assets.razeth.com/sea-planet-water-Earth-map-Arctic-193611-wallhere.com.jpg"} />);
 const defaultDivider = <Divider />;
-const defaultSocial = <SocialLogin />;
 const defaultFooter = <Footer />;
 export { Content as LoginContent, LoginCard } from "./styles/auth.styles";
 

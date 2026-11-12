@@ -95,3 +95,10 @@ contained, neumorphic, and white text/icons in both themes and interaction state
 Below `md`, show only the plus icon in a 44px circular target while retaining
 the full accessible name. Do not use
 a raw Button or per-page styling for table Create commands.
+
+In table and card views, keep More actions and row mutations disabled until
+that specific row is selected. Keep View details visible and enabled without
+selection. Use the shared DataTable overflow menu for the selection gate.
+Admin tables use `resourceRecordMenuActions` for dedicated edit and delete or
+archive pages and detail-page printing. Pass resource permission guards and
+use the shared A4 detail layout rather than a separate row printout.
