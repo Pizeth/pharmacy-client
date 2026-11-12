@@ -52,21 +52,25 @@ function AdminSocialProfiles({ adminId, providers }: {
   const remove = useMutation({ mutationFn: (profile: SocialProfile) => socialApi.deleteProfile(userId, profile.id), onSuccess: async () => { setDeleting(null); await invalidate(); } });
   const pending = save.isPending || remove.isPending;
   const reset = () => { setEditing(null); setDraft(empty); form.clearErrors(); save.reset(); };
+  const profileCards = profiles.data?.map(profile => <S.Panel key={profile.id}><Typography variant="h6">{profile.provider.name}</Typography><Typography>{profile.handle}</Typography><Typography>{profile.url || "No profile URL"}</Typography><S.Actions><Button disabled={pending} onClick={() => { setEditing(profile); setDraft({ providerId: profile.providerId, handle: profile.handle, url: profile.url }); form.clearErrors(); save.reset(); }}>Edit {profile.provider.name} profile</Button><Button color="error" disabled={pending} onClick={() => { remove.reset(); setDeleting(profile); }}>Delete {profile.provider.name} profile</Button></S.Actions></S.Panel>);
+  const profileEditor = (
+    <ProfileEditor form={form} onSave={save.mutate}>
+    <Controller name="userId" control={userForm.control} render={({ field, fieldState }) => <BaseInput field={{ ...field, onChange: event => { field.onChange(event); setUserInput(event.target.value); reset(); } }} fieldState={fieldState} name="userId" iconStart={<UserRound fontSize="small" />} fullWidth label="User ID" type="number" disabled={pending} helperText="Defaults to your account. Enter another administrator's numeric user ID to manage their profiles." />} />
+    {!validUser && <Alert severity="info">Enter a positive numeric user ID.</Alert>}
+    <ProfileQueryStatus providers={providers} profiles={profiles} />
+    <SelectField name="providerId" label="Provider" required iconStart={<Share2 fontSize="small" />} disabled={pending || !providers.data} placeholder={providers.isLoading ? "Loading providers…" : "Select a provider"} options={(providers.data ?? []).filter(provider => provider.isEnabled || provider.id === Number(draft.providerId)).map(provider => ({ value: String(provider.id), label: `${provider.name}${!provider.isEnabled ? " (disabled)" : ""}` }))} />
+    <TextField name="handle" iconStart={<AtSign fontSize="small" />} fullWidth label="Handle" required disabled={pending} />
+    <TextField name="url" iconStart={<Globe fontSize="small" />} fullWidth label="Profile URL" type="url" disabled={pending} helperText="Use the full https:// profile URL." />
+    {save.error && <Alert severity="error">{save.error.message}</Alert>}
+    {save.isSuccess && <Alert severity="success">Social profile saved.</Alert>}
+    <FormActions>{editing && <Button disabled={pending} onClick={reset}>Cancel edit</Button>}<Button type="submit" variant="contained" disabled={pending || !validUser || !providers.data?.some(p => p.isEnabled)}>{save.isPending ? "Saving…" : editing ? "Save profile" : "Add profile"}</Button></FormActions>
+  </ProfileEditor>
+  );
   return <>
       <ProfileSettingsSection>
-        <ProfileEditor form={form} onSave={save.mutate}>
-          <Controller name="userId" control={userForm.control} render={({ field, fieldState }) => <BaseInput field={{ ...field, onChange: event => { field.onChange(event); setUserInput(event.target.value); reset(); } }} fieldState={fieldState} name="userId" iconStart={<UserRound fontSize="small" />} fullWidth label="User ID" type="number" disabled={pending} helperText="Defaults to your account. Enter another administrator's numeric user ID to manage their profiles." />} />
-          {!validUser && <Alert severity="info">Enter a positive numeric user ID.</Alert>}
-          <ProfileQueryStatus providers={providers} profiles={profiles} />
-          <SelectField name="providerId" label="Provider" required iconStart={<Share2 fontSize="small" />} disabled={pending || !providers.data} placeholder={providers.isLoading ? "Loading providers…" : "Select a provider"} options={(providers.data ?? []).filter(provider => provider.isEnabled || provider.id === Number(draft.providerId)).map(provider => ({ value: String(provider.id), label: `${provider.name}${!provider.isEnabled ? " (disabled)" : ""}` }))} />
-          <TextField name="handle" iconStart={<AtSign fontSize="small" />} fullWidth label="Handle" required disabled={pending} />
-          <TextField name="url" iconStart={<Globe fontSize="small" />} fullWidth label="Profile URL" type="url" disabled={pending} helperText="Use the full https:// profile URL." />
-          {save.error && <Alert severity="error">{save.error.message}</Alert>}
-          {save.isSuccess && <Alert severity="success">Social profile saved.</Alert>}
-          <FormActions>{editing && <Button disabled={pending} onClick={reset}>Cancel edit</Button>}<Button type="submit" variant="contained" disabled={pending || !validUser || !providers.data?.some(p => p.isEnabled)}>{save.isPending ? "Saving…" : editing ? "Save profile" : "Add profile"}</Button></FormActions>
-        </ProfileEditor>
+        {profileEditor}
       {profiles.data?.length === 0 && <Alert severity="info">This user has no social profiles.</Alert>}
-      {profiles.data?.map(profile => <S.Panel key={profile.id}><Typography variant="h6">{profile.provider.name}</Typography><Typography>{profile.handle}</Typography><Typography>{profile.url || "No profile URL"}</Typography><S.Actions><Button disabled={pending} onClick={() => { setEditing(profile); setDraft({ providerId: profile.providerId, handle: profile.handle, url: profile.url }); form.clearErrors(); save.reset(); }}>Edit {profile.provider.name} profile</Button><Button color="error" disabled={pending} onClick={() => { remove.reset(); setDeleting(profile); }}>Delete {profile.provider.name} profile</Button></S.Actions></S.Panel>)}
+        {profileCards}
       </ProfileSettingsSection>
       <DeleteProfileDialog
         profile={deleting}
