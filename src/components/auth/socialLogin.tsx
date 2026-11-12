@@ -242,7 +242,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
       {activeProviders.includes("telegram") && (
         <Grid size={12}>
           <Typography variant="caption" color="text.secondary">
-            Already have an account? Sign in with your existing method and connect Telegram in Account settings first.
+            Already have an account? Sign in with your existing method and complete any required officer ID verification. Then connect Telegram in Account settings.
           </Typography>
         </Grid>
       )}

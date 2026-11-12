@@ -33,5 +33,5 @@ it("waits for detail content before printing and supports printing again from th
   expect(window.location.search).toBe("");
   expect(screen.getByText("Profile details").closest("[data-record-print]")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Print details" }));
-  expect(print).toHaveBeenCalledTimes(2);
+  await waitFor(() => { expect(print).toHaveBeenCalledTimes(2); });
 });

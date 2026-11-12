@@ -107,6 +107,7 @@ export function SelectField(inProps: SelectFieldProps) {
             data-start-icon={iconStart ? "true" : "false"}
             data-label-shrunk={shouldShrink ? "true" : "false"}
             data-size={size}
+            data-form-field={field.name}
           >
             <SelectLabel invalid={fieldState.invalid} id={labelId} required={required} shrink={shouldShrink}>
               {label}

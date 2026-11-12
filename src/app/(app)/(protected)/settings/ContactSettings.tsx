@@ -84,9 +84,11 @@ export function ContactSettings({ userId }: { readonly userId: string }) {
   }
 
   if (settings.isPending) return <Typography role="status">Loading contact settings…</Typography>;
-  if (settings.isError) return <Alert severity="error" action={<Button onClick={() => { settings.refetch().catch(() => { console.error("Account settings request failed."); }); }}>Retry</Button>}>Could not load contact settings.</Alert>;
+  const loadError = settings.isError ? (<Alert severity="error" action={<Button onClick={() => { settings.refetch().catch(() => { console.error("Account settings request failed."); }); }}>Retry</Button>}>Could not load contact settings.</Alert>) : null;
+  if (!settings.data) return loadError;
   const { phone, providers, links } = settings.data;
   return <>
+    {loadError}
     {mutation.error && <Alert severity="error">{mutation.error.message}</Alert>}
     {mutation.isSuccess && <Alert severity="success">Contact settings saved.</Alert>}
     <RecordCard title="Contact phone" description="This number is displayed in your officer profile.">

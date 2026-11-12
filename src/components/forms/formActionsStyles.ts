@@ -12,9 +12,10 @@ export function formActionsStyles(theme: Theme): CSSObject {
     "& > .MuiButton-root": { ...resourceNeumorphicStyles(theme), minHeight: 40 },
     "& > .MuiButton-root.MuiButton-contained[type='submit']": {
       color: theme.palette.common.white,
-      "&:hover, &.Mui-focusVisible, &.Mui-disabled": {
+      "&:hover, &.Mui-focusVisible": {
         color: theme.palette.common.white,
       },
+      "&.Mui-disabled": { color: theme.palette.action.disabled },
     },
     [theme.breakpoints.down("sm")]: {
       flexDirection: "column-reverse",

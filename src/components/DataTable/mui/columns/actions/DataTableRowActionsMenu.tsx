@@ -73,10 +73,6 @@ export function DataTableRowActionsMenu<TData extends RowData>(
   const disabled = !row?.getIsSelected();
   const open = !disabled && anchorEl !== null;
 
-  if (disabled && anchorEl !== null) {
-    setAnchorEl(null);
-  }
-
   const handleOpen = (event: MouseEvent<HTMLButtonElement>): void => {
     event.preventDefault();
     event.stopPropagation();

@@ -18,7 +18,12 @@ export function showFieldIssue<T extends FieldValues>(
   target: EventTarget,
   issues: readonly { path: readonly PropertyKey[]; message: string }[],
 ) {
-  if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
-  const issue = issues.find(item => item.path.join(".") === target.name);
-  if (issue) form.setError(target.name as FieldPath<T>, { type: "submitValidation", message: issue.message });
+  const name = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement
+    ? target.name
+    : target instanceof HTMLElement && target.getAttribute("role") === "combobox"
+      ? target.closest<HTMLElement>("[data-form-field]")?.dataset.formField
+      : undefined;
+  if (!name) return;
+  const issue = issues.find(item => item.path.join(".") === name);
+  if (issue) form.setError(name as FieldPath<T>, { type: "submitValidation", message: issue.message });
 }

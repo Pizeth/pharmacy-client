@@ -42,7 +42,8 @@ export function UserForm({ mode, record, onCancel, onSuccess, onPendingChange }:
         ["password", values.password !== current.password],
       ] as const).find(([, differs]) => differs)?.[0];
       if (changed) {
-        form.setError(changed, { type: "validate", message: "This field changed during validation. Review and submit again." }, { shouldFocus: true });
+        form.setFocus(changed);
+        await form.trigger();
         return;
       }
       await mutation.mutateAsync(values);

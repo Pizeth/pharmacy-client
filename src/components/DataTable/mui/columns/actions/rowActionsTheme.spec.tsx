@@ -138,9 +138,10 @@ it("exposes row-action surfaces as named RazethDataTable theme slots", () => {
   expect(screen.queryByRole("menu")).not.toBeInTheDocument();
 
   fireEvent.click(screen.getByRole("checkbox", { name: "Select row alpha" }));
-  expect(more).toBeEnabled();
+  const selectedMenu = screen.getByRole("button", { name: "More actions for row alpha" });
+  expect(selectedMenu).toBeEnabled();
 
-  fireEvent.click(more);
+  fireEvent.click(selectedMenu);
 
   const archive = screen.getByRole("menuitem", {
     name: "Archive",

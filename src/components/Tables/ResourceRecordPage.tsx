@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Typography } from "@mui/material";
 import * as S from "./resourceRecordStyles";
 export { RecordSection, RecordHeading, RecordFields, RecordField } from "./resourceRecordStyles";
@@ -27,19 +27,21 @@ export function ResourceRecordPage({
   readonly children: ReactNode;
 }) {
   const printable = !loading && !error && Boolean(children);
+  const [manualPrint, setManualPrint] = useState(false);
   const printSection = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const section = printSection.current;
     if (!printable || !section) return undefined;
     const href = window.location.href;
     const url = new URL(href);
-    if (url.searchParams.get("print") !== "1") return undefined;
+    if (!manualPrint && url.searchParams.get("print") !== "1") return undefined;
 
     let cancelled = false;
     let frame: number | undefined;
     const schedulePrint = () => {
       if (cancelled) return;
       frame = requestAnimationFrame(() => {
+        setManualPrint(false);
         if (window.location.href !== href) return;
         url.searchParams.delete("print");
         window.history.replaceState(null, "", url);
@@ -65,14 +67,14 @@ export function ResourceRecordPage({
       observer.disconnect();
       if (frame !== undefined) cancelAnimationFrame(frame);
     };
-  }, [printable]);
+  }, [manualPrint, printable]);
 
   const navigation = <>
     <Button component={NextLink} href={backHref} color="inherit" startIcon={<ArrowBackOutlined />}>Back to list</Button>
     {!loading && !error && actions}
     {!loading && !error && editHref && <Button component={NextLink} href={editHref} variant="contained" startIcon={<EditOutlined />}>Edit</Button>}
     {printable && <Tooltip title="Print details">
-      <IconButton size="small" aria-label="Print details" onClick={() => { window.print(); }}>
+      <IconButton size="small" aria-label="Print details" disabled={manualPrint} onClick={() => { setManualPrint(true); }}>
         <PrintOutlined fontSize="small" />
       </IconButton>
     </Tooltip>}

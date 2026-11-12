@@ -6,7 +6,7 @@ export class AttachmentValidationError extends Error {
 }
 
 export function getAttachmentDraft(values: { source: string; name: string; url: string; kind: AttachmentKind }, file: File | null, fallbackName = "") {
-  const name = values.name.trim() || fallbackName.trim();
+  const name = values.name.trim() || fallbackName.trim().slice(0, 255);
   if (!name) throw new AttachmentValidationError("name", "Give the attachment a name.");
   if (name.length > 255) throw new AttachmentValidationError("name", "Attachment names must be 255 characters or fewer.");
   if (values.source === "upload") {
