@@ -37,26 +37,29 @@ export function ResourceRecordPage({
 
     let cancelled = false;
     let frame: number | undefined;
-    const printWhenReady = () => {
-      if (section.querySelector("[data-record-print-pending]")) return;
-      observer.disconnect();
-      void Promise.resolve(document.fonts?.ready).then(() => {
-        if (cancelled) return;
-        frame = requestAnimationFrame(() => {
-          if (window.location.href !== href) return;
-          url.searchParams.delete("print");
-          window.history.replaceState(null, "", url);
-          window.print();
-        });
+    const schedulePrint = () => {
+      if (cancelled) return;
+      frame = requestAnimationFrame(() => {
+        if (window.location.href !== href) return;
+        url.searchParams.delete("print");
+        window.history.replaceState(null, "", url);
+        window.print();
       });
     };
-    const observer = new MutationObserver(printWhenReady);
+    const printWhenReady = (activeObserver: MutationObserver) => {
+      if (section.querySelector("[data-record-print-pending]")) return;
+      activeObserver.disconnect();
+      document.fonts.ready.then(schedulePrint, schedulePrint);
+    };
+    const observer = new MutationObserver((_, activeObserver) => {
+      printWhenReady(activeObserver);
+    });
     observer.observe(section, {
       childList: true,
       subtree: true,
       attributeFilter: ["data-record-print-pending"],
     });
-    printWhenReady();
+    printWhenReady(observer);
     return () => {
       cancelled = true;
       observer.disconnect();
@@ -69,7 +72,7 @@ export function ResourceRecordPage({
     {!loading && !error && actions}
     {!loading && !error && editHref && <Button component={NextLink} href={editHref} variant="contained" startIcon={<EditOutlined />}>Edit</Button>}
     {printable && <Tooltip title="Print details">
-      <IconButton size="small" aria-label="Print details" onClick={() => window.print()}>
+      <IconButton size="small" aria-label="Print details" onClick={() => { window.print(); }}>
         <PrintOutlined fontSize="small" />
       </IconButton>
     </Tooltip>}

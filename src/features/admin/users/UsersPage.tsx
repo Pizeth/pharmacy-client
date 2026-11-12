@@ -48,7 +48,7 @@ export function UsersPage() {
     { id: "delete", label: "Delete user", inline: true, color: "primary", renderIcon: () => <DeleteOutline />, isDisabled: ({ row }) => !row.getIsSelected() || row.id === String(access.data?.id), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
     ...resourceRecordMenuActions<AdminUser>({
       basePath: "/admin/users",
-      navigate: router.push,
+      navigate: (path) => { router.push(path); },
       canDelete: record => String(record.id) !== String(access.data?.id),
     }),
   ], [access.data?.id, router]);

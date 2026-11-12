@@ -37,7 +37,7 @@ export function SocialProviderPage() {
     { id: "delete", label: "Delete", color: "primary", inline: true, renderIcon: () => <DeleteOutline fontSize="small" />, isDisabled: ({ row }) => !row.getIsSelected(), onClick: ({ row }) => setEditor({ mode: "delete", record: row.original }) },
     ...resourceRecordMenuActions<SocialProvider>({
       basePath: "/admin/social-provider",
-      navigate: router.push,
+      navigate: (path) => { router.push(path); },
     }),
   ], [router]);
   const columns = useMemo(() => providerColumns(rowActions), [rowActions]);

@@ -7,7 +7,7 @@ export function useInvalidLabelShake(invalid: boolean) {
     if (!invalid || !label) return;
 
     label.classList.add("shake");
-    const timer = setTimeout(() => label.classList.remove("shake"), 500);
+    const timer = setTimeout(() => { label.classList.remove("shake"); }, 500);
     return () => {
       clearTimeout(timer);
       label.classList.remove("shake");

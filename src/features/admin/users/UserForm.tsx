@@ -35,7 +35,12 @@ export function UserForm({ mode, record, onCancel, onSuccess, onPendingChange }:
       if (mode !== "delete") { invalidateEmail(); invalidateUsername(); }
       if (mode !== "delete" && !await form.trigger()) return;
       const current = form.getValues();
-      const changed = (["name", "username", "email", "password"] as const).find(field => values[field] !== current[field]);
+      const changed = ([
+        ["name", values.name !== current.name],
+        ["username", values.username !== current.username],
+        ["email", values.email !== current.email],
+        ["password", values.password !== current.password],
+      ] as const).find(([, differs]) => differs)?.[0];
       if (changed) {
         form.setError(changed, { type: "validate", message: "This field changed during validation. Review and submit again." }, { shouldFocus: true });
         return;

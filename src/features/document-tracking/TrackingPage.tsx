@@ -134,7 +134,7 @@ export function TrackingPage() {
       },
       ...resourceRecordMenuActions<TrackedDocument>({
         basePath: "/admin/documents",
-        navigate: router.push,
+        navigate: (path) => { router.push(path); },
         canEdit: record => record.permissions.canManage,
         canDelete: record => record.permissions.canManage,
         deleteLabel: "Open archive page",

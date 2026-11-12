@@ -33,7 +33,7 @@ export function TranslationKeyDeletePage({ recordId }: { readonly recordId: numb
             key={record.id}
             record={record}
             presentation="page"
-            onClose={() => router.push(listPath)}
+            onClose={() => { router.push(listPath); }}
             onDeleted={() => {
               router.replace(listPath);
               router.refresh();

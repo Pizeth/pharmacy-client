@@ -23,21 +23,21 @@ export function resourceRecordMenuActions<T extends { readonly id: string | numb
       label: "Open edit page",
       renderIcon: () => <OpenInNew fontSize="small" />,
       isDisabled: ({ row }) => !row.getIsSelected() || canEdit?.(row.original) === false,
-      onClick: ({ row }) => navigate(`${basePath}/edit/${encodeURIComponent(String(row.original.id))}`),
+      onClick: ({ row }) => { navigate(`${basePath}/edit/${encodeURIComponent(String(row.original.id))}`); },
     },
     {
       id: "delete-page",
       label: deleteLabel,
       renderIcon: () => <OpenInNew fontSize="small" />,
       isDisabled: ({ row }) => !row.getIsSelected() || canDelete?.(row.original) === false,
-      onClick: ({ row }) => navigate(`${basePath}/delete/${encodeURIComponent(String(row.original.id))}`),
+      onClick: ({ row }) => { navigate(`${basePath}/delete/${encodeURIComponent(String(row.original.id))}`); },
     },
     {
       id: "print",
       label: "Print details",
       renderIcon: () => <PrintOutlined fontSize="small" />,
       isDisabled: ({ row }) => !row.getIsSelected(),
-      onClick: ({ row }) => navigate(`${basePath}/${encodeURIComponent(String(row.original.id))}?print=1`),
+      onClick: ({ row }) => { navigate(`${basePath}/${encodeURIComponent(String(row.original.id))}?print=1`); },
     },
   ];
 }

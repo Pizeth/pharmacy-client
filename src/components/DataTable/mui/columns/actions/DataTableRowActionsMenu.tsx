@@ -99,7 +99,7 @@ export function DataTableRowActionsMenu<TData extends RowData>(
   return (
     <>
       <Tooltip title={disabled ? "Select this row to use more actions" : "More actions"}>
-        <span onClick={(event) => event.stopPropagation()}>
+        <span onClick={(event) => { event.stopPropagation(); }}>
           <MenuButtonRoot
             className={dataTableClasses.rowActionsMenuButton}
             size="small"
@@ -115,7 +115,7 @@ export function DataTableRowActionsMenu<TData extends RowData>(
       </Tooltip>
 
       <Menu
-        onClick={event => event.stopPropagation()}
+        onClick={event => { event.stopPropagation(); }}
         dir={direction}
         anchorEl={anchorEl}
         open={open}

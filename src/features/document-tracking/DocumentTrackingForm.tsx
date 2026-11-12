@@ -100,7 +100,9 @@ export function DocumentForm({
       | { data: ReturnType<typeof documentInputSchema.parse> | null; attachment: ReturnType<typeof getAttachmentDraft> | null }
     ) => {
       if ("reason" in input) {
-        return trackingApi.archive(initial.current!.id, initial.current!.version, input.reason);
+        const document = initial.current;
+        if (!document) throw new Error("No document selected for archiving.");
+        return trackingApi.archive(document.id, document.version, input.reason);
       }
       const { data, attachment } = input;
       let saved = registered;

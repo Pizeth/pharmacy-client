@@ -75,7 +75,7 @@ export function RolesPage() {
       },
       ...resourceRecordMenuActions<ApplicationRole>({
         basePath: "/admin/roles",
-        navigate: router.push,
+        navigate: (path) => { router.push(path); },
         canDelete: record => !record.isProtected && record.userCount === 0,
       }),
     ],

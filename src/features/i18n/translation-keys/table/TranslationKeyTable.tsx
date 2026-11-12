@@ -155,7 +155,7 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
       },
       ...resourceRecordMenuActions<TranslationKey>({
         basePath: "/admin/i18n",
-        navigate: router.push,
+        navigate: (path) => { router.push(path); },
       }),
     ],
     [router],

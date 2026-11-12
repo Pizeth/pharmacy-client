@@ -18,10 +18,10 @@ it("validates create fields and submits the shared form", async () => {
   const save = jest.spyOn(usersApi, "save").mockResolvedValue(record); mount("create");
   expect(await screen.findByRole("button", { name: "Create user" })).toBeDisabled();
   expect(save).not.toHaveBeenCalled();
-  await act(async () => { fireEvent.change(screen.getByLabelText(/Name/), { target: { value: "Jane" } }); });
-  await act(async () => { fireEvent.change(screen.getByLabelText(/Email/), { target: { value: "jane@example.com" } }); });
-  await act(async () => { fireEvent.change(screen.getByLabelText(/Username/), { target: { value: "jane1" } }); });
-  await act(async () => { fireEvent.change(screen.getByLabelText(/Temporary password/), { target: { value: "temporary-pass123" } }); });
+  await act(() => { fireEvent.change(screen.getByLabelText(/Name/), { target: { value: "Jane" } }); return Promise.resolve(); });
+  await act(() => { fireEvent.change(screen.getByLabelText(/Email/), { target: { value: "jane@example.com" } }); return Promise.resolve(); });
+  await act(() => { fireEvent.change(screen.getByLabelText(/Username/), { target: { value: "jane1" } }); return Promise.resolve(); });
+  await act(() => { fireEvent.change(screen.getByLabelText(/Temporary password/), { target: { value: "temporary-pass123" } }); return Promise.resolve(); });
   const submit = await screen.findByRole("button", { name: "Create user" });
   await waitFor(() => expect(submit).toBeEnabled());
   fireEvent.click(submit);

@@ -11,6 +11,7 @@ afterEach(() => {
 });
 
 it("waits for detail content before printing and supports printing again from the cover", async () => {
+  Object.defineProperty(document, "fonts", { configurable: true, value: { ready: Promise.resolve() } });
   const print = jest.spyOn(window, "print").mockImplementation(() => undefined);
   window.history.replaceState(null, "", "/admin/users/12?print=1");
   const page = (loading: boolean, pending: boolean) => (
@@ -28,7 +29,7 @@ it("waits for detail content before printing and supports printing again from th
   expect(window.location.search).toBe("?print=1");
   rerender(page(false, false));
 
-  await waitFor(() => expect(print).toHaveBeenCalledTimes(1));
+  await waitFor(() => { expect(print).toHaveBeenCalledTimes(1); });
   expect(window.location.search).toBe("");
   expect(screen.getByText("Profile details").closest("[data-record-print]")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Print details" }));

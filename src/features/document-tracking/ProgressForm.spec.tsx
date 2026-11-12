@@ -63,7 +63,9 @@ it("requires an attachment before creating the document record", async () => {
   expect(screen.getByText("Document title is required.")).toBeInTheDocument();
   fillRegistration();
   expect(submit).toBeDisabled();
-  fireEvent.submit(submit.closest("form")!);
+  const form = submit.closest("form");
+  if (!form) throw new Error("Registration form is missing.");
+  fireEvent.submit(form);
   expect(await screen.findByText("Choose a non-empty file to upload.")).toBeInTheDocument();
   expect(screen.getByLabelText("Attachment file")).toHaveAccessibleDescription("Choose a non-empty file to upload.");
   expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -212,7 +214,9 @@ it("requires an archive reason and makes no request on navigation or cancel", as
   expect(archive).not.toHaveBeenCalled();
   const submit = screen.getByRole("button", { name: "Archive record" });
   expect(submit).toBeDisabled();
-  fireEvent.submit(submit.closest("form")!);
+  const form = submit.closest("form");
+  if (!form) throw new Error("Registration form is missing.");
+  fireEvent.submit(form);
   expect(
     await screen.findByText("Give a reason for archiving this record."),
   ).toBeInTheDocument();
