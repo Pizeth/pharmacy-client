@@ -244,9 +244,7 @@ export function DocumentForm({
             />
           </>
         ) : (
-          <>
-            <DocumentFields mode={mode} metadata={metadata} metadataLocked={metadataLocked} pending={pending} attachmentFile={attachmentFile} setAttachmentFile={setAttachmentFile} />
-          </>
+          <DocumentFields mode={mode} metadata={metadata} metadataLocked={metadataLocked} pending={pending} attachmentFile={attachmentFile} setAttachmentFile={setAttachmentFile} />
         )}
         {registered && mutation.error && <Alert severity="warning">The document is saved, but its required attachment could not be confirmed. Retry the upload or provide a file URL to complete registration.</Alert>}
         {mutation.error && (

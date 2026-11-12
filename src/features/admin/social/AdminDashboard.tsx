@@ -53,7 +53,7 @@ function AdminSocialProfiles({ adminId, providers }: {
   const pending = save.isPending || remove.isPending;
   const reset = () => { setEditing(null); setDraft(empty); form.clearErrors(); save.reset(); };
   return <>
-      <S.ProfileSettings><S.ProfileSummary>Profile settings</S.ProfileSummary><S.Root>
+      <ProfileSettingsSection>
       <S.Panel aria-label="Administrator social profiles"><Typography variant="h6">Administrator social profiles</Typography><Typography variant="body2">Manage social profiles for an administrator. These profiles do not change the shared site-wide footer social links.</Typography>
         <FormProvider {...form}><S.Form noValidate onSubmit={event => { event.preventDefault(); form.clearErrors(); const parsed = profileInputSchema.safeParse({ ...form.getValues(), providerId: Number(form.getValues("providerId")), url: form.getValues("url") || null }); if (!parsed.success) { setFormIssues(form, parsed.error.issues); return; } save.mutate(parsed.data); }}>
           <Controller name="userId" control={userForm.control} render={({ field, fieldState }) => <BaseInput field={{ ...field, onChange: event => { field.onChange(event); setUserInput(event.target.value); reset(); } }} fieldState={fieldState} name="userId" iconStart={<UserRound fontSize="small" />} fullWidth label="User ID" type="number" disabled={pending} helperText="Defaults to your account. Enter another administrator's numeric user ID to manage their profiles." />} />
@@ -69,7 +69,7 @@ function AdminSocialProfiles({ adminId, providers }: {
       </S.Panel>
       {profiles.data?.length === 0 && <Alert severity="info">This user has no social profiles.</Alert>}
       {profiles.data?.map(profile => <S.Panel key={profile.id}><Typography variant="h6">{profile.provider.name}</Typography><Typography>{profile.handle}</Typography><Typography>{profile.url || "No profile URL"}</Typography><S.Actions><Button disabled={pending} onClick={() => { setEditing(profile); setDraft({ providerId: profile.providerId, handle: profile.handle, url: profile.url }); form.clearErrors(); save.reset(); }}>Edit {profile.provider.name} profile</Button><Button color="error" disabled={pending} onClick={() => { remove.reset(); setDeleting(profile); }}>Delete {profile.provider.name} profile</Button></S.Actions></S.Panel>)}
-      </S.Root></S.ProfileSettings>
+      </ProfileSettingsSection>
       <DeleteProfileDialog
         profile={deleting}
         pending={pending}
@@ -125,4 +125,13 @@ function ProfileQueryStatus({ providers, profiles }: {
 
 function useAdminProfiles(userId: number, enabled: boolean) {
   return useQuery({ queryKey: ["admin-social", "profiles", userId], queryFn: ({ signal }) => socialApi.profiles(userId, signal), enabled });
+}
+
+function ProfileSettingsSection({ children }: { readonly children: React.ReactNode }) {
+  return (
+    <S.ProfileSettings>
+      <S.ProfileSummary>Profile settings</S.ProfileSummary>
+      <S.Root>{children}</S.Root>
+    </S.ProfileSettings>
+  );
 }
