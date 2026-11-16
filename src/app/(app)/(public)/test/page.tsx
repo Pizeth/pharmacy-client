@@ -51,10 +51,14 @@ export default function ApiTester() {
       const res = await fetch(url, options);
       const headersMs = performance.now() - start;
       setStatus(res.status);
-      const data = await res.json();
+      const responseBody = await res.text();
       setTiming({ headers: Math.round(headersMs), total: Math.round(performance.now() - start) });
 
-      setResponse(JSON.stringify(data, null, 2));
+      try {
+        setResponse(JSON.stringify(JSON.parse(responseBody), null, 2));
+      } catch {
+        setResponse(responseBody);
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Invalid request or JSON";
