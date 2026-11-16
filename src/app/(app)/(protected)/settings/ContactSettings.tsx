@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent } from "react";
 import { z } from "zod";
 import { RecordCard } from "@/components/Tables/ResourceRecordPage";
-import { TOKEN_KEY } from "@/types/constants";
+import { API_URL, TOKEN_KEY } from "@/types/constants";
 
 const settingsSchema = z.object({
   phone: z.string().nullable(),
@@ -33,17 +33,8 @@ async function request(path: SettingsPath, method: string, body?: object, signal
     },
     ...(body && { body: JSON.stringify(body) }),
   };
-  let response: Response;
-  switch (path) {
-    case "/phone":
-      response = await fetch("/api/account/settings/phone", options);
-      break;
-    case "/social-links":
-      response = await fetch("/api/account/settings/social-links", options);
-      break;
-    default:
-      response = await fetch("/api/account/settings", options);
-  }
+  const origin = API_URL.replace(/\/(?:api(?:\/v1)?)?\/?$/, "");
+  const response = await fetch(`${origin}/api/account/settings${path}`, options);
   const result = await response.json().catch((error: unknown) => {
     if (error instanceof SyntaxError) return undefined;
     throw error;
