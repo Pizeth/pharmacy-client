@@ -265,18 +265,20 @@ export const ThemeToggleWrapper = styled(Box, {
   padding: "1em",
   margin: "-1em -1em -2.5em 0",
 }));
-const formEnter = keyframes({
-  from: { opacity: 0, transform: "translateX(var(--auth-form-enter-offset))" },
+const formEnter = (offset: number) => keyframes({
+  from: { opacity: 0, transform: `translateX(${offset}px)` },
   to: { opacity: 1, transform: "translateX(0)" },
 });
+
+const signInEnter = formEnter(-15);
+const signUpEnter = formEnter(15);
 
 export const FormTransition = styled(Box, {
   name: PREFIX,
   slot: "FormTransition",
   shouldForwardProp: (prop) => prop !== "mode",
 })<{ mode: AuthAction }>(({ mode }) => ({
-  "--auth-form-enter-offset": mode === "signin" ? "-15px" : "15px",
-  animation: `${formEnter} 650ms cubic-bezier(0.22, 1, 0.36, 1)`,
+  animation: `${mode === "signin" ? signInEnter : signUpEnter} 650ms cubic-bezier(0.22, 1, 0.36, 1)`,
   "@media (prefers-reduced-motion: reduce)": {
     animation: "none",
   },
