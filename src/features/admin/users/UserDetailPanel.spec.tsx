@@ -10,10 +10,14 @@ it.each(["table", "card"] as const)("separates role, accounts and profile in %s 
   expect(screen.getByRole("region", { name: "User accounts" })).toBeInTheDocument();
   expect(within(screen.getByRole("region", { name: "User profile" })).getByText("Jane Doe")).toBeInTheDocument();
   const status = screen.getByText("Active");
-  expect(getComputedStyle(status.closest("dd")!.parentElement!).textAlign).toBe("left");
+  const statusField = status.closest("dd")?.parentElement;
+  if (!statusField) throw new Error("Expected a detail field.");
+  expect(getComputedStyle(statusField).textAlign).toBe("left");
   const verification = screen.getByRole("img", { name: "Email verified" });
   expect(verification).toHaveTextContent(""); expect(screen.queryByText(/^Verified$/)).not.toBeInTheDocument();
-  expect(getComputedStyle(verification.closest("dd")!.parentElement!).textAlign).toBe("left");
+  const verificationField = verification.closest("dd")?.parentElement;
+  if (!verificationField) throw new Error("Expected a detail field.");
+  expect(getComputedStyle(verificationField).textAlign).toBe("left");
   const providers = screen.getByRole("list", { name: "Linked sign-in providers" });
   expect(getComputedStyle(providers).paddingTop).toBe("16px"); expect(within(providers).getByText("Google")).toBeInTheDocument();
 });
@@ -39,7 +43,9 @@ it("keeps the verification badge circular and card labels inline", () => {
   expect(style.width).toBe("20px"); expect(style.height).toBe("20px"); expect(style.padding).toBe("0px"); expect(style.borderRadius).toBe("50%");
   const email = screen.getByText("jane@example.com");
   expect(getComputedStyle(email).display).toBe("inline");
-  expect(getComputedStyle(email.previousElementSibling!).display).toBe("inline");
+  const label = email.previousElementSibling;
+  if (!label) throw new Error("Expected the email field label.");
+  expect(getComputedStyle(label).display).toBe("inline");
 });
 
 it("shows unverified email for a Telegram account without an ID status", () => {
