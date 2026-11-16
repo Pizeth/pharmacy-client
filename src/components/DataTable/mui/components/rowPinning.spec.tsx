@@ -28,6 +28,23 @@ const data: Row[] = [
 
 const theme = createTheme();
 
+it("measures initially pinned real table rows without waiting for a selection or resize", () => {
+  const rect = jest.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+    const height = this.dataset.rowId === "b" ? 50.8125 : 61.25;
+    return { x: 0, y: 0, top: 0, left: 0, right: 100, bottom: height, width: 100, height, toJSON() {} };
+  });
+  try {
+    const { container } = render(<ThemeProvider theme={theme}><Fixture /></ThemeProvider>);
+    expect(container.querySelector('[data-row-id="c"]')).toHaveStyle({ "--DataTable-row-pinned-offset": "86.8125px" });
+    expect(container.querySelector('[data-row-id="d"]')).toHaveStyle({ "--DataTable-row-pinned-offset": "0px" });
+    rect.mockClear();
+    fireEvent.scroll(container);
+    expect(rect).not.toHaveBeenCalled();
+  } finally {
+    rect.mockRestore();
+  }
+});
+
 function Fixture({
   displayMode = "sticky",
 }: {
@@ -287,10 +304,20 @@ it("pins individual selections but select-all clears sticky pins", () => {
   );
 
   expect(screen.getByTestId("select-sticky-top-rows")).toHaveTextContent("a");
-  expect(container.querySelector('[data-row-id="a"]')).toHaveAttribute(
+  const selectedRow = container.querySelector('[data-row-id="a"]');
+
+  expect(selectedRow).toHaveAttribute(
     "data-row-pinned",
     "top",
   );
+  expect(selectedRow).toHaveAttribute(
+    "data-row-pinning-dual-edge",
+    "true",
+  );
+  expect(selectedRow).toHaveStyle({
+    "--DataTable-row-pinned-offset": "36px",
+    "--DataTable-row-pinned-bottom-offset": "0px",
+  });
 
   /**
    * Page-level select-all must not turn every selected row into a sticky row.
@@ -320,4 +347,127 @@ it("pins individual selections but select-all clears sticky pins", () => {
       container.querySelector(`[data-row-id="${row.id}"]`),
     ).not.toHaveAttribute("data-row-pinned");
   }
+});
+
+
+it("keeps select-sticky rows single-identity while stacking both sticky edges", () => {
+  const { container } = render(
+    <ThemeProvider theme={theme}>
+      <SelectStickyFixture />
+    </ThemeProvider>,
+  );
+
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select row a",
+    }),
+  );
+
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select row b",
+    }),
+  );
+
+  /**
+   * Selection-driven sticky rows keep one TanStack identity: both live only in
+   * the top pin region. The renderer supplies the second physical edge.
+   */
+  expect(screen.getByTestId("select-sticky-top-rows")).toHaveTextContent("a,b");
+
+  for (const rowId of ["a", "b"]) {
+    expect(
+      container.querySelectorAll(`tr[data-row-id="${rowId}"]`),
+    ).toHaveLength(1);
+
+    expect(
+      container.querySelector(`[data-row-id="${rowId}"]`),
+    ).toHaveAttribute("data-row-pinning-dual-edge", "true");
+  }
+
+  /**
+   * Compact density:
+   *
+   * header = 36px
+   * row    = 37px
+   *
+   * Top stack follows selection/pin order:
+   *   a = 36
+   *   b = 73
+   *
+   * Bottom stack reverses the edge order:
+   *   a = 37
+   *   b = 0
+   */
+  expect(container.querySelector('[data-row-id="a"]')).toHaveStyle({
+    "--DataTable-row-pinned-offset": "36px",
+    "--DataTable-row-pinned-bottom-offset": "37px",
+  });
+
+  expect(container.querySelector('[data-row-id="b"]')).toHaveStyle({
+    "--DataTable-row-pinned-offset": "73px",
+    "--DataTable-row-pinned-bottom-offset": "0px",
+  });
+
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select row a",
+    }),
+  );
+
+  expect(container.querySelector('[data-row-id="a"]')).not.toHaveAttribute(
+    "data-row-pinned",
+  );
+  expect(container.querySelector('[data-row-id="a"]')).not.toHaveAttribute(
+    "data-row-pinning-dual-edge",
+  );
+});
+
+it("orders select-sticky stacks by current row sequence instead of click order", () => {
+  const { container } = render(
+    <ThemeProvider theme={theme}>
+      <SelectStickyFixture />
+    </ThemeProvider>,
+  );
+
+  /**
+   * Click deliberately out of row order.
+   *
+   * TanStack rowPinning interaction history may therefore be d,b,c, but MRT
+   * presentation order must follow the current rendered row sequence b,c,d.
+   */
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select row d",
+    }),
+  );
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select row b",
+    }),
+  );
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select row c",
+    }),
+  );
+
+  expect(screen.getByTestId("select-sticky-top-rows")).toHaveTextContent(
+    "d,b,c",
+  );
+
+  expect(container.querySelector('[data-row-id="b"]')).toHaveStyle({
+    "--DataTable-row-pinned-offset": "36px",
+    "--DataTable-row-pinned-bottom-offset": "74px",
+  });
+
+  expect(container.querySelector('[data-row-id="c"]')).toHaveStyle({
+    "--DataTable-row-pinned-offset": "73px",
+    "--DataTable-row-pinned-bottom-offset": "37px",
+  });
+
+  expect(container.querySelector('[data-row-id="d"]')).toHaveStyle({
+    "--DataTable-row-pinned-offset": "110px",
+    "--DataTable-row-pinned-bottom-offset": "0px",
+  });
 });

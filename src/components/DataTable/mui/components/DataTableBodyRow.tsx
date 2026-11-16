@@ -1,7 +1,12 @@
 "use client";
 
 import { styled, TableRow } from "@mui/material";
-import type { CSSProperties } from "react";
+import type {
+  CSSProperties,
+  KeyboardEvent,
+  MouseEvent,
+  TouchEvent,
+} from "react";
 
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { Row, RowData } from "@tanstack/table-core";
@@ -9,9 +14,66 @@ import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
 import { DataTableBodyCell } from "./DataTableBodyCell";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
+import { DataTableDiagnosticCommit, useDataTableRenderDiagnostics } from "../diagnostics/renderDiagnostics";
+
+/**
+ * Optional row activation handler.
+ *
+ * Fired for a primary click on the row surface (or Enter/Space when the
+ * row itself is focused). Clicks that originate from interactive
+ * descendants (buttons, links, inputs, checkboxes, expand toggles) are
+ * ignored so row actions keep working independently.
+ */
+export type DataTableRowClickHandler<TData extends RowData> = (
+  row: Row<MuiDataTableFeatures, TData>,
+  event:
+    | MouseEvent<HTMLTableRowElement>
+    | KeyboardEvent<HTMLTableRowElement>
+    | TouchEvent<HTMLTableRowElement>,
+) => void;
+
+const INTERACTIVE_DESCENDANT_SELECTOR = [
+  "button",
+  "a[href]",
+  "input",
+  "select",
+  "textarea",
+  "label",
+  '[role="button"]',
+  '[role="checkbox"]',
+  '[role="menuitem"]',
+  '[role="switch"]',
+  '[role="radio"]',
+  '[role="textbox"]',
+  '[role="combobox"]',
+  '[role="slider"]',
+  '[contenteditable]:not([contenteditable="false"])',
+  "[data-row-click-ignore]",
+].join(",");
+
+/** Recognizes interactive descendants so their clicks do not activate the owning row. */
+export function isFromInteractiveDescendant(
+  event:
+    | MouseEvent<HTMLElement>
+    | KeyboardEvent<HTMLElement>
+    | TouchEvent<HTMLElement>,
+): boolean {
+  const target = event.target;
+
+  // React portal events bubble through the row even when their DOM target is outside it.
+  if (target instanceof Node && !event.currentTarget.contains(target)) return true;
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  const interactive = target.closest(INTERACTIVE_DESCENDANT_SELECTOR);
+
+  return interactive !== null && interactive !== event.currentTarget;
+}
 
 export interface DataTableBodyRowStyle extends CSSProperties {
   readonly "--DataTable-row-pinned-offset"?: string;
+  readonly "--DataTable-row-pinned-bottom-offset"?: string;
 }
 
 const BodyRowRoot = styled(TableRow, {
@@ -50,13 +112,15 @@ const BodyRowRoot = styled(TableRow, {
     "--DataTable-row-selected-hover-background": selectedHoverBackground,
 
     "&:hover": {
-      "--DataTable-row-background":
-        "var(--DataTable-row-hover-background)",
+      "--DataTable-row-background": "var(--DataTable-row-hover-background)",
+    },
+
+    '&[data-row-clickable="true"]': {
+      cursor: "pointer",
     },
 
     '&[data-selected="true"]': {
-      "--DataTable-row-background":
-        "var(--DataTable-row-selected-background)",
+      "--DataTable-row-background": "var(--DataTable-row-selected-background)",
 
       "&:hover": {
         "--DataTable-row-background":
@@ -87,6 +151,23 @@ const BodyRowRoot = styled(TableRow, {
       bottom: "var(--DataTable-row-pinned-offset)",
       zIndex: 2,
     },
+
+    /**
+     * MRT-style select-sticky rows use one TanStack top-pin identity but are
+     * physically constrained by both scroll edges.
+     *
+     * Keeping this as presentation-only CSS means:
+     *
+     * - the row renders exactly once,
+     * - TanStack rowPinning remains the only pin state,
+     * - the browser chooses whether the natural row position hits the top or
+     *   bottom sticky boundary first.
+     */
+    '&[data-row-pinning-sticky="true"][data-row-pinning-dual-edge="true"]': {
+      position: "sticky",
+      bottom: "var(--DataTable-row-pinned-bottom-offset)",
+      zIndex: 2,
+    },
   };
 });
 
@@ -104,6 +185,25 @@ export interface DataTableBodyRowProps<TData extends RowData> {
    * Static modes physically regroup rows and leave normal table positioning.
    */
   readonly stickyRowPinning: boolean;
+
+  /**
+   * Optional row activation handler. See DataTableRowClickHandler.
+   */
+  readonly onRowClick?: DataTableRowClickHandler<TData>;
+  readonly rowClickSelectedOnly?: boolean;
+  readonly ariaRowIndex?: number;
+
+  /**
+   * select-sticky presentation constrains the same top-pinned row against the
+   * bottom scroll edge as well. No second TanStack pin is created.
+   */
+  readonly dualEdgeStickyRowPinning: boolean;
+
+  /**
+   * Sticky presentation order derived from the rendered/final row sequence,
+   * not TanStack rowPinning insertion order.
+   */
+  readonly stickyPinnedRowIds: readonly string[];
 }
 
 /**
@@ -123,39 +223,60 @@ export interface DataTableBodyRowProps<TData extends RowData> {
 export function DataTableBodyRow<TData extends RowData>(
   props: DataTableBodyRowProps<TData>,
 ) {
-  const { table, row, pinnedRowStickyTop, stickyRowPinning } = props;
+  const {
+    table,
+    row,
+    pinnedRowStickyTop,
+    stickyRowPinning,
+    dualEdgeStickyRowPinning,
+    stickyPinnedRowIds,
+    onRowClick,
+    rowClickSelectedOnly,
+    ariaRowIndex,
+  } = props;
 
   const { density } = useDataTableDensity();
+  const diagnostics = useDataTableRenderDiagnostics();
 
   const rowHeight = getDataTableDensityMetrics(density).bodyRowHeight;
 
   return (
     <table.Subscribe
       selector={(state) => ({
-        rowSelection: state.rowSelection,
+        rowSelection: diagnostics?.narrowRowSelection
+          ? Boolean(state.rowSelection?.[row.id])
+          : state.rowSelection,
         rowPinning: state.rowPinning,
       })}
     >
       {(state) => {
-        const selected = Boolean(state.rowSelection?.[row.id]);
+        const selected = typeof state.rowSelection === "boolean"
+          ? state.rowSelection
+          : Boolean(state.rowSelection?.[row.id]);
 
+        const clickable = !!onRowClick && (!rowClickSelectedOnly || selected);
         const pinnedPosition = row.getIsPinned();
 
-        const pinnedIndex = pinnedPosition ? row.getPinnedIndex() : -1;
+        /**
+         * TanStack's rowPinning arrays preserve pin/click insertion order.
+         * MRT-style sticky presentation instead follows final row order.
+         */
+        const stickyIndex = pinnedPosition
+          ? stickyPinnedRowIds.indexOf(row.id)
+          : -1;
 
-        const bottomRows =
-          pinnedPosition === "bottom" ? table.getBottomRows() : [];
+        const reverseStickyIndex =
+          stickyIndex < 0 ? -1 : stickyPinnedRowIds.length - 1 - stickyIndex;
 
         /**
-         * Top rows stack downward beneath sticky headers.
+         * Top rows stack downward in row-model sequence.
          *
-         * Bottom rows stack upward from the bottom edge. TanStack's pinned
-         * index is array order, so bottom rows need their edge index reversed.
+         * Bottom rows stack upward using the reverse row-model sequence.
          */
         const edgeIndex =
           pinnedPosition === "bottom"
-            ? Math.max(0, bottomRows.length - 1 - pinnedIndex)
-            : Math.max(0, pinnedIndex);
+            ? Math.max(0, reverseStickyIndex)
+            : Math.max(0, stickyIndex);
 
         const pinnedOffset =
           pinnedPosition === "top"
@@ -164,41 +285,104 @@ export function DataTableBodyRow<TData extends RowData>(
               ? edgeIndex * rowHeight
               : undefined;
 
+        /**
+         * select-sticky keeps each selected row in one TanStack top-pin
+         * identity, but constrains it against both viewport edges.
+         *
+         * Top and bottom offsets both follow the current row-model sequence,
+         * matching MRT rather than FIFO selection order.
+         */
+        const dualEdgeBottomOffset =
+          dualEdgeStickyRowPinning && pinnedPosition === "top"
+            ? Math.max(0, reverseStickyIndex) * rowHeight
+            : undefined;
+
         const style: DataTableBodyRowStyle = {
           "--DataTable-row-pinned-offset":
             pinnedOffset === undefined ? undefined : `${pinnedOffset}px`,
+          "--DataTable-row-pinned-bottom-offset":
+            dualEdgeBottomOffset === undefined
+              ? undefined
+              : `${dualEdgeBottomOffset}px`,
         };
 
         return (
-        <BodyRowRoot
-          className={dataTableClasses.bodyRow}
-          hover
-          selected={selected}
-          data-row-id={row.id}
-          data-selected={selected ? "true" : undefined}
-          data-density={density}
-          data-row-pinned={pinnedPosition || undefined}
-          data-row-pinning-sticky={
-            stickyRowPinning && pinnedPosition ? "true" : undefined
-          }
-          style={style}
-        >
-          <table.Subscribe
-            selector={(state) => ({
-              columnVisibility: state.columnVisibility,
-              columnOrder: state.columnOrder,
-              columnPinning: state.columnPinning,
-            })}
-          >
-            {() =>
-              row
-                .getVisibleCells()
-                .map((cell) => (
-                  <DataTableBodyCell key={cell.id} table={table} cell={cell} />
-                ))
+          <BodyRowRoot
+            className={dataTableClasses.bodyRow}
+            hover
+            selected={selected}
+            aria-rowindex={ariaRowIndex}
+            data-row-id={row.id}
+            data-selected={selected ? "true" : undefined}
+            data-density={density}
+            data-row-pinned={pinnedPosition || undefined}
+            data-row-pinning-sticky={
+              stickyRowPinning && pinnedPosition ? "true" : undefined
             }
-          </table.Subscribe>
-        </BodyRowRoot>
+            data-row-clickable={clickable ? "true" : undefined}
+            tabIndex={clickable ? 0 : undefined}
+            onClick={
+              clickable && onRowClick
+                ? (event) => {
+                    if (
+                      event.defaultPrevented ||
+                      event.button !== 0 ||
+                      isFromInteractiveDescendant(event)
+                    ) {
+                      return;
+                    }
+
+                    onRowClick(row, event);
+                  }
+                : undefined
+            }
+            onKeyDown={
+              clickable && onRowClick
+                ? (event) => {
+                    if (
+                      event.defaultPrevented ||
+                      event.repeat ||
+                      event.target !== event.currentTarget ||
+                      (event.key !== "Enter" && event.key !== " ")
+                    ) {
+                      return;
+                    }
+
+                    event.preventDefault();
+                    onRowClick(row, event);
+                  }
+                : undefined
+            }
+            data-row-pinning-dual-edge={
+              stickyRowPinning &&
+              dualEdgeStickyRowPinning &&
+              pinnedPosition === "top"
+                ? "true"
+                : undefined
+            }
+            style={style}
+          >
+            {diagnostics && <DataTableDiagnosticCommit layer="row" id={row.id} />}
+            <table.Subscribe
+              selector={(state) => ({
+                columnVisibility: state.columnVisibility,
+                columnOrder: state.columnOrder,
+                columnPinning: state.columnPinning,
+              })}
+            >
+              {() =>
+                row
+                  .getVisibleCells()
+                  .map((cell) => (
+                    <DataTableBodyCell
+                      key={cell.id}
+                      table={table}
+                      cell={cell}
+                    />
+                  ))
+              }
+            </table.Subscribe>
+          </BodyRowRoot>
         );
       }}
     </table.Subscribe>

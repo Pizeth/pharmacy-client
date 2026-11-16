@@ -145,7 +145,7 @@
 // }
 
 import { useState } from "react";
-import { AddRounded } from "@mui/icons-material";
+import { TranslateOutlined } from "@mui/icons-material";
 import { FormDialog } from "@/components/forms/FormDialog";
 import type { TranslationKey } from "../schemas";
 import { TranslationKeyCreateForm } from "./TranslationKeyCreateForm";
@@ -177,8 +177,10 @@ export function TranslationKeyCreateDialog(
     <FormDialog
       open={open}
       title="Create translation key"
+      dedicatedPageHref="/admin/i18n/create"
+      dedicatedPageLabel="Open dedicated create page"
       subtitle="Add metadata first. Translation values can be managed separately."
-      icon={<AddRounded />}
+      icon={<TranslateOutlined />}
       pending={pending}
       closeAriaLabel="Close create translation key dialog"
       onClose={onClose}

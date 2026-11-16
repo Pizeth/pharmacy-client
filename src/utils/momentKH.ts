@@ -1390,7 +1390,7 @@ function khmerToGregorian(
   const startYear = approxYear - 2;
   const endYear = approxYear + 2;
 
-  let candidates: GregorianDate[] = [];
+  const candidates: GregorianDate[] = [];
 
   // Iterate through Gregorian dates to find all matches
   for (let year = startYear; year <= endYear; year++) {
@@ -1492,7 +1492,7 @@ function getNewYearFullInfo(ceYear: number): NewYearFullInfo {
 
   // Calculate using the standard algorithm first to get necessary info (like angsar for numberNewYearDay)
   const jsYear = adToJs(ceYear);
-  let newYearInfo = getNewYearInfo(jsYear);
+  const newYearInfo = getNewYearInfo(jsYear);
 
   // Get Lerng Sak info
   let bodithey = getBoditheyJs(jsYear);

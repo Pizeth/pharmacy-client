@@ -2,70 +2,67 @@ import { MiniDashboardProps } from "@/interfaces/component-props.interface";
 import Box from "@mui/material/Box";
 import { alpha, styled, useThemeProps } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-
 const PREFIX = "RazethMiniDashboard";
 const Root = styled(Box, {
   name: PREFIX,
-  slot: "Root",
-})(({ theme }) => ({
+  slot: "Root"
+})(({
+  theme
+}) => ({
   display: "flex",
   alignItems: "center",
   gap: theme.spacing(1.5),
   margin: theme.spacing(0, 1.25),
   padding: theme.spacing(0.25, 0.75),
-  // boxShadow: `3px 3px 15px ${theme.vars.palette.background.default}, -3px -3px 15px rgb(58, 58, 58)`,
-  // Formula: [Top-Left Highlight], [Bottom-Right Shadow]
-  // Use the CSS variable created by colorSchemes
   boxShadow: theme.vars.palette.customShadows.neumorphic,
-  border: `0.5px solid ${theme.alpha(theme.vars.palette.text.primary, 0.05)}`, // Subtle edge highlight
+  border: `0.5px solid ${theme.alpha(theme.vars.palette.text.primary, 0.05)}`,
   borderRadius: "50px",
   backgroundColor: theme.alpha(theme.vars.palette.background.paper, 0.775),
-  // transition: "box-shadow 0.00125s ease-in-out",
   "& .MuiBox-root": {
     a: {
       color: alpha(theme.palette.primary.main, 0.75),
       "&:hover": {
         textDecoration: "underline",
-        color: theme.palette.primary.main,
-      },
-    },
-  },
+        color: theme.palette.primary.main
+      }
+    }
+  }
 }));
-
 const Content = styled(Box, {
   name: PREFIX,
   slot: "Content",
-  overridesResolver: (_props, styles) => styles.content,
-})(({ theme }) => ({
+  overridesResolver: (_props, styles) => styles.content
+})(({
+  theme
+}) => ({
   position: "relative",
   display: "inline-flex",
   fontSize: "0.875rem",
   fontWeight: 500,
-  color: theme.vars.palette.text.primary,
+  color: theme.vars.palette.text.primary
 }));
-
 const MiniDashboard = (inProps: MiniDashboardProps) => {
-  const props = useThemeProps({ props: inProps, name: PREFIX });
-  const { children, mainCaption, subCaption, link, ...rest } = props;
-  return (
-    <Root {...rest}>
+  const props = useThemeProps({
+    props: inProps,
+    name: PREFIX
+  });
+  const {
+    children,
+    mainCaption,
+    subCaption,
+    link,
+    ...rest
+  } = props;
+  return <Root {...rest}>
       <Content>{children}</Content>
       <Box>
         <Typography variant="caption" fontWeight={700} display="block">
           {mainCaption}
         </Typography>
-        <Typography
-          variant="caption"
-          color="primary"
-          fontWeight={700}
-          component="a"
-          href={link}
-        >
+        <Typography variant="caption" color="primary" fontWeight={700} component="a" href={link}>
           {subCaption}
         </Typography>
       </Box>
-    </Root>
-  );
+    </Root>;
 };
-
 export default MiniDashboard;

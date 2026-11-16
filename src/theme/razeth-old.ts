@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
+
 import { deepmerge } from "@mui/utils";
 import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
 import { red, blue } from "@mui/material/colors";

@@ -154,12 +154,12 @@ describe("TranslationKey columns", () => {
       (column) => column.id === DATA_TABLE_ACTIONS_COLUMN_ID,
     );
 
-    expect(expansion?.header).toBe("Details");
-    expect(expansion?.size).toBe(72);
+    expect(typeof expansion?.header).toBe("function");
+    expect(expansion?.size).toBe(44);
     expect(expansion?.meta?.label).toBe("Details");
 
     expect(actions?.header).toBe("Actions");
-    expect(actions?.size).toBe(104);
+    expect(actions?.size).toBe(150);
     expect(actions?.meta?.label).toBe("Actions");
   });
 

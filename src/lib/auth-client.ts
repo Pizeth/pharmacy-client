@@ -8,10 +8,11 @@ import {
   adminClient,
   jwtClient, // 👈 add this — it adds role to the inferred type
 } from "better-auth/client/plugins";
+import { createSentinelClientPlugin } from "@/lib/auth/sentinelClient";
 
 import { passkeyClient } from "@better-auth/passkey/client";
 import { API_URL, COOKIE_TOKEN_KEY, TOKEN_KEY } from "@/types/constants";
-import { BetterAuthClientPlugin } from "better-auth/client";
+import { beginLoginAttempt, isLoginRequest, reportLoginFailure, reportLoginResponse, shouldReportLoginError } from "@/lib/auth/loginFeedback";
 
 export const authClient = createAuthClient({
   // 👆 Just the origin — Better Auth appends /api/auth internally
@@ -24,6 +25,15 @@ export const authClient = createAuthClient({
   cookiePolicy: "cross-origin",
   fetchOptions: {
     credentials: "include", // 👈 always send cookies cross-origin
+    onRequest: (ctx) => {
+      if (isLoginRequest(ctx.url.toString())) beginLoginAttempt();
+    },
+    onError: (ctx) => {
+      // Sentinel's challenge is retried automatically, not a failed login.
+      if (shouldReportLoginError(ctx.request.url.toString(), ctx.response.status)) {
+        reportLoginFailure(ctx.error.message);
+      }
+    },
     // 👇 Auto-capture token from every response
     onSuccess: (ctx) => {
       const authToken =
@@ -32,6 +42,7 @@ export const authClient = createAuthClient({
       if (authToken) {
         sessionStorage.setItem(TOKEN_KEY, authToken);
       }
+      reportLoginResponse(ctx.data);
     },
     // 👇 Auto-attach token to every request
     auth: {
@@ -46,6 +57,7 @@ export const authClient = createAuthClient({
     passkeyClient(),
     multiSessionClient(),
     adminClient(), // 👈 this is what adds role to the session type
+    createSentinelClientPlugin(),
     oneTapClient({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string,
       // Optional client configuration:

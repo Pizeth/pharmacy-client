@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { DataTable } from "../components/DataTable";
 import { createMuiDataTableColumnHelper, useMuiDataTable } from "../table";
+import { DataTableStickyHeightAcceptance } from "./DataTableStickyHeightAcceptance";
 
 type ExampleRow = { id: string; start: string; center: string; end: string };
 const helper = createMuiDataTableColumnHelper<ExampleRow>();
@@ -121,6 +122,7 @@ export function DataTableAcceptance() {
         </p>
         <div style={{ width: narrow ? 420 : 900, maxWidth: "100%" }}>
           <ExampleTable direction={direction} />
+          <DataTableStickyHeightAcceptance />
         </div>
       </main>
     </ThemeProvider>

@@ -19,6 +19,7 @@ const HeadRoot = styled(TableHead, {
 
 export interface DataTableHeadProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
+  readonly indexRows?: boolean;
 }
 
 /**
@@ -34,7 +35,7 @@ export interface DataTableHeadProps<TData extends RowData> {
 export function DataTableHead<TData extends RowData>(
   props: DataTableHeadProps<TData>,
 ) {
-  const { table } = props;
+  const { table, indexRows } = props;
 
   const { columnFilterDisplayMode, showColumnFilters } =
     useDataTableFilterDisplay();
@@ -61,6 +62,7 @@ export function DataTableHead<TData extends RowData>(
                 table={table}
                 headerGroup={headerGroup}
                 headerRowIndex={headerRowIndex}
+                ariaRowIndex={indexRows ? headerRowIndex + 1 : undefined}
               />
             ))}
             {renderFilterRow && (

@@ -1,0 +1,106 @@
+=== baseline-failures.txt ===
+      at render (node_modules/@testing-library/react/dist/pure.js:300:10)
+      at Object.<anonymous> (src/components/Navigations/DrawerAppBar.spec.tsx:27:9)
+
+Test Suites: 2 failed, 2 total
+Tests:       4 failed, 3 passed, 7 total
+Snapshots:   0 total
+Time:        3.659 s
+Ran all test suites matching src/features/hrd/pages/home/HrdHomePage.spec.tsx|src/components/Navigations/DrawerAppBar.spec.tsx.
+
+
+=== changed-lint.txt ===
+
+C:\Users\sethr\.codex\worktrees\datatable-live-callbacks\pharmacy-client\src\components\DataTable\mui\dev\SelectionDependenciesAcceptance.tsx
+  143:7  warning  React Hook useMemo has a missing dependency: 'table'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 1 problem (0 errors, 1 warning)
+
+
+
+=== dependency-tree.txt ===
+├── typescript@6.0.3
+├── uuid@14.0.3
+├─┬ vaul@1.1.2
+│ ├── @radix-ui/react-dialog@1.3.1 deduped
+│ ├── react-dom@19.3.1 deduped
+│ └── react@19.3.1 deduped
+└── zod@4.6.7
+
+
+
+=== focused-result.txt ===
+
+Test Suites: 2 passed, 2 total
+Tests:       31 passed, 31 total
+Snapshots:   0 total
+Time:        15.396 s, estimated 17 s
+Ran all test suites matching src/components/DataTable/mui/components/liveCallbackContext.spec.tsx|src/components/DataTable/mui/components/selectionDependencyContract.spec.tsx.
+
+
+=== full-lint-result.txt ===
+
+C:\Users\sethr\.codex\worktrees\datatable-live-callbacks\pharmacy-client\src\utils\themeUtils.ts
+  6:10  warning  'StarfieldOptions' is defined but never used  @typescript-eslint/no-unused-vars
+  7:10  warning  'MeteorConfig' is defined but never used      @typescript-eslint/no-unused-vars
+
+✖ 682 problems (174 errors, 508 warnings)
+  5 errors and 2 warnings potentially fixable with the `--fix` option.
+
+
+
+=== full-test-result.txt ===
+      at Object.<anonymous> (src/components/Navigations/DrawerAppBar.spec.tsx:27:9)
+
+
+Test Suites: 2 failed, 148 passed, 150 total
+Tests:       4 failed, 870 passed, 874 total
+Snapshots:   0 total
+Time:        122.77 s
+Ran all test suites.
+
+
+=== typecheck-result.txt ===
+   5 intentionally ignored
+
+Ignored TanStack features:
+  - cellSelectionFeature
+  - cellSpanningFeature
+  - columnFacetingFeature
+  - columnGroupingFeature
+  - rowAggregationFeature
+
+
+=== Separate CI repair ===
+=== repair-focused.txt ===
+
+Test Suites: 4 passed, 4 total
+Tests:       38 passed, 38 total
+Snapshots:   0 total
+Time:        22.045 s
+Ran all test suites matching src/features/hrd/pages/home/HrdHomePage.spec.tsx|src/components/Navigations/DrawerAppBar.spec.tsx|src/components/DataTable/mui/components/liveCallbackContext.spec.tsx|src/components/DataTable/mui/components/selectionDependencyContract.spec.tsx.
+
+
+=== repair-full.txt ===
+> jest --runInBand --roots src
+
+
+Test Suites: 150 passed, 150 total
+Tests:       874 passed, 874 total
+Snapshots:   0 total
+Time:        105.882 s, estimated 111 s
+Ran all test suites.
+
+
+=== repair-typecheck.txt ===
+   5 intentionally ignored
+
+Ignored TanStack features:
+  - cellSelectionFeature
+  - cellSpanningFeature
+  - columnFacetingFeature
+  - columnGroupingFeature
+  - rowAggregationFeature
+
+
+=== repair-lint.txt ===

@@ -8,7 +8,7 @@ interface Values {
   categoryId: string;
 }
 
-function Fixture() {
+function Fixture({ helperText }: { helperText?: string } = {}) {
   const form = useForm<Values>({
     defaultValues: {
       categoryId: "",
@@ -18,6 +18,7 @@ function Fixture() {
   return (
     <FormProvider {...form}>
       <SelectField
+        helperText={helperText}
         name="categoryId"
         label="Category"
         iconStart={<CategoryOutlined />}
@@ -29,6 +30,7 @@ function Fixture() {
         ]}
         placeholder="Choose a category"
       />
+      <button onClick={() => form.setError("categoryId", { message: "Choose a category first" })}>Show error</button>
     </FormProvider>
   );
 }
@@ -70,4 +72,13 @@ it("opens the outline notch when the select label shrinks", () => {
     "Category",
   );
   expect(root?.querySelector("legend")).toHaveTextContent("Category");
+});
+
+it("omits empty helper rows while retaining instructions and validation errors", () => {
+  const { container, rerender } = render(<Fixture />);
+  expect(container.querySelector(".MuiFormHelperText-root")).toBeNull();
+  rerender(<Fixture helperText="Choose the document category" />);
+  expect(screen.getByText("Choose the document category")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Show error" }));
+  expect(screen.getByText("Choose a category first")).toBeInTheDocument();
 });

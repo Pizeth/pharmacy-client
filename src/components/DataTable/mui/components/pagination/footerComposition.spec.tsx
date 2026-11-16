@@ -66,6 +66,8 @@ it("shares one bottom footer between selection status and pagination", () => {
 
   const footer = footers[0];
 
+  expect(footer).toHaveAttribute("data-has-selection", "true");
+
   expect(
     within(footer as HTMLElement).getByRole("status"),
   ).toHaveTextContent("1 row selected");
@@ -154,4 +156,6 @@ it("keeps the footer start reserved when no row is selected", () => {
   expect(
     within(footer).getByText("Page 1 of 1"),
   ).toBeVisible();
+
+  expect(footer).not.toHaveAttribute("data-has-selection");
 });

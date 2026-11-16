@@ -3,6 +3,7 @@
 import { IconButton, Tooltip } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { RowData } from "@tanstack/table-core";
+import { ROW_ACTION_BUTTON_SIZE } from "./rowActionStyles";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { ResolvedDataTableRowAction } from "./resolvedTypes";
 
@@ -10,9 +11,13 @@ const RowActionButtonRoot = styled(IconButton, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "RowActionButton",
   overridesResolver: (_props, styles) => styles.rowActionButton,
-})(({ theme }) => ({
-  width: 28,
-  height: 28,
+})(({ theme, color }) => ({
+  flexShrink: 0, // Keep action icons evenly sized in narrow cells.
+  width: ROW_ACTION_BUTTON_SIZE,
+  height: ROW_ACTION_BUTTON_SIZE,
+  padding: 2,
+  "&&:not(.Mui-disabled)": { color: color && color !== "default" && color !== "inherit" ? (theme.vars ?? theme).palette[color].main : color === "inherit" ? (theme.vars ?? theme).palette.text.primary : (theme.vars ?? theme).palette.text.secondary },
+  "& .MuiSvgIcon-root": { fontSize: 24, width: 24, height: 24, color: "inherit" },
   "&:focus-visible": {
     outline: `2px solid ${theme.palette.primary.main}`,
     outlineOffset: 2,

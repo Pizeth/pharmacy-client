@@ -1,0 +1,122 @@
+diff --git a/src/modules/users/data-table/user-data-table.ts b/src/modules/users/data-table/user-data-table.ts
+new file mode 100644
+--- /dev/null
++++ b/src/modules/users/data-table/user-data-table.ts
+@@ -0,0 +1,27 @@
++import { z } from 'zod';
++import type { Prisma } from 'generated/prisma/client';
++import { createDataTableQueryPolicy, createDataTablePrismaTranslator } from 'common/data-table';
++const text = z.string().trim().min(1).max(500);
++export const userDataTablePolicy = createDataTableQueryPolicy({
++  sorting: { name: { target: 'name' }, email: { target: 'email' }, role: { target: 'roleName' }, banned: { target: 'banned' } },
++  filtering: {
++    name: { target: 'name', operators: ['contains', 'equals'], values: { contains: text, equals: text } },
++    email: { target: 'email', operators: ['contains', 'equals'], values: { contains: text, equals: text } },
++    role: { target: 'roleId', operators: ['equals'], values: { equals: z.number().int().positive() } },
++    banned: { target: 'banned', operators: ['equals'], values: { equals: z.boolean() } },
++  },
++  search: { targets: ['name', 'email', 'username'] },
++});
++export const userDataTableTranslator = createDataTablePrismaTranslator<Prisma.UserWhereInput, Prisma.UserOrderByWithRelationInput>()({
++  policy: userDataTablePolicy,
++  sorting: { name: direction => ({ name: direction }), email: direction => ({ email: direction }), roleName: direction => ({ userRole: { name: direction } }), banned: direction => ({ banned: direction }) },
++  filtering: {
++    name: { contains: value => ({ name: { contains: value, mode: 'insensitive' } }), equals: value => ({ name: { equals: value, mode: 'insensitive' } }) },
++    email: { contains: value => ({ email: { contains: value, mode: 'insensitive' } }), equals: value => ({ email: { equals: value, mode: 'insensitive' } }) },
++    roleId: { equals: value => ({ roleId: value }) },
++    banned: { equals: value => value ? { banned: true } : { OR: [{ banned: false }, { banned: null }] } },
++  },
++  search: { name: term => ({ name: { contains: term, mode: 'insensitive' } }), email: term => ({ email: { contains: term, mode: 'insensitive' } }), username: term => ({ username: { contains: term, mode: 'insensitive' } }) },
++  where: { and: clauses => ({ AND: [...clauses] }), or: clauses => ({ OR: [...clauses] }) },
++});
++export const USER_TABLE_SELECT = { id: true, name: true, email: true, image: true, username: true, role: true, roleId: true, banned: true, emailVerified: true } satisfies Prisma.UserSelect;
+diff --git a/src/modules/users/data-table/user-data-table.spec.ts b/src/modules/users/data-table/user-data-table.spec.ts
+new file mode 100644
+--- /dev/null
++++ b/src/modules/users/data-table/user-data-table.spec.ts
+@@ -0,0 +1,14 @@
++import { dataTableQuerySchema } from 'common/data-table';
++import { resolveDataTableQuery } from 'common/data-table';
++import { userDataTablePolicy, userDataTableTranslator } from './user-data-table';
++it('combines name, role and active-status filters with search and pagination', () => {
++  const query = dataTableQuerySchema.parse({ page: 2, pageSize: 25, filters: [{ field: 'name', operator: 'contains', value: 'Jane' }, { field: 'role', operator: 'equals', value: 2 }, { field: 'banned', operator: 'equals', value: false }], search: { term: 'example.com' } });
++  const result = userDataTableTranslator.translate(resolveDataTableQuery(userDataTablePolicy, query));
++  expect(result.skip).toBe(25); expect(result.take).toBe(25);
++  const where = JSON.stringify(result.where);
++  expect(where).toContain('"roleId":2'); expect(where).toContain('"banned":false'); expect(where).toContain('"banned":null'); expect(where).toContain('example.com'); expect(where).toContain('Jane');
++});
++it('rejects fields and operators outside the user query policy', () => {
++  expect(() => resolveDataTableQuery(userDataTablePolicy, dataTableQuerySchema.parse({ filters: [{ field: 'password', operator: 'contains', value: 'secret' }] }))).toThrow();
++  expect(() => resolveDataTableQuery(userDataTablePolicy, dataTableQuerySchema.parse({ filters: [{ field: 'role', operator: 'equals', value: 'admin' }] }))).toThrow();
++});
+diff --git a/src/modules/users/services/users.service.ts b/src/modules/users/services/users.service.ts
+index 5a39a70..9e90b8e 100644
+--- a/src/modules/users/services/users.service.ts
++++ b/src/modules/users/services/users.service.ts
+@@ -20,10 +20,27 @@ import { ImagesService } from 'modules/images/services/images.service';
+ import { UserDetail } from 'types/dto';
+ import type { UpdateUserDto } from '../dto/update-user.dto';
+ import { USER_DETAIL_INCLUDE } from '../consts/user.const';
++import type { DataTableQuery } from 'common/data-table';
++import { resolveDataTableQueryForHttp } from 'common/data-table/http';
++import { userDataTablePolicy, userDataTableTranslator, USER_TABLE_SELECT } from '../data-table/user-data-table';
+ import { DiceBearStyle } from 'dicebear-styles.map';
+ 
+ @Injectable()
+ export class UsersService {
++  async queryAdminUsers(query: DataTableQuery) {
++    const resolved = resolveDataTableQueryForHttp(userDataTablePolicy, query);
++    const prismaQuery = userDataTableTranslator.translate(resolved);
++    const result = await this.dbHelper.getDataTablePage({
++      query: prismaQuery,
++      defaultOrderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
++      operations: {
++        findMany: ({ skip, take, where, orderBy }) => this.prisma.user.findMany({ skip, take, ...(where ? { where } : {}), orderBy: [...orderBy], select: USER_TABLE_SELECT }),
++        count: ({ where }) => where ? this.prisma.user.count({ where }) : this.prisma.user.count(),
++      },
++    });
++    return { users: result.data, total: result.metadata.totalItems };
++  }
++
+   /** Display-only projection; never expose account credentials or tokens. */
+   async getAdminDisplayRoles() {
+     return this.prisma.role.findMany({
+diff --git a/src/modules/users/controllers/users.controller.ts b/src/modules/users/controllers/users.controller.ts
+index 6be5351..f6529e2 100644
+--- a/src/modules/users/controllers/users.controller.ts
++++ b/src/modules/users/controllers/users.controller.ts
+@@ -6,6 +6,9 @@ import {
+   Body,
+   Logger,
+   ParseIntPipe,
++  HttpCode,
++  HttpStatus,
++  UseGuards,
+   UseInterceptors,
+   //   Put,
+   //   Delete,
+@@ -20,6 +23,9 @@ import type { CreateUserDto } from '../dto/create-user.dto';
+ import { ValidateFile } from 'decorators/validate-upload.decorator';
+ import { FileInterceptor } from '@nestjs/platform-express';
+ import { Public } from 'decorators/public.decorator';
++import { AuthGuard, UserHasPermission } from '@thallesp/nestjs-better-auth';
++import { dataTableQuerySchema } from 'common/data-table';
++import type { DataTableQuery } from 'common/data-table';
+ import { Roles } from 'decorators/roles.decorator';
+ // import { PaginatedDataResult } from './types/types';
+ @ApiTags('Users') // Swagger tag for grouping endpoints
+@@ -146,6 +152,14 @@ export class UserController {
+   //   };
+   // }
+ 
++  @Post('query')
++  @HttpCode(HttpStatus.OK)
++  @UseGuards(AuthGuard)
++  @UserHasPermission({ permission: { user: ['list'] } })
++  queryAdminUsers(@Body({ schema: dataTableQuerySchema }) query: DataTableQuery) {
++    return this.service.queryAdminUsers(query);
++  }
++
+   @Get('admin-roles')
+   @Roles(['admin'])
+   async getAdminDisplayRoles() {

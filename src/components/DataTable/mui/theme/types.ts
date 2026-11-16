@@ -1,4 +1,5 @@
 import type { Breakpoint } from "@mui/material/styles";
+import type { CSSProperties } from "react";
 import type { MuiDataTableDensity } from "../density";
 import type { DataTableDisplayMode } from "../presentation/types";
 import type {
@@ -109,6 +110,27 @@ export interface DataTableThemeProps extends DataTableVariantProps {
    * It is not fullscreen state.
    */
   readonly enableFullscreen?: boolean;
+
+  /**
+   * Preferred width of the native table surface.
+   *
+   * This is a generic presentation default. A DataTable instance may override
+   * it explicitly. When omitted, the renderer uses TanStack's resolved total
+   * visible-column width.
+   *
+   * Example:
+   *
+   *   theme.components.RazethDataTable.defaultProps.tableWidth = "100%"
+   */
+  readonly tableWidth?: CSSProperties["width"];
+
+  /**
+   * Optional minimum width of the native table surface.
+   *
+   * When omitted, TanStack's resolved total visible-column width remains the
+   * minimum so wide column models continue to scroll horizontally.
+   */
+  readonly tableMinWidth?: CSSProperties["minWidth"];
 }
 
 /**

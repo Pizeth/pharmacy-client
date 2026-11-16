@@ -330,15 +330,15 @@ export const PasswordValidationInput = (props: IconTextInputProps) => {
   // const handleClick = () => setVisible(!visible);
 
   // Handle mouse release (global)
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = useCallback(function releaseMouse() {
     setVisible(false);
-    document.removeEventListener("mouseup", handleMouseUp);
+    document.removeEventListener("mouseup", releaseMouse);
   }, []);
 
   // Handle touch release (global)
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchEnd = useCallback(function releaseTouch() {
     setVisible(false);
-    document.removeEventListener("touchend", handleTouchEnd);
+    document.removeEventListener("touchend", releaseTouch);
   }, []);
 
   // Consolidated togglePassword function

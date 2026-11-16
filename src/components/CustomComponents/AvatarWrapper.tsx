@@ -15,8 +15,9 @@ const Root = styled(Box, {
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  inset: "0.175vmin",
-  border: "3px solid #070a1c",
+  // Expose the original settings avatar's rotating red/primary ring.
+  inset: "2.25px",
+  border: "1px solid #070a1c",
   borderRadius: "50%",
   overflow: "hidden",
   zIndex: 3,
@@ -84,6 +85,8 @@ const IconWrapper = styled(Box, {
   "&:hover": {
     opacity: 1,
   },
+  "*:focus-visible &": { opacity: 1 },
+  "& > .MuiSvgIcon-root": { fontSize: "2rem" },
   // The Pulse Ripple Effect
   // "&::after": {
   //   content: '""',
@@ -106,7 +109,7 @@ const AvatarWrapper = ({
   return (
     <Root>
       {children}
-      <IconWrapper>{icon}</IconWrapper>
+      {icon != null && <IconWrapper>{icon}</IconWrapper>}
     </Root>
   );
 };

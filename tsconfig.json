@@ -1,8 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "types": ["jest"],
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": [
+      "jest"
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -21,7 +27,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
@@ -32,7 +40,13 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "build/datatable-browser/types/**/*.ts",
+    "build/datatable-browser/dev/types/**/*.ts",
+    "build/datatable-react/types/**/*.ts",
+    "build/datatable-react/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

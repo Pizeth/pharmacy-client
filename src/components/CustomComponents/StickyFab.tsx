@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { PermissionTypeInput } from "../fts/PermissionTypeInput";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -20,9 +21,8 @@ import {
   useForm,
   useWatch,
   Controller,
-  useFormContext,
 } from "react-hook-form";
-import { DateInput, FormDataConsumer, SelectInput } from "react-admin";
+import { DateInput, SelectInput } from "react-admin";
 import ArticleIcon from "@mui/icons-material/Article";
 import {
   AccessTimeFilledOutlined,
@@ -46,7 +46,6 @@ import {
   statuses,
   offices,
   categories,
-  permissionType,
   docTypes,
 } from "../fts/mockData";
 // import dayjs from 'dayjs';
@@ -96,7 +95,6 @@ const VisuallyHiddenInput = styled("input")({
 const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: { text?: string }) => {
   const methods = useForm();
   const [open, setOpen] = useState(false);
-  const { setValue } = useFormContext();
 
   const handleClickOpen = () => setOpen(true);
   // const handleClose = () => setOpen(false);
@@ -386,33 +384,7 @@ const StickyFAB = ({ text = "បញ្ចូលឯកសារថ្មី" }: {
                     </FormItem> */}
 
                     <FormItem colSpan={4}>
-                      <FormDataConsumer>
-                        {({ formData, ...rest }) => {
-                          const isEnabled =
-                            formData.category === "សំណើសុំច្បាប់ឈប់សម្រាក";
-
-                          // Reset logic: clear the value if disabled
-                          useEffect(() => {
-                            if (!isEnabled) {
-                              // setValue("permissionType", null);
-                              setValue("permissionType", "", {
-                                shouldValidate: true,
-                              });
-                            }
-                          }, [isEnabled, setValue]);
-
-                          return (
-                            <SelectInput
-                              disabled={!isEnabled}
-                              source="permissionType"
-                              label="ប្រភេទច្បាប់ឈប់សម្រាក"
-                              choices={permissionType}
-                              emptyText="សូមជ្រើសរើស"
-                              // required
-                            />
-                          );
-                        }}
-                      </FormDataConsumer>
+                      <PermissionTypeInput />
                     </FormItem>
 
                     {/* Action Buttons Row */}

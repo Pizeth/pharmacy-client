@@ -1,18 +1,18 @@
-# Phase 1.7.10.6D.2 — Toolbar actions and filter-status slots
+# Phase 1.7.10.6D.2 ï¿½ Toolbar actions and filter-status slots
 
 ## Implemented contract
 
 Seven more named slots join `RazethDataTable`. Every slot has a stable utility class and an explicit `overridesResolver`; the existing registry-derived `DataTableSlotKey` supplies theme augmentation typing automatically.
 
-| Slot | Surface |
-| --- | --- |
-| toolbarActions | Internal action group |
+| Slot                | Surface                                        |
+| ------------------- | ---------------------------------------------- |
+| toolbarActions      | Internal action group                          |
 | toolbarFilterStatus | Active column-filter chip and clear-all action |
-| searchToggleButton | Collapsible global-search trigger |
-| filterToggleButton | Subheader filter-row trigger |
-| densityButton | Density menu trigger |
-| fullscreenButton | Fullscreen toggle |
-| columnManagerButton | Column-manager dialog trigger |
+| searchToggleButton  | Collapsible global-search trigger              |
+| filterToggleButton  | Subheader filter-row trigger                   |
+| densityButton       | Density menu trigger                           |
+| fullscreenButton    | Fullscreen toggle                              |
+| columnManagerButton | Column-manager dialog trigger                  |
 
 This remains one structural component family. No new leaf theme families or resource-specific state are introduced. The intentional `error.main` header label accent from the prior correction is unchanged.
 
@@ -39,11 +39,11 @@ const theme = createTheme({
         toolbarFilterStatus: { fontWeight: 600 },
         searchToggleButton: { borderRadius: 6 },
         filterToggleButton: {
-          '&[aria-expanded="true"]': { backgroundColor: '#e3f2fd' },
+          '&[aria-expanded="true"]': { backgroundColor: "#e3f2fd" },
         },
         densityButton: { borderRadius: 6 },
         fullscreenButton: {
-          '&[aria-pressed="true"]': { backgroundColor: '#e3f2fd' },
+          '&[aria-pressed="true"]': { backgroundColor: "#e3f2fd" },
         },
         columnManagerButton: { borderRadius: 6 },
       },
@@ -830,7 +830,7 @@ export function DataTableFullscreenButton() {
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
 import { styled, IconButton, Tooltip } from "@mui/material";
-import { ViewColumnOutlined } from "@mui/icons-material";
+import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import { useState } from "react";
 import type { MouseEvent } from "react";
 import type { RowData } from "@tanstack/table-core";
@@ -885,7 +885,7 @@ export function DataTableColumnManagerButton<TData extends RowData>(
           aria-expanded={open ? "true" : undefined}
           onClick={handleOpen}
         >
-          <ViewColumnOutlined fontSize="small" />
+          <ViewColumnIcon fontSize="small" />
         </ColumnManagerButtonRoot>
       </Tooltip>
 
@@ -1032,4 +1032,4 @@ it("opens the column manager through its dedicated trigger", async () => {
 
 This phase has not been rerun in the live browser. Earlier live RTL/touch/pinned-scrolling gaps remain pending; provider-level fullscreen tests do not verify browser rendering or overlay positioning.
 
-Next focused phase: **6D.3 — pagination structural theme slots**. Selection-summary styling and the complete 6D browser audit remain separately trackable before closing 6D.
+Next focused phase: **6D.3 ï¿½ pagination structural theme slots**. Selection-summary styling and the complete 6D browser audit remain separately trackable before closing 6D.

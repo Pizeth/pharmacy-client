@@ -1,0 +1,17 @@
+{
+  "build": "next build --profile, isolated build/datatable-react",
+  "sourceCommit": "a0ceb53",
+  "environment": "Windows 10.0.26200; i5-1235U; 12 logical CPUs; 15.692 GiB; Node 24.16.0; Chrome 153 IAB; 1440x900; DPR 1.25; local-hr.razeth.com",
+  "protocol": "One discarded warmup then three measured repeats; default, owner, row order; equal diagnostics; all 6 cases PASS, 33 samples each. Values are summed Profiler actualDuration milliseconds per action, not browser latency. Null means no callback. No Jest/build ran during samples.",
+  "actionOrder": ["mount", "select", "deselect", "expand", "collapse", "sort-desc", "sort-asc", "filter", "clear-filter", "scroll-vertical", "scroll-horizontal"],
+  "cases": [
+    {"label":"100x8 table default","reactMs":[[156.1,154.1,131],[117.9,120.4,130.8],[142,161.4,110.8],[135.8,127.6,117.8],[127.1,127,125.9],[113.5,118.5,124.8],[118.7,115.6,110.1],[19.5,19,22.9],[130.8,113.6,150.7],[null,null,null],[null,null,null]],"selectCommitVector":[2,1,1,100,800]},
+    {"label":"200x16 table default","reactMs":[[468.1,603.9,417.8],[447.7,399.9,388.1],[422.4,425.3,387.6],[516.1,418.2,401.7],[457.8,405,380.9],[412.5,464.4,397.3],[404,414.1,421.5],[27.4,32.3,29.9],[436.3,408.9,417.1],[null,null,null],[null,null,null]],"selectCommitVector":[2,1,1,200,3200]},
+    {"label":"100x8 table owner","reactMs":[[128.8,131.9,168.8],[96.5,94.1,105.4],[96.8,93.7,101.9],[105.4,96.9,140.6],[113.1,93.2,94.6],[115.9,111.7,110.4],[113,121.4,117.3],[15.3,16,17.1],[110.7,113,112],[null,null,null],[null,null,null]],"selectCommitVector":[1,0,0,100,800]},
+    {"label":"200x16 table owner","reactMs":[[429.9,429.1,430.2],[364.6,377.4,373.5],[355.5,350.2,370.4],[416.5,360.9,359.8],[372.6,353.4,359.7],[383,400.8,400.2],[399,390.3,449.5],[40.3,35.2,29.1],[418.4,397,411.1],[null,null,null],[null,null,null]],"selectCommitVector":[1,0,0,200,3200]},
+    {"label":"100x8 table row","reactMs":[[148.9,132.8,124.5],[3.6,2.3,3.7],[1.2,2.2,1.2],[100.3,91.5,105.6],[99.8,109.1,111.1],[119.1,103.8,129.7],[116.9,129.7,126.6],[16.7,14.2,15.9],[122.9,125.1,111.4],[null,null,null],[null,null,null]],"selectCommitVector":[1,0,0,1,8]},
+    {"label":"200x16 table row","reactMs":[[429.9,431.2,434.7],[3.2,3.5,3.4],[2.8,27.3,3.2],[370.4,354,376.9],[370.4,351.6,389.8],[394.1,376.4,379.4],[386.9,395.5,384.7],[28,25.3,36.4],[403.3,395.9,471.6],[null,null,null],[null,null,null]],"selectCommitVector":[1,0,0,1,16]}
+  ],
+  "commitVectorOrder": ["profilerCallbacks", "owner", "body", "rows", "cells"],
+  "commitNotes": "Selection vectors were identical across three repeats. Expansion and sorting still committed all rows/cells in every mode. Deselect had one Profiler callback in every case. Scroll had no Profiler callback."
+}

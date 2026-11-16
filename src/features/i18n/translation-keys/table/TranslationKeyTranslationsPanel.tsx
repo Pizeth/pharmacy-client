@@ -1,8 +1,9 @@
 "use client";
+import { ResourceBadge as Chip } from "@/components/Tables/ResourceBadge";
+import { formatAdminDate } from "@/lib/utils/adminDate";
 
 import {
   Box,
-  Chip,
   Typography,
   TypographyProps,
   styled,
@@ -18,6 +19,7 @@ import type { TranslationKey, TranslationValue } from "../schemas";
 
 import {
   getTranslationKeyLocaleLabel,
+  getTranslationKeyLocaleColor,
   TRANSLATION_KEY_LOCALE_OPTIONS,
 } from "../locales";
 
@@ -147,10 +149,7 @@ const CaptionRoot = styled(Typography, {
   overridesResolver: (_props, styles) => styles.caption,
 })<TypographyProps>({});
 
-const translationDateTimeFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
+
 
 export interface TranslationKeyTranslationsPanelProps {
   readonly record: TranslationKey;
@@ -173,7 +172,7 @@ function formatUpdatedAt(value: string): string {
     return value;
   }
 
-  return translationDateTimeFormatter.format(date);
+  return formatAdminDate(date);
 }
 
 /**
@@ -269,7 +268,7 @@ export function TranslationKeyTranslationsPanel(
             >
               <LocaleRoot
                 size="small"
-                color="primary"
+                color={getTranslationKeyLocaleColor(translation.locale)}
                 variant="outlined"
                 label={getTranslationKeyLocaleLabel(translation.locale)}
               />

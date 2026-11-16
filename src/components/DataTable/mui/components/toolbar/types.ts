@@ -197,6 +197,17 @@ export interface DataTableToolbarConfig<TData extends RowData> {
   readonly enableDisplayModeToggle?: boolean;
 
   /**
+   * Enable the renderer-independent sorting action while card presentation is
+   * active.
+   *
+   * Table presentation keeps sorting on its column headers. Card presentation
+   * has no headers, so the toolbar owns the equivalent generic sort surface.
+   *
+   * Default: true when a card renderer is available.
+   */
+  readonly enableCardSorting?: boolean;
+
+  /**
    * Enable fullscreen control.
    *
    * Default: true.

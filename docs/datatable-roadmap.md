@@ -1,5 +1,117 @@
 # TanStack v9 + MUI DataTable roadmap
 
+## 2.0.6–2.0.7 — production realtime continuation
+
+The completed 2.0.1–2.0.5 generic live contracts and fixture proof remain complete.
+**2.0.6** adds a gated PostgreSQL transactional NOTIFY → authenticated SSE → Refine
+bridge → generic executor vertical slice for TranslationKey. Production rollout
+requires disposable-database/two-session acceptance and deployment topology checks;
+it is not approved by mocked transport tests. See [the integration record](datatable-production-realtime-2-0-6.md).
+**2.0.7** follows for authorization-scoped Document Tracking; no document stream is
+enabled in 2.0.6. Complete realtime consistency before returning to conditional
+2.2.3.8 owner/subscription optimization. 2.2.3.9 virtualization remains unapproved.
+
+PR #54 follow-up retains broad resize invalidation for undeclared callbacks and
+deprecates the redundant native-detail table prop without breaking source callers.
+Historical performance/browser records below are unchanged.
+
+## 2.2.3.7 — production invocation boundary integration
+
+**Outcome B — row-local production rollout deferred.** Native detail invocation
+now subscribes before physical tr/td omission, and each card has a mounted broad
+composition boundary before nullable slot decisions. Genuine full AppTable callback
+context is preserved; the full owner still broadcasts. No public opt-in or production
+performance improvement is claimed. See [the integration report](datatable-production-subscriptions-2-2-3-7.md)
+for current DOM tests, browser evidence and remaining gates. Historical results below
+remain unchanged.
+
+The proposed continuation labels are now recorded as: **2.2.3.8**, conditional
+performance acceptance after a compatible optimized owner and browser correctness;
+**2.2.3.9**, a separate evidence-based virtualization decision, not approved for
+implementation. Do not run the expensive matrix for the broad-boundary integration.
+
+## October 26 — 2.2.3.6 internal callback-context proof
+
+**Outcome B: production integration deferred.** The new internal proof retains
+the genuine full-state feature-bound hook context and places callback invocation
+inside a stable boundary before nullable output. Global detail can update below
+a row-local parent that skips its commit; snapshot guards, all card slots and
+controlled/off-page selection pass focused DOM regressions. The historical narrow
+owner remains an unsafe negative probe. No production subscriptions or public
+opt-in API change; physical nullable-slot omission and owner/context fan-out still
+require bounded production design and browser acceptance. Density profiling is
+skipped until that gate passes. See [the complete report](datatable-selection-callback-context-2-2-3-6.md)
+for results, unchanged master test failures, browser evidence and limitations.
+Historical measurements below remain unchanged; virtualization is unapproved.
+
+
+## October 22 — 2.2.3.5 scoped output proof
+
+**Outcome B: contract established, rollout deferred.** An internal typed output
+boundary proves local A can skip B while global/nested output and live aggregate
+guards update. New D1–D26 tests retain the old unsafe projection counterexample.
+Callback-snapshot and nullable-detail negative probes show why this cannot yet
+narrow generic production owners/rows. Browser reproduces live2/snapshot0 versus
+the default's correct2/2. See the [full report](datatable-selection-dependencies-2-2-3-5.md).
+
+Production subscriptions/resources are unchanged; real TranslationKey selected
+row overlap remains0px. No approved candidate exists for a new performance matrix.
+Next gate **2.2.3.6**: compatible live callback context plus independent invocation boundaries
+for nullable details and card slots, followed by correctness and profiling.
+Virtualization and PR #31 remain separate. Historical outcomes below are retained.
+
+## October 21 — 2.2.3.4 sticky-height repair
+
+Track A COMPLETE: measured sticky data-row heights replace nominal stacking;
+the real13.8125px overlap is now0px. Independent bands, wrapping, resize, content,
+density, sorting/filtering/paging and table/card lifecycle were browser checked.
+See [the repair record](datatable-sticky-height-2-2-3-4.md) for bounds and limits.
+Final validation:139 suites/796 tests, typecheck and whitespace PASS.
+Selection optimization stays deferred (decision C); production subscriptions
+are unchanged. [Dependency contract](datatable-selection-dependency-contract.md)
+records unproven opt-in invariants. No profiling rerun, virtualization or PR #31
+extraction. Navbar reload outcomes are recorded separately.
+
+## October 20 — 2.2.3.3 correctness gate
+
+Dependency diagnosis and remeasurement are complete; production rollout remains
+BLOCKED. Both builds passed 21 comparison cases each (1,386 measured actions).
+The real resource browser follow-up also exposes 13.8125px overlap between selected
+rows: actual 50.8125px heights exceed nominal 37px sticky increments. Preserve the
+existing run and record this FAIL; do not declare the current follow-up green.
+
+The real-table adversarial proof confirms the diagnostic row-local projection
+can leave a globally dependent cell and cross-row action stale. Keep production
+subscriptions unchanged (decision C); no virtualization or PR #31 extraction.
+The 28 mode/direction/keepPinnedRows combinations and A1–A12 focused tests pass.
+Broader validation and current profiling/browser results are tracked in
+[the dependency report](datatable-dependency-correctness-2-2-3-3.md) and the
+independent [navbar report](navbar-responsive-regression-2026-10-20.md).
+
+## Current handoff — October 14, 2026
+
+2.2.3.2 COMPLETE; all required local validation passed.
+Branch codex/datatable-production-profiling, measured source a0ceb53 (based on
+master 48e881f). Later master 9b02af0 has no DataTable/config/package/CI changes.
+The final evidence commit is the commit containing this handoff, after a0ceb53.
+Do not replay dependency repair or the completed browser matrix.
+
+Eight normal cases, both stress cases, and six controlled comparisons in each
+of two production builds passed. At 200x16, selection commits fell from 200 rows /
+3200 cells to one row / 16 cells; React median 399.9 to 3.4 ms. Broad expansion
+and sorting work persists; timing drift prevents precise universal speedup claims.
+Decision 2: bounded optimization helps but virtualization may still be justified.
+No production behavior or resource contract changed; experiments stay opt-in.
+
+Next phase 2.2.3.3: prove row-local versus global cell/action dependencies,
+off-page/global counts, cross-row mutation guards, all selected-pinning and
+keepPinnedRows combinations; retain feature-bound hooks. Recheck sort/filter,
+pagination, detail panels, RTL/resize/focus and same-instance table/card state.
+Then repeat counterbalanced 25/100/200 production comparisons before considering
+rollout. Exact acceptance, raw evidence and limitations are in
+[the profiling report](datatable-performance-2-2-3-2.md). Virtualization and PR #31
+extraction remain outside this next bounded phase. Historical entries follow.
+
 This document records the current architecture roadmap after the TranslationKey
 production proof and the row-pinning hardening pass.
 
@@ -1037,11 +1149,156 @@ The repeatable manual protocol is documented in:
 
 ## 2.2.2 — browser measurement and virtualization decision gate
 
-**Status: next**
+**Status: realistic density measurements recorded (2026-10-13); 1000×32 stress interaction protocol blocked by renderer stalls. Conditional 2.2.3 review justified; see latest Matrix B decision record.**
 
 Run `Matrix A` in `docs/datatable-browser-matrix.md` first so the production
 TranslationKey named-Refine path and the independent Refine-backed Document
 presentation path are green before profiling.
+
+The authenticated Matrix A run on 2026-09-28 found two real renderer-parity
+gaps in card mode: the subheader filter editors had no physical card surface and
+sorting had no card-mode control. Commit
+`9c01a2ca0c5db336250c27e700a8541740b96798` fixes both generically by reusing
+the existing TanStack column-filter state/editors and sorting state from the
+shared toolbar. CI passed typecheck, the complete Jest suite, and
+`git diff --check`.
+
+Those Matrix A cells still require browser re-verification before 2.2.2 starts.
+
+A second visual-parity follow-up landed on 2026-09-29 in PR #32
+(`chatgpt/datatable-visual-parity-2-2-2`) after desktop/card screenshots exposed
+presentation defects that unit tests could not prove visually:
+
+- expanded card row actions now remain before potentially tall detail content,
+- TranslationValue detail content uses an intrinsic two-column layout rather
+  than viewport breakpoints, so edit/delete/add controls cannot disappear merely
+  because a detail/card region is narrow inside a desktop viewport,
+- generic DataTable card slots use the application's existing neumorphic shadow
+  language through `RazethDataTable.styleOverrides`,
+- DataTable leaf-filter components now expose `variant` and `margin` through
+  their MUI theme contracts; the application defaults them to compact
+  `filled` / `margin="none"` presentation,
+- filter-row cell chrome is tighter without changing sticky offsets or density
+  height calculations,
+- TranslationKey's expansion utility header is now the compact 44px,
+  double-chevron affordance; expand-all remains intentionally disabled and the
+  visible "Details" label is gone.
+
+PR #32 CI passed the repository typecheck, complete Jest suite and whitespace
+check before this roadmap update. These items are **implemented, not browser
+certified**. Matrix A must explicitly recheck desktop/narrow table and card
+presentation before any PASS is recorded.
+
+A follow-up theme-only refinement after PR #32 further narrows the remaining
+visual acceptance surface:
+
+- compact filled table filters keep their existing MUI filled semantics but use
+  a 5px radius instead of inheriting pill-like form geometry,
+- DataTable cards/detail insets now use dedicated
+  `customShadows.dataTableCard` / `customShadows.dataTableInset` tokens so
+  dark-mode table surfaces can use crisper elevation without changing the
+  application's global neumorphism tokens,
+- the TranslationValue detail-panel resource root no longer caps itself at
+  960px, allowing the renderer-owned spanning detail row to use the full
+  available table width.
+
+These visual items were browser-rechecked on the September 29/30 Matrix A
+continuation. The latest report at commit
+`722d3d3adf138dcc28a6809c625cc2be327aa8e3` leaves Matrix A blocked for two
+evidence gaps plus two newly requested MRT-parity behaviors.
+
+### 2.2.2 pre-gate MRT-parity follow-up — 2026-09-30
+
+Do not change unrelated page/navigation/theme work already present on
+`master`. The user's current visual styling is intentional. The remaining
+implementation should stay inside the generic DataTable behavior/theme
+boundaries plus the minimum development-only acceptance seam needed to close
+the matrix.
+
+#### Selection-driven sticky row parity
+
+TranslationKey already declares:
+
+```tsx
+rowPinning={{ displayMode: "select-sticky" }}
+```
+
+The current selection controls pin an individually selected row into TanStack's
+top pin region and the renderer applies only a top sticky edge. MRT's
+`select-sticky` semantics are different at the presentation layer: one pinned
+row can stick to the top **or** bottom of the scrolling table depending on which
+edge it crosses.
+
+Architecture target:
+
+- keep TanStack `rowPinning` as the single state authority,
+- do not duplicate a selected row into both top and bottom pin arrays,
+- keep the row in normal rendered order for sticky mode,
+- let `DataTableBodyRow` distinguish `select-sticky` from ordinary
+  one-edge sticky pinning,
+- calculate independent top and bottom stack offsets,
+- for multiple selected rows, use forward order at the top and reverse order at
+  the bottom,
+- preserve `select-top`, `select-bottom`, explicit sticky/static modes and
+  the existing select-all pin-clearing safety rule,
+- do not introduce resource-local scroll listeners or duplicate row state.
+
+This should be covered generically in the row-pinning tests and then verified on
+the production TranslationKey table with a long 100/200-row viewport.
+
+#### Density-independent shared footer
+
+The pagination footer currently consumes `footerHeight` and
+`footerPaddingBlock` from `DataTableDensityMetrics`. That coupling should be
+removed.
+
+Architecture target:
+
+- Compact/Comfortable/Spacious continue changing table row/header/cell
+  geometry,
+- the pagination/selection footer keeps one fixed geometry,
+- remove footer metrics from the density contract when no longer consumed,
+- keep footer presentation themeable through the existing
+  `RazethDataTable.pagination` slot,
+- no resource-local `sx`.
+
+#### Selection-aware footer surface
+
+The selection bar is already embedded into the pagination footer. Keep that
+single-footer composition, but make the outer footer aware of whether TanStack
+currently has selected rows.
+
+Architecture target:
+
+- expose selected state on the Pagination root (for example
+  `data-has-selection`),
+- keep the embedded selection content background transparent,
+- apply the selected footer background at theme level so the whole footer
+  changes as one surface,
+- clearing selection restores the normal footer background immediately,
+- selected/unselected footer geometry must be identical and independent of
+  density,
+- table and card renderers must share the behavior.
+
+#### Matrix A evidence still missing
+
+After the parity changes above, Matrix A still requires:
+
+1. **TranslationKey explicit same-lifecycle refetch evidence** — temporarily
+   instrument the existing named provider/list lifecycle and perform one
+   reversible mutation whose existing success path calls `refresh()`; capture
+   the named provider plus the canonical
+   `POST /api/v1/i18n/keys/query` request. Do not add a permanent product
+   Refresh control just for the test.
+2. **Controlled async filter-option error/retry** — provide a development/test
+   deterministic failure-then-retry seam, prove the existing warning/Retry
+   surface and successful recovery in both table and card modes, then keep the
+   seam development-only or remove it.
+
+The exact acceptance order and browser steps are maintained in
+`docs/datatable-browser-matrix.md`.
+
+Only after those items pass should Matrix A be marked complete.
 
 Then run the baseline matrix in one controlled browser environment and record:
 
@@ -1059,6 +1316,330 @@ deferred and 2.2 can close without adding another rendering subsystem.
 
 If profiling demonstrates a material user-visible renderer bottleneck at a
 realistic density, proceed to 2.2.3.
+
+### 2.2.2 pre-gate viewport/fullscreen correction — 2026-09-30
+
+Before continuing the remaining Matrix A parity gates, the shared presentation
+viewport needed one bounded regression fix.
+
+The normal page intentionally caps DataTable content height at
+`calc(100vh - 350px)`, but that rule had become presentation-agnostic in the
+wrong way:
+
+- fullscreen inherited the normal-page cap,
+- card mode had no scrolling presentation root and could be clipped,
+- TranslationKey still had an older table-only resource viewport rule.
+
+The correction keeps one generic ownership model:
+
+```text
+DataTableShell
+  toolbar                         fixed chrome
+  ContentRoot                     normal-page max-height owner
+    table ContainerRoot           scroll viewport
+    OR CardContainerRoot          scroll viewport
+    pagination / selection        fixed chrome
+```
+
+Fullscreen changes only shell geometry:
+
+- remove the normal-page max-height from ContentRoot,
+- let the active table/card presentation flex into the remaining viewport,
+- keep toolbar/footer intrinsic and visible.
+
+No resource `sx`, no table/card duplicated server/query state, and no
+TranslationKey-specific fullscreen behavior are introduced.
+
+Browser acceptance for this correction is documented in
+`docs/datatable-browser-matrix.md` and must pass before the remaining
+A-PIN-DUAL-EDGE / A-FOOTER-* / A-REFETCH / A-FILTER-ERROR gates continue.
+
+PR #34 CI follow-up:
+
+- run `36692123975` passed typecheck and 92/93 Jest suites,
+- the single failure was a JSDOM/Emotion nested-style assertion in
+  `fullscreenInteraction.spec.tsx`, not a runtime implementation failure,
+- the regression assertion now verifies the structural fullscreen flex/overflow
+  contract and normal-page cap restoration while leaving actual fullscreen
+  height to the required browser proof,
+- PR #34 must be completely green before browser acceptance begins.
+
+### 2.2.2 browser regression follow-up — dual-edge sticky + card grid
+
+The first browser check after the viewport/fullscreen correction exposed two
+remaining renderer defects:
+
+- `select-sticky` still behaved as top-only sticky,
+- card rows could overlap because the scroll viewport and CSS grid were the same
+  shrinkable flex element.
+
+The correction branch is:
+
+`chatgpt/datatable-dual-sticky-card-grid-fix`
+
+Architecture:
+
+- `select-sticky` retains one TanStack top-pin identity,
+- the physical row gets both top and bottom sticky constraints,
+- top stacking follows pin order,
+- bottom stacking uses reverse edge order,
+- no duplicate row ID is introduced into TanStack bottom pinning,
+- card mode now uses an outer scroll viewport plus an inner intrinsic grid,
+- the new `CardGrid` slot is themeable through
+  `RazethDataTable.styleOverrides.cardGrid`,
+- card spacing moved from `cardContainer` to `cardGrid`,
+- no resource-local `sx` or TranslationKey-only layout patch was added.
+
+These changes remain browser-gated. Do not advance Matrix A until the production
+TranslationKey table proves both dual-edge sticky behavior and non-overlapping
+card scrolling.
+
+### 2.2.2 Selection continuity follow-up — 2026-09-30
+
+After PR #36 passed browser verification for MRT row ordering and footer
+geometry, one lifecycle regression remained: row selection disappeared after
+sorting, filtering, global search, or pagination.
+
+Root cause:
+
+- TranslationKey resource orchestration explicitly cleared `rowSelection` and
+  `rowPinning` on every `query.state` change,
+- the generic live table-state safety hook was additionally pruning selected
+  and pinned IDs against only the currently loaded server page.
+
+That behavior conflicts with stable-ID selection on a manual/server-paginated
+table. "Not present on this loaded page" does not mean "record no longer
+exists."
+
+Follow-up branch:
+
+`chatgpt/datatable-preserve-selection-across-query`
+
+Target contract:
+
+- selection is stable record-identity application state,
+- sorting/filtering/search/pagination must not clear selection,
+- selection-owned pin identities survive the same query transitions,
+- expansion remains query-context local and still resets on semantic query
+  changes,
+- TranslationKey disables current-page selection/pinning reconciliation in the
+  generic live safety hook,
+- successful known deletion explicitly removes the deleted stable ID,
+- bulk mutation safety continues to require loaded selected rows, so preserving
+  off-page IDs does not authorize mutation of unavailable records.
+
+Browser certification is required before Matrix A advances.
+
+### 2.2.2 Native table width contract follow-up — 2026-10-01
+
+The production DataTable needed a first-class way to fill its available
+container width without pushing resource styling into `tableProps.sx`.
+
+The earlier experimental `overrideWidthSize` approach was removed because it
+mixed CSS-unit parsing with runtime DOM measurement, relied on an unattached
+container ref, and could not represent percentage widths robustly.
+
+The generic renderer now owns two presentation-only geometry props:
+
+```tsx
+<DataTable
+  table={table}
+  tableWidth="100%"
+  tableMinWidth="100%"
+/>
+```
+
+Contract:
+
+- `tableWidth` controls the native table's preferred width,
+- `tableMinWidth` optionally replaces its minimum width,
+- when neither is supplied, TanStack's resolved visible-column total remains
+  both the width and minimum width,
+- `tableWidth="100%"` with no explicit `tableMinWidth` fills a wider
+  container while preserving TanStack's column total as the minimum, so narrow
+  containers still scroll horizontally instead of compressing configured
+  columns,
+- numeric values are normalized to pixel CSS values,
+- both properties are also available through
+  `theme.components.RazethDataTable.defaultProps`,
+- explicit DataTable props override theme defaults,
+- no resource-local `sx` is required,
+- no measurement effect, ResizeObserver, or duplicate width state is introduced.
+
+The physical table slot continues using stable themeable structure and CSS
+custom properties; TanStack remains the source of truth for individual column
+sizes.
+
+Focused regression coverage:
+
+`src/components/DataTable/mui/components/tableGeometryTheme.spec.tsx`
+
+Browser acceptance after merge should verify:
+
+1. default intrinsic/TanStack width still horizontally scrolls when needed,
+2. `tableWidth="100%"` fills a wider table container,
+3. pinned columns and resize geometry remain correct,
+4. fullscreen and card/table switching are unchanged.
+
+### 2.2.2 MRT row-order + fixed-footer follow-up — 2026-09-30
+
+PR #35 closed the card-overlap regression, but browser testing showed that the
+remaining `select-sticky` implementation still diverged from MRT in one
+important detail: presentation order was based on TanStack pin insertion order.
+That is FIFO interaction history, not visible row order.
+
+The follow-up branch:
+
+`chatgpt/datatable-mrt-row-order-footer-parity`
+
+changes only renderer presentation and the already-planned shared-footer work:
+
+- sticky pinned IDs are derived from the currently rendered/final row sequence,
+- top offsets use forward row order,
+- bottom offsets use reverse row order,
+- TanStack rowPinning arrays remain untouched and authoritative,
+- no resource-local sorting or duplicated pin state is introduced,
+- `footerHeight` and `footerPaddingBlock` are removed from
+  `DataTableDensityMetrics`,
+- the shared pagination/selection footer uses one fixed 56px minimum height and
+  one fixed block padding across all row densities,
+- the footer root exposes selected state through `data-has-selection`,
+- selected footer background is applied through the
+  `RazethDataTable.pagination` theme slot,
+- embedded SelectionBar remains transparent,
+- footer CLEAR also removes selection-driven row pins so selection and
+  select-pinning cannot diverge.
+
+Browser certification is still required before Matrix A advances.
+
+### Deferred core-layering PR #31
+
+PR #31, `refactor(datatable): establish core layering`, remains intentional
+future architecture work.
+
+It is **open, draft, and unmerged** while Matrix A and 2.2.2 stabilize the
+production behavior/performance baseline. Its extraction should not be discarded
+or recreated.
+
+After 2.2.2 closes, reconcile/rebase PR #31 onto the then-current `master`,
+preserve the useful core/react/browser split, resolve only genuine API drift,
+and use that reconciled PR as the continuation point for the architectural
+migration.
+
+
+
+### October 13 — latest-master rescope before Matrix A closeout
+
+Current repository baseline:
+
+- master before this documentation update:
+  `3b62de029f0bd75debf6ddda1755b663230ec096`,
+- PR #38 is merged,
+- subsequent direct pushes introduced additional DataTable behavior plus the HRD
+  feature family,
+- the latest direct-push master commit has no associated GitHub Actions run, so
+  the next implementation branch must begin by proving a fresh automated
+  baseline rather than assuming green CI.
+
+Important clarification about the core:
+
+The user has recently changed many DataTable-adjacent files, but
+`src/components/DataTable/core/**` itself has not been materially rewritten by
+the post-PR #38 pushes. Current master still contains the earlier foundation:
+
+- feature/builder pipeline,
+- command registry,
+- framework-independent context/runtime,
+- event bus,
+- plugin/service registries,
+- core TanStack table construction,
+- React runtime hooks.
+
+The latest core-path semantic change on master remains the September 25
+row-pinning feature exposure. Current generated stock-feature coverage is:
+
+- 12 exposed,
+- 5 intentionally ignored:
+  - cellSelectionFeature,
+  - cellSpanningFeature,
+  - columnFacetingFeature,
+  - columnGroupingFeature,
+  - rowAggregationFeature.
+
+What *did* change substantially after PR #38 is the MUI/resource surface:
+
+- generic row-click/keyboard row activation,
+- card flip detail mode,
+- card flip slots/classes and tests,
+- global-filter composition using the shared SearchInput,
+- collapsible horizontal search presentation and commit semantics,
+- HRD PublicDocuments becoming a real client-side DataTable consumer,
+- PublicDocuments table/card/compact-card/category/action behavior,
+- TranslationKey card/detail integration adjustments,
+- theme and navigation/resource composition around those surfaces.
+
+#### PR #31 disposition
+
+PR #31 remains **open, draft, useful, and unmerged**, but it must now be treated
+as a donor/reference branch rather than something to mechanically rebase and
+merge wholesale.
+
+Current comparison against master:
+
+- 83 commits ahead,
+- 102 commits behind,
+- it contains a broad second-stage extraction into:
+  - `core/density`,
+  - `core/server-state`,
+  - `core/server-data`,
+  - `core/server-query`,
+  - `core/query-url`,
+  - `core/live`,
+  - `core/persistence`,
+  - React/browser adapter splits.
+
+Since current master has since changed row pinning, presentation, card flip,
+search, width geometry, resources and dependencies, PR #31 should be reconciled
+only after the production/performance baseline is closed.
+
+Recommended post-2.2 strategy:
+
+1. keep PR #31 available as architectural reference,
+2. create a fresh branch from then-current master,
+3. port one transport-independent domain at a time,
+4. remove the corresponding old MUI-owned implementation only after tests pass,
+5. add import-boundary tests/enforcement,
+6. do not mix behavior changes with layer migration,
+7. rerun focused + complete DataTable + browser acceptance after each bounded
+   extraction.
+
+#### Immediate next goal
+
+Do **not** start Matrix B yet.
+
+The next branch should close latest-master Matrix A with this order:
+
+1. establish green automated baseline,
+2. certify native table width,
+3. certify generic row activation,
+4. certify card flip,
+5. certify collapsible global search/debounce semantics,
+6. rerun TranslationKey selection/query smoke,
+7. close safe delete + filter-error/retry + same-lifecycle refetch evidence,
+8. final console/network smoke,
+9. mark Matrix A PASS,
+10. then begin Matrix B performance measurements.
+
+The detailed browser/implementation order is maintained in
+`docs/datatable-browser-matrix.md`.
+
+### October 13 — Matrix A automated retry regression (continuation)
+
+Latest `master` baseline `17a2f0ff01d427f37d83616c6f00c2280bb6c4a0` has a successful GitHub Actions CI run: [run #263](https://github.com/Pizeth/pharmacy-client/actions/runs/38349267985). This confirms typecheck and the full Jest suite for that baseline, not browser certification.
+
+On `chatgpt/datatable-matrix-a-validation-20261013`, a focused resource-owned regression extends `useTranslationKeyFilterOptions.spec.tsx` to exercise deterministic initial category lookup failure, explicit retry, recovered sorted category options, persistent static locale options, and protection against obsolete responses from transports that ignore abort. This is automated hook evidence only: it does **not** certify the Matrix A browser warning/Retry surface in both table and card modes. Browser evidence and remaining safe deletion/same-lifecycle refetch checks are still pending.
+
+Do not advance Matrix A to PASS or start Matrix B until those checks and the latest-master width, row activation, card flip and search rechecks are recorded in `docs/datatable-browser-matrix.md`. PR #31 remains draft/donor and should not be merged mechanically. No virtualization is authorized yet.
 
 ## 2.2.3 — virtualization architecture
 
@@ -1123,3 +1704,25 @@ The project reaches migration closure when:
 At that point the custom stack is not merely an MRT replacement. It is the
 application's reusable data-presentation platform built around TanStack v9,
 MUI and replaceable data-source adapters.
+
+### October 13 — browser continuation after PR #39
+
+On `codex/datatable-matrix-a-closeout`, browser certification found an HRD client-side search footer defect: filtered/no-match rows retained the raw-data total. Pagination now reads TanStack v9 `getRowCount()` and subscribes to global/column filters. Browser recheck covers matched/empty/clear counts in table/card, with an automated regression. Typecheck, 91 focused suites (518 tests), and 120 full suites (709 tests) pass.
+
+Safe selected-ID deletion, controlled Category failure/retry in both renderers, and explicit same-mounted named Refine refetch evidence are now recorded in the matrix. Temporary test controls/logging were removed. Native width, row activation, narrow explicit flip controls, focus/inert, and search checks pass. Genuine hover/touch/pen checks remain pending; Matrix A is not promoted and Matrix B remains gated.
+
+### October 13 — Matrix A completion
+
+User confirms genuine mouse hover and touch flip controls both work. With those user-verified passes and the recorded browser/automated continuation, Matrix A is complete. Matrix B / 2.2.2 is now current for evidence-based profiling; virtualization remains undecided until measurements. Tested state is master `b2a2950b66e09b7893ac59bc153c6269e6165bb8` plus the pagination fix on `codex/datatable-matrix-a-closeout`.
+
+### October 13 — Matrix B measurements and conditional 2.2.3
+
+Measured 25/100/200 rows in table/card, 500-row table stress, and 1000×32 table mount in the existing development fixture. Additional eight-column cases show material cost at reachable 100/200 page sizes (356.67ms / 769.67ms average), independent of transport latency. Cards are cheaper but also scale with row count. The 1000×32 interaction protocol remains BLOCKED by rendering/input-observation deadlines; its mount takes 15.84s for 32,000 cells.
+
+Proceed to conditional 2.2.3 architecture review, documented in `docs/datatable-virtualization-2-2-3.md`. Do not close 2.2 by claiming responsive normal densities. No virtualizer/renderer dependency added. Production profiling and rerender diagnosis precede implementation; Matrix B retains the stress blocker. PR #31 core extraction stays separate.
+
+### October 13 — 2.2.3.1 committed-output diagnosis
+
+Fetched master ddb1459 (PR #40); work branch codex/datatable-rerender-diagnosis. Opt-in development counters distinguish committed owner/body/row/cell output from speculative function renders, with separate inclusive model-read and synchronous dispatch intervals. At100×8, selection commits100rows/800cells. Narrow owner alone does not remove it; row-specific selection projection in the fixture reduces it to row1/eightcells, reproduced repeatedly. Expansion/sorting still commit the full displayed list. No production selector optimization, virtualizer, dependency, or PR #31 extraction introduced.
+
+Evidence and limitations are recorded in `docs/datatable-rerender-diagnosis-2-2-3-1.md`. Next milestone is2.2.3.2 controlled production-equivalent profiling, followed by bounded optimization validation. The row-pinning/global mutation-policy cases require their own proof before applying the fixture prototype to production.

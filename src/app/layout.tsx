@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Montserrat } from "next/font/google";
+import { Geist, Geist_Mono, Montserrat, Inter } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Siemreap, Moul } from "next/font/google";
@@ -9,11 +9,18 @@ import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import RefineContext from "./refineContext";
 import Script from "next/script";
 import { Suspense } from "react";
-import PulseLoader from "@/components/effect/loaders/loader";
+import { RouteContentLoading } from "@/components/layouts/RouteContentLoading";
+import { LoginFeedback } from "@/components/auth/LoginFeedback";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -148,7 +155,7 @@ export default function RootLayout({
         />
       </head> */}
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} ${kantumruy.variable} ${montserrat.variable} ${tactieng.variable} antialiased`}
+        className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${mef1.variable} ${mef2.variable} ${interKhmerLooped.variable} ${interKhmerLoopless.variable} ${googleSans.variable}  ${siemreap.variable} ${moul.variable} ${kantumruy.variable} ${montserrat.variable} ${tactieng.variable} antialiased`}
       >
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"
@@ -157,7 +164,8 @@ export default function RootLayout({
         {/* <AppRouterCacheProvider>{children}+ </AppRouterCacheProvider> */}
         {/* <InitColorSchemeScript attribute="class" /> ← before everything */}
         <ThemeProviderWrapper theme={darkTheme}>
-          <Suspense fallback={<PulseLoader />}>
+          <Suspense fallback={null}><LoginFeedback /></Suspense>
+          <Suspense fallback={<RouteContentLoading />}>
             {/* <RefineContext>{children}</RefineContext> */}
             {children}
           </Suspense>

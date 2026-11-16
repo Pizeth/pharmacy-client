@@ -12,6 +12,13 @@ import {
 import type { DataTableThemeProps } from "@/components/DataTable/mui/theme/types";
 import type { DataTableVariantProps } from "@/components/DataTable/mui/theme/variants";
 import type { DataTableSlotKey } from "@/components/DataTable/mui/styles/dataTableClasses";
+import type { HrdSlotKey } from "@/features/hrd/styles/hrdSlotKeys";
+import type { NavigationSlotMap } from "@/components/Navigations/styles/slots";
+import type { PublicDocumentsSlotKey } from "@/features/hrd/styles/publicDocumentsSlotKeys";
+import type { AvatarContainerProps } from "@/components/Avatar/AvatarContainer";
+import type { RouteContentLoadingSlot } from "@/components/layouts/RouteContentLoading";
+import type { PulseLoaderSlot } from "@/components/effect/loaders/PulseLoader/PulseLoader.styles";
+import type { LoginFeedbackSlot } from "@/components/auth/LoginFeedback.styles";
 
 import { ClassKey, CustomComponents } from "@/types/classKey";
 import {
@@ -32,6 +39,12 @@ declare module "@mui/material/styles" {
       neumorphic: string;
       inset: string;
       circleWell: string;
+      /**
+       * Data-dense surfaces need crisper elevation than the broader
+       * application neumorphism language, especially in dark mode.
+       */
+      dataTableCard: string;
+      dataTableInset: string;
     };
     dynamic: {
       background: string;
@@ -47,6 +60,8 @@ declare module "@mui/material/styles" {
       neumorphic: string;
       inset: string;
       circleWell: string;
+      dataTableCard: string;
+      dataTableInset: string;
     };
     dynamic?: {
       background: string;
@@ -89,11 +104,35 @@ declare module "@mui/material/styles" {
   // ComponentNameToClassKey can derive its keys from our map.
   // Note: If each component has different keys (e.g., 'root', 'card'),
   // this interface should be defined manually for full accuracy.
-  interface ComponentNameToClassKey extends Record<
+  interface ComponentNameToClassKey extends NavigationSlotMap, Record<
     keyof RazethComponentsPropsList,
     ClassKey
   > {
     RazethDataTable: DataTableSlotKey;
+    RazethSiteBreadcrumbs: import("@/components/layouts/SiteBreadcrumbs").SiteBreadcrumbSlot;
+    RazethTableCreateButton: "root";
+    RazethFormActions: "root";
+    RazethResourceBadge: "root";
+    RazethResourceRecord: import("@/components/Tables/resourceRecordStyles").ResourceRecordSlot;
+    RazethDocumentTracking: import("@/features/document-tracking/styles").DocumentTrackingSlot;
+    RazethCompactCardToggle: import("@/components/Tables/CompactCardToggle").CompactCardToggleSlot;
+    RazethResourceTableLoading: import("@/components/Tables/ResourceTableLoading").ResourceTableLoadingSlot;
+    RazethAdminUsers: import("@/features/admin/users/styles").AdminUserSlot;
+    RazethAdminSocial: import("@/features/admin/social/styles").AdminSocialSlot;
+    RazethAdminRoles: import("@/features/admin/roles/styles").AdminRoleSlot;
+    RazethDashboard: import("@/features/dashboard/styles").DashboardSlot;
+    RazethHrd: HrdSlotKey;
+    RazethLoader: PulseLoaderSlot;
+    RazethCloudLoader: "root" | "message";
+    RazethRouteContentLoading: RouteContentLoadingSlot;
+    RazethLoginFeedback: LoginFeedbackSlot;
+    RazethPublicDocuments: PublicDocumentsSlotKey;
+    RazethAvatarContainer: "root" | "chip" | "foreground";
+    RazethBackToTop: "root" | "progressRing";
+    RazethSideImagePreview: "root" | "toolbar";
+    RazethDrawerTheme: "root" | "label";
+    RazethNavPattern: "root";
+    RazethNavigationLayout: "main" | "headerDivider";
   }
 
   /**
@@ -108,10 +147,89 @@ declare module "@mui/material/styles" {
    * Theme defaultProps are typed separately below.
    */
   interface ComponentsPropsList extends RazethComponentsPropsList {
+    RazethSiteBreadcrumbs: Record<string, unknown>;
+    RazethTableCreateButton: Record<string, unknown>;
+    RazethFormActions: Record<string, unknown>;
+    RazethResourceBadge: Record<string, unknown>;
+    RazethResourceRecord: Record<string, unknown>;
+    RazethDocumentTracking: Record<string, unknown>;
+    RazethCompactCardToggle: Record<string, unknown>;
+    RazethResourceTableLoading: Record<string, unknown>;
+    RazethAdminUsers: Record<string, unknown>;
+    RazethAdminSocial: Record<string, unknown>;
+    RazethAdminRoles: Record<string, unknown>;
+    RazethDashboard: Record<string, unknown>;
+    RazethDrawer: Record<string, unknown>;
+    RazethLoginFeedback: Record<string, unknown>;
+    RazethNav: Record<string, unknown>;
+    RazethSearch: Record<string, unknown>;
+    RazethSearchPoppers: Record<string, unknown>;
+    RazethUserSetting: import("@/interfaces/component-props.interface").UserMenuProps;
     RazethDataTable: DataTableVariantProps;
+    RazethHrd: Record<string, unknown>;
+    RazethLoader: Record<string, unknown>;
+    RazethCloudLoader: Record<string, unknown>;
+    RazethRouteContentLoading: Record<string, unknown>;
+    RazethPublicDocuments: Record<string, unknown>;
+    RazethAvatarContainer: AvatarContainerProps;
+    RazethBackToTop: Record<string, unknown>;
+    RazethSideImagePreview: Record<string, unknown>;
+    RazethDrawerTheme: Record<string, unknown>;
+    RazethNavPattern: Record<string, unknown>;
+    RazethNavigationLayout: Record<string, unknown>;
   }
 
   interface Components extends CustomComponents {
+    RazethSiteBreadcrumbs?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSiteBreadcrumbs"] };
+    RazethTableCreateButton?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethTableCreateButton"] };
+    RazethFormActions?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethFormActions"] };
+    RazethResourceBadge?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethResourceBadge"] };
+    RazethResourceRecord?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethResourceRecord"] };
+    RazethDocumentTracking?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDocumentTracking"] };
+    RazethCompactCardToggle?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethCompactCardToggle"] };
+    RazethResourceTableLoading?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethResourceTableLoading"] };
+    RazethAdminUsers?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAdminUsers"] };
+    RazethAdminSocial?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAdminSocial"] };
+    RazethAdminRoles?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAdminRoles"] };
+    RazethDashboard?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDashboard"] };
+    RazethLoginFeedback?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethLoginFeedback"] };
+    RazethSideImagePreview?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSideImagePreview"] };
+    RazethDrawer?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDrawer"] };
+    RazethNav?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethNav"] };
+    RazethSearch?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSearch"] };
+    RazethSearchPoppers?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethSearchPoppers"] };
+    RazethUserSetting?: { styleOverrides?: ComponentsOverrides<MuiTheme>["RazethUserSetting"] };
+    RazethNavigationLayout?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethNavigationLayout"];
+    };
+    RazethNavPattern?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethNavPattern"];
+    };
+    RazethDrawerTheme?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethDrawerTheme"];
+    };
+    RazethCloudLoader?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethCloudLoader"];
+    };
+    RazethLoader?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethLoader"];
+    };
+    RazethBackToTop?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethBackToTop"];
+    };
+    RazethAvatarContainer?: {
+      defaultProps?: Partial<AvatarContainerProps>;
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethAvatarContainer"];
+    };
+    RazethPublicDocuments?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethPublicDocuments"];
+    };
+    RazethRouteContentLoading?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethRouteContentLoading"];
+    };
+    RazethHrd?: {
+      styleOverrides?: ComponentsOverrides<MuiTheme>["RazethHrd"];
+    };
     /** Shared structural slots and resource-independent presentation defaults. */
     RazethDataTable?: {
       /**

@@ -1,4 +1,4 @@
-import { CircularProgress, Grid, styled, useThemeProps } from "@mui/material";
+import { CircularProgress, Grid, Typography, styled, useThemeProps } from "@mui/material";
 import {
   Apple,
   Discord,
@@ -26,6 +26,8 @@ import {
 import { useSearchParams } from "next/navigation";
 import { LANDING_PAGE } from "@/types/constants";
 import { getAuthRedirectTarget } from "@/lib/auth/redirectTarget";
+import { createOAuthErrorCallback } from "@/lib/auth/oauthError";
+import { beginLoginAttempt, reportLoginFailure } from "@/lib/auth/loginFeedback";
 
 const PREFIX = "RazethSocialLogin";
 
@@ -115,7 +117,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
     name: PREFIX,
   });
 
-  const { children, className, sx, ...rest } = props;
+  const { children, className, sx, allowTelegramSignup = false, ...rest } = props;
   const searchParams = useSearchParams();
   // const destination =
   //   searchParams?.get("to") ?? searchParams?.get("callbackUrl") ?? "/fts";
@@ -140,8 +142,9 @@ const SocialLogin = (inProps: SocialLoginProps) => {
     async (provider: string) => {
       try {
         setLoading(provider);
+        beginLoginAttempt();
         // Use authClient directly — it knows the correct baseURL + /api/auth path
-        await authClient.signIn.social({
+        const result = await authClient.signIn.social({
           /**
            * The social provider ID
            * @example "github", "google", "apple"
@@ -149,6 +152,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
           provider: provider as Parameters<
             typeof authClient.signIn.social
           >[0]["provider"],
+          ...(provider === "telegram" && { requestSignUp: allowTelegramSignup }),
           // 👈 where to redirect after OAuth
           /**
            * A URL to redirect after the user authenticates with the provider
@@ -163,17 +167,20 @@ const SocialLogin = (inProps: SocialLoginProps) => {
           /**
            * A URL to redirect if an error occurs during the sign in process
            */
-          errorCallbackURL: `${window.location.origin}/auth/signup?error=provider_error&provider=${provider}`,
+          errorCallbackURL: createOAuthErrorCallback(window.location.origin, destination),
           /**
            * A URL to redirect if the user is newly registered
            */
-          newUserCallbackURL: `${window.location.origin}/welcome`,
+          newUserCallbackURL: `${window.location.origin}/verify-id?callbackUrl=${encodeURIComponent(destination)}`,
           /**
            * disable the automatic redirect to the provider.
            * @default false
            */
           // disableRedirect: true,
         });
+        if (result.error) {
+          setLoading(null);
+        }
         // setLoading(true);
 
         // const backendUrl =
@@ -183,7 +190,8 @@ const SocialLogin = (inProps: SocialLoginProps) => {
         // // Redirect to OIDC provider
         // window.location.href = loginUrl;
       } catch (err) {
-        console.error("Login error:", err);
+        reportLoginFailure();
+        setLoading(null);
         // notify("razeth.auth.oidc_error", {
         //   type: "error",
         // });
@@ -193,7 +201,7 @@ const SocialLogin = (inProps: SocialLoginProps) => {
         // }
       }
     },
-    [destination],
+    [destination, allowTelegramSignup],
   );
 
   const isLoading = useCallback((type: string) => loading === type, [loading]);
@@ -224,13 +232,20 @@ const SocialLogin = (inProps: SocialLoginProps) => {
                 {loading === key ? (
                   <CircularProgress color="inherit" size="1rem" thickness={3} />
                 ) : (
-                  entry.name
+                  key === "telegram" && allowTelegramSignup ? "Sign up with Telegram" : entry.name
                 )}
               </SocialButton>
             )}
           </SocialLogin.children>
         );
       })}
+      {activeProviders.includes("telegram") && (
+        <Grid size={12}>
+          <Typography variant="caption" color="text.secondary">
+            Already have an account? Sign in with your existing method and complete any required officer ID verification. Then connect Telegram in Account settings.
+          </Typography>
+        </Grid>
+      )}
     </Root>
   );
 };

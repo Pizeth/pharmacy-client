@@ -4,9 +4,7 @@ import { Avatar, Box, styled, Typography, useThemeProps } from "@mui/material";
 import { AvatarProps } from "@/interfaces/auth.interface";
 import { earthRotate } from "@/theme/keyframes";
 import { buildResponsiveShadow } from "@/utils/themeUtils";
-import AvatarFrame from "../CustomComponents/AvatarFrame";
-import AvatarWrapper from "../CustomComponents/AvatarWrapper";
-import MiniImg from "../Navigations/Navigation/MiniImg";
+import AvatarContainer from "@/components/Avatar/AvatarContainer";
 import MCS from "../icons/socials/mcs";
 
 const AvatarHeader = (inProps: AvatarProps) => {
@@ -26,7 +24,7 @@ const AvatarHeader = (inProps: AvatarProps) => {
 
   return (
     <Root className={className} sx={sx} {...rest}>
-      <AvatarFrame>
+      <AvatarContainer>
         {/* <AvatarWrapper><MiniImg src={src} /></AvatarWrapper> */}
         <Avatar alt="Razeth" sizes="75">
           {avatarIcon}
@@ -35,7 +33,7 @@ const AvatarHeader = (inProps: AvatarProps) => {
           <RocketAnimation />
           <Avatar alt="Razeth">{avatarIcon}</Avatar>
         </Box> */}
-      </AvatarFrame>
+      </AvatarContainer>
       {/* <Typography
         variant="body2"
         color="text.secondary"

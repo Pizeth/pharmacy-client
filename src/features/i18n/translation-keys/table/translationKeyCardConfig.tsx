@@ -1,7 +1,8 @@
 "use client";
+import { ResourceBadge as Chip } from "@/components/Tables/ResourceBadge";
+import { formatAdminDate } from "@/lib/utils/adminDate";
 
 import {
-  Chip,
   Stack,
   Typography,
   styled,
@@ -14,6 +15,7 @@ import type {
 
 import {
   getTranslationKeyLocaleLabel,
+  getTranslationKeyLocaleColor,
 } from "../locales";
 import type {
   TranslationKey,
@@ -99,16 +101,7 @@ const MetadataRoot = styled(
     0,
 });
 
-const dateTimeFormatter =
-  new Intl.DateTimeFormat(
-    undefined,
-    {
-      dateStyle:
-        "medium",
-      timeStyle:
-        "short",
-    },
-  );
+
 
 function formatDateTime(
   value: string,
@@ -122,9 +115,7 @@ function formatDateTime(
     date.getTime(),
   )
     ? value
-    : dateTimeFormatter.format(
-        date,
-      );
+    : formatAdminDate(date);
 }
 
 export interface CreateTranslationKeyCardConfigOptions {
@@ -156,6 +147,15 @@ export function createTranslationKeyCardConfig(
   } = options;
 
   return {
+    detailMode: "flip",
+    flip: {
+      // Keep key actions on the front until details are explicitly requested.
+      flipOnHover: false,
+      labels: {
+        showDetails: "Show translations",
+        hideDetails: "Back to key",
+      },
+    },
     enableSelection:
       true,
 
@@ -166,7 +166,7 @@ export function createTranslationKeyCardConfig(
       rowActions,
 
     maxInlineActions:
-      2,
+      3,
 
     renderHeader: ({
       row,
@@ -269,6 +269,7 @@ export function createTranslationKeyCardConfig(
                   >
                     <Chip
                       size="small"
+                      color={getTranslationKeyLocaleColor(translation.locale)}
                       variant="outlined"
                       label={
                         getTranslationKeyLocaleLabel(

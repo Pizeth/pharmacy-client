@@ -1,0 +1,128 @@
+"use client";
+import { useEffect, useId, useRef, useState } from "react";
+import { Typography } from "@mui/material";
+import * as S from "./resourceRecordStyles";
+export { RecordSection, RecordHeading, RecordFields, RecordField } from "./resourceRecordStyles";
+import type { ReactNode } from "react";
+import NextLink from "next/link";
+import { Alert, Button, GlobalStyles, IconButton, Tooltip } from "@mui/material";
+import EditOutlined from "@mui/icons-material/EditOutlined";
+import PrintOutlined from "@mui/icons-material/PrintOutlined";
+import { ResourcePage } from "@/components/layouts/ResourcePage";
+import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
+import ArrowBackOutlined from "@mui/icons-material/ArrowBackOutlined";
+import { RecordPageActionsProvider, RecordPageActions } from "./recordPageActions";
+import { recordPrintStyles } from "./recordPrintStyles";
+export function ResourceRecordPage({
+  title, subtitle, backHref, editHref, loading, error, onRetry, children, actions,
+}: {
+  readonly title: string;
+  readonly subtitle?: string;
+  readonly actions?: ReactNode;
+  readonly backHref: string;
+  readonly editHref?: string;
+  readonly loading: boolean;
+  readonly error?: string;
+  readonly onRetry: () => void;
+  readonly children: ReactNode;
+}) {
+  const printable = !loading && !error && Boolean(children);
+  const [manualPrint, setManualPrint] = useState(false);
+  const printSection = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const section = printSection.current;
+    if (!printable || !section) return undefined;
+    const href = window.location.href;
+    const url = new URL(href);
+    if (!manualPrint && url.searchParams.get("print") !== "1") return undefined;
+
+    let cancelled = false;
+    let frame: number | undefined;
+    let waitingForFonts = false;
+    const hasPendingContent = () => Boolean(section.querySelector("[data-record-print-pending]"));
+    const schedulePrint = (activeObserver: MutationObserver) => {
+      waitingForFonts = false;
+      if (cancelled || hasPendingContent()) return;
+      frame = requestAnimationFrame(() => {
+        frame = undefined;
+        if (hasPendingContent()) return;
+        activeObserver.disconnect();
+        setManualPrint(false);
+        if (window.location.href !== href) return;
+        url.searchParams.delete("print");
+        window.history.replaceState(null, "", url);
+        window.print();
+      });
+    };
+    const printWhenReady = (activeObserver: MutationObserver) => {
+      if (waitingForFonts || frame !== undefined || hasPendingContent()) return;
+      waitingForFonts = true;
+      const onFontsSettled = () => { schedulePrint(activeObserver); };
+      document.fonts.ready.then(onFontsSettled, onFontsSettled);
+    };
+    const observer = new MutationObserver((_, activeObserver) => { printWhenReady(activeObserver); });
+    observer.observe(section, {
+      childList: true,
+      subtree: true,
+      attributeFilter: ["data-record-print-pending"],
+    });
+    printWhenReady(observer);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      if (frame !== undefined) cancelAnimationFrame(frame);
+    };
+  }, [manualPrint, printable]);
+
+  const navigation = <>
+    <Button component={NextLink} href={backHref} color="inherit" startIcon={<ArrowBackOutlined />}>Back to list</Button>
+    {!loading && !error && actions}
+    {!loading && !error && editHref && <Button component={NextLink} href={editHref} variant="contained" startIcon={<EditOutlined />}>Edit</Button>}
+    {printable && <Tooltip title="Print details">
+      <IconButton size="small" aria-label="Print details" disabled={manualPrint} onClick={() => { setManualPrint(true); }}>
+        <PrintOutlined fontSize="small" />
+      </IconButton>
+    </Tooltip>}
+  </>;
+  return <ResourcePage title={title} titleComponent="h1" showHeader={false} subtitle={subtitle} maxWidth="xl">
+    <RecordPageActionsProvider value={!loading && !error ? navigation : null}>
+      <S.RecordSection ref={printSection} data-record-print={printable ? "" : undefined}>
+        {printable && <GlobalStyles styles={recordPrintStyles} />}
+        {(loading || error) && <><Typography component="h1" variant="h6">{title}</Typography><S.Toolbar aria-label="Record actions">{navigation}</S.Toolbar></>}
+        {loading ? <ResourceFormLoading message="Loading details..." /> : error ? <Alert severity="error" action={<Button onClick={onRetry}>Retry</Button>}>{error}</Alert> : children}
+      </S.RecordSection>
+    </RecordPageActionsProvider>
+  </ResourcePage>;
+
+}
+export function isResourceIntegerId(id: string): boolean {
+  return /^[1-9]\d*$/.test(id) && Number.isSafeInteger(Number(id));
+}
+
+export function RecordHero({ title, eyebrow, description, icon, badges }: {
+  readonly title: string; readonly eyebrow: string; readonly description?: string | null;
+  readonly icon: ReactNode; readonly badges?: ReactNode;
+}) {
+  return <S.Hero><S.HeroIcon aria-hidden="true">{icon}</S.HeroIcon><S.HeroBody>
+    <Typography variant="overline" color="text.secondary">{eyebrow}</Typography>
+    <Typography component="h1" variant="h5">{title}</Typography>
+    {description && <S.Prose variant="body2" color="text.secondary">{description}</S.Prose>}
+    {badges && <S.Badges>{badges}</S.Badges>}
+  </S.HeroBody><RecordPageActions /></S.Hero>;
+}
+export function RecordCard({ title, description, icon, action, children }: {
+  readonly title: string; readonly description?: string; readonly icon?: ReactNode;
+  readonly action?: ReactNode; readonly children: ReactNode;
+}) {
+  const id = useId();
+  return <S.Section aria-labelledby={id}><S.SectionHeader><div>
+    <Typography id={id} component="h2" variant="h6">{icon}{title}</Typography>
+    {description && <Typography variant="body2" color="text.secondary">{description}</Typography>}
+  </div>{action}</S.SectionHeader><S.SectionContent>{children}</S.SectionContent></S.Section>;
+}
+export function RecordFacts({ items, inline = false }: { readonly inline?: boolean; readonly items: readonly { label: string; value: ReactNode; wide?: boolean }[] }) {
+  return <S.RecordFields data-inline={inline || undefined}>{items.map(item => <S.RecordField key={item.label} data-wide={item.wide || undefined}><dt>{item.label}</dt><dd>{item.value ?? "Not provided"}</dd></S.RecordField>)}</S.RecordFields>;
+}
+export function RecordMetrics({ items }: { readonly items: readonly { label: string; value: ReactNode }[] }) {
+  return <S.Metrics>{items.map(item => <S.Metric key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></S.Metric>)}</S.Metrics>;
+}

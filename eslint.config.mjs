@@ -1,22 +1,15 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTypescript from "eslint-config-next/typescript";
 
 const eslintConfig = [
   // 1. Global Ignores (Must be the first object and only contain 'ignores')
   {
-    ignores: [".next/*", "node_modules/*", "dist/*"],
+    ignores: [".next/**", ".open-next/**", ".vercel/**", "node_modules/**", "dist/**", "out/**", "coverage/**", "next-env.d.ts"],
   },
 
   // 2. Base Next.js & TS Configs
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...nextVitals,
+  ...nextTypescript,
 
   // 3. Custom Rule Overrides
   {

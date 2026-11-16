@@ -88,8 +88,12 @@ export const dataTableClasses = generateUtilityClasses(
 
     "toolbarActions",
     "toolbarFilterStatus",
+    "toolbarCardFilters",
+    "toolbarCardFilterGrid",
+    "toolbarCardFilterField",
     "searchToggleButton",
     "filterToggleButton",
+    "cardSortButton",
     "densityButton",
     "displayModeButton",
     "fullscreenButton",
@@ -135,6 +139,7 @@ export const dataTableClasses = generateUtilityClasses(
     "refreshingIndicator",
     "body",
     "bodyRow",
+    "windowSpacerCell",
     "bodyCell",
 
     /**
@@ -143,6 +148,7 @@ export const dataTableClasses = generateUtilityClasses(
      * ============================================================
      */
     "cardContainer",
+    "cardGrid",
     "cardItem",
     "cardHeader",
     "cardSelection",
@@ -151,6 +157,10 @@ export const dataTableClasses = generateUtilityClasses(
     "cardActions",
     "cardExpansion",
     "cardDetail",
+    "cardFlip",
+    "cardFlipInner",
+    "cardFace",
+    "cardFlipControl",
     "cardState",
 
     /**

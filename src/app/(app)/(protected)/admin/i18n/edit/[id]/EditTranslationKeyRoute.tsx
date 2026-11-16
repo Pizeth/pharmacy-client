@@ -23,6 +23,7 @@ export function EditTranslationKeyRoute(
 
   return (
     <TranslationKeyEditPage
+      key={recordId}
       recordId={recordId}
       onBack={backToList}
       onUpdated={() => {

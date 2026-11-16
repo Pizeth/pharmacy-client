@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { FormProvider, useForm } from "react-hook-form";
 import { AccountBox, KeyOutlined } from "@mui/icons-material";
 import { TextField } from "./textfield";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { UserRound } from "lucide-react";
 // import ControlledInput from "./controlledInput";
 // import userEvent from "@testing-library/user-event";
 
@@ -9,6 +11,61 @@ interface Values {
   key: string;
   officialId: string;
 }
+
+function DateFixture({ type }: { type: string }) {
+  const form = useForm({ defaultValues: { date: "" } });
+  return <FormProvider {...form}><TextField name="date" label="Optional date" type={type} /></FormProvider>;
+}
+
+it.each(["date", "datetime-local", "month", "time", "week"])("keeps an empty %s label above the native date hint", type => {
+  render(<DateFixture type={type} />);
+  const input = screen.getByLabelText("Optional date");
+  const label = document.querySelector(`label[for="${input.id}"]`);
+  expect(label).toHaveAttribute("data-shrink", "true");
+  fireEvent.focus(input);
+  fireEvent.blur(input);
+  expect(label).toHaveAttribute("data-shrink", "true");
+});
+
+function LucideFixture() {
+  const form = useForm({ defaultValues: { name: "" } });
+  return <ThemeProvider theme={createTheme({ palette: { primary: { main: "#123456" } } })}>
+    <FormProvider {...form}><TextField name="name" label="Name" iconStart={<UserRound />} /></FormProvider>
+  </ThemeProvider>;
+}
+
+it("lets Lucide start icons inherit the focused field color", () => {
+  const { container } = render(<LucideFixture />);
+  fireEvent.focus(screen.getByRole("textbox", { name: "Name" }));
+  expect(container.querySelector(".lucide")?.closest(".MuiInputAdornment-root")).toHaveStyle({ color: "#123456" });
+});
+
+function MultilineFixture() {
+  const form = useForm({ defaultValues: { centered: "", top: "", single: "" } });
+  return <FormProvider {...form}>
+    <TextField name="centered" label="Centered message" iconStart={<UserRound />} iconStartAlignment="center" multiline minRows={5} />
+    <TextField name="top" label="Top message" iconStart={<UserRound />} multiline minRows={5} />
+    <TextField name="single" label="Single line" iconStart={<UserRound />} iconStartAlignment="top" />
+  </FormProvider>;
+}
+
+it("defaults multiline start icons to the first line while preserving explicit center and single-line alignment", () => {
+  render(<MultilineFixture />);
+  const adornment = (name: string) => screen.getByRole("textbox", { name })
+    .closest(".MuiInputBase-root")?.querySelector(".MuiInputAdornment-positionStart");
+
+  expect(adornment("Centered message")).toHaveStyle({ alignSelf: "auto" });
+  expect(adornment("Top message")).toHaveStyle({ alignSelf: "flex-start", marginTop: "0px" });
+  expect(adornment("Single line")).toHaveStyle({ alignSelf: "auto" });
+
+  const input = screen.getByRole("textbox", { name: "Top message" });
+  fireEvent.focus(input);
+  expect(document.querySelector(`label[for="${input.id}"]`)).toHaveAttribute("data-shrink", "true");
+  expect(adornment("Top message")).toHaveStyle({ alignSelf: "flex-start" });
+  fireEvent.change(input, { target: { value: "First line\nSecond line\nThird line" } });
+  fireEvent.blur(input);
+  expect(adornment("Top message")).toHaveStyle({ alignSelf: "flex-start", marginTop: "0px" });
+});
 
 // interface TestFormValues {
 //   email: string;

@@ -61,6 +61,8 @@ export function DataTableTextFilter(inProps: DataTableTextFilterProps) {
     value,
     label,
     size = "small",
+    variant,
+    margin,
     className,
     sx,
     onChange,
@@ -73,6 +75,8 @@ export function DataTableTextFilter(inProps: DataTableTextFilterProps) {
       ownerState={{ ...props, size }}
       fullWidth
       size={size}
+      variant={variant}
+      margin={margin}
       label={label}
       value={value}
       className={className}

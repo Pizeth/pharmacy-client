@@ -541,7 +541,7 @@ export default function LoginPageClaude({
         process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
       const loginUrl = `${backendUrl}/auth/${provider}/login`;
 
-      window.location.href = loginUrl;
+      window.location.assign(loginUrl);
     } catch (err) {
       console.error("Login error:", err);
       setError("Failed to initiate login. Please try again.");

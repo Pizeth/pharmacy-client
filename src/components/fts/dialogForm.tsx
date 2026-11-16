@@ -1,3 +1,4 @@
+import { PermissionTypeInput } from "./PermissionTypeInput";
 // --- PROPS INTERFACE ---
 
 import {
@@ -12,7 +13,7 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { km } from "date-fns/locale/km";
@@ -26,13 +27,12 @@ import { useRequired } from "@/utils/validator";
 import { FormatListNumberedOutlined } from "@mui/icons-material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { FormDataConsumer, SelectInput } from "react-admin";
-import { useEffect } from "react";
+import { SelectInput } from "react-admin";
+
 import {
   categories,
   docTypes,
   offices,
-  permissionType,
   statuses,
 } from "./mockData";
 
@@ -83,7 +83,7 @@ const FormItem = ({
 export interface DocumentFormDialogProps {
   open: boolean;
   onClose: () => void;
-  initialData?: any; // Optional: Pass data here if you want to pre-fill the form for editing
+  initialData?: number | null; // Optional: Pass data here if you want to pre-fill the form for editing
 }
 
 export default function DocumentFormDialog({
@@ -93,7 +93,6 @@ export default function DocumentFormDialog({
 }: DocumentFormDialogProps) {
   const methods = useForm();
   const required = useRequired();
-  const { setValue } = useFormContext();
 
   return (
     <Dialog
@@ -303,33 +302,7 @@ export default function DocumentFormDialog({
                     </FormItem> */}
 
                   <FormItem colSpan={4}>
-                    <FormDataConsumer>
-                      {({ formData, ...rest }) => {
-                        const isEnabled =
-                          formData.category === "សំណើសុំច្បាប់ឈប់សម្រាក";
-
-                        // Reset logic: clear the value if disabled
-                        useEffect(() => {
-                          if (!isEnabled) {
-                            // setValue("permissionType", null);
-                            setValue("permissionType", "", {
-                              shouldValidate: true,
-                            });
-                          }
-                        }, [isEnabled, setValue]);
-
-                        return (
-                          <SelectInput
-                            disabled={!isEnabled}
-                            source="permissionType"
-                            label="ប្រភេទច្បាប់ឈប់សម្រាក"
-                            choices={permissionType}
-                            emptyText="សូមជ្រើសរើស"
-                            // required
-                          />
-                        );
-                      }}
-                    </FormDataConsumer>
+                    <PermissionTypeInput />
                   </FormItem>
 
                   {/* Action Buttons Row */}

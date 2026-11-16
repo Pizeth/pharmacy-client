@@ -2,6 +2,8 @@ import "./src/configs/envConfig";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  distDir: process.env.DATATABLE_LOCAL_PROFILE === "browser" || process.env.DATATABLE_LOCAL_PROFILE === "react"
+    ? `build/datatable-${process.env.DATATABLE_LOCAL_PROFILE}` : ".next",
   /* config options here */
   // experimental: {
   //   appDir: true,
@@ -10,12 +12,18 @@ const nextConfig: NextConfig = {
     useTypeScriptCli: true, // Forces Next.js to use the native tsc binary
   },
   env: {
+    // Project ingestion URL is public; never expose the infrastructure API key.
+    NEXT_PUBLIC_BETTER_AUTH_IDENTIFY_URL:
+      process.env.BETTER_AUTH_IDENTIFY_URL?.trim() ||
+      process.env.NEXT_PUBLIC_BETTER_AUTH_IDENTIFY_URL?.trim(),
+    DATATABLE_PROFILE_BUILD_MODE: process.env.DATATABLE_LOCAL_PROFILE ?? "disabled",
     NEXT_PUBLIC_BACKEND_URL:
       process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000",
     NEXT_PUBLIC_API_URL:
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
   },
   allowedDevOrigins: [
+    "127.0.0.1",
     "local-origin.dev",
     "*.local-origin.dev",
     "local-store.razeth.com",
@@ -44,6 +52,12 @@ const nextConfig: NextConfig = {
     "@refinedev/nextjs-router",
     "@refinedev/nestjsx-crud",
   ],
+  async redirects() {
+    return [
+      { source: "/link", destination: "/hrd/documents", permanent: true },
+      { source: "/link/:path*", destination: "/hrd/:path*", permanent: true },
+    ];
+  },
   async rewrites() {
     return [
       // Proxy API calls to your NestJS backend during development

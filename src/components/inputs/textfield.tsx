@@ -110,7 +110,7 @@ export function TextField(inProps: IconInputProps) {
     ...rest
   } = props;
 
-  const { control } = useFormContext();
+  const { control, clearErrors } = useFormContext();
 
   return (
     <Controller
@@ -121,7 +121,13 @@ export function TextField(inProps: IconInputProps) {
       render={({ field, fieldState }) => (
         // ✅ No hooks here — render prop is a plain JSX expression
         <ControlledInput
-          field={field}
+          field={{
+            ...field,
+            onChange: (value) => {
+              if (fieldState.error?.type === "submitValidation") clearErrors(name);
+              field.onChange(value);
+            },
+          }}
           fieldState={fieldState}
           name={name}
           label={label}

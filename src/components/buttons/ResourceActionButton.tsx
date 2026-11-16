@@ -11,14 +11,14 @@ const Root = styled(Button, {
   slot: "Root",
   overridesResolver: (_props, styles) => styles.root,
 })(({ theme }) => ({
-  borderRadius: 999,
+  borderRadius: "var(--app-border-radius)",
   paddingInline: theme.spacing(2),
   fontWeight: 700,
   whiteSpace: "nowrap",
   boxShadow: theme.shadows[2],
 }));
 
-export interface ResourceActionButtonProps extends Omit<ButtonProps, "sx"> {}
+export type ResourceActionButtonProps = Omit<ButtonProps, "sx">;
 
 /**
  * Resource-level action button.

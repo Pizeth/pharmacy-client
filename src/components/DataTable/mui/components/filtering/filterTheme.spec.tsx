@@ -66,7 +66,11 @@ describe.each(cases)("$name theme integration", (control) => {
   const theme = createTheme({
     components: {
       [control.name]: {
-        defaultProps: { size: "medium" },
+        defaultProps: {
+          size: "medium",
+          variant: "filled",
+          margin: "none",
+        },
         styleOverrides: { root: { paddingTop: "7px" } },
         variants: [
           {
@@ -88,6 +92,7 @@ describe.each(cases)("$name theme integration", (control) => {
     });
     const inputs = container.querySelectorAll(".MuiInputBase-root");
     expect(inputs.length).toBeGreaterThan(0);
+    expect(container.querySelector(".MuiFilledInput-root")).not.toBeNull();
     inputs.forEach((input) =>
       expect(input).not.toHaveClass("MuiInputBase-sizeSmall"),
     );

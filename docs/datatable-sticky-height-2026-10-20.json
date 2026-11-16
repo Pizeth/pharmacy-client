@@ -1,0 +1,22 @@
+{
+  "first": {
+    "bottom": 331.0625,
+    "height": 50.8125,
+    "top": 280.25
+  },
+  "firstCount": 1,
+  "firstOffset": "36px",
+  "header": {
+    "bottom": 280.25,
+    "height": 36,
+    "top": 244.25
+  },
+  "overlap": 13.8125,
+  "second": {
+    "bottom": 368.0625,
+    "height": 50.8125,
+    "top": 317.25
+  },
+  "secondCount": 1,
+  "secondOffset": "73px"
+}

@@ -45,3 +45,13 @@ export function getTranslationKeyLocaleLabel(locale: string): string {
       ?.label ?? locale.toLocaleUpperCase()
   );
 }
+
+/** Stable locale tones across columns, cards and detail views, regardless of order. */
+export function getTranslationKeyLocaleColor(locale: string): "primary" | "secondary" | "success" | "info" | "warning" | "error" {
+  const colors = ["primary", "secondary", "success", "info", "warning", "error"] as const;
+  const key = locale.toLowerCase().split("-")[0];
+  if (key === "en") return "primary";
+  if (key === "km") return "secondary";
+  const hash = Array.from(key).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  return colors[hash % colors.length];
+}

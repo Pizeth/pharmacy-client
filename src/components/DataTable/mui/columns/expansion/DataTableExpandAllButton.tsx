@@ -1,17 +1,16 @@
 // mui/columns/expansion/DataTableExpandAllButton.tsx
 
 "use client";
-import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
-import { styled, IconButton, Tooltip } from "@mui/material";
-import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import { IconButton, Tooltip, styled } from "@mui/material";
+import {
+  KeyboardDoubleArrowDown,
+  KeyboardDoubleArrowUp,
+} from "@mui/icons-material";
+
+import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import { useMuiDataTableContext } from "../../table";
 
-/**
- * Header control for expanding/collapsing every expandable row.
- *
- * Uses the React table context because Subscribe is a React-layer API.
- */
 const ExpandAllButtonRoot = styled(IconButton, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "ExpandAllButton",
@@ -25,45 +24,63 @@ const ExpandAllButtonRoot = styled(IconButton, {
   },
 }));
 
-export function DataTableExpandAllButton() {
+export interface DataTableExpandAllButtonProps {
+  /**
+   * Presentation-only disabled state.
+   *
+   * Useful for resources that expose per-row expansion while deliberately
+   * withholding an "expand the whole server page" command.
+   */
+  readonly disabled?: boolean;
+}
+
+export function DataTableExpandAllButton(
+  props: DataTableExpandAllButtonProps = {},
+) {
+  const { disabled: disabledProp = false } = props;
   const table = useMuiDataTableContext();
 
   return (
     <table.Subscribe selector={(state) => state.expanded}>
       {() => {
         const canExpand = table.getCanSomeRowsExpand();
+        const disabled = disabledProp || !canExpand;
+        const allExpanded = !disabledProp && table.getIsAllRowsExpanded();
 
-        const allExpanded = table.getIsAllRowsExpanded();
-
-        // const someExpanded = table.getIsSomeRowsExpanded();
-
-        // const active = allExpanded || someExpanded;
+        const title = disabledProp
+          ? "Expand all is unavailable"
+          : allExpanded
+            ? "Collapse all"
+            : "Expand all";
 
         return (
-          <Tooltip title={allExpanded ? "Collapse all" : "Expand all"}>
+          <Tooltip title={title}>
             <span>
               <ExpandAllButtonRoot
                 className={dataTableClasses.expandAllButton}
                 size="small"
-                disabled={!canExpand}
+                disabled={disabled}
                 aria-label={
-                  allExpanded
-                    ? "Collapse all expandable rows"
-                    : "Expand all expandable rows"
+                  disabledProp
+                    ? "Expand all rows unavailable"
+                    : allExpanded
+                      ? "Collapse all expandable rows"
+                      : "Expand all expandable rows"
                 }
-                aria-pressed={allExpanded}
-                // aria-pressed={active}
+                aria-pressed={disabledProp ? undefined : allExpanded}
                 onClick={(event) => {
                   event.preventDefault();
                   event.stopPropagation();
 
-                  table.toggleAllRowsExpanded();
+                  if (!disabled) {
+                    table.toggleAllRowsExpanded();
+                  }
                 }}
               >
                 {allExpanded ? (
-                  <KeyboardArrowUp fontSize="small" />
+                  <KeyboardDoubleArrowUp fontSize="small" />
                 ) : (
-                  <KeyboardArrowDown fontSize="small" />
+                  <KeyboardDoubleArrowDown fontSize="small" />
                 )}
               </ExpandAllButtonRoot>
             </span>

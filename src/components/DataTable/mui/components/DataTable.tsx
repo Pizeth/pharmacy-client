@@ -7,16 +7,14 @@ import type { RowData } from "@tanstack/table-core";
 import { DataTableAccessibilityProvider } from "../accessibility";
 import { DataTableDensityProvider } from "../density";
 import type { DataTableDensityConfig } from "../density";
-import { DataTableFilterDisplayProvider } from "../filter-display";
+import { DataTableFilterDisplayProvider, useDataTableFilterDisplay } from "../filter-display";
 import type { DataTableFilterDisplayConfig } from "../filter-display";
 import { DataTableFullscreenProvider } from "../fullscreen";
 import {
   DataTablePersistedVisualStateBridge,
   useDataTablePersistedVisualStateController,
 } from "../persistence";
-import type {
-  DataTablePersistedVisualStateConfig,
-} from "../persistence";
+import type { DataTablePersistedVisualStateConfig } from "../persistence";
 import type { DataTableFullscreenConfig } from "../fullscreen";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
 import type { MuiDataTableInstance } from "../table";
@@ -38,6 +36,7 @@ import { DATA_TABLE_DEFAULT_VARIANT } from "../theme";
 import type { DataTableOwnerState, DataTableVariantProps } from "../theme";
 import { useDataTableThemeDefaults } from "../theme/useDataTableThemeDefaults";
 import { DataTableBody } from "./DataTableBody";
+import type { DataTableRowClickHandler } from "./DataTableBodyRow";
 import { DataTableColumnGroup } from "./DataTableColumnGroup";
 import { DataTableHead } from "./DataTableHead";
 import type { DataTableDetailPanelRenderer } from "./detail-panel";
@@ -68,7 +67,30 @@ const ContentRoot = styled(Box, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Content",
   overridesResolver: (_props, styles) => styles.content,
-})({ display: "flex", flexDirection: "column", minWidth: 0 });
+})({
+  display: "flex",
+  flexDirection: "column",
+  minWidth: 0,
+  minHeight: 0,
+
+  /**
+   * Normal-page viewport cap.
+   *
+   * The shell owns the cap because both table and card presentations live
+   * inside this region. Fullscreen explicitly removes it in DataTableShell.
+   */
+  maxHeight: "calc(100vh - 350px)",
+  overflow: "hidden",
+
+  /**
+   * Presentation owns the remaining bounded viewport while fixed chrome keeps
+   * its intrinsic geometry.
+   */
+  [`& > .${dataTableClasses.pagination}, & > .${dataTableClasses.selectionBar}, & > .${dataTableClasses.refreshingIndicator}`]:
+    {
+      flexShrink: 0,
+    },
+});
 
 /**
  * ------------------------------------------------------------------
@@ -79,7 +101,14 @@ const ContainerRoot = styled(TableContainer, {
   name: DATA_TABLE_COMPONENT_NAME,
   slot: "Container",
   overridesResolver: (_props, styles) => styles.container,
-})({ overflowX: "auto", position: "relative", flex: 1, minHeight: 0 });
+})({
+  overflow: "auto",
+  containerType: "inline-size",
+  position: "relative",
+  flex: "1 1 auto",
+  minWidth: 0,
+  minHeight: 0,
+});
 
 /**
  * ------------------------------------------------------------------
@@ -94,15 +123,57 @@ const TableRoot = styled(Table, {
   tableLayout: "fixed",
   borderCollapse: "separate",
   borderSpacing: 0,
-  width: "var(--DataTable-table-size)",
-  minWidth: "var(--DataTable-table-size)",
+  width: "var(--DataTable-table-width, var(--DataTable-table-size))",
+  minWidth: "var(--DataTable-table-min-width, var(--DataTable-table-size))",
 });
 
 /**
  * Runtime width supplied by TanStack.
  */
 export interface DataTableTableStyle extends CSSProperties {
+  /**
+   * TanStack's resolved sum of visible column widths.
+   *
+   * This remains available as the geometry fallback even when a consumer
+   * requests a wider presentation width such as 100%.
+   */
   "--DataTable-table-size": string;
+
+  /**
+   * Preferred physical table width.
+   */
+  "--DataTable-table-width": string;
+
+  /**
+   * Minimum physical table width.
+   *
+   * By default this remains TanStack's resolved total so filling a wider
+   * container does not destroy horizontal overflow when the column model is
+   * wider than the viewport.
+   */
+  "--DataTable-table-min-width": string;
+}
+
+/**
+ * Normalize public width props before they cross into CSS custom properties.
+ *
+ * React treats numeric width values as pixels for ordinary style properties,
+ * but custom properties are raw tokens. Convert numbers explicitly so:
+ *
+ *   tableWidth={960}
+ *
+ * becomes:
+ *
+ *   --DataTable-table-width: 960px
+ */
+function normalizeDataTableTableSize(
+  value: CSSProperties["width"] | CSSProperties["minWidth"],
+): string | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  return typeof value === "number" ? `${value}px` : String(value);
 }
 
 export interface DataTableProps<TData extends RowData>
@@ -124,6 +195,9 @@ export interface DataTableProps<TData extends RowData>
    */
   readonly tableProps?: Omit<TableProps, "children">;
 
+  /** Experimental fixed-height windowing. Interactive mode restores all rows during keyboard navigation. */
+  readonly windowRows?: boolean | "interactive";
+
   /**
    * Props forwarded to MUI's <TableContainer>.
    */
@@ -142,6 +216,16 @@ export interface DataTableProps<TData extends RowData>
   readonly toolbar?: boolean | DataTableToolbarConfig<TData>;
 
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
+
+  /**
+   * Optional row activation handler for the table presentation.
+   *
+   * Clicks on interactive descendants (buttons, links, inputs,
+   * checkboxes) are ignored. Card presentation is unaffected.
+   */
+  readonly onRowClick?: DataTableRowClickHandler<TData>;
+  /** Restrict table-row surface activation and tab focus to explicitly selected rows. */
+  readonly rowClickSelectedOnly?: boolean;
 
   /**
    * Resource-owned card composition.
@@ -215,6 +299,34 @@ export interface DataTableProps<TData extends RowData>
    * stored through this key.
    */
   readonly persistence?: false | DataTablePersistedVisualStateConfig;
+
+  /**
+   * Preferred width of the native table surface.
+   *
+   * Default:
+   *   TanStack's resolved total visible-column width.
+   *
+   * Common fill-container usage:
+   *
+   *   tableWidth="100%"
+   *
+   * The default minimum width still preserves TanStack's column geometry, so
+   * a table wider than the viewport continues to scroll horizontally.
+   *
+   * This is a first-class geometry prop and does not require tableProps.sx.
+   */
+  readonly tableWidth?: CSSProperties["width"];
+
+  /**
+   * Optional minimum width of the native table surface.
+   *
+   * Default:
+   *   TanStack's resolved total visible-column width.
+   *
+   * Set this explicitly when a resource wants to replace that minimum, for
+   * example together with tableWidth="100%".
+   */
+  readonly tableMinWidth?: CSSProperties["minWidth"];
 }
 
 /**
@@ -253,15 +365,22 @@ export interface DataTableProps<TData extends RowData>
 interface DataTablePresentationRegionProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
   readonly tableProps?: Omit<TableProps, "children">;
+  readonly windowRows?: boolean | "interactive";
   readonly containerProps?: Omit<TableContainerProps, "children">;
   readonly card?: DataTableCardConfig<TData>;
   readonly rowPinningDisplayMode: NonNullable<
     DataTableRowPinningConfig["displayMode"]
   >;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
+  readonly onRowClick?: DataTableRowClickHandler<TData>;
+  /** Restrict table-row surface activation and tab focus to explicitly selected rows. */
+  readonly rowClickSelectedOnly?: boolean;
   readonly autoCardBreakpoint: NonNullable<
     DataTableDisplayModeConfig["autoCardBreakpoint"]
   >;
+
+  readonly tableWidth?: CSSProperties["width"];
+  readonly tableMinWidth?: CSSProperties["minWidth"];
 }
 
 /**
@@ -275,15 +394,21 @@ function DataTablePresentationRegion<TData extends RowData>(
   const {
     table,
     tableProps,
+    windowRows,
     containerProps,
     card,
     rowPinningDisplayMode,
     renderDetailPanel,
+    onRowClick,
+    rowClickSelectedOnly,
     autoCardBreakpoint,
+    tableWidth,
+    tableMinWidth,
   } = props;
 
   const resolvedDisplayMode =
     useDataTableResolvedDisplayMode(autoCardBreakpoint);
+  const { showColumnFilters } = useDataTableFilterDisplay();
 
   if (resolvedDisplayMode === "card") {
     if (!card) {
@@ -302,47 +427,59 @@ function DataTablePresentationRegion<TData extends RowData>(
     );
   }
 
+  const windowBody = windowRows && (windowRows === "interactive" || (!renderDetailPanel && !onRowClick)) && tableProps?.stickyHeader && !showColumnFilters;
+
   return (
     <ContainerRoot
       {...containerProps}
-      className={[
-        dataTableClasses.container,
-        containerProps?.className,
-      ]
+      className={[dataTableClasses.container, containerProps?.className]
         .filter(Boolean)
         .join(" ")}
     >
       <table.Subscribe
-        selector={(state) => ({
+        selector={(state) => windowBody ? state : ({
           columnSizing: state.columnSizing,
           columnVisibility: state.columnVisibility,
         })}
       >
         {() => {
-          const totalSize = table.getTotalSize();
+          const tanStackTableSize = `${table.getTotalSize()}px`;
+
+          const resolvedTableWidth =
+            normalizeDataTableTableSize(tableWidth) ?? tanStackTableSize;
+
+          const resolvedTableMinWidth =
+            normalizeDataTableTableSize(tableMinWidth) ?? tanStackTableSize;
 
           const tableStyle: DataTableTableStyle = {
-            "--DataTable-table-size": `${totalSize}px`,
             ...tableProps?.style,
+            "--DataTable-table-size": tanStackTableSize,
+            "--DataTable-table-width": resolvedTableWidth,
+            "--DataTable-table-min-width": resolvedTableMinWidth,
           };
+
+          const rowCount = windowBody ? table.getRowModel().rows.length : 0;
+          const windowActive = rowCount > 25 && !table.options.meta?.loading && !table.options.meta?.error;
+          const indexRows = windowActive && !table.getIsSomeRowsPinned() && !(renderDetailPanel && table.getIsSomeRowsExpanded());
 
           return (
             <TableRoot
               {...tableProps}
-              className={[
-                dataTableClasses.table,
-                tableProps?.className,
-              ]
+              aria-rowcount={indexRows ? rowCount + table.getHeaderGroups().length : tableProps?.["aria-rowcount"]}
+              className={[dataTableClasses.table, tableProps?.className]
                 .filter(Boolean)
                 .join(" ")}
               style={tableStyle}
             >
-              <DataTableColumnGroup table={table} />
-              <DataTableHead table={table} />
+              <DataTableColumnGroup table={table} fillContainer={resolvedTableWidth === "100%"} />
+              <DataTableHead table={table} indexRows={indexRows} />
               <DataTableBody
                 table={table}
+                windowRows={windowBody ? windowRows : false}
                 rowPinningDisplayMode={rowPinningDisplayMode}
                 renderDetailPanel={renderDetailPanel}
+                onRowClick={onRowClick}
+                rowClickSelectedOnly={rowClickSelectedOnly}
               />
             </TableRoot>
           );
@@ -352,11 +489,13 @@ function DataTablePresentationRegion<TData extends RowData>(
   );
 }
 
+/** Renders the configured table with shared providers and automatic display-mode handling. */
 export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
   const themeDefaults = useDataTableThemeDefaults();
   const {
     table,
     tableProps,
+    windowRows,
     containerProps,
 
     /**
@@ -368,6 +507,8 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     toolbar = themeDefaults.enableToolbar ?? true,
 
     renderDetailPanel,
+    onRowClick,
+    rowClickSelectedOnly,
     card,
     rowPinning,
     refreshing = false,
@@ -405,39 +546,42 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     displayMode,
     defaultDisplayMode: defaultDisplayModeProp,
     onDisplayModeChange,
-    autoCardBreakpoint:
-      autoCardBreakpointProp,
+    autoCardBreakpoint: autoCardBreakpointProp,
 
     persistence = false,
+
+    tableWidth: tableWidthProp,
+    tableMinWidth: tableMinWidthProp,
   } = props;
 
   const variant =
     variantProp ?? themeDefaults.variant ?? DATA_TABLE_DEFAULT_VARIANT;
 
   const autoCardBreakpoint =
-    autoCardBreakpointProp ??
-    themeDefaults.autoCardBreakpoint ??
-    "sm";
+    autoCardBreakpointProp ?? themeDefaults.autoCardBreakpoint ?? "sm";
 
-  const persistenceController =
-    useDataTablePersistedVisualStateController({
-      table,
-      persistence,
-      density,
-      defaultDensity:
-        defaultDensity ??
-        themeDefaults.density ??
-        "compact",
-      onDensityChange,
-      displayMode,
-      defaultDisplayMode:
-        defaultDisplayModeProp ??
-        themeDefaults.defaultDisplayMode ??
-        "table",
-      onDisplayModeChange,
-      cardAvailable:
-        card !== undefined,
-    });
+  /**
+   * Table geometry follows the same generic presentation precedence as the
+   * other resource-independent defaults:
+   *
+   * explicit prop -> theme default -> TanStack total-size fallback
+   */
+  const tableWidth = tableWidthProp ?? themeDefaults.tableWidth;
+
+  const tableMinWidth = tableMinWidthProp ?? themeDefaults.tableMinWidth;
+
+  const persistenceController = useDataTablePersistedVisualStateController({
+    table,
+    persistence,
+    density,
+    defaultDensity: defaultDensity ?? themeDefaults.density ?? "compact",
+    onDensityChange,
+    displayMode,
+    defaultDisplayMode:
+      defaultDisplayModeProp ?? themeDefaults.defaultDisplayMode ?? "table",
+    onDisplayModeChange,
+    cardAvailable: card !== undefined,
+  });
 
   /**
    * ----------------------------------------------------------------
@@ -505,89 +649,102 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
         }
       >
         <DataTableAccessibilityProvider>
-        <DataTableDensityProvider
-          density={
-            persistenceController.enabled
-              ? persistenceController.density
-              : density
-          }
-          defaultDensity={defaultDensity}
-          onDensityChange={
-            persistenceController.enabled
-              ? persistenceController.setDensity
-              : onDensityChange
-          }
-        >
-          <DataTablePersistedVisualStateBridge
-            table={table}
-            controller={persistenceController}
-          />
-          <DataTableFullscreenProvider
-            fullscreen={fullscreen}
-            defaultFullscreen={defaultFullscreen}
-            onFullscreenChange={onFullscreenChange}
+          <DataTableDensityProvider
+            density={
+              persistenceController.enabled
+                ? persistenceController.density
+                : density
+            }
+            defaultDensity={defaultDensity}
+            onDensityChange={
+              persistenceController.enabled
+                ? persistenceController.setDensity
+                : onDensityChange
+            }
           >
-            <DataTableRowPinningProvider displayMode={rowPinningDisplayMode}>
-              <DataTableFilterDisplayProvider
-              columnFilterDisplayMode={columnFilterDisplayMode}
-              defaultColumnFilterDisplayMode={defaultColumnFilterDisplayMode}
-              onColumnFilterDisplayModeChange={onColumnFilterDisplayModeChange}
-              showColumnFilters={showColumnFilters}
-              defaultShowColumnFilters={defaultShowColumnFilters}
-              onShowColumnFiltersChange={onShowColumnFiltersChange}
+            <DataTablePersistedVisualStateBridge
+              table={table}
+              controller={persistenceController}
+            />
+            <DataTableFullscreenProvider
+              fullscreen={fullscreen}
+              defaultFullscreen={defaultFullscreen}
+              onFullscreenChange={onFullscreenChange}
             >
-              <DataTableShell ownerState={ownerState}>
-                {toolbar !== false && (
-                  <DataTableToolbar
-                    table={table}
-                    displayModeToggleAvailable={
-                      card !== undefined &&
-                      (displayMode === undefined ||
-                        onDisplayModeChange !== undefined)
-                    }
-                    autoCardBreakpoint={autoCardBreakpoint}
-                    {...toolbarConfig}
-                  />
-                )}
-                <ContentRoot className={dataTableClasses.content}>
-                  <DataTableRefreshingIndicator
-                    refreshing={refreshing}
-                    progress={refreshProgress}
-                  />
-                  <DataTablePresentationRegion
-                    table={table}
-                    tableProps={tableProps}
-                    containerProps={containerProps}
-                    card={card}
-                    rowPinningDisplayMode={rowPinningDisplayMode}
-                    renderDetailPanel={renderDetailPanel}
-                    autoCardBreakpoint={autoCardBreakpoint}
-                  />
-                  {pagination !== false ? (
-                    <DataTablePagination
-                      table={table}
-                      {...pagination}
-                      startContent={
-                        selectionBar !== false ? (
+              <DataTableRowPinningProvider displayMode={rowPinningDisplayMode}>
+                <DataTableFilterDisplayProvider
+                  columnFilterDisplayMode={columnFilterDisplayMode}
+                  defaultColumnFilterDisplayMode={
+                    defaultColumnFilterDisplayMode
+                  }
+                  onColumnFilterDisplayModeChange={
+                    onColumnFilterDisplayModeChange
+                  }
+                  showColumnFilters={showColumnFilters}
+                  defaultShowColumnFilters={defaultShowColumnFilters}
+                  onShowColumnFiltersChange={onShowColumnFiltersChange}
+                >
+                  <DataTableShell ownerState={ownerState}>
+                    {toolbar !== false && (
+                      <DataTableToolbar
+                        table={table}
+                        displayModeToggleAvailable={
+                          card !== undefined &&
+                          (displayMode === undefined ||
+                            onDisplayModeChange !== undefined)
+                        }
+                        cardPresentationAvailable={card !== undefined}
+                        autoCardBreakpoint={autoCardBreakpoint}
+                        {...toolbarConfig}
+                      />
+                    )}
+                    <ContentRoot className={dataTableClasses.content}>
+                      <DataTableRefreshingIndicator
+                        refreshing={refreshing}
+                        progress={refreshProgress}
+                      />
+                      <DataTablePresentationRegion
+                        table={table}
+                        tableProps={tableProps}
+                        windowRows={windowRows}
+                        containerProps={containerProps}
+                        card={card}
+                        rowPinningDisplayMode={rowPinningDisplayMode}
+                        renderDetailPanel={renderDetailPanel}
+                        onRowClick={onRowClick}
+                        rowClickSelectedOnly={rowClickSelectedOnly}
+                        autoCardBreakpoint={autoCardBreakpoint}
+                        tableWidth={tableWidth}
+                        tableMinWidth={tableMinWidth}
+                      />
+                      {pagination !== false ? (
+                        <DataTablePagination
+                          table={table}
+                          {...pagination}
+                          startContent={
+                            selectionBar !== false ? (
+                              <DataTableSelectionBar
+                                table={table}
+                                {...selectionBar}
+                                embedded
+                              />
+                            ) : undefined
+                          }
+                        />
+                      ) : (
+                        selectionBar !== false && (
                           <DataTableSelectionBar
                             table={table}
                             {...selectionBar}
-                            embedded
                           />
-                        ) : undefined
-                      }
-                    />
-                  ) : (
-                    selectionBar !== false && (
-                      <DataTableSelectionBar table={table} {...selectionBar} />
-                    )
-                  )}
-                </ContentRoot>
-              </DataTableShell>
-              </DataTableFilterDisplayProvider>
-            </DataTableRowPinningProvider>
-          </DataTableFullscreenProvider>
-        </DataTableDensityProvider>
+                        )
+                      )}
+                    </ContentRoot>
+                  </DataTableShell>
+                </DataTableFilterDisplayProvider>
+              </DataTableRowPinningProvider>
+            </DataTableFullscreenProvider>
+          </DataTableDensityProvider>
         </DataTableAccessibilityProvider>
       </DataTableDisplayModeProvider>
     </table.AppTable>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Stack, styled, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Collapse, Stack, styled, useMediaQuery, useTheme } from "@mui/material";
 import type { Breakpoint } from "@mui/material/styles";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { RowData } from "@tanstack/table-core";
@@ -9,6 +9,7 @@ import { DataTableGlobalFilter } from "../global-filtering";
 import type { MuiDataTableInstance } from "../../table";
 import { DataTableSearchToggleButton } from "./actions";
 import { DataTableToolbarActions } from "./DataTableToolbarActions";
+import { DataTableToolbarCardFilterPanel } from "./DataTableToolbarCardFilterPanel";
 import { DataTableToolbarFilterStatus } from "./DataTableToolbarFilterStatus";
 import { DataTableToolbarSelection } from "./DataTableToolbarSelection";
 import { renderDataTableToolbarContent } from "./renderToolbarContent";
@@ -69,6 +70,20 @@ const ToolbarSearchRoot = styled(Box, {
   maxWidth: "100%",
   minWidth: 0,
   flexShrink: 1,
+  containerType: "inline-size",
+  display: "flex",
+  justifyContent: "center",
+  "& > .MuiCollapse-root": {
+    display: "flex",
+    justifyContent: "center",
+  },
+  "& .MuiCollapse-wrapper": {
+    flexShrink: 0,
+  },
+  "& .MuiCollapse-wrapperInner": {
+    // Keep the input at its available width while Collapse animates its viewport.
+    width: "100cqw",
+  },
 }));
 const ToolbarSearchRowRoot = styled(Box, {
   name: DATA_TABLE_COMPONENT_NAME,
@@ -88,6 +103,8 @@ export interface DataTableToolbarProps<
    * control that can switch to a renderer which does not exist.
    */
   readonly displayModeToggleAvailable?: boolean;
+
+  readonly cardPresentationAvailable?: boolean;
 
   readonly autoCardBreakpoint?: Breakpoint;
 }
@@ -131,7 +148,9 @@ export function DataTableToolbar<TData extends RowData>(
     enableDensity = themeDefaults.enableDensityToggle ?? true,
     enableDisplayModeToggle =
       themeDefaults.enableDisplayModeToggle ?? true,
+    enableCardSorting = true,
     displayModeToggleAvailable = false,
+    cardPresentationAvailable = false,
     autoCardBreakpoint,
     enableFullscreen = themeDefaults.enableFullscreen ?? true,
   } = props;
@@ -145,6 +164,7 @@ export function DataTableToolbar<TData extends RowData>(
    * toolbar row and takes the available width.
    */
   const narrow = useMediaQuery(theme.breakpoints.down("md"));
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   const context: DataTableToolbarRenderContext<TData> = {
     table,
@@ -169,19 +189,28 @@ export function DataTableToolbar<TData extends RowData>(
    * Search field is created once and placed in the appropriate
    * desktop region, or its own responsive row on narrow screens.
    */
-  const searchField = searchVisibility.open ? (
+  const searchField = search ? (
     <ToolbarSearchRoot
       className={dataTableClasses.toolbarSearch}
       id={globalSearchId}
       role="search"
       aria-label="Table search"
+      data-open={searchVisibility.open ? "true" : "false"}
+      aria-hidden={!searchVisibility.open}
+      inert={!searchVisibility.open}
     >
-      <DataTableGlobalFilter
-        table={table}
-        placeholder={searchPlaceholder}
-        debounceMs={searchDebounceMs}
-        fullWidth={narrow}
-      />
+      <Collapse
+        in={searchVisibility.open}
+        orientation="horizontal"
+        timeout={reducedMotion ? 0 : 300}
+      >
+        <DataTableGlobalFilter
+          table={table}
+          placeholder={searchPlaceholder}
+          debounceMs={searchDebounceMs}
+          fullWidth
+        />
+      </Collapse>
     </ToolbarSearchRoot>
   ) : null;
 
@@ -276,6 +305,9 @@ export function DataTableToolbar<TData extends RowData>(
             enableDisplayModeToggle={
               displayModeToggleAvailable && enableDisplayModeToggle
             }
+            enableCardSorting={
+              cardPresentationAvailable && enableCardSorting
+            }
             autoCardBreakpoint={autoCardBreakpoint}
             enableFullscreen={enableFullscreen}
           />
@@ -293,6 +325,13 @@ export function DataTableToolbar<TData extends RowData>(
         <ToolbarSearchRowRoot className={dataTableClasses.toolbarSearchRow}>
           {searchField}
         </ToolbarSearchRowRoot>
+      )}
+
+      {cardPresentationAvailable && (
+        <DataTableToolbarCardFilterPanel
+          table={table}
+          autoCardBreakpoint={autoCardBreakpoint}
+        />
       )}
     </ToolbarRoot>
   );

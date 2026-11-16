@@ -20,6 +20,7 @@ export interface DataTableHeaderRowProps<TData extends RowData> {
    * offset.
    */
   readonly headerRowIndex: number;
+  readonly ariaRowIndex?: number;
 }
 
 /**
@@ -59,11 +60,12 @@ const HeaderRowRoot = styled(TableRow, {
 export function DataTableHeaderRow<TData extends RowData>(
   props: DataTableHeaderRowProps<TData>,
 ) {
-  const { table, headerGroup, headerRowIndex } = props;
+  const { table, headerGroup, headerRowIndex, ariaRowIndex } = props;
 
   return (
     <HeaderRowRoot
       className={dataTableClasses.headerRow}
+      aria-rowindex={ariaRowIndex}
       data-header-group-id={headerGroup.id}
       data-header-row-index={headerRowIndex}
     >

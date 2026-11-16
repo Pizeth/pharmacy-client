@@ -1,13 +1,14 @@
 "use client";
+import { ResourceBadge as Chip } from "@/components/Tables/ResourceBadge";
+import { formatAdminDate } from "@/lib/utils/adminDate";
 
 import {
   Box,
-  Chip,
-  ChipProps,
   Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
+import { getTranslationKeyLocaleColor } from "../locales";
 import type { TranslationValue } from "../schemas";
 
 /**
@@ -51,16 +52,6 @@ export interface TranslationKeyLocalesCellProps {
   readonly align?: "start" | "center" | "end"; // Accepts standard alignment values
 }
 
-// Define the palette order you want to cycle through
-const CHIP_COLORS: NonNullable<ChipProps["color"]>[] = [
-  "primary",
-  "secondary",
-  "success",
-  "info",
-  "warning",
-  "error",
-];
-
 export function TranslationKeyLocalesCell1({
   translations,
 }: TranslationKeyLocalesCellProps) {
@@ -71,7 +62,7 @@ export function TranslationKeyLocalesCell1({
   return (
     <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap">
       {translations.map((translation) => (
-        <Chip key={translation.id} label={translation.locale} size="small" />
+        <Chip key={translation.id} label={translation.locale} color={getTranslationKeyLocaleColor(translation.locale)} size="small" />
       ))}
     </Stack>
   );
@@ -100,9 +91,9 @@ export function TranslationKeyLocalesCell({
       flexWrap="wrap"
       justifyContent={justifyContent} // Dynamically justify the flex items
     >
-      {translations.map((translation, index) => {
-        // Use the remainder (%) operator to cleanly loop back around the array length
-        const chipColor = CHIP_COLORS[index % CHIP_COLORS.length];
+      {translations.map((translation) => {
+        // Keep each locale tone stable across all presentations.
+        const chipColor = getTranslationKeyLocaleColor(translation.locale);
         return (
           <Chip
             key={translation.id}
@@ -192,10 +183,7 @@ export function TranslationKeyValuesCell({
  * Conversion to Date happens here at the presentation boundary.
  */
 
-const translationDateTimeFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
+
 
 export interface TranslationKeyDateTimeCellProps {
   readonly value: string;
@@ -213,7 +201,7 @@ export function TranslationKeyDateTimeCell({
   return (
     <Tooltip title={value}>
       <Typography component="span" variant="body2" noWrap>
-        {translationDateTimeFormatter.format(date)}
+        {formatAdminDate(date)}
       </Typography>
     </Tooltip>
   );

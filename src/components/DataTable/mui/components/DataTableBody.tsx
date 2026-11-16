@@ -1,6 +1,6 @@
 "use client";
 
-import { styled, TableBody } from "@mui/material";
+import { BodyRoot, DataTableStickyRowMeasurements } from "./DataTableStickyRowMeasurements";
 import type { RowData } from "@tanstack/table-core";
 import type { MuiDataTableInstance } from "../table";
 import {
@@ -8,7 +8,7 @@ import {
   isDataTableStickyRowPinningMode,
   type DataTableRowPinningDisplayMode,
 } from "../row-pinning";
-import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../styles";
+import { dataTableClasses } from "../styles";
 import {
   DataTableEmptyState,
   DataTableErrorState,
@@ -18,18 +18,18 @@ import { normalizeDataTableGlobalFilter } from "../utils";
 import { getDataTableDensityMetrics, useDataTableDensity } from "../density";
 import { useOptionalDataTableFilterDisplay } from "../filter-display";
 import { DataTableDetailPanelRenderer } from "./detail-panel";
+import { DataTableWindowedBody } from "./DataTableWindowedBody";
 import { DataTableBodyRowGroup } from "./DataTableBodyRowGroup";
-
-const BodyRoot = styled(TableBody, {
-  name: DATA_TABLE_COMPONENT_NAME,
-  slot: "Body",
-  overridesResolver: (_props, styles) => styles.body,
-})({});
+import type { DataTableRowClickHandler } from "./DataTableBodyRow";
+import { DataTableDiagnosticCommit, useDataTableRenderDiagnostics } from "../diagnostics/renderDiagnostics";
 
 export interface DataTableBodyProps<TData extends RowData> {
   readonly table: MuiDataTableInstance<TData>;
+  readonly windowRows?: boolean | "interactive";
   readonly rowPinningDisplayMode?: DataTableRowPinningDisplayMode;
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
+  readonly onRowClick?: DataTableRowClickHandler<TData>;
+  readonly rowClickSelectedOnly?: boolean;
 }
 
 /**
@@ -59,10 +59,14 @@ export function DataTableBody<TData extends RowData>(
   const {
     table,
     rowPinningDisplayMode = "sticky",
+    windowRows,
     renderDetailPanel,
+    onRowClick,
+    rowClickSelectedOnly,
   } = props;
 
   const { density } = useDataTableDensity();
+  const diagnostics = useDataTableRenderDiagnostics();
   const filterDisplay = useOptionalDataTableFilterDisplay();
 
   const columnFilterDisplayMode =
@@ -103,14 +107,44 @@ export function DataTableBody<TData extends RowData>(
       })}
     >
       {(selected) => {
-        const rows = getDataTableRowsForPinningDisplay(
+        /** Reads the current body rows for the subscribed render pass. */
+        const readRows = () => getDataTableRowsForPinningDisplay(
           table,
           rowPinningDisplayMode,
         );
+        const rows = diagnostics ? diagnostics.measureRowModel(readRows) : readRows();
 
         const stickyRowPinning = isDataTableStickyRowPinningMode(
           rowPinningDisplayMode,
         );
+
+        /**
+         * select-sticky intentionally keeps one TanStack pin identity in the
+         * top region while the renderer constrains that same physical row
+         * against both scroll edges. This mirrors MRT's selected-row behavior
+         * without duplicating the row ID into both TanStack pin arrays.
+         */
+        const dualEdgeStickyRowPinning =
+          rowPinningDisplayMode === "select-sticky";
+
+        /**
+         * MRT does not stack sticky rows in the order they were clicked.
+         *
+         * TanStack rowPinning state is interaction history, so selected rows
+         * may be appended FIFO. Presentation instead follows the current final
+         * row-model sequence. This keeps sticky rows in the same deterministic
+         * order the user sees in the table.
+         *
+         * Use the rendered row list so keepPinnedRows rows that are missing
+         * from the current center model still receive a stable edge index.
+         */
+        const stickyPinnedRowIds: { top: string[]; bottom: string[] } = { top: [], bottom: [] };
+        if (stickyRowPinning) {
+          for (const row of rows) {
+            const edge = row.getIsPinned();
+            if (edge) stickyPinnedRowIds[edge].push(row.id);
+          }
+        }
 
         const visibleColumnCount = table.getVisibleLeafColumns().length;
 
@@ -166,8 +200,33 @@ export function DataTableBody<TData extends RowData>(
           );
         }
 
+        if (windowRows && !showColumnFilters) {
+          return <DataTableWindowedBody
+            key={density}
+            table={table}
+            rows={rows}
+            rowHeight={densityMetrics.bodyRowHeight}
+            headerHeight={normalHeaderHeight}
+            colSpan={colSpan}
+            pinned={table.getIsSomeRowsPinned()}
+            stickyRowPinning={stickyRowPinning}
+            pinnedRowStickyTop={pinnedRowStickyTop}
+            dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
+            stickyPinnedRowIds={stickyPinnedRowIds}
+            renderDetailPanel={renderDetailPanel && table.getIsSomeRowsExpanded() ? renderDetailPanel : undefined}
+            onRowClick={onRowClick}
+            rowClickSelectedOnly={rowClickSelectedOnly}
+          />;
+        }
+
         return (
-          <BodyRoot className={dataTableClasses.body}>
+          <DataTableStickyRowMeasurements
+            enabled={stickyRowPinning}
+            top={pinnedRowStickyTop}
+            fallbackHeight={densityMetrics.bodyRowHeight}
+            dualEdge={dualEdgeStickyRowPinning}
+          >
+            {diagnostics && <DataTableDiagnosticCommit layer="body" id="body" />}
             {rows.map((row) => (
               <DataTableBodyRowGroup
                 key={row.id}
@@ -175,10 +234,14 @@ export function DataTableBody<TData extends RowData>(
                 row={row}
                 pinnedRowStickyTop={pinnedRowStickyTop}
                 stickyRowPinning={stickyRowPinning}
+                dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
+                stickyPinnedRowIds={stickyPinnedRowIds[row.getIsPinned() || "top"]}
                 renderDetailPanel={renderDetailPanel}
+                onRowClick={onRowClick}
+                rowClickSelectedOnly={rowClickSelectedOnly}
               />
             ))}
-          </BodyRoot>
+          </DataTableStickyRowMeasurements>
         );
       }}
     </table.Subscribe>

@@ -1,10 +1,13 @@
 "use client";
+import { resourceViewAction } from "@/components/Tables/resourceViewAction";
+import { resourceRecordMenuActions } from "@/components/Tables/resourceRecordMenuActions";
 
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   Alert,
+  Box,
   Button,
-  CircularProgress,
   Paper,
   Typography,
 } from "@mui/material";
@@ -16,13 +19,13 @@ import {
   Refresh,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
-import { DataTable } from "@/components/DataTable";
+import { ResourceDataTable as DataTable } from "@/components/Tables/ResourceDataTable";
 import type {
   DataTableBulkAction,
   DataTableRowAction,
   DataTableServerStateController,
 } from "@/components/DataTable";
-import { ResourceActionButton } from "@/components/buttons";
+import { ResourceTableCreateButton } from "@/components/Tables/ResourceTableCreateButton";
 import { TranslationKeyApiError } from "../api";
 import {
   TranslationKeyCreateDialog,
@@ -36,6 +39,7 @@ import type { TranslationKey, TranslationValue } from "../schemas";
 import { useTranslationKeyDataTable } from "./useTranslationKeyDataTable";
 import { TranslationKeyTranslationsPanel } from "./TranslationKeyTranslationsPanel";
 import { createTranslationKeyCardConfig } from "./translationKeyCardConfig";
+import { ResourceTableLoading } from "@/components/Tables/ResourceTableLoading";
 
 const COMPONENT_NAME = "RazethTranslationKeyTable";
 
@@ -45,19 +49,7 @@ const Root = styled("section", {
   overridesResolver: (_props, styles) => styles.root,
 })({});
 
-const LoadingRoot = styled(Paper, {
-  name: COMPONENT_NAME,
-  slot: "Card",
-  overridesResolver: (_props, styles) => styles.card,
-})({});
-
-const LoadingContentRoot = styled("div", {
-  name: COMPONENT_NAME,
-  slot: "Content",
-  overridesResolver: (_props, styles) => styles.content,
-})({});
-
-const TableRegionRoot = styled("div", {
+const TableRegionRoot = styled(Box, {
   name: COMPONENT_NAME,
   slot: "Main",
   overridesResolver: (_props, styles) => styles.main,
@@ -100,12 +92,9 @@ export interface TranslationKeyTableProps {
  * First real production resource using the custom TanStack v9 + MUI
  * DataTable stack.
  */
-export function TranslationKeyTable(
-  props: TranslationKeyTableProps = {},
-) {
-  const {
-    queryController,
-  } = props;
+export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
+  const router = useRouter();
+  const { queryController } = props;
   const [createOpen, setCreateOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<TranslationKey | null>(
     null,
@@ -129,11 +118,12 @@ export function TranslationKeyTable(
 
   const rowActions = useMemo<readonly DataTableRowAction<TranslationKey>[]>(
     () => [
+      resourceViewAction<TranslationKey>(router.push, record => `/admin/i18n/${encodeURIComponent(String(record.id))}`),
       {
         id: "edit",
         label: "Edit",
         inline: true,
-        color: "primary",
+        color: "error",
         renderIcon: () => <EditOutlined fontSize="small" />,
 
         /**
@@ -151,7 +141,8 @@ export function TranslationKeyTable(
       {
         id: "delete",
         label: "Delete",
-        color: "error",
+        inline: true,
+        color: "primary",
         renderIcon: () => <DeleteOutline fontSize="small" />,
 
         /**
@@ -162,8 +153,12 @@ export function TranslationKeyTable(
 
         onClick: ({ row }) => setDeletingRecord(row.original),
       },
+      ...resourceRecordMenuActions<TranslationKey>({
+        basePath: "/admin/i18n",
+        navigate: (path) => { router.push(path); },
+      }),
     ],
-    [],
+    [router],
   );
 
   const card = useMemo(
@@ -207,7 +202,7 @@ export function TranslationKeyTable(
       {
         id: "edit-selected",
         label: "Edit selected",
-        color: "primary",
+        color: "error",
         variant: "text",
         renderIcon: () => <EditOutlined fontSize="small" />,
         isDisabled: ({ selectedCount, selectedRows }) =>
@@ -223,7 +218,7 @@ export function TranslationKeyTable(
       {
         id: "delete-selected",
         label: "Delete selected",
-        color: "error",
+        color: "primary",
         variant: "text",
         renderIcon: () => <DeleteOutline fontSize="small" />,
         isDisabled: ({ selectedCount, selectedRows }) =>
@@ -252,14 +247,7 @@ export function TranslationKeyTable(
    */
   if (server.isInitialLoading) {
     return (
-      <LoadingRoot variant="outlined">
-        <LoadingContentRoot>
-          <CircularProgress />
-          <Typography variant="body2" color="text.secondary">
-            Loading translation keys…
-          </Typography>
-        </LoadingContentRoot>
-      </LoadingRoot>
+      <ResourceTableLoading message="Loading translation keys…" />
     );
   }
 
@@ -444,8 +432,7 @@ export function TranslationKeyTable(
           setDeletingTranslation(null);
         }}
         onDeleted={(translation) => {
-          const key =
-            deletingTranslation?.record.key;
+          const key = deletingTranslation?.record.key;
 
           setDeletingTranslation(null);
 
@@ -512,8 +499,15 @@ export function TranslationKeyTable(
         )}
 
         <DataTable
+          windowRows="interactive"
+          onViewRecord={record => {
+            router.push(`/admin/i18n/${encodeURIComponent(String(record.id))}`);
+          }}
+          resourceId="admin/i18n/translation-keys"
           table={table}
           card={card}
+          defaultDisplayMode="auto"
+          autoCardBreakpoint="md"
           persistence={{
             /**
              * Saved visual preferences are scoped to this resource surface.
@@ -577,16 +571,15 @@ export function TranslationKeyTable(
             //   </Button>
             // ),
             startContent: (
-              <ResourceActionButton
-                variant="contained"
-                color="warning"
+              <ResourceTableCreateButton
+                color="error"
                 startIcon={<AddRounded />}
                 onClick={() => {
                   setCreateOpen(true);
                 }}
               >
                 Create key
-              </ResourceActionButton>
+              </ResourceTableCreateButton>
             ),
             search: true,
             /**

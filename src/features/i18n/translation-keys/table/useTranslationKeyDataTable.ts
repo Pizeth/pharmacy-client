@@ -23,6 +23,7 @@ import {
   useTranslationKeyRefineDataTableServerResult,
 } from "../refine";
 import { useTranslationKeyFilterOptions } from "./useTranslationKeyFilterOptions";
+import { useTranslationKeyLiveResult, useTranslationKeyLiveSubscription } from "../refine/useTranslationKeyLive";
 import type { TranslationKeyFilterOptionsState } from "./useTranslationKeyFilterOptions";
 import type { DataTableRowAction } from "@/components/DataTable/mui/columns/actions";
 import {
@@ -144,13 +145,23 @@ export function useTranslationKeyDataTable(
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
   /**
-   * Server-backed row selection is page/query-context local.
+   * Server-backed row selection is stable record-identity application state.
    *
-   * A same-query mutation refresh preserves the selected record so an
-   * edit can refresh canonical data without surprising deselection.
+   * It intentionally survives:
    *
-   * A semantic query transition clears selection so stale/off-page IDs
-   * cannot accidentally authorize resource mutation commands.
+   * - sorting,
+   * - column filtering,
+   * - global search,
+   * - pagination,
+   * - same-query canonical refreshes.
+   *
+   * Manual/server pagination means the currently loaded page is only a subset
+   * of the resource. Absence from one page is therefore NOT evidence that a
+   * selected record no longer exists.
+   *
+   * Mutation commands that require a loaded record already guard themselves
+   * through selectedRows.length, while known successful deletion removes the
+   * deleted stable ID explicitly.
    */
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -163,6 +174,11 @@ export function useTranslationKeyDataTable(
    * - deselecting that row unpins it
    * - selecting the whole page selects every row but intentionally clears
    *   pinning instead of stacking 25 sticky rows at the top of the viewport
+   *
+   * Selection-driven pin IDs survive semantic query transitions alongside
+   * rowSelection. keepPinnedRows=false below guarantees that off-page IDs are
+   * never resurrected into the current server page merely because the pin
+   * identity remains remembered.
    *
    * The generic selection controls coordinate TanStack's own:
    *
@@ -261,7 +277,8 @@ export function useTranslationKeyDataTable(
    * --------------------------------------------------------------
    */
   /**
-   * Query state changes establish a different server-result context.
+   * Query state changes establish a different server-result context for
+   * expansion only.
    *
    * Reset expansion for:
    *
@@ -271,17 +288,16 @@ export function useTranslationKeyDataTable(
    * - global search
    * - explicit query replacement/reset
    *
-   * Refine refresh deliberately leaves query.state unchanged, so
-   * nested TranslationValue mutations preserve the expanded key while
-   * canonical server data replaces row.original.translations.
+   * Row selection and selection-driven pin identities are deliberately NOT
+   * reset here. They are stable-ID application state and must survive ordinary
+   * table query changes.
+   *
+   * Refine refresh deliberately leaves query.state unchanged, so nested
+   * TranslationValue mutations preserve the expanded key while canonical
+   * server data replaces row.original.translations.
    */
   useEffect(() => {
     setExpanded({});
-    setRowSelection({});
-    setRowPinning({
-      top: [],
-      bottom: [],
-    });
   }, [query.state]);
 
   /**
@@ -311,8 +327,8 @@ export function useTranslationKeyDataTable(
       query.state,
     );
 
-  const server =
-    refine.server;
+  const live = useTranslationKeyLiveResult(query.state, refine.server, refine.request.refresh);
+  const server = live.server;
 
   /**
    * ================================================================
@@ -577,27 +593,31 @@ export function useTranslationKeyDataTable(
    * 8. Canonical server/live row-state safety
    * ================================================================
    *
-   * The generic safety layer replaces the resource-local selection/pinning
-   * cleanup previously implemented above.
+   * TranslationKey uses cross-query stable selection identities.
    *
-   * It reconciles only after a canonical current-query result settles, so
-   * background refresh keeps prior rows and their interactions intact.
+   * Therefore the current loaded page is authoritative for expansion, but is
+   * NOT authoritative for rowSelection/rowPinning:
    *
-   * Once canonical rows are known it removes no-longer-visible IDs from:
+   * - an ID missing after pagination may simply be on another page,
+   * - an ID missing after filtering may simply be filtered out,
+   * - an ID missing after sorting may simply have moved to another page.
    *
-   * - rowSelection,
-   * - rowPinning,
-   * - expanded.
+   * Known deletion is handled explicitly by the resource mutation command.
+   * keepPinnedRows=false still prevents off-page pinned rows from being
+   * rendered into the current page.
    *
-   * It also recovers pageIndex only when live/server count changes leave the
-   * current page outside the returned pageCount.
+   * Page-index recovery and expanded-row reconciliation remain enabled.
    */
+  useTranslationKeyLiveSubscription(table, live.handleEvent);
   useDataTableLiveTableStateSafety({
     table,
     query,
     server,
     getRowId: (row) => row.id,
     enabled: true,
+    reconcileRowSelection: false,
+    reconcileRowPinning: false,
+    reconcileExpanded: true,
   });
 
   return {

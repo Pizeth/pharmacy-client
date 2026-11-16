@@ -1,0 +1,74 @@
+"use client";
+import { GlobalStyles, Portal, useMediaQuery } from "@mui/material";
+import { useColorScheme, useTheme } from "@mui/material/styles";
+import { useEffect, useId, useRef, useState } from "react";
+import ParticleField from "./ParticleField";
+import GradientRing from "./GradientRing";
+import * as S from "./PulseLoader.styles";
+
+
+const LOADING_MESSAGES = [
+  "Initializing System",
+  "Syncing Neural Interface",
+  "Loading Assets",
+  "Calibrating Interface",
+  "Fetching Data Streams",
+  "Optimizing Core",
+  "Establishing Connection",
+];
+
+export default function PulseLoader() {
+  const theme = useTheme();
+  const { mode, systemMode } = useColorScheme();
+  const scheme = mode === "system" ? systemMode : mode;
+  const palette = scheme ? theme.colorSchemes?.[scheme]?.palette ?? theme.palette : theme.palette;
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const particleId = useId().replace(/:/g, "");
+  const emblemRef = useRef<HTMLDivElement>(null);
+  // Portal content mounts only in the browser, so this seed cannot mismatch server markup.
+  const [messageIndex, setMessageIndex] = useState(() => Math.floor(Math.random() * LOADING_MESSAGES.length));
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setMessageIndex(current => (current + 1) % LOADING_MESSAGES.length);
+    }, 2500);
+    return () => window.clearInterval(timer);
+  }, []);
+  return (
+    <Portal>
+      <GlobalStyles styles={'@property --PulseLoader-frame-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; } body:has(> [data-pulse-loader]) { overflow: hidden; }'} />
+      <S.Root data-pulse-loader role="status" aria-label="Loading…" aria-live="polite" aria-busy="true">
+        <S.Background aria-hidden="true">
+          {!reducedMotion && <ParticleField emblemRef={emblemRef} main={palette.primary.main} light={palette.primary.light} />}
+        </S.Background>
+        <S.Frame aria-hidden="true" />
+        <S.Emblem ref={emblemRef} aria-hidden="true">
+          <S.CircleBackground />
+          <S.Storm />
+          <S.OuterGlow />
+          <GradientRing />
+          <S.Ring data-ring="outer" />
+          <S.Ring data-ring="middle" />
+          <S.Ring data-ring="inner">
+            <svg viewBox="0 0 140 140" aria-hidden="true">
+              <defs>
+                <mask id={`pulse-ring-${particleId}`} maskUnits="userSpaceOnUse" x="0" y="0" width="140" height="140">
+                  <rect width="140" height="140" fill="white" />
+                  <rect data-gap="horizontal" x="-7" y="50" width="154" height="40" fill="black" />
+                  <rect data-gap="vertical" x="50" y="-7" width="40" height="154" fill="black" />
+                </mask>
+              </defs>
+              <circle cx="70" cy="70" r="68.5" fill="none" stroke="var(--PulseLoader-ring-color)" strokeWidth="3" mask={`url(#pulse-ring-${particleId})`} />
+            </svg>
+          </S.Ring>
+          <S.Glow />
+          <S.Pulse />
+          <S.Avatar src="/static/images/logo.svg" alt="" neumorphic softGlow />
+          <S.Progress>{[0, 1, 2, 3, 4, 5, 6].map(index => <S.Orbit key={index} />)}</S.Progress>
+          <S.Message variant="h6">
+            {LOADING_MESSAGES[messageIndex]}
+          </S.Message>
+        </S.Emblem>
+      </S.Root>
+    </Portal>
+  );
+}

@@ -1,4 +1,5 @@
 "use client";
+import TranslateOutlined from "@mui/icons-material/TranslateOutlined";
 
 import { useRouter } from "next/navigation";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
@@ -8,7 +9,7 @@ export default function CreateTranslationPage() {
   const router = useRouter();
 
   return (
-    <ResourcePage
+    <ResourcePage titleIcon={<TranslateOutlined />}
       title="Create translation key"
       subtitle="Add key metadata to the translation registry."
       maxWidth="md"

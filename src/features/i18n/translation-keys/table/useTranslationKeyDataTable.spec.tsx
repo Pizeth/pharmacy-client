@@ -298,7 +298,7 @@ describe("TranslationKey DataTable row-selection continuity", () => {
     });
   });
 
-  it("prunes a selected ID when a same-query replacement no longer contains that row", async () => {
+  it("does not treat absence from one canonical server page as deletion", async () => {
     const { result, rerender } = renderHook(() =>
       useTranslationKeyDataTable({
         enableRowSelection: true,
@@ -309,10 +309,10 @@ describe("TranslationKey DataTable row-selection continuity", () => {
       result.current.table.setRowSelection({
         [String(record.id)]: true,
       });
-    });
-
-    expect(result.current.table.state.rowSelection).toEqual({
-      [String(record.id)]: true,
+      result.current.table.setRowPinning({
+        top: [String(record.id)],
+        bottom: [],
+      });
     });
 
     currentResult = createResult([]);
@@ -320,40 +320,52 @@ describe("TranslationKey DataTable row-selection continuity", () => {
     rerender();
 
     await waitFor(() => {
-      expect(result.current.table.state.rowSelection).toEqual({});
+      expect(result.current.table.state.rowSelection).toEqual({
+        [String(record.id)]: true,
+      });
+      expect(result.current.table.state.rowPinning).toEqual({
+        top: [String(record.id)],
+        bottom: [],
+      });
     });
   });
 
-  it("clears selection when the semantic server query changes", async () => {
+  it("preserves selection and select-sticky pin identities across semantic server-query changes", async () => {
     const { result } = renderHook(() =>
       useTranslationKeyDataTable({
         enableRowSelection: true,
       }),
     );
 
-    const selectRecord = () => {
-      act(() => {
-        result.current.table.setRowSelection({
-          [String(record.id)]: true,
+    const selectedId = String(record.id);
+
+    act(() => {
+      result.current.table.setRowSelection({
+        [selectedId]: true,
+      });
+      result.current.table.setRowPinning({
+        top: [selectedId],
+        bottom: [],
+      });
+    });
+
+    const expectSelectionPreserved = async () => {
+      await waitFor(() => {
+        expect(result.current.table.state.rowSelection).toEqual({
+          [selectedId]: true,
+        });
+        expect(result.current.table.state.rowPinning).toEqual({
+          top: [selectedId],
+          bottom: [],
         });
       });
-
-      expect(result.current.table.state.rowSelection).toEqual({
-        [String(record.id)]: true,
-      });
     };
-
-    selectRecord();
 
     act(() => {
       result.current.query.onGlobalFilterChange("auth");
     });
 
-    await waitFor(() => {
-      expect(result.current.table.state.rowSelection).toEqual({});
-    });
-
-    selectRecord();
+    await expectSelectionPreserved();
 
     act(() => {
       result.current.query.onColumnFiltersChange([
@@ -364,11 +376,7 @@ describe("TranslationKey DataTable row-selection continuity", () => {
       ]);
     });
 
-    await waitFor(() => {
-      expect(result.current.table.state.rowSelection).toEqual({});
-    });
-
-    selectRecord();
+    await expectSelectionPreserved();
 
     act(() => {
       result.current.query.onSortingChange([
@@ -379,11 +387,7 @@ describe("TranslationKey DataTable row-selection continuity", () => {
       ]);
     });
 
-    await waitFor(() => {
-      expect(result.current.table.state.rowSelection).toEqual({});
-    });
-
-    selectRecord();
+    await expectSelectionPreserved();
 
     act(() => {
       result.current.query.onPaginationChange((previous) => ({
@@ -392,9 +396,7 @@ describe("TranslationKey DataTable row-selection continuity", () => {
       }));
     });
 
-    await waitFor(() => {
-      expect(result.current.table.state.rowSelection).toEqual({});
-    });
+    await expectSelectionPreserved();
   });
 
   it("pins expansion then selection to logical start and actions to logical end", () => {

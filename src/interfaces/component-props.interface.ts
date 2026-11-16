@@ -102,6 +102,8 @@ export interface SignUpFormProps extends LoginFormProps {
 }
 
 export interface DrawerToggleProps extends HtmlHTMLAttributes<HTMLDivElement> {
+  neumorphic?: boolean;
+  softGlow?: boolean;
   wrapper?: ReactNode;
   children?: ReactNode;
   icon?: ReactNode;
@@ -282,14 +284,17 @@ export interface UserMenuProps {
   open: boolean;
   placement?: PopperPlacementType;
   onClose: () => void;
-  data: {
+  authenticated: boolean;
+  authLoading?: boolean;
+  data?: {
     name: string;
     email: string;
     role: string;
-    avatar: string;
-    storageUsed: number;
-    storageTotal: number;
-  };
+    avatar?: string | undefined;
+    isVerified?: boolean;
+    storageUsed?: number;
+    storageTotal?: number;
+  } | undefined;
 }
 
 export interface RazethAvatarContainerProps extends HtmlHTMLAttributes<HTMLDivElement> {
@@ -380,6 +385,8 @@ export interface BaseInputProps<
   type?: string;
 
   iconStart?: ReactNode;
+  /** Vertical alignment of the start icon in multiline fields. Defaults to top; single-line fields remain centered. */
+  iconStartAlignment?: "center" | "top";
   iconEnd?: ReactNode;
 
   /**
@@ -452,6 +459,7 @@ export interface SelectFieldProps {
   readonly options: readonly SelectFieldOption[];
 
   readonly placeholder?: ReactNode;
+  readonly includeEmptyOption?: boolean;
   readonly helperText?: ReactNode;
 
   readonly defaultValue?: string;

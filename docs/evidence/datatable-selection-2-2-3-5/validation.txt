@@ -1,0 +1,78 @@
+DataTable 2.2.3.5 local validation — October 22, 2026
+Original proof revision: 0921295c071aad6799a642f27b24d325049df9fd
+Base: 9b75b0372938767d01874f43cc0bd401011a7a40
+Branch: codex/datatable-selection-dependencies
+Windows / Node24.16.0 / npm11.14.1 / Next16.4.2 / TanStack9.3.1
+
+npm ci
+PASS. First attempt EPERM SWC lock; exact repository Next processes stopped,
+installation retried, dev server restored. No dependency/version changes.
+
+npm run typecheck
+PASS (feature synchronization + tsc --noEmit).
+
+npm test -- --runInBand --roots src --runTestsByPath
+  src/components/DataTable/mui/components/selectionDependencyContract.spec.tsx
+  src/components/DataTable/mui/components/selectionDependencies.spec.tsx
+2 suites PASS /21 tests PASS.
+Final focused run25.405s. Layout-effect output counters, not render calls.
+After A then B: default owner/body1/1,rowIDs a,b,14 unique physical cells;
+experimental owner/body0/0,rowID b,7 unique physical cells.
+Both: ownA output0 commits, globalA1,nestedA1; counts2 and live guard disabled.
+Cards: both rowIDs commit,0 physical table-cell commits, ownA0; globalA2.
+
+npm run test:datatable -- --runInBand --roots src
+100 suites PASS /584 tests PASS.280.085s.
+
+npm test -- --runInBand --roots src
+142 suites:138 PASS,4 FAIL.819 tests:811 PASS,8 FAIL.234.597s.
+
+At original proof0921295, these suites were rerun independently:
+  src/features/hrd/pages/home/HrdHomePage.spec.tsx
+  src/features/hrd/styles/hrdThemeSlots.spec.tsx
+  src/components/inputs/textfieldInteraction.spec.tsx
+  src/features/hrd/pages/home/HrdFaq.spec.tsx
+4 suites FAIL;8 tests FAIL,6 PASS.8.406s.
+Failures:5 HrdHomePage (theme.vars null.palette),1 HrdFaq (same),
+1 hrdThemeSlots (customShadows undefined.neumorphic),
+1 textfieldInteraction (multiline adornment alignSelf:auto expectation).
+git diff 9b75b0372938767d01874f43cc0bd401011a7a40
+  0921295c071aad6799a642f27b24d325049df9fd
+  -- src/features/hrd src/components/inputs package.json
+  package-lock.json jest.config.mjs jest.setup.ts
+Empty: no differences in those paths between base and original proof revision.
+This is historical attribution at0921295, not a claim about current PR HEAD.
+Follow-up08a4521 changes baseInput.tsx and HrdFaq.styles.tsx on the exercised
+failure paths; all14 tests in those four suites pass, and CI306 is green:
+https://github.com/Pizeth/pharmacy-client/actions/runs/39720166273
+Later package upgrades and final-tree validation are tracked by the latest PR
+checks. No assertion or timeout was weakened. Outcome B remains unchanged.
+Historical tree at194f54a: npm ls --all reports no problems; npm ci --strict-peer-deps PASS;
+npm run typecheck PASS. Resolver5.9.2,TypeScript6.0.3,ESLint9.39.5 satisfy the
+installed optional-validation and Next lint-tool peer contracts. No force or
+legacy-peer-deps flags and no peer-suppression overrides were used.
+
+Superseded at5e179bd by maintainer choice: resolver6.0.0,Effect4.0.5,
+TypeScript7.0.2,ESLint9.39.5. Resolver's Zod/RHF/Effect peers resolve normally;
+no TypeSchema/Effect3 adapter is installed. TypeScript7 exceeds the installed
+typescript-eslint8.71.1 peer range >=4.8.4 <6.1.0. The maintainer accepts that
+upstream warning initially; the incoming strict npm ci FAILS and npm ls --all
+reports invalid TypeScript7.0.2. The maintainer then approved Microsoft's
+side-by-side compiler7/API6 setup. Final tsc=7.0.2, tooling API=6.0.3;
+strict lockfile resolution/npm ls --all/typecheck PASS. Final strict clean-install
+and suite results are in the acceptance report. Historical checks remain scoped.
+Latest acceptance results: docs/pr47-final-acceptance.md.
+Final source4c0a935: npm ci --strict-peer-deps PASS; npm ls --all has no problems;
+tsc7.0.2/tooling API6.0.3 verified; typecheck PASS; full Jest144 suites/828 tests
+PASS (170.074s); CI310 PASS. Lint restored but173 existing source errors remain
+outside PR-changed source paths; changed acceptance files have0 lint errors.
+
+git diff --check
+PASS. Existing LF/CRLF conversion notices are not whitespace errors.
+
+Browser Windows IAB Chrome155.0.0.0,1101x884 and420x884, development.
+Fixture console:0 warnings,0 errors.
+Resources:0 errors; existing logo.svg fill/parent-position warning.
+Snapshot negative proof: cards mounted before A/B: live/raw2,snapshot0,
+aggregate guard enabled. Default same sequence snapshot2,guard disabled.
+No production optimization approval. Outcome B.

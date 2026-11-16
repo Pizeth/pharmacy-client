@@ -1,3 +1,4 @@
+import { ResourceTableCreateButton } from "@/components/Tables/ResourceTableCreateButton";
 import React, { useMemo, useState } from "react";
 // Assuming Next.js, swap if using react-router-dom
 import {
@@ -109,7 +110,7 @@ const BottomBar = styled(Box)(({ theme }) => ({
   left: 0,
   right: 0,
   // fontFamily: [
-  //   "Roboto",
+  //   "var(--font-inter)",
   //   "Helvetica",
   //   "sans-serif",
   //   "var(--font-interkhmerloopless)",
@@ -118,7 +119,7 @@ const BottomBar = styled(Box)(({ theme }) => ({
   "& .MuiAlert-message": {
     fontSize: "0.875rem",
     fontFamily: [
-      "Roboto",
+      "var(--font-inter)",
       "Helvetica",
       "sans-serif",
       "var(--font-interkhmerloopless)",
@@ -128,7 +129,7 @@ const BottomBar = styled(Box)(({ theme }) => ({
       color: theme.vars.palette.text.primary,
       fontSize: "0.875rem",
       fontFamily: [
-        "Roboto",
+        "var(--font-inter)",
         "Helvetica",
         "sans-serif",
         "var(--font-interkhmerloopless)",
@@ -141,7 +142,7 @@ const BottomBar = styled(Box)(({ theme }) => ({
   label: {
     fontSize: "0.875rem",
     fontFamily: [
-      "Roboto",
+      "var(--font-inter)",
       "Helvetica",
       "sans-serif",
       "var(--font-interkhmerloopless)",
@@ -157,14 +158,14 @@ const PaginationRow = styled(Box)(({ theme }) => ({
   padding: "0.5rem",
   width: "100%",
   // fontFamily: [
-  //   "Roboto",
+  //   "var(--font-inter)",
   //   "Helvetica",
   //   "sans-serif",
   //   "var(--font-interkhmerloopless)",
   // ].join(","),
   // "&.MuiStack-root": {
   //   fontFamily: [
-  //     "Roboto",
+  //     "var(--font-inter)",
   //     "Helvetica",
   //     "sans-serif",
   //     "var(--font-interkhmerloopless)",
@@ -180,17 +181,6 @@ const DetailPane = styled(Box)(({ theme }) => ({
   },
   td: {
     fontFamily: "var(--font-interkhmerloopless)",
-  },
-}));
-
-const AddButton = styled(Button, {
-  name: PREFIX,
-  slot: "button",
-  overridesResolver: (_props, styles) => styles.button,
-})(({ theme }) => ({
-  borderRadius: "50px",
-  "&.MuiButton-contained": {
-    color: theme.palette.common.white,
   },
 }));
 
@@ -922,20 +912,9 @@ export default function DocumentTableOld() {
             p: (theme) => theme.spacing(1),
           }}
         >
-          <AddButton
-            variant="contained"
-            startIcon={<Add />}
-            // fullWidth
-            size="large"
-            color="error"
-            // autoFocus
-            type="button"
-            onClick={handleDialogForm}
-          >
-            <Typography variant="body2">
-              <strong>បញ្ចូលឯកសារថ្មី</strong>
-            </Typography>
-          </AddButton>
+          <ResourceTableCreateButton startIcon={<Add />} size="large" color="error" type="button" onClick={handleDialogForm}>
+            បញ្ចូលឯកសារថ្មី
+          </ResourceTableCreateButton>
         </Box>
         <MRT_GlobalFilterTextField table={table} />
         <Box>

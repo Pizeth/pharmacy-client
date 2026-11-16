@@ -1,3 +1,4 @@
+jest.mock("next/navigation", () => ({ useRouter: () => ({ push: jest.fn() }) }));
 import { fireEvent, render, screen } from "@testing-library/react";
 
 import type {

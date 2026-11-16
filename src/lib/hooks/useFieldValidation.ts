@@ -196,10 +196,14 @@ export const useAsyncFieldRule = (source: string, debounceDelay = 500) => {
   // ✅ FIX: memoize zodRefine so it has a stable reference across renders
   // const zodRefine = useMemo(() => asZodRefine(validate), [validate]);
   // return { validate, status };
+  const invalidate = useCallback(() => {
+    validate.invalidate();
+    validator.invalidate?.();
+  }, [validate, validator]);
   return {
     validate, // for manual use
     // zodRefine, // ← Best for Zod
-    invalidate: validate.invalidate,
+    invalidate,
   };
   // return validate;
 };

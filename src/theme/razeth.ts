@@ -1,6 +1,9 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-empty-object-type */
+import { resourceFormStyles } from "@/components/forms/resourceFormStyles";
+import { ROW_ACTION_CARD_PADDING } from "@/components/DataTable/mui/columns/actions/rowActionStyles";
+
 import { deepmerge } from "@mui/utils";
+import { formActionsStyles } from "@/components/forms/formActionsStyles";
 import { defaultDarkTheme, defaultTheme, RaThemeOptions } from "react-admin";
 import { red, blue } from "@mui/material/colors";
 import {
@@ -15,6 +18,7 @@ import {
 // import { makePulseVars } from "@/utils/themeUtils";
 import { getMeteorConfig, getSideImageConfig } from "@/configs/themeConfig";
 import { shake } from "./keyframes";
+import { SIGNATURE_BLUE, SIGNATURE_GOLD } from "./brandColors";
 import {
   RazethAvatarOptimized,
   RazethLoginOptimized,
@@ -23,10 +27,11 @@ import {
   RazethSideImageOptimized,
   RazethTwinkleStarOptimized,
 } from "@/theme/components";
-import { dataTableClasses } from "@/components/DataTable/mui/styles";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"; // Optional
+
+
 
 const globalStyles = (theme: Theme) => ({
   "html, body, #__next": {
@@ -34,7 +39,7 @@ const globalStyles = (theme: Theme) => ({
     margin: 0,
     padding: 0,
     fontFamily: [
-      "Roboto",
+      "var(--font-inter)",
       "Helvetica",
       "sans-serif",
       "var(--font-siemreap)",
@@ -56,6 +61,7 @@ const globalStyles = (theme: Theme) => ({
     "--app-sideImage-circleColor": theme.custom.sideImage.circleColor,
     "--app-sideImage-logoOffset": theme.custom.sideImage.logoOffset,
     "--app-circle-stop-count": theme.custom.sideImage.circleStopCount,
+    "--app-border-radius": "50px",
   },
   // Custom styles for a text field with an icon
   ".icon-input .MuiInputLabel-root": {
@@ -81,11 +87,11 @@ const globalStyles = (theme: Theme) => ({
     textAlign: "center",
   },
   /* Target ALL Boxes inside Stacks */
-  ".MuiStack-root .MuiBox-root": {
-    margin: `${theme.spacing(0)}`,
-    padding: `${theme.spacing(0)}`,
-    // lineHeight: 0,
-  },
+  // ".MuiStack-root .MuiBox-root": {
+  //   margin: `${theme.spacing(0)}`,
+  //   padding: `${theme.spacing(0)}`,
+  //   // lineHeight: 0,
+  // },
   /* Specific to Password Strength Meter Box */
   ".MuiStack-root > .MuiBox-root:has(.MuiLinearProgress-root)": {
     marginTop: `${theme.spacing(0)}`,
@@ -140,7 +146,9 @@ const standardizedFormComponents = {
           theme.direction === "rtl" ? "-45px" : "45px",
         "--RazethTextField-label-offset-y-small": "9px",
         "--RazethTextField-label-offset-y-medium": "16px",
-        "& .MuiOutlinedInput-root": { borderRadius: 999 },
+        "& .MuiOutlinedInput-root": {
+          borderRadius: "var(--app-border-radius)",
+        },
 
         /**
          * Multiline fields should be rounded panels rather than
@@ -212,7 +220,9 @@ const standardizedFormComponents = {
           theme.direction === "rtl" ? "-45px" : "45px",
         "--RazethSelectField-label-offset-y-small": "9px",
         "--RazethSelectField-label-offset-y-medium": "16px",
-        "& .MuiOutlinedInput-root": { borderRadius: 999 },
+        "& .MuiOutlinedInput-root": {
+          borderRadius: "var(--app-border-radius)",
+        },
       }),
 
       icon: ({ theme }: { theme: Theme }) => ({
@@ -242,7 +252,9 @@ const standardizedFormComponents = {
 
       heading: ({ theme }: { theme: Theme }) => ({
         padding: theme.spacing(2, 3),
-        borderBottom: `1px solid ${theme.vars.palette.warning.main}`,
+        borderBottom: `1px solid ${SIGNATURE_GOLD}`,
+        backgroundColor: SIGNATURE_BLUE,
+        color: "#fff",
       }),
 
       wrapper: ({ theme }: { theme: Theme }) => ({
@@ -253,20 +265,27 @@ const standardizedFormComponents = {
         gap: theme.spacing(1.5),
       }),
 
-      icon: ({ theme }: { theme: Theme }) => ({
+      icon: {
         width: 40,
         height: 40,
         borderRadius: "50%",
-        color: theme.palette.warning.contrastText,
-        backgroundColor: theme.vars.palette.warning.main,
-      }),
+        color: "#1a1a1a",
+        backgroundColor: SIGNATURE_GOLD,
+      },
 
-      caption: ({ theme }: { theme: Theme }) => ({
-        color: (theme.vars ?? theme).palette.text.secondary,
-      }),
+      caption: {
+        color: "rgba(255, 255, 255, 0.8)",
+      },
+
+      button: {
+        color: "#fff",
+        "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.12)" },
+        "&:focus-visible": { outline: `2px solid ${SIGNATURE_GOLD}`, outlineOffset: 2 },
+      },
 
       footer: ({ theme }: { theme: Theme }) => ({
         padding: theme.spacing(3),
+        [theme.breakpoints.down("sm")]: { padding: theme.spacing(2) },
       }),
     },
   },
@@ -283,6 +302,7 @@ const standardizedFormComponents = {
 
     styleOverrides: {
       root: ({ theme }: { theme: Theme }) => ({
+        marginTop: 0,
         paddingBlock: theme.spacing(3),
       }),
 
@@ -321,10 +341,155 @@ const standardizedFormComponents = {
 
     styleOverrides: {
       root: ({ theme }: { theme: Theme }) => ({
-        borderRadius: 999,
+        borderRadius: "var(--app-border-radius)",
         paddingInline: theme.spacing(2),
         fontWeight: 700,
         whiteSpace: "nowrap",
+      }),
+    },
+  },
+
+  /**
+   * ================================================================
+   * DataTable leaf filter presentation
+   * ================================================================
+   *
+   * Table filters are compact data-manipulation controls rather than full
+   * application forms. Keep their appearance independent from RazethTextField
+   * / RazethSelectField so form styling can evolve without changing tables.
+   */
+  RazethDataTableTextFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          borderRadius: 5,
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.035),
+          "&:hover, &.Mui-focused": {
+            backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.06),
+          },
+        },
+        "& .MuiFilledInput-input": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableNumberFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          borderRadius: 5,
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.035),
+        },
+        "& .MuiFilledInput-input": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableNumberRangeFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        gap: theme.spacing(0.5),
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          borderRadius: 5,
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.035),
+        },
+        "& .MuiFilledInput-input": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableBooleanFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          borderRadius: 5,
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.035),
+        },
+        "& .MuiSelect-select": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+      }),
+    },
+  },
+
+  RazethDataTableSelectFilter: {
+    defaultProps: {
+      variant: "filled" as const,
+      margin: "none" as const,
+      size: "small" as const,
+    },
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        margin: 0,
+        "& .MuiFilledInput-root": {
+          minHeight: 36,
+          borderRadius: 5,
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.035),
+          "&:hover, &.Mui-focused": {
+            backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.06),
+          },
+        },
+        "& .MuiSelect-select": {
+          paddingTop: theme.spacing(1.75),
+          paddingBottom: theme.spacing(0.5),
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "0.8125rem",
+        },
+        "& .MuiFormHelperText-root": {
+          marginInline: 0,
+          marginTop: theme.spacing(0.25),
+        },
       }),
     },
   },
@@ -336,20 +501,9 @@ const standardizedFormComponents = {
    */
   RazethTranslationKeyForm: {
     styleOverrides: {
-      root: ({ theme }: { theme: Theme }) => ({
-        display: "flex",
-        flexDirection: "column",
-        gap: theme.spacing(3),
-      }),
+      root: ({ theme }: { theme: Theme }) => resourceFormStyles(theme),
 
-      footer: ({ theme }: { theme: Theme }) => ({
-        display: "flex",
-        justifyContent: "flex-end",
-        gap: theme.spacing(1),
-        [theme.breakpoints.down("sm")]: {
-          flexDirection: "column-reverse",
-        },
-      }),
+      footer: ({ theme }: { theme: Theme }) => formActionsStyles(theme),
     },
   },
 
@@ -390,12 +544,14 @@ const standardizedFormComponents = {
         minWidth: 0,
 
         /**
-         * Resource-specific viewport geometry without caller sx.
+         * Presentation viewport geometry is generic DataTable behavior.
+         *
+         * Keep this resource slot free of table-only height caps so:
+         *
+         * - card and table modes share one viewport contract,
+         * - fullscreen can consume the complete shell,
+         * - resource theme styling cannot accidentally override fullscreen.
          */
-        [`& .${dataTableClasses.container}`]: {
-          maxHeight: "calc(100vh - 290px)",
-          minHeight: 320,
-        },
       },
     },
   },
@@ -413,24 +569,28 @@ const standardizedFormComponents = {
   RazethTranslationValuesPanel: {
     styleOverrides: {
       root: ({ theme }: { theme: Theme }) => ({
+        width: "100%",
+        maxWidth: "none",
+        boxSizing: "border-box",
         padding: theme.spacing(1.5, 2),
         minWidth: 0,
         backgroundColor: theme.vars.palette.background.paper,
       }),
 
+      /**
+       * Detail content can be hosted by a narrow card while the browser itself
+       * is still desktop-sized. Keep this layout intrinsic to its own width
+       * rather than relying on viewport breakpoints.
+       */
       heading: ({ theme }: { theme: Theme }) => ({
         display: "grid",
-        gridTemplateColumns: "auto minmax(0, 1fr) auto",
+        gridTemplateColumns: "auto minmax(0, 1fr)",
         alignItems: "center",
         gap: theme.spacing(1.25),
         minWidth: 0,
         paddingBottom: theme.spacing(1.25),
         borderBottom: `1px solid ${theme.vars.palette.divider}`,
         color: theme.vars.palette.text.primary,
-
-        [theme.breakpoints.down("sm")]: {
-          gridTemplateColumns: "auto minmax(0, 1fr)",
-        },
       }),
 
       main: {
@@ -446,58 +606,35 @@ const standardizedFormComponents = {
 
       item: ({ theme }: { theme: Theme }) => ({
         display: "grid",
-        gridTemplateColumns:
-          "minmax(96px, auto) minmax(0, 1fr) minmax(170px, auto) auto",
+        gridTemplateColumns: "minmax(84px, auto) minmax(0, 1fr)",
         alignItems: "center",
-        gap: theme.spacing(2),
+        columnGap: theme.spacing(1.5),
+        rowGap: theme.spacing(0.75),
         padding: theme.spacing(1.25, 1),
         border: 0,
         borderBottom: `1px solid ${theme.vars.palette.divider}`,
         borderRadius: 0,
         backgroundImage: "none",
         backgroundColor: "transparent",
-
         "&:hover": {
-          backgroundColor: theme.alpha(
-            theme.vars.palette.text.primary,
-            0.06,
-          ),
-        },
-
-        [theme.breakpoints.down("md")]: {
-          gridTemplateColumns: "auto minmax(0, 1fr) auto",
-        },
-
-        [theme.breakpoints.down("sm")]: {
-          gridTemplateColumns: "auto minmax(0, 1fr)",
-          gap: theme.spacing(0.75, 1.25),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.06),
         },
       }),
 
       wrapper: {
         minWidth: 0,
-        // overflowWrap: "anywhere",
       },
 
       caption: ({ theme }: { theme: Theme }) => ({
+        gridColumn: "2",
         margin: 0,
         padding: 0,
-        whiteSpace: "nowrap",
+        whiteSpace: "normal",
         color: theme.vars.palette.text.secondary,
-
-        [theme.breakpoints.down("md")]: {
-          gridColumn: "2 / -1",
-        },
-
-        [theme.breakpoints.down("sm")]: {
-          gridColumn: "2",
-        },
-
         '&[data-empty="true"]': {
-          gridColumn: "auto",
+          gridColumn: "1 / -1",
           padding: theme.spacing(2),
           textAlign: "center",
-          whiteSpace: "normal",
         },
       }),
 
@@ -506,14 +643,13 @@ const standardizedFormComponents = {
       },
 
       button: ({ theme }: { theme: Theme }) => ({
+        gridColumn: "2",
         display: "flex",
-        justifyContent: "flex-end",
+        flexWrap: "wrap",
+        justifyContent: "flex-start",
         alignItems: "center",
-
-        [theme.breakpoints.down("sm")]: {
-          gridColumn: "2",
-          justifyContent: "flex-start",
-        },
+        gap: theme.spacing(1.25),
+        minWidth: 0,
       }),
     },
   },
@@ -526,7 +662,7 @@ const defaultThemeInvariants = {
     //   fontFamily: "var(--font-siemreap)",
     // },
     fontFamily: [
-      "Roboto",
+      "var(--font-inter)",
       "Helvetica",
       "sans-serif",
       "var(--font-interkhmerloopless)",
@@ -536,7 +672,7 @@ const defaultThemeInvariants = {
     ].join(","),
     h6: {
       fontWeight: 700,
-      fontFamily: "var(--font-mef2)", // Use Moul for headers like "Kingdom of Cambodia"
+      fontFamily: "var(--font-inter), var(--font-mef2), Helvetica, sans-serif",
     },
   },
   sidebar: {
@@ -588,15 +724,76 @@ const defaultThemeInvariants = {
           ),
         }),
 
+        // cardContainer: ({ theme }: { theme: Theme }) => ({
+        //   gap: theme.spacing(2.25),
+        //   padding: theme.spacing(2.25),
+        // }),
+
+        // cardItem: ({ theme }: { theme: Theme }) => ({
+        //   border: `1px solid ${theme.alpha(
+        //     theme.vars.palette.text.primary,
+        //     0.06,
+        //   )}`,
+        //   borderRadius: theme.spacing(2),
+        //   backgroundImage: "none",
+        //   backgroundColor: theme.alpha(
+        //     theme.vars.palette.background.paper,
+        //     0.96,
+        //   ),
+        //   boxShadow: theme.vars.palette.customShadows.dataTableCard,
+        //   transition: theme.transitions.create(
+        //     ["transform", "box-shadow", "background-color"],
+        //     { duration: theme.transitions.duration.shortest },
+        //   ),
+        //   "&:hover": {
+        //     transform: "translateY(-1px)",
+        //   },
+        //   '&[data-selected="true"]': {
+        //     backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.08),
+        //   },
+        // }),
+
+        // cardHeader: ({ theme }: { theme: Theme }) => ({
+        //   padding: theme.spacing(1.25, 1.5),
+        //   backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.025),
+        // }),
+
+        // cardBody: ({ theme }: { theme: Theme }) => ({
+        //   padding: theme.spacing(1.5),
+        // }),
+
+        // cardMetadata: ({ theme }: { theme: Theme }) => ({
+        //   padding: theme.spacing(0, 1.5, 1.25),
+        // }),
+
+        // cardExpansion: ({ theme }: { theme: Theme }) => ({
+        //   padding: theme.spacing(0, 1.25, 0.75),
+        // }),
+
+        // cardActions: ({ theme }: { theme: Theme }) => ({
+        //   minHeight: 40,
+        //   padding: theme.spacing(0.75, 1.25),
+        //   backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.025),
+        // }),
+
+        cardDetail: ({ theme }: { theme: Theme }) => ({
+          margin: theme.spacing(0, 1.25, 1.25),
+          padding: theme.spacing(1),
+          borderTop: 0,
+          borderRadius: theme.spacing(1.5),
+          backgroundColor: theme.alpha(
+            theme.vars.palette.background.default,
+            0.35,
+          ),
+          boxShadow: theme.vars.palette.customShadows.dataTableInset,
+        }),
+
         expandRowButton: ({ theme }: { theme: Theme }) => ({
           opacity: 1,
           color: theme.vars.palette.text.primary,
           "&:hover": {
             color: theme.vars.palette.primary.main,
-            backgroundColor: theme.alpha(
-              theme.vars.palette.primary.main,
-              0.12,
-            ),
+            backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.12),
           },
         }),
 
@@ -605,10 +802,7 @@ const defaultThemeInvariants = {
           color: theme.vars.palette.text.primary,
           "&:hover": {
             color: theme.vars.palette.primary.main,
-            backgroundColor: theme.alpha(
-              theme.vars.palette.primary.main,
-              0.12,
-            ),
+            backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.12),
           },
         }),
 
@@ -668,6 +862,18 @@ const defaultThemeInvariants = {
           },
         },
 
+        pagination: ({ theme }: { theme: Theme }) => ({
+          /**
+           * The complete pagination/selection footer is one surface.
+           * Selection state belongs on the footer root so the background does
+           * not stop at the embedded SelectionBar content.
+           */
+          backgroundColor: theme.vars.palette.background.paper,
+          '&[data-has-selection="true"]': {
+            backgroundColor: theme.vars.palette.action.selected,
+          },
+        }),
+
         paginationStart: {
           minWidth: 0,
           flex: "1 1 auto",
@@ -678,6 +884,162 @@ const defaultThemeInvariants = {
           flexWrap: "wrap",
           justifyContent: "flex-end",
           rowGap: theme.spacing(0.5),
+        }),
+
+        /**
+         * ==============================================================
+         * Card presentation — premium neumorphic surface
+         * ==============================================================
+         *
+         * Reuses the app's existing soft-UI shadow tokens
+         * (customShadows.neumorphic / inset / circleWell) so light/dark
+         * parity comes for free through CSS variables, matching the
+         * treatment already used for the auth divider, social buttons,
+         * day/night switch and avatar frame.
+         *
+         * Uses dedicated DataTable shell and inset shadows so the dark
+         * surfaces stay crisp while retaining the application's soft-UI
+         * design language. Chip accents retain the shared theme treatment.
+         */
+        cardGrid: ({ theme }: { theme: Theme }) => ({
+          gap: theme.spacing(2.5),
+          padding: theme.spacing(2.5),
+        }),
+
+        cardItem: ({ theme }: { theme: Theme }) => ({
+          border: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.06)}`,
+          borderRadius: 20,
+          backgroundColor: theme.vars.palette.background.paper,
+          // boxShadow: theme.vars.palette.customShadows.dataTableCard,
+          boxShadow: theme.vars.palette.customShadows.neumorphic,
+          height: `clamp(250px, 25vh, 325px)`,
+          transition: theme.transitions.create(
+            ["transform", "box-shadow", "background-color"],
+            { duration: theme.transitions.duration.short },
+          ),
+          willChange: "transform",
+
+          "&:hover": {
+            transform: "translateY(-3px)",
+          },
+
+          "&:active": {
+            transform: "translateY(-1px) scale(0.995)",
+            boxShadow: theme.vars.palette.customShadows.inset,
+            // boxShadow: theme.vars.palette.customShadows.dataTableInset,
+          },
+
+          '&[data-selected="true"]': {
+            outline: `2px solid ${theme.vars.palette.primary.main}`,
+            outlineOffset: 0,
+            backgroundColor: theme.alpha(theme.vars.palette.primary.main, 0.04),
+            boxShadow: `${theme.vars.palette.customShadows.inset}, 0 0 0 4px ${theme.alpha(
+              // boxShadow: `${theme.vars.palette.customShadows.dataTableInset}, 0 0 0 4px ${theme.alpha(
+              theme.vars.palette.primary.main,
+              0.14,
+            )}`,
+          },
+
+          "&:focus-visible": {
+            outline: `2px solid ${theme.vars.palette.primary.main}`,
+            outlineOffset: 2,
+          },
+
+          /**
+           * Chips (locale tags, translation-count badges) read as soft
+           * engraved pills rather than flat solid swatches.
+           */
+          "& .MuiChip-root": {
+            fontWeight: 600,
+            letterSpacing: 0.2,
+            borderRadius: "var(--app-border-radius)",
+            boxShadow: theme.vars.palette.customShadows.circleWell,
+          },
+          "& .MuiChip-outlined": {
+            backgroundColor: theme.vars.palette.background.paper,
+            borderColor: theme.alpha(theme.vars.palette.text.primary, 0.12),
+          },
+        }),
+
+        cardHeader: ({ theme }: { theme: Theme }) => ({
+          alignItems: "center",
+          gap: theme.spacing(1),
+          padding: theme.spacing(1.75, 2, 1.25),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.025),
+          borderBottom: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.06)}`,
+        }),
+
+        cardSelection: {
+          display: "flex",
+          alignItems: "center",
+        },
+
+        cardBody: ({ theme }: { theme: Theme }) => ({
+          padding: theme.spacing(1.5, 2),
+          gap: theme.spacing(1),
+        }),
+
+        cardMetadata: ({ theme }: { theme: Theme }) => ({
+          display: "flex",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: theme.spacing(1),
+          padding: theme.spacing(0, 2, 1.5),
+          color: theme.vars.palette.text.secondary,
+        }),
+
+        cardExpansion: ({ theme }: { theme: Theme }) => ({
+          padding: theme.spacing(0, 1, 1),
+
+          "& .MuiIconButton-root": {
+            borderRadius: "50%",
+            backgroundColor: theme.vars.palette.background.paper,
+            boxShadow: theme.vars.palette.customShadows.circleWell,
+            transition: theme.transitions.create([
+              "box-shadow",
+              "transform",
+              "color",
+            ]),
+
+            "&:hover": {
+              color: theme.vars.palette.primary.main,
+              boxShadow: theme.vars.palette.customShadows.neumorphic,
+            },
+            "&:active": {
+              boxShadow: theme.vars.palette.customShadows.inset,
+              transform: "scale(0.92)",
+            },
+          },
+        }),
+
+        cardActions: ({ theme }: { theme: Theme }) => ({
+          marginTop: "auto",
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: theme.spacing(0.75),
+          padding: theme.spacing(...ROW_ACTION_CARD_PADDING),
+          backgroundColor: theme.alpha(theme.vars.palette.text.primary, 0.025),
+          borderTop: `1px solid ${theme.alpha(theme.vars.palette.text.primary, 0.06)}`,
+
+          "& .MuiIconButton-root": {
+            borderRadius: "50%",
+            backgroundColor: theme.vars.palette.background.paper,
+            boxShadow: theme.vars.palette.customShadows.circleWell,
+            transition: theme.transitions.create([
+              "box-shadow",
+              "transform",
+              "color",
+            ]),
+
+            "&:hover": {
+              color: theme.vars.palette.primary.main,
+              boxShadow: theme.vars.palette.customShadows.neumorphic,
+            },
+            "&:active": {
+              boxShadow: theme.vars.palette.customShadows.inset,
+              transform: "scale(0.92)",
+            },
+          },
         }),
       },
     },
@@ -778,7 +1140,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       },
       secondary: { dark: "#2563eb", main: "#3b82f6", contrastText: "#fff" },
       error: { dark: "#f58700", main: "#c26a00", contrastText: "#fff" },
-      warning: { dark: "#eab308", main: "#ca8a04", contrastText: "#fff" },
+      warning: { light: "#a39124", main: "#827400", dark: "#625700", contrastText: "#fff" },
       // info: { dark: "#9333ea", main: "#7e22ce", contrastText: "#fff" },
       info: { dark: "#6366f1", main: "#4338ca", contrastText: "#fff" },
       success: { dark: "#22c55e", main: "#16a34a", contrastText: "#fff" },
@@ -801,6 +1163,10 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       customShadows: {
         neumorphic: `-7px -7px 15px rgba(255, 255, 255, 1), 7px 7px 15px rgba(174, 174, 192, 0.4)`,
         inset: `inset -5px -5px 10px rgba(255, 255, 255, 1), inset 5px 5px 10px rgba(174, 174, 192, 0.4)`,
+        dataTableCard:
+          "0 8px 20px rgba(61, 76, 105, 0.18), 0 1px 2px rgba(255, 255, 255, 0.9)",
+        dataTableInset:
+          "inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 0 0 1px rgba(104, 120, 148, 0.12), inset 0 6px 14px rgba(94, 109, 137, 0.08)",
         circleWell:
           // "inset 6px 6px 15px rgba(163, 177, 198, 0.5), inset -6px -6px 15px rgba(255, 255, 255, 1)",
           "-7px -7px 15px rgba(255,255,255,1), 7px 7px 15px rgba(174, 174, 192, 0.75)",
@@ -875,7 +1241,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           },
           secondary: { main: "#2563eb", dark: "#3b82f6", contrastText: "#fff" },
           error: { main: "#f58700", dark: "#c26a00", contrastText: "#fff" },
-          warning: { main: "#eab308", dark: "#ca8a04", contrastText: "#fff" },
+          warning: { light: "#b3a13d", main: "#857500", dark: "#6b5e00", contrastText: "#fff" },
           // info: { main: "#9333ea", dark: "#7e22ce", contrastText: "#fff" },
           info: { main: "#6366f1", dark: "#4338ca", contrastText: "#fff" },
           success: { main: "#22c55e", dark: "#16a34a", contrastText: "#fff" },
@@ -900,6 +1266,10 @@ export const RazethBaseTheme = (): RaThemeOptions =>
               "-7px -7px 15px rgba(255, 255, 255, 0.05), 7px 7px 15px rgba(0, 0, 0, 0.5)",
             inset:
               "inset -5px -5px 10px rgba(255, 255, 255, 0.05), inset 5px 5px 10px rgba(0, 0, 0, 0.5)",
+            dataTableCard:
+              "0 10px 24px rgba(0, 0, 0, 0.38), 0 1px 0 rgba(255, 255, 255, 0.05)",
+            dataTableInset:
+              "inset 0 1px 0 rgba(255, 255, 255, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 8px 18px rgba(0, 0, 0, 0.20)",
             circleWell:
               // "inset 6px 6px 15px rgba(0, 0, 0, 0.6), inset -6px -6px 15px rgba(255, 255, 255, 0.05)",
               "-7px -7px 15px rgba(255,255,255,0.125), 7px 7px 15px rgba(0, 0, 0, 0.75)",
@@ -938,6 +1308,10 @@ export const RazethBaseTheme = (): RaThemeOptions =>
               "-7px -7px 15px rgba(255, 255, 255, 1), 7px 7px 15px rgba(174, 174, 192, 0.4)",
             inset:
               "inset -5px -5px 10px rgba(255, 255, 255, 1), inset 5px 5px 10px rgba(174, 174, 192, 0.4)",
+            dataTableCard:
+              "0 8px 20px rgba(61, 76, 105, 0.18), 0 1px 2px rgba(255, 255, 255, 0.9)",
+            dataTableInset:
+              "inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 0 0 1px rgba(104, 120, 148, 0.12), inset 0 6px 14px rgba(94, 109, 137, 0.08)",
             circleWell: `
               inset 7px 7px 15px rgba(0, 0, 0, 0.6), 
               inset -7px -7px 15px rgba(255, 255, 255, 0.05)
@@ -968,7 +1342,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
     },
     typography: {
       fontFamily: [
-        "Roboto",
+        "var(--font-inter)",
         "Helvetica",
         "sans-serif",
         // "var(--font-interkhmerloopless)",
@@ -981,7 +1355,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         "var(--font-kantumruy)",
       ].join(","),
       h6: {
-        fontFamily: "var(--font-mef2)", // Use Moul for headers like "Kingdom of Cambodia"
+        fontFamily: "var(--font-inter), var(--font-mef2), Helvetica, sans-serif",
         fontSize: "1rem",
       },
       h5: {
@@ -989,7 +1363,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         fontSize: "1.15rem",
       },
       h4: {
-        fontFamily: "var(--font-kantumruy)", // Use Moul for headers like "Kingdom of Cambodia"
+        fontFamily: "var(--font-inter), var(--font-kantumruy), Helvetica, sans-serif",
         fontSize: "1.3rem",
       },
     },
@@ -1366,7 +1740,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
         styleOverrides: {
           root: {
             fontFamily: [
-              "Roboto",
+              "var(--font-inter)",
               "Helvetica",
               "sans-serif",
               "var(--font-interkhmerloopless)",
@@ -1397,16 +1771,16 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           },
           h6: {
             fontFamily: [
-              // "Roboto",
-              // "Helvetica",
-              // "sans-serif",
+              "var(--font-inter)",
               "var(--font-moul)",
               "var(--font-google)",
+              "Helvetica",
+              "sans-serif",
             ].join(","),
           },
           h5: {
             fontFamily: [
-              "Roboto",
+              "var(--font-inter)",
               "Helvetica",
               "sans-serif",
               "var(--font-moul)",
@@ -1414,10 +1788,10 @@ export const RazethBaseTheme = (): RaThemeOptions =>
           },
           h4: {
             fontFamily: [
-              "Roboto",
+              "var(--font-inter)",
+              "var(--font-kantumruy)",
               "Helvetica",
               "sans-serif",
-              "var(--font-kantumruy)",
             ].join(","),
             fontWeight: "inherit",
           },
@@ -1426,10 +1800,10 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       MuiInputBase: {
         styleOverrides: {
           root: (props: { theme: Theme }) => ({
-            borderRadius: 50,
+            borderRadius: "var(--app-border-radius)",
             "&.Mui-focused .MuiSvgIcon-root": {
               color: props.theme.palette.primary.main,
-              borderRadius: 50,
+              borderRadius: "var(--app-border-radius)",
             },
             "&.Mui-error .MuiSvgIcon-root": {
               color: props.theme.palette.error.main,
@@ -1440,7 +1814,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       MuiFilledInput: {
         styleOverrides: {
           root: {
-            borderRadius: 50,
+            borderRadius: "var(--app-border-radius)",
             backgroundColor: "rgba(0, 0, 0, 0.04)",
             "&$disabled": {
               backgroundColor: "rgba(0, 0, 0, 0.04)",
@@ -1451,7 +1825,7 @@ export const RazethBaseTheme = (): RaThemeOptions =>
       MuiOutlinedInput: {
         styleOverrides: {
           root: (props: { theme: Theme }) => ({
-            borderRadius: 50,
+            borderRadius: "var(--app-border-radius)",
             "&.Mui-focused .MuiSvgIcon-root": {
               color: props.theme.palette.primary.main,
             },

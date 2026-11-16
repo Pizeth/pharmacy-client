@@ -13,6 +13,7 @@ import { MoreVert } from "@mui/icons-material";
 import { useState } from "react";
 import type { MouseEvent } from "react";
 import type { RowData } from "@tanstack/table-core";
+import { ROW_ACTION_BUTTON_SIZE } from "./rowActionStyles";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { ResolvedDataTableRowAction } from "./resolvedTypes";
 
@@ -23,8 +24,9 @@ const MenuButtonRoot = styled(IconButton, {
 
   overridesResolver: (_props, styles) => styles.rowActionsMenuButton,
 })(({ theme }) => ({
-  width: 28,
-  height: 28,
+  flexShrink: 0, // Match the inline action buttons.
+  width: ROW_ACTION_BUTTON_SIZE,
+  height: ROW_ACTION_BUTTON_SIZE,
   "&:focus-visible": {
     outline: `2px solid ${theme.palette.primary.main}`,
     outlineOffset: 2,
@@ -67,41 +69,49 @@ export function DataTableRowActionsMenu<TData extends RowData>(
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const open = anchorEl !== null;
+  const row = actions[0]?.context.row;
+  const disabled = !row?.getIsSelected();
+  const open = !disabled && anchorEl !== null;
 
   const handleOpen = (event: MouseEvent<HTMLButtonElement>): void => {
     event.preventDefault();
     event.stopPropagation();
 
-    setAnchorEl(event.currentTarget);
+    if (!disabled) {
+      setAnchorEl(event.currentTarget);
+    }
   };
 
   const handleClose = (): void => {
     setAnchorEl(null);
   };
 
-  if (actions.length === 0) {
+  if (!row) {
     return null;
   }
 
-  const rowId = actions[0].context.row.id;
+  const rowId = row.id;
 
   return (
     <>
-      <Tooltip title="More actions">
-        <MenuButtonRoot
-          className={dataTableClasses.rowActionsMenuButton}
-          size="small"
-          aria-label={`More actions for row ${rowId}`}
-          aria-haspopup="menu"
-          aria-expanded={open ? "true" : undefined}
-          onClick={handleOpen}
-        >
-          <MoreVert fontSize="small" />
-        </MenuButtonRoot>
+      <Tooltip title={disabled ? "Select this row to use more actions" : "More actions"}>
+        <span onClick={(event) => { event.stopPropagation(); }}>
+          <MenuButtonRoot
+            className={dataTableClasses.rowActionsMenuButton}
+            size="small"
+            disabled={disabled}
+            aria-label={`More actions for row ${rowId}`}
+            aria-haspopup="menu"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleOpen}
+          >
+            <MoreVert fontSize="small" />
+          </MenuButtonRoot>
+        </span>
       </Tooltip>
 
       <Menu
+        onClick={event => { event.stopPropagation(); }}
         dir={direction}
         anchorEl={anchorEl}
         open={open}

@@ -2,6 +2,7 @@
 import PulseLoader from "@/components/effect/loaders/loader";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
 import { VERIFY_ID_PATH } from "@/types/constants";
+import { normalizeInternalRedirectTarget } from "@/lib/auth/redirectTarget";
 import { Authenticated, useGetIdentity } from "@refinedev/core";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
@@ -9,7 +10,7 @@ import { useEffect, useRef } from "react";
 // export const VERIFY_ID_PATH = "/verify-id";
 function ProfileGate({ children }: { children: React.ReactNode }) {
   const { data: identity, isLoading } = useGetIdentity<{
-    isLinked?: boolean;
+    isLinked?: boolean | null;
   }>();
   const router = useRouter();
   const pathname = usePathname();
@@ -21,7 +22,8 @@ function ProfileGate({ children }: { children: React.ReactNode }) {
   const redirectedFromPath = useRef<string | null>(null);
 
   const isOnVerifyPage =
-    !!VERIFY_ID_PATH && pathname?.startsWith(VERIFY_ID_PATH);
+    pathname === VERIFY_ID_PATH;
+  const canAccessBeforeVerification = isOnVerifyPage || pathname === "/settings";
 
   useEffect(() => {
     if (isLoading || !identity) return;
@@ -29,10 +31,11 @@ function ProfileGate({ children }: { children: React.ReactNode }) {
 
     // Already redirected away from this exact pathname — don't refire
     if (redirectedFromPath.current === pathname) return;
+    redirectedFromPath.current = null;
 
     // Unlinked, and not already on the verify page → send there,
     // remembering where the user actually wanted to go
-    if (identity.isLinked === false && !isOnVerifyPage) {
+    if (identity.isLinked !== true && !canAccessBeforeVerification) {
       // router.replace(VERIFY_ID_PATH);
       redirectedFromPath.current = pathname;
       const callbackUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
@@ -49,19 +52,19 @@ function ProfileGate({ children }: { children: React.ReactNode }) {
       redirectedFromPath.current = pathname;
       const callbackUrl = searchParams.get("callbackUrl");
       // router.replace(callbackUrl ? decodeURIComponent(callbackUrl) : "/fts");
-      router.replace(callbackUrl || "/fts");
+      router.replace(normalizeInternalRedirectTarget(callbackUrl, "/fts"));
       return;
     }
 
     // if (!isLoading && identity && identity.isLinked === false) {
     //   router.replace("/verify-id");
     // }
-  }, [isLoading, identity, isOnVerifyPage, pathname, searchParams, router]);
+  }, [isLoading, identity, isOnVerifyPage, canAccessBeforeVerification, pathname, searchParams, router]);
 
   // 👇 Same principle as the login page: never render real content
   // while a redirect is pending or about to be decided.
   const willRedirectAway =
-    (identity?.isLinked === false && !isOnVerifyPage) ||
+    (identity?.isLinked !== true && !canAccessBeforeVerification) ||
     (identity?.isLinked === true && isOnVerifyPage);
 
   // if (isLoading) return <PulseLoader />;

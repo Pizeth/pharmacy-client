@@ -5,6 +5,7 @@ import type { Row, RowData } from "@tanstack/table-core";
 import type { MuiDataTableFeatures } from "../features";
 import type { MuiDataTableInstance } from "../table";
 import { DataTableBodyRow } from "./DataTableBodyRow";
+import type { DataTableRowClickHandler } from "./DataTableBodyRow";
 import { DataTableDetailPanelRow } from "./detail-panel";
 import type { DataTableDetailPanelRenderer } from "./detail-panel";
 
@@ -13,7 +14,12 @@ export interface DataTableBodyRowGroupProps<TData extends RowData> {
   readonly row: Row<MuiDataTableFeatures, TData>;
   readonly pinnedRowStickyTop: number;
   readonly stickyRowPinning: boolean;
+  readonly dualEdgeStickyRowPinning: boolean;
+  readonly stickyPinnedRowIds: readonly string[];
   readonly renderDetailPanel?: DataTableDetailPanelRenderer<TData>;
+  readonly onRowClick?: DataTableRowClickHandler<TData>;
+  readonly rowClickSelectedOnly?: boolean;
+  readonly ariaRowIndex?: number;
 }
 
 /**
@@ -33,7 +39,12 @@ export function DataTableBodyRowGroup<TData extends RowData>(
     row,
     pinnedRowStickyTop,
     stickyRowPinning,
+    dualEdgeStickyRowPinning,
+    stickyPinnedRowIds,
     renderDetailPanel,
+    onRowClick,
+    rowClickSelectedOnly,
+    ariaRowIndex,
   } = props;
 
   return (
@@ -43,11 +54,15 @@ export function DataTableBodyRowGroup<TData extends RowData>(
         row={row}
         pinnedRowStickyTop={pinnedRowStickyTop}
         stickyRowPinning={stickyRowPinning}
+        onRowClick={onRowClick}
+        rowClickSelectedOnly={rowClickSelectedOnly}
+        ariaRowIndex={ariaRowIndex}
+        dualEdgeStickyRowPinning={dualEdgeStickyRowPinning}
+        stickyPinnedRowIds={stickyPinnedRowIds}
       />
 
       {renderDetailPanel && (
         <DataTableDetailPanelRow
-          table={table}
           row={row}
           renderDetailPanel={renderDetailPanel}
         />

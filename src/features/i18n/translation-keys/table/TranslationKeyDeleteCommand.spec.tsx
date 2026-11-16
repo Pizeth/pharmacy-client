@@ -1,3 +1,5 @@
+jest.mock("next/navigation", () => ({ useRouter: () => ({ push: jest.fn() }) }));
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { DataTableRowAction } from "@/components/DataTable";
 import type { TranslationKey } from "../schemas";
@@ -82,7 +84,7 @@ function setup(rows: TranslationKey[], pageIndex = 2) {
     refresh,
   }));
   remove.mockResolvedValue({ data: { id: record.id, key: record.key } });
-  render(<TranslationKeyTable />);
+  render(<QueryClientProvider client={new QueryClient()}><TranslationKeyTable /></QueryClientProvider>);
 }
 
 beforeEach(() => {

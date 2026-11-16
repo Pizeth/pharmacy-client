@@ -8,7 +8,7 @@ import {
   MenuItem,
   Tooltip,
 } from "@mui/material";
-import { ViewColumnOutlined } from "@mui/icons-material";
+import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import { useState } from "react";
 import type { MouseEvent } from "react";
 import type { RowData } from "@tanstack/table-core";
@@ -56,7 +56,7 @@ export function DataTableColumnVisibilityButton<TData extends RowData>(
           aria-expanded={open ? "true" : undefined}
           onClick={handleOpen}
         >
-          <ViewColumnOutlined fontSize="small" />
+          <ViewColumnIcon fontSize="small" />
         </IconButton>
       </Tooltip>
 

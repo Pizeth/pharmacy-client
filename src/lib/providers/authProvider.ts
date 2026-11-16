@@ -17,7 +17,9 @@ import {
   TOKEN_KEY,
 } from "@/types/constants";
 import {
+  createLoginRedirect,
   getBrowserAuthRedirectTarget,
+  getCurrentBrowserTarget,
   getUnauthenticatedLoginRedirect,
 } from "@/lib/auth/redirectTarget";
 // import { fetchSessionDirect } from "../auth/sessionFetch";
@@ -66,8 +68,6 @@ export const authProvider: AuthProvider = {
       rememberMe: false,
     });
 
-    console.log("result", result);
-
     if (result.error?.status === 422 || result.error?.status === 404) {
       // Not a valid username — try as email
       result = await authClient.signIn.email({
@@ -102,8 +102,8 @@ export const authProvider: AuthProvider = {
       return {
         success: false,
         error: {
-          name: "LoginError",
-          message: error.message || error.statusText || "Invalid credentials",
+          name: error?.code || "LoginError",
+          message: error?.message || error?.statusText || "Invalid credentials",
           statusCode: error?.status ?? 401,
         },
       };
@@ -152,6 +152,7 @@ export const authProvider: AuthProvider = {
 
   // ── Sign out ───────────────────────────────────────────────────────────────
   logout: async (): Promise<AuthActionResponse> => {
+    const redirectTo = createLoginRedirect(getCurrentBrowserTarget(LANDING_PAGE), LANDING_PAGE);
     const { error } = await authClient.signOut({
       fetchOptions: {
         // credentials: "include",
@@ -176,7 +177,7 @@ export const authProvider: AuthProvider = {
     // Clear all auth-related cookies
     clearAuthCookies();
     clearAxiosAuth();
-    return { success: true, redirectTo: "/login" };
+    return { success: true, redirectTo };
   },
 
   // ── Register ───────────────────────────────────────────────────────────────

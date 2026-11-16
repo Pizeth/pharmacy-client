@@ -61,7 +61,8 @@ describe("DataTable card presentation", () => {
       components: {
         RazethDataTable: {
           styleOverrides: {
-            cardContainer: { paddingTop: "7px" },
+            cardContainer: { overscrollBehavior: "contain" },
+            cardGrid: { paddingTop: "7px" },
             cardItem: { borderTopWidth: "3px" },
             cardHeader: { minHeight: "41px" },
             cardSelection: { minWidth: "17px" },
@@ -87,9 +88,28 @@ describe("DataTable card presentation", () => {
     expect(screen.getByText("Selection")).toBeInTheDocument();
     expect(screen.getByText("Expansion")).toBeInTheDocument();
 
-    expect(
-      container.querySelector(`.${dataTableClasses.cardContainer}`),
-    ).not.toBeNull();
+    const cardContainer = container.querySelector(
+      `.${dataTableClasses.cardContainer}`,
+    );
+
+    expect(cardContainer).not.toBeNull();
+    expect(cardContainer).toHaveStyle({
+      flex: "1 1 auto",
+      minHeight: "0",
+      overflow: "auto",
+      overscrollBehavior: "contain",
+    });
+
+    const cardGrid = container.querySelector(
+      `.${dataTableClasses.cardGrid}`,
+    );
+
+    expect(cardGrid).not.toBeNull();
+    expect(cardGrid).toHaveStyle({
+      display: "grid",
+      gridAutoRows: "max-content",
+      paddingTop: "7px",
+    });
 
     expect(
       container.querySelector(`.${dataTableClasses.cardItem}`),
@@ -180,6 +200,31 @@ describe("DataTable card presentation", () => {
     expect(detail).toHaveAttribute(
       "aria-labelledby",
       expand.id,
+    );
+
+    /**
+     * Expanded application content may be arbitrarily tall. Keep row commands
+     * before the detail region so expansion cannot push the command surface out
+     * of the visible card.
+     */
+    const cardItem = container.querySelector(
+      `.${dataTableClasses.cardItem}`,
+    );
+    const cardActions = cardItem?.querySelector(
+      `.${dataTableClasses.cardActions}`,
+    );
+    const cardDetail = cardItem?.querySelector(
+      `.${dataTableClasses.cardDetail}`,
+    );
+
+    expect(cardItem).not.toBeNull();
+    expect(cardActions).not.toBeNull();
+    expect(cardDetail).not.toBeNull();
+
+    const children = Array.from(cardItem?.children ?? []);
+
+    expect(children.indexOf(cardActions!)).toBeLessThan(
+      children.indexOf(cardDetail!),
     );
   });
 

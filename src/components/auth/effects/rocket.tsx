@@ -6,9 +6,7 @@ import React, { CSSProperties, useEffect, useRef, useState } from "react";
 /**
  * Interface for the smoke particles managed via DOM
  */
-interface SmokeParticle extends SVGCircleElement {
-  // Add any custom properties if needed, otherwise extends base
-}
+type SmokeParticle = SVGCircleElement;
 
 const PREFIX = "RazethRocket";
 

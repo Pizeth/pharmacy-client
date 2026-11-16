@@ -24,7 +24,7 @@ const record: TranslationKey = {
 
 beforeEach(() => jest.resetAllMocks());
 
-it("identifies the target and requires explicit confirmation, with Cancel initially focused", () => {
+it("identifies the target and requires explicit confirmation, with Cancel initially focused", async () => {
   const onClose = jest.fn();
   render(
     <TranslationKeyDeleteDialog
@@ -34,7 +34,7 @@ it("identifies the target and requires explicit confirmation, with Cancel initia
     />,
   );
   expect(screen.getByRole("dialog")).toHaveTextContent("sequence_test");
-  expect(screen.getByRole("button", { name: "Cancel" })).toHaveFocus();
+  await waitFor(() => { expect(screen.getByRole("button", { name: "Cancel" })).toHaveFocus(); });
   expect(remove).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
   expect(onClose).toHaveBeenCalledTimes(1);

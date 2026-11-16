@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-26",
+  "mode": "isolated development",
+  "url": "http://localhost:8082/dev/datatable/selection-dependencies",
+  "browser": "Chrome 156 IAB Windows",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "table": {
+    "initialDetailCount": 0,
+    "afterAandB": {
+      "global": "2",
+      "detail": "2",
+      "guardDisabled": true
+    }
+  },
+  "card": {
+    "header": "Alpha: 2",
+    "body": "Callback snapshot: 2",
+    "metadata": "2",
+    "selection": "2",
+    "expansion": "2",
+    "detail": "2",
+    "guardDisabled": true,
+    "detailAfterClear": 0
+  },
+  "controlledOffPage": {
+    "ids": "a,unloaded",
+    "detail": "2",
+    "guardDisabled": true
+  },
+  "rtlKeyboardRows": [
+    {
+      "id": "a",
+      "height": 37,
+      "top": 281.875,
+      "bottom": 318.875
+    },
+    {
+      "id": "b",
+      "height": 37,
+      "top": 339.890625,
+      "bottom": 376.890625
+    }
+  ],
+  "filter": {
+    "raw": "2",
+    "filtered": "1"
+  },
+  "idsAfterSortAndPage": "a,b",
+  "controlledFlip": {
+    "detail": "2",
+    "callback": "Callback snapshot: 2"
+  },
+  "limits": [
+    "physical nullable slot omission not integrated",
+    "full owner remains broad",
+    "production variable-height browser certification not repeated"
+  ]
+}

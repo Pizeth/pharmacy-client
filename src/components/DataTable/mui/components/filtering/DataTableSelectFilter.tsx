@@ -12,7 +12,7 @@ import {
   useThemeProps,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { DATA_TABLE_THEME_COMPONENT_NAMES } from "../../theme";
 import {
   decodeDataTableSelectFilterValue,
@@ -61,6 +61,8 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
     value,
     label,
     size = "small",
+    variant,
+    margin,
     disabled = false,
     loading = false,
     errorMessage,
@@ -79,9 +81,7 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
 
   // A background refresh may begin while the menu is open. Close it and
   // require a new user action after recovery, without changing filter state.
-  useEffect(() => {
-    if (unavailable) setOpen(false);
-  }, [unavailable]);
+  if (unavailable && open) setOpen(false);
 
   const selectedValue =
     value === undefined ? "" : encodeDataTableSelectFilterValue(value);
@@ -99,6 +99,8 @@ export function DataTableSelectFilter(inProps: DataTableSelectFilterProps) {
       ownerState={{ ...props, size, disabled: unavailable, loading }}
       fullWidth
       size={size}
+      variant={variant}
+      margin={margin}
       disabled={unavailable}
       error={Boolean(errorMessage) && !loading}
     >
