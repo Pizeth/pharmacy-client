@@ -33,8 +33,17 @@ async function request(path: SettingsPath, method: string, body?: object, signal
     },
     ...(body && { body: JSON.stringify(body) }),
   };
-  const origin = API_URL.replace(/\/(?:api(?:\/v1)?)?\/?$/, "");
-  const response = await fetch(`${origin}/api/account/settings${path}`, options);
+  let response: Response;
+  switch (path) {
+    case "/phone":
+      response = await fetch(new URL("/api/account/settings/phone", API_URL), options);
+      break;
+    case "/social-links":
+      response = await fetch(new URL("/api/account/settings/social-links", API_URL), options);
+      break;
+    default:
+      response = await fetch(new URL("/api/account/settings", API_URL), options);
+  }
   const result = await response.json().catch((error: unknown) => {
     if (error instanceof SyntaxError) return undefined;
     throw error;
