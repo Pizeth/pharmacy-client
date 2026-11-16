@@ -1,8 +1,8 @@
 "use client";
 
-import { Box, Card, styled } from "@mui/material";
+import { Box, Card, keyframes, styled } from "@mui/material";
 import type { AuthProps } from "@/interfaces/component-props.interface";
-import { cloudMove, moveBackgroundLeft, move, twinkle, fadeIn, fadeOut } from "@/theme/keyframes";
+import { cloudMove, moveBackgroundLeft, move, twinkle } from "@/theme/keyframes";
 import type { AuthAction } from "@/types/auth";
 
 const PREFIX = "RazethAuth";
@@ -265,4 +265,19 @@ export const ThemeToggleWrapper = styled(Box, {
   padding: "1em",
   margin: "-1em -1em -2.5em 0",
 }));
-export const FormTransition = styled(Box, { name: PREFIX, slot: 'FormTransition', shouldForwardProp: prop => prop !== 'mode' })<{ mode: AuthAction }>(({ mode }) => ({ animation: `${mode === 'signin' ? fadeIn : fadeOut} 0.75s ease` }));
+const formEnter = keyframes({
+  from: { opacity: 0, transform: "translateX(var(--auth-form-enter-offset))" },
+  to: { opacity: 1, transform: "translateX(0)" },
+});
+
+export const FormTransition = styled(Box, {
+  name: PREFIX,
+  slot: "FormTransition",
+  shouldForwardProp: (prop) => prop !== "mode",
+})<{ mode: AuthAction }>(({ mode }) => ({
+  "--auth-form-enter-offset": mode === "signin" ? "-15px" : "15px",
+  animation: `${formEnter} 650ms cubic-bezier(0.22, 1, 0.36, 1)`,
+  "@media (prefers-reduced-motion: reduce)": {
+    animation: "none",
+  },
+}));
