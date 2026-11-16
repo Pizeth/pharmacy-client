@@ -1,6 +1,8 @@
 import type { CSSObject, Theme } from "@mui/material/styles";
 
 export const ROW_ACTION_BUTTON_SIZE = 28;
+// Four buttons, three gaps, and both levels of padding need 148px at 8px spacing.
+export const STANDARD_ROW_ACTION_COLUMN_SIZE = 150;
 export const ROW_ACTION_CELL_PADDING = 1;
 export const ROW_ACTION_CARD_PADDING = [1.5, 2] as const;
 

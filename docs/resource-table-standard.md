@@ -40,10 +40,23 @@ Do not pretend that a list-only backend implements server query pagination.
 Loading, retry, empty/no-results, stale-data/background-refresh and mutation
 errors must be visible. Preserve prior usable rows while refetching.
 
+Use the shared 150 px default from `createActionsColumn` for resource action columns.
+Keep this size at the shared factory so resource tables use consistent spacing.
+
 Cards use the same row actions and selection state as the table. Keep actions
 on the front, detail content on the back and a manual return control. Compact
 cards keep essential identity and actions visible. Use resource detail renderers
 for additional content; generic components must not know resource fields.
+
+More actions and row mutations require selection of that specific row in both
+presentations. Keep View details visible and enabled before selection. The
+shared DataTable menu enforces the overflow selection gate.
+Admin resource menus use the shared edit, delete or archive, and print actions.
+Dedicated pages preserve the same permission checks as inline commands. Print
+opens the actual detail page. Its cover also has a print button. Use the shared
+A4 portrait layout so navigation and interactive controls stay off the paper.
+Use the shared 150px Actions column for three inline buttons and More actions.
+Keep resource-level width overrides for layouts with a different control count.
 
 ## CRUD
 
@@ -117,6 +130,10 @@ the label, icon, color and handler; do not duplicate those styles per resource.
 Below `md`, the button becomes a 44px circle with only the plus icon visible.
 Keep the full label available to assistive technology; desktop retains icon and text.
 
+Keep Create and Edit/Save labels white in light and dark modes. Use the shared
+contained form submit style in dialogs and dedicated forms. Cancel and Close
+use the primary text accent. Icon-only table and card actions keep their semantic colors.
+
 ## Record details and edit snapshots
 
 Every admin resource table has a dedicated read-only `/<resource>/<id>` page and a visible **View details** action in both table and card presentations. Keep inline expansion available as a quick preview. Use `ResourceDataTable.onViewRecord` to enable row-surface navigation: only explicitly selected rows/cards are clickable or keyboard-focusable for navigation. Buttons, links, selection, expansion, and editable descendants must not activate the row. View details itself is available without selection. Public download tables retain their separate download behavior.
@@ -138,6 +155,8 @@ Social profiles render as colored, icon-only profile links using safe HTTP(S) UR
 Dedicated record pages omit redundant outer page titles and subtitles: the breadcrumb identifies the route, and the record name remains the accessible h1. Place Back to list and Edit inside the record hero/cover using RecordPageActions. Keep navigation available during loading and error states. Facebook profile links use the shared custom Meta icon.
 
 Resource forms share `resourceFormStyles`: 2-spacing field gaps, no accumulated input margins or form top padding, and shared FormDialog content padding (3 desktop / 2 mobile). Keep helper text for actionable constraints or validation; omit date-format/timezone captions when the date editor already presents the format. File uploads use a rounded MUI label button with a visually hidden native file input. Dedicated detail content actions use error for Edit/Manage and primary for Delete; cover navigation keeps its existing presentation.
+
+Follow the auth forms for client validation. Bind errors to their fields through React Hook Form and render them with the shared input helper text and error animation. Disable create and edit submission while the input is invalid or required async validation is pending. Place file validation below the upload control. Reserve submit-error alerts for request failures and server responses.
 
 Use shared FormActions for every dialog and dedicated CRUD form footer. Its buttons use the shared rounded neumorphic idle/hover/focus treatment while preserving semantic colors and contained-button contrast; retain the mobile stacked primary-above-Cancel layout.
 

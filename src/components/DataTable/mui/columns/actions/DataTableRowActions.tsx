@@ -126,7 +126,7 @@ export function DataTableRowActions<TData extends RowData>(
           action={action}
         />
       ))}
-      <DataTableRowActionsMenu<TData> actions={overflowActions} />
+      <DataTableRowActionsMenu<TData> key={row.getIsSelected() ? "selected" : "unselected"} actions={overflowActions} />
     </RowActionsRoot>
   );
 }

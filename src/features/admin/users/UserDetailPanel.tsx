@@ -1,5 +1,6 @@
 "use client";
-import { ResourceStatusBadge, ResourceBadge } from "@/components/Tables/ResourceBadge";
+import { ResourceBadge } from "@/components/Tables/ResourceBadge";
+import { UserAccountStatus } from "./UserAccountStatus";
 import { formatAdminDate } from "@/lib/utils/adminDate";
 import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -23,7 +24,7 @@ export function UserDetailContent({ data, view = "table" }: { data: AdminUserDet
     {view === "table" && <S.DetailHero><UserIdentity user={data} /></S.DetailHero>}
     <S.DetailSection aria-label="User role">
       <S.DetailHeading><ShieldCheck aria-hidden="true" /><div><Typography component="h3" variant="subtitle2">Role & access</Typography><Typography variant="caption" color="text.secondary">Assigned permissions</Typography></div></S.DetailHeading>
-      <S.DetailFields><Field label="Assigned role"><RoleBadge role={data.userRole} fallback={data.role} /></Field><Field label="Account status"><ResourceStatusBadge active={!data.banned} inactiveLabel="Banned" inactiveColor="error" /></Field><Field label="Description">{data.userRole?.description || "No role description."}</Field></S.DetailFields>
+      <S.DetailFields><Field label="Assigned role"><RoleBadge role={data.userRole} fallback={data.role} /></Field><Field label="Account status"><UserAccountStatus user={data} /></Field><Field label="Description">{data.userRole?.description || "No role description."}</Field></S.DetailFields>
     </S.DetailSection>
     <S.DetailSection aria-label="User accounts">
       <S.DetailHeading><Fingerprint aria-hidden="true" /><div><Typography component="h3" variant="subtitle2">Account & sign-in</Typography><Typography variant="caption" color="text.secondary">Identity and linked providers</Typography></div></S.DetailHeading>

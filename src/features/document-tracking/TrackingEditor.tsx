@@ -8,7 +8,7 @@ import { FormDialog } from "@/components/forms/FormDialog";
 import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import { trackingApi } from "./api";
 import type { DocumentDetail, TrackingMetadata } from "./contracts";
-import { DocumentForm, type DocumentFormMode } from "./DocumentForm";
+import { DocumentForm, type DocumentFormMode } from "./DocumentTrackingForm";
 import { ProgressForm, AttachmentForm } from "./ProgressForm";
 export type TrackingEditorState = {
   mode: DocumentFormMode | "progress" | "attachment";

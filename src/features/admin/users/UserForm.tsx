@@ -22,7 +22,7 @@ export function UserForm({ mode, record, onCancel, onSuccess, onPendingChange }:
     resolver: hybridResolver(mode === "create" ? createUserInputSchema : userInputSchema, asyncMap),
     mode: "onChange",
   });
-  const [validation, setValidation] = useState("");
+  const [saveInterrupted, setSaveInterrupted] = useState(false);
   const inFlight = useRef(false);
   const client = useQueryClient();
   const mutation = useMutation({ mutationFn: (values: AdminUserInput) => usersApi.save(mode, values, record), onSuccess: async () => { await client.invalidateQueries({ queryKey: ["admin-users"] }); onSuccess(); } });
@@ -30,12 +30,25 @@ export function UserForm({ mode, record, onCancel, onSuccess, onPendingChange }:
   useEffect(() => { onPendingChange?.(pending); }, [pending, onPendingChange]);
   return <FormProvider {...form}><S.Form noValidate aria-busy={pending} onSubmit={async event => {
     event.preventDefault(); if (inFlight.current) return;
-    setValidation(""); inFlight.current = true;
+    inFlight.current = true;
+    setSaveInterrupted(false);
     try {
       const values = form.getValues();
       if (mode !== "delete") { invalidateEmail(); invalidateUsername(); }
       if (mode !== "delete" && !await form.trigger()) return;
-      if (JSON.stringify(values) !== JSON.stringify(form.getValues())) { setValidation("Fields changed during validation. Review and submit again."); return; }
+      const current = form.getValues();
+      const changed = ([
+        ["name", values.name !== current.name],
+        ["username", values.username !== current.username],
+        ["email", values.email !== current.email],
+        ["password", values.password !== current.password],
+      ] as const).find(([, differs]) => differs)?.[0];
+      if (changed) {
+        setSaveInterrupted(true);
+        form.setFocus(changed);
+        await form.trigger();
+        return;
+      }
       await mutation.mutateAsync(values);
       invalidateEmail(); invalidateUsername();
     } catch { /* Keep the form open and present the API error. */ } finally { inFlight.current = false; }
@@ -46,7 +59,8 @@ export function UserForm({ mode, record, onCancel, onSuccess, onPendingChange }:
       <TextField name="email" label="Email" type="email" required fullWidth iconStart={<Mail fontSize="small" />} disabled={mutation.isPending} />
       {mode === "create" && <PasswordField name="password" label="Temporary password" iconStart={<LockOutlined fontSize="small" />} required fullWidth autoComplete="new-password" helperText="At least 8 characters. Share securely with the account owner." disabled={mutation.isPending} />}
     </>}
-    {(validation || mutation.error) && <Alert severity="error">{validation || mutation.error?.message}</Alert>}
-    <FormActions><Button disabled={pending} onClick={onCancel}>Cancel</Button><Button type="submit" variant="contained" color={mode === "delete" ? "error" : "primary"} disabled={pending}>{mutation.isPending ? "Saving…" : form.formState.isValidating ? "Checking…" : mode === "create" ? "Create user" : mode === "edit" ? "Save user" : "Delete user"}</Button></FormActions>
+    {saveInterrupted && <Alert severity="info">Your changes were not saved because a field changed during validation. Review the form and submit again.</Alert>}
+    {mutation.error && <Alert severity="error">{mutation.error.message}</Alert>}
+    <FormActions><Button disabled={pending} onClick={onCancel}>Cancel</Button><Button type="submit" variant="contained" color={mode === "delete" ? "error" : "primary"} disabled={pending || (mode !== "delete" && !form.formState.isValid)}>{mutation.isPending ? "Saving…" : form.formState.isValidating ? "Checking…" : mode === "create" ? "Create user" : mode === "edit" ? "Save user" : "Delete user"}</Button></FormActions>
   </S.Form></FormProvider>;
 }

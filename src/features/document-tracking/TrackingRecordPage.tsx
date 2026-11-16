@@ -10,7 +10,7 @@ import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import { trackingApi } from "./api";
 import { documentReference } from "./contracts";
-import { DocumentForm, type DocumentFormMode } from "./DocumentForm";
+import { DocumentForm, type DocumentFormMode } from "./DocumentTrackingForm";
 import { DocumentRecordContent } from "./DocumentRecordContent";
 import { ResourceRecordPage } from "@/components/Tables/ResourceRecordPage";
 import { TrackingEditor, type TrackingEditorState } from "./TrackingEditor";

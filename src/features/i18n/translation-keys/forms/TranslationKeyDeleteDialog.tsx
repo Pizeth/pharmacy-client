@@ -32,16 +32,18 @@ export function TranslationKeyDeleteDialog({
   ...callbacks
 }: TranslationKeyDeleteDialogProps) {
   return record ? (
-    <DeleteConfirmation key={record.id} record={record} {...callbacks} />
+    <TranslationKeyDeleteConfirmation key={record.id} record={record} {...callbacks} />
   ) : null;
 }
 
-function DeleteConfirmation({
+export function TranslationKeyDeleteConfirmation({
   record,
   onClose,
   onDeleted,
+  presentation = "dialog",
 }: Omit<TranslationKeyDeleteDialogProps, "record"> & {
   readonly record: TranslationKey;
+  readonly presentation?: "dialog" | "page";
 }) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>();
@@ -51,6 +53,7 @@ function DeleteConfirmation({
 
   useEffect(() => {
     mounted.current = true;
+    cancelButton.current?.focus();
     // Let the closing overflow menu finish restoring focus before choosing the
     // safe initial action in the newly mounted modal.
     const frame = requestAnimationFrame(() => cancelButton.current?.focus());
@@ -93,7 +96,39 @@ function DeleteConfirmation({
     if (mounted.current) onDeleted(deleted);
   };
 
-  return (
+  const content = (
+    <ContentRoot aria-busy={pending}>
+      <Typography>
+        Confirm deletion of translation key <strong>{record.key}</strong>.
+      </Typography>
+      {error && <Alert severity="error">{error}</Alert>}
+      <ActionsRoot>
+        <Button
+          ref={cancelButton}
+          variant="outlined"
+          disabled={pending}
+          onClick={close}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          startIcon={<DeleteOutline />}
+          loading={pending}
+          loadingPosition="start"
+          disabled={pending}
+          onClick={() => {
+            confirm().catch(console.error);
+          }}
+        >
+          {pending ? "Deleting…" : "Delete key"}
+        </Button>
+      </ActionsRoot>
+    </ContentRoot>
+  );
+
+  return presentation === "page" ? content : (
     <FormDialog
       open
       title="Delete translation key"
@@ -104,36 +139,7 @@ function DeleteConfirmation({
       closeAriaLabel="Close delete translation key dialog"
       onClose={close}
     >
-      <ContentRoot aria-busy={pending}>
-        <Typography>
-          Confirm deletion of translation key <strong>{record.key}</strong>.
-        </Typography>
-        {error && <Alert severity="error">{error}</Alert>}
-        <ActionsRoot>
-          <Button
-            ref={cancelButton}
-            autoFocus
-            variant="outlined"
-            disabled={pending}
-            onClick={close}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            startIcon={<DeleteOutline />}
-            loading={pending}
-            loadingPosition="start"
-            disabled={pending}
-            onClick={() => {
-              void confirm();
-            }}
-          >
-            {pending ? "Deleting…" : "Delete key"}
-          </Button>
-        </ActionsRoot>
-      </ContentRoot>
+      {content}
     </FormDialog>
   );
 }

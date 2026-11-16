@@ -21,6 +21,6 @@ export function providerColumns(actions: readonly DataTableRowAction<SocialProvi
     }),
     helper.accessor("websiteUrl", { header: "Website", size: 260, cell: ({ getValue }) => <ProviderWebsite url={getValue()} />, meta: { label: "Website", filterVariant: "text" } }),
     helper.accessor("icon", { header: "Icon key", size: 150, cell: ({ getValue }) => getValue() || "—", meta: { label: "Icon key", filterVariant: "text" } }),
-    createActionsColumn<SocialProvider>({ actions, size: 152, maxInlineActions: 3 }),
+    createActionsColumn<SocialProvider>({ actions, maxInlineActions: 3 }),
   ]);
 }

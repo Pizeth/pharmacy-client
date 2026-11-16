@@ -1,8 +1,9 @@
 "use client";
+import { setFormIssues, showFieldIssue } from "@/components/forms/formValidationFeedback";
 import { FormActions } from "@/components/forms/FormActions";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import {
   Alert,
   Button,
@@ -60,8 +61,15 @@ export function RoleForm({
         record?.permissions.map((permission) => permission.id) ?? [],
     },
   });
-  const draft = useWatch({ control: form.control });
-  const [validation, setValidation] = useState("");
+  const draft = form.watch();
+  const parse = (values: typeof draft) => roleInputSchema.safeParse({
+    ...values,
+    description: values.description.trim() || null,
+    icon: values.icon || null,
+    color: initial && initial.color == null && !form.getFieldState("color").isDirty
+      ? null : values.color.trim() || null,
+  });
+  const valid = mode === "delete" || parse(draft).success;
   const mutation = useMutation({
     mutationFn: (data: RoleInput) =>
       mode === "delete"
@@ -94,23 +102,19 @@ export function RoleForm({
       <S.Form
         noValidate
         aria-busy={locked}
+        onBlur={event => { const result = parse(form.getValues()); if (mode !== "delete" && !result.success) showFieldIssue(form, event.target, result.error.issues); }}
         onSubmit={async (event) => {
           event.preventDefault();
           if (inFlight.current || conflict || cannotDelete) return;
           const values = form.getValues();
-          const parsed = roleInputSchema.safeParse({
-            ...values,
-            description: values.description.trim() || null,
-            icon: values.icon || null,
-            color: initial && initial.color == null && !form.getFieldState("color").isDirty
-              ? null : values.color.trim() || null,
-          });
+          form.clearErrors();
+          const parsed = parse(values);
           if (mode !== "delete" && !parsed.success) {
-            setValidation(parsed.error.issues[0].message);
+            setFormIssues(form, parsed.error.issues);
             return;
           }
           inFlight.current = true;
-          setValidation("");
+
           try {
             await mutation.mutateAsync(
               parsed.success
@@ -279,9 +283,9 @@ export function RoleForm({
             </S.Permissions>
           </>
         )}
-        {(validation || mutation.error) && (
+        {mutation.error && (
           <Alert severity="error">
-            {validation || mutation.error?.message}
+            {mutation.error.message}
           </Alert>
         )}
         <FormActions>
@@ -293,7 +297,7 @@ export function RoleForm({
             variant="contained"
             color={mode === "delete" ? "error" : "success"}
             loading={locked}
-            disabled={locked || conflict || cannotDelete}
+            disabled={locked || conflict || cannotDelete || !valid}
           >
             {mode === "create"
               ? "Create role"

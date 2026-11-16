@@ -7,7 +7,8 @@ import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { Alert, Button, Typography } from "@mui/material";
 import { TextField, SelectField } from "@/components/inputs";
 import { AttachmentFields } from "./AttachmentFields";
-import { getAttachmentDraft } from "./attachmentDraft";
+import { setFormIssues } from "@/components/forms/formValidationFeedback";
+import { AttachmentValidationError, getAttachmentDraft } from "./attachmentDraft";
 import {
   activeStep,
   progressInputSchema,
@@ -66,49 +67,7 @@ export function ProgressForm({
   const client = useQueryClient();
   const inFlight = useRef(false);
   const mutation = useMutation({
-    mutationFn: async () => {
-      if (!options.includes(action)) throw new Error("This progress action is not available to your account.");
-      const values = form.getValues();
-      const parsed = progressInputSchema.safeParse({
-        version: initial.version,
-        action,
-        note: values.note.trim() || null,
-        ...(handoff
-          ? {
-              assignedToId: values.assignedToId
-                ? Number(values.assignedToId)
-                : null,
-              departmentId: values.departmentId
-                ? Number(values.departmentId)
-                : null,
-            }
-          : {}),
-        ...(action === "RETURN"
-          ? {
-              targetPosition:
-                values.targetPosition === ""
-                  ? undefined
-                  : Number(values.targetPosition),
-            }
-          : {}),
-        ...(action === "FORWARD"
-          ? { outgoingNumber: values.outgoingNumber.trim() || null }
-          : {}),
-        ...(action === "FORWARD" && !next
-          ? {
-              storageLocationCode: values.storageLocationCode.trim() || null,
-              chronologicalCode: values.chronologicalCode.trim() || null,
-              archiveSequence: values.archiveSequence
-                ? Number(values.archiveSequence)
-                : null,
-            }
-          : {}),
-      });
-      if (!parsed.success)
-        throw new Error(parsed.error.issues[0]?.message ?? "Check the form values.");
-      const data = parsed.data;
-      if (handoff && !data.assignedToId)
-        throw new Error("Choose the person who will receive the document.");
+    mutationFn: (data: ReturnType<typeof progressInputSchema.parse>) => {
       return trackingApi.progress(initial.id, data);
     },
     onSuccess: async (result) => {
@@ -160,9 +119,59 @@ export function ProgressForm({
         onSubmit={async (event) => {
           event.preventDefault();
           if (inFlight.current || conflict) return;
+          form.clearErrors();
+          if (!options.includes(action)) {
+            setFormIssues(form, [{ path: ["action"], message: "This progress action is not available to your account." }]);
+            return;
+          }
+          const values = form.getValues();
+          const parsed = progressInputSchema.safeParse({
+            version: initial.version,
+            action,
+            note: values.note.trim() || null,
+            ...(handoff
+              ? {
+                  assignedToId: values.assignedToId
+                    ? Number(values.assignedToId)
+                    : null,
+                  departmentId: values.departmentId
+                    ? Number(values.departmentId)
+                    : null,
+                }
+              : {}),
+            ...(action === "RETURN"
+              ? {
+                  targetPosition:
+                    values.targetPosition === ""
+                      ? undefined
+                      : Number(values.targetPosition),
+                }
+              : {}),
+            ...(action === "FORWARD"
+              ? { outgoingNumber: values.outgoingNumber.trim() || null }
+              : {}),
+            ...(action === "FORWARD" && !next
+              ? {
+                  storageLocationCode: values.storageLocationCode.trim() || null,
+                  chronologicalCode: values.chronologicalCode.trim() || null,
+                  archiveSequence: values.archiveSequence
+                    ? Number(values.archiveSequence)
+                    : null,
+                }
+              : {}),
+          });
+          if (!parsed.success) {
+            setFormIssues(form, parsed.error.issues);
+            return;
+          }
+          const data = parsed.data;
+          if (handoff && !data.assignedToId) {
+            setFormIssues(form, [{ path: ["assignedToId"], message: "Choose the person who will receive the document." }]);
+            return;
+          }
           inFlight.current = true;
           try {
-            await mutation.mutateAsync();
+            await mutation.mutateAsync(data);
           } catch {
             /* The open form presents mutation errors. */
           } finally {
@@ -337,6 +346,7 @@ export function AttachmentForm({
       source: "upload",
       name: "",
       url: "",
+      file: "",
       kind: "SUPPORTING" as "INCOMING" | "OUTGOING" | "SUPPORTING",
     },
   });
@@ -344,8 +354,7 @@ export function AttachmentForm({
   const client = useQueryClient();
   const inFlight = useRef(false);
   const mutation = useMutation({
-    mutationFn: () => {
-      const draft = getAttachmentDraft(form.getValues(), file);
+    mutationFn: (draft: ReturnType<typeof getAttachmentDraft>) => {
       return draft.source === "upload"
         ? trackingApi.uploadAttachment(initial.id, initial.version, { name: draft.name, kind: draft.kind }, draft.file)
         : trackingApi.attachment(initial.id, initial.version, { name: draft.name, kind: draft.kind, url: draft.url });
@@ -368,9 +377,18 @@ export function AttachmentForm({
         onSubmit={async (event) => {
           event.preventDefault();
           if (inFlight.current || conflict) return;
+          form.clearErrors();
+          let draft: ReturnType<typeof getAttachmentDraft>;
+          try {
+            draft = getAttachmentDraft(form.getValues(), file);
+          } catch (error) {
+            if (!(error instanceof AttachmentValidationError)) throw error;
+            setFormIssues(form, [{ path: [error.field], message: error.message }]);
+            return;
+          }
           inFlight.current = true;
           try {
-            await mutation.mutateAsync();
+            await mutation.mutateAsync(draft);
           } catch {
             /* Keep the form and present the error. */
           } finally {

@@ -63,6 +63,7 @@ it("uses the real table with selection-gated actions and a dedicated create link
   fireEvent.click(screen.getByRole("button", { name: "Register document" }));
   const dialog = within(screen.getByRole("dialog"));
   expect(dialog.getByLabelText(/Document title/)).toBeInTheDocument();
+  expect(dialog.getByRole("button", { name: "Register document" })).toBeDisabled();
   expect(
     dialog.getByRole("link", { name: "Open dedicated create page" }),
   ).toHaveAttribute("href", "/admin/documents/create");

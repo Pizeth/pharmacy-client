@@ -1,0 +1,438 @@
+"use client";
+import { setFormIssues, showFieldIssue } from "@/components/forms/formValidationFeedback";
+import { FormActions } from "@/components/forms/FormActions";
+import { AccountTreeOutlined, ArchiveOutlined, ArticleOutlined, CallMade, CallReceived, CategoryOutlined, DescriptionOutlined, FlagOutlined, FormatListNumbered, Inventory2Outlined, LabelOutlined, NotesOutlined, PersonOutline } from "@mui/icons-material";
+import { useEffect, useRef, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { FormProvider, useForm } from "react-hook-form";
+import { Alert, Button, Typography } from "@mui/material";
+import { TextField, SelectField } from "@/components/inputs";
+import { trackingApi, TrackingRequestError } from "./api";
+import {
+  activeStep,
+  documentInputSchema,
+  handlerOptionLabel,
+  type DocumentDetail,
+  type TrackingMetadata,
+} from "./contracts";
+import { FieldGrid, Form } from "./styles";
+import { TrackingDateTimeField } from "./TrackingDateTimeField";
+import { AttachmentFields } from "./AttachmentFields";
+import { AttachmentValidationError, getAttachmentDraft, isAttachmentDraftValid, type AttachmentKind } from "./attachmentDraft";
+
+export type DocumentFormMode = "create" | "edit" | "delete";
+export const toLocalDate = (date: string) =>
+  new Date(new Date(date).getTime() + 7 * 3600_000).toISOString().slice(0, 16);
+export const fromLocalDate = (date: string) => {
+  if (!date) return null;
+  const parsed = new Date(`${date}+07:00`);
+  return Number.isNaN(parsed.getTime()) ? date : parsed.toISOString();
+};
+const nullable = (value: string) => value.trim() || null;
+const number = (value: string) => (value ? Number(value) : null);
+function documentAssignmentDefaults(record: DocumentDetail | undefined, actorId: TrackingMetadata["actor"]["id"]) {
+  return {
+    responsibleDepartmentId: String(record?.responsibleDepartmentId ?? ""),
+    assignedToId: String(
+      record ? (activeStep(record)?.assignedToId ?? "") : actorId,
+    ),
+    storageLocationCode: record?.storageLocation?.code ?? "",
+    chronologicalCode: record?.chronologicalCode ?? "",
+    archiveSequence: String(record?.archiveSequence ?? ""),
+    notes: record?.notes ?? "",
+  };
+}
+
+function documentDefaults(record: DocumentDetail | undefined, actorId: TrackingMetadata["actor"]["id"]) {
+  return {
+    title: record?.title ?? "",
+    categoryId: record?.categoryId ?? "",
+    typeId: record?.typeId ?? "",
+    subtype: record?.subtype ?? "",
+    priority: record?.priority ?? "NORMAL",
+    incomingNumber: record?.incomingNumber ?? "",
+    outgoingNumber: record?.outgoingNumber ?? "",
+    receivedAt: toLocalDate(record?.receivedAt ?? new Date().toISOString()),
+    dueAt: record?.dueAt ? toLocalDate(record.dueAt) : "",
+    ...documentAssignmentDefaults(record, actorId),
+    reason: "",
+    attachmentSource: "upload",
+    attachmentName: "",
+    attachmentUrl: "",
+    attachmentFile: "",
+    attachmentKind: "INCOMING" as AttachmentKind,
+  };
+}
+
+export function DocumentForm({
+  mode,
+  record,
+  metadata,
+  onCancel,
+  onSuccess,
+  onPendingChange,
+}: {
+  readonly mode: DocumentFormMode;
+  readonly record?: DocumentDetail;
+  readonly metadata: TrackingMetadata;
+  readonly onCancel: () => void;
+  readonly onSuccess: (record: DocumentDetail) => void;
+  readonly onPendingChange?: (pending: boolean) => void;
+}) {
+  const client = useQueryClient();
+  const initial = useRef(record);
+  const inFlight = useRef(false);
+  const form = useForm({
+    defaultValues: documentDefaults(record, metadata.actor.id),
+  });
+  const draft = form.watch();
+  function parseDocument(values: typeof draft) {
+    return documentInputSchema.safeParse({
+      ...values,
+      subtype: nullable(values.subtype),
+      incomingNumber: nullable(values.incomingNumber),
+      outgoingNumber: nullable(values.outgoingNumber),
+      receivedAt: fromLocalDate(values.receivedAt),
+      dueAt: fromLocalDate(values.dueAt),
+      responsibleDepartmentId: number(values.responsibleDepartmentId),
+      assignedToId: number(values.assignedToId),
+      storageLocationCode: nullable(values.storageLocationCode),
+      chronologicalCode: nullable(values.chronologicalCode),
+      archiveSequence: number(values.archiveSequence),
+      notes: nullable(values.notes),
+    });
+  }
+  const [registered, setRegistered] = useState<DocumentDetail | null>(null);
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const mutation = useMutation({
+    mutationFn: async (input:
+      | { reason: string }
+      | { data: ReturnType<typeof documentInputSchema.parse> | null; attachment: ReturnType<typeof getAttachmentDraft> | null }
+    ) => {
+      if ("reason" in input) {
+        const document = initial.current;
+        if (!document) throw new Error("No document selected for archiving.");
+        return trackingApi.archive(document.id, document.version, input.reason);
+      }
+      const { data, attachment } = input;
+      let saved = registered;
+      if (data) {
+        saved = await trackingApi.save(
+          data,
+          mode === "edit" ? initial.current : undefined,
+        );
+        if (mode === "create") {
+          setRegistered(saved);
+          await client.invalidateQueries({ queryKey: ["document-tracking"] });
+        }
+      }
+      if (!saved) throw new Error("Document registration has not completed.");
+      if (attachment?.source === "upload") return trackingApi.uploadAttachment(saved.id, saved.version, { name: attachment.name, kind: attachment.kind }, attachment.file);
+      if (attachment?.source === "link") return trackingApi.attachment(saved.id, saved.version, { name: attachment.name, kind: attachment.kind, url: attachment.url });
+      return saved;
+    },
+    onSuccess: async (result) => {
+      await client.invalidateQueries({ queryKey: ["document-tracking"] });
+      onSuccess(result);
+    },
+  });
+  useEffect(() => {
+    onPendingChange?.(mutation.isPending);
+  }, [mutation.isPending, onPendingChange]);
+  const pending = mutation.isPending;
+  const parsedDraft = !registered && mode !== "delete" ? parseDocument(draft) : null;
+  const datesValid = !parsedDraft?.success || !parsedDraft.data.dueAt ||
+    new Date(parsedDraft.data.dueAt) >= new Date(parsedDraft.data.receivedAt);
+  const valid = mode === "delete" ? Boolean(draft.reason.trim()) :
+    (registered || (parsedDraft?.success && datesValid)) &&
+    (mode !== "create" || isAttachmentDraftValid({
+      source: draft.attachmentSource, name: draft.attachmentName,
+      url: draft.attachmentUrl, kind: draft.attachmentKind,
+    }, attachmentFile, draft.title));
+  const metadataLocked = pending || Boolean(registered);
+  const conflict =
+    mutation.error instanceof TrackingRequestError &&
+    mutation.error.status === 409;
+  return (
+    <FormProvider {...form}>
+      <Form
+        noValidate
+        aria-busy={pending}
+        onBlur={event => {
+          const values = form.getValues();
+          if (mode === "delete") {
+            if (!values.reason.trim()) showFieldIssue(form, event.target, [{ path: ["reason"], message: "Give a reason for archiving this record." }]);
+            return;
+          }
+          if (!registered) {
+            const result = parseDocument(values);
+            if (!result.success) showFieldIssue(form, event.target, result.error.issues);
+            else if (result.data.dueAt && new Date(result.data.dueAt) < new Date(result.data.receivedAt)) {
+              showFieldIssue(form, event.target, [{ path: ["dueAt"], message: "Due time cannot be before receipt time." }]);
+            }
+          }
+          if (mode === "create") {
+            try {
+              getAttachmentDraft({ source: values.attachmentSource, name: values.attachmentName, url: values.attachmentUrl, kind: values.attachmentKind }, attachmentFile, values.title);
+            } catch (error) {
+              if (!(error instanceof AttachmentValidationError)) throw error;
+              const fields = { name: "attachmentName", url: "attachmentUrl", file: "attachmentFile" };
+              showFieldIssue(form, event.target, [{ path: [fields[error.field]], message: error.message }]);
+            }
+          }
+        }}
+        onSubmit={async (event) => {
+          event.preventDefault();
+          if (inFlight.current || conflict) return;
+          form.clearErrors();
+          const values = form.getValues();
+          if (mode === "delete" && !values.reason.trim()) {
+            setFormIssues(form, [{ path: ["reason"], message: "Give a reason for archiving this record." }]);
+            return;
+          }
+          let data: ReturnType<typeof documentInputSchema.parse> | null = null;
+          if (mode !== "delete" && !registered) {
+            const parsed = parseDocument(values);
+            if (!parsed.success) {
+              setFormIssues(form, parsed.error.issues);
+              return;
+            }
+            data = parsed.data;
+            if (data.dueAt && new Date(data.dueAt) < new Date(data.receivedAt)) {
+              setFormIssues(form, [{ path: ["dueAt"], message: "Due time cannot be before receipt time." }]);
+              return;
+            }
+          }
+          let attachment: ReturnType<typeof getAttachmentDraft> | null = null;
+          if (mode === "create") {
+            try {
+              attachment = getAttachmentDraft({ source: values.attachmentSource, name: values.attachmentName, url: values.attachmentUrl, kind: values.attachmentKind }, attachmentFile, values.title);
+            } catch (error) {
+              if (!(error instanceof AttachmentValidationError)) throw error;
+              const fields = { name: "attachmentName", url: "attachmentUrl", file: "attachmentFile" };
+              setFormIssues(form, [{ path: [fields[error.field]], message: error.message }]);
+              return;
+            }
+          }
+          inFlight.current = true;
+          try {
+            await mutation.mutateAsync(mode === "delete" ? { reason: values.reason.trim() } : { data, attachment });
+          } catch {
+            // The form presents request errors.
+          } finally {
+            inFlight.current = false;
+          }
+        }}
+      >
+        {mode === "delete" ? (
+          <>
+            <Typography>
+              Archive <strong>{record?.title}</strong>?
+            </Typography>
+            <Alert severity="warning">
+              This removes the record from the active register and preserves its
+              history. This is separate from physical filing.
+            </Alert>
+            <TextField
+              name="reason"
+              iconStart={<NotesOutlined />}
+              iconStartAlignment="top"
+              label="Reason"
+              required
+              fullWidth
+              disabled={metadataLocked}
+            />
+          </>
+        ) : (
+          <DocumentFields mode={mode} metadata={metadata} metadataLocked={metadataLocked} pending={pending} attachmentFile={attachmentFile} setAttachmentFile={setAttachmentFile} />
+        )}
+        {registered && mutation.error && <Alert severity="warning">The document is saved, but its required attachment could not be confirmed. Retry the upload or provide a file URL to complete registration.</Alert>}
+        {mutation.error && (
+          <Alert severity="error">
+            {conflict
+              ? "This document changed while the form was open. Close and reopen it to review the latest version before saving."
+              : mutation.error.message}
+          </Alert>
+        )}
+        <DocumentFormActions mode={mode} registered={Boolean(registered)} pending={pending} disabled={pending || conflict || !valid} onCancel={onCancel} />
+      </Form>
+    </FormProvider>
+  );
+}
+
+function DocumentFields({ mode, metadata, metadataLocked, pending, attachmentFile, setAttachmentFile }: {
+  readonly mode: "create" | "edit";
+  readonly metadata: TrackingMetadata;
+  readonly metadataLocked: boolean;
+  readonly pending: boolean;
+  readonly attachmentFile: File | null;
+  readonly setAttachmentFile: (file: File | null) => void;
+}) {
+  return (
+    <>
+      <TextField
+        name="title"
+        iconStart={<DescriptionOutlined />}
+        label="Document title"
+        required
+        fullWidth
+        disabled={metadataLocked}
+      />
+      {mode === "create" && <>
+        <Typography component="h3" variant="h6">Document file (required)</Typography>
+        <AttachmentFields names={{ source: "attachmentSource", name: "attachmentName", url: "attachmentUrl", file: "attachmentFile", kind: "attachmentKind" }} useDocumentTitle file={attachmentFile} onFileChange={setAttachmentFile} disabled={pending} />
+      </>}
+      <FieldGrid>
+        <SelectField
+          name="categoryId"
+          iconStart={<CategoryOutlined />}
+          label="Category"
+          required
+          options={metadata.categories.map((item) => ({
+            value: item.id,
+            label: item.name,
+          }))}
+          disabled={metadataLocked}
+        />
+        <SelectField
+          name="typeId"
+          iconStart={<ArticleOutlined />}
+          label="Document type"
+          required
+          options={metadata.types.map((item) => ({
+            value: item.id,
+            label: item.name,
+          }))}
+          disabled={metadataLocked}
+        />
+        <TextField
+          name="subtype"
+          iconStart={<LabelOutlined />}
+          label="Subtype / leave type"
+          fullWidth
+          disabled={metadataLocked}
+        />
+        <SelectField
+          name="priority"
+          iconStart={<FlagOutlined />}
+          label="Priority"
+          options={[
+            { value: "NORMAL", label: "Normal" },
+            { value: "URGENT", label: "Urgent" },
+          ]}
+          disabled={metadataLocked}
+        />
+        <TextField
+          name="incomingNumber"
+          iconStart={<CallReceived />}
+          label="Incoming number"
+          fullWidth
+          disabled={metadataLocked}
+        />
+        <TextField
+          name="outgoingNumber"
+          iconStart={<CallMade />}
+          label="Outgoing number"
+          fullWidth
+          disabled={metadataLocked}
+        />
+        <TrackingDateTimeField
+          name="receivedAt"
+          label="Received at"
+          required
+          disabled={metadataLocked}
+        />
+        <TrackingDateTimeField
+          name="dueAt"
+          label="Due at"
+          disabled={metadataLocked}
+        />
+        <SelectField
+          name="responsibleDepartmentId"
+          iconStart={<AccountTreeOutlined />}
+          label="Responsible office"
+          options={metadata.departments.map((item) => ({
+            value: String(item.id),
+            label: item.name,
+          }))}
+          disabled={metadataLocked}
+        />
+        <SelectField
+          name="assignedToId"
+          iconStart={<PersonOutline />}
+          label={
+            mode === "create" ? "Initial handler" : "Current handler"
+          }
+          options={metadata.handlers.map((item) => ({
+            value: String(item.id),
+            label: handlerOptionLabel(item),
+          }))}
+          disabled={metadataLocked || mode === "edit"}
+          placeholder="Receives the initial intake stage."
+          helperText={mode === "edit" ? "Use Update progress to reassign or hand over." : undefined}
+        />
+        <TextField
+          name="storageLocationCode"
+          iconStart={<Inventory2Outlined />}
+          label="Cabinet / storage code"
+          fullWidth
+          disabled={metadataLocked}
+        />
+        <TextField
+          name="chronologicalCode"
+          iconStart={<ArchiveOutlined />}
+          label="Chronological archive code"
+          fullWidth
+          disabled={metadataLocked}
+        />
+        <TextField
+          name="archiveSequence"
+          iconStart={<FormatListNumbered />}
+          label="Archive sequence"
+          type="number"
+          fullWidth
+          disabled={metadataLocked}
+        />
+      </FieldGrid>
+      <TextField
+        name="notes"
+        iconStart={<NotesOutlined />}
+        iconStartAlignment="top"
+        label="Notes"
+        multiline
+        minRows={2}
+        fullWidth
+        disabled={metadataLocked}
+      />
+    </>
+  );
+}
+
+function DocumentFormActions({ mode, registered, pending, disabled, onCancel }: {
+  readonly mode: DocumentFormMode;
+  readonly registered: boolean;
+  readonly pending: boolean;
+  readonly disabled: boolean;
+  readonly onCancel: () => void;
+}) {
+  return (
+    <FormActions>
+      <Button variant="outlined" onClick={onCancel} disabled={pending}>
+        {registered ? "Close" : "Cancel"}
+      </Button>
+      <Button
+        type="submit"
+        variant="contained"
+        color={mode === "delete" ? "error" : "success"}
+        loading={pending}
+        disabled={disabled}
+      >
+        {mode === "delete"
+          ? "Archive record"
+          : mode === "edit"
+            ? "Save changes"
+            : registered ? "Retry attachment" : "Register document"}
+      </Button>
+    </FormActions>
+  );
+}

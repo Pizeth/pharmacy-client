@@ -129,8 +129,8 @@ export const metadataSchema = z.object({
 const optionalText = (max: number) => z.string().trim().max(max).nullable();
 export const documentInputSchema = z.object({
   title: z.string().trim().min(1, "Document title is required.").max(500),
-  categoryId: z.uuid(),
-  typeId: z.uuid(),
+  categoryId: z.uuid("Choose a document category."),
+  typeId: z.uuid("Choose a document type."),
   subtype: optionalText(160),
   priority: prioritySchema,
   incomingNumber: optionalText(120),

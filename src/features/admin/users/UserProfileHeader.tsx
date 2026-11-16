@@ -1,5 +1,6 @@
 "use client";
-import { ResourceBadge as Chip, ResourceStatusBadge } from "@/components/Tables/ResourceBadge";
+import { ResourceBadge as Chip } from "@/components/Tables/ResourceBadge";
+import { UserAccountStatus } from "./UserAccountStatus";
 import { Link, Typography } from "@mui/material";
 import MailOutline from "@mui/icons-material/MailOutline";
 import PhoneOutlined from "@mui/icons-material/PhoneOutlined";
@@ -23,7 +24,7 @@ export function UserProfileHeader({ user, isSelf }: { readonly user: AdminUserDe
         <S.ProfileHeading>
           <Typography component="h1" variant="h4">{user.name}</Typography>
           {user.username && <Typography variant="body2" color="text.secondary">@{user.username}</Typography>}
-          <Badges><RoleBadge role={user.userRole} fallback={user.role} /><ResourceStatusBadge active={!user.banned} inactiveLabel="Banned" inactiveColor="error" />{isSelf && <Chip size="small" color="info" variant="outlined" label="Your profile" />}</Badges>
+          <Badges><RoleBadge role={user.userRole} fallback={user.role} /><UserAccountStatus user={user} />{isSelf && <Chip size="small" color="info" variant="outlined" label="Your profile" />}</Badges>
         </S.ProfileHeading>
       </S.ProfileIdentity>
       <S.ProfileContact>

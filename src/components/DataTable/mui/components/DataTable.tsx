@@ -103,6 +103,7 @@ const ContainerRoot = styled(TableContainer, {
   overridesResolver: (_props, styles) => styles.container,
 })({
   overflow: "auto",
+  containerType: "inline-size",
   position: "relative",
   flex: "1 1 auto",
   minWidth: 0,
@@ -470,7 +471,7 @@ function DataTablePresentationRegion<TData extends RowData>(
                 .join(" ")}
               style={tableStyle}
             >
-              <DataTableColumnGroup table={table} />
+              <DataTableColumnGroup table={table} fillContainer={resolvedTableWidth === "100%"} />
               <DataTableHead table={table} indexRows={indexRows} />
               <DataTableBody
                 table={table}
