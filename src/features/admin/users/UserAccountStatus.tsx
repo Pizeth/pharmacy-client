@@ -10,7 +10,7 @@ export function UserAccountStatus({ user }: {
   if (user.role !== "sys-admin" && user.emailVerified === false) {
     return <ResourceBadge size="small" color="error" label="Email not verified" />;
   }
-  if (user.role !== "sys-admin" && user.isLinked === false) {
+  if (user.role !== "sys-admin" && user.isLinked !== true) {
     return <ResourceBadge size="small" color="warning" label="Pending ID verification" />;
   }
   return <ResourceBadge size="small" color="success" label="Active" />;

@@ -15,7 +15,7 @@ export function formActionsStyles(theme: Theme): CSSObject {
       "&:hover, &.Mui-focusVisible": {
         color: theme.palette.common.white,
       },
-      "&.Mui-disabled": { color: theme.palette.action.disabled },
+      "&.Mui-disabled": { color: theme.vars?.palette.action.disabled ?? theme.palette.action.disabled },
     },
     [theme.breakpoints.down("sm")]: {
       flexDirection: "column-reverse",
