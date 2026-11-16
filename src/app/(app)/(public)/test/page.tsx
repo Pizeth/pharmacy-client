@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Paper,
@@ -14,11 +14,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { API_URL } from "@/types/constants";
-import {
-  loadTranslationKeyDataTableResult,
-  queryTranslationKeys,
-  translationKeyDataTableServerAdapter,
-} from "@/features/i18n/translation-keys";
 
 export default function ApiTester() {
   const [url, setUrl] = useState(`${API_URL}/api/v1/i18n/keys/query`);
@@ -32,64 +27,13 @@ export default function ApiTester() {
   const [response, setResponse] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<number | null>(null);
-
-  const request = translationKeyDataTableServerAdapter.createRequest({
-    pagination: {
-      pageIndex: 1,
-      pageSize: 10,
-    },
-
-    sorting: [
-      {
-        id: "category",
-        desc: false,
-      },
-
-      {
-        id: "key",
-        desc: true,
-      },
-    ],
-
-    columnFilters: [
-      {
-        id: "category",
-        value: 2,
-      },
-
-      {
-        id: "locale",
-        value: "km",
-      },
-
-      {
-        id: "key",
-        value: "auth",
-      },
-    ],
-
-    globalFilter: "Login",
-  });
-
-  console.log(request);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void loadTranslationKeyDataTableResult({
-      pagination: { pageIndex: 0, pageSize: 25 },
-      sorting: [], columnFilters: [], globalFilter: "Login",
-    }, controller.signal).then((result) => {
-      if (!controller.signal.aborted) console.log(result);
-    }).catch((error: unknown) => {
-      if (!controller.signal.aborted) console.error(error);
-    });
-    return () => controller.abort();
-  }, []);
+  const [timing, setTiming] = useState<{ headers: number; total: number } | null>(null);
 
   const handleSend = async () => {
     setLoading(true);
     setResponse("");
     setStatus(null);
+    setTiming(null);
 
     try {
       const parsedHeaders = headers ? JSON.parse(headers) : {};
@@ -103,11 +47,18 @@ export default function ApiTester() {
         options.body = JSON.stringify(JSON.parse(body));
       }
 
+      const start = performance.now();
       const res = await fetch(url, options);
+      const headersMs = performance.now() - start;
       setStatus(res.status);
-      const data = await res.json();
+      const responseBody = await res.text();
+      setTiming({ headers: Math.round(headersMs), total: Math.round(performance.now() - start) });
 
-      setResponse(JSON.stringify(data, null, 2));
+      try {
+        setResponse(JSON.stringify(JSON.parse(responseBody), null, 2));
+      } catch {
+        setResponse(responseBody);
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Invalid request or JSON";
@@ -121,6 +72,7 @@ export default function ApiTester() {
     setLoading(true);
 
     setStatus(null);
+    setTiming(null);
 
     try {
       const res = await fetch(`${API_URL}/api/auth/get-session`, {
@@ -240,7 +192,7 @@ export default function ApiTester() {
             mb: 1,
           }}
         >
-          HTTP {status}
+          HTTP {status}{timing && ` · Headers ${timing.headers} ms · Total ${timing.total} ms`}
         </Typography>
       )}
 
