@@ -44,8 +44,11 @@ async function request(path: SettingsPath, method: string, body?: object, signal
     default:
       response = await fetch("/api/account/settings", options);
   }
-  const result = await response.json();
-  if (!response.ok) throw new Error(result?.message || "Could not save account settings.");
+  const result = await response.json().catch((error: unknown) => {
+    if (error instanceof SyntaxError) return undefined;
+    throw error;
+  });
+  if (!response.ok) throw new Error((typeof result?.message === "string" && result.message) || "Could not save account settings.");
   return result?.data ?? result;
 }
 

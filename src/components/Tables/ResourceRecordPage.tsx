@@ -38,9 +38,15 @@ export function ResourceRecordPage({
 
     let cancelled = false;
     let frame: number | undefined;
+    let waitingForFonts = false;
+    const hasPendingContent = () => Boolean(section.querySelector("[data-record-print-pending]"));
     const schedulePrint = () => {
-      if (cancelled) return;
+      waitingForFonts = false;
+      if (cancelled || hasPendingContent()) return;
       frame = requestAnimationFrame(() => {
+        frame = undefined;
+        if (hasPendingContent()) return;
+        observer.disconnect();
         setManualPrint(false);
         if (window.location.href !== href) return;
         url.searchParams.delete("print");
@@ -48,20 +54,18 @@ export function ResourceRecordPage({
         window.print();
       });
     };
-    const printWhenReady = (activeObserver: MutationObserver) => {
-      if (section.querySelector("[data-record-print-pending]")) return;
-      activeObserver.disconnect();
-      document.fonts.ready.then(schedulePrint, schedulePrint);
+    const printWhenReady = () => {
+      if (waitingForFonts || frame !== undefined || hasPendingContent()) return;
+      waitingForFonts = true;
+      void document.fonts.ready.then(schedulePrint, schedulePrint);
     };
-    const observer = new MutationObserver((_, activeObserver) => {
-      printWhenReady(activeObserver);
-    });
+    const observer = new MutationObserver(printWhenReady);
     observer.observe(section, {
       childList: true,
       subtree: true,
       attributeFilter: ["data-record-print-pending"],
     });
-    printWhenReady(observer);
+    printWhenReady();
     return () => {
       cancelled = true;
       observer.disconnect();
