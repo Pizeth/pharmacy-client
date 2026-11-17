@@ -54,6 +54,50 @@ const formPresentation = {
   delete: { title: "Archive document record", Icon: ArchiveOutlined },
 };
 
+function TrackingRecordForm({
+  mode, id, valid, metadata, record, back,
+}: ReturnType<typeof useTrackingRecordQueries> & {
+  mode: DocumentFormMode;
+  id?: string;
+  back: () => void;
+}) {
+  const router = useRouter();
+  if (!valid) return <Alert severity="error">Invalid document reference.</Alert>;
+  if (metadata.isLoading || (mode !== "create" && record.isLoading)) {
+    return <ResourceFormLoading message="Loading document tracking…" />;
+  }
+  const error = metadata.error || record.error;
+  if (error) {
+    const retry = () => {
+      const refresh = metadata.refetch();
+      return mode === "create" ? refresh : Promise.all([refresh, record.refetch()]);
+    };
+    return <Alert severity="error" action={<Button onClick={retry}>Retry</Button>}>{error.message}</Alert>;
+  }
+  if (!metadata.data) return null;
+  if (!metadata.data.actor.isAdmin) {
+    return (
+      <Alert severity="error">
+        Only administrators can register, edit or archive documents.
+        Assigned handlers can update progress from the tracking page.
+      </Alert>
+    );
+  }
+  if (mode !== "create" && !record.data) return null;
+  return (
+    <S.Panel>
+      <DocumentForm
+        key={`${mode}-${id ?? "new"}`}
+        mode={mode}
+        metadata={metadata.data}
+        record={record.data}
+        onCancel={back}
+        onSuccess={(result) => router.push(`/admin/documents/${result.id}`)}
+      />
+    </S.Panel>
+  );
+}
+
 export function TrackingRecordPage({
   mode,
   id,
@@ -83,53 +127,7 @@ export function TrackingRecordPage({
         <S.Actions>
           <Button onClick={back}>Back to document register</Button>
         </S.Actions>
-        {!valid ? (
-          <Alert severity="error">Invalid document reference.</Alert>
-        ) : metadata.isLoading || (mode !== "create" && record.isLoading) ? (
-          <ResourceFormLoading message="Loading document tracking…" />
-        ) : metadata.error || record.error ? (
-          <Alert
-            severity="error"
-            action={
-              <Button
-                onClick={() => {
-                  const refresh = metadata.refetch();
-                  return mode === "create" ? refresh : Promise.all([refresh, record.refetch()]);
-                }}
-              >
-                Retry
-              </Button>
-            }
-          >
-            {metadata.error?.message || record.error?.message}
-          </Alert>
-        ) : (
-          metadata.data && (
-            <>
-              {!metadata.data.actor.isAdmin ? (
-                <Alert severity="error">
-                  Only administrators can register, edit or archive documents.
-                  Assigned handlers can update progress from the tracking page.
-                </Alert>
-              ) : (
-                (mode === "create" || record.data) && (
-                  <S.Panel>
-                    <DocumentForm
-                      key={`${mode}-${id ?? "new"}`}
-                      mode={mode as DocumentFormMode}
-                      metadata={metadata.data}
-                      record={record.data}
-                      onCancel={back}
-                      onSuccess={(result) =>
-                        router.push(`/admin/documents/${result.id}`)
-                      }
-                    />
-                  </S.Panel>
-                )
-              )}
-            </>
-          )
-        )}
+        <TrackingRecordForm mode={mode} id={id} valid={valid} metadata={metadata} record={record} back={back} />
       </S.Root>
     </ResourcePage>
   );
