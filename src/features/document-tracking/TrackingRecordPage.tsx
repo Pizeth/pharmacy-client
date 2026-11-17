@@ -16,15 +16,7 @@ import { DocumentRecordContent } from "./DocumentRecordContent";
 import { ResourceRecordPage } from "@/components/Tables/ResourceRecordPage";
 import { TrackingEditor, type TrackingEditorState } from "./TrackingEditor";
 import * as S from "./styles";
-export function TrackingRecordPage({
-  mode,
-  id,
-}: {
-  readonly mode: DocumentFormMode | "view";
-  readonly id?: string;
-}) {
-  const router = useRouter();
-  const viewing = mode === "view";
+function useTrackingRecordQueries(mode: DocumentFormMode | "view", id: string | undefined, viewing: boolean) {
   const valid = mode === "create" || z.uuid().safeParse(id).success;
   const metadata = useQuery({
     queryKey: ["document-tracking", "metadata"],
@@ -40,6 +32,19 @@ export function TrackingRecordPage({
     refetchOnWindowFocus: viewing,
     refetchInterval: viewing ? 15_000 : false,
   });
+  return { valid, metadata, record };
+}
+
+export function TrackingRecordPage({
+  mode,
+  id,
+}: {
+  readonly mode: DocumentFormMode | "view";
+  readonly id?: string;
+}) {
+  const router = useRouter();
+  const viewing = mode === "view";
+  const { valid, metadata, record } = useTrackingRecordQueries(mode, id, viewing);
   useBreadcrumbLabel(viewing ? `/admin/documents/${id ?? ""}` : `/admin/documents/${mode}/${id ?? ""}`, mode !== "create" && !record.error && record.data ? `${viewing ? "" : mode === "delete" ? "Archive " : "Edit "}${record.data.title}` : undefined);
   const [editor, setEditor] = useState<TrackingEditorState | null>(null);
   const back = () => router.push("/admin/documents");
