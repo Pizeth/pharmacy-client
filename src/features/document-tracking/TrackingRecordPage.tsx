@@ -42,10 +42,12 @@ function TrackingRecordView({
   record,
 }: ReturnType<typeof useTrackingRecordQueries> & { id?: string }) {
   const [editor, setEditor] = useState<TrackingEditorState | null>(null);
-  return <ResourceRecordPage title="Document tracking details" subtitle="Full route, responsibility, attachments and handling history." backHref="/admin/documents" editHref={record.data?.permissions.canManage ? `/admin/documents/edit/${encodeURIComponent(record.data.id)}` : undefined} loading={valid && (metadata.isLoading || record.isLoading)} error={!valid ? "Invalid document reference." : metadata.error?.message ?? record.error?.message} onRetry={() => { if (valid) { Promise.all([metadata.refetch(), record.refetch()]).catch(() => undefined); } }}>
+  return <>
+    <ResourceRecordPage title="Document tracking details" subtitle="Full route, responsibility, attachments and handling history." backHref="/admin/documents" editHref={record.data?.permissions.canManage ? `/admin/documents/edit/${encodeURIComponent(record.data.id)}` : undefined} loading={valid && (metadata.isLoading || record.isLoading)} error={!valid ? "Invalid document reference." : metadata.error?.message ?? record.error?.message} onRetry={() => { if (valid) { Promise.all([metadata.refetch(), record.refetch()]).catch(() => undefined); } }}>
     {record.data && <DocumentRecordContent record={record.data} onProgress={() => setEditor({ mode: "progress", id })} onAttachment={() => setEditor({ mode: "attachment", id })} />}
+    </ResourceRecordPage>
     {editor && metadata.data && <TrackingEditor key={`${editor.mode}-${editor.id}`} {...editor} metadata={metadata.data} onClose={() => { setEditor(null); }} onSuccess={() => { setEditor(null); record.refetch().catch(() => undefined); }} />}
-  </ResourceRecordPage>;
+  </>;
 }
 
 const formPresentation = {
