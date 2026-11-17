@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, type QueryFilters } from "@tanstack/react-query";
 import { createProductionLiveProvider } from "@/lib/realtime/productionLiveProvider";
 
 const provider = createProductionLiveProvider({
@@ -21,10 +21,13 @@ export function useDocumentTrackingRealtime(active: boolean) {
       callback: () => {
         // Keep open forms and optimistic versions stable. Lists and reads refetch
         // through the same authorization checks used by manual refresh.
-        queryClient.invalidateQueries({
+        const filters: QueryFilters = {
           queryKey: ["document-tracking"],
           predicate: ({ queryKey }) => queryKey[1] === "list" || queryKey[1] === "detail",
-        }).catch(() => {
+        };
+        void queryClient.cancelQueries(filters).then(() =>
+          queryClient.invalidateQueries(filters),
+        ).catch(() => {
           // The query observers own errors and retry behavior.
         });
       },
