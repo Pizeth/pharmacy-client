@@ -9,6 +9,7 @@ import { z } from "zod";
 import { ResourcePage } from "@/components/layouts/ResourcePage";
 import { ResourceFormLoading } from "@/components/forms/ResourceFormLoading";
 import { trackingApi } from "./api";
+import { useDocumentTrackingRealtime } from "./useDocumentTrackingRealtime";
 import { documentReference } from "./contracts";
 import { DocumentForm, type DocumentFormMode } from "./DocumentTrackingForm";
 import { DocumentRecordContent } from "./DocumentRecordContent";
@@ -29,6 +30,7 @@ export function TrackingRecordPage({
     queryFn: ({ signal }) => trackingApi.metadata(signal),
     enabled: valid,
   });
+  useDocumentTrackingRealtime(mode === "view" && metadata.isSuccess);
   const record = useQuery({
     queryKey: ["document-tracking", mode === "view" ? "detail" : "page-editor", mode, id],
     queryFn: ({ signal }) => trackingApi.get(id!, signal),
@@ -37,7 +39,7 @@ export function TrackingRecordPage({
     refetchOnWindowFocus: mode === "view",
     refetchInterval: mode === "view" ? 15_000 : false,
   });
-  useBreadcrumbLabel(mode === "view" ? `/admin/documents/${id ?? ""}` : `/admin/documents/${mode}/${id ?? ""}`, mode !== "create" && record.data ? `${mode === "view" ? "" : mode === "delete" ? "Archive " : "Edit "}${record.data.title}` : undefined);
+  useBreadcrumbLabel(mode === "view" ? `/admin/documents/${id ?? ""}` : `/admin/documents/${mode}/${id ?? ""}`, mode !== "create" && !record.error && record.data ? `${mode === "view" ? "" : mode === "delete" ? "Archive " : "Edit "}${record.data.title}` : undefined);
   const [editor, setEditor] = useState<TrackingEditorState | null>(null);
   const back = () => router.push("/admin/documents");
   const title =
