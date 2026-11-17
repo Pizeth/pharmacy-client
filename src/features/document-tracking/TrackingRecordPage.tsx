@@ -24,22 +24,23 @@ export function TrackingRecordPage({
   readonly id?: string;
 }) {
   const router = useRouter();
+  const viewing = mode === "view";
   const valid = mode === "create" || z.uuid().safeParse(id).success;
   const metadata = useQuery({
     queryKey: ["document-tracking", "metadata"],
     queryFn: ({ signal }) => trackingApi.metadata(signal),
     enabled: valid,
   });
-  useDocumentTrackingRealtime(mode === "view" && metadata.isSuccess);
+  useDocumentTrackingRealtime(viewing && metadata.isSuccess);
   const record = useQuery({
-    queryKey: ["document-tracking", mode === "view" ? "detail" : "page-editor", mode, id],
+    queryKey: ["document-tracking", viewing ? "detail" : "page-editor", mode, id],
     queryFn: ({ signal }) => trackingApi.get(id!, signal),
     enabled: valid && mode !== "create",
-    gcTime: mode === "view" ? 5 * 60_000 : 0,
-    refetchOnWindowFocus: mode === "view",
-    refetchInterval: mode === "view" ? 15_000 : false,
+    gcTime: viewing ? 5 * 60_000 : 0,
+    refetchOnWindowFocus: viewing,
+    refetchInterval: viewing ? 15_000 : false,
   });
-  useBreadcrumbLabel(mode === "view" ? `/admin/documents/${id ?? ""}` : `/admin/documents/${mode}/${id ?? ""}`, mode !== "create" && !record.error && record.data ? `${mode === "view" ? "" : mode === "delete" ? "Archive " : "Edit "}${record.data.title}` : undefined);
+  useBreadcrumbLabel(viewing ? `/admin/documents/${id ?? ""}` : `/admin/documents/${mode}/${id ?? ""}`, mode !== "create" && !record.error && record.data ? `${viewing ? "" : mode === "delete" ? "Archive " : "Edit "}${record.data.title}` : undefined);
   const [editor, setEditor] = useState<TrackingEditorState | null>(null);
   const back = () => router.push("/admin/documents");
   const title =
@@ -50,7 +51,7 @@ export function TrackingRecordPage({
         : mode === "delete"
           ? "Archive document record"
           : "Document tracking";
-  if (mode === "view") {
+  if (viewing) {
     return <ResourceRecordPage title="Document tracking details" subtitle="Full route, responsibility, attachments and handling history." backHref="/admin/documents" editHref={record.data?.permissions.canManage ? `/admin/documents/edit/${encodeURIComponent(id!)}` : undefined} loading={valid && (metadata.isLoading || record.isLoading)} error={!valid ? "Invalid document reference." : metadata.error?.message ?? record.error?.message} onRetry={() => { if (valid) { void metadata.refetch(); void record.refetch(); } }}>
       {record.data && <DocumentRecordContent record={record.data} onProgress={() => setEditor({ mode: "progress", id })} onAttachment={() => setEditor({ mode: "attachment", id })} />}
       {editor && metadata.data && <TrackingEditor key={`${editor.mode}-${editor.id}`} {...editor} metadata={metadata.data} onClose={() => setEditor(null)} onSuccess={() => { setEditor(null); void record.refetch(); }} />}
