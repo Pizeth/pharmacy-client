@@ -24,7 +24,7 @@ it("refreshes lists and details while preserving editor queries and unsubscribes
   rerender(true);
   expect(mockSubscribe).toHaveBeenCalledTimes(1);
   const [{ callback }] = mockSubscribe.mock.calls[0];
-  await act(async () => { callback(); });
+  await act(() => callback());
   expect(cancelQueries).toHaveBeenCalledWith(invalidateQueries.mock.calls[0][0]);
   expect(cancelQueries.mock.invocationCallOrder[0]).toBeLessThan(invalidateQueries.mock.invocationCallOrder[0]);
   const [{ queryKey, predicate }] = invalidateQueries.mock.calls[0];

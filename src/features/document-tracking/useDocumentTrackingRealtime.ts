@@ -25,7 +25,7 @@ export function useDocumentTrackingRealtime(active: boolean) {
           queryKey: ["document-tracking"],
           predicate: ({ queryKey }) => queryKey[1] === "list" || queryKey[1] === "detail",
         };
-        void queryClient.cancelQueries(filters).then(() =>
+        return queryClient.cancelQueries(filters).then(() =>
           queryClient.invalidateQueries(filters),
         ).catch(() => {
           // The query observers own errors and retry behavior.
