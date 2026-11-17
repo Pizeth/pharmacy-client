@@ -42,11 +42,17 @@ function TrackingRecordView({
   record,
 }: ReturnType<typeof useTrackingRecordQueries> & { id?: string }) {
   const [editor, setEditor] = useState<TrackingEditorState | null>(null);
-  return <ResourceRecordPage title="Document tracking details" subtitle="Full route, responsibility, attachments and handling history." backHref="/admin/documents" editHref={record.data?.permissions.canManage ? `/admin/documents/edit/${encodeURIComponent(id!)}` : undefined} loading={valid && (metadata.isLoading || record.isLoading)} error={!valid ? "Invalid document reference." : metadata.error?.message ?? record.error?.message} onRetry={() => { if (valid) { void metadata.refetch(); void record.refetch(); } }}>
+  return <ResourceRecordPage title="Document tracking details" subtitle="Full route, responsibility, attachments and handling history." backHref="/admin/documents" editHref={record.data?.permissions.canManage ? `/admin/documents/edit/${encodeURIComponent(record.data.id)}` : undefined} loading={valid && (metadata.isLoading || record.isLoading)} error={!valid ? "Invalid document reference." : metadata.error?.message ?? record.error?.message} onRetry={() => { if (valid) { return Promise.all([metadata.refetch(), record.refetch()]); } }}>
     {record.data && <DocumentRecordContent record={record.data} onProgress={() => setEditor({ mode: "progress", id })} onAttachment={() => setEditor({ mode: "attachment", id })} />}
-    {editor && metadata.data && <TrackingEditor key={`${editor.mode}-${editor.id}`} {...editor} metadata={metadata.data} onClose={() => setEditor(null)} onSuccess={() => { setEditor(null); void record.refetch(); }} />}
+    {editor && metadata.data && <TrackingEditor key={`${editor.mode}-${editor.id}`} {...editor} metadata={metadata.data} onClose={() => setEditor(null)} onSuccess={() => { setEditor(null); return record.refetch(); }} />}
   </ResourceRecordPage>;
 }
+
+const formPresentation = {
+  create: { title: "Register document", Icon: DescriptionOutlined },
+  edit: { title: "Edit document", Icon: EditOutlined },
+  delete: { title: "Archive document record", Icon: ArchiveOutlined },
+};
 
 export function TrackingRecordPage({
   mode,
@@ -56,23 +62,15 @@ export function TrackingRecordPage({
   readonly id?: string;
 }) {
   const router = useRouter();
-  const [editor, setEditor] = useState<TrackingEditorState | null>(null);
   const viewing = mode === "view";
   const { valid, metadata, record } = useTrackingRecordQueries(mode, id, viewing);
   useBreadcrumbLabel(viewing ? `/admin/documents/${id ?? ""}` : `/admin/documents/${mode}/${id ?? ""}`, mode !== "create" && !record.error && record.data ? `${viewing ? "" : mode === "delete" ? "Archive " : "Edit "}${record.data.title}` : undefined);
   const back = () => router.push("/admin/documents");
-  const title =
-    mode === "create"
-      ? "Register document"
-      : mode === "edit"
-        ? "Edit document"
-        : mode === "delete"
-          ? "Archive document record"
-          : "Document tracking";
   if (viewing) return <TrackingRecordView id={id} valid={valid} metadata={metadata} record={record} />;
+  const { title, Icon } = formPresentation[mode];
   return (
     <ResourcePage
-      titleIcon={mode === "create" ? <DescriptionOutlined /> : mode === "edit" ? <EditOutlined /> : <ArchiveOutlined />}
+      titleIcon={<Icon />}
       title={title}
       subtitle={
         record.data
@@ -95,8 +93,8 @@ export function TrackingRecordPage({
             action={
               <Button
                 onClick={() => {
-                  void metadata.refetch();
-                  if (mode !== "create") void record.refetch();
+                  const refresh = metadata.refetch();
+                  return mode === "create" ? refresh : Promise.all([refresh, record.refetch()]);
                 }}
               >
                 Retry
@@ -128,15 +126,6 @@ export function TrackingRecordPage({
                     />
                   </S.Panel>
                 )
-              )}
-              {editor && (
-                <TrackingEditor
-                  key={`${editor.mode}-${editor.id}`}
-                  {...editor}
-                  metadata={metadata.data}
-                  onClose={() => setEditor(null)}
-                  onSuccess={() => setEditor(null)}
-                />
               )}
             </>
           )
