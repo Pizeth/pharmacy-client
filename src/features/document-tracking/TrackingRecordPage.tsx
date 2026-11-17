@@ -42,9 +42,9 @@ function TrackingRecordView({
   record,
 }: ReturnType<typeof useTrackingRecordQueries> & { id?: string }) {
   const [editor, setEditor] = useState<TrackingEditorState | null>(null);
-  return <ResourceRecordPage title="Document tracking details" subtitle="Full route, responsibility, attachments and handling history." backHref="/admin/documents" editHref={record.data?.permissions.canManage ? `/admin/documents/edit/${encodeURIComponent(record.data.id)}` : undefined} loading={valid && (metadata.isLoading || record.isLoading)} error={!valid ? "Invalid document reference." : metadata.error?.message ?? record.error?.message} onRetry={() => valid ? Promise.all([metadata.refetch(), record.refetch()]) : undefined}>
+  return <ResourceRecordPage title="Document tracking details" subtitle="Full route, responsibility, attachments and handling history." backHref="/admin/documents" editHref={record.data?.permissions.canManage ? `/admin/documents/edit/${encodeURIComponent(record.data.id)}` : undefined} loading={valid && (metadata.isLoading || record.isLoading)} error={!valid ? "Invalid document reference." : metadata.error?.message ?? record.error?.message} onRetry={() => { if (valid) { Promise.all([metadata.refetch(), record.refetch()]).catch(() => undefined); } }}>
     {record.data && <DocumentRecordContent record={record.data} onProgress={() => setEditor({ mode: "progress", id })} onAttachment={() => setEditor({ mode: "attachment", id })} />}
-    {editor && metadata.data && <TrackingEditor key={`${editor.mode}-${editor.id}`} {...editor} metadata={metadata.data} onClose={() => setEditor(null)} onSuccess={() => { setEditor(null); return record.refetch(); }} />}
+    {editor && metadata.data && <TrackingEditor key={`${editor.mode}-${editor.id}`} {...editor} metadata={metadata.data} onClose={() => { setEditor(null); }} onSuccess={() => { setEditor(null); record.refetch().catch(() => undefined); }} />}
   </ResourceRecordPage>;
 }
 
@@ -70,7 +70,8 @@ function TrackingRecordForm({
   if (error) {
     const retry = () => {
       const refresh = metadata.refetch();
-      return mode === "create" ? refresh : Promise.all([refresh, record.refetch()]);
+      const pending = mode === "create" ? refresh : Promise.all([refresh, record.refetch()]);
+      pending.catch(() => undefined);
     };
     return <Alert severity="error" action={<Button onClick={retry}>Retry</Button>}>{error.message}</Alert>;
   }
@@ -92,7 +93,7 @@ function TrackingRecordForm({
         metadata={metadata.data}
         record={record.data}
         onCancel={back}
-        onSuccess={(result) => router.push(`/admin/documents/${result.id}`)}
+        onSuccess={(result) => { router.push(`/admin/documents/${result.id}`); }}
       />
     </S.Panel>
   );
@@ -111,7 +112,7 @@ export function TrackingRecordPage({
   useBreadcrumbLabel(viewing ? `/admin/documents/${id ?? ""}` : `/admin/documents/${mode}/${id ?? ""}`, mode !== "create" && !record.error && record.data ? `${viewing ? "" : mode === "delete" ? "Archive " : "Edit "}${record.data.title}` : undefined);
   const back = () => router.push("/admin/documents");
   if (viewing) return <TrackingRecordView id={id} valid={valid} metadata={metadata} record={record} />;
-  const { title, Icon } = formPresentation[mode];
+  const { title, Icon } = mode === "create" ? formPresentation.create : mode === "edit" ? formPresentation.edit : formPresentation.delete;
   return (
     <ResourcePage
       titleIcon={<Icon />}
