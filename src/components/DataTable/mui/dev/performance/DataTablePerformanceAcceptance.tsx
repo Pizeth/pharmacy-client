@@ -443,7 +443,7 @@ export const PerformanceTable =
             ),
           [
             columnCount,
-            props.integratedInteractive,
+            rowControls,
           ],
         );
 
