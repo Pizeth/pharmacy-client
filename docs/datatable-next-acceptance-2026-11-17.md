@@ -178,3 +178,9 @@ At 200×16, median browser action times in milliseconds were:
 
 Selection timings use the shared table state operations. Selection-driven pinning is covered independently by the pinning action and the interaction matrix. Each benchmark uses one warm-up and three measured repetitions. The interactive expansion and pin timings include mounting the full page. The current implementation remains an opt-in pilot.
 The separate React Profiler build passed all 15 cases and recorded 600 samples. Both builds passed TypeScript and static generation.
+
+## Pre-push local verification
+
+The final frontend run passed all 1197 tests in 201 suites, plus TypeScript and whitespace checks. The API source matching the current API merge passed all 345 tests in 51 suites when run with local loopback access. The disposable Document Tracking handoff proved that both authenticated streams refreshed on reassignment and subsequent reads enforced current visibility.
+
+A fresh headless Chrome run opened two separately authenticated cookie origins against the disposable harness. Session A edited a TranslationKey and Session B updated its card view through realtime refetch. Session B edited it again and Session A updated its table through realtime refetch. The cleanup endpoint returned HTTP 200 and the harness confirmed removal of test fixtures. Hosted migration, proxy and deployment checks retain their separate status.
