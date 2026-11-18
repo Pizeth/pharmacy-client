@@ -274,7 +274,7 @@ function FixtureRowDialog() {
     <Dialog open={open} onClose={() => { setOpen(false); }} aria-labelledby="fixture-row-dialog-title">
       <DialogTitle id="fixture-row-dialog-title">Fixture row dialog</DialogTitle>
       <DialogActions>
-        <Button autoFocus onClick={() => { setOpen(false); }}>Close row dialog</Button>
+        <Button onClick={() => { setOpen(false); }}>Close row dialog</Button>
       </DialogActions>
     </Dialog>
   </>;
@@ -406,6 +406,7 @@ export interface PerformanceTableProps {
   readonly integratedWindow?: boolean;
   readonly integratedPersistence?: boolean;
   readonly integratedInteractive?: boolean;
+  readonly matchingControls?: boolean;
   readonly windowedDetails?: boolean;
   readonly windowedRtl?: boolean;
   readonly columnCount: number;
@@ -432,12 +433,13 @@ export const PerformanceTable =
         surfaceRef,
       } = props;
 
+      const rowControls = props.integratedInteractive || props.matchingControls;
       const columns =
         useMemo(
           () =>
             createColumns(
               columnCount,
-              props.integratedInteractive,
+              rowControls,
             ),
           [
             columnCount,
@@ -656,7 +658,7 @@ export const PerformanceTable =
                   table
                 }
                 tableProps={props.integratedWindow !== undefined ? { stickyHeader: true } : undefined}
-                rowPinning={props.integratedInteractive ? { displayMode: "select-sticky" } : undefined}
+                rowPinning={rowControls ? { displayMode: "select-sticky" } : undefined}
                 windowRows={props.integratedInteractive ? "interactive" : props.integratedWindow}
                 onRowClick={props.integratedInteractive ? togglePinnedSelection : undefined}
                 persistence={props.integratedPersistence ? { storageId: "profile-integrated-window" } : false}

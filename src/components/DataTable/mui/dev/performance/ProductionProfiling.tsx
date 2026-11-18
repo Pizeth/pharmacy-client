@@ -23,7 +23,7 @@ const Report = styled("pre", { name: "RazethDataTablePerformance", slot: "Report
 
 type Mode = "table" | "card";
 type Probe = "off" | "default" | "owner" | "row";
-interface Case { rows: number; pageSize?: number; windowed?: boolean; windowedDetails?: boolean; windowedRtl?: boolean; integratedWindow?: boolean; integratedPersistence?: boolean; integratedInteractive?: boolean; columns: number; mode: Mode; probe: Probe; serial: number }
+interface Case { rows: number; pageSize?: number; windowed?: boolean; windowedDetails?: boolean; windowedRtl?: boolean; integratedWindow?: boolean; integratedPersistence?: boolean; integratedInteractive?: boolean; matchingControls?: boolean; columns: number; mode: Mode; probe: Probe; serial: number }
 interface Sample {
   action: string;
   repeat: number;
@@ -153,7 +153,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
             mode = initialMode;
             await measure("mount", repeat, () => {
               tableRef.current = null;
-              setFixture({ rows, pageSize, windowed, integratedWindow, integratedInteractive, columns, mode, probe, serial: ++serial.current });
+              setFixture({ rows, pageSize, windowed, integratedWindow, integratedInteractive, matchingControls: track === "windowing-matrix", columns, mode, probe, serial: ++serial.current });
             }, () => validMountedCount() && (!windowed || firstWindowRow()?.getAttribute("aria-rowindex") === "1"));
             if (isRegularTrack(track)) {
               for (const selected of [true, false]) await measure(selected ? "select" : "deselect", repeat,
@@ -199,12 +199,12 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
               }
               for (const selected of [true, false]) {
                 await measure(selected ? "select-one" : "clear-one", repeat,
-                  () => table().getRow("1").toggleSelected(selected),
-                  () => validMountedCount() && hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
+                  () => { surfaceRef.current?.querySelector<HTMLInputElement>('tr[data-row-id="1"] input[type="checkbox"]')?.click(); },
+                  () => (selected ? count() === rows : validMountedCount()) && hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
               }
               for (const selected of [true, false]) {
                 await measure(selected ? "select-page" : "clear-page", repeat,
-                  () => table().toggleAllPageRowsSelected(selected),
+                  () => { surfaceRef.current?.querySelector<HTMLInputElement>('input[aria-label="Select all rows on current page"]')?.click(); },
                   () => validMountedCount() && table().getIsAllPageRowsSelected() === selected &&
                     hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
               }
@@ -320,7 +320,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }}>Download raw samples</Button>
     {fixture && <DataTableRenderDiagnosticsContext.Provider value={fixture.probe === "off" ? null : observer}>
-      <PerformanceTable key={fixture.serial} rowCount={fixture.rows} columnCount={fixture.columns} pageSize={fixture.pageSize} windowed={fixture.windowed} windowedDetails={fixture.windowedDetails} windowedRtl={fixture.windowedRtl} integratedWindow={fixture.integratedWindow} integratedPersistence={fixture.integratedPersistence} integratedInteractive={fixture.integratedInteractive}
+      <PerformanceTable key={fixture.serial} rowCount={fixture.rows} columnCount={fixture.columns} pageSize={fixture.pageSize} windowed={fixture.windowed} windowedDetails={fixture.windowedDetails} windowedRtl={fixture.windowedRtl} integratedWindow={fixture.integratedWindow} integratedPersistence={fixture.integratedPersistence} integratedInteractive={fixture.integratedInteractive} matchingControls={fixture.matchingControls}
         displayMode={fixture.mode} narrowOwner={fixture.probe === "owner" || fixture.probe === "row"}
         diagnostics={fixture.probe === "off" ? null : collector} onProfile={onProfile}
         surfaceRef={surfaceRef} onTable={onTable} />

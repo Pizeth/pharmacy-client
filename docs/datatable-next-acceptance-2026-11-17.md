@@ -184,3 +184,26 @@ The separate React Profiler build passed all 15 cases and recorded 600 samples. 
 The final frontend run passed all 1197 tests in 201 suites, plus TypeScript and whitespace checks. The API source matching the current API merge passed all 345 tests in 51 suites when run with local loopback access. The disposable Document Tracking handoff proved that both authenticated streams refreshed on reassignment and subsequent reads enforced current visibility.
 
 A fresh headless Chrome run opened two separately authenticated cookie origins against the disposable harness. Session A edited a TranslationKey and Session B updated its card view through realtime refetch. Session B edited it again and Session A updated its table through realtime refetch. The cleanup endpoint returned HTTP 200 and the harness confirmed removal of test fixtures. Hosted migration, proxy and deployment checks retain their separate status.
+
+## Reproducing the acceptance checks
+
+- Run the DataTable Jest suites with `npm run test:datatable -- --runInBand`. Executable regression coverage includes [windowing, focus and geometry](../src/components/DataTable/mui/components/tableGeometryTheme.spec.tsx), [pinning with other features](../src/components/DataTable/mui/components/rowPinningCrossFeature.spec.tsx), [row activation](../src/components/DataTable/mui/components/rowClickInteraction.spec.tsx), and [interactive fixture selection](../src/components/DataTable/mui/dev/performance/interactiveWindowing.spec.tsx). Jest coverage and the browser measurements establish different kinds of evidence.
+- Follow the [two production-build commands](datatable-performance-2-2-3-2.md) and select **Run windowing matrix** in each local profiling route. The executable profiling fixture verifies rendered output before accepting samples and offers **Download raw samples**. Its manual controls open the same LTR and RTL DataTable variants for browser acceptance.
+- Follow the [disposable two-session recipe](datatable-production-realtime-2-0-6.md#local-authenticated-acceptance) with the checked-in [browser bundle builder](../scripts/build-realtime-acceptance.mjs) and [API fixture runner](https://github.com/Pizeth/pharmacy-api/blob/dc98795f2f19ed6ce16ad02abba90bfab85f7921/scripts/realtime-authenticated-acceptance.ts). Use two loopback origins, perform one edit each direction, verify canonical table and card updates, and finish with cleanup.
+
+## Review follow-up with matched row controls
+
+The current matrix renders the same columns, dialog and selection controls across all three modes. All modes use the same select-sticky policy and click the rendered row or page checkbox for selection samples. The interactive mode additionally exercises row activation and detail rendering. Ordinary windowing deliberately requires those callbacks to be absent, so the interactive-only fallback actions are measured separately. The preceding tables describe earlier fixture revisions.
+
+At 200×16 the corrected ordinary production run measured the following medians in milliseconds:
+
+| Action | Unwindowed | Windowed | Interactive |
+| --- | ---: | ---: | ---: |
+| Mount | 406.5 | 88.3 | 80.6 |
+| Select one and pin | 295.2 | 367.9 | 380.3 |
+| Select page | 311.9 | 48.4 | 47.6 |
+| Switch to cards | 163.0 | 158.3 | 156.6 |
+| Switch back to table | 357.4 | 78.0 | 77.8 |
+
+Single-row selection mounted all 200 rows in every mode. Page selection left both windowed modes at 15 mounted rows. These results account for the real selection fallback that the earlier state-only timing did not invoke. The fixture dialog uses the dialog component's normal focus management.
+Both corrected production builds passed all 15 cases, recording 600 samples each. TypeScript and static generation also passed.
