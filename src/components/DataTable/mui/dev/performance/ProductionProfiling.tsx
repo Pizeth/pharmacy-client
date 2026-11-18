@@ -146,19 +146,24 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
           return hasViewportCoverage(viewport(), mounted, pageSize, table().getRowModel().rows.map(row => row.id));
         };
         /** Measures the regular track selection and detail interactions. */
-        async function measureBasicSelection(repeat: number) {
-          for (const selected of [true, false]) await measure(selected ? "select" : "deselect", repeat,
-            () => table().getRow("1").toggleSelected(selected),
-            () => table().getRow("1").getIsSelected() === selected &&
-              hasRenderedRowState(surfaceRef.current, mode, "1", selected, false));
-          for (const expanded of [true, false]) await measure(expanded ? "expand" : "collapse", repeat,
-            () => table().getRow("1").toggleExpanded(expanded),
-            () => table().getRow("1").getIsExpanded() === expanded &&
-              hasRenderedRowState(surfaceRef.current, mode, "1", false, expanded));
-        }
+        const measureBasicSelection = async (repeat: number) => {
+          try {
+            for (const selected of [true, false]) await measure(selected ? "select" : "deselect", repeat,
+              () => table().getRow("1").toggleSelected(selected),
+              () => table().getRow("1").getIsSelected() === selected &&
+                hasRenderedRowState(surfaceRef.current, mode, "1", selected, false));
+            for (const expanded of [true, false]) await measure(expanded ? "expand" : "collapse", repeat,
+              () => table().getRow("1").toggleExpanded(expanded),
+              () => table().getRow("1").getIsExpanded() === expanded &&
+                hasRenderedRowState(surfaceRef.current, mode, "1", false, expanded));
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            throw new Error("Selection and detail actions: " + message, { cause: error });
+          }
+        };
 
         /** Checks end-of-scroll geometry for the prototype and integrated tracks. */
-        async function measureScrollToEnd(repeat: number) {
+        const measureScrollToEnd = async (repeat: number) => {
           if (windowed) {
             await measure("scroll-to-end", repeat, () => {
               scrollViewportToEnd(viewport(), "vertical");
@@ -177,56 +182,61 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
               return validMountedCount() && mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
             });
           }
-        }
+        };
 
         /** Measures query, selection, presentation and fallback interactions in the matrix. */
-        async function measureWindowingMatrix(repeat: number) {
-          for (const filter of ["Record 0001", ""]) {
-            await measure(filter ? "filter" : "clear-filter", repeat, () => {
-              const view = viewport();
-              if (view) view.scrollTop = 0;
-              table().setGlobalFilter(filter);
-            }, () => filter ? count() === 1 && firstWindowRow()?.getAttribute("data-row-id") === "1"
-              : validMountedCount() && firstWindowRow()?.getAttribute("data-row-id") === "1");
-          }
-          for (const selected of [true, false]) {
-            await measure(selected ? "select-one" : "clear-one", repeat,
-              () => { surfaceRef.current?.querySelector<HTMLInputElement>('tr[data-row-id="1"] input[type="checkbox"]')?.click(); },
-              () => (selected ? count() === rows : validMountedCount()) && hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
-          }
-          for (const selected of [true, false]) {
-            await measure(selected ? "select-page" : "clear-page", repeat,
-              () => { surfaceRef.current?.querySelector<HTMLInputElement>('input[aria-label="Select all rows on current page"]')?.click(); },
-              () => validMountedCount() && table().getIsAllPageRowsSelected() === selected &&
-                hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
-          }
-          const store = table().store;
-          for (const target of ["card", "table"] as const) {
-            await measure(`switch-${target}`, repeat, () => {
-              document.querySelector<HTMLButtonElement>(`button[aria-label="Switch to ${target} view"]`)?.click();
-              mode = target;
-            }, () => table().store === store && hasRenderedFirstRow(surfaceRef.current, mode, "1") &&
-              (mode === "card" ? count() === rows : validMountedCount()));
-          }
-          if (integratedInteractive) {
-            for (const active of [true, false]) {
-              await measure(active ? "expand-detail" : "collapse-detail", repeat,
-                () => table().getRow("1").toggleExpanded(active),
-                () => (active ? count() === rows : validMountedCount()) &&
-                  hasRenderedRowState(surfaceRef.current, "table", "1", false, active));
+        const measureWindowingMatrix = async (repeat: number) => {
+          try {
+            for (const filter of ["Record 0001", ""]) {
+              await measure(filter ? "filter" : "clear-filter", repeat, () => {
+                const view = viewport();
+                if (view) view.scrollTop = 0;
+                table().setGlobalFilter(filter);
+              }, () => filter ? count() === 1 && firstWindowRow()?.getAttribute("data-row-id") === "1"
+                : validMountedCount() && firstWindowRow()?.getAttribute("data-row-id") === "1");
             }
-            for (const active of [true, false]) {
-              await measure(active ? "pin-row" : "unpin-row", repeat,
-                () => table().getRow("1").pin(active ? "top" : false),
-                () => (active ? count() === rows : validMountedCount()) &&
-                  hasRenderedFirstRow(surfaceRef.current, "table", "1") &&
-                  table().getRow("1").getIsPinned() === (active ? "top" : false));
+            for (const selected of [true, false]) {
+              await measure(selected ? "select-one" : "clear-one", repeat,
+                () => { surfaceRef.current?.querySelector<HTMLInputElement>('tr[data-row-id="1"] input[type="checkbox"]')?.click(); },
+                () => (selected ? count() === rows : validMountedCount()) && hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
             }
+            for (const selected of [true, false]) {
+              await measure(selected ? "select-page" : "clear-page", repeat,
+                () => { surfaceRef.current?.querySelector<HTMLInputElement>('input[aria-label="Select all rows on current page"]')?.click(); },
+                () => validMountedCount() && table().getIsAllPageRowsSelected() === selected &&
+                  hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
+            }
+            const store = table().store;
+            for (const target of ["card", "table"] as const) {
+              await measure(`switch-${target}`, repeat, () => {
+                document.querySelector<HTMLButtonElement>(`button[aria-label="Switch to ${target} view"]`)?.click();
+                mode = target;
+              }, () => table().store === store && hasRenderedFirstRow(surfaceRef.current, mode, "1") &&
+                (mode === "card" ? count() === rows : validMountedCount()));
+            }
+            if (integratedInteractive) {
+              for (const active of [true, false]) {
+                await measure(active ? "expand-detail" : "collapse-detail", repeat,
+                  () => table().getRow("1").toggleExpanded(active),
+                  () => (active ? count() === rows : validMountedCount()) &&
+                    hasRenderedRowState(surfaceRef.current, "table", "1", false, active));
+              }
+              for (const active of [true, false]) {
+                await measure(active ? "pin-row" : "unpin-row", repeat,
+                  () => table().getRow("1").pin(active ? "top" : false),
+                  () => (active ? count() === rows : validMountedCount()) &&
+                    hasRenderedFirstRow(surfaceRef.current, "table", "1") &&
+                    table().getRow("1").getIsPinned() === (active ? "top" : false));
+              }
+            }
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            throw new Error("Windowing matrix actions: " + message, { cause: error });
           }
-        }
+        };
 
         /** Measures filtering, scrolling and presentation for regular tracks. */
-        async function measureRegularInteractions(repeat: number) {
+        const measureRegularInteractions = async (repeat: number) => {
           for (const filter of ["Record 0001", ""]) await measure(filter ? "filter" : "clear-filter", repeat,
             () => table().setGlobalFilter(filter), () => count() === (filter ? 1 : rows));
           await measure("scroll-vertical", repeat, () => {
@@ -251,7 +261,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
                 hasRenderedRowState(surfaceRef.current, target, "1", true, true));
             }
           }
-        }
+        };
 
         try {
           for (let repeat = 0; repeat <= 3; repeat++) {
