@@ -145,6 +145,114 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
           if (!integratedWindow || (track === "windowing-matrix" && pageSize <= 25)) return mounted === expectedMounted;
           return hasViewportCoverage(viewport(), mounted, pageSize, table().getRowModel().rows.map(row => row.id));
         };
+        /** Measures the regular track selection and detail interactions. */
+        async function measureBasicSelection(repeat: number) {
+          for (const selected of [true, false]) await measure(selected ? "select" : "deselect", repeat,
+            () => table().getRow("1").toggleSelected(selected),
+            () => table().getRow("1").getIsSelected() === selected &&
+              hasRenderedRowState(surfaceRef.current, mode, "1", selected, false));
+          for (const expanded of [true, false]) await measure(expanded ? "expand" : "collapse", repeat,
+            () => table().getRow("1").toggleExpanded(expanded),
+            () => table().getRow("1").getIsExpanded() === expanded &&
+              hasRenderedRowState(surfaceRef.current, mode, "1", false, expanded));
+        }
+
+        /** Checks end-of-scroll geometry for the prototype and integrated tracks. */
+        async function measureScrollToEnd(repeat: number) {
+          if (windowed) {
+            await measure("scroll-to-end", repeat, () => {
+              scrollViewportToEnd(viewport(), "vertical");
+            }, () => {
+              const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
+              const last = mounted?.[mounted.length - 1];
+              return mounted !== undefined && mounted.length < rows && last?.getAttribute("data-row-id") === String(rows) &&
+                last.getAttribute("aria-rowindex") === String(rows);
+            });
+          }
+          if (track === "integrated" || track === "windowing-matrix") {
+            await measure("scroll-to-end", repeat, () => {
+              scrollViewportToEnd(viewport(), "vertical");
+            }, () => {
+              const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
+              return validMountedCount() && mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
+            });
+          }
+        }
+
+        /** Measures query, selection, presentation and fallback interactions in the matrix. */
+        async function measureWindowingMatrix(repeat: number) {
+          for (const filter of ["Record 0001", ""]) {
+            await measure(filter ? "filter" : "clear-filter", repeat, () => {
+              const view = viewport();
+              if (view) view.scrollTop = 0;
+              table().setGlobalFilter(filter);
+            }, () => filter ? count() === 1 && firstWindowRow()?.getAttribute("data-row-id") === "1"
+              : validMountedCount() && firstWindowRow()?.getAttribute("data-row-id") === "1");
+          }
+          for (const selected of [true, false]) {
+            await measure(selected ? "select-one" : "clear-one", repeat,
+              () => { surfaceRef.current?.querySelector<HTMLInputElement>('tr[data-row-id="1"] input[type="checkbox"]')?.click(); },
+              () => (selected ? count() === rows : validMountedCount()) && hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
+          }
+          for (const selected of [true, false]) {
+            await measure(selected ? "select-page" : "clear-page", repeat,
+              () => { surfaceRef.current?.querySelector<HTMLInputElement>('input[aria-label="Select all rows on current page"]')?.click(); },
+              () => validMountedCount() && table().getIsAllPageRowsSelected() === selected &&
+                hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
+          }
+          const store = table().store;
+          for (const target of ["card", "table"] as const) {
+            await measure(`switch-${target}`, repeat, () => {
+              document.querySelector<HTMLButtonElement>(`button[aria-label="Switch to ${target} view"]`)?.click();
+              mode = target;
+            }, () => table().store === store && hasRenderedFirstRow(surfaceRef.current, mode, "1") &&
+              (mode === "card" ? count() === rows : validMountedCount()));
+          }
+          if (integratedInteractive) {
+            for (const active of [true, false]) {
+              await measure(active ? "expand-detail" : "collapse-detail", repeat,
+                () => table().getRow("1").toggleExpanded(active),
+                () => (active ? count() === rows : validMountedCount()) &&
+                  hasRenderedRowState(surfaceRef.current, "table", "1", false, active));
+            }
+            for (const active of [true, false]) {
+              await measure(active ? "pin-row" : "unpin-row", repeat,
+                () => table().getRow("1").pin(active ? "top" : false),
+                () => (active ? count() === rows : validMountedCount()) &&
+                  hasRenderedFirstRow(surfaceRef.current, "table", "1") &&
+                  table().getRow("1").getIsPinned() === (active ? "top" : false));
+            }
+          }
+        }
+
+        /** Measures filtering, scrolling and presentation for regular tracks. */
+        async function measureRegularInteractions(repeat: number) {
+          for (const filter of ["Record 0001", ""]) await measure(filter ? "filter" : "clear-filter", repeat,
+            () => table().setGlobalFilter(filter), () => count() === (filter ? 1 : rows));
+          await measure("scroll-vertical", repeat, () => {
+            scrollViewportToEnd(viewport(), "vertical");
+          }, () => { const view = viewport(); return view != null && (view.scrollHeight <= view.clientHeight || view.scrollTop > 0); });
+          await measure("scroll-horizontal", repeat, () => {
+            scrollViewportToEnd(viewport(), "horizontal");
+          }, () => { const view = viewport(); return view != null && (view.scrollWidth <= view.clientWidth || view.scrollLeft > 0); });
+          if (track === "normal") {
+            // Seed shared state outside switching samples and verify both views retain it.
+            table().getRow("1").toggleSelected(true);
+            table().getRow("1").toggleExpanded(true);
+            await afterTwoFrames();
+            assertProfilingRunActive(cancelled.current, document.visibilityState);
+            for (const target of [initialMode === "table" ? "card" : "table", initialMode] as const) {
+              const store = table().store;
+              await measure(`switch-${target}`, repeat, () => {
+                mode = target;
+                setFixture((current) => current ? { ...current, mode: target } : current);
+              }, () => table().store === store && count() === rows && table().getRow("1").getIsSelected() &&
+                table().getRow("1").getIsExpanded() &&
+                hasRenderedRowState(surfaceRef.current, target, "1", true, true));
+            }
+          }
+        }
+
         try {
           for (let repeat = 0; repeat <= 3; repeat++) {
             setStatus(`${result.label}: ${repeat === 0 ? "warm-up" : `repeat ${repeat}`}`);
@@ -155,108 +263,15 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
               tableRef.current = null;
               setFixture({ rows, pageSize, windowed, integratedWindow, integratedInteractive, matchingControls: track === "windowing-matrix", columns, mode, probe, serial: ++serial.current });
             }, () => validMountedCount() && (!windowed || firstWindowRow()?.getAttribute("aria-rowindex") === "1"));
-            if (isRegularTrack(track)) {
-              for (const selected of [true, false]) await measure(selected ? "select" : "deselect", repeat,
-                () => table().getRow("1").toggleSelected(selected),
-                () => table().getRow("1").getIsSelected() === selected &&
-                  hasRenderedRowState(surfaceRef.current, mode, "1", selected, false));
-              for (const expanded of [true, false]) await measure(expanded ? "expand" : "collapse", repeat,
-                () => table().getRow("1").toggleExpanded(expanded),
-                () => table().getRow("1").getIsExpanded() === expanded &&
-                  hasRenderedRowState(surfaceRef.current, mode, "1", false, expanded));
-            }
+            if (isRegularTrack(track)) await measureBasicSelection(repeat);
             for (const desc of [true, false]) await measure(desc ? "sort-desc" : "sort-asc", repeat,
               () => table().setSorting([{ id: "name", desc }]),
               () => table().getRowModel().rows[0]?.id === (desc ? String(rows) : "1") &&
                 hasRenderedFirstRow(surfaceRef.current, mode, desc ? String(rows) : "1") && validMountedCount() &&
                 (!windowed || firstWindowRow()?.getAttribute("aria-rowindex") === "1"));
-            if (windowed) {
-              await measure("scroll-to-end", repeat, () => {
-                scrollViewportToEnd(viewport(), "vertical");
-              }, () => {
-                const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
-                const last = mounted?.[mounted.length - 1];
-                return mounted !== undefined && mounted.length < rows && last?.getAttribute("data-row-id") === String(rows) &&
-                  last.getAttribute("aria-rowindex") === String(rows);
-              });
-            }
-            if (track === "integrated" || track === "windowing-matrix") {
-              await measure("scroll-to-end", repeat, () => {
-                scrollViewportToEnd(viewport(), "vertical");
-              }, () => {
-                const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
-                return validMountedCount() && mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
-              });
-            }
-            if (track === "windowing-matrix") {
-              for (const filter of ["Record 0001", ""]) {
-                await measure(filter ? "filter" : "clear-filter", repeat, () => {
-                  const view = viewport();
-                  if (view) view.scrollTop = 0;
-                  table().setGlobalFilter(filter);
-                }, () => filter ? count() === 1 && firstWindowRow()?.getAttribute("data-row-id") === "1"
-                  : validMountedCount() && firstWindowRow()?.getAttribute("data-row-id") === "1");
-              }
-              for (const selected of [true, false]) {
-                await measure(selected ? "select-one" : "clear-one", repeat,
-                  () => { surfaceRef.current?.querySelector<HTMLInputElement>('tr[data-row-id="1"] input[type="checkbox"]')?.click(); },
-                  () => (selected ? count() === rows : validMountedCount()) && hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
-              }
-              for (const selected of [true, false]) {
-                await measure(selected ? "select-page" : "clear-page", repeat,
-                  () => { surfaceRef.current?.querySelector<HTMLInputElement>('input[aria-label="Select all rows on current page"]')?.click(); },
-                  () => validMountedCount() && table().getIsAllPageRowsSelected() === selected &&
-                    hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
-              }
-              const store = table().store;
-              for (const target of ["card", "table"] as const) {
-                await measure(`switch-${target}`, repeat, () => {
-                  document.querySelector<HTMLButtonElement>(`button[aria-label="Switch to ${target} view"]`)?.click();
-                  mode = target;
-                }, () => table().store === store && hasRenderedFirstRow(surfaceRef.current, mode, "1") &&
-                  (mode === "card" ? count() === rows : validMountedCount()));
-              }
-              if (integratedInteractive) {
-                for (const active of [true, false]) {
-                  await measure(active ? "expand-detail" : "collapse-detail", repeat,
-                    () => table().getRow("1").toggleExpanded(active),
-                    () => (active ? count() === rows : validMountedCount()) &&
-                      hasRenderedRowState(surfaceRef.current, "table", "1", false, active));
-                }
-                for (const active of [true, false]) {
-                  await measure(active ? "pin-row" : "unpin-row", repeat,
-                    () => table().getRow("1").pin(active ? "top" : false),
-                    () => (active ? count() === rows : validMountedCount()) &&
-                      hasRenderedFirstRow(surfaceRef.current, "table", "1") &&
-                      table().getRow("1").getIsPinned() === (active ? "top" : false));
-                }
-              }
-            }
-            if (!isRegularTrack(track)) continue;
-            for (const filter of ["Record 0001", ""]) await measure(filter ? "filter" : "clear-filter", repeat,
-              () => table().setGlobalFilter(filter), () => count() === (filter ? 1 : rows));
-            await measure("scroll-vertical", repeat, () => {
-              scrollViewportToEnd(viewport(), "vertical");
-            }, () => { const view = viewport(); return view != null && (view.scrollHeight <= view.clientHeight || view.scrollTop > 0); });
-            await measure("scroll-horizontal", repeat, () => {
-              scrollViewportToEnd(viewport(), "horizontal");
-            }, () => { const view = viewport(); return view != null && (view.scrollWidth <= view.clientWidth || view.scrollLeft > 0); });
-            if (track === "normal") {
-              // Seed shared state outside switching samples and verify both views retain it.
-              table().getRow("1").toggleSelected(true);
-              table().getRow("1").toggleExpanded(true);
-              await afterTwoFrames();
-              assertProfilingRunActive(cancelled.current, document.visibilityState);
-              for (const target of [initialMode === "table" ? "card" : "table", initialMode] as const) {
-                const store = table().store;
-                await measure(`switch-${target}`, repeat, () => {
-                  mode = target;
-                  setFixture((current) => current ? { ...current, mode: target } : current);
-                }, () => table().store === store && count() === rows && table().getRow("1").getIsSelected() &&
-                  table().getRow("1").getIsExpanded() &&
-                  hasRenderedRowState(surfaceRef.current, target, "1", true, true));
-              }
-            }
+            await measureScrollToEnd(repeat);
+            if (track === "windowing-matrix") await measureWindowingMatrix(repeat);
+            if (isRegularTrack(track)) await measureRegularInteractions(repeat);
           }
           assertProfilingRunActive(cancelled.current, document.visibilityState);
           result.status = "PASS";
