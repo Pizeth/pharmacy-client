@@ -179,7 +179,9 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
               scrollViewportToEnd(viewport(), "vertical");
             }, () => {
               const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
-              return validMountedCount() && mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
+              const view = viewport();
+              return view != null && Math.abs(view.scrollHeight - view.clientHeight - view.scrollTop) <= 1 &&
+                validMountedCount() && mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
             });
           }
         };
@@ -198,12 +200,14 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
             for (const selected of [true, false]) {
               await measure(selected ? "select-one" : "clear-one", repeat,
                 () => { surfaceRef.current?.querySelector<HTMLInputElement>('tr[data-row-id="1"] input[type="checkbox"]')?.click(); },
-                () => (selected ? count() === rows : validMountedCount()) && hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
+                () => (selected ? count() === rows : validMountedCount()) &&
+                    firstWindowRow()?.getAttribute("data-row-pinned") === (selected ? "top" : null) &&
+                    hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
             }
             for (const selected of [true, false]) {
               await measure(selected ? "select-page" : "clear-page", repeat,
                 () => { surfaceRef.current?.querySelector<HTMLInputElement>('input[aria-label="Select all rows on current page"]')?.click(); },
-                () => validMountedCount() && table().getIsAllPageRowsSelected() === selected &&
+                () => validMountedCount() && table().getRowModel().rows.every(row => row.getIsSelected() === selected) &&
                   hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
             }
             const store = table().store;
@@ -226,6 +230,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
                   () => table().getRow("1").pin(active ? "top" : false),
                   () => (active ? count() === rows : validMountedCount()) &&
                     hasRenderedFirstRow(surfaceRef.current, "table", "1") &&
+                    firstWindowRow()?.getAttribute("data-row-pinned") === (active ? "top" : null) &&
                     table().getRow("1").getIsPinned() === (active ? "top" : false));
               }
             }

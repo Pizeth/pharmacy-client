@@ -193,7 +193,7 @@ A fresh headless Chrome run opened two separately authenticated cookie origins a
 
 ## Review follow-up with matched row controls
 
-The current matrix renders the same columns, dialog and selection controls across all three modes. All modes use the same select-sticky policy and click the rendered row or page checkbox for selection samples. The interactive mode additionally exercises row activation and detail rendering. Ordinary windowing deliberately requires those callbacks to be absent, so the interactive-only fallback actions are measured separately. The preceding tables describe earlier fixture revisions.
+The current matrix renders the same columns, dialog and selection controls across all three modes. All modes use the same select-sticky policy and click the rendered row or page checkbox for selection samples. Only the interactive mode exposes the detail control and exercises row activation and detail rendering. Ordinary windowing deliberately requires those callbacks to be absent, so the interactive-only fallback actions are measured separately. The preceding tables describe earlier fixture revisions.
 
 At 200×16 the corrected ordinary production run measured the following medians in milliseconds:
 

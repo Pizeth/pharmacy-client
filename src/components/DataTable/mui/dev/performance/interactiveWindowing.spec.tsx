@@ -46,6 +46,11 @@ it("keeps first-row selection and reset consistent with select-sticky pinning", 
   expect(instance.getIsSomeRowsPinned()).toBe(false);
   expect(mounted().length).toBeLessThan(50);
   expect(container.querySelector('tr[data-row-id="1"]')).not.toHaveAttribute("data-row-pinned");
+  fireEvent.click(getByRole("button", { name: "Toggle name filter" }));
+  fireEvent.click(getByRole("button", { name: "Pin sample rows" }));
+  expect(instance.store.get().rowPinning).toEqual({ top: ["1"], bottom: [] });
+  expect(mounted()).toHaveLength(1);
+  expect(mounted()[0]).toHaveAttribute("data-row-pinned", "top");
   unmount();
 });
 

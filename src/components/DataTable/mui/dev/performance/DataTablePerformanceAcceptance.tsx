@@ -284,6 +284,7 @@ function FixtureRowDialog() {
 function createColumns(
   columnCount: number,
   interactive = false,
+  showExpansionControl = false,
 ) {
   const valueColumnCount =
     Math.max(
@@ -340,7 +341,7 @@ function createColumns(
         header: interactive ? () => <><DataTableSelectAllCheckbox /> Status</> : "Status",
         cell: interactive ? ({ row }) => <>
           <DataTableSelectRowCheckbox />
-          <DataTableExpandRowButton />
+          {showExpansionControl && <DataTableExpandRowButton />}
           <Button size="small" onClick={() => { togglePinnedSelection(row); }}>Select {row.id}</Button>
         </> : undefined,
         size:
@@ -440,10 +441,12 @@ export const PerformanceTable =
             createColumns(
               columnCount,
               rowControls,
+              props.integratedInteractive,
             ),
           [
             columnCount,
             rowControls,
+            props.integratedInteractive,
           ],
         );
 
@@ -636,7 +639,7 @@ export const PerformanceTable =
                 const rows = table.getRowModel().rows;
                 table.setRowPinning({
                   top: rows.slice(0, 2).map((row) => row.id),
-                  bottom: rows.slice(-2).map((row) => row.id),
+                  bottom: rows.slice(2).slice(-2).map((row) => row.id),
                 });
               }}>Pin sample rows</Button>
             )}
