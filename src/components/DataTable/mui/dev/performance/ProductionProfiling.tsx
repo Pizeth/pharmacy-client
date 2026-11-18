@@ -84,8 +84,8 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
     const cases = profilingCases(track);
     try {
       for (const [caseIndex, [rows, columns, initialMode, probe, pageSize = rows]] of cases.entries()) {
-        const { windowed, integratedWindow, expectedMounted } = profilingCaseOptions(track, caseIndex, pageSize);
-        const result: Result = { label: profilingCaseLabel(integratedWindow, windowed, rows, columns, initialMode, probe, pageSize), status: "RUNNING", samples: [] };
+        const { windowed, integratedWindow, integratedInteractive, expectedMounted } = profilingCaseOptions(track, caseIndex, pageSize);
+        const result: Result = { label: profilingCaseLabel(integratedWindow, integratedInteractive, windowed, rows, columns, initialMode, probe, pageSize), status: "RUNNING", samples: [] };
         const tasks: PerformanceEntry[] = [];
         const taskObserver = observeLongTasks(tasks);
         const supportsTasks = taskObserver !== null;
@@ -142,7 +142,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
         /** Reject partial windows that leave blank space in the visible body. */
         const validMountedCount = () => {
           const mounted = count() ?? 0;
-          if (!integratedWindow) return mounted === expectedMounted;
+          if (!integratedWindow || (track === "windowing-matrix" && pageSize <= 25)) return mounted === expectedMounted;
           return hasViewportCoverage(viewport(), mounted, pageSize, table().getRowModel().rows.map(row => row.id));
         };
         try {
@@ -153,7 +153,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
             mode = initialMode;
             await measure("mount", repeat, () => {
               tableRef.current = null;
-              setFixture({ rows, pageSize, windowed, integratedWindow, columns, mode, probe, serial: ++serial.current });
+              setFixture({ rows, pageSize, windowed, integratedWindow, integratedInteractive, columns, mode, probe, serial: ++serial.current });
             }, () => validMountedCount() && (!windowed || firstWindowRow()?.getAttribute("aria-rowindex") === "1"));
             if (isRegularTrack(track)) {
               for (const selected of [true, false]) await measure(selected ? "select" : "deselect", repeat,
@@ -180,13 +180,23 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
                   last.getAttribute("aria-rowindex") === String(rows);
               });
             }
-            if (track === "integrated") {
+            if (track === "integrated" || track === "windowing-matrix") {
               await measure("scroll-to-end", repeat, () => {
                 scrollViewportToEnd(viewport(), "vertical");
               }, () => {
                 const mounted = surfaceRef.current?.querySelectorAll("tbody tr[data-row-id]");
                 return validMountedCount() && mounted?.[mounted.length - 1]?.getAttribute("data-row-id") === String(rows);
               });
+            }
+            if (track === "windowing-matrix") {
+              for (const filter of ["Record 0001", ""]) {
+                await measure(filter ? "filter" : "clear-filter", repeat, () => {
+                  const view = viewport();
+                  if (view) view.scrollTop = 0;
+                  table().setGlobalFilter(filter);
+                }, () => filter ? count() === 1 && firstWindowRow()?.getAttribute("data-row-id") === "1"
+                  : validMountedCount() && firstWindowRow()?.getAttribute("data-row-id") === "1");
+              }
             }
             if (!isRegularTrack(track)) continue;
             for (const filter of ["Record 0001", ""]) await measure(filter ? "filter" : "clear-filter", repeat,
@@ -253,10 +263,12 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
     <Stack direction="row" spacing={1}>
       <Button disabled={running} onClick={() => { setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowed: true, serial: ++serial.current }); }}>Open windowed fixture</Button>
       <Button disabled={running} onClick={() => { setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowed: true, windowedDetails: true, serial: ++serial.current }); }}>Open windowed details</Button>
-      <Button disabled={running} onClick={() => { setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowedRtl: true, serial: ++serial.current }); }}>Open RTL windowed details</Button>
+      <Button disabled={running} onClick={() => { setFixture({ rows: 200, columns: 16, mode: "table", probe: "off", windowed: true, windowedDetails: true, windowedRtl: true, serial: ++serial.current }); }}>Open RTL windowed details</Button>
       <Button disabled={running} onClick={() => { setFixture({ rows: 200, pageSize: 100, columns: 16, mode: "table", probe: "off", integratedWindow: true, integratedPersistence: true, serial: ++serial.current }); }}>Open integrated window</Button>
       <Button disabled={running} onClick={() => { setFixture({ rows: 200, pageSize: 100, columns: 16, mode: "table", probe: "off", integratedWindow: true, integratedInteractive: true, serial: ++serial.current }); }}>Open interactive window</Button>
+      <Button disabled={running} onClick={() => { setFixture({ rows: 200, pageSize: 100, columns: 16, mode: "table", probe: "off", integratedWindow: true, integratedInteractive: true, windowedRtl: true, serial: ++serial.current }); }}>Open RTL interactive window</Button>
       <Button disabled={running} onClick={() => { run("integrated").catch(error => { setStatus(String(error)); }); }}>Compare integrated window</Button>
+      <Button disabled={running} onClick={() => { run("windowing-matrix").catch(error => { setStatus(String(error)); }); }}>Run windowing matrix</Button>
       <Button disabled={running} onClick={() => { run("window").catch(error => { setStatus(String(error)); }); }}>Run windowed prototype</Button>
       <Button disabled={running} onClick={() => { run("sort").catch(error => { setStatus(String(error)); }); }}>Run focused sort</Button>
       <Button disabled={running} onClick={() => { run("normal").catch(error => { setStatus(String(error)); }); }}>Run normal matrix</Button>
@@ -283,10 +295,14 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
 }
 
 
-type ProfilingTrack = "integrated" | "window" | "sort" | "normal" | "compare" | "500" | "1000";
+type ProfilingTrack = "windowing-matrix" | "integrated" | "window" | "sort" | "normal" | "compare" | "500" | "1000";
 
 /** Builds the matched fixture cases and counterbalanced diagnostic order for a profiling track. */
 function profilingCases(track: ProfilingTrack): Array<readonly [number, number, Mode, Probe, number?]> {
+  if (track === "windowing-matrix") {
+    return ([[25, 8], [100, 8], [100, 16], [200, 8], [200, 16]] as const)
+      .flatMap(([rows, columns]) => Array.from({ length: 3 }, () => [rows, columns, "table", "off"] as const));
+  }
   return track === "normal"
       ? NORMAL.map(([rows, columns, mode]) => [rows, columns, mode, "off"])
       : track === "integrated"
@@ -307,8 +323,8 @@ function profilingCases(track: ProfilingTrack): Array<readonly [number, number, 
 
 
 /** Labels windowed and reference cases without conflating page size with total records. */
-function profilingCaseLabel(integrated: boolean | undefined, windowed: boolean, rows: number, columns: number, mode: Mode, probe: Probe, pageSize: number) {
-  const prefix = integrated === undefined ? (windowed ? "Windowed " : "") : integrated ? "Integrated windowed " : "Integrated reference ";
+function profilingCaseLabel(integrated: boolean | undefined, interactive: boolean, windowed: boolean, rows: number, columns: number, mode: Mode, probe: Probe, pageSize: number) {
+  const prefix = interactive ? "Integrated interactive " : integrated === undefined ? (windowed ? "Windowed " : "") : integrated ? "Integrated windowed " : "Integrated reference ";
   const suffix = pageSize === rows ? "" : ` / ${pageSize} mounted`;
   return `${prefix}${rows}x${columns} ${mode} ${probe}${suffix}`;
 }
@@ -317,12 +333,16 @@ function profilingCaseLabel(integrated: boolean | undefined, windowed: boolean, 
 /** Selects integrated windowing and expected mounted-row policy for a profiling case. */
 function profilingCaseOptions(track: ProfilingTrack, caseIndex: number, pageSize: number) {
   const windowed = track === "window";
-  return { windowed, integratedWindow: track === "integrated" ? caseIndex === 1 : undefined, expectedMounted: windowed ? 13 : pageSize };
+  // Rotate the mode order between datasets to vary which renderer runs first.
+  const variant = (caseIndex + Math.floor(caseIndex / 3)) % 3;
+  const integratedWindow = track === "windowing-matrix" ? variant !== 0
+    : track === "integrated" ? caseIndex === 1 : undefined;
+  return { windowed, integratedWindow, integratedInteractive: track === "windowing-matrix" && variant === 2, expectedMounted: windowed ? 13 : pageSize };
 }
 
 /** Distinguishes ordinary rendering tracks from specialized sorting and windowing probes. */
 function isRegularTrack(track: ProfilingTrack) {
-  return track !== "sort" && track !== "integrated" && track !== "window";
+  return track !== "windowing-matrix" && track !== "sort" && track !== "integrated" && track !== "window";
 }
 
 /** Collects browser long-task entries only when the performance API supports them. */

@@ -1,5 +1,9 @@
 # DataTable 2.0.6 — authenticated production realtime integration
 
+## November 18 acceptance update
+
+The historical local authenticated TranslationKey acceptance remains the baseline. Hosted migration, stream and replica verification remain open. The merged Document Tracking realtime work has its own delivery and authorization acceptance. See the [current acceptance inventory](datatable-next-acceptance-2026-11-17.md).
+
 ## Scope and decision
 
 Frontend base: `0cb5822b20297f3746cb8db65cb288522eb703d0`.

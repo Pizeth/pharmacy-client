@@ -1,5 +1,9 @@
 # DataTable browser matrix runbook
 
+## November 18 acceptance update
+
+The current windowing acceptance run tracks W01–W10, K01–K08 and the cross-feature fallback matrix. Earlier results below retain their original scope. See the [current acceptance inventory](datatable-next-acceptance-2026-11-17.md).
+
 ## 2.0.6 — production realtime acceptance
 
 Keep both transport gates off until the backend migration, dedicated PostgreSQL
