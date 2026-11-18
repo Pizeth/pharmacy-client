@@ -1,5 +1,9 @@
 # Conditional DataTable virtualization architecture — 2.2.3
 
+## November 18 acceptance update
+
+Client PR #57 merged opt-in row windowing with a TranslationKey pilot. Browser certification and profiling remain open. The separate row-local subscription optimization remains deferred under Outcome B. See the [current acceptance inventory](datatable-next-acceptance-2026-11-17.md).
+
 ## 2.2.3.7 — boundary integration is not a performance gate pass
 
 Outcome **B** integrates broad production callback invocation before physical

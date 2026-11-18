@@ -16,6 +16,9 @@ import type {
 
 import {
   Button,
+  Dialog,
+  DialogActions,
+  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,
@@ -52,6 +55,7 @@ import type {
   DataTablePerformanceMetrics,
 } from "./performanceMetrics";
 import { DataTableDiagnosticCommit, DataTableRenderDiagnosticsContext } from "../../diagnostics/renderDiagnostics";
+import { DataTableSelectAllCheckbox } from "../../columns/selection/DataTableSelectAllCheckbox";
 import { DataTableSelectRowCheckbox } from "../../columns/selection/DataTableSelectRowCheckbox";
 import { DataTableExpandRowButton } from "../../columns/expansion/DataTableExpandRowButton";
 import { WindowedPerformanceTable } from "./WindowedPerformanceTable";
@@ -261,10 +265,26 @@ function togglePinnedSelection(row: {
   row.toggleSelected(selected);
 }
 
+/** Provides a row-owned focus target outside the table DOM. */
+function FixtureRowDialog() {
+  const [open, setOpen] = useState(false);
+
+  return <>
+    <Button size="small" onClick={() => { setOpen(true); }}>Open row dialog</Button>
+    <Dialog open={open} onClose={() => { setOpen(false); }} aria-labelledby="fixture-row-dialog-title">
+      <DialogTitle id="fixture-row-dialog-title">Fixture row dialog</DialogTitle>
+      <DialogActions>
+        <Button onClick={() => { setOpen(false); }}>Close row dialog</Button>
+      </DialogActions>
+    </Dialog>
+  </>;
+}
+
 /** Builds consistent columns for the baseline and interactive acceptance tracks. */
 function createColumns(
   columnCount: number,
   interactive = false,
+  showExpansionControl = false,
 ) {
   const valueColumnCount =
     Math.max(
@@ -281,6 +301,9 @@ function createColumns(
           "Name",
         size:
           180,
+        cell: interactive ? ({ row, getValue }) => row.id === "1"
+          ? <>{getValue()} <FixtureRowDialog /></>
+          : getValue() : undefined,
       },
     ),
 
@@ -315,11 +338,10 @@ function createColumns(
     columnHelper.accessor(
       "status",
       {
-        header:
-          "Status",
+        header: interactive ? () => <><DataTableSelectAllCheckbox /> Status</> : "Status",
         cell: interactive ? ({ row }) => <>
           <DataTableSelectRowCheckbox />
-          <DataTableExpandRowButton />
+          {showExpansionControl && <DataTableExpandRowButton />}
           <Button size="small" onClick={() => { togglePinnedSelection(row); }}>Select {row.id}</Button>
         </> : undefined,
         size:
@@ -385,6 +407,7 @@ export interface PerformanceTableProps {
   readonly integratedWindow?: boolean;
   readonly integratedPersistence?: boolean;
   readonly integratedInteractive?: boolean;
+  readonly matchingControls?: boolean;
   readonly windowedDetails?: boolean;
   readonly windowedRtl?: boolean;
   readonly columnCount: number;
@@ -411,15 +434,18 @@ export const PerformanceTable =
         surfaceRef,
       } = props;
 
+      const rowControls = props.integratedInteractive || props.matchingControls;
       const columns =
         useMemo(
           () =>
             createColumns(
               columnCount,
+              rowControls,
               props.integratedInteractive,
             ),
           [
             columnCount,
+            rowControls,
             props.integratedInteractive,
           ],
         );
@@ -551,7 +577,7 @@ export const PerformanceTable =
           ));
         };
 
-      return (
+      const content = (
         <>
           {diagnostics && <DataTableDiagnosticCommit layer="owner" id="owner" />}
           <Stack
@@ -608,6 +634,15 @@ export const PerformanceTable =
               diagnostics?.begin("filtering");
               dispatch(() => table.setGlobalFilter(table.state.globalFilter ? "" : "Record 0001"));
             }}>Toggle name filter</Button>
+            {props.integratedInteractive && (
+              <Button onClick={() => {
+                const rows = table.getRowModel().rows;
+                table.setRowPinning({
+                  top: rows.slice(0, 2).map((row) => row.id),
+                  bottom: rows.slice(2).slice(-2).map((row) => row.id),
+                });
+              }}>Pin sample rows</Button>
+            )}
           </Stack>
 
           <TableSurfaceRoot
@@ -621,16 +656,12 @@ export const PerformanceTable =
                 onProfile
               }
             >
-              {props.windowedRtl ? (
-                <ThemeProvider theme={withRtlDirection}>
-                  <div dir="rtl"><WindowedPerformanceTable table={table} detailControls /></div>
-                </ThemeProvider>
-              ) : props.windowed ? <WindowedPerformanceTable table={table} detailControls={props.windowedDetails} /> : <DataTable
+              {props.windowed ? <WindowedPerformanceTable table={table} detailControls={props.windowedDetails} /> : <DataTable
                 table={
                   table
                 }
                 tableProps={props.integratedWindow !== undefined ? { stickyHeader: true } : undefined}
-                rowPinning={props.integratedInteractive ? { displayMode: "select-sticky" } : undefined}
+                rowPinning={rowControls ? { displayMode: "select-sticky" } : undefined}
                 windowRows={props.integratedInteractive ? "interactive" : props.integratedWindow}
                 onRowClick={props.integratedInteractive ? togglePinnedSelection : undefined}
                 persistence={props.integratedPersistence ? { storageId: "profile-integrated-window" } : false}
@@ -640,7 +671,9 @@ export const PerformanceTable =
                 displayMode={props.integratedWindow !== undefined ? undefined : displayMode}
                 defaultDisplayMode="table"
                 toolbar={props.integratedWindow !== undefined ? {} : false}
-                pagination={props.integratedWindow !== undefined ? {} : false}
+                pagination={props.integratedWindow !== undefined
+                  ? { pageSizeOptions: props.integratedInteractive ? [10, 25, 26, 50, 100, 200] : undefined }
+                  : false}
                 selectionBar={{}}
                 renderDetailPanel={props.integratedWindow !== undefined && !props.integratedInteractive ? undefined : ({
                   row,
@@ -671,6 +704,12 @@ export const PerformanceTable =
           </TableSurfaceRoot>
         </>
       );
+
+      return props.windowedRtl ? (
+        <ThemeProvider theme={withRtlDirection}>
+          <div dir="rtl">{content}</div>
+        </ThemeProvider>
+      ) : content;
     },
   );
 
