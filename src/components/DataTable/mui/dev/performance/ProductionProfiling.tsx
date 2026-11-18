@@ -158,7 +158,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
                 hasRenderedRowState(surfaceRef.current, mode, "1", false, expanded));
           } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
-            throw new Error("Selection and detail actions: " + message, { cause: error });
+            throw new Error(`Selection and detail actions: ${message}`, { cause: error });
           }
         };
 
@@ -231,7 +231,7 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
             }
           } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
-            throw new Error("Windowing matrix actions: " + message, { cause: error });
+            throw new Error(`Windowing matrix actions: ${message}`, { cause: error });
           }
         };
 
