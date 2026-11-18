@@ -158,3 +158,23 @@ Both production builds passed all 15 cases in the expanded local benchmark. The 
 The latest API merge has the same source tree as its tested feature parent. Its existing authenticated HTTP harness passed against the explicit disposable realtime database injected by Infisical. It verified two cookie sessions, mutations and canonical refetch, shared invalidation identities, rejected actors and origins, permission revocation, disabled-account shutdown and reconnect. Cleanup removed the fixture records and preserved existing records and grants. This run established local HTTP and database behavior. Hosted proxy and deployment acceptance require separate evidence.
 
 The disposable harness reached browser-ready state on both loopback origins. Codex had no in-app browser available, and the separate Chrome window approval timed out before any browser edit was attempted. The authenticated cleanup endpoint returned 200 and the harness confirmed fixture removal. The two authenticated HTTP sessions passed. A fresh browser cross-edit and hosted tests remain open.
+
+## Selection, presentation and fallback timings
+
+The expanded production benchmark now checks single and page selection, clearing each, switching to cards and back on the same table store, and interactive detail expansion and top pinning. It checks rendered state after each action. Detail and pinning run independently so each collapse or unpin can restore the window before the next sample. The ordinary build passed all 15 cases and recorded 600 samples.
+
+At 200×16, median browser action times in milliseconds were:
+
+| Action | Unwindowed | Windowed | Interactive |
+| --- | ---: | ---: | ---: |
+| Select one | 235.7 | 39.8 | 51.7 |
+| Select page | 255.5 | 41.4 | 42.3 |
+| Switch to cards | 172.0 | 149.9 | 157.8 |
+| Switch back to table | 271.6 | 66.4 | 74.5 |
+| Expand detail | — | — | 407.5 |
+| Collapse detail | — | — | 75.5 |
+| Pin row | — | — | 366.7 |
+| Unpin row | — | — | 73.1 |
+
+Selection timings use the shared table state operations. Selection-driven pinning is covered independently by the pinning action and the interaction matrix. Each benchmark uses one warm-up and three measured repetitions. The interactive expansion and pin timings include mounting the full page. The current implementation remains an opt-in pilot.
+The separate React Profiler build passed all 15 cases and recorded 600 samples. Both builds passed TypeScript and static generation.

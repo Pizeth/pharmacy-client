@@ -197,6 +197,40 @@ export function ProductionProfiling({ buildMode }: { readonly buildMode: "browse
                 }, () => filter ? count() === 1 && firstWindowRow()?.getAttribute("data-row-id") === "1"
                   : validMountedCount() && firstWindowRow()?.getAttribute("data-row-id") === "1");
               }
+              for (const selected of [true, false]) {
+                await measure(selected ? "select-one" : "clear-one", repeat,
+                  () => table().getRow("1").toggleSelected(selected),
+                  () => validMountedCount() && hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
+              }
+              for (const selected of [true, false]) {
+                await measure(selected ? "select-page" : "clear-page", repeat,
+                  () => table().toggleAllPageRowsSelected(selected),
+                  () => validMountedCount() && table().getIsAllPageRowsSelected() === selected &&
+                    hasRenderedRowState(surfaceRef.current, "table", "1", selected, false));
+              }
+              const store = table().store;
+              for (const target of ["card", "table"] as const) {
+                await measure(`switch-${target}`, repeat, () => {
+                  document.querySelector<HTMLButtonElement>(`button[aria-label="Switch to ${target} view"]`)?.click();
+                  mode = target;
+                }, () => table().store === store && hasRenderedFirstRow(surfaceRef.current, mode, "1") &&
+                  (mode === "card" ? count() === rows : validMountedCount()));
+              }
+              if (integratedInteractive) {
+                for (const active of [true, false]) {
+                  await measure(active ? "expand-detail" : "collapse-detail", repeat,
+                    () => table().getRow("1").toggleExpanded(active),
+                    () => (active ? count() === rows : validMountedCount()) &&
+                      hasRenderedRowState(surfaceRef.current, "table", "1", false, active));
+                }
+                for (const active of [true, false]) {
+                  await measure(active ? "pin-row" : "unpin-row", repeat,
+                    () => table().getRow("1").pin(active ? "top" : false),
+                    () => (active ? count() === rows : validMountedCount()) &&
+                      hasRenderedFirstRow(surfaceRef.current, "table", "1") &&
+                      table().getRow("1").getIsPinned() === (active ? "top" : false));
+                }
+              }
             }
             if (!isRegularTrack(track)) continue;
             for (const filter of ["Record 0001", ""]) await measure(filter ? "filter" : "clear-filter", repeat,
