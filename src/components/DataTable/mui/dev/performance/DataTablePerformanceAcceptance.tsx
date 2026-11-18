@@ -270,11 +270,11 @@ function FixtureRowDialog() {
   const [open, setOpen] = useState(false);
 
   return <>
-    <Button size="small" onClick={() => setOpen(true)}>Open row dialog</Button>
-    <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="fixture-row-dialog-title">
+    <Button size="small" onClick={() => { setOpen(true); }}>Open row dialog</Button>
+    <Dialog open={open} onClose={() => { setOpen(false); }} aria-labelledby="fixture-row-dialog-title">
       <DialogTitle id="fixture-row-dialog-title">Fixture row dialog</DialogTitle>
       <DialogActions>
-        <Button autoFocus onClick={() => setOpen(false)}>Close row dialog</Button>
+        <Button autoFocus onClick={() => { setOpen(false); }}>Close row dialog</Button>
       </DialogActions>
     </Dialog>
   </>;
