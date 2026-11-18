@@ -4,19 +4,22 @@ import { readEventStream } from "./eventStream";
 
 export const productionRealtimeEnabled = process.env.NEXT_PUBLIC_REALTIME_ENABLED === "true";
 
+type RealtimeResource = "translations" | "tracked-documents";
+
 /** Strict v1 identity-only wire decoder. The browser never receives a DB row. */
-export function decodeLiveEvent(data: string): LiveEvent | undefined {
+export function decodeLiveEvent(data: string, resource: RealtimeResource = "translations"): LiveEvent | undefined {
   try {
     const value: unknown = JSON.parse(data);
     if (!value || typeof value !== "object") return undefined;
     const event = value as Record<string, unknown>;
-    if (event.version !== 1 || event.resource !== "translations" ||
+    if (event.version !== 1 || event.resource !== resource ||
       typeof event.eventId !== "string" || !/^[0-9a-f-]{36}$/i.test(event.eventId) ||
       typeof event.occurredAt !== "string" || !Number.isFinite(Date.parse(event.occurredAt)) ||
       !["created", "updated", "deleted", "invalidate"].includes(String(event.type)) ||
       (event.recordId !== undefined && (typeof event.recordId !== "string" || !/^\d+$/.test(event.recordId))) ||
       (event.type !== "invalidate" && event.recordId === undefined)) return undefined;
-    return { channel: "resources/translations", type: String(event.type),
+    if (resource === "tracked-documents" && (event.type !== "invalidate" || event.recordId !== undefined)) return undefined;
+    return { channel: `resources/${resource}`, type: String(event.type),
       date: new Date(event.occurredAt), payload: { eventId: event.eventId,
         ...(event.recordId !== undefined ? { id: event.recordId } : {}) } };
   } catch { return undefined; }
@@ -26,8 +29,8 @@ type Subscription = Parameters<LiveProvider["subscribe"]>[0];
 
 /** One cookie-authenticated stream per browser provider, shared by list consumers. */
 export function createProductionLiveProvider({ enabled = productionRealtimeEnabled,
-  fetcher, url = `${API_URL.replace(/\/+$/, "")}/api/v1/live/translations`,
-}: { enabled?: boolean; fetcher?: typeof fetch; url?: string } = {}): LiveProvider {
+  resource = "translations", fetcher, url = `${API_URL.replace(/\/+$/, "")}/api/v1/live/${resource}`,
+}: { enabled?: boolean; resource?: RealtimeResource; fetcher?: typeof fetch; url?: string } = {}): LiveProvider {
   const subscribers = new Set<Subscription>();
   let controller: AbortController | undefined;
   let retry: ReturnType<typeof setTimeout> | undefined;
@@ -57,7 +60,7 @@ export function createProductionLiveProvider({ enabled = productionRealtimeEnabl
         throw new Error("Realtime stream unavailable.");
       }
       await readEventStream(response.body, current.signal, data => {
-        const event = decodeLiveEvent(data);
+        const event = decodeLiveEvent(data, resource);
         if (!event) return;
         attempts = 0;
         for (const subscription of [...subscribers]) {
@@ -84,7 +87,7 @@ export function createProductionLiveProvider({ enabled = productionRealtimeEnabl
   };
   return {
     subscribe(options) {
-      if (!enabled || options.channel !== "resources/translations" || options.params?.subscriptionType !== "useList") return undefined;
+      if (!enabled || options.channel !== `resources/${resource}` || options.params?.subscriptionType !== "useList") return undefined;
       subscribers.add(options);
       if (subscribers.size === 1) {
         terminal = false;
