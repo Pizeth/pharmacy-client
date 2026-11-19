@@ -60,7 +60,7 @@ const LanguageOption = styled(MenuItem, navigationSlot("RazethDrawer", "Language
 }));
 
 function LocaleFlag({ locale }: { readonly locale: keyof typeof locales }) {
-  return <FlagImage src={locales[locale].flag} alt="" width={24} height={18} loading="eager" />;
+  return <FlagImage src={(locale === "en" ? locales.en : locales.km).flag} alt="" width={24} height={18} loading="eager" />;
 }
 
 export function NavigationLanguage() {
@@ -72,11 +72,11 @@ export function NavigationLanguage() {
   return <>
     <Tooltip title={anchor ? "" : label}>
       <UtilityButton color="inherit" aria-label={label} aria-haspopup="menu"
-        aria-expanded={Boolean(anchor)} onClick={(event) => setAnchor(event.currentTarget)}>
+        aria-expanded={Boolean(anchor)} onClick={(event) => { setAnchor(event.currentTarget); }}>
         <LocaleFlag locale={locale} />
       </UtilityButton>
     </Tooltip>
-    <LanguageMenu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}
+    <LanguageMenu anchorEl={anchor} open={Boolean(anchor)} onClose={() => { setAnchor(null); }}
       slotProps={{ list: { "aria-label": label } }}>
       {(["km", "en"] as const).map((code) => (
         <LanguageOption key={code} lang={code} role="menuitemradio" aria-checked={locale === code}
@@ -84,7 +84,7 @@ export function NavigationLanguage() {
             setAnchor(null);
             i18n.changeLanguage(code).catch(() => undefined);
           }}>
-          <LocaleFlag locale={code} />{locales[code].label}
+          <LocaleFlag locale={code} />{(code === "en" ? locales.en : locales.km).label}
         </LanguageOption>
       ))}
     </LanguageMenu>
@@ -96,11 +96,11 @@ export function NavigationNotifications() {
   return <>
     <Tooltip title="Notifications">
       <UtilityButton color="inherit" aria-label="Notifications" aria-haspopup="dialog"
-        aria-expanded={Boolean(anchor)} onClick={(event) => setAnchor(event.currentTarget)}>
+        aria-expanded={Boolean(anchor)} onClick={(event) => { setAnchor(event.currentTarget); }}>
         <Notifications />
       </UtilityButton>
     </Tooltip>
-    <Popover anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}
+    <Popover anchorEl={anchor} open={Boolean(anchor)} onClose={() => { setAnchor(null); }}
       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "right" }}
       slotProps={{ paper: { role: "dialog", "aria-label": "Notifications" } }}>

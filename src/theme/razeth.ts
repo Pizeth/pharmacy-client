@@ -526,10 +526,7 @@ const standardizedFormComponents = {
         display: "grid",
         placeItems: "center",
         padding: theme.spacing(4),
-        borderRadius:
-          typeof theme.shape.borderRadius === "number"
-            ? theme.shape.borderRadius * 9
-            : `calc(${theme.shape.borderRadius} * 9)`,
+        borderRadius: typeof theme.shape.borderRadius === "number" ? theme.shape.borderRadius * 9 : "var(--app-border-radius)",
         overflow: "hidden",
       }),
 
