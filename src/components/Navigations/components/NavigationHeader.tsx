@@ -11,6 +11,8 @@ import MiniImg from "../Navigation/MiniImg";
 import NavPattern from "../Navigation/NavPattern";
 import { NavItems } from "../Navigation/NavItems";
 import type { NavigationHeaderProps } from "../types";
+import { NavigationLanguage, NavigationNotifications } from "./NavigationPreferences";
+import { useNavigationAccount } from "../UserSetting/useNavigationAccount";
 import * as S from "../styles/header.styles";
 export function NavigationHeader({
   headerRef,
@@ -21,6 +23,7 @@ export function NavigationHeader({
   disabledMenu,
   onToggle
 }: NavigationHeaderProps) {
+  const { authenticated } = useNavigationAccount();
   const particleOptions = useMemo(() => options(), []);
   return <S.AppBar ref={headerRef} position="fixed" color="primary" component="nav" enableColorOnDark data-desktop-compact={compactDesktop ? "true" : undefined} data-mobile-scrolled={mobile && scrolled ? "true" : undefined} data-socials-hidden={mobile || scrolled ? "true" : undefined}>
     <NavPattern />
@@ -39,6 +42,7 @@ export function NavigationHeader({
               <Typography variant="subtitle1">General Secretariat</Typography>
             </S.LogoCaption>
           </S.LogoSection>
+          {mobile && authenticated && <NavigationNotifications />}
           <S.MobileMenuButton color="inherit" aria-label="open drawer" aria-expanded={open} onClick={onToggle}>
             <span data-menu-glyph aria-hidden="true" />
           </S.MobileMenuButton>
@@ -50,6 +54,10 @@ export function NavigationHeader({
           <AvatarContainer neumorphic={false} softGlow><MiniImg alt="អគ្គលេខាធិការដ្ឋាន" /></AvatarContainer>
         </S.CompactLogoButton>
         <NavItems />
+        <S.DesktopUtilities>
+          <NavigationLanguage />
+          {authenticated && <NavigationNotifications />}
+        </S.DesktopUtilities>
       </S.DesktopToolbar>}
     </Container>
   </S.AppBar>;
