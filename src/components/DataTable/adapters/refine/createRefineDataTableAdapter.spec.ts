@@ -1,8 +1,8 @@
-import type { DataTableServerQueryState } from "../../mui/server-state";
+import type { DataTableServerQueryState } from "../../core/server-state";
 import {
   createDataTableServerQueryMapper,
   createDataTableTextServerFilter,
-} from "../../mui/server-query";
+} from "../../core/server-query";
 import { createRefineDataTableAdapter } from "./createRefineDataTableAdapter";
 
 type Row = {

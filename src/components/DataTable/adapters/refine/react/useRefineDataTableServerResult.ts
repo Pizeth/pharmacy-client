@@ -8,7 +8,7 @@ import type { RowData } from "@tanstack/table-core";
 
 import {
   useDataTableServerResult,
-} from "../../../mui/server-data";
+} from "../../../react/hooks/useDataTableServerResult";
 import type {
   RefineDataTableServerLifecycle,
   UseRefineDataTableServerResultOptions,

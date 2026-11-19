@@ -5,13 +5,13 @@ import type {
   LogicalFilter,
 } from "@refinedev/core";
 
-import type { DataTableServerQueryAdapter } from "../../mui/server-data";
+import type { DataTableServerQueryAdapter } from "../../core/server-data";
 import type {
   DataTableSemanticServerQueryAdapter,
   DataTableServerFilterDescriptor,
   DataTableServerSearchDescriptor,
   DataTableServerSortDescriptor,
-} from "../../mui/server-query";
+} from "../../core/server-query";
 import type {
   CreateRefineDataTableQueryAdapterOptions,
   RefineDataTableSearchFilterMapper,
