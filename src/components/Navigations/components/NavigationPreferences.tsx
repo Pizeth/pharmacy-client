@@ -67,7 +67,7 @@ export function NavigationLanguage() {
   const { i18n, t } = useTranslation();
   const label = t("navigation.language", { defaultValue: "Language" });
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
-  const locale = i18n.language === "en" ? "en" : "km";
+  const locale = i18n.language?.split("-")[0] === "en" ? "en" : "km";
 
   return <>
     <Tooltip title={anchor ? "" : label}>
@@ -92,10 +92,20 @@ export function NavigationLanguage() {
 }
 
 export function NavigationNotifications() {
+  const { i18n, t } = useTranslation();
+  const english = i18n.language?.split("-")[0] === "en";
+  const label = t("navigation.notifications", {
+    defaultValue: english ? "Notifications" : "ការជូនដំណឹង",
+  });
+  const unavailable = t("navigation.notificationsUnavailable", {
+    defaultValue: english
+      ? "The notification feed is not available yet."
+      : "បញ្ជីការជូនដំណឹងមិនទាន់អាចប្រើបានទេ។",
+  });
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   return <>
-    <Tooltip title="Notifications">
-      <UtilityButton color="inherit" aria-label="Notifications" aria-haspopup="dialog"
+    <Tooltip title={label}>
+      <UtilityButton color="inherit" aria-label={label} aria-haspopup="dialog"
         aria-expanded={Boolean(anchor)} onClick={(event) => { setAnchor(event.currentTarget); }}>
         <Notifications />
       </UtilityButton>
@@ -103,10 +113,10 @@ export function NavigationNotifications() {
     <Popover anchorEl={anchor} open={Boolean(anchor)} onClose={() => { setAnchor(null); }}
       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "right" }}
-      slotProps={{ paper: { role: "dialog", "aria-label": "Notifications" } }}>
+      slotProps={{ paper: { role: "dialog", "aria-label": label } }}>
       <NotificationContent>
-        <Typography variant="subtitle2">Notifications</Typography>
-        <Typography variant="body2" color="text.secondary">The notification feed isn’t available yet.</Typography>
+        <Typography variant="subtitle2">{label}</Typography>
+        <Typography variant="body2" color="text.secondary">{unavailable}</Typography>
       </NotificationContent>
     </Popover>
   </>;
