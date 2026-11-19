@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import SettingsIcon from "@mui/icons-material/Settings";
+import TranslateOutlined from "@mui/icons-material/TranslateOutlined";
+import { useTranslation } from "react-i18next";
 import PaletteOutlined from "@mui/icons-material/PaletteOutlined";
 import ThemeToggle from "@/components/effect/themes/themeToggle";
+import { NavigationLanguage } from "./NavigationPreferences";
 import { UserMenu } from "../UserSetting/Settings";
 import { useNavigationAccount } from "../UserSetting/useNavigationAccount";
 import * as S from "../styles/account.styles";
@@ -14,6 +17,7 @@ export function DrawerAccount() {
     authLoading,
     account
   } = useNavigationAccount();
+  const { t } = useTranslation();
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const closeMenu = () => setAnchor(null);
   return <S.Footer>
@@ -23,6 +27,7 @@ export function DrawerAccount() {
       <S.LegacyLink variant="caption">Switch now →</S.LegacyLink>
     </S.LegacyCard>
     <DrawerThemeRow><DrawerThemeLabel variant="body2"><PaletteOutlined fontSize="small" />Theme</DrawerThemeLabel><ThemeToggle /></DrawerThemeRow>
+    <DrawerThemeRow><DrawerThemeLabel variant="body2"><TranslateOutlined fontSize="small" />{t("navigation.language", { defaultValue: "Language" })}</DrawerThemeLabel><NavigationLanguage /></DrawerThemeRow>
     <AccountButton onClick={event => setAnchor(event.currentTarget)}>
       <AccountAvatar src={account?.avatar || "/static/images/otto.webp"} alt={account?.name ?? "Account"} fallback={account?.name?.charAt(0)} neumorphic />
       <S.AccountCopy>

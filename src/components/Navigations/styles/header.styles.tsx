@@ -10,6 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import { shimmerText } from "@/theme/keyframes";
 import { MOBILE_HEADER_HEIGHT, MOBILE_COMPACT_HEIGHT, DESKTOP_COMPACT_HEIGHT, HEADER_GOLD_GRADIENT } from "./constants";
+import { HEADER_ICON_GOLD, HEADER_ICON_SHADOW, HEADER_ICON_STROKE } from "./headerGlyphStyles";
 export const AppBar = styled(MuiAppBar, {
   ...navigationSlot("RazethDrawer", "AppBar"),
   shouldForwardProp: prop => prop !== "open"
@@ -204,25 +205,25 @@ export const MobileMenuButton = styled(IconButton, navigationSlot("RazethDrawer"
       backgroundColor: "transparent",
       boxShadow: "none",
       "& [data-menu-glyph]": {
-        filter: "var(--Navigation-menu-stroke) drop-shadow(2px 2px 3px rgb(0 0 0 / 40%)) drop-shadow(-1px -1px 2px rgb(255 255 255 / 30%))"
+        filter: `var(--Navigation-menu-stroke) ${HEADER_ICON_SHADOW.hover}`
       }
     },
     "&:active [data-menu-glyph]": {
-      filter: "var(--Navigation-menu-stroke) drop-shadow(-1px -1px 1px rgb(0 0 0 / 35%)) drop-shadow(1px 1px 1px rgb(255 255 255 / 25%))"
+      filter: `var(--Navigation-menu-stroke) ${HEADER_ICON_SHADOW.pressed}`
     },
     "& [data-menu-glyph]": {
-      "--Navigation-menu-stroke": `drop-shadow(-0.125px -0.125px 0 ${theme.alpha(theme.vars.palette.common.black, 0.375)}) drop-shadow(0.125px -0.125px 0 ${theme.alpha(theme.vars.palette.common.black, 0.375)}) drop-shadow(-0.125px 0.125px 0 ${theme.alpha(theme.vars.palette.common.black, 0.375)}) drop-shadow(0.125px 0.125px 0 ${theme.alpha(theme.vars.palette.common.black, 0.375)})`,
+      "--Navigation-menu-stroke": HEADER_ICON_STROKE,
       display: "block",
       width: 30,
       height: 30,
       flexShrink: 0,
-      filter: "var(--Navigation-menu-stroke) drop-shadow(1.5px 1.5px 2px rgb(0 0 0 / 35%)) drop-shadow(-1px -1px 1px rgb(255 255 255 / 25%))",
+      filter: `var(--Navigation-menu-stroke) ${HEADER_ICON_SHADOW.idle}`,
       "&::before": {
         content: '""',
         display: "block",
         width: "100%",
         height: "100%",
-        backgroundColor: "#edad54",
+        backgroundColor: HEADER_ICON_GOLD,
         mask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z'/%3E%3C/svg%3E") center / contain no-repeat`
       },
       "@media (prefers-reduced-motion: reduce)": {
@@ -283,4 +284,12 @@ export const NavMenuButton = styled(IconButton, {
     width: variant === "main" ? "6rem" : "stretch",
     flexShrink: 0
   }
+}));
+
+export const DesktopUtilities = styled(Stack, navigationSlot("RazethDrawer", "DesktopUtilities"))(({ theme }) => ({
+  flexDirection: "row",
+  alignItems: "center",
+  marginInlineStart: "auto",
+  flexShrink: 0,
+  gap: theme.spacing(0.5),
 }));
