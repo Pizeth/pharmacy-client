@@ -12,7 +12,7 @@ export const Root = styled(Box, navigationSlot("RazethNav", "Root"))(({
   flex: "1 1 auto",
   minWidth: 0,
   overflowX: "auto",
-  scrollbarWidth: "none",
+  scrollbarWidth: "thin",
   display: "flex",
   justifyContent: "left",
   alignItems: "center",

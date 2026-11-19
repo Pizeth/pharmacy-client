@@ -47,10 +47,10 @@ const FlagImage = styled(Image, navigationSlot("RazethDrawer", "LanguageFlag"))(
 
 const glassSurface = ({ theme }: { theme: Theme }) => ({
   "&& .MuiPaper-root": {
-    backgroundColor: theme.alpha((theme.vars ?? theme).palette.background.paper, 0.58),
+    backgroundColor: theme.alpha(theme.vars.palette.background.paper, 0.58),
     backgroundImage: "none",
     backdropFilter: "blur(20px) saturate(180%)",
-    border: `1px solid ${theme.alpha((theme.vars ?? theme).palette.divider, 0.15)}`,
+    border: `1px solid ${theme.alpha(theme.vars.palette.divider, 0.15)}`,
     "& .MuiMenu-list": { backgroundColor: "transparent" },
   },
 });
