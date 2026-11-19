@@ -241,14 +241,14 @@ const FooterBottom = styled(
     width: "clamp(160px, 32vw, 500px)", maxWidth: "100%",
     pointerEvents: "none", zIndex: -1, opacity: 0.2,
     backgroundColor: "#fff",
-    maskImage: 'url("/static/svg/patterns/red-pattern.svg"), linear-gradient(to right, transparent, black 75%)',
+    maskImage: 'url("/static/svg/patterns/khmer-flower-pattern.svg"), linear-gradient(to right, transparent, black 75%)',
     maskSize: "104px 104px, 100% 100%", maskRepeat: "repeat, no-repeat",
     maskPosition: "right center", maskComposite: "intersect",
   },
   ...theme.applyStyles("dark", {
     "&::after": {
       inset: "0 auto 0 0", maskPosition: "left center",
-      maskImage: 'url("/static/svg/patterns/red-pattern.svg"), linear-gradient(to left, transparent, black 75%)',
+      maskImage: 'url("/static/svg/patterns/khmer-flower-pattern.svg"), linear-gradient(to left, transparent, black 75%)',
     },
   }),
 }));

@@ -9,7 +9,10 @@ import { Box, ButtonBase, Menu, List, ListItem, ListItemButton, ListItemIcon, Li
 export const Root = styled(Box, navigationSlot("RazethNav", "Root"))(({
   theme
 }) => ({
-  flexGrow: 1,
+  flex: "1 1 auto",
+  minWidth: 0,
+  overflowX: "auto",
+  scrollbarWidth: "thin",
   display: "flex",
   justifyContent: "left",
   alignItems: "center",
@@ -90,7 +93,7 @@ export const NavItem = styled(ListItem, {
   zIndex: 1,
   display: "inline-flex",
   width: "fit-content",
-  minWidth: 64,
+  flexShrink: 0,
   margin: 0,
   padding: 0,
   listStyle: "none",
@@ -146,7 +149,7 @@ export const NavLink = styled(Link, {
     height: "100%",
     textAlign: "center",
     textDecoration: "none",
-    padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
+    padding: `${theme.spacing(1)} clamp(0.375rem, 1.1vw, 1rem)`,
     color: variant === "vertical" ? theme.vars.palette.common.white : theme.vars.palette.text.primary,
     fontSize: "1rem",
   };
@@ -180,7 +183,13 @@ export const NavText = styled(ListItemText, navigationSlot("RazethNav", "Text"))
   variant = "vertical"
 }) => ({
   letterSpacing: "0.05em",
-  "& .MuiTypography-root": { fontWeight: 500 },
+  "& .MuiTypography-root": {
+    fontWeight: 500,
+    ...(variant === "vertical" && {
+      fontSize: "clamp(0.875rem, 0.55rem + 0.65vw, 1.375rem)",
+      whiteSpace: "nowrap",
+    }),
+  },
   textTransform: "none",
   transform: "translateY(0px)",
   textAlign: variant === "vertical" ? "center" : "left"
@@ -194,12 +203,13 @@ export const NavGroupButton = styled(ButtonBase, navigationSlot("RazethNav", "Gr
   width: "100%",
   height: "100%",
   alignSelf: "stretch",
-  padding: theme.spacing(1, 2),
+  padding: `${theme.spacing(1)} clamp(0.375rem, 1.1vw, 1rem)`,
   color: theme.vars.palette.common.white,
 }));
 export const DrawerRoot = styled(Root, navigationSlot("RazethNav", "DrawerRoot"))({
   width: "100%",
-  alignItems: "flex-start"
+  alignItems: "flex-start",
+  overflow: "visible",
 });
 export const DrawerList = styled(List, navigationSlot("RazethNav", "DrawerList"))({
   width: "100%",

@@ -28,6 +28,6 @@ const Root = styled(ResourceActionButton, {
   };
 });
 /** Universal table Create command. Dialogs and dedicated routes share its action. */
-export function ResourceTableCreateButton(props: Omit<ResourceActionButtonProps, "variant">) {
-  return <Root startIcon={<AddRounded />} {...props} variant="contained" />;
+export function ResourceTableCreateButton(props: Omit<ResourceActionButtonProps, "variant" | "color">) {
+  return <Root startIcon={<AddRounded />} {...props} color="primary" variant="contained" />;
 }

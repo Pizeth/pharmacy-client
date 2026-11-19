@@ -70,7 +70,7 @@ export function SocialProviderPage() {
         refreshing={providers.isFetching && !providers.isLoading}
         rowPinning={{ displayMode: "select-sticky" }}
         selectionBar={{ clearable: true, actions: selectionActions }}
-        toolbar={{ searchPlaceholder: "Search social providers…", startContent: <S.Actions><ResourceTableCreateButton color="error" startIcon={<AddRounded />} onClick={() => setEditor({ mode: "create" })}>Create provider</ResourceTableCreateButton></S.Actions> }}
+        toolbar={{ searchPlaceholder: "Search social providers…", startContent: <S.Actions><ResourceTableCreateButton startIcon={<AddRounded />} onClick={() => { setEditor({ mode: "create" }); }}>Create provider</ResourceTableCreateButton></S.Actions> }}
         renderDetailPanel={({ row }) => <SocialProviderDetail record={row.original} />}
       />}
       {editor && <SocialProviderDialog key={`${editor.mode}-${editor.record?.id ?? "new"}`} {...editor} onClose={() => setEditor(null)} onSuccess={record => {

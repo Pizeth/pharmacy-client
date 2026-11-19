@@ -912,7 +912,7 @@ export default function DocumentTableOld() {
             p: (theme) => theme.spacing(1),
           }}
         >
-          <ResourceTableCreateButton startIcon={<Add />} size="large" color="error" type="button" onClick={handleDialogForm}>
+          <ResourceTableCreateButton startIcon={<Add />} size="large" type="button" onClick={handleDialogForm}>
             បញ្ចូលឯកសារថ្មី
           </ResourceTableCreateButton>
         </Box>
