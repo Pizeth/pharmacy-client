@@ -572,7 +572,6 @@ export function TranslationKeyTable(props: TranslationKeyTableProps = {}) {
             // ),
             startContent: (
               <ResourceTableCreateButton
-                color="error"
                 startIcon={<AddRounded />}
                 onClick={() => {
                   setCreateOpen(true);

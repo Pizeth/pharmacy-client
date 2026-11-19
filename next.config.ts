@@ -1,5 +1,6 @@
 import "./src/configs/envConfig";
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs/config";
 
 const nextConfig: NextConfig = {
   distDir: process.env.DATATABLE_LOCAL_PROFILE === "browser" || process.env.DATATABLE_LOCAL_PROFILE === "react"
@@ -108,4 +109,13 @@ const nextConfig: NextConfig = {
 
 // module.exports = nextConfig;
 
-export default nextConfig;
+const { SENTRY_ORG, SENTRY_PROJECT, SENTRY_AUTH_TOKEN } = process.env;
+
+export default withSentryConfig(nextConfig, {
+  org: SENTRY_ORG,
+  project: SENTRY_PROJECT,
+  authToken: SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  telemetry: false,
+  sourcemaps: { disable: !(SENTRY_ORG && SENTRY_PROJECT && SENTRY_AUTH_TOKEN) },
+});

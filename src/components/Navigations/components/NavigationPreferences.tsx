@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import Notifications from "@mui/icons-material/Notifications";
 import { IconButton, Menu, MenuItem, Popover, Tooltip, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, type Theme } from "@mui/material/styles";
 import { HEADER_ICON_GOLD, HEADER_ICON_SHADOW, HEADER_ICON_STROKE } from "../styles/headerGlyphStyles";
 import { navigationSlot } from "../styles/slots";
 
@@ -45,14 +45,18 @@ const FlagImage = styled(Image, navigationSlot("RazethDrawer", "LanguageFlag"))(
   flexShrink: 0,
 });
 
-const LanguageMenu = styled(Menu, navigationSlot("RazethDrawer", "LanguageMenu"))(({ theme }) => ({
-  "& .MuiMenu-paper": {
-    backgroundColor: theme.alpha(theme.vars.palette.background.paper, 0.7),
+const glassSurface = ({ theme }: { theme: Theme }) => ({
+  "&& .MuiPaper-root": {
+    backgroundColor: theme.alpha((theme.vars ?? theme).palette.background.paper, 0.58),
     backgroundImage: "none",
     backdropFilter: "blur(20px) saturate(180%)",
-    border: `1px solid ${theme.alpha(theme.vars.palette.divider, 0.1)}`,
+    border: `1px solid ${theme.alpha((theme.vars ?? theme).palette.divider, 0.15)}`,
+    "& .MuiMenu-list": { backgroundColor: "transparent" },
   },
-}));
+});
+
+const LanguageMenu = styled(Menu, navigationSlot("RazethDrawer", "LanguageMenu"))(glassSurface);
+const NotificationPopover = styled(Popover, navigationSlot("RazethDrawer", "NotificationPopover"))(glassSurface);
 
 const LanguageOption = styled(MenuItem, navigationSlot("RazethDrawer", "LanguageOption"))(({ theme }) => ({
   gap: theme.spacing(1.25),
@@ -114,7 +118,7 @@ export function NavigationNotifications() {
         <Notifications />
       </UtilityButton>
     </Tooltip>
-    <Popover anchorEl={anchor} open={Boolean(anchor)} onClose={() => { setAnchor(null); }}
+    <NotificationPopover anchorEl={anchor} open={Boolean(anchor)} onClose={() => { setAnchor(null); }}
       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "right" }}
       slotProps={{ paper: { role: "dialog", "aria-label": label } }}>
@@ -122,6 +126,6 @@ export function NavigationNotifications() {
         <Typography variant="subtitle2">{label}</Typography>
         <Typography variant="body2" color="text.secondary">{unavailable}</Typography>
       </NotificationContent>
-    </Popover>
+    </NotificationPopover>
   </>;
 }
