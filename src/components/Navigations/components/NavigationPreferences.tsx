@@ -67,7 +67,7 @@ export function NavigationLanguage() {
   const { i18n, t } = useTranslation();
   const label = t("navigation.language", { defaultValue: "Language" });
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
-  const locale = i18n.language?.split("-")[0] === "en" ? "en" : "km";
+  const locale = i18n.language.split("-")[0] === "en" ? "en" : "km";
 
   return <>
     <Tooltip title={anchor ? "" : label}>
@@ -93,7 +93,7 @@ export function NavigationLanguage() {
 
 export function NavigationNotifications() {
   const { i18n, t } = useTranslation();
-  const english = i18n.language?.split("-")[0] === "en";
+  const english = i18n.language.split("-")[0] === "en";
   const label = t("navigation.notifications", {
     defaultValue: english ? "Notifications" : "ការជូនដំណឹង",
   });
