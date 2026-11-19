@@ -32,6 +32,7 @@ import {
   type TrackedDocument,
 } from "./contracts";
 import { trackingApi } from "./api";
+import { useDocumentTrackingRealtime } from "./useDocumentTrackingRealtime";
 import { DocumentDetail } from "./DocumentDetail";
 import { DocumentStatus, formatTrackingDate } from "./DocumentProgress";
 import { TrackingEditor, type TrackingEditorState } from "./TrackingEditor";
@@ -44,6 +45,7 @@ export function TrackingPage() {
     queryKey: ["document-tracking", "metadata"],
     queryFn: ({ signal }) => trackingApi.metadata(signal),
   });
+  useDocumentTrackingRealtime(metadata.isSuccess);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<ColumnFiltersState>([]);

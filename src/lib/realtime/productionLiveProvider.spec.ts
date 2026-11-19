@@ -112,3 +112,25 @@ it("isolates throwing subscribers without dropping delivery or reconnecting the 
   provider.unsubscribe(first); provider.unsubscribe(second);
   await flush();
 });
+
+it("delivers only ID-free document invalidations to document subscribers", async () => {
+  const event = { ...wire, resource: "tracked-documents", type: "invalidate", recordId: undefined };
+  const frames = [wire, { ...event, recordId: "12" }, { ...event, type: "updated" }, event]
+    .map((entry) => `data: ${JSON.stringify(entry)}\n\n`).join("");
+  const fetcher = jest.fn().mockResolvedValue(response(stream(frames)));
+  const provider = createProductionLiveProvider({ enabled: true, resource: "tracked-documents", fetcher });
+  const listener = { ...subscription(), channel: "resources/tracked-documents" };
+  const handle = provider.subscribe(listener);
+  try {
+    await flush();
+    expect(listener.callback).toHaveBeenCalledTimes(1);
+    expect(listener.callback).toHaveBeenCalledWith(expect.objectContaining({
+      channel: "resources/tracked-documents",
+      type: "invalidate",
+      payload: { eventId: wire.eventId },
+    }));
+    expect(fetcher.mock.calls[0][0]).toMatch(/\/live\/tracked-documents$/);
+  } finally {
+    provider.unsubscribe(handle);
+  }
+});
