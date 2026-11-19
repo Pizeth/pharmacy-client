@@ -102,3 +102,16 @@ selection. Use the shared DataTable overflow menu for the selection gate.
 Admin tables use `resourceRecordMenuActions` for dedicated edit and delete or
 archive pages and detail-page printing. Pass resource permission guards and
 use the shared A4 detail layout rather than a separate row printout.
+
+## Browser testing and web configuration
+
+Use the Codex built-in in-app browser for visual testing, signed-in checks,
+and authorized web configuration. Keep browser work in the background unless
+the user asks to watch it. Reuse existing in-app tabs and sessions.
+Do not open or control the user's Google Chrome, Edge, or other external
+browser, or request whole-screen access, unless the user explicitly asks.
+When sign-in is needed, open the relevant page in the built-in browser and
+ask the user to sign in there. Resume verification after sign-in.
+If the built-in browser tools are unavailable, continue terminal and automated
+checks and report the specific visual verification that remains pending.
+Do not substitute an external browser automatically.

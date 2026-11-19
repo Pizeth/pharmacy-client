@@ -92,7 +92,7 @@ export const CardShape = styled("span", hrdSlot("ContactCardShape"))(({ theme })
   "&::after": {
     content: '""', position: "absolute", inset: 14, borderRadius: 12,
     backgroundColor: "#fff",
-    maskImage: 'url("/static/svg/patterns/red-pattern.svg")', maskSize: "104px 104px", maskRepeat: "repeat",
+    maskImage: 'url("/static/svg/patterns/khmer-flower-pattern.svg")', maskSize: "104px 104px", maskRepeat: "repeat",
     opacity: 0.32,
   },
   "&:nth-child(2)": { right: "auto", left: "-18%", bottom: "-69%", width: "54%" },
