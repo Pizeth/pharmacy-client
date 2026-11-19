@@ -349,6 +349,20 @@ const standardizedFormComponents = {
     },
   },
 
+  RazethTableCreateButton: {
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        "&&:not(.Mui-disabled)": {
+          // Keep white text readable through the lightest part of the gradient.
+          backgroundColor: `color-mix(in srgb, ${theme.vars.palette.primary.main} 76%, black)`,
+          "&:hover, &:focus-visible, &:active": {
+            backgroundColor: `color-mix(in srgb, ${theme.vars.palette.primary.main} 68%, black)`,
+          },
+        },
+      }),
+    },
+  },
+
   /**
    * ================================================================
    * DataTable leaf filter presentation
