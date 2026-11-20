@@ -1,8 +1,8 @@
 # TanStack v9 + MUI DataTable roadmap
 
-## November 18 acceptance update
+## November 20 acceptance update
 
-The merged TranslationKey row-windowing pilot is in browser acceptance. Client PR #66 and API PR #20 have also merged Document Tracking realtime. Authorization and cross-session acceptance remain pending. See the [current acceptance inventory](datatable-next-acceptance-2026-11-17.md).
+The TranslationKey row-windowing pilot passed representative fixture browser checks. The signed-in application route still needs the larger-dataset windowing matrix before wider rollout. TranslationKey realtime passed a disposable two-session browser round trip. Document Tracking realtime passed a disposable authenticated HTTP handoff and permission-aware refetch. Its application-route browser round trip and hosted realtime acceptance for both resources remain open. See the [current acceptance inventory](datatable-next-acceptance-2026-11-17.md).
 
 ## 2.0.6–2.0.7 — production realtime continuation
 

@@ -207,3 +207,30 @@ At 200×16 the corrected ordinary production run measured the following medians 
 
 Single-row selection mounted all 200 rows in every mode. Page selection left both windowed modes at 15 mounted rows. These results account for the real selection fallback that the earlier state-only timing did not invoke. The fixture dialog uses the dialog component's normal focus management.
 Both corrected production builds passed all 15 cases, recording 600 samples each. TypeScript and static generation also passed.
+
+## November 20 release acceptance handoff
+
+- TranslationKey realtime has a local, disposable, authenticated browser round trip. Hosted R01–R10 remains open.
+- Document Tracking has a local, disposable, authenticated HTTP handoff and permission-aware refetch. The application list/detail browser round trip and hosted streaming checks remain open.
+- The signed-in `/admin/i18n` check after client PR #69 covered navigation and popovers at tablet widths. The real-route windowing matrix still needs disposable datasets of at least 26, 100 and 200 rows, plus responsive layout, keyboard, sticky selection, resize and refetch coverage.
+- Confirm the hosted client and API target, migrated disposable database, and two independently authenticated test accounts before running mutation cases. Record the topology and any cases that do not apply, such as cross-replica delivery on a single-replica target.
+- Keep the windowing pilot limited to TranslationKey until the real-route checks pass. The matched benchmark documents the current sticky-selection fallback cost.
+
+### November 20 preflight results
+
+- Production API liveness and readiness returned HTTP 200. Anonymous requests to `/api/v1/live/translations` and `/api/v1/live/tracked-documents` returned HTTP 401. Signed-in streaming through the hosted proxy remains unverified.
+- The authenticated HTTP harness passed against the Infisical disposable database using two real cookie sessions. Mutation/refetch, shared event identities, rejected actors and origins, permission revocation, disabled-account shutdown and reconnect passed. Fixture cleanup preserved existing records and grants.
+- The in-app browser was unavailable to this chat. Signed-in hosted streaming and the real-route windowing matrix remain pending.
+
+### Signed-in application route follow-up
+
+- The built-in browser recovered and opened `/admin/i18n` with an existing signed-in session. The route had 30 records. Document scroll widths were 405, 885 and 1265 px at viewports of 420, 900 and 1280 px, respectively, with no document-level horizontal overflow. The Create target measured 44 px at the narrow width.
+- Choosing the 50-row page size showed all 30 records in the pager with 13 table body rows mounted in the initial viewport. Switching to cards and back worked. The original 25-row setting and viewport were restored.
+- Intermittent browser command timeouts prevented a reliable keyboard/selection result. The 100- and 200-record datasets, signed-in hosted streaming, and Document Tracking application-route browser round trip remain open.
+
+### Keyboard and Document Tracking follow-up
+
+- Space selected and cleared a focused row checkbox. The selection count and row action availability followed the selection. ArrowRight resized the Key column from 240 to 248 px, and ArrowLeft restored it to 240 px.
+- The signed-in Documents application list completed loading and displayed its empty state. No detail record was available for this session.
+- The Infisical disposable harness passed again with `REALTIME_TEST_DOCUMENT_HANDOFF=true`. Both authenticated document streams invalidated on reassignment, the previous assignee lost access, and the new assignee could refetch the record. Fixture cleanup passed.
+- Hosted signed-in streaming and the larger disposable application-route datasets remain open. The production smoke checks used read-only requests.
