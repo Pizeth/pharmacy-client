@@ -234,3 +234,8 @@ Both corrected production builds passed all 15 cases, recording 600 samples each
 - The signed-in Documents application list completed loading and displayed its empty state. No detail record was available for this session.
 - The Infisical disposable harness passed again with `REALTIME_TEST_DOCUMENT_HANDOFF=true`. Both authenticated document streams invalidated on reassignment, the previous assignee lost access, and the new assignee could refetch the record. Fixture cleanup passed.
 - Hosted signed-in streaming and the larger disposable application-route datasets remain open. The production smoke checks used read-only requests.
+
+### Built-in browser disposable round trip
+
+- The existing Infisical browser harness ran on two loopback origins with independent authenticated sessions. Each session edited the disposable TranslationKey and the other session rendered the new description without reloading. Session A retained its selected row across the incoming update.
+- The harness also passed the authenticated Document Tracking reassignment check and exited successfully after fixture cleanup. The Document Tracking check used HTTP streams. The full application-route browser and hosted acceptance matrices remain open.
