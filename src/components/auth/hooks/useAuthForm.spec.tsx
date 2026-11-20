@@ -33,20 +33,20 @@ it("sends the CAPTCHA with login and clears expired tokens", () => {
   const {result} = renderHook(() => useAuthForm("signin","/forgot-password"));
   act(() => result.current.setCaptchaToken("test-token"));
   const submit = result.current.onSubmit;
-  act(() => result.current.onSubmit({identifier:"test@example.com",password:"test-only"}));
+  void act(() => { result.current.onSubmit({identifier:"test@example.com",password:"test-only"}); });
   expect(mockBegin).toHaveBeenCalledTimes(1);
   expect(mockLogin.mock.calls[0][0]).toEqual({identifier:"test@example.com",password:"test-only",captchaToken:"test-token"});
   act(() => result.current.handleCaptchaExpire());
-  act(() => submit({identifier:"test@example.com",password:"test-only"}));
+  void act(() => { submit({identifier:"test@example.com",password:"test-only"}); });
   expect(mockLogin).toHaveBeenCalledTimes(1);
-  act(() => mockLogin.mock.calls[0][1].onSettled());
+  void act(() => { mockLogin.mock.calls[0][1].onSettled(); });
   expect(result.current.captchaAttempt).toBe(1);
 });
 
 it("preserves email activation and mutation failure feedback", () => {
   const {result} = renderHook(() => useAuthForm("signin","/forgot-password"));
   act(() => result.current.setCaptchaToken("test-token"));
-  act(() => result.current.onSubmit({identifier:"test+auth@example.com",password:"test-only"}));
+  void act(() => { result.current.onSubmit({identifier:"test+auth@example.com",password:"test-only"}); });
   const callbacks=mockLogin.mock.calls[0][1];
   act(() => callbacks.onSuccess({success:false,error:{name:"EMAIL_NOT_VERIFIED"}}));
   expect(mockReplace).toHaveBeenCalledWith("/activate?email=test%2Bauth%40example.com");
@@ -57,10 +57,10 @@ it("preserves email activation and mutation failure feedback", () => {
 it("registers without accidentally logging in and preserves async validation", () => {
   const {result} = renderHook(() => useAuthForm("signup","/forgot-password"));
   const values={name:"Test User",username:"test-user",email:"test@example.com",password:"test-only",confirmPassword:"test-only"};
-  act(() => result.current.onSubmit(values));
+  void act(() => { result.current.onSubmit(values); });
   expect(mockRegister).not.toHaveBeenCalled();
   act(() => result.current.setCaptchaToken("test-token"));
-  act(() => result.current.onSubmit(values));
+  void act(() => { result.current.onSubmit(values); });
   expect(mockRegister.mock.calls[0][0]).toEqual({...values,captchaToken:"test-token"});
   expect(mockLogin).not.toHaveBeenCalled();
   expect(mockResolver).toHaveBeenLastCalledWith(expect.anything(),{email:mockEmail,username:mockUsername,password:mockStrength});

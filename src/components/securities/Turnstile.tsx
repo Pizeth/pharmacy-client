@@ -10,7 +10,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 declare global {
   interface Window {
-    turnstile: {
+    turnstile?: {
       render: (container: string | HTMLElement, options: object) => string;
       reset: (widgetId: string) => void;
       remove: (widgetId: string) => void;

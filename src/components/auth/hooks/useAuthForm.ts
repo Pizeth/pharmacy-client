@@ -65,7 +65,9 @@ export function useAuthForm(mode: AuthAction, forgotPasswordUrl: string) {
     const captchaToken = captchaTokenRef.current;
     if (!captchaToken || isPending || isRegisterPending) return;
     setCaptchaToken(null);
-    const onSettled = () => setCaptchaAttempt((attempt) => attempt + 1);
+    const onSettled = () => {
+      setCaptchaAttempt((attempt) => attempt + 1);
+    };
     if(isLogin) {
       beginLoginAttempt();
       login({ ...values, captchaToken }, {
