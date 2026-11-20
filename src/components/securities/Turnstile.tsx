@@ -128,6 +128,9 @@ export const Turnstile = ({
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
       sitekey: siteKey,
       action: "auth_form",
+      "refresh-expired": "auto",
+      "refresh-timeout": "auto",
+      retry: "auto",
       theme: resolvedTheme, // 👈 Dynamically forces dark styling to remove bright borders
       size: "flexible",
       callback: (token: string) => {
@@ -151,11 +154,12 @@ export const Turnstile = ({
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
+    const hasSiteKey = siteKey.trim().length > 0;
 
-    if (siteKey && window.turnstile) {
+    if (hasSiteKey && window.turnstile) {
       // Script already loaded — render immediately
       renderWidget();
-    } else if (siteKey) {
+    } else if (hasSiteKey) {
       // 👇 Poll until turnstile is available (handles lazyOnload timing)
       interval = setInterval(() => {
         if (window.turnstile) {

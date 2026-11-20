@@ -20,10 +20,11 @@ const AuthForm = (inProps: AuthFormProps) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { mode = "signin", redirectTo: _redirectTo, className, sx, forgotPassword = "Forgot your password?", forgotPasswordUrl = "/forgot-password", termsUrl: _termsUrl = "/terms", privacyUrl: _privacyUrl = "/privacy", children, ...rest } = props;
   const { form, isLogin, isSubmitting, isReady, handleSubmit, onSubmit, handleForgotPassword, captchaAttempt, setCaptchaToken, handleCaptchaExpire } = useAuthForm(mode, forgotPasswordUrl);
+  const challenge = <Turnstile key={`${mode}-${captchaAttempt}`} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""} onSuccess={setCaptchaToken} onExpire={handleCaptchaExpire} onError={handleCaptchaExpire} />;
   return (<FormProvider {...form}>
     <Root key={mode} onSubmit={handleSubmit(onSubmit)} className={className} sx={sx} {...rest}>
       <CardContent>
-        {children || (<AuthForm.content>
+        {children ? <>{children}{challenge}</> : (<AuthForm.content>
           {isLogin ? (<>
             <TextField name="identifier" label="Username or Email" required iconStart={<Person />} rules={{ required: "Username or Email is required" }} fullWidth />
             <AuthForm.password>
@@ -38,7 +39,7 @@ const AuthForm = (inProps: AuthFormProps) => {
               {forgotPassword}
             </Link>
           </AuthForm.footer>)}
-          <Turnstile key={`${mode}-${captchaAttempt}`} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""} onSuccess={setCaptchaToken} onExpire={handleCaptchaExpire} onError={handleCaptchaExpire} />
+          {challenge}
           <ValidatedButton loading={isSubmitting} authType={isLogin ? "signin" : "signup"} disabled={!isReady} />
         </AuthForm.content>)}
       </CardContent>
