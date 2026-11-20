@@ -56,7 +56,7 @@ export function useAuthForm(mode: AuthAction, forgotPasswordUrl: string) {
     captchaToken?: string | null;
   }>();
   const { handleSubmit } = form;
-  const onSubmit = async (values: LoginValues | RegisterValues) => {
+  const onSubmit = (values: LoginValues | RegisterValues) => {
     if (!captchaToken || isPending || isRegisterPending) return;
     setCaptchaToken(null);
     const onSettled = () => setCaptchaAttempt((attempt) => attempt + 1);

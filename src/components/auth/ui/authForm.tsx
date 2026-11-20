@@ -38,7 +38,7 @@ const AuthForm = (inProps: AuthFormProps) => {
               {forgotPassword}
             </Link>
           </AuthForm.footer>)}
-          <Turnstile key={`${mode}-${captchaAttempt}`} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} onSuccess={setCaptchaToken} onExpire={handleCaptchaExpire} onError={handleCaptchaExpire} />
+          <Turnstile key={`${mode}-${captchaAttempt}`} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""} onSuccess={setCaptchaToken} onExpire={handleCaptchaExpire} onError={handleCaptchaExpire} />
           <ValidatedButton loading={isSubmitting} authType={isLogin ? "signin" : "signup"} disabled={!isReady} />
         </AuthForm.content>)}
       </CardContent>

@@ -150,13 +150,12 @@ export const Turnstile = ({
   }, [siteKey, resolvedTheme, onSuccess, onExpire, onError]);
 
   useEffect(() => {
-    if (!containerRef.current) return;
     let interval: ReturnType<typeof setInterval> | undefined;
 
-    if (window.turnstile) {
+    if (siteKey && window.turnstile) {
       // Script already loaded — render immediately
       renderWidget();
-    } else {
+    } else if (siteKey) {
       // 👇 Poll until turnstile is available (handles lazyOnload timing)
       interval = setInterval(() => {
         if (window.turnstile) {
@@ -177,7 +176,7 @@ export const Turnstile = ({
         widgetIdRef.current = null;
       }
     };
-  }, [renderWidget, onExpire]);
+  }, [renderWidget, onExpire, siteKey]);
 
   // useEffect(() => {
   //   if (!containerRef.current) return;
