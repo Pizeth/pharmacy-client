@@ -243,3 +243,9 @@ Both corrected production builds passed all 15 cases, recording 600 samples each
 
 - The existing Infisical browser harness ran on two loopback origins with independent authenticated sessions. Each session edited the disposable TranslationKey and the other session rendered the new description without reloading. Session A retained its selected row across the incoming update.
 - The harness also passed the authenticated Document Tracking reassignment check and exited successfully after fixture cleanup. The Document Tracking check used HTTP streams. The full application-route browser and hosted acceptance matrices remain open.
+
+## November 21 acceptance update
+
+- The signed-in local `/admin/i18n` application route used the Infisical disposable database, the full API, and a synthetic user with a linked profile. With 200 records in the database, the 100- and 200-row page sizes each initially mounted 12 table rows at the default viewport. At widths of 420, 900, and 1280 px, document scroll widths were 405, 885, and 1265 px. Fixture cleanup passed.
+- The latest production client and API passed a signed-in TranslationKey list smoke check after the Turnstile rollout. The production route showed 30 records.
+- Production API Infisical has `REALTIME_ENABLED` enabled and a dedicated listener URL configured. The Vercel project environment inventory did not list `NEXT_PUBLIC_REALTIME_ENABLED`. These are configuration observations. Hosted signed-in stream delivery, proxy behavior, and rollout acceptance still need direct evidence.
