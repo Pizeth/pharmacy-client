@@ -51,41 +51,10 @@ export const authProvider: AuthProvider = {
      */
     const redirectTo = getBrowserAuthRedirectTarget(LANDING_PAGE);
 
-    // Try username first, fall back to email
-    let result: SignInResult = await authClient.signIn.username({
-      username: identifier,
-      password,
-      fetchOptions: { headers },
-      /**
-       * A URL to redirect to after the user verifies their email (optional)
-       */
-      callbackURL: redirectTo,
-      // callbackURL: getCallbackUrl(LANDING_PAGE),
-      /**
-       * remember the user session after the browser is closed.
-       * @default true
-       */
-      rememberMe: false,
-    });
-
-    if (result.error?.status === 422 || result.error?.status === 404) {
-      // Not a valid username — try as email
-      result = await authClient.signIn.email({
-        email: identifier,
-        password,
-        fetchOptions: { headers },
-        /**
-         * A URL to redirect to after the user verifies their email (optional)
-         */
-        // callbackURL: getCallbackUrl(LANDING_PAGE),
-        callbackURL: redirectTo,
-        /**
-         * remember the user session after the browser is closed.
-         * @default true
-         */
-        rememberMe: false,
-      });
-    }
+    const credentials = { password, fetchOptions: { headers }, callbackURL: redirectTo, rememberMe: false };
+    const result: SignInResult = identifier.includes("@")
+      ? await authClient.signIn.email({ ...credentials, email: identifier })
+      : await authClient.signIn.username({ ...credentials, username: identifier });
 
     const { data, error } = result;
 
