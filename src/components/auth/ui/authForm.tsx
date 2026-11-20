@@ -19,7 +19,7 @@ const AuthForm = (inProps: AuthFormProps) => {
   // Consume legacy public options without leaking them onto the form element.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { mode = "signin", redirectTo: _redirectTo, className, sx, forgotPassword = "Forgot your password?", forgotPasswordUrl = "/forgot-password", termsUrl: _termsUrl = "/terms", privacyUrl: _privacyUrl = "/privacy", children, ...rest } = props;
-  const { form, isLogin, isSubmitting, isReady, handleSubmit, onSubmit, handleForgotPassword, setCaptchaToken, handleCaptchaExpire } = useAuthForm(mode, forgotPasswordUrl);
+  const { form, isLogin, isSubmitting, isReady, handleSubmit, onSubmit, handleForgotPassword, captchaAttempt, setCaptchaToken, handleCaptchaExpire } = useAuthForm(mode, forgotPasswordUrl);
   return (<FormProvider {...form}>
     <Root key={mode} onSubmit={handleSubmit(onSubmit)} className={className} sx={sx} {...rest}>
       <CardContent>
@@ -38,7 +38,7 @@ const AuthForm = (inProps: AuthFormProps) => {
               {forgotPassword}
             </Link>
           </AuthForm.footer>)}
-          <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} onSuccess={setCaptchaToken} onExpire={handleCaptchaExpire} />
+          <Turnstile key={`${mode}-${captchaAttempt}`} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} onSuccess={setCaptchaToken} onExpire={handleCaptchaExpire} onError={handleCaptchaExpire} />
           <ValidatedButton loading={isSubmitting} authType={isLogin ? "signin" : "signup"} disabled={!isReady} />
         </AuthForm.content>)}
       </CardContent>

@@ -26,6 +26,7 @@ export function useAuthForm(mode: AuthAction, forgotPasswordUrl: string) {
   const resetAllValidations = useSetAtom(resetAllValidationsAtom);
   const router = useRouter();
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaAttempt, setCaptchaAttempt] = useState(0);
   const handleCaptchaExpire = useCallback(() => {
     setCaptchaToken(null);
   }, []);
@@ -56,6 +57,9 @@ export function useAuthForm(mode: AuthAction, forgotPasswordUrl: string) {
   }>();
   const { handleSubmit } = form;
   const onSubmit = async (values: LoginValues | RegisterValues) => {
+    if (!captchaToken || isPending || isRegisterPending) return;
+    setCaptchaToken(null);
+    const onSettled = () => setCaptchaAttempt((attempt) => attempt + 1);
     if(isLogin) {
       beginLoginAttempt();
       login({ ...values, captchaToken }, {
@@ -70,10 +74,12 @@ export function useAuthForm(mode: AuthAction, forgotPasswordUrl: string) {
           }
         },
         onError: () => reportLoginFailure(),
+        onSettled,
       });
     }
     else {
       register({ ...(values as RegisterValues), captchaToken }, {
+        onSettled,
         onSuccess: (data) => {
           if(!data.success) {
             console.error("Registration failed:", data.error);
@@ -87,6 +93,6 @@ export function useAuthForm(mode: AuthAction, forgotPasswordUrl: string) {
     window.location.href = forgotPasswordUrl;
   }, [forgotPasswordUrl]);
   const isSubmitting = isPending || isRegisterPending;
-  const isReady = form.formState.isValid && !form.formState.isValidating && !isSubmitting;
-  return { form, isLogin, isSubmitting, isReady, handleSubmit, onSubmit, handleForgotPassword, setCaptchaToken, handleCaptchaExpire };
+  const isReady = Boolean(captchaToken) && form.formState.isValid && !form.formState.isValidating && !isSubmitting;
+  return { form, isLogin, isSubmitting, isReady, handleSubmit, onSubmit, handleForgotPassword, captchaAttempt, setCaptchaToken, handleCaptchaExpire };
 }
