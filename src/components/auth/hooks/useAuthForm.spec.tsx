@@ -32,11 +32,12 @@ beforeEach(() => {jest.clearAllMocks(); mockPending=false;});
 it("sends the CAPTCHA with login and clears expired tokens", () => {
   const {result} = renderHook(() => useAuthForm("signin","/forgot-password"));
   act(() => result.current.setCaptchaToken("test-token"));
+  const submit = result.current.onSubmit;
   act(() => result.current.onSubmit({identifier:"test@example.com",password:"test-only"}));
   expect(mockBegin).toHaveBeenCalledTimes(1);
   expect(mockLogin.mock.calls[0][0]).toEqual({identifier:"test@example.com",password:"test-only",captchaToken:"test-token"});
   act(() => result.current.handleCaptchaExpire());
-  act(() => result.current.onSubmit({identifier:"test@example.com",password:"test-only"}));
+  act(() => submit({identifier:"test@example.com",password:"test-only"}));
   expect(mockLogin).toHaveBeenCalledTimes(1);
   act(() => mockLogin.mock.calls[0][1].onSettled());
   expect(result.current.captchaAttempt).toBe(1);

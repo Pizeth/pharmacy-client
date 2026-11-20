@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLogin, useRegister, type RefineError } from "@refinedev/core";
 import { useRouter } from "next/navigation";
@@ -25,11 +25,16 @@ export function useAuthForm(mode: AuthAction, forgotPasswordUrl: string) {
   const isLogin = mode === "signin";
   const resetAllValidations = useSetAtom(resetAllValidationsAtom);
   const router = useRouter();
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaTokenRef = useRef<string | null>(null);
+  const [hasCaptchaToken, setHasCaptchaToken] = useState(false);
   const [captchaAttempt, setCaptchaAttempt] = useState(0);
+  const setCaptchaToken = useCallback((token: string | null) => {
+    captchaTokenRef.current = token;
+    setHasCaptchaToken(Boolean(token));
+  }, []);
   const handleCaptchaExpire = useCallback(() => {
     setCaptchaToken(null);
-  }, []);
+  }, [setCaptchaToken]);
   const { validate: emailValidate } = useAsyncFieldRule("email");
   const { validate: usernameValidate } = useAsyncFieldRule("username");
   const { validate: strengthRule } = usePasswordValidation("password");
@@ -57,6 +62,7 @@ export function useAuthForm(mode: AuthAction, forgotPasswordUrl: string) {
   }>();
   const { handleSubmit } = form;
   const onSubmit = (values: LoginValues | RegisterValues) => {
+    const captchaToken = captchaTokenRef.current;
     if (!captchaToken || isPending || isRegisterPending) return;
     setCaptchaToken(null);
     const onSettled = () => setCaptchaAttempt((attempt) => attempt + 1);
@@ -93,6 +99,6 @@ export function useAuthForm(mode: AuthAction, forgotPasswordUrl: string) {
     window.location.href = forgotPasswordUrl;
   }, [forgotPasswordUrl]);
   const isSubmitting = isPending || isRegisterPending;
-  const isReady = Boolean(captchaToken) && form.formState.isValid && !form.formState.isValidating && !isSubmitting;
+  const isReady = hasCaptchaToken && form.formState.isValid && !form.formState.isValidating && !isSubmitting;
   return { form, isLogin, isSubmitting, isReady, handleSubmit, onSubmit, handleForgotPassword, captchaAttempt, setCaptchaToken, handleCaptchaExpire };
 }
