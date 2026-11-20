@@ -10,7 +10,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 declare global {
   interface Window {
-    turnstile: {
+    turnstile?: {
       render: (container: string | HTMLElement, options: object) => string;
       reset: (widgetId: string) => void;
       remove: (widgetId: string) => void;
@@ -108,9 +108,7 @@ export const Turnstile = ({
   const [status, setStatus] = useState<Status>("loading");
 
   // 👇 Read MUI color scheme — works with both light and dark
-  const { mode, systemMode } = useColorScheme();
-  const resolvedMode = mode === "system" ? systemMode : mode;
-  const turnstileTheme = resolvedMode === "dark" ? "dark" : "light";
+  const { mode } = useColorScheme();
   // Map Material-UI mode values to Cloudflare theme specs ("light", "dark", or "auto")
   const resolvedTheme = mode === "dark" || mode === "light" ? mode : "auto";
 
@@ -129,6 +127,10 @@ export const Turnstile = ({
 
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
       sitekey: siteKey,
+      action: "auth_form",
+      "refresh-expired": "auto",
+      "refresh-timeout": "auto",
+      retry: "auto",
       theme: resolvedTheme, // 👈 Dynamically forces dark styling to remove bright borders
       size: "flexible",
       callback: (token: string) => {
@@ -148,27 +150,29 @@ export const Turnstile = ({
     });
 
     setStatus("idle");
-  }, [siteKey, turnstileTheme, onSuccess, onExpire, onError]);
+  }, [siteKey, resolvedTheme, onSuccess, onExpire, onError]);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    let interval: ReturnType<typeof setInterval> | undefined;
+    const hasSiteKey = siteKey.trim().length > 0;
 
-    if (window.turnstile) {
+    if (hasSiteKey && window.turnstile) {
       // Script already loaded — render immediately
       renderWidget();
-    } else {
+    } else if (hasSiteKey) {
       // 👇 Poll until turnstile is available (handles lazyOnload timing)
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         if (window.turnstile) {
           clearInterval(interval);
           renderWidget();
         }
       }, 100);
 
-      return () => clearInterval(interval);
     }
 
     return () => {
+      clearInterval(interval);
+      onExpire?.();
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
@@ -176,14 +180,7 @@ export const Turnstile = ({
         widgetIdRef.current = null;
       }
     };
-  }, [renderWidget]);
-
-  // 👇 Re-render widget when theme changes
-  useEffect(() => {
-    if (widgetIdRef.current) {
-      renderWidget();
-    }
-  }, [turnstileTheme, renderWidget]);
+  }, [renderWidget, onExpire, siteKey]);
 
   // useEffect(() => {
   //   if (!containerRef.current) return;
