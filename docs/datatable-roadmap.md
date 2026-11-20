@@ -2,7 +2,7 @@
 
 ## November 20 acceptance update
 
-The TranslationKey row-windowing pilot passed representative fixture browser checks. The signed-in application route still needs the larger-dataset windowing matrix before wider rollout. TranslationKey realtime passed a disposable two-session browser round trip. Document Tracking realtime passed a disposable authenticated HTTP handoff and permission-aware refetch. Its application-route browser round trip and hosted realtime acceptance for both resources remain open. See the [current acceptance inventory](datatable-next-acceptance-2026-11-17.md).
+The TranslationKey row-windowing pilot passed representative fixture browser checks. The signed-in application route still needs the larger-dataset windowing matrix before wider rollout. TranslationKey realtime passed a disposable two-session browser round trip. Hosted TranslationKey streaming remains open. Document Tracking acceptance is deferred until DataTable is complete and the user confirms the registration flow. See the [current acceptance inventory](datatable-next-acceptance-2026-11-17.md).
 
 ## 2.0.6–2.0.7 — production realtime continuation
 

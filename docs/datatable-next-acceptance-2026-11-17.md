@@ -13,6 +13,10 @@ The frontend acceptance branch is `codex/datatable-next-acceptance`, based on th
 
 ## Acceptance inventory
 
+Current scope covers DataTable and TranslationKey. Document Tracking acceptance
+is deferred until DataTable is complete and the user confirms the registration
+flow. Earlier Document Tracking results below are retained as historical evidence.
+
 | Evidence | Status |
 | --- | --- |
 | Targeted Jest regression | Passed on the client baseline above |
@@ -22,7 +26,7 @@ The frontend acceptance branch is `codex/datatable-next-acceptance`, based on th
 | Controlled React and browser performance comparison | Pending browser correctness |
 | Hosted TranslationKey R01–R10 | Pending authorized environment access |
 | Socket.IO application notifications | Outside the foundation's scope |
-| Document Tracking realtime | Merged implementation, cross-session delivery and visibility acceptance pending |
+| Document Tracking realtime | Deferred pending DataTable completion and confirmation of the registration flow |
 | Row-local production subscriptions | Deferred under Outcome B |
 
 ## Release decisions

@@ -76,6 +76,11 @@ ABAC condition editing.
 
 ## Organization and HR reuse
 
+Document Tracking and document registration work is deferred until DataTable is
+complete and the user confirms the registration flow to use. Exclude Document
+Tracking from targeted DataTable and realtime acceptance plans and merge gates.
+Run required repository-wide CI as configured.
+
 Organization and HR data are authoritative: document tracking must reuse the
 existing User/Profile/EmploymentHistory and versioned Department/Ministry models.
 Do not introduce parallel staff or office catalogues. Resolve effective assignments
