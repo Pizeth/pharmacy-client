@@ -9,7 +9,8 @@ createServer((incoming, outgoing) => {
     outgoing.writeHead(400).end();
     return;
   }
-  const api = /^\/api(?:\/|\?|$)/.test(incoming.url);
+  const api = incoming.url === '/api' ||
+    incoming.url.startsWith('/api/') || incoming.url.startsWith('/api?');
   const headers = { ...incoming.headers, 'x-forwarded-host': host, 'x-forwarded-proto': 'https' };
   delete headers['cf-access-jwt-assertion'];
   // Forward only host-local test session cookies, with the gateway prefix removed.
