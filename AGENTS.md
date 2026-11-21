@@ -110,6 +110,15 @@ use the shared A4 detail layout rather than a separate row printout.
 
 ## Browser testing and web configuration
 
+Use `https://realtime-test.razeth.com` as the dedicated hosted target for
+isolated realtime acceptance once its Cloudflare Access policy and tunnel route
+are active. Before mutating records, confirm that its API uses Infisical's
+`REALTIME_TEST_DATABASE_URL` and that the disposable database is distinct from
+the application database. Use synthetic accounts and fixtures and verify cleanup
+after the run. For local acceptance, use the isolated loopback client and API.
+Treat `asus-hr.razeth.com` and `hr.razeth.com` as production-backed unless their
+runtime configuration proves otherwise.
+
 Use the Codex built-in in-app browser for visual testing, signed-in checks,
 and authorized web configuration. Keep browser work in the background unless
 the user asks to watch it. Reuse existing in-app tabs and sessions.
