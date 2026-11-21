@@ -76,6 +76,11 @@ ABAC condition editing.
 
 ## Organization and HR reuse
 
+Document Tracking and document registration work is deferred until DataTable is
+complete and the user confirms the registration flow to use. Exclude Document
+Tracking from targeted DataTable and realtime acceptance plans and merge gates.
+Run required repository-wide CI as configured.
+
 Organization and HR data are authoritative: document tracking must reuse the
 existing User/Profile/EmploymentHistory and versioned Department/Ministry models.
 Do not introduce parallel staff or office catalogues. Resolve effective assignments
@@ -104,6 +109,18 @@ archive pages and detail-page printing. Pass resource permission guards and
 use the shared A4 detail layout rather than a separate row printout.
 
 ## Browser testing and web configuration
+
+Use `https://realtime-test.razeth.com` as the dedicated hosted target for
+isolated realtime acceptance. Cloudflare Access protects the ASUS Tunnel route,
+which points to the isolated loopback gateway at `127.0.0.1:8084`. Start the
+isolated origin for each acceptance run and verify its health before signing in.
+Follow the [hosted acceptance runbook](docs/datatable-production-realtime-2-0-6.md#hosted-disposable-acceptance).
+Before mutating records, confirm that its API uses Infisical's
+`REALTIME_TEST_DATABASE_URL` and that the disposable database is distinct from
+the application database. Use synthetic accounts and fixtures and verify cleanup
+after the run. For local acceptance, use the isolated loopback client and API.
+Treat `asus-hr.razeth.com` and `hr.razeth.com` as production-backed unless their
+runtime configuration proves otherwise.
 
 Use the Codex built-in in-app browser for visual testing, signed-in checks,
 and authorized web configuration. Keep browser work in the background unless

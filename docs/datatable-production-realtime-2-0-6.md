@@ -288,3 +288,76 @@ in the client checkout, then set REALTIME_TEST_BROWSER_BUNDLE to the absolute
 path of the resulting bundle before starting the backend harness. Open the two
 loopback URLs it prints, edit from each session and check the receiving view.
 Use Finish and clean up to remove the fixtures and stop the server.
+
+## Hosted disposable acceptance
+
+The ASUS Tunnel's published hostname `realtime-test.razeth.com` forwards to
+`http://127.0.0.1:8084`. Cloudflare Access protects that exact hostname. The
+gateway and Next.js bind to loopback. The Nest API binds to all interfaces,
+so keep inbound access to port 3085 blocked at the host firewall before
+starting it. Run the API from the adjacent `pharmacy-api` checkout after
+building it with `npm run build`.
+
+Use Infisical's API development environment and an isolated Better Auth secret
+that matches the disposable database's signing keys. Set
+`REALTIME_TEST_AUTH_SECRET` securely in the launch environment before running
+this command. The database identity check runs before any connection or seed.
+
+```powershell
+infisical.cmd run --env=dev -- node --input-type=module -e '
+  import { getRealtimeTestDatabaseUrl } from "./scripts/realtime-test-database.mjs";
+  const database = getRealtimeTestDatabaseUrl(process.env);
+  const host = "https://realtime-test.razeth.com";
+  const secret = process.env.REALTIME_TEST_AUTH_SECRET;
+  if (!secret) throw new Error("Set the isolated Better Auth secret first.");
+  Object.assign(process.env, {
+    DATABASE_URL: database, DIRECT_URL: database, REALTIME_DATABASE_URL: database,
+    REALTIME_ENABLED: "true", DOCUMENT_REALTIME_ENABLED: "false", PORT: "3085",
+    BETTER_AUTH_URL: host, FRONTEND_URL: host, CORS_ORIGINS: host,
+    BETTER_AUTH_SECRET: secret, ALLOW_PRODUCTION_SEEDING: "false",
+    SENTRY_DSN: "", BETTER_AUTH_API_KEY: "", BETTER_AUTH_IDENTIFY_URL: "",
+    BETTER_AUTH_KV_URL: ""
+  });
+  await import("./dist/main.js");
+'
+```
+
+From the client checkout, build for the hosted origin and start Next.js in a
+separate terminal. Supply the configured Turnstile site key through Infisical.
+
+```powershell
+infisical.cmd run --env=dev -- node --input-type=module -e '
+  Object.assign(process.env, {
+    NODE_ENV: "production", NEXT_PUBLIC_API_URL: "https://realtime-test.razeth.com",
+    BACKEND_URL: "https://realtime-test.razeth.com",
+    NEXT_PUBLIC_BACKEND_URL: "https://realtime-test.razeth.com",
+    NEXT_PUBLIC_REALTIME_ENABLED: "true", NEXT_PUBLIC_DOCUMENT_REALTIME_ENABLED: "false"
+  });
+  process.argv = [process.execPath, "./node_modules/next/dist/bin/next", "build"];
+  await import("./node_modules/next/dist/bin/next");
+'
+infisical.cmd run --env=dev -- node --input-type=module -e '
+  Object.assign(process.env, {
+    NODE_ENV: "production", NEXT_PUBLIC_API_URL: "https://realtime-test.razeth.com",
+    BACKEND_URL: "https://realtime-test.razeth.com"
+  });
+  process.argv = [process.execPath, "./node_modules/next/dist/bin/next",
+    "start", "--hostname", "127.0.0.1", "--port", "8085"];
+  await import("./node_modules/next/dist/bin/next");
+'
+```
+
+Start the loopback gateway from the client checkout with
+`node scripts/realtime-test-gateway.mjs`. It forwards API requests to port
+3085 and frontend requests to port 8085. Verify readiness on the ASUS host
+and repeat the browser checks after signing into Access.
+
+```powershell
+curl.exe --fail http://127.0.0.1:3085/health/ready
+curl.exe --fail -H 'Host: realtime-test.razeth.com' http://127.0.0.1:8084/login
+curl.exe --fail -H 'Host: realtime-test.razeth.com' http://127.0.0.1:8084/api/auth/get-session
+```
+
+The final probe should return an empty session before app sign-in. Use a
+profile-linked synthetic account, confirm the data is disposable before
+editing, and verify fixture removal afterwards.

@@ -13,6 +13,10 @@ The frontend acceptance branch is `codex/datatable-next-acceptance`, based on th
 
 ## Acceptance inventory
 
+Current scope covers DataTable and TranslationKey. Document Tracking acceptance
+is deferred until DataTable is complete and the user confirms the registration
+flow. Earlier Document Tracking results below are retained as historical evidence.
+
 | Evidence | Status |
 | --- | --- |
 | Targeted Jest regression | Passed on the client baseline above |
@@ -22,7 +26,7 @@ The frontend acceptance branch is `codex/datatable-next-acceptance`, based on th
 | Controlled React and browser performance comparison | Pending browser correctness |
 | Hosted TranslationKey R01–R10 | Pending authorized environment access |
 | Socket.IO application notifications | Outside the foundation's scope |
-| Document Tracking realtime | Merged implementation, cross-session delivery and visibility acceptance pending |
+| Document Tracking realtime | Deferred pending DataTable completion and confirmation of the registration flow |
 | Row-local production subscriptions | Deferred under Outcome B |
 
 ## Release decisions
@@ -207,3 +211,48 @@ At 200×16 the corrected ordinary production run measured the following medians 
 
 Single-row selection mounted all 200 rows in every mode. Page selection left both windowed modes at 15 mounted rows. These results account for the real selection fallback that the earlier state-only timing did not invoke. The fixture dialog uses the dialog component's normal focus management.
 Both corrected production builds passed all 15 cases, recording 600 samples each. TypeScript and static generation also passed.
+
+## November 20 release acceptance handoff
+
+- TranslationKey realtime has a local, disposable, authenticated browser round trip. Hosted R01–R10 remains open.
+- Document Tracking has a local, disposable, authenticated HTTP handoff and permission-aware refetch. The application list/detail browser round trip and hosted streaming checks remain open.
+- The signed-in `/admin/i18n` check after client PR #69 covered navigation and popovers at tablet widths. The real-route windowing matrix still needs disposable datasets of at least 26, 100 and 200 rows, plus responsive layout, keyboard, sticky selection, resize and refetch coverage.
+- Confirm the hosted client and API target, migrated disposable database, and two independently authenticated test accounts before running mutation cases. Record the topology and any cases that do not apply, such as cross-replica delivery on a single-replica target.
+- Keep the windowing pilot limited to TranslationKey until the real-route checks pass. The matched benchmark documents the current sticky-selection fallback cost.
+
+### November 20 preflight results
+
+- Production API liveness and readiness returned HTTP 200. Anonymous requests to `/api/v1/live/translations` and `/api/v1/live/tracked-documents` returned HTTP 401. Signed-in streaming through the hosted proxy remains unverified.
+- The authenticated HTTP harness passed against the Infisical disposable database using two real cookie sessions. Mutation/refetch, shared event identities, rejected actors and origins, permission revocation, disabled-account shutdown and reconnect passed. Fixture cleanup preserved existing records and grants.
+- The in-app browser was unavailable to this chat. Signed-in hosted streaming and the real-route windowing matrix remain pending.
+
+### Signed-in application route follow-up
+
+- The built-in browser recovered and opened `/admin/i18n` with an existing signed-in session. The route had 30 records. Document scroll widths were 405, 885 and 1265 px at viewports of 420, 900 and 1280 px, respectively, with no document-level horizontal overflow. The Create target measured 44 px at the narrow width.
+- Choosing the 50-row page size showed all 30 records in the pager with 13 table body rows mounted in the initial viewport. Switching to cards and back worked. The original 25-row setting and viewport were restored.
+- Intermittent browser command timeouts prevented a reliable keyboard/selection result. The 100- and 200-record datasets, signed-in hosted streaming, and Document Tracking application-route browser round trip remain open.
+
+### Keyboard and Document Tracking follow-up
+
+- Space selected and cleared a focused row checkbox. The selection count and row action availability followed the selection. ArrowRight resized the Key column from 240 to 248 px, and ArrowLeft restored it to 240 px.
+- The signed-in Documents application list completed loading and displayed its empty state. No detail record was available for this session.
+- The Infisical disposable harness passed again with `REALTIME_TEST_DOCUMENT_HANDOFF=true`. Both authenticated document streams invalidated on reassignment, the previous assignee lost access, and the new assignee could refetch the record. Fixture cleanup passed.
+- Hosted signed-in streaming and the larger disposable application-route datasets remain open. The production smoke checks used read-only requests.
+
+### Built-in browser disposable round trip
+
+- The existing Infisical browser harness ran on two loopback origins with independent authenticated sessions. Each session edited the disposable TranslationKey and the other session rendered the new description without reloading. Session A retained its selected row across the incoming update.
+- The harness also passed the authenticated Document Tracking reassignment check and exited successfully after fixture cleanup. The Document Tracking check used HTTP streams. The full application-route browser and hosted acceptance matrices remain open.
+
+## November 21 acceptance update
+
+- The signed-in local `/admin/i18n` application route used the Infisical disposable database, the full API, and a synthetic user with a linked profile. With 200 records in the database, the 100- and 200-row page sizes each initially mounted 12 table rows at the default viewport. At widths of 420, 900, and 1280 px, document scroll widths were 405, 885, and 1265 px. Fixture cleanup passed.
+- The latest production client and API passed a signed-in TranslationKey list smoke check after the Turnstile rollout. The production route showed 30 records.
+- Production API Infisical has `REALTIME_ENABLED` enabled and a dedicated listener URL configured. The Vercel project environment inventory did not list `NEXT_PUBLIC_REALTIME_ENABLED`. These are configuration observations. Hosted signed-in stream delivery, proxy behavior, and rollout acceptance still need direct evidence.
+- The hosted API stream returned an HTTP 204 CORS preflight with `Access-Control-Allow-Origin: https://hr.razeth.com` and credentials allowed for the production application origin. The unrelated `https://example.invalid` origin received no `Access-Control-Allow-Origin` header. This covers browser preflight policy. A signed-in navigation through the frontend rewrite returned HTTP 401, and the built-in browser blocked direct API navigation. The live provider uses a credentialed fetch to the API origin, so neither navigation certifies that request or streaming.
+
+### Isolated hosted TranslationKey round trip
+
+- The built-in browser passed Cloudflare Access and Turnstile on `realtime-test.razeth.com`. A synthetic account with a linked profile loaded the actual `/admin/i18n` route with 200 keys from Infisical's disposable realtime database. The browser reached key 200 through pagination and found it in card view through search.
+- An independent authenticated API session updated key 200 through the isolated loopback gateway. The API session received the identity event and the hosted browser card displayed the updated description without reloading. The browser then edited the same key. The API session received that update event and fetched the saved description, and the browser kept the card selected.
+- Cleanup removed the synthetic accounts, sessions, grants, translation fixtures and temporary signing key. This run covered the hosted ASUS tunnel browser path with one API and one browser session. Production signed-in streaming and cross-replica delivery remain rollout checks. Document Tracking was deferred.
