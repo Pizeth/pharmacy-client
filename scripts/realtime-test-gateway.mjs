@@ -24,6 +24,9 @@ createServer((incoming, outgoing) => {
     }
     outgoing.writeHead(response.statusCode ?? 502, responseHeaders);
     outgoing.flushHeaders();
+    response.once('close', () => {
+      if (!response.complete) outgoing.destroy();
+    });
     response.pipe(outgoing);
   });
   upstream.on('error', () => {
