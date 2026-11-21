@@ -114,6 +114,7 @@ Use `https://realtime-test.razeth.com` as the dedicated hosted target for
 isolated realtime acceptance. Cloudflare Access protects the ASUS Tunnel route,
 which points to the isolated loopback gateway at `127.0.0.1:8084`. Start the
 isolated origin for each acceptance run and verify its health before signing in.
+Follow the [hosted acceptance runbook](docs/datatable-production-realtime-2-0-6.md#hosted-disposable-acceptance).
 Before mutating records, confirm that its API uses Infisical's
 `REALTIME_TEST_DATABASE_URL` and that the disposable database is distinct from
 the application database. Use synthetic accounts and fixtures and verify cleanup
