@@ -361,3 +361,16 @@ curl.exe --fail -H 'Host: realtime-test.razeth.com' http://127.0.0.1:8084/api/au
 The final probe should return an empty session before app sign-in. Use a
 profile-linked synthetic account, confirm the data is disposable before
 editing, and verify fixture removal afterwards.
+
+## November 22 production release gates
+
+The authenticated TranslationKey round trip passed through the isolated ASUS
+tunnel. The production release decision is **hold**.
+
+| Gate | Evidence or remaining work |
+| --- | --- |
+| Production frontend build flag | Vercel maps `hr.razeth.com` to the ready production deployment of `aec143d`. It finished at 18:29 ICT on November 21. The current production-targeted `NEXT_PUBLIC_REALTIME_ENABLED=true` entry was created at 22:42 ICT that day. The public JavaScript served by that deployment still compares the environment lookup with `"true"`, with no enabled value inlined at the provider. |
+| Authenticated production SSE | Previous API readiness and CORS preflight passed. Capture the production application's credentialed fetch and verify HTTP 200, `text/event-stream` and incremental heartbeat delivery. |
+| Proxy and stream lifecycle | Verify Northflank idle behavior, buffering, reconnect and authorization revocation on a production-equivalent topology. Use approved synthetic data for checks that require a mutation or account change. |
+| Replica delivery | Verify the deployed replica count and show that a committed update received by one replica reaches an independent subscriber on another. |
+| Release authorization | Record rollout and rollback approval before changing production flags or deploying an enabled build. |

@@ -1,8 +1,10 @@
 # TanStack v9 + MUI DataTable roadmap
 
-## November 20 acceptance update
+## November 22 acceptance and release decision
 
-The TranslationKey row-windowing pilot passed representative fixture browser checks and the signed-in local application route passed the 100- and 200-row mounted-count checks against the disposable database. TranslationKey realtime passed a disposable two-session browser round trip. Hosted TranslationKey streaming remains open. Document Tracking acceptance is deferred until DataTable is complete and the user confirms the registration flow. See the [current acceptance inventory](datatable-next-acceptance-2026-11-17.md).
+**Windowing is accepted for the existing TranslationKey pilot.** The signed-in application route passed the 25-to-26-row threshold, 200-row sticky-selection geometry, keyboard selection and table/card state continuity. Keep wider rollout opt-in.
+
+**Production realtime rollout is on hold.** Isolated hosted TranslationKey realtime passed through the ASUS Tunnel. The active production client deployment predates the current Vercel build flag, and authenticated production streaming and replica delivery still require evidence and rollout approval. Document Tracking remains deferred pending DataTable completion and confirmation of the registration workflow. Row-local subscriptions remain deferred. See the [acceptance inventory](datatable-next-acceptance-2026-11-17.md) and [production release gates](datatable-production-realtime-2-0-6.md#november-22-production-release-gates).
 
 ## 2.0.6–2.0.7 — production realtime continuation
 
