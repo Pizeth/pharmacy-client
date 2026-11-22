@@ -374,3 +374,16 @@ tunnel. The production release decision is **hold**.
 | Proxy and stream lifecycle | Verify Northflank idle behavior, buffering, reconnect and authorization revocation on a production-equivalent topology. Use approved synthetic data for checks that require a mutation or account change. |
 | Replica delivery | Verify the deployed replica count and show that a committed update received by one replica reaches an independent subscriber on another. |
 | Release authorization | Record rollout and rollback approval before changing production flags or deploying an enabled build. |
+
+### Controlled production verification
+
+After rollout approval, Vercel rebuilt the same `aec143d` commit and assigned
+`hr.razeth.com` to deployment `dpl_HjpmhDG9QXs3ZfYfwhLFnHjhDWy7`. The prior
+deployment `dpl_2spQa3QtrAtm4YkzQ4868b9Sr45c` is the rollback target.
+
+Two signed-in production tabs verified live create, edit and delete delivery
+without reloading. The temporary translation key was removed and the total
+returned to 30. This establishes end-to-end live delivery for the observed
+browser sessions. The API replica count, cross-replica delivery, heartbeat
+timing, automatic reconnect after a dropped stream, and revocation remain open.
+The previously documented Northflank service page returned 404 during this run.

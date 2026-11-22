@@ -4,7 +4,7 @@
 
 **Windowing is accepted for the existing TranslationKey pilot.** The signed-in application route passed the 25-to-26-row threshold, 200-row sticky-selection geometry, keyboard selection and table/card state continuity. Keep wider rollout opt-in.
 
-**Production realtime rollout is on hold.** Isolated hosted TranslationKey realtime passed through the ASUS Tunnel. The active production client deployment predates the current Vercel build flag, and authenticated production streaming and replica delivery still require evidence and rollout approval. Document Tracking remains deferred pending DataTable completion and confirmation of the registration workflow. Row-local subscriptions remain deferred. See the [acceptance inventory](datatable-next-acceptance-2026-11-17.md) and [production release gates](datatable-production-realtime-2-0-6.md#november-22-production-release-gates).
+**Production realtime is live and certification is in progress.** TranslationKey realtime passed through the isolated ASUS Tunnel and in two signed-in production tabs after the approved redeploy. Replica delivery, automatic reconnect and other stream lifecycle checks remain open. Document Tracking remains deferred pending DataTable completion and confirmation of the registration workflow. Row-local subscriptions remain deferred. See the [acceptance inventory](datatable-next-acceptance-2026-11-17.md) and [production release gates](datatable-production-realtime-2-0-6.md#november-22-production-release-gates).
 
 ## 2.0.6–2.0.7 — production realtime continuation
 
