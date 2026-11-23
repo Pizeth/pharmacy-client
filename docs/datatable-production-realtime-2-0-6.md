@@ -384,6 +384,10 @@ deployment `dpl_2spQa3QtrAtm4YkzQ4868b9Sr45c` is the rollback target.
 Two signed-in production tabs verified live create, edit and delete delivery
 without reloading. The temporary translation key was removed and the total
 returned to 30. This establishes end-to-end live delivery for the observed
-browser sessions. The API replica count, cross-replica delivery, heartbeat
-timing, automatic reconnect after a dropped stream, and revocation remain open.
-The previously documented Northflank service page returned 404 during this run.
+browser sessions. Heartbeat timing, automatic reconnect after a dropped
+stream, and revocation remain open.
+
+On November 23, the [production Northflank service](https://app.northflank.com/t/razeths-team/project/razeth-api/services/razeth-api)
+confirmed that `api.razeth.com` was running one of one API instances on
+commit `9726bd8` with zero restarts. Cross-replica delivery does not apply to
+this topology and remains a gate before scaling beyond one instance.
