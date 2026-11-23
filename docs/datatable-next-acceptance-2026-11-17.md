@@ -256,3 +256,16 @@ Both corrected production builds passed all 15 cases, recording 600 samples each
 - The built-in browser passed Cloudflare Access and Turnstile on `realtime-test.razeth.com`. A synthetic account with a linked profile loaded the actual `/admin/i18n` route with 200 keys from Infisical's disposable realtime database. The browser reached key 200 through pagination and found it in card view through search.
 - An independent authenticated API session updated key 200 through the isolated loopback gateway. The API session received the identity event and the hosted browser card displayed the updated description without reloading. The browser then edited the same key. The API session received that update event and fetched the saved description, and the browser kept the card selected.
 - Cleanup removed the synthetic accounts, sessions, grants, translation fixtures and temporary signing key. This run covered the hosted ASUS tunnel browser path with one API and one browser session. Production signed-in streaming and cross-replica delivery remain rollout checks. Document Tracking was deferred.
+
+## November 22 real-route windowing closeout
+
+The built-in browser used a linked synthetic account on `realtime-test.razeth.com/admin/i18n` at a 1280 × 720 viewport. The API used Infisical's disposable realtime database.
+
+| Check | Observed result |
+| --- | --- |
+| Exact threshold | With page size 200, filtering to 25 records mounted all 25 rows. Filtering to 26 records mounted 11 rows and exposed an ARIA row count of 27 including the header. |
+| Sticky selection and keyboard | The initial 200-record view mounted 11 rows. Pressing Space on the first row's checkbox selected it and mounted all 200. At 2160 px of table scroll, the selected row appeared once, remained checked and focused, and met the sticky header cell with a 0 px gap. |
+| State continuity | Searching for the selected key kept it checked. Table to card to table preserved the search and selection. Pressing Space again cleared selection. Clearing the search returned to 200 records with 11 mounted rows. |
+| Cleanup | The synthetic account, sessions, fixture records, grants and temporary signing key were removed. |
+
+The TranslationKey opt-in windowing pilot passed. Wider rollout remains opt-in. Production streaming remains a separate release decision.

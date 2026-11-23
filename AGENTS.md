@@ -122,6 +122,17 @@ after the run. For local acceptance, use the isolated loopback client and API.
 Treat `asus-hr.razeth.com` and `hr.razeth.com` as production-backed unless their
 runtime configuration proves otherwise.
 
+For explicitly authorized production TranslationKey realtime acceptance, reuse
+`codex_realtime_prod_20261123@example.com` and its dedicated read-only role
+`codex_realtime_prod_20261123`. Keep the linked synthetic profile and limit the
+role to reading TranslationKey and TranslationCategory. Start from a disabled
+account with no sessions. For an approved run, issue a fresh credential through
+the authorized admin workflow, enable the account for the test, then disable it
+and revoke its sessions. Verify that temporary records are gone and the account
+has no active sessions. Keep credentials out of Git and chat. Routine seed
+runs must leave this account disabled. Use the disposable environment for
+other acceptance work.
+
 Use the Codex built-in in-app browser for visual testing, signed-in checks,
 and authorized web configuration. Keep browser work in the background unless
 the user asks to watch it. Reuse existing in-app tabs and sessions.
