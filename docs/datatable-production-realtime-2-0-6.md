@@ -420,6 +420,14 @@ this topology and remains a gate before scaling beyond one instance.
   heartbeats. The simulation establishes the effect of that timeout, while
   production's effective edge timeout remains unconfirmed.
 
+On November 25, the same comparison was repeated with the authenticated
+NestJS SSE endpoint and the disposable PostgreSQL database. A loopback
+reverse proxy with a 10-second idle cutoff closed the stream before the first
+heartbeat. The 25-second control delivered two heartbeats at approximately
+15.5 and 30.5 seconds. Both requests used genuine fixture sessions, and the
+harness verified cleanup. This reproduces the failure with the real API under
+the modeled proxy policy.
+
 Northflank Support was asked to confirm the effective timeout and advise on a
 route-specific override that preserves TLS, HSTS, and authenticated-stream
 cache policy. Keep the current production routing and heartbeat settings
