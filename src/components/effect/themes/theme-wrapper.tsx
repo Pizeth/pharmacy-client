@@ -12,7 +12,6 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import ResponsiveAppBar from "@/components/Navigations/AppBar"; // PrimarySearchAppBar,
 import BackToTopFab from "@/components/Navigations/BackToTop";
 import DrawerAppBar from "@/components/Navigations/DrawerAppBar";
-import PersistentDrawerLeft from "@/components/fts/menu";
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 
 export const ThemeContext = createContext({
@@ -93,7 +92,6 @@ export default function ThemeProviderWrapper<Theme = DefaultTheme>({
         {/* <InitColorSchemeScript attribute="class" /> */}
         {/* <ResponsiveAppBar /> */}
         {/* <PrimarySearchAppBar /> */}
-        {/* <PersistentDrawerLeft /> */}
         {/* We use a fragment here because the html/body tags are in the Server Layout */}
         {/* {mounted ? (
             children

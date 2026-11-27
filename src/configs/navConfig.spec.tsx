@@ -22,6 +22,11 @@ describe("route navigation", () => {
     expect(getDynamicNavItems("/hrd-other")).not.toBe(ROUTE_NAV_MAP["/hrd"]);
   });
 
+  it("omits the retired FTS route from default navigation", () => {
+    const items = getDynamicNavItems("/");
+    expect(items.some(item => item.href === "/fts")).toBe(false);
+  });
+
   it("selects specific items rather than the section home link", () => {
     const items = ROUTE_NAV_MAP["/hrd"];
     expect(getActiveNavIndex("/hrd", items)).toBe(0);

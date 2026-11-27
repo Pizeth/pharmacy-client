@@ -55,6 +55,7 @@ const nextConfig: NextConfig = {
   ],
   async redirects() {
     return [
+      { source: "/fts", destination: "/dashboard", permanent: true },
       { source: "/link", destination: "/hrd/documents", permanent: true },
       { source: "/link/:path*", destination: "/hrd/:path*", permanent: true },
     ];
