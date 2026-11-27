@@ -3,10 +3,10 @@
 import type {
   DataTableQueryUrlCodec,
   DataTableQueryUrlHistoryMode,
-} from "../../mui/query-url";
+} from "../../core/query-url";
 import type {
   DataTableServerQueryStateChangeHandler,
-} from "../../mui/server-state";
+} from "../../core/server-state";
 
 export interface UseDataTableServerQueryUrlStateOptions {
   readonly codec: DataTableQueryUrlCodec;

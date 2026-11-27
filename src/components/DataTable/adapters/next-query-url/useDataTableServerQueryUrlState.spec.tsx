@@ -12,7 +12,7 @@ import {
 import {
   createDataTableQueryUrlCodec,
   createDataTableServerQueryState,
-} from "@/components/DataTable/mui";
+} from "@/components/DataTable/core";
 
 import {
   useDataTableServerQueryUrlState,

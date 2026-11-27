@@ -5,7 +5,7 @@ import type { RowData } from "@tanstack/table-core";
 import type {
   DataTableServerResponseAdapter,
   DataTableServerResult,
-} from "../../mui/server-data";
+} from "../../core/server-data";
 import type { StandardApiPaginatedResponse } from "./types";
 
 /**

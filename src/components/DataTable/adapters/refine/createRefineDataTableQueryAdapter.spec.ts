@@ -3,7 +3,7 @@ import {
   createDataTableSelectServerFilter,
   createDataTableServerQueryMapper,
   createDataTableTextServerFilter,
-} from "../../mui/server-query";
+} from "../../core/server-query";
 import {
   createRefineDataTableQueryAdapter,
   createRefineOrContainsSearchFilters,
