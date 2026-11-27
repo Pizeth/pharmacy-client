@@ -68,6 +68,9 @@ export interface DataTableRowAction<TData extends RowData> {
   //   readonly label: DataTableRowActionValue<TData, string>;
   readonly label: string;
 
+  /** Optional single-key command while focus is inside the open overflow menu. */
+  readonly menuShortcutKey?: string;
+
   /**
    * Optional icon renderer.
    *

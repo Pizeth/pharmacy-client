@@ -32,7 +32,7 @@ const data: readonly Row[] = [
   },
 ];
 
-function Fixture() {
+function Fixture({ onInspect = () => undefined, disabled = false } = {}) {
   const table = useMuiDataTable({
     columns,
 
@@ -52,8 +52,9 @@ function Fixture() {
     id: "inspect",
 
     label: "Inspect",
+    menuShortcutKey: "I",
 
-    onClick: () => undefined,
+    onClick: onInspect,
   };
 
   const action: ResolvedDataTableRowAction<Row> = {
@@ -68,7 +69,7 @@ function Fixture() {
 
     color: "default",
 
-    disabled: false,
+    disabled,
 
     inline: false,
   };
@@ -100,4 +101,14 @@ it("passes RTL direction into the row-actions menu portal", () => {
   });
 
   expect(menu.closest('[dir="rtl"]')).not.toBeNull();
+});
+
+it.each([false, true])("honors the enabled state for a menu shortcut (disabled: %s)", (disabled) => {
+  const onInspect = jest.fn();
+  render(<Fixture onInspect={onInspect} disabled={disabled} />);
+  fireEvent.click(screen.getByRole("button", { name: "More actions for row alpha" }));
+  const menu = screen.getByRole("menu", { name: "Actions for row alpha" });
+  expect(screen.getByRole("menuitem", { name: "Inspect" })).toHaveAttribute("aria-keyshortcuts", "I");
+  fireEvent.keyDown(menu, { key: "i" });
+  expect(onInspect).toHaveBeenCalledTimes(disabled ? 0 : 1);
 });

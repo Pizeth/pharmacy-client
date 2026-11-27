@@ -58,7 +58,7 @@ const PoperResult = (inProps: PoperResultProps) => {
             onSelect?.(product);
             setValue(product.title);
             setOpen(false);
-          }} component="a" href="/fts">
+          }}>
                     <ListItemText primary={product.title} secondary={product.body} />
                   </ListItemButton>)}
               </ScrollableList> : <Empty align="center" color="textSecondary" variant="subtitle2" noWrap>

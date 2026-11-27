@@ -8,7 +8,6 @@ import RazHome from "@/components/icons/home";
 import RazPeople from "@/components/icons/people";
 import RazContact from "@/components/icons/contact";
 import RielIcon from "@/components/icons/riel";
-import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
 import FolderIcon from "@mui/icons-material/Folder";
@@ -163,12 +162,6 @@ export const ROUTE_NAV_MAP: Record<string, NavItemType[]> = {
       Icon: <RazHome color="error" fontSize="medium" />,
       color: "error",
       href: "/",
-    },
-    {
-      label: "ប្រព័ន្ធចរន្តឯកសារ",
-      Icon: <ContentPasteSearchIcon color="secondary" fontSize="medium" />,
-      color: "secondary",
-      href: "/fts",
     },
     {
       label: "ប្រព័ន្ធគ្រប់គ្រងបុគ្គលិក",
