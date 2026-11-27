@@ -47,13 +47,14 @@ export function AvatarSettings({ user, afterSignup }: {
       if (typeof body.image !== "string") throw new Error("The upload response was incomplete. Reload the page to check your avatar.");
       setImage(body.image);
       setMessage({ error: false, text: "Avatar saved." });
-      await refreshIdentity();
     } catch (error) {
       setMessage({ error: true, text: error instanceof Error ? error.message : "Could not upload your avatar." });
+      return;
     } finally {
       submitting.current = false;
       setPending(false);
     }
+    await refreshIdentity({ throwOnError: false });
   }
 
   return (
