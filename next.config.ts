@@ -53,12 +53,12 @@ const nextConfig: NextConfig = {
     "@refinedev/nextjs-router",
     "@refinedev/nestjsx-crud",
   ],
-  async redirects() {
-    return [
+  redirects() {
+    return Promise.resolve([
       { source: "/fts", destination: "/dashboard", permanent: true },
       { source: "/link", destination: "/hrd/documents", permanent: true },
       { source: "/link/:path*", destination: "/hrd/:path*", permanent: true },
-    ];
+    ]);
   },
   async rewrites() {
     return [
