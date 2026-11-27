@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { Alert, Avatar, Button, Stack, Typography } from "@mui/material";
+import { useGetIdentity } from "@refinedev/core";
 import { RecordCard } from "@/components/Tables/ResourceRecordPage";
 import { type ClientUser } from "@/lib/auth-client";
 import { getGeneratedAvatarUrl } from "@/lib/auth/generatedAvatar";
@@ -14,6 +15,7 @@ export function AvatarSettings({ user, afterSignup }: {
   readonly user: ClientUser;
   readonly afterSignup: boolean;
 }) {
+  const { refetch: refreshIdentity } = useGetIdentity({ queryOptions: { enabled: false } });
   const [image, setImage] = useState(user.image);
   const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null);
   const [pending, setPending] = useState(false);
@@ -45,6 +47,7 @@ export function AvatarSettings({ user, afterSignup }: {
       if (typeof body.image !== "string") throw new Error("The upload response was incomplete. Reload the page to check your avatar.");
       setImage(body.image);
       setMessage({ error: false, text: "Avatar saved." });
+      await refreshIdentity();
     } catch (error) {
       setMessage({ error: true, text: error instanceof Error ? error.message : "Could not upload your avatar." });
     } finally {
