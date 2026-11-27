@@ -71,11 +71,18 @@ const FooterSocials = styled("section", publicDocumentsSlot("FooterSocials"))(({
   borderTop: "4px solid #26247B",
   backgroundColor: (theme.vars ?? theme).palette.background.default,
   "& .MuiIconButton-root": { margin: theme.spacing(0.5) },
-  position: "relative",
+  position: "relative", isolation: "isolate",
   "&::before": {
     content: '""', position: "absolute", top: -4, left: 0, right: 0, height: 4,
     background: "linear-gradient(90deg, #26247B, #7774d9, #26247B)",
     pointerEvents: "none", opacity: 0,
+  },
+  "&::after": {
+    content: '""', position: "absolute", inset: 0,
+    pointerEvents: "none", zIndex: -1, opacity: 0.1,
+    backgroundColor: (theme.vars ?? theme).palette.text.primary,
+    maskImage: 'url("/static/svg/patterns/khmer-flower-pattern.svg")',
+    maskSize: "104px 104px", maskRepeat: "repeat", maskPosition: "center",
   },
   '@media (prefers-reduced-motion: no-preference)': {
     '&[data-revealed="true"]::before': { animation: `${stripeReveal} 850ms ease-out` },
@@ -241,14 +248,14 @@ const FooterBottom = styled(
     width: "clamp(160px, 32vw, 500px)", maxWidth: "100%",
     pointerEvents: "none", zIndex: -1, opacity: 0.2,
     backgroundColor: "#fff",
-    maskImage: 'url("/static/svg/patterns/khmer-flower-pattern.svg"), linear-gradient(to right, transparent, black 75%)',
+    maskImage: 'url("/static/svg/patterns/red-pattern.svg"), linear-gradient(to right, transparent, black 75%)',
     maskSize: "104px 104px, 100% 100%", maskRepeat: "repeat, no-repeat",
     maskPosition: "right center", maskComposite: "intersect",
   },
   ...theme.applyStyles("dark", {
     "&::after": {
       inset: "0 auto 0 0", maskPosition: "left center",
-      maskImage: 'url("/static/svg/patterns/khmer-flower-pattern.svg"), linear-gradient(to left, transparent, black 75%)',
+      maskImage: 'url("/static/svg/patterns/red-pattern.svg"), linear-gradient(to left, transparent, black 75%)',
     },
   }),
 }));
