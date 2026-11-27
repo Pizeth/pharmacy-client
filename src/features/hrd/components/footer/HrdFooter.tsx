@@ -79,11 +79,14 @@ const FooterSocials = styled("section", publicDocumentsSlot("FooterSocials"))(({
   },
   "&::after": {
     content: '""', position: "absolute", inset: 0,
-    pointerEvents: "none", zIndex: -1, opacity: 0.1,
-    backgroundColor: (theme.vars ?? theme).palette.text.primary,
+    pointerEvents: "none", zIndex: -1, opacity: 0.28,
+    backgroundColor: "#26247B",
     maskImage: 'url("/static/svg/patterns/khmer-flower-pattern.svg")',
     maskSize: "104px 104px", maskRepeat: "repeat", maskPosition: "center",
   },
+  ...theme.applyStyles("dark", {
+    "&::after": { backgroundColor: "#A8A5F0", opacity: 0.22 },
+  }),
   '@media (prefers-reduced-motion: no-preference)': {
     '&[data-revealed="true"]::before': { animation: `${stripeReveal} 850ms ease-out` },
     '&[data-revealed="true"] > .MuiTypography-root': { animation: `${footerRise} 550ms ease-out backwards` },
