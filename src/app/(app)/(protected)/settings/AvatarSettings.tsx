@@ -15,7 +15,7 @@ export function AvatarSettings({ user, afterSignup }: {
   readonly afterSignup: boolean;
 }) {
   const [image, setImage] = useState(user.image);
-  const [message, setMessage] = useState<{ error: boolean; text: string }>();
+  const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null);
   const [pending, setPending] = useState(false);
   const submitting = useRef(false);
 
@@ -30,7 +30,7 @@ export function AvatarSettings({ user, afterSignup }: {
     }
     submitting.current = true;
     setPending(true);
-    setMessage(undefined);
+    setMessage(null);
     try {
       const token = sessionStorage.getItem(TOKEN_KEY);
       const response = await fetch(new URL("/api/account/settings/avatar", API_URL), {
@@ -59,7 +59,9 @@ export function AvatarSettings({ user, afterSignup }: {
         <Avatar src={image || getGeneratedAvatarUrl(user.id)} alt={user.name}>{user.name.slice(0, 1)}</Avatar>
         {message && <Alert severity={message.error ? "error" : "success"}>{message.text}</Alert>}
         {!image && (
-          <Stack component="form" spacing={2} onSubmit={event => { void saveAvatar(event); }}>
+          <Stack component="form" spacing={2} onSubmit={event => {
+            saveAvatar(event).catch(() => { setMessage({ error: true, text: "Could not read the selected avatar." }); });
+          }}>
             <Typography component="label">
               Optional avatar (JPEG, PNG, or WebP, up to 2 MB)
               <input name="avatar" type="file" accept={allowedImageTypes.join(",")} required disabled={pending} />
