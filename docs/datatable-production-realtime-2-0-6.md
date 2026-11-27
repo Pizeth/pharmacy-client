@@ -433,3 +433,17 @@ route-specific override that preserves TLS, HSTS, and authenticated-stream
 cache policy. Keep the current production routing and heartbeat settings
 while waiting for that confirmation. Retest production heartbeat, reconnect,
 and closure of an already-open stream after an agreed remediation.
+
+### November 27 production retest
+
+The user reported that Northflank increased the timeout to 30 seconds.
+After the dedicated read-only observer signed in through the production
+app, an authenticated HTTP/2 probe to the live TranslationKey endpoint
+on api.razeth.com received two heartbeats 15.03 seconds apart. The probe
+reopened the stream after a deliberate client disconnect. Revoking the
+observer session closed the open stream within approximately 15.34 seconds.
+A fresh request using the revoked session returned HTTP 401.
+
+The probe explicitly reopened the connection. Automatic browser catch-up
+was verified in the disposable environment described above. The production
+observer was disabled and verified to have zero sessions after the run.
