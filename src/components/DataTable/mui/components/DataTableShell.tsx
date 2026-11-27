@@ -116,6 +116,30 @@ const ShellRoot = styled(Box, {
     },
     [`& > .${dataTableClasses.toolbar}`]: { flexShrink: 0 },
   },
+  '@media print': {
+    '&&, &&[data-fullscreen="true"]': {
+      position: "static",
+      display: "block",
+      width: "auto",
+      height: "auto",
+      maxHeight: "none",
+      overflow: "visible",
+    },
+    [`&& > .${dataTableClasses.content}, && .${dataTableClasses.container}, && .${dataTableClasses.cardContainer}`]: {
+      display: "block",
+      maxHeight: "none",
+      overflow: "visible",
+    },
+    [`&& .${dataTableClasses.table}`]: {
+      width: "100%",
+      minWidth: 0,
+      tableLayout: "fixed",
+      "& col": { width: "auto !important" },
+      "& tr": { position: "static", breakInside: "avoid" },
+      "& th, & td": { position: "static", overflowWrap: "anywhere", whiteSpace: "normal" },
+    },
+    [`&& > .${dataTableClasses.toolbar}`]: { display: "none" },
+  },
 }));
 
 export interface DataTableShellProps {

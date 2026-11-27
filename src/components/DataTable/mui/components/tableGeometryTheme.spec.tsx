@@ -295,6 +295,10 @@ it("mounts a bounded row range and moves it when the table scrolls", () => {
 
     expect(mounted().length).toBeLessThan(30);
     expect(mounted()[0]).toBe("Record 1");
+    fireEvent(window, new Event("beforeprint"));
+    expect(mounted()).toHaveLength(30);
+    fireEvent(window, new Event("afterprint"));
+    expect(mounted().length).toBeLessThan(30);
     viewport.scrollTop = 1000;
     fireEvent.scroll(viewport);
     expect(mounted()).toContain("Record 30");

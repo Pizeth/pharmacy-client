@@ -3,6 +3,8 @@
 import { Box, Table, TableContainer, styled } from "@mui/material";
 import type { TableContainerProps, TableProps } from "@mui/material";
 import type { CSSProperties } from "react";
+import { useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 import type { RowData } from "@tanstack/table-core";
 import { DataTableAccessibilityProvider } from "../accessibility";
 import { DataTableDensityProvider } from "../density";
@@ -409,6 +411,21 @@ function DataTablePresentationRegion<TData extends RowData>(
   const resolvedDisplayMode =
     useDataTableResolvedDisplayMode(autoCardBreakpoint);
   const { showColumnFilters } = useDataTableFilterDisplay();
+  const [printing, setPrinting] = useState(false);
+
+  useEffect(() => {
+    if (!windowRows) return;
+    const prepare = () => {
+      flushSync(() => { setPrinting(true); });
+    };
+    const restore = () => { setPrinting(false); };
+    window.addEventListener("beforeprint", prepare);
+    window.addEventListener("afterprint", restore);
+    return () => {
+      window.removeEventListener("beforeprint", prepare);
+      window.removeEventListener("afterprint", restore);
+    };
+  }, [windowRows]);
 
   if (resolvedDisplayMode === "card") {
     if (!card) {
@@ -427,7 +444,7 @@ function DataTablePresentationRegion<TData extends RowData>(
     );
   }
 
-  const windowBody = windowRows && (windowRows === "interactive" || (!renderDetailPanel && !onRowClick)) && tableProps?.stickyHeader && !showColumnFilters;
+  const windowBody = !printing && windowRows && (windowRows === "interactive" || (!renderDetailPanel && !onRowClick)) && tableProps?.stickyHeader && !showColumnFilters;
 
   return (
     <ContainerRoot
