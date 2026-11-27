@@ -414,7 +414,7 @@ function DataTablePresentationRegion<TData extends RowData>(
   const [printing, setPrinting] = useState(false);
 
   useEffect(() => {
-    if (!windowRows) return;
+    if (!windowRows) return undefined;
     const prepare = () => {
       flushSync(() => { setPrinting(true); });
     };
