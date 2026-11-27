@@ -36,6 +36,7 @@ export const Main = styled("main", {
 }) => ({
   flexGrow: 1,
   minWidth: 0,
+  backgroundColor,
   background: `${paperTexture("0 0 0")}, ${backgroundColor ?? lightAuroraWaves}`,
   ...theme.applyStyles("dark", {
     background: `${paperTexture("255 255 255")}, ${blueRadialGlow}`,
