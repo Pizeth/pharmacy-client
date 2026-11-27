@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
+import { resolvePalette } from "@/theme/resolvePalette";
 import { MoreVert } from "@mui/icons-material";
 import { useState } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
@@ -54,8 +55,8 @@ const MenuShortcut = styled("kbd")(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   ...theme.typography.caption,
   fontWeight: theme.typography.fontWeightMedium,
-  color: (theme.vars ?? theme).palette.text.primary,
-  backgroundColor: (theme.vars ?? theme).palette.background.paper,
+  color: resolvePalette(theme).text.primary,
+  backgroundColor: resolvePalette(theme).background.paper,
   whiteSpace: "nowrap",
 }));
 

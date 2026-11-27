@@ -6,6 +6,7 @@ import { keyframes, styled } from "@mui/material/styles";
 import { HrdPageContainer } from "../../components/layout/HrdPageLayout";
 import { SocialIconsRoot } from "@/components/icons/components/socials";
 import { paperTexture } from "@/theme/paperTexture";
+import { resolvePalette } from "@/theme/resolvePalette";
 import { hrdSlot } from "../../styles/styled";
 
 export const Root = styled(HrdPageContainer, hrdSlot("ContactRoot"))(({ theme }) => ({
@@ -49,7 +50,7 @@ export const Card = styled("article", hrdSlot("ContactCard"))(({ theme }) => ({
   maxWidth: 460,
   boxSizing: "border-box",
   borderRadius: "var(--Hrd-contact-card-radius)",
-  background: `${paperTexture("var(--Hrd-contact-paper-ink)")}, linear-gradient(135deg, color-mix(in srgb, var(--Hrd-contact-brand) 5%, transparent), transparent 55%) ${(theme.vars ?? theme).palette.background.paper}`,
+  background: `${paperTexture("var(--Hrd-contact-paper-ink)")}, linear-gradient(135deg, color-mix(in srgb, var(--Hrd-contact-brand) 5%, transparent), transparent 55%) ${resolvePalette(theme).background.paper}`,
   border: `1px solid ${(theme.vars ?? theme).palette.divider}`,
   borderTop: `2px solid ${theme.alpha((theme.vars ?? theme).palette.warning.main, 0.65)}`,
   boxShadow: "var(--Hrd-contact-raised-shadow)",
