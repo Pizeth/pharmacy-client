@@ -10,14 +10,10 @@ const backgroundColor =
 const BackgroundRoot = styled(
   "div",
   hrdSlot("LayoutRoot"),
-)(({ theme }) => ({
+)({
   display: "contents",
   "--Hrd-page-background": backgroundColor,
-  ...theme.applyStyles("dark", {
-    "--Hrd-page-background":
-      "linear-gradient(135deg, #101720 0%, #172331 40%, #1d2c3d 55%, #172331 75%, #101720 100%)",
-  }),
-}));
+});
 const Content = styled(
   "div",
   hrdSlot("LayoutContent"),
