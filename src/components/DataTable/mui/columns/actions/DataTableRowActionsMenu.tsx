@@ -11,9 +11,9 @@ import {
 import { styled, useTheme } from "@mui/material/styles";
 import { MoreVert } from "@mui/icons-material";
 import { useState } from "react";
-import type { MouseEvent } from "react";
+import type { KeyboardEvent, MouseEvent } from "react";
 import type { RowData } from "@tanstack/table-core";
-import { ROW_ACTION_BUTTON_SIZE } from "./rowActionStyles";
+import { ROW_ACTION_BUTTON_SIZE, ROW_ACTION_ICON_SIZE } from "./rowActionStyles";
 import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 import type { ResolvedDataTableRowAction } from "./resolvedTypes";
 
@@ -27,10 +27,32 @@ const MenuButtonRoot = styled(IconButton, {
   flexShrink: 0, // Match the inline action buttons.
   width: ROW_ACTION_BUTTON_SIZE,
   height: ROW_ACTION_BUTTON_SIZE,
+  padding: 2,
+  "& .MuiSvgIcon-root": { fontSize: ROW_ACTION_ICON_SIZE },
   "&:focus-visible": {
     outline: `2px solid ${theme.palette.primary.main}`,
     outlineOffset: 2,
   },
+}));
+
+const GlassMenu = styled(Menu)(({ theme }) => {
+  const { palette } = theme.vars ?? theme;
+  return {
+    "&& .MuiMenu-paper": {
+      backgroundColor: theme.alpha(palette.background.paper, 0.58),
+      backgroundImage: "none",
+      backdropFilter: "blur(20px) saturate(180%)",
+      border: `1px solid ${theme.alpha(palette.divider, 0.15)}`,
+      "& .MuiMenu-list": { backgroundColor: "transparent" },
+    },
+  };
+});
+
+const MenuShortcut = styled("kbd")(({ theme }) => ({
+  marginInlineStart: theme.spacing(2),
+  ...theme.typography.caption,
+  color: (theme.vars ?? theme).palette.text.secondary,
+  whiteSpace: "nowrap",
 }));
 
 const MenuItemRoot = styled(MenuItem, {
@@ -110,16 +132,28 @@ export function DataTableRowActionsMenu<TData extends RowData>(
         </span>
       </Tooltip>
 
-      <Menu
+      <GlassMenu
         onClick={event => { event.stopPropagation(); }}
         dir={direction}
         anchorEl={anchorEl}
+        anchorOrigin={{ horizontal: direction === "rtl" ? "left" : "right", vertical: "bottom" }}
+        transformOrigin={{ horizontal: direction === "rtl" ? "left" : "right", vertical: "top" }}
         open={open}
         onClose={handleClose}
         slotProps={{
           list: {
             dense: true,
             "aria-label": `Actions for row ${rowId}`,
+            onKeyDown: (event: KeyboardEvent<HTMLUListElement>) => {
+              if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.repeat) return;
+              const action = actions.find(({ definition, disabled }) =>
+                !disabled && definition.menuShortcutKey?.toLowerCase() === event.key.toLowerCase());
+              if (!action) return;
+              event.preventDefault();
+              event.stopPropagation();
+              handleClose();
+              action.definition.onClick(action.context);
+            },
           },
         }}
       >
@@ -132,6 +166,7 @@ export function DataTableRowActionsMenu<TData extends RowData>(
               className={dataTableClasses.rowActionsMenuItem}
               data-color={color === "error" ? "error" : undefined}
               disabled={disabled}
+              aria-keyshortcuts={definition.menuShortcutKey}
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -154,10 +189,11 @@ export function DataTableRowActionsMenu<TData extends RowData>(
               )}
 
               <ListItemText>{definition.label}</ListItemText>
+              {definition.menuShortcutKey && <MenuShortcut aria-hidden="true">{definition.menuShortcutKey}</MenuShortcut>}
             </MenuItemRoot>
           );
         })}
-      </Menu>
+      </GlassMenu>
     </>
   );
 }

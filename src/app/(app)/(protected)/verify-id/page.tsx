@@ -264,7 +264,7 @@ export default function VerifyIdPage() {
           const callbackUrl = searchParams.get("callbackUrl");
           await refreshIdentity();
           router.replace(
-            normalizeInternalRedirectTarget(callbackUrl, "/fts"),
+            normalizeInternalRedirectTarget(callbackUrl, "/dashboard"),
           );
         },
         onError: (error) => {

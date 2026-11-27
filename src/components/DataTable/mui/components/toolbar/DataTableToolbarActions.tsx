@@ -4,7 +4,8 @@ import { DATA_TABLE_COMPONENT_NAME, dataTableClasses } from "../../styles";
 
 // src/components/DataTable/mui/components/toolbar/DataTableToolbarActions.tsx
 
-import { Stack, styled } from "@mui/material";
+import { IconButton, Stack, Tooltip, styled } from "@mui/material";
+import { PrintOutlined } from "@mui/icons-material";
 import type { Breakpoint } from "@mui/material/styles";
 import type { RowData } from "@tanstack/table-core";
 import { DataTableColumnManagerButton } from "../column-manager";
@@ -88,6 +89,11 @@ export function DataTableToolbarActions<TData extends RowData>(
         />
       )}
 
+      <Tooltip title="Print table">
+        <IconButton size="small" aria-label="Print table" onClick={() => window.print()}>
+          <PrintOutlined fontSize="small" />
+        </IconButton>
+      </Tooltip>
       {enableFullscreen && <DataTableFullscreenButton />}
     </ToolbarActionsRoot>
   );

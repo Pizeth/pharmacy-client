@@ -21,6 +21,7 @@ export function resourceRecordMenuActions<T extends { readonly id: string | numb
     {
       id: "edit-page",
       label: "Open edit page",
+      menuShortcutKey: "E",
       renderIcon: () => <OpenInNew fontSize="small" />,
       isDisabled: ({ row }) => !row.getIsSelected() || canEdit?.(row.original) === false,
       onClick: ({ row }) => { navigate(`${basePath}/edit/${encodeURIComponent(String(row.original.id))}`); },
@@ -28,6 +29,7 @@ export function resourceRecordMenuActions<T extends { readonly id: string | numb
     {
       id: "delete-page",
       label: deleteLabel,
+      menuShortcutKey: "D",
       renderIcon: () => <OpenInNew fontSize="small" />,
       isDisabled: ({ row }) => !row.getIsSelected() || canDelete?.(row.original) === false,
       onClick: ({ row }) => { navigate(`${basePath}/delete/${encodeURIComponent(String(row.original.id))}`); },
@@ -35,6 +37,7 @@ export function resourceRecordMenuActions<T extends { readonly id: string | numb
     {
       id: "print",
       label: "Print details",
+      menuShortcutKey: "P",
       renderIcon: () => <PrintOutlined fontSize="small" />,
       isDisabled: ({ row }) => !row.getIsSelected(),
       onClick: ({ row }) => { navigate(`${basePath}/${encodeURIComponent(String(row.original.id))}?print=1`); },

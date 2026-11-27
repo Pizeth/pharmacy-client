@@ -13,6 +13,17 @@ function Fixture({ loading = false, onViewRecord, flip = false }: { flip?: boole
   return <ResourceDataTable resourceId="test/resource-standard" onViewRecord={onViewRecord} loading={loading} loadingMessage="Loading test records…" table={table} card={{ detailMode: flip ? "flip" : "inline", flip: { flipOnHover: false }, renderDetail: () => "Expanded details", enableExpansion: true, enableSelection: true, renderHeader: ({ row }) => row.original.name, renderBody: ({ row }) => row.original.name }} />;
 }
 beforeEach(() => localStorage.clear());
+it("opens the browser print dialog from the shared toolbar", () => {
+  const print = jest.spyOn(window, "print").mockImplementation(() => {});
+  try {
+    render(<Fixture />);
+    fireEvent.click(screen.getByRole("button", { name: "Print table" }));
+    expect(print).toHaveBeenCalledTimes(1);
+  } finally {
+    print.mockRestore();
+  }
+});
+
 it("offers shared controls and retains semantic state across card changes", () => {
   render(<Fixture />);
   expect(screen.getByRole("button", { name: "Manage table columns" })).toBeInTheDocument();

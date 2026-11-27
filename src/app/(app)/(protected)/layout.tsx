@@ -46,13 +46,11 @@ function ProfileGate({ children }: { children: React.ReactNode }) {
     }
 
     // Already linked but sitting on the verify page → bounce back
-    // to wherever they originally came from (or /fts as fallback)
+    // to wherever they originally came from, with the dashboard as fallback.
     if (identity.isLinked === true && isOnVerifyPage) {
-      // router.replace("/fts");
       redirectedFromPath.current = pathname;
       const callbackUrl = searchParams.get("callbackUrl");
-      // router.replace(callbackUrl ? decodeURIComponent(callbackUrl) : "/fts");
-      router.replace(normalizeInternalRedirectTarget(callbackUrl, "/fts"));
+      router.replace(normalizeInternalRedirectTarget(callbackUrl, "/dashboard"));
       return;
     }
 
