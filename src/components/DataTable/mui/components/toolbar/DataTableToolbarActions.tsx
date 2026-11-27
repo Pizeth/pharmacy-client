@@ -90,7 +90,7 @@ export function DataTableToolbarActions<TData extends RowData>(
       )}
 
       <Tooltip title="Print table">
-        <IconButton size="small" aria-label="Print table" onClick={() => window.print()}>
+        <IconButton size="small" aria-label="Print table" onClick={() => { window.print(); }}>
           <PrintOutlined fontSize="small" />
         </IconButton>
       </Tooltip>

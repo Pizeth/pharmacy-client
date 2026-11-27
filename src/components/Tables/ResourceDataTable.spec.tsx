@@ -14,7 +14,7 @@ function Fixture({ loading = false, onViewRecord, flip = false }: { flip?: boole
 }
 beforeEach(() => localStorage.clear());
 it("opens the browser print dialog from the shared toolbar", () => {
-  const print = jest.spyOn(window, "print").mockImplementation(() => {});
+  const print = jest.spyOn(window, "print").mockImplementation(() => undefined);
   try {
     render(<Fixture />);
     fireEvent.click(screen.getByRole("button", { name: "Print table" }));
