@@ -3,6 +3,7 @@
 
 import { AuthActionResponse, AuthProvider } from "@refinedev/core";
 import { authClient } from "@/lib/auth-client";
+import { getGeneratedAvatarUrl } from "@/lib/auth/generatedAvatar";
 import {
   clearAuthCookies,
   clearAxiosAuth,
@@ -179,6 +180,7 @@ export const authProvider: AuthProvider = {
       username,
       password,
       name,
+      callbackURL: new URL("/settings?flow=signup", window.location.origin).href,
       fetchOptions: { headers }, // 👈 Attach captcha headers here
     });
 
@@ -196,10 +198,7 @@ export const authProvider: AuthProvider = {
 
     return {
       success: true,
-      // Stay on login so user verifies email before entering the app
-      // redirectTo: "/login",
-      // 👈 Redirect to your activation page and pass the email via query params
-      redirectTo: `/activate?email=${encodeURIComponent(email)}`,
+      redirectTo: "/login",
       successNotification: {
         message: "Registration Successful",
         description: `Welcome, ${data.user.name}! Please check your email to verify your account.`,
@@ -279,7 +278,7 @@ export const authProvider: AuthProvider = {
         id: user.id,
         name: user.name,
         email: user.email,
-        avatar: user.image ?? undefined,
+        avatar: user.image || getGeneratedAvatarUrl(user.id),
         role: user.role, // ✅ now typed correctly
         isLinked: user.isLinked, // 👈 add this
         profileComplete: user.profileComplete,

@@ -45,3 +45,39 @@ the corresponding API contracts before redirecting legacy routes.
 
 React Admin retirement, including `/admin-old`, is deferred. Document Tracking,
 row-local subscriptions, and wider windowing rollout remain deferred.
+
+## Users and Better Auth capability review
+
+| Capability | Current implementation | Migration decision |
+| --- | --- | --- |
+| Avatar | Better Auth stores the image URL in `User.image`. Modern Users and the signed-in profile already read it. NestJS has DiceBear generation and R2 storage. | Support an optional signup file through a validated, account-scoped upload that persists the resulting URL to `User.image`. Keep provider images on social signup when supplied, and use DiceBear when there is no uploaded or provider image. |
+| MFA | Better Auth's two-factor plugin and Prisma `twoFactorEnabled` are active. The modern Users response schema does not expose the flag. | If administrators need to see enrollment status, expose the existing boolean through the authorized Users response. |
+| Sign-in method | Better Auth persists `lastLoginMethod`, and linked `Account` records identify providers. | Use the recorded method or linked providers for display. Retire the legacy editable authentication-method selector. |
+| Sign-in and activity time | Better Auth sessions have creation and update timestamps. The latter changes when the session record updates. | Label a session timestamp according to what it measures. Successful sign-in history across session expiry needs a durable timestamp or audit event. |
+| Lock status and audit actors | Prisma and Better Auth define `isLocked`, `createdBy`, and `lastUpdatedBy`. Better Auth marks all three as server-controlled inputs. | Preserve the current lock checks. Verify which write paths populate actor IDs before adding read-only audit display. |
+| Failed attempts | The active Better Auth configuration applies rate limiting and Turnstile. The old per-user attempt counter belongs to the legacy auth flow. | Keep the active controls and omit the legacy counter. Rate limiting and a durable per-user attempt count serve different purposes. |
+
+Email/password registration currently calls Better Auth's JSON signup endpoint
+with Turnstile. The NestJS multipart Users creation route is admin-only and
+creates a Prisma user directly. The generic file upload route is a stub.
+Signup avatar upload needs a supported API flow that preserves Better Auth
+registration and email verification, validates image bytes and size, binds
+the image to the registering account, and cleans up failed or abandoned uploads.
+
+The implementation sends the signup verification link back to Account
+Settings. A verified account without an existing image can add a JPEG, PNG,
+or WebP up to 2 MB, or skip to officer profile verification. The paired API
+change uses the current session and account state and stores the R2 URL in
+`User.image`. The signed-in UI uses a generated DiceBear image when that
+field is empty. This flow depends on deploying the API endpoint before the
+client and has yet to be verified on a deployed environment.
+
+The old `/api/admin/[...slug]` proxy remains a separate route audit item. Its
+implementation forwards server credentials, and the active legacy Users provider
+uses its own configured API URL. Verify the proxy's callers and authorization
+boundary independently before deciding its retirement.
+
+Unreferenced React Admin login and FTS prototype sources are preserved as
+commented TypeScript files under `archive/legacy-react-admin`. Each archived
+file records its original path. Components still used by `/admin-old` or shared
+application routes remain active.
