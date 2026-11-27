@@ -22,8 +22,13 @@ const Content = styled(
   maxWidth: theme.breakpoints.values.xl,
   marginInline: "auto",
   backgroundColor: theme.alpha(theme.vars.palette.background.paper, 0.75),
+  // Crosshatch Art – Light, with theme-aware ink for the translucent surface.
+  // https://github.com/megh-bari/pattern-craft/blob/main/src/data/patterns.ts
   backgroundImage: `
-    repeating-linear-gradient(45deg, transparent 0 2px, ${theme.alpha(theme.vars.palette.text.primary, 0.045)} 2px 4px),
+    repeating-linear-gradient(22.5deg, transparent 0 2px, ${theme.alpha(theme.vars.palette.text.primary, 0.06)} 2px 3px, transparent 3px 8px),
+    repeating-linear-gradient(67.5deg, transparent 0 2px, ${theme.alpha(theme.vars.palette.text.primary, 0.05)} 2px 3px, transparent 3px 8px),
+    repeating-linear-gradient(112.5deg, transparent 0 2px, ${theme.alpha(theme.vars.palette.text.primary, 0.04)} 2px 3px, transparent 3px 8px),
+    repeating-linear-gradient(157.5deg, transparent 0 2px, ${theme.alpha(theme.vars.palette.text.primary, 0.03)} 2px 3px, transparent 3px 8px),
     linear-gradient(135deg, ${theme.alpha(theme.vars.palette.primary.main, 0.1)}, ${theme.alpha(theme.vars.palette.secondary.main, 0.1)})
   `,
   backdropFilter: "blur(20px) saturate(175%)",
