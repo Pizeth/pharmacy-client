@@ -50,8 +50,12 @@ const GlassMenu = styled(Menu)(({ theme }) => {
 
 const MenuShortcut = styled("kbd")(({ theme }) => ({
   marginInlineStart: theme.spacing(2),
+  paddingInline: theme.spacing(0.5),
+  borderRadius: theme.shape.borderRadius,
   ...theme.typography.caption,
-  color: theme.palette.text.secondary,
+  fontWeight: theme.typography.fontWeightMedium,
+  color: (theme.vars ?? theme).palette.text.primary,
+  backgroundColor: (theme.vars ?? theme).palette.background.paper,
   whiteSpace: "nowrap",
 }));
 
