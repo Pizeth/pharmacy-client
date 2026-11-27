@@ -391,3 +391,59 @@ On November 23, the [production Northflank service](https://app.northflank.com/t
 confirmed that `api.razeth.com` was running one of one API instances on
 commit `9726bd8` with zero restarts. Cross-replica delivery does not apply to
 this topology and remains a gate before scaling beyond one instance.
+
+### Production edge comparison and isolated recovery
+
+- The same authenticated synthetic session reached both production API
+  hostnames. The Northflank service hostname returned HTTP 200 and delivered
+  two heartbeat comments at 15.8 and 30.8 seconds. The custom hostname
+  `api.razeth.com` returned HTTP 200 and the initial event, then closed before
+  a heartbeat was observed. HTTP/1.1 and HTTP/2 probes reported protocol
+  errors on the custom hostname. DNS and response headers showed that the
+  custom hostname used the Northflank Fastly CDN.
+- In a controlled routing trial, the direct custom-domain route redirected
+  HTTP to HTTPS and returned HTTP 200 for readiness, but omitted HSTS. The
+  CDN was restored. Public readiness returned HTTP 200 with the original
+  `Strict-Transport-Security: max-age=31557600` header after rollback.
+- Production authorization for new streams returned HTTP 200 before the
+  synthetic observer's TranslationKey grant was revoked and HTTP 403
+  afterward. Closure of an already-open production stream remains unverified.
+  The reusable observer was disabled and its sessions removed.
+- In the disposable loopback browser harness, one stream was interrupted
+  while the other authenticated session edited a key. Restoring the stream
+  triggered automatic catch-up and delivered the next edit without a page
+  reload or losing selection. The authenticated HTTP harness also verified
+  closure of an open stream on grant revocation and HTTP 403 on a new
+  connection. Disposable fixture cleanup passed.
+- In a loopback simulation, a 10-second proxy idle timeout closed the stream
+  before the 15-second heartbeat. A 5-second control delivered three
+  heartbeats. The simulation establishes the effect of that timeout, while
+  production's effective edge timeout remains unconfirmed.
+
+On November 25, the same comparison was repeated with the authenticated
+NestJS SSE endpoint and the disposable PostgreSQL database. A loopback
+reverse proxy with a 10-second idle cutoff closed the stream before the first
+heartbeat. The 25-second control delivered two heartbeats at approximately
+15.5 and 30.5 seconds. Both requests used genuine fixture sessions, and the
+harness verified cleanup. This reproduces the failure with the real API under
+the modeled proxy policy.
+
+Northflank Support was asked to confirm the effective timeout and advise on a
+route-specific override that preserves TLS, HSTS, and authenticated-stream
+cache policy. Keep the current production routing and heartbeat settings
+while waiting for that confirmation. Retest production heartbeat, reconnect,
+and closure of an already-open stream after an agreed remediation.
+
+### November 27 production retest
+
+The user reported that Northflank increased the timeout to 30 seconds.
+After the dedicated read-only observer signed in through the production
+app, an authenticated HTTP/2 probe to the live TranslationKey endpoint
+on api.razeth.com received two heartbeats 15.03 seconds apart. The probe
+reopened the stream after a deliberate client disconnect. Revoking the
+observer session closed the open stream within approximately 15.34 seconds.
+A fresh request using the revoked session returned HTTP 401.
+
+The probe explicitly reopened the connection. Automatic browser catch-up
+was verified in the disposable environment described above. The production
+observer was disabled and verified to have zero sessions after the run.
