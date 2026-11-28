@@ -43,9 +43,10 @@ export function AvatarSettings({ user, afterSignup }: {
         body: form,
       });
       if (!response.ok) throw new Error("Could not upload your avatar. Try another image or continue without one.");
-      const body: { image?: unknown } = await response.json();
-      if (typeof body.image !== "string") throw new Error("The upload response was incomplete. Reload the page to check your avatar.");
-      setImage(body.image);
+      const body: { data?: { image?: unknown } } = await response.json();
+      const uploadedImage = body.data?.image;
+      if (typeof uploadedImage !== "string") throw new Error("The upload response was incomplete. Reload the page to check your avatar.");
+      setImage(uploadedImage);
       setMessage({ error: false, text: "Avatar saved." });
     } catch (error) {
       setMessage({ error: true, text: error instanceof Error ? error.message : "Could not upload your avatar." });
