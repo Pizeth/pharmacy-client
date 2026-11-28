@@ -66,7 +66,7 @@ export function AvatarSettings({ user, afterSignup }: {
         {message && <Alert severity={message.error ? "error" : "success"}>{message.text}</Alert>}
         {image && !changing && <Button onClick={() => { setMessage(null); setChanging(true); }}>Change avatar</Button>}
         {(!image || changing) && (
-          <Stack component="form" spacing={2} onSubmit={saveAvatar}>
+          <Stack component="form" spacing={2} onSubmit={event => { saveAvatar(event).catch(() => undefined); }}>
             <Typography component="label">
               {image ? "New avatar" : "Optional avatar"} (JPEG, PNG, or WebP, up to 2 MB)
               <input name="avatar" type="file" accept={allowedImageTypes.join(",")} required disabled={pending} />
