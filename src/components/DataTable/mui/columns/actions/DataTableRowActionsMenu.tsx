@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
+import { resolvePalette } from "@/theme/resolvePalette";
 import { MoreVert } from "@mui/icons-material";
 import { useState } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
@@ -50,8 +51,12 @@ const GlassMenu = styled(Menu)(({ theme }) => {
 
 const MenuShortcut = styled("kbd")(({ theme }) => ({
   marginInlineStart: theme.spacing(2),
+  paddingInline: theme.spacing(0.5),
+  borderRadius: theme.shape.borderRadius,
   ...theme.typography.caption,
-  color: theme.palette.text.secondary,
+  fontWeight: theme.typography.fontWeightMedium,
+  color: resolvePalette(theme).text.primary,
+  backgroundColor: resolvePalette(theme).background.paper,
   whiteSpace: "nowrap",
 }));
 

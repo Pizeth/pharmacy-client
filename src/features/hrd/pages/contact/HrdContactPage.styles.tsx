@@ -5,6 +5,8 @@ import { Button } from "@mui/material";
 import { keyframes, styled } from "@mui/material/styles";
 import { HrdPageContainer } from "../../components/layout/HrdPageLayout";
 import { SocialIconsRoot } from "@/components/icons/components/socials";
+import { paperTexture } from "@/theme/paperTexture";
+import { resolvePalette } from "@/theme/resolvePalette";
 import { hrdSlot } from "../../styles/styled";
 
 export const Root = styled(HrdPageContainer, hrdSlot("ContactRoot"))(({ theme }) => ({
@@ -28,12 +30,14 @@ export const Layout = styled("section", hrdSlot("ContactLayout"))(({ theme }) =>
   "& > h2": { lineHeight: 1.8, margin: 0 },
 }));
 export const Card = styled("article", hrdSlot("ContactCard"))(({ theme }) => ({
+  "--Hrd-contact-paper-ink": "0 0 0",
   "--Hrd-contact-brand": "#26247B",
   "--Hrd-contact-gold": "#edad54",
   "--Hrd-contact-card-radius": "20px",
   "--Hrd-contact-footer-height": "24px",
   "--Hrd-contact-raised-shadow": "-6px -6px 14px rgba(255,255,255,0.8), 7px 7px 16px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.45)",
   ...theme.applyStyles("dark", {
+    "--Hrd-contact-paper-ink": "255 255 255",
     "--Hrd-contact-raised-shadow": "-6px -6px 14px rgba(255,255,255,0.05), 7px 7px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)",
   }),
   position: "relative", isolation: "isolate", overflow: "hidden", containerType: "inline-size",
@@ -46,10 +50,9 @@ export const Card = styled("article", hrdSlot("ContactCard"))(({ theme }) => ({
   maxWidth: 460,
   boxSizing: "border-box",
   borderRadius: "var(--Hrd-contact-card-radius)",
-  backgroundColor: (theme.vars ?? theme).palette.background.paper,
+  background: `${paperTexture("var(--Hrd-contact-paper-ink)")}, linear-gradient(135deg, color-mix(in srgb, var(--Hrd-contact-brand) 5%, transparent), transparent 55%) ${resolvePalette(theme).background.paper}`,
   border: `1px solid ${(theme.vars ?? theme).palette.divider}`,
   borderTop: `2px solid ${theme.alpha((theme.vars ?? theme).palette.warning.main, 0.65)}`,
-  backgroundImage: "linear-gradient(135deg, color-mix(in srgb, var(--Hrd-contact-brand) 5%, transparent), transparent 55%)",
   boxShadow: "var(--Hrd-contact-raised-shadow)",
   "&::before": {
     content: '""', position: "absolute", inset: "auto 0 0",

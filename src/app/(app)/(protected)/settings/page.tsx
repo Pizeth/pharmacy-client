@@ -9,11 +9,13 @@ import { RecordCard, RecordSection } from "@/components/Tables/ResourceRecordPag
 import { authClient, type ClientUser } from "@/lib/auth-client";
 import { API_URL } from "@/types/constants";
 import { ContactSettings } from "./ContactSettings";
+import { AvatarSettings } from "./AvatarSettings";
 
 export default function AccountSettingsPage() {
   const searchParams = useSearchParams();
   const callbackError = searchParams.get("error");
   const emailCallback = searchParams.get("flow") === "email-change";
+  const signupCallback = searchParams.get("flow") === "signup";
   const { data: session, isPending } = authClient.useSession();
   const user: ClientUser | undefined = session?.user;
   const accounts = useQuery({
@@ -101,7 +103,9 @@ export default function AccountSettingsPage() {
     <ResourcePage title="Account settings" titleComponent="h1" maxWidth="md">
       <RecordSection>
         {callbackError && <Alert severity="error">
-          {emailCallback
+          {signupCallback
+            ? "The signup email could not be verified. Sign in to request a new verification email."
+            : emailCallback
             ? "The email change link could not be verified. Request a new link."
             : callbackError === "account_already_linked_to_different_user"
             ? "This sign-in method is already connected to another account."
@@ -111,6 +115,7 @@ export default function AccountSettingsPage() {
         {isPending && <Typography role="status">Loading account settings…</Typography>}
         {!isPending && !user && <Alert severity="error">Your session could not be loaded.</Alert>}
         {user && <>
+          {user.emailVerified && <AvatarSettings key={user.id} user={user} afterSignup={signupCallback} />}
           <RecordCard title="Profile">
             <Stack component="form" key={user.id} spacing={2} onSubmit={event => { saveProfile(event).catch(() => { console.error("Account settings request failed."); }); }}>
               <TextField name="name" label="Display name" required defaultValue={user.name} />
